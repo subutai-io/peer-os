@@ -58,9 +58,9 @@ public class HostsCommand extends OsgiCommandSupport
             containerInfo += c.getEnvironmentId();
             containerInfo+=parentHost.isConnected( c ) ? " CONNECTED" : " DISCONNECTED";
 
-            if ( c.getOwnerPeerId() != null )
+            if ( c.getOwnerId() != null )
             {
-                containerInfo += peerManager.getPeerByUUID( c.getOwnerPeerId() ).getIp();
+                containerInfo += peerManager.getPeerByUUID( c.getOwnerId() ).getIp();
             }
         }
 

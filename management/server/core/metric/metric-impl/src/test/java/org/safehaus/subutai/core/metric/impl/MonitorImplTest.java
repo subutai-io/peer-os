@@ -207,7 +207,7 @@ public class MonitorImplTest
         ContainerHost containerHost = mock( ContainerHost.class );
         when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
         //set owner id as local peer
-        when( containerHost.getOwnerPeerId() ).thenReturn( LOCAL_PEER_ID );
+        when( containerHost.getOwnerId() ).thenReturn( LOCAL_PEER_ID );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         PeerInterface ownerPeer = mock( PeerInterface.class );
         when( peerManager.getPeer( LOCAL_PEER_ID ) ).thenReturn( ownerPeer );
@@ -226,7 +226,7 @@ public class MonitorImplTest
         ContainerHost containerHost = mock( ContainerHost.class );
         when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
         //set owner id as local peer
-        when( containerHost.getOwnerPeerId() ).thenReturn( REMOTE_PEER_ID );
+        when( containerHost.getOwnerId() ).thenReturn( REMOTE_PEER_ID );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         PeerInterface ownerPeer = mock( PeerInterface.class );
         when( peerManager.getPeer( REMOTE_PEER_ID ) ).thenReturn( ownerPeer );

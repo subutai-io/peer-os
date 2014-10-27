@@ -97,9 +97,9 @@ public class LocalPeerImpl extends Peer implements LocalPeer
             for ( Agent agent : agents )
             {
                 ResourceHost resourceHost = getResourceHostByName( agent.getParentHostName() );
-                ContainerHostImpl containerHost = new ContainerHostImpl( agent );
+                ContainerHost containerHost = new ContainerHost( agent );
                 containerHost.setParentAgent( resourceHost.getAgent() );
-                containerHost.setOwnerPeerId( ownerPeerId );
+                containerHost.setOwnerId( ownerPeerId );
                 containerHost.setTemplateName( templateName );
                 resourceHost.addContainerHost( containerHost );
                 result.add( containerHost );
