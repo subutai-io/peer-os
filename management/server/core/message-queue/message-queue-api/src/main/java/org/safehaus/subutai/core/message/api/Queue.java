@@ -4,6 +4,8 @@ package org.safehaus.subutai.core.message.api;
 import java.io.Serializable;
 import java.util.UUID;
 
+import org.safehaus.subutai.core.peer.api.Peer;
+
 
 /**
  * Message Queue API.
@@ -18,7 +20,8 @@ public interface Queue
      *
      * @return - message envelope
      */
-    public Message createMessage( Serializable payload );
+    public Message createMessage( Serializable payload ) throws MessageException;
+
 
     /**
      * Sends message to recipient
@@ -30,20 +33,8 @@ public interface Queue
      *
      * @return -id of message
      */
-    public UUID sendMessage( Message message, String recipient, long ttl );
-
-    /**
-     * Sends message to recipient
-     *
-     * @param message - message to send
-     * @param recipient - recipient of message
-     * @param ttl - time-to-live of message within which message is retried to be sent to recipient. After ttl expires
-     * and message is still not sent, it expires
-     * @param sender - sender of message for reference by recipient
-     *
-     * @return -id of message
-     */
-    public UUID sendMessage( Message message, String recipient, long ttl, String sender );
+    public UUID sendMessage( final Peer peer, final Message message, final String recipient, final long ttl )
+            throws MessageException;
 
     /**
      * Returns status of message in queue
@@ -53,4 +44,6 @@ public interface Queue
      * @return - status of message
      */
     public MessageStatus getMessageStatus( UUID messageId );
+
+    public void processMessage( String messageJson ) throws MessageException;
 }

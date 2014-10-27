@@ -19,8 +19,8 @@
       <artifactId>subutai-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>peer-manager-api</artifactId>
     </dependency>
   </dependencies>
 
@@ -36,9 +36,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.message.api</Bundle-SymbolicName>
-            <Export-Package>
-              {local-packages};version=${project.version};-noimport:=true
-            </Export-Package>
           </instructions>
         </configuration>
       </plugin>

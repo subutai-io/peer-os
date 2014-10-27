@@ -19,4 +19,12 @@ public interface Message
      * @return - sender
      */
     public String getSender();
+
+
+    /**
+     * Sets sender of message
+     *
+     * @param sender - sender of message
+     */
+    public void setSender( String sender );
 }

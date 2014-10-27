@@ -334,7 +334,6 @@
         <version>${project.version}</version>
       </dependency>
 
-
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- monitor -->
       <dependency>
@@ -355,6 +354,29 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>metric-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- queue -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>message-queue-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>message-queue-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>message-queue-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>message-queue-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -819,9 +841,9 @@
         <version>1.2.0</version>
       </dependency>
       <dependency>
-      	<groupId>org.codehaus.jettison</groupId>
-      	<artifactId>jettison</artifactId>
-      	<version>1.3.5</version>
+        <groupId>org.codehaus.jettison</groupId>
+        <artifactId>jettison</artifactId>
+        <version>1.3.5</version>
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -1354,7 +1376,6 @@
         <version>${project.version}</version>
       </dependency>
 
-
       <!-- zookeeper -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1381,7 +1402,6 @@
         <artifactId>zookeeper-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-
 
       <!-- hipi -->
       <dependency>

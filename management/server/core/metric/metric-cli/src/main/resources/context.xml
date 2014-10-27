@@ -6,14 +6,14 @@
              interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="monitor/resource-host-metrics">
+    <command name="metric/resource-host-metrics">
       <action class="org.safehaus.subutai.core.metric.cli.ResourceHostMetricsCommand">
         <argument ref="monitor" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="monitor/container-host-metrics">
+    <command name="metric/container-host-metrics">
       <action class="org.safehaus.subutai.core.metric.cli.ContainerHostMetricsCommand">
         <argument ref="monitor" />
         <argument ref="environmentManager" />

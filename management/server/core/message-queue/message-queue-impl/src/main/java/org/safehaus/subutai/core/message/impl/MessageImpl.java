@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 /**
@@ -24,12 +25,14 @@ import com.google.common.base.Preconditions;
 public class MessageImpl implements Message
 {
     private static final Logger LOG = LoggerFactory.getLogger( MessageImpl.class.getName() );
-    protected byte[] payloadBytes;
+    private String sender;
+    private byte[] payloadBytes;
 
 
     public MessageImpl( Serializable payload ) throws MessageException
     {
         Preconditions.checkNotNull( payload, "Payload is null" );
+
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutput out = null;
         try
@@ -111,6 +114,15 @@ public class MessageImpl implements Message
     @Override
     public String getSender()
     {
-        return null;
+        return sender;
+    }
+
+
+    @Override
+    public void setSender( final String sender )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sender ), "Invalid sender" );
+
+        this.sender = sender;
     }
 }

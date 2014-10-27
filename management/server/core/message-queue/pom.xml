@@ -10,10 +10,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>message-queue-parent</artifactId>
+  <name>Subutai Message Queue Parent</name>
+  <description>Subutai Message Queue Parent</description>
   <packaging>pom</packaging>
+
   <modules>
     <module>message-queue-api</module>
     <module>message-queue-impl</module>
+    <module>message-queue-rest</module>
+    <module>message-queue-cli</module>
   </modules>
 
 </project>
