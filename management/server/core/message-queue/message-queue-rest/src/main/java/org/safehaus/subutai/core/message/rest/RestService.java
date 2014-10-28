@@ -8,7 +8,7 @@ import javax.ws.rs.core.Response;
 
 
 /**
- * Rest for Queue
+ * Messenger REST API
  */
 public interface RestService
 {
@@ -16,5 +16,5 @@ public interface RestService
 
     @POST
     @Path("message")
-    public Response processMessage( @FormParam( "envelope" ) String envelope );
+    public Response processMessage( @FormParam("envelope") String envelope );
 }

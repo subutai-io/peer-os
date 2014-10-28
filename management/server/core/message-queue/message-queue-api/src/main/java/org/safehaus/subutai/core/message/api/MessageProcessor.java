@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.message.api;
 
 
 /**
- * Interface exposed by message queue for REST endpoint
+ * Interface exposed by messenger for REST endpoint
  */
 public interface MessageProcessor
 {

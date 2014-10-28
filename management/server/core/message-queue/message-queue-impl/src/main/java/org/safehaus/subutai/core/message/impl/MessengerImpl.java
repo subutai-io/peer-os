@@ -2,8 +2,6 @@ package org.safehaus.subutai.core.message.impl;
 
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,45 +10,65 @@ import java.util.concurrent.Executors;
 
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.common.exception.HTTPException;
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.core.message.api.Message;
 import org.safehaus.subutai.core.message.api.MessageException;
 import org.safehaus.subutai.core.message.api.MessageListener;
 import org.safehaus.subutai.core.message.api.MessageProcessor;
 import org.safehaus.subutai.core.message.api.MessageStatus;
-import org.safehaus.subutai.core.message.api.Queue;
+import org.safehaus.subutai.core.message.api.Messenger;
 import org.safehaus.subutai.core.peer.api.PeerInterface;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.JsonSyntaxException;
 
 
 /**
- * Implementation of Queue
+ * Implementation of Messenger
  */
-public class QueueImpl implements Queue, MessageProcessor
+public class MessengerImpl implements Messenger, MessageProcessor
 {
-    private static final Logger LOG = LoggerFactory.getLogger( QueueImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( MessengerImpl.class.getName() );
     private final Set<MessageListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MessageListener, Boolean>() );
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     private final PeerManager peerManager;
+    protected MessengerDao messengerDao;
+    protected MessageSender messageSender;
 
 
-    public QueueImpl( final PeerManager peerManager, final DataSource dataSource )
+    public MessengerImpl( final PeerManager peerManager, final DataSource dataSource ) throws DaoException
     {
+        Preconditions.checkNotNull( peerManager, "Peer Manager is null" );
+        Preconditions.checkNotNull( dataSource, "Data source is null" );
+
         this.peerManager = peerManager;
+        this.messengerDao = new MessengerDao( dataSource );
+        this.messageSender = new MessageSender( peerManager, messengerDao );
+    }
+
+
+    public void init()
+    {
+        messageSender.init();
+    }
+
+
+    public void destroy()
+    {
+        messageSender.dispose();
+        notificationExecutor.shutdown();
     }
 
 
     @Override
     public Message createMessage( final Object payload ) throws MessageException
     {
-        return new MessageImpl( payload );
+        return new MessageImpl( peerManager.getSiteId(), payload );
     }
 
 
@@ -58,20 +76,17 @@ public class QueueImpl implements Queue, MessageProcessor
     public void sendMessage( final PeerInterface peer, final Message message, final String recipient,
                              final int timeToLive ) throws MessageException
     {
-        //TODO save to persistent queue so that background task will try to send it
         try
         {
+            //TODO use commented code to create Envelope when peer and peerManager are completed
             //            Envelope envelope =
             //                    new Envelope( message, peerManager.getLocalPeer().getId(), peer.getId(), recipient,
             // timeToLive )
-            Envelope envelope = new Envelope( ( MessageImpl ) message, UUID.randomUUID(), UUID.randomUUID(), recipient,
-                    timeToLive );
+            Envelope envelope = new Envelope( ( MessageImpl ) message, peerManager.getSiteId(), recipient, timeToLive );
 
-            Map<String, String> params = new HashMap<>();
-            params.put( "envelope", JsonUtil.toJson( envelope ) );
-            RestUtil.post( "http://172.16.131.203:8181/cxf/queue/message", params );
+            messengerDao.saveEnvelope( envelope );
         }
-        catch ( HTTPException e )
+        catch ( DaoException e )
         {
             LOG.error( "Error in sendMessage", e );
             throw new MessageException( e );
@@ -80,9 +95,41 @@ public class QueueImpl implements Queue, MessageProcessor
 
 
     @Override
-    public MessageStatus getMessageStatus( final UUID messageId )
+    public MessageStatus getMessageStatus( final UUID messageId ) throws MessageException
     {
-        return null;
+
+        try
+        {
+            Envelope envelope = messengerDao.getEnvelope( messageId );
+            if ( envelope != null )
+            {
+
+                if ( envelope.isSent() )
+                {
+                    return MessageStatus.SENT;
+                }
+                else
+                {
+                    //give 10 extra seconds in case background sender is in process of transmitting this message
+                    if ( ( envelope.getCreateDate().getTime() + envelope.getTimeToLive() * 1000 )
+                            < System.currentTimeMillis() + 10 * 1000 )
+                    {
+                        return MessageStatus.IN_PROCESS;
+                    }
+                    else
+                    {
+                        return MessageStatus.EXPIRED;
+                    }
+                }
+            }
+
+            return MessageStatus.NOT_FOUND;
+        }
+        catch ( DaoException e )
+        {
+            LOG.error( "Error in getMessageStatus", e );
+            throw new MessageException( e );
+        }
     }
 
 
@@ -98,8 +145,7 @@ public class QueueImpl implements Queue, MessageProcessor
             {
                 if ( listener.getRecipient().equalsIgnoreCase( envelope.getRecipient() ) )
                 {
-                    notificationExecutor
-                            .execute( new MessageNotifier( listener, message, envelope.getSourcePeerId() ) );
+                    notificationExecutor.execute( new MessageNotifier( listener, message ) );
                 }
             }
         }

@@ -16,7 +16,6 @@ import com.google.common.base.Strings;
 public class Envelope
 {
     private final MessageImpl message;
-    private final UUID sourcePeerId;
     private final UUID targetPeerId;
     private final String recipient;
     private final int timeToLive;
@@ -25,16 +24,15 @@ public class Envelope
     private transient Timestamp createDate;
 
 
-    public Envelope( final MessageImpl message, UUID sourcePeerId, UUID targetPeerId, String recipient, int timeToLive )
+    public Envelope( final MessageImpl message, UUID targetPeerId, String recipient, int timeToLive )
     {
 
-        Preconditions.checkNotNull( sourcePeerId, "Source peer id is null" );
+        Preconditions.checkNotNull( targetPeerId, "Target peer id is null" );
         Preconditions.checkNotNull( message, "Message is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
         Preconditions.checkArgument( timeToLive > 0, "Invalid time-to-live" );
 
         this.message = message;
-        this.sourcePeerId = sourcePeerId;
         this.targetPeerId = targetPeerId;
         this.recipient = recipient;
         this.timeToLive = timeToLive;
@@ -44,12 +42,6 @@ public class Envelope
     public Message getMessage()
     {
         return message;
-    }
-
-
-    public UUID getSourcePeerId()
-    {
-        return sourcePeerId;
     }
 
 

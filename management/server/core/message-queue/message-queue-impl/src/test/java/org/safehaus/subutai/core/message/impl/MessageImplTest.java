@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.message.impl;
 
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import org.junit.Test;
 
@@ -82,7 +83,7 @@ public class MessageImplTest
     {
         CustomObject customObject = new CustomObject( 123, "hello" );
 
-        MessageImpl message = new MessageImpl( customObject );
+        MessageImpl message = new MessageImpl( UUID.randomUUID(), customObject );
 
         assertEquals( customObject, message.getPayload( CustomObject.class ) );
     }

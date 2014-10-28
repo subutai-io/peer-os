@@ -24,18 +24,18 @@ import com.google.gson.reflect.TypeToken;
 
 
 /**
- * Queue DAO
+ * Messenger DAO
  */
-public class QueueDao
+public class MessengerDao
 {
-    private static final Logger LOG = LoggerFactory.getLogger( QueueDao.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( MessengerDao.class.getName() );
     private static final int WIDENING_INTERVAL_SEC = 5;
     private static final int MESSAGE_LIMIT_PER_PEER = 10;
 
     protected DbUtil dbUtil;
 
 
-    public QueueDao( final DataSource dataSource ) throws DaoException
+    public MessengerDao( final DataSource dataSource ) throws DaoException
     {
         Preconditions.checkNotNull( dataSource, "Data source is null" );
 
@@ -54,7 +54,7 @@ public class QueueDao
                 //create table for storing outstanding messages
                 "create table if not exists messages ( messageId uuid, targetPeerId uuid, " +
                 "envelope clob, createDate timestamp default CURRENT_TIMESTAMP(), attempts smallint default 0, " +
-                "isSent boolean default false, PRIMARY KEY (messageId) );";
+                "isSent boolean default false, timeToLive smallint, PRIMARY KEY (messageId) );";
         try
         {
             dbUtil.update( sql );
@@ -67,7 +67,7 @@ public class QueueDao
     }
 
 
-    public void clearDb() throws DaoException
+    public void purgeExpiredMessages()
     {
 
         try
@@ -86,17 +86,16 @@ public class QueueDao
         }
         catch ( SQLException e )
         {
-            LOG.error( "Error in clearDb", e );
-            throw new DaoException( e );
+            LOG.error( "Error in purgeExpiredMessages", e );
         }
     }
 
 
-    public Set<Envelope> getEnvelopes() throws DaoException
+    public Set<Envelope> getEnvelopes()
     {
+        Set<Envelope> envelopes = Sets.newHashSet();
         try
         {
-            Set<Envelope> envelopes = Sets.newHashSet();
 
             //we need to select target peers separately to allow selection of N messages per each peer within one pass
             //to avoid throttling of other peers in case one peer has message overflow
@@ -105,7 +104,7 @@ public class QueueDao
             {
                 ResultSet messagesRs = dbUtil.select(
                         //select messages where
-                        "select envelope, attempts, isSent, createDate from message_queue where " +
+                        "select envelope, attempts, isSent, createDate from messages where " +
                                 //widening interval attempt has passed
                                 "CURRENT_TIMESTAMP() >= dateadd('SECOND', attempts * ?, createDate) and " +
                                 //the message is still not sent
@@ -120,43 +119,39 @@ public class QueueDao
 
                 envelopes.addAll( retrieveEnvelopsFromResultSet( messagesRs ) );
             }
-
-            return envelopes;
         }
         catch ( SQLException e )
         {
             LOG.error( "Error in getEnvelopes", e );
-            throw new DaoException( e );
         }
+        return envelopes;
     }
 
 
-    public void markEnvelopeAsSent( Envelope envelope ) throws DaoException
+    public void markAsSent( Envelope envelope )
     {
         try
         {
-            dbUtil.update( "update message_queue set isSent = true where messageId = ?",
+            dbUtil.update( "update messages set isSent = true where messageId = ?",
                     envelope.getMessage().getId() );
         }
         catch ( SQLException e )
         {
-            LOG.error( "Error in markEnvelopeAsSent", e );
-            throw new DaoException( e );
+            LOG.error( "Error in markAsSent", e );
         }
     }
 
 
-    public void incrementEnvelopeAttempts( Envelope envelope ) throws DaoException
+    public void incrementDeliveryAttempts( Envelope envelope )
     {
         try
         {
-            dbUtil.update( "update message_queue set attempts = attempts + 1 where messageId = ?",
+            dbUtil.update( "update messages set attempts = attempts + 1 where messageId = ?",
                     envelope.getMessage().getId() );
         }
         catch ( SQLException e )
         {
-            LOG.error( "Error in incrementEnvelopeAttempts", e );
-            throw new DaoException( e );
+            LOG.error( "Error in incrementDeliveryAttempts", e );
         }
     }
 
@@ -170,9 +165,10 @@ public class QueueDao
         try
         {
             dbUtil.update( "merge into target_peers ( targetPeerId) values ( ? )", envelope.getTargetPeerId() );
-            dbUtil.update( "insert into message_queue ( messageId, targetPeerId, envelope) values ( ?, ?, ? )",
+            dbUtil.update(
+                    "insert into messages ( messageId, targetPeerId, envelope, timeToLive) values ( ?, ?, ?, ? )",
                     envelope.getMessage().getId(), envelope.getTargetPeerId(),
-                    new StringReader( JsonUtil.toJson( envelope, type ) ) );
+                    new StringReader( JsonUtil.toJson( envelope, type ) ), envelope.getTimeToLive() );
         }
         catch ( SQLException e )
         {
@@ -187,7 +183,7 @@ public class QueueDao
         try
         {
             ResultSet resultSet = dbUtil.select(
-                    "select envelope, attempts, isSent, createDate from message_queue where messageId = ?", messageId );
+                    "select envelope, attempts, isSent, createDate from messages where messageId = ?", messageId );
             Set<Envelope> envelopes = retrieveEnvelopsFromResultSet( resultSet );
 
             if ( !CollectionUtil.isCollectionEmpty( envelopes ) )
@@ -205,7 +201,7 @@ public class QueueDao
     }
 
 
-    public Set<Envelope> retrieveEnvelopsFromResultSet( ResultSet resultSet ) throws DaoException
+    public Set<Envelope> retrieveEnvelopsFromResultSet( ResultSet resultSet )
     {
         Set<Envelope> envelopes = Sets.newHashSet();
 
@@ -230,7 +226,6 @@ public class QueueDao
         catch ( SQLException e )
         {
             LOG.error( "Error in retrieveEnvelopsFromResultSet", e );
-            throw new DaoException( e );
         }
 
         return envelopes;

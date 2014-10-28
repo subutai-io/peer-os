@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.message.api;
 
 
 /**
- * Exception thrown by Queue methods
+ * Exception thrown by Messenger methods
  */
 public class MessageException extends Exception
 {

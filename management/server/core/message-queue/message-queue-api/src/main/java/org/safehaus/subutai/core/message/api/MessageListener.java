@@ -1,8 +1,6 @@
 package org.safehaus.subutai.core.message.api;
 
 
-import java.util.UUID;
-
 import org.safehaus.subutai.common.util.StringUtil;
 
 import com.google.common.base.Preconditions;
@@ -29,7 +27,7 @@ public abstract class MessageListener
     }
 
 
-    public abstract void onMessage( UUID sourcePeerId, Message message );
+    public abstract void onMessage( Message message );
 
 
     public String getRecipient() {return recipient;}

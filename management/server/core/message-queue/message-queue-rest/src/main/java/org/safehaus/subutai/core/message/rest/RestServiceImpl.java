@@ -12,7 +12,7 @@ import com.google.common.base.Preconditions;
 
 
 /**
- * Queue Rest implementation
+ * Messenger REST implementation
  */
 public class RestServiceImpl implements RestService
 {

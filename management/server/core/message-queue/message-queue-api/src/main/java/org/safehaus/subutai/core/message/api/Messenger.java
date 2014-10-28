@@ -7,9 +7,9 @@ import org.safehaus.subutai.core.peer.api.PeerInterface;
 
 
 /**
- * Message Queue API.
+ * Messenger API
  */
-public interface Queue
+public interface Messenger
 {
 
     /**
@@ -17,7 +17,7 @@ public interface Queue
      *
      * @param payload - object to send
      *
-     * @return - message envelope
+     * @return - message
      */
     public Message createMessage( Object payload ) throws MessageException;
 
@@ -35,13 +35,13 @@ public interface Queue
                              final int timeToLive ) throws MessageException;
 
     /**
-     * Returns status of message in queue
+     * Returns status of message
      *
      * @param messageId - id of message
      *
      * @return - status of message
      */
-    public MessageStatus getMessageStatus( UUID messageId );
+    public MessageStatus getMessageStatus( UUID messageId ) throws MessageException;
 
     /**
      * Add listener of messages

@@ -2,14 +2,14 @@
 
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
-  <reference id="messageQueue" availability="mandatory"
-             interface="org.safehaus.subutai.core.message.api.Queue" />
+  <reference id="messenger" availability="mandatory"
+             interface="org.safehaus.subutai.core.message.api.Messenger" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="message-queue/test">
+    <command name="messenger/test">
       <action class="org.safehaus.subutai.core.message.cli.TestCommand">
         <argument ref="peerManager" />
-        <argument ref="messageQueue" />
+        <argument ref="messenger" />
       </action>
     </command>
   </command-bundle>

@@ -5,7 +5,7 @@ import java.util.UUID;
 
 
 /**
- * Queue Message
+ * Message
  */
 public interface Message
 {
@@ -17,15 +17,25 @@ public interface Message
      */
     public UUID getId();
 
+
     /**
-     * Return message payload. Receiver needs to cast it to required target object
+     * Returns source peer id of message
      *
-     * @return payload
+     * @return - source peer id
+     */
+    public UUID getSourcePeerId();
+
+    /**
+     * Returns original payload
+     *
+     * @param clazz - payload class
+     *
+     * @return - payload
      */
     public <T> T getPayload( Class<T> clazz );
 
     /**
-     * Returns sender of message
+     * Returns sender of message or null if it was not set by calling party
      *
      * @return - sender
      */

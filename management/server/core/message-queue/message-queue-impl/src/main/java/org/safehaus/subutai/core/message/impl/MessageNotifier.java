@@ -1,8 +1,6 @@
 package org.safehaus.subutai.core.message.impl;
 
 
-import java.util.UUID;
-
 import org.safehaus.subutai.core.message.api.Message;
 import org.safehaus.subutai.core.message.api.MessageListener;
 import org.slf4j.Logger;
@@ -19,19 +17,16 @@ public class MessageNotifier implements Runnable
     protected Logger LOG = LoggerFactory.getLogger( MessageNotifier.class.getName() );
 
     protected MessageListener listener;
-    protected UUID sourcePeerId;
     protected Message message;
 
 
-    public MessageNotifier( final MessageListener listener, final Message message, final UUID sourcePeerId )
+    public MessageNotifier( final MessageListener listener, final Message message )
     {
         Preconditions.checkNotNull( message, "Message is null" );
         Preconditions.checkNotNull( listener, "Listener is null" );
-        Preconditions.checkNotNull( sourcePeerId, "Source peer id is null" );
 
         this.listener = listener;
         this.message = message;
-        this.sourcePeerId = sourcePeerId;
     }
 
 
@@ -40,13 +35,11 @@ public class MessageNotifier implements Runnable
     {
         try
         {
-            listener.onMessage( sourcePeerId, message );
+            listener.onMessage( message );
         }
         catch ( Exception e )
         {
-            LOG.error(
-                    String.format( "Error notifying %s on %s from %s", listener.getRecipient(), message, sourcePeerId ),
-                    e );
+            LOG.error( String.format( "Error notifying %s on %s", listener.getRecipient(), message ), e );
         }
     }
 }
