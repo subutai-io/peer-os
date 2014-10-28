@@ -453,8 +453,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public Set<Agent> getConnectedAgents( final PeerInfo peerInfo, final String environmentId )
-            throws PeerException
+    public Set<Agent> getConnectedAgents( final PeerInfo peerInfo, final String environmentId ) throws PeerException
     {
         if ( isPeerReachable( peerInfo ) )
         {
@@ -769,39 +768,35 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public Peer getPeer( final UUID peerId )
     {
-        PeerInfo peerInfo = findPeerInfo( peerId );
+        if ( peerInfo.getId().equals( peerId ) )
+        {
+            return localPeer;
+        }
+
+        PeerInfo peerInfo = getPeerInfo( peerId );
 
         if ( peerInfo != null )
         {
-
-            if ( peerInfo.getId().equals( getPeerId() ) )
-            {
-                return localPeer;
-            }
-            else
-            {
-                return new RemotePeerImpl( peerInfo );
-            }
+            return new RemotePeerImpl( peerInfo );
         }
         return null;
     }
 
-
-    private PeerInfo findPeerInfo( final UUID peerId )
-    {
-        PeerInfo result = null;
-        Iterator<PeerInfo> iterator = peers().iterator();
-        while ( result == null && iterator.hasNext() )
-        {
-
-            PeerInfo peerInfo = iterator.next();
-            if ( peerInfo.getId().equals( peerId ) )
-            {
-                result = peerInfo;
-            }
-        }
-        return result;
-    }
+    //
+    //    private PeerInfo findPeerInfo( final UUID peerId )
+    //    {
+    //        PeerInfo result = null;
+    //        Iterator<PeerInfo> iterator = peers().iterator();
+    //        while ( result == null && iterator.hasNext() )
+    //        {
+    //            PeerInfo peerInfo = iterator.next();
+    //            if ( peerInfo.getId().equals( peerId ) )
+    //            {
+    //                result = peerInfo;
+    //            }
+    //        }
+    //        return result;
+    //    }
 
 
     private void executeCommand( final ExecuteCommandMessage ecm )
