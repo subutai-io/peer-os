@@ -34,7 +34,6 @@ import org.apache.http.util.EntityUtils;
 public class HttpUtil
 {
 
-    public static final int RESPONSE_OK = 200;
     private static final Logger LOG = LoggerFactory.getLogger( HttpUtil.class.getName() );
 
 
@@ -129,7 +128,7 @@ public class HttpUtil
             response = httpclient.execute( req );
             entity = response.getEntity();
             int resCode = response.getStatusLine().getStatusCode();
-            if ( resCode == RESPONSE_OK )
+            if ( NumUtil.isIntBetween( resCode, 200, 299 ) )
             {
                 return EntityUtils.toString( entity, Consts.UTF_8 ).trim();
             }
@@ -189,7 +188,7 @@ public class HttpUtil
             response = httpclient.execute( req );
             entity = response.getEntity();
             int resCode = response.getStatusLine().getStatusCode();
-            if ( resCode == RESPONSE_OK )
+            if ( NumUtil.isIntBetween( resCode, 200, 299 ) )
             {
                 return EntityUtils.toString( entity, Consts.UTF_8 ).trim();
             }

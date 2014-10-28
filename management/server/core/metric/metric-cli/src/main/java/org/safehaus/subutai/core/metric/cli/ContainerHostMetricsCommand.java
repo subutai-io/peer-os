@@ -8,11 +8,9 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
@@ -21,14 +19,13 @@ import com.google.common.base.Preconditions;
 /**
  * ResourceHostMetricsCommand
  */
-@Command( scope = "monitor", name = "container-host-metrics", description = "Lists container host metrics" )
+@Command( scope = "metric", name = "container-host-metrics", description = "Lists container host metrics" )
 public class ContainerHostMetricsCommand extends OsgiCommandSupport
 {
     @Argument( index = 0, name = "environment id", required = true, multiValued = false,
             description = "environment id (uuid)" )
     String environmentIdString;
 
-    private static final Logger LOG = LoggerFactory.getLogger( ContainerHostMetricsCommand.class.getName() );
 
     private final Monitor monitor;
     private final EnvironmentManager environmentManager;

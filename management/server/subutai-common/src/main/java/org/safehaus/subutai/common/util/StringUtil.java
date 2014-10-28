@@ -77,4 +77,14 @@ public class StringUtil
         sb.replace( sb.length() - 2, sb.length(), "" );
         return sb.toString();
     }
+
+
+    public static int getLen( String str )
+    {
+        if ( !isStringNullOrEmpty( str ) )
+        {
+            return str.length();
+        }
+        return 0;
+    }
 }
