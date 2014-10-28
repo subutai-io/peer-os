@@ -52,8 +52,6 @@ public class CassandraImpl implements Cassandra
     private Tracker tracker;
     private ExecutorService executor;
     private EnvironmentManager environmentManager;
-    //TODO:remove container manager and use environment manager instead
-//    private ContainerManager containerManager;
     private PluginDao pluginDAO;
     private DataSource dataSource;
     private ServiceLocator serviceLocator;
@@ -101,24 +99,13 @@ public class CassandraImpl implements Cassandra
     }
 
 
-    /*public ContainerManager getContainerManager()
-    {
-        return containerManager;
-    }
-
-
-    public void setContainerManager( final ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
-    }*/
-
-
     public void init()
     {
         try
         {
             this.serviceLocator = new ServiceLocator();
             this.tracker = serviceLocator.getService( Tracker.class );
+            this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
             this.pluginDAO = new PluginDao( dataSource );
         }
         catch ( SQLException e )

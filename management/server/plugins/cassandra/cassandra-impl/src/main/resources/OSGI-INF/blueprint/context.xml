@@ -7,15 +7,8 @@
     <property name="password" value="" />
   </bean>
 
-  <reference id="containerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.container.api.container.ContainerManager" />
-  <reference id="environmentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
-
   <bean id="cassandra-impl" scope="singleton" class="org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl"
         init-method="init" destroy-method="destroy">
-    <property name="containerManager" ref="containerManager" />
-    <property name="environmentManager" ref="environmentManager" />
     <argument ref="dataSource" />
   </bean>
 
