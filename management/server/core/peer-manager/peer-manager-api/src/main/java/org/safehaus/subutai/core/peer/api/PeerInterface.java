@@ -33,8 +33,4 @@ public interface PeerInterface
     public void destroyContainer( ContainerHost containerHost ) throws PeerException;
 
     public boolean isConnected( Host host ) throws PeerException;
-
-    public boolean configureSshHosts( Set<ContainerHost> containers ) throws PeerException;
-
-    public boolean configureLinkHosts( Set<ContainerHost> containers ) throws PeerException;
 }
