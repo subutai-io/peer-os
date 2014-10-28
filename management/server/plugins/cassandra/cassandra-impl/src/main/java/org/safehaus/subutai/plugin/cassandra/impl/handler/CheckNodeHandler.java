@@ -23,6 +23,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl>
     private static final Logger LOG = LoggerFactory.getLogger( CheckServiceHandler.class.getName() );
     private String clusterName;
     private UUID agentUUID;
+    String serviceStatusCommand = "service cassandra status";
 
 
     public CheckNodeHandler( final CassandraImpl manager, final String clusterName, UUID agentUUID )
@@ -73,7 +74,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl>
 
         try
         {
-            CommandResult result = host.execute( new RequestBuilder( "service cassandra status" ) );
+            CommandResult result = host.execute( new RequestBuilder( serviceStatusCommand) );
             logStatusResults( trackerOperation, result );
         }
         catch ( CommandException e )

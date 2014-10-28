@@ -20,6 +20,9 @@ public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl>
 
     private static final Logger LOG = LoggerFactory.getLogger( StartClusterHandler.class.getName() );
     private String clusterName;
+    String startCommand = ". /etc/profile && $CASSANDRA_HOME/bin/cassandra";
+    String serviceStartCommand = "service cassandra start";
+    String serviceStatusCommand = "service cassandra status";
 
 
     public StartClusterHandler( final CassandraImpl manager, final String clusterName )
@@ -47,7 +50,7 @@ public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl>
         {
             try
             {
-                CommandResult result = host.execute( new RequestBuilder( "service cassandra start" ) );
+                CommandResult result = host.execute( new RequestBuilder( startCommand ) );
                 if ( result.hasSucceeded() )
                 {
                     trackerOperation.addLogDone( "Start succeeded" );

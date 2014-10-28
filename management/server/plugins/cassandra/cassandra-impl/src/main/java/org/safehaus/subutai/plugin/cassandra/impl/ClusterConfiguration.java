@@ -40,7 +40,7 @@ public class ClusterConfiguration
         String clusterNameParam = "cluster_name " + config.getClusterName();
         String dataDirParam = "data_dir " + config.getDataDirectory();
         String commitLogDirParam = "commitlog_dir " + config.getCommitLogDirectory();
-        String savedCacheDirParam = "saved_cache_dir " + config.getCommitLogDirectory();
+        String savedCacheDirParam = "saved_cache_dir " + config.getSavedCachesDirectory();
 
 
         StringBuilder sb = new StringBuilder();
