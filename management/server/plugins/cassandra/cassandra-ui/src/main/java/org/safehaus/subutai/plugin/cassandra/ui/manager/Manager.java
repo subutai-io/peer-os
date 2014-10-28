@@ -15,7 +15,6 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -68,7 +67,6 @@ public class Manager
     //    private final AgentManager agentManager;
     private final EnvironmentManager environmentManager;
     private final Cassandra cassandra;
-    private final CommandRunner commandRunner;
     private final Table nodesTable;
     private GridLayout contentRoot;
     private ComboBox clusterCombo;
@@ -83,7 +81,6 @@ public class Manager
         this.tracker = serviceLocator.getService( Tracker.class );
         //        this.agentManager = serviceLocator.getService( AgentManager.class );
         this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );

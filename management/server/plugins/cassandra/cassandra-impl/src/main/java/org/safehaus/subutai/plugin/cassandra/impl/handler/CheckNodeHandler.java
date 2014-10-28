@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.CommandException;
@@ -10,8 +9,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
@@ -76,23 +73,8 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl>
 
         try
         {
-
             CommandResult result = host.execute( new RequestBuilder( "service cassandra status" ) );
-            if ( result.getExitCode() == 0 )
-            {
-                if ( result.getStdOut().contains( "running..." ) )
-                {
-                    trackerOperation.addLogDone( "Service running" );
-                }
-                else
-                {
-                    trackerOperation.addLogFailed( String.format( "Unexpected result, %s", result.getStdErr() ) );
-                }
-            }
-            else
-            {
-                trackerOperation.addLogFailed( String.format( "Checking service failed, %s", result.getStdErr() ) );
-            }
+            logStatusResults( trackerOperation, result );
         }
         catch ( CommandException e )
         {
@@ -102,26 +84,25 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl>
     }
 
 
-    private void logStatusResults( TrackerOperation po, Command checkStatusCommand )
+    private void logStatusResults( TrackerOperation po, CommandResult result )
     {
 
         StringBuilder log = new StringBuilder();
 
-        for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() )
+        String status = "UNKNOWN";
+        if ( result.getExitCode() == 0 )
         {
-
-            String status = "UNKNOWN";
-            if ( e.getValue().getExitCode() == 0 )
-            {
-                status = "Cassandra is running";
-            }
-            else if ( e.getValue().getExitCode() == 768 )
-            {
-                status = "Cassandra is not running";
-            }
-
-            log.append( String.format( "%s", status ) );
+            status = "Cassandra is running";
         }
+        else if ( result.getExitCode() == 768 )
+        {
+            status = "Cassandra is not running";
+        } else {
+            status = result.getStdOut();
+        }
+
+        log.append( String.format( "%s", status ) );
+
         po.addLogDone( log.toString() );
     }
 }
