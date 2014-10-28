@@ -49,16 +49,22 @@ public interface PeerManager
     public Set<Agent> createContainers( UUID envId, UUID peerId, String template, int numberOfNodes, String strategy )
             throws ContainerCreateException;
 
+    @Deprecated
     public boolean startContainer( PeerContainer container );
 
+    @Deprecated
     public boolean stopContainer( PeerContainer container );
 
+    @Deprecated
     public boolean isContainerConnected( PeerContainer container );
 
+    @Deprecated
     public Set<PeerContainer> getContainers();
 
+    @Deprecated
     public void addContainer( PeerContainer peerContainer );
 
+    @Deprecated
     public void invoke( PeerCommandMessage peerCommandMessage );
 
     List<PeerGroup> peersGroups();
@@ -73,9 +79,10 @@ public interface PeerManager
     //    public Set<ContainerHost> createContainers( UUID envId, String templateName, int quantity, String strategyId,
     //                                                List<Criteria> criteria ) throws ContainerCreateException;
 
+    @Deprecated
     public boolean isConnected( Host host );
 
-    public ManagementHost getManagementHost();
+    //    public ManagementHost getManagementHost();
 
     public LocalPeer getLocalPeer();
 

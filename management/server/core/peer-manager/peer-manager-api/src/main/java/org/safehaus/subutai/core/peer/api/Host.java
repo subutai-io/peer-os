@@ -39,7 +39,9 @@ public interface Host extends Serializable
 
     public void executeAsync( RequestBuilder requestBuilder ) throws CommandException;
 
-    public boolean isConnected( Host host );
+    public boolean isConnected();
+
+    public long getLastHeartbeat();
 
     public Peer getPeer( UUID peerId ) throws PeerException;
 

@@ -16,4 +16,8 @@ public interface LocalPeer extends PeerInterface
     public ManagementHost getManagementHost() throws PeerException;
 
     public Set<ResourceHost> getResourceHosts() throws PeerException;
+
+    void init();
+
+    void shutdown();
 }

@@ -4,14 +4,13 @@ package org.safehaus.subutai.core.peer.cli;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command( scope = "peer", name = "stop-lxc" )
+@Command(scope = "peer", name = "stop-lxc")
 public class StopLxcCommand extends OsgiCommandSupport
 {
 
@@ -24,7 +23,7 @@ public class StopLxcCommand extends OsgiCommandSupport
     }
 
 
-    @Argument( index = 0, name = "hostname", multiValued = false, description = "LXC name" )
+    @Argument(index = 0, name = "hostname", multiValued = false, description = "LXC name")
     private String hostname;
 
 
@@ -41,8 +40,7 @@ public class StopLxcCommand extends OsgiCommandSupport
             System.out.println( "LXC not found." );
         }
 
-        ResourceHost rh = localPeer.getResourceHostByName( host.getParentHostname() );
-        boolean result = rh.stopContainerHost( host );
+        boolean result = localPeer.stopContainer( host );
         System.out.println( String.format( "%s", result ? "LXC stopped successfully" : "Could not stop LXC" ) );
         return null;
     }
