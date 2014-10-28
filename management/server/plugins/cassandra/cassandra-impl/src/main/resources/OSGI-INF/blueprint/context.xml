@@ -7,8 +7,8 @@
     <property name="password" value="" />
   </bean>
 
-  <reference id="tracker" availability="mandatory"
-             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+  <!--<reference id="tracker" availability="mandatory"
+             interface="org.safehaus.subutai.core.tracker.api.Tracker" />-->
   <!--<reference id="lxcManager" availability="mandatory"
              interface="org.safehaus.subutai.core.container.api.lxcmanager.LxcManager" />-->
   <!--<reference id="networkManager" availability="mandatory"
@@ -24,7 +24,7 @@
 
   <bean id="cassandra-impl" scope="singleton" class="org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl"
         init-method="init" destroy-method="destroy">
-    <property name="tracker" ref="tracker" />
+    <!--<property name="tracker" ref="tracker" />-->
     <!--<property name="lxcManager" ref="lxcManager" />-->
     <!--<property name="networkManager" ref="networkManager" />-->
     <property name="commandRunner" ref="commandRunner" />

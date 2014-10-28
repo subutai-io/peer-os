@@ -36,6 +36,7 @@ public class ClusterConfiguration
 
         po.addLog( String.format( "Configuring cluster: %s", config.getClusterName() ) );
         String script = ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s";
+        String permissionParam = "sudo chmod 750 $CASSANDRA_HOME";
         String clusterNameParam = "cluster_name " + config.getClusterName();
         String dataDirParam = "data_dir " + config.getDataDirectory();
         String commitLogDirParam = "commitlog_dir " + config.getCommitLogDirectory();
@@ -62,7 +63,11 @@ public class ClusterConfiguration
             try
             {
                 po.addLog( "Configuring node: " + containerHost.getId() );
-                CommandResult commandResult =
+
+                CommandResult commandResult = containerHost.execute( new RequestBuilder( permissionParam ) );
+                po.addLog( commandResult.getStdOut() );
+
+                commandResult =
                         containerHost.execute( new RequestBuilder( String.format( script, clusterNameParam ) ) );
                 po.addLog( commandResult.getStdOut() );
 
@@ -97,7 +102,7 @@ public class ClusterConfiguration
                 throw new ClusterConfigurationException( e.getMessage() );
             }
         }
-        
+
         config.setEnvironmentId( environment.getId() );
         cassandraManager.getPluginDAO().saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
         po.addLogDone( "Cassandra cluster data saved into database" );
