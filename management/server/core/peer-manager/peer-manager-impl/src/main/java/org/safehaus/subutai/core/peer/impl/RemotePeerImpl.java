@@ -58,28 +58,28 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<ContainerHost> createContainers( final UUID ownerPeerId, final UUID environmentId,
+    public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
                                                 final List<Template> templates, final int quantity, final String strategyId,
                                                 final List<Criteria> criteria ) throws ContainerCreateException
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000 );
         return remotePeerRestClient
-                .createRemoteContainers( peer.getIp(), "8181", ownerPeerId, environmentId, templates, quantity,
+                .createRemoteContainers( peer.getIp(), "8181", creatorPeerId, environmentId, templates, quantity,
                         strategyId, criteria );
     }
 
 
     @Override
-    public void startContainer( final ContainerHost containerHost ) throws PeerException
+    public boolean startContainer( final ContainerHost containerHost ) throws PeerException
     {
-
+        return false;
     }
 
 
     @Override
-    public void stopContainer( final ContainerHost containerHost ) throws PeerException
+    public boolean stopContainer( final ContainerHost containerHost ) throws PeerException
     {
-
+       return false;
     }
 
 
