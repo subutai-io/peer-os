@@ -1,6 +1,10 @@
 package org.safehaus.subutai.core.message.api;
 
 
+import java.util.UUID;
+
+import org.safehaus.subutai.common.util.StringUtil;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -11,21 +15,24 @@ import com.google.common.base.Strings;
 public abstract class MessageListener
 {
 
-    private String recipientId;
+    private static final int MAX_RECIPIENT_ID_LEN = 50;
+    private String recipient;
 
 
-    protected MessageListener( final String recipientId )
+    protected MessageListener( final String recipient )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipientId ), "invalid recipient id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "invalid recipient id" );
+        Preconditions.checkArgument( StringUtil.getLen( recipient ) <= MAX_RECIPIENT_ID_LEN,
+                String.format( "Max recipient length must be %d", MAX_RECIPIENT_ID_LEN ) );
 
-        this.recipientId = recipientId;
+        this.recipient = recipient;
     }
 
 
-    public abstract void onMessage( Message message );
+    public abstract void onMessage( UUID sourcePeerId, Message message );
 
 
-    public String getRecipientId() {return recipientId;}
+    public String getRecipient() {return recipient;}
 
 
     @Override
@@ -42,7 +49,7 @@ public abstract class MessageListener
 
         final MessageListener listener = ( MessageListener ) o;
 
-        if ( !recipientId.equals( listener.recipientId ) )
+        if ( !recipient.equals( listener.recipient ) )
         {
             return false;
         }
@@ -54,6 +61,6 @@ public abstract class MessageListener
     @Override
     public int hashCode()
     {
-        return recipientId.hashCode();
+        return recipient.hashCode();
     }
 }

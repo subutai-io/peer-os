@@ -30,11 +30,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response processMessage( final String message )
+    public Response processMessage( final String envelope )
     {
         try
         {
-            messageProcessor.processMessage( message );
+            messageProcessor.processMessage( envelope );
             return Response.accepted().build();
         }
         catch ( MessageException e )

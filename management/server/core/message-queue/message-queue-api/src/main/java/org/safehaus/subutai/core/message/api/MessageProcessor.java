@@ -6,5 +6,5 @@ package org.safehaus.subutai.core.message.api;
  */
 public interface MessageProcessor
 {
-    public void processMessage( String messageJson ) throws MessageException;
+    public void processMessage( String envelope ) throws MessageException;
 }

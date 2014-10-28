@@ -1,15 +1,15 @@
 package org.safehaus.subutai.core.message.cli;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.core.message.api.Message;
-import org.safehaus.subutai.core.message.api.MessageException;
 import org.safehaus.subutai.core.message.api.MessageListener;
 import org.safehaus.subutai.core.message.api.Queue;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-
-import com.google.common.base.Preconditions;
 
 
 /**
@@ -20,19 +20,17 @@ public class TestCommand extends OsgiCommandSupport
 {
 
     private final Queue queue;
-    private MyMessageListener listener;
+    private final PeerManager peerManager;
 
 
-    public TestCommand( final Queue queue )
+    public TestCommand( final Queue queue, final PeerManager peerManager )
     {
-        Preconditions.checkNotNull( queue, "Queue is null" );
-
         this.queue = queue;
+        this.peerManager = peerManager;
 
-        listener = new MyMessageListener( "Test" );
+        final MyMessageListener listener = new MyMessageListener( "Test" );
         queue.addMessageListener( listener );
     }
-
 
 
     @Override
@@ -41,7 +39,7 @@ public class TestCommand extends OsgiCommandSupport
 
         Message message = queue.createMessage( new CustomObject( 123, "hello world" ) );
 
-        queue.sendMessage( null, message, "Test", 0 );
+        queue.sendMessage( peerManager.getLocalPeer(), message, "Test", 30 );
 
         return null;
     }
@@ -50,23 +48,17 @@ public class TestCommand extends OsgiCommandSupport
     static class MyMessageListener extends MessageListener
     {
 
-        protected MyMessageListener( final String recipientId )
+        protected MyMessageListener( final String recipient )
         {
-            super( recipientId );
+            super( recipient );
         }
 
 
         @Override
-        public void onMessage( final Message message )
+        public void onMessage( UUID sourcePeerId, Message message )
         {
-            try
-            {
-                System.out.println( message.getPayload( CustomObject.class ) );
-            }
-            catch ( MessageException e )
-            {
-                e.printStackTrace();
-            }
+
+            System.out.println( sourcePeerId + " : " + message.getPayload( CustomObject.class ) );
         }
     }
 }

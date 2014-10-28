@@ -1,17 +1,28 @@
 package org.safehaus.subutai.core.message.api;
 
 
+import java.util.UUID;
+
+
 /**
  * Queue Message
  */
 public interface Message
 {
+
+    /**
+     * Returns id of message
+     *
+     * @return - id of message
+     */
+    public UUID getId();
+
     /**
      * Return message payload. Receiver needs to cast it to required target object
      *
      * @return payload
      */
-    public <T> T getPayload( Class<T> clazz ) throws MessageException;
+    public <T> T getPayload( Class<T> clazz );
 
     /**
      * Returns sender of message

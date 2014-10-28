@@ -15,6 +15,6 @@ public interface RestService
 
 
     @POST
-    @Path( "message" )
-    public Response processMessage( @FormParam( "message" ) String message );
+    @Path("message")
+    public Response processMessage( @FormParam( "envelope" ) String envelope );
 }
