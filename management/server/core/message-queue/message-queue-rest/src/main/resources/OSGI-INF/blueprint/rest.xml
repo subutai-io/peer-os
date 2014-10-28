@@ -11,11 +11,11 @@
     </cxf:features>
   </cxf:bus>
 
-  <reference id="queue" availability="mandatory"
-             interface="org.safehaus.subutai.core.message.api.Queue" />
+  <reference id="messageProcessor" availability="mandatory"
+             interface="org.safehaus.subutai.core.message.api.MessageProcessor" />
 
   <bean id="queueRestImpl" class="org.safehaus.subutai.core.message.rest.RestServiceImpl">
-    <argument ref="queue" />
+    <argument ref="messageProcessor" />
   </bean>
 
   <jaxrs:server address="/queue" id="queueRestService">

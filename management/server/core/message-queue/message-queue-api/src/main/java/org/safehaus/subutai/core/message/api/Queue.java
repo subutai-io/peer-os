@@ -26,6 +26,7 @@ public interface Queue
     /**
      * Sends message to recipient
      *
+     * @param peer - target peer
      * @param message - message to send
      * @param recipient - recipient of message
      * @param ttl - time-to-live of message within which message is retried to be sent to recipient. After ttl expires
@@ -45,9 +46,17 @@ public interface Queue
      */
     public MessageStatus getMessageStatus( UUID messageId );
 
-    public void processMessage( String messageJson ) throws MessageException;
-
+    /**
+     * Add listener of messages
+     *
+     * @param listener - listener
+     */
     public void addMessageListener( MessageListener listener );
 
+    /**
+     * Remove listener
+     *
+     * @param listener - listener
+     */
     public void removeMessageListener( MessageListener listener );
 }

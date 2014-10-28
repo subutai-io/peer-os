@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.core.message.api.Message;
 import org.safehaus.subutai.core.message.api.MessageException;
 import org.safehaus.subutai.core.message.api.MessageListener;
+import org.safehaus.subutai.core.message.api.MessageProcessor;
 import org.safehaus.subutai.core.message.api.MessageStatus;
 import org.safehaus.subutai.core.message.api.Queue;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -27,7 +28,7 @@ import com.google.gson.JsonSyntaxException;
 /**
  * Implementation of Queue
  */
-public class QueueImpl implements Queue
+public class QueueImpl implements Queue, MessageProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( QueueImpl.class.getName() );
     private final Set<MessageListener> listeners =

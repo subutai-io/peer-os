@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.message.rest;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.core.message.api.MessageException;
-import org.safehaus.subutai.core.message.api.Queue;
+import org.safehaus.subutai.core.message.api.MessageProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,14 +18,14 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
 
-    private final Queue queue;
+    private final MessageProcessor messageProcessor;
 
 
-    public RestServiceImpl( final Queue queue )
+    public RestServiceImpl( final MessageProcessor messageProcessor )
     {
-        Preconditions.checkNotNull( queue, "Queue is null" );
+        Preconditions.checkNotNull( messageProcessor, "Message processor is null" );
 
-        this.queue = queue;
+        this.messageProcessor = messageProcessor;
     }
 
 
@@ -34,7 +34,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            queue.processMessage( message );
+            messageProcessor.processMessage( message );
             return Response.accepted().build();
         }
         catch ( MessageException e )
