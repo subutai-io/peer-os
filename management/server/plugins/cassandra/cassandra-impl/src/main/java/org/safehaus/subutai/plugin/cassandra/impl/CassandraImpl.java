@@ -19,8 +19,6 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -51,14 +49,11 @@ public class CassandraImpl implements Cassandra
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( CassandraImpl.class.getName() );
-    private Commands commands;
     private Tracker tracker;
     private ExecutorService executor;
-    private CommandRunner commandRunner;
-    //    private AgentManager agentManager;
     private EnvironmentManager environmentManager;
     //TODO:remove container manager and use environment manager instead
-    private ContainerManager containerManager;
+//    private ContainerManager containerManager;
     private PluginDao pluginDAO;
     private DataSource dataSource;
     private ServiceLocator serviceLocator;
@@ -94,30 +89,6 @@ public class CassandraImpl implements Cassandra
     }
 
 
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
-    public void setCommandRunner( final CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
-    }
-
-
-    /*public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public void setAgentManager( final AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }*/
-
-
     public EnvironmentManager getEnvironmentManager()
     {
         return environmentManager;
@@ -130,7 +101,7 @@ public class CassandraImpl implements Cassandra
     }
 
 
-    public ContainerManager getContainerManager()
+    /*public ContainerManager getContainerManager()
     {
         return containerManager;
     }
@@ -139,13 +110,7 @@ public class CassandraImpl implements Cassandra
     public void setContainerManager( final ContainerManager containerManager )
     {
         this.containerManager = containerManager;
-    }
-
-
-    public Commands getCommands()
-    {
-        return commands;
-    }
+    }*/
 
 
     public void init()
@@ -164,7 +129,6 @@ public class CassandraImpl implements Cassandra
         {
             LOG.error( e.getMessage(), e );
         }
-        this.commands = new Commands( commandRunner );
 
         executor = Executors.newCachedThreadPool();
     }
