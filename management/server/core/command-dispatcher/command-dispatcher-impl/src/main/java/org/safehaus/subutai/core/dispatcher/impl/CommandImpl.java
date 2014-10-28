@@ -12,12 +12,12 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.command.api.command.AbstractCommand;
 import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.dispatcher.api.ContainerRequestBuilder;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
@@ -70,7 +70,7 @@ public class CommandImpl extends AbstractCommand
             }
             Request request = requestBuilder.build( container.getAgentId(), commandUUID );
             //this is a local agent
-            if ( peerManager.getSiteId().compareTo( container.getPeerId() ) == 0 )
+            if ( peerManager.getPeerId().compareTo( container.getPeerId() ) == 0 )
             {
                 requests.add( request );
             }
@@ -129,7 +129,7 @@ public class CommandImpl extends AbstractCommand
             //            }
             Request request = requestBuilder.build( agent.getUuid(), commandUUID );
             //this is a local agent
-            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 )
+            if ( peerManager.getPeerId().compareTo( agent.getSiteId() ) == 0 )
             {
                 requests.add( request );
             }
@@ -252,7 +252,7 @@ public class CommandImpl extends AbstractCommand
                 maxTimeout = requestBuilder.getTimeout();
             }
             //this is a local agent
-            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 )
+            if ( peerManager.getPeerId().compareTo( agent.getSiteId() ) == 0 )
             {
                 requests.add( request );
             }
@@ -310,7 +310,7 @@ public class CommandImpl extends AbstractCommand
                 maxTimeout = requestBuilder.getTimeout();
             }
             //this is a local agent
-            if ( peerManager.getSiteId().compareTo( container.getPeerId() ) == 0 )
+            if ( peerManager.getPeerId().compareTo( container.getPeerId() ) == 0 )
             {
                 requests.add( request );
             }

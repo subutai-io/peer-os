@@ -15,19 +15,25 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.CommandStatus;
 import org.safehaus.subutai.common.protocol.NullAgent;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
+import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -37,6 +43,7 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -44,12 +51,12 @@ import com.google.gson.GsonBuilder;
 /**
  * Local peer implementation
  */
-public class LocalPeerImpl extends Peer implements LocalPeer, ResponseListener
+public class LocalPeerImpl implements LocalPeer, ResponseListener
 {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final String SOURCE_MANAGEMENT = "MANAGEMENT_HOST";
-    private static final String SOURCE_RESOURCE = "RESOURCE_HOST";
-    private static final String SOURCE_CONTAINER = "CONTAINER_HOST";
+    //    private static final String SOURCE_RESOURCE = "RESOURCE_HOST";
+    //    private static final String SOURCE_CONTAINER = "CONTAINER_HOST";
     private static final int MAX_LXC_NAME = 15;
     private PeerManager peerManager;
     private ContainerManager containerManager;
@@ -58,23 +65,60 @@ public class LocalPeerImpl extends Peer implements LocalPeer, ResponseListener
     private PeerDAO peerDAO;
     private ConcurrentMap<String, AtomicInteger> sequences = new ConcurrentHashMap<>();
     private ManagementHost managementHost;
+    private CommandRunner commandRunner;
 
 
     public LocalPeerImpl( PeerManager peerManager, ContainerManager containerManager, TemplateRegistry templateRegistry,
-                          PeerDAO peerDao, CommunicationManager communicationManager )
+                          PeerDAO peerDao, CommunicationManager communicationManager,
+                          CommandRunner commandRunner )
     {
         this.peerManager = peerManager;
         this.containerManager = containerManager;
         this.templateRegistry = templateRegistry;
         this.peerDAO = peerDao;
         this.communicationManager = communicationManager;
+        this.commandRunner = commandRunner;
+    }
+
+
+    @Override
+    public void init()
+    {
+        List<ManagementHost> result = peerDAO.getInfo( SOURCE_MANAGEMENT, ManagementHost.class );
+        if ( result.size() > 0 )
+        {
+            managementHost = result.get( 0 );
+        }
+        communicationManager.addListener( this );
+    }
+
+
+    @Override
+    public void shutdown()
+    {
+        communicationManager.removeListener( this );
+    }
+
+
+    @Override
+    public UUID getId()
+    {
+
+        return peerManager.getLocalPeerInfo().getId();
+    }
+
+
+    @Override
+    public String getName()
+    {
+        return peerManager.getLocalPeerInfo().getName();
     }
 
 
     @Override
     public UUID getOwnerId()
     {
-        return null;
+        return peerManager.getLocalPeerInfo().getOwnerId();
     }
 
 
@@ -360,21 +404,23 @@ public class LocalPeerImpl extends Peer implements LocalPeer, ResponseListener
 
 
     @Override
-    public void init()
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
 
-        List<ManagementHost> result = peerDAO.getInfo( SOURCE_MANAGEMENT, ManagementHost.class );
-        if ( result.size() > 0 )
+        Agent agent = host.getAgent();
+        Command command = commandRunner.createCommand( requestBuilder, Sets.newHashSet( agent ) );
+        command.execute();
+
+        AgentResult agentResult = command.getResults().get( agent.getUuid() );
+
+        if ( agentResult != null )
         {
-            managementHost = result.get( 0 );
+            return new CommandResult( agentResult.getExitCode(), agentResult.getStdOut(), agentResult.getStdErr(),
+                    command.getCommandStatus() );
         }
-        communicationManager.addListener( this );
-    }
-
-
-    @Override
-    public void shutdown()
-    {
-        communicationManager.removeListener( this );
+        else
+        {
+            return new CommandResult( null, null, null, CommandStatus.TIMEOUT );
+        }
     }
 }

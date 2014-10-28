@@ -10,10 +10,14 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.exception.DaoException;
+import org.safehaus.subutai.common.exception.RunCommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CommandStatus;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -24,16 +28,12 @@ import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
-import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.core.command.api.command.CommandExecutor;
 import org.safehaus.subutai.core.command.api.command.CommandExecutorExpiryCallback;
-import org.safehaus.subutai.common.protocol.CommandStatus;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.dispatcher.api.ContainerRequestBuilder;
-import org.safehaus.subutai.common.exception.RunCommandException;
-import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
@@ -172,7 +172,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
         for ( Map.Entry<UUID, Set<BatchRequest>> entry : command.getRemoteRequests().entrySet() )
         {
             //check if peer is registered
-            Peer peer = peerManager.getPeerByUUID( entry.getKey() );
+            PeerInfo peer = peerManager.getPeerInfo( entry.getKey() );
             if ( peer == null )
             {
                 throw new RunCommandException( String.format( "Peer %s not found", entry.getKey() ) );
@@ -204,7 +204,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     }
 
 
-    private void checkIfRemoteAgentsConnected( Peer peer, Set<BatchRequest> requests ) throws PeerException
+    private void checkIfRemoteAgentsConnected( PeerInfo peer, Set<BatchRequest> requests ) throws PeerException
     {
         //check if all agents required for command execution are connected on remote peer
         UUID environmentId = requests.iterator().next().getEnvironmentId();
@@ -253,7 +253,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
         for ( Map.Entry<UUID, Set<BatchRequest>> request : requests.entrySet() )
         {
-            Peer peer = peerManager.getPeerByUUID( request.getKey() );
+            PeerInfo peer = peerManager.getPeerInfo( request.getKey() );
 
             try
             {
@@ -316,7 +316,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     @Override
-    public String onMessage( final Peer peer, final String peerMessage ) throws PeerMessageException
+    public String onMessage( final PeerInfo peer, final String peerMessage ) throws PeerMessageException
     {
         try
         {
@@ -365,7 +365,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     }
 
 
-    private void executeRequests( final Peer peer, final Set<BatchRequest> requests ) throws PeerMessageException
+    private void executeRequests( final PeerInfo peer, final Set<BatchRequest> requests ) throws PeerMessageException
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requests ), "Requests are empty or null" );
 

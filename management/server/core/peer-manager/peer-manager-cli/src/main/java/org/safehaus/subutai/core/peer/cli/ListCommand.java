@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.peer.cli;
 
 import java.util.List;
 
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Command;
@@ -35,11 +35,11 @@ public class ListCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        List<Peer> list = peerManager.peers();
+        List<PeerInfo> list = peerManager.peers();
         System.out.println( "Found " + list.size() + " registered peers" );
-        for ( Peer peer : list )
+        for ( PeerInfo peerInfo : list )
         {
-            System.out.println( peer.getId() + " " + peer.getIp() + " " + peer.getName() );
+            System.out.println( peerInfo.getId() + " " + peerInfo.getIp() + " " + peerInfo.getName() );
         }
         return null;
     }

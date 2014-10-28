@@ -5,12 +5,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
-import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.RemotePeer;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 
@@ -20,12 +23,12 @@ import org.safehaus.subutai.core.strategy.api.Criteria;
  */
 public class RemotePeerImpl implements RemotePeer
 {
-    protected Peer peer;
+    protected PeerInfo peerInfo;
 
 
-    public RemotePeerImpl( final Peer peer )
+    public RemotePeerImpl( final PeerInfo peerInfo )
     {
-        this.peer = peer;
+        this.peerInfo = peerInfo;
     }
 
 
@@ -39,7 +42,14 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public UUID getId()
     {
-        return peer.getId();
+        return peerInfo.getId();
+    }
+
+
+    @Override
+    public String getName()
+    {
+        return peerInfo.getName();
     }
 
 
@@ -59,12 +69,13 @@ public class RemotePeerImpl implements RemotePeer
 
     @Override
     public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
-                                                final List<Template> templates, final int quantity, final String strategyId,
-                                                final List<Criteria> criteria ) throws ContainerCreateException
+                                                final List<Template> templates, final int quantity,
+                                                final String strategyId, final List<Criteria> criteria )
+            throws ContainerCreateException
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000 );
         return remotePeerRestClient
-                .createRemoteContainers( peer.getIp(), "8181", creatorPeerId, environmentId, templates, quantity,
+                .createRemoteContainers( peerInfo.getIp(), "8181", creatorPeerId, environmentId, templates, quantity,
                         strategyId, criteria );
     }
 
@@ -79,7 +90,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public boolean stopContainer( final ContainerHost containerHost ) throws PeerException
     {
-       return false;
+        return false;
     }
 
 
@@ -94,5 +105,12 @@ public class RemotePeerImpl implements RemotePeer
     public boolean isConnected( final Host host ) throws PeerException
     {
         return false;
+    }
+
+
+    @Override
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
+    {
+        return null;
     }
 }

@@ -1,79 +1,43 @@
 package org.safehaus.subutai.core.peer.api;
 
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+
+import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.container.api.ContainerCreateException;
+import org.safehaus.subutai.core.strategy.api.Criteria;
 
 
 /**
- * Created by bahadyr on 9/6/14.
+ * Peer interface
  */
-//@XmlRootElement(name = "Peer")
-public class Peer
+public interface Peer
 {
 
-    private String name;
-    private String ip;
-    private PeerStatus status;
-    private UUID id;
-    private UUID ownerId;
+    public UUID getId();
 
+    public String getName();
 
-    public UUID getId()
-    {
-        return id;
-    }
+    public UUID getOwnerId();
 
+    public Set<ContainerHost> getContainerHostsByEnvironmentId( UUID environmentId ) throws PeerException;
 
-    public void setId( final UUID id )
-    {
-        this.id = id;
-    }
+    public Set<ContainerHost> createContainers( UUID creatorPeerId, UUID environmentId, List<Template> templates,
+                                                int quantity, String strategyId, List<Criteria> criteria )
+            throws ContainerCreateException;
 
+    public boolean startContainer( ContainerHost containerHost ) throws PeerException;
 
-    public String getName()
-    {
-        return name;
-    }
+    public boolean stopContainer( ContainerHost containerHost ) throws PeerException;
 
+    public void destroyContainer( ContainerHost containerHost ) throws PeerException;
 
-    public void setName( final String name )
-    {
-        this.name = name;
-    }
+    public boolean isConnected( Host host ) throws PeerException;
 
-
-    public String getIp()
-    {
-        return ip;
-    }
-
-
-    public void setIp( final String ip )
-    {
-        this.ip = ip;
-    }
-
-
-    public PeerStatus getStatus()
-    {
-        return status;
-    }
-
-
-    public void setStatus( final PeerStatus status )
-    {
-        this.status = status;
-    }
-
-
-    public UUID getOwnerId()
-    {
-        return ownerId;
-    }
-
-
-    public void setOwnerId( final UUID ownerId )
-    {
-        this.ownerId = ownerId;
-    }
+    public CommandResult execute( RequestBuilder requestBuilder, Host host ) throws CommandException;
 }
