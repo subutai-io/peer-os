@@ -31,7 +31,8 @@ class CustomPlacementStrategy extends LxcPlacementStrategy
     }
 
 
-    /*public static Map<Agent, Set<Agent>> createNodes( LxcManager lxcManager, int nodesCount ) throws LxcCreateException
+    /*public static Map<Agent, Set<Agent>> createNodes( LxcManager lxcManager,
+    int nodesCount ) throws LxcCreateException
     {
         Map<String, Map<Agent, Set<Agent>>> map =
                 lxcManager.createLxcsByStrategy( new CustomPlacementStrategy( nodesCount ) );

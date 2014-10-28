@@ -1,12 +1,12 @@
 package org.safehaus.subutai.core.environment.terminal.ui;
 
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.enums.ResponseType;
-import org.safehaus.subutai.common.protocol.Container;
+import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
@@ -15,10 +15,8 @@ import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
-import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +48,7 @@ public class SendButtonListener implements Button.ClickListener
     @Override
     public void buttonClick( Button.ClickEvent event )
     {
-        Set<EnvironmentContainer> containers = form.environmentTree.getSelectedContainers();
+        Set<ContainerHost> containers = form.environmentTree.getSelectedContainers();
         if ( CollectionUtil.isCollectionEmpty( containers ) )
         {
             form.show( "Please, select container(s)" );
@@ -66,7 +64,7 @@ public class SendButtonListener implements Button.ClickListener
     }
 
 
-    private void executeCommand( Set<EnvironmentContainer> containers )
+    private void executeCommand( Set<ContainerHost> containers )
     {
 
         RequestBuilder requestBuilder = new RequestBuilder( form.programTxtFld.getValue() );
@@ -84,10 +82,19 @@ public class SendButtonListener implements Button.ClickListener
 
             form.indicator.setVisible( true );
 
-            Set<Container> containerSet = new HashSet<>();
-            containerSet.addAll( containers );
-            Command command = commandDispatcher.createContainerCommand( requestBuilder, containerSet );
-            executor.execute( new ExecuteCommandTask( form, command ) );
+            for ( ContainerHost host : containers )
+            {
+                try
+                {
+                    host.execute( requestBuilder );
+                }
+                catch ( CommandException e )
+                {
+                    LOG.error( e.getMessage(), e );
+                }
+            }
+            //            Command command = commandDispatcher.createContainerCommand( requestBuilder, containerSet );
+            //            executor.execute( new ExecuteCommandTask( form, command ) );
         }
     }
 

@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.environment.cli;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 
 import org.apache.karaf.shell.commands.Argument;
@@ -18,9 +20,9 @@ public class DestroyEnvironmentCommand extends OsgiCommandSupport
 
     EnvironmentManager environmentManager;
 
-    @Argument( name = "environmentName", index = 0, required = true, multiValued = false,
-            description = "Environment name", valueToShowInHelp = "Environment name" )
-    String environmentName;
+    @Argument( name = "environmentId", index = 0, required = true, multiValued = false,
+            description = "Environment id", valueToShowInHelp = "Environment name" )
+    String environmentId;
 
 
     public EnvironmentManager getEnvironmentManager()
@@ -38,7 +40,7 @@ public class DestroyEnvironmentCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        boolean destroyResult = environmentManager.destroyEnvironment( environmentName );
+        boolean destroyResult = environmentManager.destroyEnvironment( UUID.fromString( environmentId ) );
         if ( destroyResult )
         {
             System.out.println( "Environment destroyed successfully." );
@@ -48,17 +50,5 @@ public class DestroyEnvironmentCommand extends OsgiCommandSupport
             System.out.println( "Environment destroy failed." );
         }
         return null;
-    }
-
-
-    public String getEnvironmentName()
-    {
-        return environmentName;
-    }
-
-
-    public void setEnvironmentName( final String environmentName )
-    {
-        this.environmentName = environmentName;
     }
 }
