@@ -136,15 +136,6 @@ public class CassandraImpl implements Cassandra
     }
 
 
-    public UUID configureEnvironmentCluster( final CassandraClusterConfig config )
-    {
-        Preconditions.checkNotNull( config, "Configuration is null" );
-        AbstractOperationHandler operationHandler = new ConfigureEnvironmentClusterHandler( this, config );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
-    }
-
-
     public UUID uninstallCluster( final String clusterName )
     {
         AbstractOperationHandler operationHandler = new UninstallClusterHandler( this, clusterName );
@@ -281,5 +272,14 @@ public class CassandraImpl implements Cassandra
         blueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
 
         return blueprint;
+    }
+
+
+    public UUID configureEnvironmentCluster( final CassandraClusterConfig config )
+    {
+        Preconditions.checkNotNull( config, "Configuration is null" );
+        AbstractOperationHandler operationHandler = new ConfigureEnvironmentClusterHandler( this, config );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 }

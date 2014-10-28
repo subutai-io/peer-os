@@ -55,8 +55,7 @@ public interface RestService
     @POST
     @Path("clusters/{clusterName}/nodes/{lxcHostname}/{nodeType}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public Response addNode( @PathParam("clusterName") String clusterName,
-                             @PathParam("nodeType") String nodeType );
+    public Response addNode( @PathParam("clusterName") String clusterName, @PathParam("nodeType") String nodeType );
 
     //destroy node
     @DELETE

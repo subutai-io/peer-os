@@ -24,7 +24,7 @@ public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl>
     private UUID containerId;
 
 
-    public StopServiceHandler( final CassandraImpl manager, final String clusterName, UUID containerId)
+    public StopServiceHandler( final CassandraImpl manager, final String clusterName, UUID containerId )
     {
         super( manager, clusterName );
         this.containerId = containerId;

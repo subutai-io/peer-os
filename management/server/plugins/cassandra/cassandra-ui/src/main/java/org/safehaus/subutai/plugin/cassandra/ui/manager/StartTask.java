@@ -14,8 +14,8 @@ public class StartTask implements Runnable
 {
 
     private final String clusterName;
-    private UUID containerId;
     private final CompleteEvent completeEvent;
+    private UUID containerId;
     private Cassandra cassandra;
     private Tracker tracker;
 

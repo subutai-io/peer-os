@@ -53,10 +53,11 @@ public class CheckServiceHandlerTest
     @Test
     public void testWithNotConnectedAgents()
     {
-//        when( cassandraMock.getCluster( anyString() ) ).thenReturn( new CassandraClusterConfig() );
-//        AbstractOperationHandler operationHandler = new CheckNodeHandler( cassandraMock, "test-cluster", UUID.randomUUID() );
-//        operationHandler.run();
-//        assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not connected" ) );
-//        assertEquals( operationHandler.getTrackerOperation().getState(), OperationState.FAILED );
+        //        when( cassandraMock.getCluster( anyString() ) ).thenReturn( new CassandraClusterConfig() );
+        //        AbstractOperationHandler operationHandler = new CheckNodeHandler( cassandraMock, "test-cluster",
+        // UUID.randomUUID() );
+        //        operationHandler.run();
+        //        assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not connected" ) );
+        //        assertEquals( operationHandler.getTrackerOperation().getState(), OperationState.FAILED );
     }
 }

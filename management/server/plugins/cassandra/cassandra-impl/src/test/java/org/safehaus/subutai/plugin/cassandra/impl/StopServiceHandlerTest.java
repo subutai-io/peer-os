@@ -35,7 +35,7 @@ public class StopServiceHandlerTest
     public void testWithoutCluster()
     {
         AbstractOperationHandler operationHandler =
-                new StopServiceHandler( cassandraMock, "test-cluster", UUID.randomUUID());
+                new StopServiceHandler( cassandraMock, "test-cluster", UUID.randomUUID() );
         operationHandler.run();
         assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not exist" ) );
         assertEquals( operationHandler.getTrackerOperation().getState(), OperationState.FAILED );
