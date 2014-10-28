@@ -366,7 +366,7 @@ public class Manager
                     }
                     if ( containerHost != null )
                     {
-                        TerminalWindow terminal = new TerminalWindow( containerHosts);
+                        TerminalWindow terminal = new TerminalWindow( containerHosts );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else

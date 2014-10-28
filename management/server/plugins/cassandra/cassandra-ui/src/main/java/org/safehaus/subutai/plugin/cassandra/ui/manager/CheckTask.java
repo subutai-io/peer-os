@@ -19,8 +19,8 @@ public class CheckTask implements Runnable
 {
 
     private final String clusterName;
-    private UUID containerId;
     private final CompleteEvent completeEvent;
+    private UUID containerId;
     private Cassandra cassandra;
     private Tracker tracker;
 
@@ -31,7 +31,7 @@ public class CheckTask implements Runnable
         this.cassandra = cassandra;
         this.tracker = tracker;
         this.clusterName = clusterName;
-        this.containerId  = containerId;
+        this.containerId = containerId;
         this.completeEvent = completeEvent;
     }
 

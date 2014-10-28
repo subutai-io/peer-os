@@ -45,7 +45,6 @@ public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl>
         }
 
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        //        final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
         Iterator iterator = environment.getContainers().iterator();
 
         ContainerHost host = null;

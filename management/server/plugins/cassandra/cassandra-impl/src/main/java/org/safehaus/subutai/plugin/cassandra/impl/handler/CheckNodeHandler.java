@@ -97,7 +97,9 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl>
         else if ( result.getExitCode() == 768 )
         {
             status = "Cassandra is not running";
-        } else {
+        }
+        else
+        {
             status = result.getStdOut();
         }
 
