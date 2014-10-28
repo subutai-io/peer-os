@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.peer.api;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.container.api.ContainerState;
 
 
 /**
@@ -15,6 +16,7 @@ public class ContainerHost extends SubutaiHost
     private UUID creatorPeerId;
     private String templateName;
     private String templateArch;
+    private ContainerState state = ContainerState.UNKNOWN;
 
 
     public ContainerHost( final Agent agent )
@@ -71,9 +73,21 @@ public class ContainerHost extends SubutaiHost
     }
 
 
-    @Override
-    public boolean isConnected( Host host )
+    public ContainerState getState()
     {
-        throw new UnsupportedOperationException( "Container host has no child host." );
+        return state;
+    }
+
+
+    public void setState( final ContainerState state )
+    {
+        this.state = state;
+    }
+
+
+    @Override
+    public boolean isConnected()
+    {
+        return ContainerState.RUNNING.equals( state ) && super.isConnected();
     }
 }

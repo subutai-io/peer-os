@@ -322,17 +322,17 @@ public class ResourceHost extends SubutaiHost
         return result;
     }
 
-
-    @Override
-    public boolean isConnected( final Host host )
-    {
-        try
-        {
-            return ContainerState.RUNNING.equals( getContainerHostState( ( ContainerHost ) host ) );
-        }
-        catch ( CommandException e )
-        {
-            return false;
-        }
-    }
+    //
+    //    @Override
+    //    public boolean isConnected( final Host host )
+    //    {
+    //        try
+    //        {
+    //            return ContainerState.RUNNING.equals( getContainerHostState( ( ContainerHost ) host ) );
+    //        }
+    //        catch ( CommandException e )
+    //        {
+    //            return false;
+    //        }
+    //    }
 }
