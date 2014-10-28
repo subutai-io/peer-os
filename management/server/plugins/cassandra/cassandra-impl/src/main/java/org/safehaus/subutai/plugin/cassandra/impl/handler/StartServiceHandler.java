@@ -8,7 +8,6 @@ import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
@@ -21,20 +20,16 @@ public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl>
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( StartServiceHandler.class.getName() );
-    private String clusterName;
-    private UUID agentUUID;
-    String startCommand = ". /etc/profile && $CASSANDRA_HOME/bin/cassandra";
+    private UUID containerId;
     String serviceStartCommand = "service cassandra start";
-    String serviceStatusCommand = "service cassandra status";
 
 
-    public StartServiceHandler( final CassandraImpl manager, final String clusterName, UUID agentUUID )
+    public StartServiceHandler( final CassandraImpl manager, final String clusterName, UUID containerId )
     {
         super( manager, clusterName );
-        this.agentUUID = agentUUID;
-        this.clusterName = clusterName;
+        this.containerId = containerId;
         trackerOperation = manager.getTracker().createTrackerOperation( CassandraClusterConfig.PRODUCT_KEY,
-                String.format( "Starting %s cluster...", clusterName ) );
+                String.format( "Starting %s container...", clusterName ) );
     }
 
 
@@ -55,7 +50,7 @@ public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl>
         while ( iterator.hasNext() )
         {
             host = ( ContainerHost ) iterator.next();
-            if ( host.getId().equals( agentUUID ) )
+            if ( host.getId().equals( containerId ) )
             {
                 break;
             }
@@ -63,24 +58,22 @@ public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl>
 
         if ( host == null )
         {
-            trackerOperation.addLogFailed( String.format( "No Container with ID %s", agentUUID ) );
+            trackerOperation.addLogFailed( String.format( "No Container with ID %s", containerId ) );
             return;
         }
 
-        if ( !config.getNodes().contains( UUID.fromString( host.getId().toString() ) ) )
-        {
-            trackerOperation.addLogFailed(
-                    String.format( "Agent with ID %s does not belong to cluster %s", host.getId(), clusterName ) );
-            return;
-        }
 
         try
         {
-            CommandResult result = host.execute( new RequestBuilder( startCommand ) );
-            if ( result.getExitCode() == 0 )
+            CommandResult result = host.execute( new RequestBuilder( serviceStartCommand ) );
+            if ( result.hasSucceeded() )
             {
-                result = host.execute( new RequestBuilder( serviceStatusCommand ) );
-                logStatusResults( trackerOperation, result );
+                if ( result.getStdOut().contains( "starting Cassandra ..." ) || result.getStdOut().contains(
+                        "is already running..." ) )
+                {
+                    trackerOperation.addLog( result.getStdOut() );
+                    trackerOperation.addLogDone( "Start succeeded" );
+                }
             }
             else
             {
@@ -89,32 +82,8 @@ public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl>
         }
         catch ( CommandException e )
         {
-            trackerOperation.addLogFailed( String.format( "Start failed, %s", e.getMessage() ) );
+            LOG.error( e.getMessage(), e );
+            trackerOperation.addLogFailed( String.format( "Command failed, %s", e.getMessage() ) );
         }
-    }
-
-
-    private void logStatusResults( TrackerOperation po, CommandResult result )
-    {
-
-        StringBuilder log = new StringBuilder();
-
-        String status = "UNKNOWN";
-        if ( result.getExitCode() == 0 )
-        {
-            status = "Cassandra is running";
-        }
-        else if ( result.getExitCode() == 768 )
-        {
-            status = "Cassandra is not running";
-        }
-        else
-        {
-            status = result.getStdOut();
-        }
-
-        log.append( String.format( "%s", status ) );
-
-        po.addLogDone( log.toString() );
     }
 }

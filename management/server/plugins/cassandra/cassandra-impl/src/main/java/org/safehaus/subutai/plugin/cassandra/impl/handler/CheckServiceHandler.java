@@ -23,6 +23,7 @@ public class CheckServiceHandler extends AbstractOperationHandler<CassandraImpl>
     private static final Logger LOG = LoggerFactory.getLogger( CheckServiceHandler.class.getName() );
     private String clusterName;
     private UUID agentUUID;
+    String serviceStatusCommand = "service cassandra status";
 
 
     public CheckServiceHandler( final CassandraImpl manager, final String clusterName, UUID agentUUID )
@@ -64,23 +65,14 @@ public class CheckServiceHandler extends AbstractOperationHandler<CassandraImpl>
             return;
         }
 
-        if ( !config.getNodes().contains( UUID.fromString( host.getId().toString() ) ) )
-        {
-            trackerOperation.addLogFailed(
-                    String.format( "Agent with ID %s does not belong to cluster %s", host.getId(), clusterName ) );
-            return;
-        }
-
         try
         {
-
-            CommandResult result = host.execute( new RequestBuilder( "service cassandra status" ) );
+            CommandResult result = host.execute( new RequestBuilder( serviceStatusCommand ) );
             logStatusResults( trackerOperation, result );
         }
         catch ( CommandException e )
         {
             trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
-            return;
         }
     }
 

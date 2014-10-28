@@ -8,7 +8,6 @@ import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
@@ -21,20 +20,16 @@ public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl>
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( StopServiceHandler.class.getName() );
-    private String clusterName;
     private UUID containerId;
-    String startCommand = ". /etc/profile && $CASSANDRA_HOME/bin/cassandra";
-    String serviceStartCommand = "service cassandra start";
-    String serviceStatusCommand = "service cassandra status";
+    String serviceStopCommand = "service cassandra stop";
 
 
     public StopServiceHandler( final CassandraImpl manager, final String clusterName, UUID containerId )
     {
         super( manager, clusterName );
         this.containerId = containerId;
-        this.clusterName = clusterName;
         trackerOperation = manager.getTracker().createTrackerOperation( CassandraClusterConfig.PRODUCT_KEY,
-                String.format( "Starting %s cluster...", clusterName ) );
+                String.format( "Stopping %s cluster...", clusterName ) );
     }
 
 
@@ -67,55 +62,23 @@ public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl>
             return;
         }
 
-        if ( !config.getNodes().contains( UUID.fromString( host.getId().toString() ) ) )
-        {
-            trackerOperation.addLogFailed(
-                    String.format( "Agent with ID %s does not belong to cluster %s", host.getId(), clusterName ) );
-            return;
-        }
-
         try
         {
-            CommandResult result = host.execute( new RequestBuilder( startCommand ) );
-            if ( result.getExitCode() == 0 )
+            CommandResult result = host.execute( new RequestBuilder( serviceStopCommand ) );
+            if ( result.hasSucceeded() )
             {
-                result = host.execute( new RequestBuilder( serviceStatusCommand ) );
-                logStatusResults( trackerOperation, result );
+                trackerOperation.addLog( result.getStdOut() );
+                trackerOperation.addLogDone( "Stop succeeded" );
             }
             else
             {
-                trackerOperation.addLogFailed( String.format( "Start failed, %s", result.getStdErr() ) );
+                trackerOperation.addLogFailed( String.format( "Stop failed, %s", result.getStdErr() ) );
             }
         }
         catch ( CommandException e )
         {
-            trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
+            trackerOperation.addLogFailed( String.format( "Command failed, %s", e.getMessage() ) );
             LOG.error( e.getMessage(), e );
-            return;
         }
-    }
-
-    private void logStatusResults( TrackerOperation po, CommandResult result )
-    {
-
-        StringBuilder log = new StringBuilder();
-
-        String status = "UNKNOWN";
-        if ( result.getExitCode() == 0 )
-        {
-            status = "Cassandra is running";
-        }
-        else if ( result.getExitCode() == 768 )
-        {
-            status = "Cassandra is not running";
-        }
-        else
-        {
-            status = result.getStdOut();
-        }
-
-        log.append( String.format( "%s", status ) );
-
-        po.addLogDone( log.toString() );
     }
 }
