@@ -76,14 +76,11 @@ import com.google.gson.reflect.TypeToken;
 /**
  * PeerManager implementation
  */
-public class PeerManagerImpl implements PeerManager, ResponseListener
+public class PeerManagerImpl implements PeerManager
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class.getName() );
     private static final String SOURCE = "PEER_MANAGER";
-    private static final String SOURCE_MANAGEMENT = "MANAGEMENT_HOST";
-    private static final String SOURCE_RESOURCE = "RESOURCE_HOST";
-    private static final String SOURCE_CONTAINER = "CONTAINER_HOST";
     private static final String PEER_GROUP = "PEER_GROUP";
     private final Queue<PeerMessageListener> peerMessageListeners = new ConcurrentLinkedQueue<>();
     private AgentManager agentManager;
@@ -94,7 +91,6 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
     private DataSource dataSource;
     private Set<PeerContainer> containers = new HashSet<>();
     private CommunicationManager communicationManager;
-    private ManagementHost managementHost;
     private LocalPeer localPeer;
     private StrategyManager strategyManager;
 
@@ -116,19 +112,15 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
         {
             LOG.error( e.getMessage(), e );
         }
-        communicationManager.addListener( this );
-        localPeer = new LocalPeerImpl( this, containerManager, templateRegistry );
-        List<ManagementHost> result = peerDAO.getInfo( SOURCE_MANAGEMENT, ManagementHost.class );
-        if ( result.size() > 0 )
-        {
-            managementHost = result.get( 0 );
-        }
+
+        localPeer = new LocalPeerImpl( this, containerManager, templateRegistry, peerDAO, communicationManager );
+        localPeer.init();
     }
 
 
     public void destroy()
     {
-        communicationManager.removeListener( this );
+        localPeer.shutdown();
     }
 
 
@@ -944,82 +936,6 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
     public Collection<PeerMessageListener> getPeerMessageListeners()
     {
         return Collections.unmodifiableCollection( peerMessageListeners );
-    }
-
-
-    @Override
-    public void onResponse( final Response response )
-    {
-        if ( response == null || response.getType() == null )
-        {
-            return;
-        }
-
-        if ( response.getType().equals( ResponseType.REGISTRATION_REQUEST ) || response.getType().equals(
-                ResponseType.HEARTBEAT_RESPONSE ) )
-        {
-            if ( response.getHostname().equals( "management" ) )
-            {
-                if ( managementHost == null )
-                {
-                    managementHost = new ManagementHost( PeerUtils.buildAgent( response ) );
-                    managementHost.setParentAgent( NullAgent.getInstance() );
-                    String json = JsonUtil.toJson( managementHost );
-                    LOG.info( json );
-                    peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), json );
-                }
-                //                managementHost.updateHeartbeat();
-                return;
-            }
-
-            if ( managementHost == null )
-            {
-                return;
-            }
-
-            if ( response.getHostname().startsWith( "py" ) )
-            {
-                org.safehaus.subutai.core.peer.api.ResourceHost host =
-                        managementHost.getResourceHostByName( response.getHostname() );
-                if ( host == null )
-                {
-                    host = new ResourceHost( PeerUtils.buildAgent( response ) );
-                    host.setParentAgent( managementHost.getAgent() );
-                    managementHost.addResourceHost( host );
-                    String json = JsonUtil.toJson( managementHost );
-                    LOG.info( json );
-                    peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), json );
-                }
-                //                host.updateHeartbeat();
-                return;
-            }
-
-            org.safehaus.subutai.core.peer.api.ResourceHost resourceHost =
-                    managementHost.getResourceHostByName( response.getParentHostName() );
-            if ( resourceHost == null )
-            {
-                return;
-            }
-
-            ContainerHost containerHost = resourceHost.getContainerHostByName( response.getHostname() );
-
-            if ( containerHost == null )
-            {
-                containerHost = new ContainerHost( PeerUtils.buildAgent( response ) );
-                containerHost.setParentAgent( resourceHost.getAgent() );
-                resourceHost.addContainerHost( containerHost );
-                String json = JsonUtil.toJson( managementHost );
-                LOG.info( json );
-                peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), json );
-            }
-        }
-    }
-
-
-    @Override
-    public ManagementHost getManagementHost()
-    {
-        return this.managementHost;
     }
 
 

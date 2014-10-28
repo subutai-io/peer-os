@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Container;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
 public interface NetworkManager
@@ -25,4 +26,8 @@ public interface NetworkManager
     public boolean configSsh( Set<Container> containers );
 
     public boolean configSsh( Set<Container> containers, Container container );
+
+    public boolean configSshHosts( Set<ContainerHost> containers );
+
+    public boolean configLinkHosts( String domainName, Set<ContainerHost> containers );
 }

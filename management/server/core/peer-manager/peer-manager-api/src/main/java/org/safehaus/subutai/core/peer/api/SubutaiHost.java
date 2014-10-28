@@ -33,8 +33,8 @@ public abstract class SubutaiHost implements Host
 
     private Agent agent = NullAgent.getInstance();
     private Agent parentAgent = NullAgent.getInstance();
-    //    private long lastHeartbeat;
-    //    private long inactiveTime = 5 * 1000 * 60; // 5 min
+    private long lastHeartbeat = System.currentTimeMillis();
+    transient private static final long INACTIVE_TIME = 5 * 1000 * 60; // 5 min
 
 
     protected SubutaiHost( final Agent agent )
@@ -221,9 +221,22 @@ public abstract class SubutaiHost implements Host
     }
 
 
-    //    @Override
-    //    public void updateHeartbeat()
-    //    {
-    //        lastHeartbeat = System.currentTimeMillis();
-    //    }
+    public void updateHeartbeat()
+    {
+        lastHeartbeat = System.currentTimeMillis();
+    }
+
+
+    @Override
+    public boolean isConnected()
+    {
+        return ( System.currentTimeMillis() - lastHeartbeat ) < INACTIVE_TIME;
+    }
+
+
+    @Override
+    public long getLastHeartbeat()
+    {
+        return lastHeartbeat;
+    }
 }

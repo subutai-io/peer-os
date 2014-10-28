@@ -22,18 +22,24 @@ public class ManagementHost extends SubutaiHost
         super( agent );
     }
 
-
-    @Override
-    public boolean isConnected( final Host host )
-    {
-        //TODO: Implement resource host check
-        return true;
-    }
+    //
+    //    @Override
+    //    public boolean isConnected( final Host host )
+    //    {
+    //        //TODO: Implement resource host check
+    //        return true;
+    //    }
 
 
     public Set<ResourceHost> getResourceHosts()
     {
         return resourceHosts;
+    }
+
+
+    public void setResourceHosts( final Set<ResourceHost> resourceHosts )
+    {
+        this.resourceHosts = resourceHosts;
     }
 
 
