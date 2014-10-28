@@ -114,7 +114,7 @@ public class EnvironmentsForm
                 {
                     try
                     {
-                        managerUI.getEnvironmentManager().destroyEnvironment( environment.getId().toString() );
+                        managerUI.getEnvironmentManager().destroyEnvironment( environment.getId() );
                         environmentsButton.click();
                     }
                     catch ( EnvironmentDestroyException e )

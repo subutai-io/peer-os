@@ -1,11 +1,12 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
 
+import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.OperationState;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StopServiceHandler;
@@ -27,7 +28,6 @@ public class StopServiceHandlerTest
     public void setup()
     {
         cassandraMock = mock( CassandraImpl.class );
-        when( cassandraMock.getAgentManager() ).thenReturn( mock( AgentManager.class ) );
         when( cassandraMock.getCommandRunner() ).thenReturn( mock( CommandRunner.class ) );
         when( cassandraMock.getTracker() ).thenReturn( new TrackerMock() );
         when( cassandraMock.getContainerManager() ).thenReturn( mock( ContainerManager.class ) );
@@ -39,7 +39,7 @@ public class StopServiceHandlerTest
     public void testWithoutCluster()
     {
         AbstractOperationHandler operationHandler =
-                new StopServiceHandler( cassandraMock, "test-cluster", "test-node" );
+                new StopServiceHandler( cassandraMock, "test-cluster", UUID.randomUUID());
         operationHandler.run();
         assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not exist" ) );
         assertEquals( operationHandler.getTrackerOperation().getState(), OperationState.FAILED );

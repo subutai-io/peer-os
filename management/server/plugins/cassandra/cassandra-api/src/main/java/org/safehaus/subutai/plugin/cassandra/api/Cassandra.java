@@ -19,17 +19,17 @@ public interface Cassandra extends ApiBase<CassandraClusterConfig>
 
     UUID stopCluster( String clusterName );
 
-    UUID startService( String clusterName, UUID agentUUID );
+    UUID startService( String clusterName, UUID containerId );
 
-    UUID stopService( String clusterName, String lxchostname );
+    UUID stopService( String clusterName, UUID containerId );
 
-    UUID statusService( String clusterName, String lxchostname );
+    UUID statusService( String clusterName, UUID containerId );
 
-    UUID addNode( String clusterName, String lxchostname, String nodetype );
+    UUID addNode( String clusterName, String nodetype );
 
-    UUID destroyNode( String clusterName, String lxchostname, String nodetype );
+    UUID destroyNode( String clusterName, UUID containerId );
 
-    UUID checkNode( String clustername, String lxchostname );
+    UUID checkNode( String clusterName, UUID containerId );
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, CassandraClusterConfig config,
                                                          TrackerOperation po );

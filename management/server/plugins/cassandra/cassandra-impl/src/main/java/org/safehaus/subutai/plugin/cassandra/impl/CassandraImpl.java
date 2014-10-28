@@ -17,7 +17,6 @@ import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
@@ -43,6 +42,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
+//import org.safehaus.subutai.core.agent.api.AgentManager;
+
 
 public class CassandraImpl implements Cassandra
 {
@@ -52,7 +53,7 @@ public class CassandraImpl implements Cassandra
     private Tracker tracker;
     private ExecutorService executor;
     private CommandRunner commandRunner;
-    private AgentManager agentManager;
+    //    private AgentManager agentManager;
     private EnvironmentManager environmentManager;
     //TODO:remove container manager and use environment manager instead
     private ContainerManager containerManager;
@@ -102,7 +103,7 @@ public class CassandraImpl implements Cassandra
     }
 
 
-    public AgentManager getAgentManager()
+    /*public AgentManager getAgentManager()
     {
         return agentManager;
     }
@@ -111,7 +112,7 @@ public class CassandraImpl implements Cassandra
     public void setAgentManager( final AgentManager agentManager )
     {
         this.agentManager = agentManager;
-    }
+    }*/
 
 
     public EnvironmentManager getEnvironmentManager()
@@ -207,13 +208,6 @@ public class CassandraImpl implements Cassandra
     }
 
 
-    @Override
-    public UUID addNode( final String clusterName, final String agentHostName )
-    {
-        return null;
-    }
-
-
     public PluginDao getPluginDAO()
     {
         return pluginDAO;
@@ -248,34 +242,34 @@ public class CassandraImpl implements Cassandra
 
 
     @Override
-    public UUID startService( final String clusterName, final UUID agentUUID )
+    public UUID startService( final String clusterName, final UUID containerId )
     {
-        AbstractOperationHandler operationHandler = new StartServiceHandler( this, clusterName, agentUUID );
+        AbstractOperationHandler operationHandler = new StartServiceHandler( this, clusterName, containerId );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID stopService( final String clusterName, final String lxchostname )
+    public UUID stopService( final String clusterName, final UUID containerId )
     {
-        AbstractOperationHandler operationHandler = new StopServiceHandler( this, clusterName, lxchostname );
+        AbstractOperationHandler operationHandler = new StopServiceHandler( this, clusterName, containerId );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID statusService( final String clusterName, final String lxchostname )
+    public UUID statusService( final String clusterName, final UUID containerId )
     {
-        AbstractOperationHandler operationHandler = new CheckServiceHandler( this, clusterName, lxchostname );
+        AbstractOperationHandler operationHandler = new CheckServiceHandler( this, clusterName, containerId );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID addNode( final String clusterName, final String lxchostname, final String nodetype )
+    public UUID addNode( final String clusterName, final String nodetype )
     {
         // TODO
         return null;
@@ -283,7 +277,7 @@ public class CassandraImpl implements Cassandra
 
 
     @Override
-    public UUID destroyNode( final String clusterName, final String lxchostname, final String nodetype )
+    public UUID destroyNode( final String clusterName, UUID containerId )
     {
         // TODO
         return null;
@@ -291,9 +285,9 @@ public class CassandraImpl implements Cassandra
 
 
     @Override
-    public UUID checkNode( final String clustername, final String lxchostname )
+    public UUID checkNode( final String clusterName, final UUID containerId )
     {
-        AbstractOperationHandler operationHandler = new CheckNodeHandler( this, clustername, lxchostname );
+        AbstractOperationHandler operationHandler = new CheckNodeHandler( this, clusterName, containerId );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }

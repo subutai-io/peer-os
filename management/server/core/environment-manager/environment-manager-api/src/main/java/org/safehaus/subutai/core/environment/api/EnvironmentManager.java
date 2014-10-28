@@ -43,10 +43,7 @@ public interface EnvironmentManager
      */
     Environment getEnvironment( String environmentName );
 
-    /**
-     * Destroys environment by a given environment name.
-     */
-    boolean destroyEnvironment( String environmentName ) throws EnvironmentDestroyException;
+    boolean destroyEnvironment( UUID environmentId ) throws EnvironmentDestroyException;
 
     boolean saveBlueprint( String blueprint );
 

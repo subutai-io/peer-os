@@ -254,9 +254,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public boolean destroyEnvironment( final String uuid )
+    public boolean destroyEnvironment( final UUID uuid )
     {
-        Environment environment = getEnvironment( uuid );
+        Environment environment = getEnvironmentByUUID( uuid );
         int count = 0;
         /*for ( EnvironmentContainer container : environment.getContainers() )
         {
@@ -276,7 +276,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
         }*/
-        return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
+        return environmentDAO.deleteInfo( ENVIRONMENT, uuid.toString() );
     }
 
 

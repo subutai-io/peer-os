@@ -1,18 +1,22 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
-import java.util.Set;
-
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl>
 {
 
+    private static final Logger LOG = LoggerFactory.getLogger( StopClusterHandler.class.getName() );
     private String clusterName;
 
 
@@ -21,7 +25,7 @@ public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl>
         super( manager, clusterName );
         this.clusterName = clusterName;
         trackerOperation = manager.getTracker().createTrackerOperation( CassandraClusterConfig.PRODUCT_KEY,
-                String.format( "Setting up %s cluster...", clusterName ) );
+                String.format( "Stopping %s cluster...", clusterName ) );
     }
 
 
@@ -36,17 +40,26 @@ public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl>
             return;
         }
 
-        Set<Agent> agentSet = manager.getAgentManager().returnAgentsByGivenUUIDSet( config.getNodes() );
-        Command stopServiceCommand = manager.getCommands().getStopCommand( agentSet );
-        manager.getCommandRunner().runCommand( stopServiceCommand );
-
-        if ( stopServiceCommand.hasSucceeded() )
+        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+        for ( ContainerHost host : environment.getContainers() )
         {
-            trackerOperation.addLogDone( "Stop succeeded" );
-        }
-        else
-        {
-            trackerOperation.addLogFailed( String.format( "Start failed, %s", stopServiceCommand.getAllErrors() ) );
+            try
+            {
+                CommandResult result = host.execute( new RequestBuilder( "service cassandra stop" ) );
+                if ( result.hasSucceeded() )
+                {
+                    trackerOperation.addLogDone( "Stop succeeded" );
+                }
+                else
+                {
+                    trackerOperation.addLogFailed( String.format( "Stop failed, %s", result.getStdErr() ) );
+                }
+            }
+            catch ( CommandException e )
+            {
+                trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
+                LOG.error( e.getMessage(), e );
+            }
         }
     }
 }

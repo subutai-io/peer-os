@@ -12,11 +12,14 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl>
 {
 
+    private static final Logger LOG = LoggerFactory.getLogger( StartServiceHandler.class.getName() );
     private String clusterName;
     private UUID agentUUID;
 
@@ -57,7 +60,7 @@ public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl>
 
         if ( host == null )
         {
-            trackerOperation.addLogFailed( String.format( "Agent with ID %s is not connected", agentUUID ) );
+            trackerOperation.addLogFailed( String.format( "No Container with ID %s", agentUUID ) );
             return;
         }
 
@@ -99,25 +102,6 @@ public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl>
         catch ( CommandException e )
         {
             trackerOperation.addLogFailed( String.format( "Start failed, %s", e.getMessage() ) );
-            return;
         }
-
-        /*Command startCommand = manager.getCommands().getStartCommand( Sets.newHashSet( node ) );
-        manager.getCommandRunner().runCommand( startCommand );
-
-        if ( startCommand.hasSucceeded() )
-        {
-            AgentResult ar = startCommand.getResults().get( node.getUuid() );
-            if ( ar.getStdOut().contains( "starting Cassandra ..." ) || ar.getStdOut()
-                                                                          .contains( "is already running..." ) )
-            {
-                trackerOperation.addLog( ar.getStdOut() );
-                trackerOperation.addLogDone( "Start succeeded" );
-            }
-        }
-        else
-        {
-            trackerOperation.addLogFailed( String.format( "Start failed, %s", startCommand.getAllErrors() ) );
-        }*/
     }
 }

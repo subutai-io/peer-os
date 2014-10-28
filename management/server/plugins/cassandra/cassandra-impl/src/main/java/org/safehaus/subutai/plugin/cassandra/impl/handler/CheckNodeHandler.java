@@ -1,34 +1,40 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
-
-import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl>
 {
 
+    private static final Logger LOG = LoggerFactory.getLogger( CheckServiceHandler.class.getName() );
     private String clusterName;
-    private String lxcHostname;
+    private UUID agentUUID;
 
 
-    public CheckNodeHandler( final CassandraImpl manager, String clusterName, String lxcHostname )
+    public CheckNodeHandler( final CassandraImpl manager, final String clusterName, UUID agentUUID )
     {
         super( manager, clusterName );
+        this.agentUUID = agentUUID;
         this.clusterName = clusterName;
-        this.lxcHostname = lxcHostname;
         trackerOperation = manager.getTracker().createTrackerOperation( CassandraClusterConfig.PRODUCT_KEY,
-                String.format( "Checking cassandra on %s of %s cluster...", lxcHostname, clusterName ) );
+                String.format( "Checking %s cluster...", clusterName ) );
     }
 
 
@@ -42,30 +48,56 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl>
             return;
         }
 
-        final Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( agent == null )
+        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+        Iterator iterator = environment.getContainers().iterator();
+
+        ContainerHost host = null;
+        while ( iterator.hasNext() )
         {
-            trackerOperation.addLogFailed( "Agent is not connected !" );
+            host = ( ContainerHost ) iterator.next();
+            if ( host.getId().equals( agentUUID ) )
+            {
+                break;
+            }
+        }
+
+        if ( host == null )
+        {
+            trackerOperation.addLogFailed( String.format( "No Container with ID %s", agentUUID ) );
             return;
         }
 
-        if ( !config.getNodes().contains( UUID.fromString( agent.getUuid().toString() ) ) )
+        if ( !config.getNodes().contains( UUID.fromString( host.getId().toString() ) ) )
         {
             trackerOperation.addLogFailed(
-                    String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
+                    String.format( "Agent with ID %s does not belong to cluster %s", host.getId(), clusterName ) );
             return;
         }
 
-        Command statusServiceCommand = manager.getCommands().getStatusCommand( Sets.newHashSet( agent ) );
-        manager.getCommandRunner().runCommand( statusServiceCommand );
+        try
+        {
 
-        if ( statusServiceCommand.hasSucceeded() )
-        {
-            trackerOperation.addLogDone( "Cassandra is running" );
+            CommandResult result = host.execute( new RequestBuilder( "service cassandra status" ) );
+            if ( result.getExitCode() == 0 )
+            {
+                if ( result.getStdOut().contains( "running..." ) )
+                {
+                    trackerOperation.addLogDone( "Service running" );
+                }
+                else
+                {
+                    trackerOperation.addLogFailed( String.format( "Unexpected result, %s", result.getStdErr() ) );
+                }
+            }
+            else
+            {
+                trackerOperation.addLogFailed( String.format( "Checking service failed, %s", result.getStdErr() ) );
+            }
         }
-        else
+        catch ( CommandException e )
         {
-            logStatusResults( trackerOperation, statusServiceCommand );
+            trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
+            return;
         }
     }
 

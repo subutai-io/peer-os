@@ -7,17 +7,11 @@ package org.safehaus.subutai.server.ui.component;
 
 
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.enums.ResponseType;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
+import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 import com.google.common.base.Strings;
 import com.vaadin.event.ShortcutAction;
@@ -47,16 +41,14 @@ public class TerminalWindow
     private int commandTimeout = 30;
 
 
-    public TerminalWindow( final Set<Agent> agents, final ExecutorService executor, final CommandRunner commandRunner,
-                           final AgentManager agentManager, int commandTimeout )
+    public TerminalWindow( final Set<ContainerHost> containerHosts, int commandTimeout )
     {
-        this( agents, executor, commandRunner, agentManager );
+        this( containerHosts );
         this.commandTimeout = commandTimeout;
     }
 
 
-    public TerminalWindow( final Set<Agent> agents, final ExecutorService executor, final CommandRunner commandRunner,
-                           final AgentManager agentManager )
+    public TerminalWindow( final Set<ContainerHost> containerHosts )
     {
 
         GridLayout grid = new GridLayout();
@@ -128,10 +120,40 @@ public class TerminalWindow
                 {
                     indicator.setVisible( true );
                     taskCount++;
-                    final Command command = commandRunner
+                    /*final Command command = commandRunner
                             .createCommand( new RequestBuilder( txtCommand.getValue() ).withTimeout( commandTimeout ),
-                                    agents );
-                    executor.execute( new Runnable()
+                                    agents );*/
+                    for ( ContainerHost containerHost : containerHosts )
+                    {
+                        try
+                        {
+                            CommandResult result = containerHost.execute(
+                                    new RequestBuilder( txtCommand.getValue() ).withTimeout( commandTimeout ) );
+                            StringBuilder out = new StringBuilder( containerHost.getId().toString() ).append( ":\n" );
+                            if ( !Strings.isNullOrEmpty( result.getStdOut() ) )
+                            {
+                                out.append( result.getStdOut() ).append( '\n' );
+                            }
+                            if ( !Strings.isNullOrEmpty( result.getStdErr() ) )
+                            {
+                                out.append( result.getStdErr() ).append( '\n' );
+                            }
+                            if ( result.hasCompleted() )
+                            {
+                                out.append( "Exit code: " ).append( result.getExitCode() ).append( "\n\n" );
+                            }
+                            else
+                            {
+                                out.append( "Command has not completed" ).append( "\n\n" );
+                            }
+                            addOutput( out.toString() );
+                        }
+                        catch ( CommandException e )
+                        {
+
+                        }
+                    }
+                    /*executor.execute( new Runnable()
                     {
                         @Override
                         public void run()
@@ -175,7 +197,7 @@ public class TerminalWindow
                                 indicator.setVisible( false );
                             }
                         }
-                    } );
+                    } );*/
                 }
                 else
                 {

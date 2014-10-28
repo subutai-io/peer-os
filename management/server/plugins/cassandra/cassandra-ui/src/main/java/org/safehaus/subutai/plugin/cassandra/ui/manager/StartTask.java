@@ -14,19 +14,19 @@ public class StartTask implements Runnable
 {
 
     private final String clusterName;
-    private UUID agentUUID;
+    private UUID containerId;
     private final CompleteEvent completeEvent;
     private Cassandra cassandra;
     private Tracker tracker;
 
 
-    public StartTask( Cassandra cassandra, Tracker tracker, String clusterName, UUID agentUUID,
+    public StartTask( Cassandra cassandra, Tracker tracker, String clusterName, UUID containerId,
                       CompleteEvent completeEvent )
     {
         this.cassandra = cassandra;
         this.tracker = tracker;
         this.clusterName = clusterName;
-        this.agentUUID = agentUUID;
+        this.containerId = containerId;
         this.completeEvent = completeEvent;
     }
 
@@ -35,7 +35,7 @@ public class StartTask implements Runnable
     public void run()
     {
 
-        UUID trackID = cassandra.startService( clusterName, agentUUID );
+        UUID trackID = cassandra.startService( clusterName, containerId );
 
         long start = System.currentTimeMillis();
         while ( !Thread.interrupted() )

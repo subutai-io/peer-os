@@ -1,18 +1,18 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
-import java.util.Set;
-
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class UninstallClusterHandler extends AbstractOperationHandler<CassandraImpl>
 {
 
+    private static final Logger LOG = LoggerFactory.getLogger( UninstallClusterHandler.class.getName() );
     private String clusterName;
 
 
@@ -28,7 +28,6 @@ public class UninstallClusterHandler extends AbstractOperationHandler<CassandraI
     @Override
     public void run()
     {
-        trackerOperation.addLog( "Building environment..." );
         CassandraClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -36,22 +35,17 @@ public class UninstallClusterHandler extends AbstractOperationHandler<CassandraI
             return;
         }
 
-        trackerOperation.addLog( "Destroying lxc containers" );
         try
         {
-            Set<Agent> agentSet = manager.getAgentManager().returnAgentsByGivenUUIDSet( config.getNodes() );
-            manager.getContainerManager().clonesDestroy( agentSet );
-//            manager.getEnvironmentManager().destroyEnvironment( config.getEnvironmentId() );
-            trackerOperation.addLog( "Lxc containers successfully destroyed" );
+            trackerOperation.addLog( "Destroying environment..." );
+            manager.getEnvironmentManager().destroyEnvironment( config.getEnvironmentId() );
+            manager.getPluginDAO().deleteInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName() );
+            trackerOperation.addLogDone( "Cluster destroyed" );
         }
-        catch ( LxcDestroyException ex )
+        catch ( EnvironmentDestroyException e )
         {
-            trackerOperation.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
+            trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
+            LOG.error( e.getMessage(), e );
         }
-
-        trackerOperation.addLog( "Deleting cluster information from database.." );
-
-        manager.getPluginDAO().deleteInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName() );
-        trackerOperation.addLogDone( "Cluster info deleted from database" );
     }
 }
