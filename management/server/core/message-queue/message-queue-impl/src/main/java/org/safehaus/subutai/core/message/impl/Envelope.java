@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.message.impl;
 
 
+import java.sql.Timestamp;
 import java.util.UUID;
 
 import org.safehaus.subutai.core.message.api.Message;
@@ -19,6 +20,9 @@ public class Envelope
     private final UUID targetPeerId;
     private final String recipient;
     private final int timeToLive;
+    private transient int attempts;
+    private transient boolean isSent;
+    private transient Timestamp createDate;
 
 
     public Envelope( final MessageImpl message, UUID sourcePeerId, UUID targetPeerId, String recipient, int timeToLive )
@@ -64,5 +68,41 @@ public class Envelope
     public int getTimeToLive()
     {
         return timeToLive;
+    }
+
+
+    public int getAttempts()
+    {
+        return attempts;
+    }
+
+
+    public void setAttempts( final int attempts )
+    {
+        this.attempts = attempts;
+    }
+
+
+    public boolean isSent()
+    {
+        return isSent;
+    }
+
+
+    public void setSent( final boolean isSent )
+    {
+        this.isSent = isSent;
+    }
+
+
+    public Timestamp getCreateDate()
+    {
+        return createDate;
+    }
+
+
+    public void setCreateDate( final Timestamp createDate )
+    {
+        this.createDate = ( Timestamp ) createDate.clone();
     }
 }
