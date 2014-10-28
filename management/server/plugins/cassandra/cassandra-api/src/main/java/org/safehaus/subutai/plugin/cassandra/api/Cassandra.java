@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
@@ -19,22 +19,22 @@ public interface Cassandra extends ApiBase<CassandraClusterConfig>
 
     UUID stopCluster( String clusterName );
 
-    UUID startService( String clusterName, String lxchostname );
+    UUID startService( String clusterName, UUID containerId );
 
-    UUID stopService( String clusterName, String lxchostname );
+    UUID stopService( String clusterName, UUID containerId );
 
-    UUID statusService( String clusterName, String lxchostname );
+    UUID statusService( String clusterName, UUID containerId );
 
-    UUID addNode( String clusterName, String lxchostname, String nodetype );
+    UUID addNode( String clusterName, String nodetype );
 
-    UUID destroyNode( String clusterName, String lxchostname, String nodetype );
+    UUID destroyNode( String clusterName, UUID containerId );
 
-    UUID checkNode( String clustername, String lxchostname );
+    UUID checkNode( String clusterName, UUID containerId );
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, CassandraClusterConfig config,
                                                          TrackerOperation po );
 
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( CassandraClusterConfig config );
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( CassandraClusterConfig config );
 
     UUID configureEnvironmentCluster( CassandraClusterConfig config );
 }

@@ -15,8 +15,8 @@
              interface="org.safehaus.subutai.core.network.api.NetworkManager" />-->
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
+  <!--<reference id="agentManager" availability="mandatory"-->
+             <!--interface="org.safehaus.subutai.core.agent.api.AgentManager" />-->
   <reference id="containerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.container.api.container.ContainerManager" />
   <reference id="environmentManager" availability="mandatory"
@@ -28,7 +28,7 @@
     <!--<property name="lxcManager" ref="lxcManager" />-->
     <!--<property name="networkManager" ref="networkManager" />-->
     <property name="commandRunner" ref="commandRunner" />
-    <property name="agentManager" ref="agentManager" />
+    <!--<property name="agentManager" ref="agentManager" />-->
     <property name="containerManager" ref="containerManager" />
     <property name="environmentManager" ref="environmentManager" />
     <argument ref="dataSource" />

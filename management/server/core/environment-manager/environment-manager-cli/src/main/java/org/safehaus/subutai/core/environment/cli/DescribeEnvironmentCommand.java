@@ -19,7 +19,7 @@ public class DescribeEnvironmentCommand extends OsgiCommandSupport
 
     EnvironmentManager environmentManager;
 
-    @Argument( name = "environmentName", index = 0, required = true, multiValued = false,
+    @Argument( name = "environmentId", index = 0, required = true, multiValued = false,
             description = "Environment name", valueToShowInHelp = "Environment name" )
     String environmentName;
 

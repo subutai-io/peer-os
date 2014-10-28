@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.network.impl;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -8,6 +9,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 import com.google.common.base.Preconditions;
 
@@ -81,5 +83,33 @@ public class NetworkManagerImpl implements NetworkManager
     public boolean configSsh( final Set<Container> containers, final Container container )
     {
         return new SshManager( containers, commands ).execute( container );
+    }
+
+
+    @Override
+    @Deprecated
+    public boolean configSshHosts( final Set<ContainerHost> containers )
+    {
+        List<Agent> agentSet = new ArrayList<>();
+        for ( ContainerHost host : containers )
+        {
+            agentSet.add( host.getAgent() );
+        }
+        configSshOnAgents( agentSet );
+        return true;
+    }
+
+
+    @Override
+    @Deprecated
+    public boolean configLinkHosts( final String domainName, final Set<ContainerHost> containers )
+    {
+        List<Agent> agentSet = new ArrayList<>();
+        for ( ContainerHost host : containers )
+        {
+            agentSet.add( host.getAgent() );
+        }
+        configHostsOnAgents( agentSet, domainName );
+        return true;
     }
 }

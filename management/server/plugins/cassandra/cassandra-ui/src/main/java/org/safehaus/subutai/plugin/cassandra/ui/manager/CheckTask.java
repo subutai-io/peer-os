@@ -18,19 +18,20 @@ import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 public class CheckTask implements Runnable
 {
 
-    private final String clusterName, lxcHostname;
+    private final String clusterName;
+    private UUID containerId;
     private final CompleteEvent completeEvent;
     private Cassandra cassandra;
     private Tracker tracker;
 
 
-    public CheckTask( Cassandra cassandra, Tracker tracker, String clusterName, String lxcHostname,
+    public CheckTask( Cassandra cassandra, Tracker tracker, String clusterName, UUID containerId,
                       CompleteEvent completeEvent )
     {
         this.cassandra = cassandra;
         this.tracker = tracker;
         this.clusterName = clusterName;
-        this.lxcHostname = lxcHostname;
+        this.containerId  = containerId;
         this.completeEvent = completeEvent;
     }
 
@@ -38,7 +39,7 @@ public class CheckTask implements Runnable
     public void run()
     {
 
-        UUID trackID = cassandra.checkNode( clusterName, lxcHostname );
+        UUID trackID = cassandra.checkNode( clusterName, containerId );
 
         long start = System.currentTimeMillis();
         while ( !Thread.interrupted() )

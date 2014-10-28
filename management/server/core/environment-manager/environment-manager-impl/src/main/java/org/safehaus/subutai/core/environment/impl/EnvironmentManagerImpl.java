@@ -17,7 +17,6 @@ import java.util.UUID;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
@@ -31,6 +30,7 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.TopologyEnum;
@@ -39,24 +39,22 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerExc
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenceException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.TopologyBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
-import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
@@ -119,6 +117,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     PeerManager peerManager;
+    TopologyBuilder topologyBuilder;
 
 
     public void init()
@@ -126,6 +125,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
+            topologyBuilder = new TopologyBuilder( this );
             this.environmentDAO = new EnvironmentDAO( dataSource );
         }
         catch ( SQLException e )
@@ -227,11 +227,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
      * This method should be deprecated soon
      */
     @Override
-    public Environment buildEnvironment( final EnvironmentBuildTask environmentBuildTask )
-            throws EnvironmentBuildException
+    public Environment buildEnvironment( final EnvironmentBlueprint blueprint ) throws EnvironmentBuildException
     {
 
-        return environmentBuilder.build( environmentBuildTask );
+        saveBlueprint( GSON.toJson( blueprint ) );
+        EnvironmentBuildProcess process =
+                topologyBuilder.createEnvironmentBuildProcessB2P( blueprint.getId(), getPeerId() );
+
+
+        return buildEnvironment( process );
     }
 
 
@@ -250,9 +254,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public boolean destroyEnvironment( final String uuid )
+    public boolean destroyEnvironment( final UUID uuid )
     {
-        Environment environment = getEnvironment( uuid );
+        Environment environment = getEnvironmentByUUID( uuid );
         int count = 0;
         /*for ( EnvironmentContainer container : environment.getContainers() )
         {
@@ -272,7 +276,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
         }*/
-        return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
+        return environmentDAO.deleteInfo( ENVIRONMENT, uuid.toString() );
     }
 
 
@@ -361,7 +365,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
+    public Environment buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
     {
         try
         {
@@ -412,45 +416,32 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 try
                 {
                     operation.addLog( String.format( "sending clone command: %s", ccm.toString() ) );
-                    peerCommandDispatcher.invoke( ccm, timeout );
+                    //                    peerCommandDispatcher.invoke( ccm, timeout );
+                    Set<ContainerHost> containers = peerManager.getPeer( ccm.getPeerId() ).
+                            createContainers( peerId, ccm.getEnvId(), ccm.getTemplates(), ccm.getNumberOfNodes(),
+                                    ccm.getStrategy(), null );
+                    if ( !containers.isEmpty() )
+                    {
+                        for ( ContainerHost container : containers )
+                        {
+                            environment.addContainer( container );
+                        }
+                    }
+                    else
+                    {
+                        environment.setStatus( EnvironmentStatusEnum.BROKEN );
+                        saveEnvironment( environment );
+                        throw new EnvironmentBuildException(
+                                String.format( "FAILED creating environment on %s", ccm.getPeerId() ) );
+                    }
                 }
-                catch ( PeerCommandException e )
+                catch ( ContainerCreateException e )
                 {
                     LOG.error( e.getMessage(), e );
                     operation.addLogFailed( "Error occured while invoking command." );
                     environment.setStatus( EnvironmentStatusEnum.BROKEN );
                     saveEnvironment( environment );
                     throw new EnvironmentBuildException( e.getMessage() );
-                }
-
-                boolean result = ccm.isSuccess();
-                if ( result )
-                {
-                    Set<Agent> agents = ( Set<Agent> ) ccm.getResult();
-                    if ( !agents.isEmpty() )
-                    {
-                        for ( Agent agent : agents )
-                        {
-                            EnvironmentContainer container = new EnvironmentContainer();
-
-                            container.setPeerId( agent.getSiteId() );
-                            container.setAgentId( agent.getUuid() );
-                            container.setIps( agent.getListIP() );
-                            container.setHostname( agent.getHostname() );
-                            container.setDescription( ccm.getTemplate() + " agent " + agent.getEnvironmentId() );
-                            container.setName( agent.getHostname() );
-                            container.setTemplateName( ccm.getTemplate() );
-
-                            environment.addContainer( container );
-                        }
-                    }
-                }
-                else
-                {
-                    environment.setStatus( EnvironmentStatusEnum.BROKEN );
-                    saveEnvironment( environment );
-                    throw new EnvironmentBuildException(
-                            String.format( "FAILED creating environment on %s", ccm.getPeerId() ) );
                 }
             }
 
@@ -462,16 +453,29 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             else
             {
-                Set<Container> containers = Sets.newHashSet();
-                containers.addAll( environment.getContainers() );
-
                 if ( blueprint.isExchangeSshKeys() )
                 {
-                    networkManager.configSsh( containers );
+                    /*try
+                    {
+                        peerManager.getPeer( getPeerId() ).configureSshHosts( environment.getContainers() );
+                    }
+                    catch ( PeerException e )
+                    {
+                        LOG.error( e.getMessage(), e );
+                    }*/
+                    networkManager.configSshHosts( environment.getContainers() );
                 }
                 if ( blueprint.isLinkHosts() )
                 {
-                    networkManager.configHosts( blueprint.getDomainName(), containers );
+                    /*try
+                    {
+                        peerManager.getPeer( getPeerId() ).configureLinkHosts( environment.getContainers() );
+                    }
+                    catch ( PeerException e )
+                    {
+                        LOG.error( e.getMessage(), e );
+                    }*/
+                    networkManager.configLinkHosts( blueprint.getDomainName(), environment.getContainers() );
                 }
                 if ( environment.getContainers().size() != containerCount )
                 {
@@ -482,8 +486,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     environment.setStatus( EnvironmentStatusEnum.HEALTHY );
                 }
                 saveEnvironment( environment );
-                operation.addLogDone( "Complete" );
             }
+            operation.addLogDone( "Complete" );
+            return environment;
         }
         catch ( EnvironmentPersistenceException e )
         {
@@ -533,16 +538,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Set<EnvironmentContainer> getConnectedContainers( final Environment environment )
+    public Set<ContainerHost> getConnectedContainers( final Environment environment )
     {
 
         Set<UUID> peers = new HashSet<>();
-        for ( EnvironmentContainer ec : environment.getContainers() )
+        for ( ContainerHost ec : environment.getContainers() )
         {
             peers.add( ec.getPeerId() );
         }
 
-        Set<EnvironmentContainer> freshContainers = new HashSet<>();
+        Set<ContainerHost> freshContainers = new HashSet<>();
         for ( UUID peerId : peers )
         {
             PeerCommandMessage cmd =
@@ -561,11 +566,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 for ( Container c : containers )
                 {
-                    EnvironmentContainer ec = new EnvironmentContainer();
+                    ContainerHost ec = new ContainerHost( null );
                     ec.setEnvironmentId( environment.getId() );
-
-                    ec.setAgentId( c.getAgentId() );
-                    ec.setPeerId( c.getPeerId() );
                     freshContainers.add( ec );
                 }
             }
@@ -579,7 +581,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Environment environment = environmentDAO.getInfo( ENVIRONMENT, environmentId.toString(), Environment.class );
 
-        environmentBuilder.convertEnvironmentContainersToNodes( environment );
+        //        environmentBuilder.convertEnvironmentContainersToNodes( environment );
 
         return environment;
     }
@@ -590,7 +592,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                      final Map<Object, NodeGroup> map, TopologyEnum topologyEnum )
     {
         EnvironmentBuildProcess process = null;
-        TopologyBuilder topologyBuilder = new TopologyBuilder( this );
+
         switch ( topologyEnum )
         {
             case NODE_2_PEER:

@@ -19,8 +19,8 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import com.google.common.collect.Lists;
@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 /**
  * This class creates containers according to supplied Environment Blueprint
  */
+@Deprecated
 public class EnvironmentBuilder
 {
 
@@ -49,6 +50,7 @@ public class EnvironmentBuilder
 
 
     //@todo destroy all containers of all groups inside environment on any failure ???
+    @Deprecated
     public Environment build( final EnvironmentBuildTask environmentBuildTask ) throws EnvironmentBuildException
     {
 
@@ -88,7 +90,7 @@ public class EnvironmentBuilder
                 throw new EnvironmentBuildException(
                         String.format( "Template %s not registered", nodeGroup.getTemplateName() ) );
             }
-            Set<EnvironmentContainer> environmentContainers = new HashSet<>();
+            Set<ContainerHost> environmentContainers = new HashSet<>();
             try
             {
                 Set<Agent> agents = containerManager
@@ -96,7 +98,7 @@ public class EnvironmentBuilder
                                 physicalAgents, placementStrategy );
                 for ( Agent agent : agents )
                 {
-                    environmentContainers.add( new EnvironmentContainer( agent, template, nodeGroup.getName() ) );
+                    environmentContainers.add( new ContainerHost( agent ) );
                 }
 
 
@@ -122,13 +124,13 @@ public class EnvironmentBuilder
             {
 
                 //destroy lxcs here
-                Set<EnvironmentContainer> alreadyBuiltEnvironmentContainers = environment.getContainers();
+                Set<ContainerHost> alreadyBuiltEnvironmentContainers = environment.getContainers();
 
                 if ( alreadyBuiltEnvironmentContainers != null && !alreadyBuiltEnvironmentContainers.isEmpty() )
                 {
 
                     Set<Agent> agents = new HashSet<>();
-                    for ( EnvironmentContainer environmentContainer : alreadyBuiltEnvironmentContainers )
+                    for ( ContainerHost environmentContainer : alreadyBuiltEnvironmentContainers )
                     {
                         agents.add( environmentContainer.getAgent() );
                     }
@@ -150,7 +152,7 @@ public class EnvironmentBuilder
         }
 
         List<Agent> allAgents = new ArrayList<>();
-        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
+        for ( ContainerHost environmentContainer : environment.getContainers() )
         {
             allAgents.add( environmentContainer.getAgent() );
         }
@@ -174,18 +176,17 @@ public class EnvironmentBuilder
     }
 
 
-    public Environment convertEnvironmentContainersToNodes( final Environment environment )
+    /*public Environment convertEnvironmentContainersToNodes( final Environment environment )
     {
-        final Set<EnvironmentContainer> environmentContainers = new HashSet<>();
-        for ( EnvironmentContainer container : environment.getContainers() )
+        final Set<ContainerHost> environmentContainers = new HashSet<>();
+        for ( ContainerHost container : environment.getContainers() )
         {
             Agent agent = agentManager.getAgentByHostname( container.getHostname() );
-            Template template = templateRegistry.getTemplate( container.getTemplateName() );
-            EnvironmentContainer environmentContainer = new EnvironmentContainer( agent, template, "cassandra" );
+            ContainerHost environmentContainer = new ContainerHost( agent );
             environmentContainers.add( environmentContainer );
         }
 
         environment.setContainers( environmentContainers );
         return environment;
-    }
+    }*/
 }
