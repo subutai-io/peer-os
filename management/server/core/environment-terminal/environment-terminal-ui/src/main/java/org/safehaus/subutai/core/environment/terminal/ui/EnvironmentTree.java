@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+//import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.server.ui.component.ConcurrentComponent;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
     private static final Logger LOG = LoggerFactory.getLogger( UI.getCurrent().getClass().getName() );
     private final Tree tree;
     private HierarchicalContainer container;
-    private Set<EnvironmentContainer> selectedContainers = new HashSet<>();
+    private Set<ContainerHost> selectedContainers = new HashSet<>();
     private Environment environment;
     private final ScheduledExecutorService scheduler;
 
@@ -103,11 +103,11 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 Item item = tree.getItem( itemId );
                 if ( item != null )
                 {
-                    EnvironmentContainer ec = ( EnvironmentContainer ) item.getItemProperty( "value" ).getValue();
+                    ContainerHost ec = ( ContainerHost ) item.getItemProperty( "value" ).getValue();
                     if ( ec != null )
                     {
                         description = "Hostname: " + ec.getHostname() + "<br>" + "Peer ID: " + ec.getPeerId() + "<br>"
-                                + "Agent ID: " + ec.getAgentId() + "<br>" + "Description: " + ec.getDescription();
+                                + "Agent ID: " + ec.getId();
                     }
                 }
 
@@ -126,15 +126,15 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 {
                     Tree t = ( Tree ) event.getProperty();
 
-                    Set<EnvironmentContainer> selectedList = new HashSet<>();
+                    Set<ContainerHost> selectedList = new HashSet<>();
 
                     for ( Object o : ( Iterable<?> ) t.getValue() )
                     {
                         if ( tree.getItem( o ).getItemProperty( "value" ).getValue() != null )
                         {
-                            EnvironmentContainer environmentContainer =
-                                    ( EnvironmentContainer ) tree.getItem( o ).getItemProperty( "value" ).getValue();
-                            selectedList.add( environmentContainer );
+                            ContainerHost containerHost =
+                                    ( ContainerHost ) tree.getItem( o ).getItemProperty( "value" ).getValue();
+                            selectedList.add( containerHost );
                         }
                     }
 
@@ -155,7 +155,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
     public HierarchicalContainer getNodeContainer()
     {
         container = new HierarchicalContainer();
-        container.addContainerProperty( "value", EnvironmentContainer.class, null );
+        container.addContainerProperty( "value", ContainerHost.class, null );
         container.addContainerProperty( "icon", Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
 
         tree.removeAllItems();
@@ -199,7 +199,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
     }
 
 
-    public Set<EnvironmentContainer> getSelectedContainers()
+    public Set<ContainerHost> getSelectedContainers()
     {
         return Collections.unmodifiableSet( selectedContainers );
     }
