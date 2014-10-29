@@ -6,8 +6,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -111,15 +115,27 @@ public class MessageSender
             peerEnvelopes.add( envelope );
         }
 
+        CompletionService<Boolean> completer = new ExecutorCompletionService<>( restExecutor );
+
         //try to send messages in parallel - one thread per peer
         for ( Map.Entry<UUID, Set<Envelope>> envelopsPerPeer : peerEnvelopesMap.entrySet() )
         {
             PeerInterface targetPeer = peerManager.getPeer( envelopsPerPeer.getKey() );
-            restExecutor
-                    .execute( new PeerMessageSender( restUtil, messengerDao, targetPeer, envelopsPerPeer.getValue() ) );
+            completer.submit( new PeerMessageSender( restUtil, messengerDao, targetPeer, envelopsPerPeer.getValue() ) );
         }
 
-        //TODO wait for tasks to finish, for this we need to implement Callable PeerMessageSender and use probably
-        // Completion service
+        //wait for completion
+        try
+        {
+            for ( int i = 0; i < peerEnvelopesMap.size(); i++ )
+            {
+                Future<Boolean> future = completer.take();
+                future.get();
+            }
+        }
+        catch ( InterruptedException | ExecutionException ignore )
+        {
+            LOG.warn( ignore.getMessage() );
+        }
     }
 }

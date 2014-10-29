@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.messenger.impl;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -17,7 +18,7 @@ import com.google.common.collect.Maps;
 /**
  * Delivers messages to a specific peer
  */
-public class PeerMessageSender implements Runnable
+public class PeerMessageSender implements Callable<Boolean>
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerMessageSender.class.getName() );
 
@@ -38,7 +39,7 @@ public class PeerMessageSender implements Runnable
 
 
     @Override
-    public void run()
+    public Boolean call()
     {
         for ( Envelope envelope : envelopes )
         {
@@ -66,5 +67,6 @@ public class PeerMessageSender implements Runnable
                 break;
             }
         }
+        return true;
     }
 }
