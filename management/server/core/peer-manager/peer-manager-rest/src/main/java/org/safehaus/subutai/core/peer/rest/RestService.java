@@ -72,9 +72,14 @@ public interface RestService
     @Produces(MediaType.APPLICATION_JSON)
     public Response createContainers( @FormParam("ownerPeerId") String ownerPeerId,
                                       @FormParam("environmentId") String environmentId,
-                                      @FormParam("templates") String templates,
-                                      @FormParam("quantity") int quantity, @FormParam("strategyId") String strategyId,
+                                      @FormParam("templates") String templates, @FormParam("quantity") int quantity,
+                                      @FormParam("strategyId") String strategyId,
                                       @FormParam("criteria") String criteria );
+
+    @POST
+    @Path( "execute" )
+    @Produces( MediaType.APPLICATION_JSON )
+    public Response execute( @FormParam( "requestBuilder" ) String requestBuilder, @FormParam( "host" ) String host );
 
     @GET
     @Path("ping")

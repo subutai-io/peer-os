@@ -10,21 +10,25 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.PeerStatus;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
@@ -303,6 +307,25 @@ public class RestServiceImpl implements RestService
             //            return Response.ok().entity( result ).build();
         }
         catch ( ContainerCreateException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response execute( @FormParam( "requestBuilder" ) final String requestBuilder,
+                             @FormParam( "host" ) final String host )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            RequestBuilder rb = JsonUtil.fromJson( requestBuilder, RequestBuilder.class );
+            ContainerHost h = JsonUtil.fromJson( requestBuilder, ContainerHost.class );
+            CommandResult result = localPeer.execute( rb, h );
+            return Response.ok( JsonUtil.toJson( result ) ).build();
+        }
+        catch ( CommandException e )
         {
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }

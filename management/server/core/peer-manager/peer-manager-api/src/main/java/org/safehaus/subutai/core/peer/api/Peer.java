@@ -25,6 +25,8 @@ public interface Peer
 
     public UUID getOwnerId();
 
+    public PeerInfo getPeerInfo();
+
     public Set<ContainerHost> getContainerHostsByEnvironmentId( UUID environmentId ) throws PeerException;
 
     public Set<ContainerHost> createContainers( UUID creatorPeerId, UUID environmentId, List<Template> templates,

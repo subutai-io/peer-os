@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.environment.ui.wizard.Node2PeerWizard;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
@@ -37,7 +38,7 @@ public class EnvironmentContainerNode2PeerWizardTest
     {
 
         when( module.getPeerManager() ).thenReturn( peerManager );
-        when( peerManager.peers() ).thenReturn( Collections.<PeerInfo>emptyList() );
+        when( peerManager.getPeers() ).thenReturn( Collections.<Peer>emptyList() );
     }
 
 

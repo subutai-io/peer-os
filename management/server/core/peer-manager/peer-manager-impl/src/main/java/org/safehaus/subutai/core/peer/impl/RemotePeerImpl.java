@@ -61,6 +61,13 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public PeerInfo getPeerInfo()
+    {
+        return peerInfo;
+    }
+
+
+    @Override
     public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId ) throws PeerException
     {
         return null;
@@ -73,10 +80,9 @@ public class RemotePeerImpl implements RemotePeer
                                                 final String strategyId, final List<Criteria> criteria )
             throws ContainerCreateException
     {
-        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000 );
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
         return remotePeerRestClient
-                .createRemoteContainers( peerInfo.getIp(), "8181", creatorPeerId, environmentId, templates, quantity,
-                        strategyId, criteria );
+                .createContainers( creatorPeerId, environmentId, templates, quantity, strategyId, criteria );
     }
 
 

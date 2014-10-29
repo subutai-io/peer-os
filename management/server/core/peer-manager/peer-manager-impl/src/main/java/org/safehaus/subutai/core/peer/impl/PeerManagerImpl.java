@@ -112,7 +112,7 @@ public class PeerManagerImpl implements PeerManager
         {
             peerInfo = new PeerInfo();
             peerInfo.setId( generatePeerId() );
-            peerInfo.setName( "Subutai management server" );
+            peerInfo.setName( "Local Subutai server" );
             peerInfo.setOwnerId( UUID.randomUUID() );
             peerDAO.saveInfo( SOURCE_LOCAL_PEER, peerInfo.getId().toString(), peerInfo );
         }
