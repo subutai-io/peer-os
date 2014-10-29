@@ -4,7 +4,7 @@
              interface="org.safehaus.subutai.core.monitor.api.Monitoring" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="monitor:all-metrics">
+    <command name="monitoring:all-metrics">
       <action class="org.safehaus.subutai.core.monitor.cli.AllMetricsCommand">
         <argument ref="monitoring" />
       </action>

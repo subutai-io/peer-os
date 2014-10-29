@@ -280,14 +280,21 @@ public class MonitorImpl implements Monitor
     }
 
 
+    @Override
     public void addMetricListener( MetricListener metricListener )
     {
-        metricListeners.add( metricListener );
+        if ( metricListener != null )
+        {
+            metricListeners.add( metricListener );
+        }
     }
 
-
+    @Override
     public void removeMetricListener( MetricListener metricListener )
     {
-        metricListeners.remove( metricListener );
+        if ( metricListener != null )
+        {
+            metricListeners.remove( metricListener );
+        }
     }
 }

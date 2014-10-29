@@ -20,17 +20,16 @@ public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl>
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( StopServiceHandler.class.getName() );
-    private String clusterName;
     private UUID containerId;
+    String serviceStopCommand = "service cassandra stop";
 
 
     public StopServiceHandler( final CassandraImpl manager, final String clusterName, UUID containerId )
     {
         super( manager, clusterName );
         this.containerId = containerId;
-        this.clusterName = clusterName;
         trackerOperation = manager.getTracker().createTrackerOperation( CassandraClusterConfig.PRODUCT_KEY,
-                String.format( "Starting %s cluster...", clusterName ) );
+                String.format( "Stopping %s cluster...", clusterName ) );
     }
 
 
@@ -63,46 +62,23 @@ public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl>
             return;
         }
 
-        if ( !config.getNodes().contains( UUID.fromString( host.getId().toString() ) ) )
-        {
-            trackerOperation.addLogFailed(
-                    String.format( "Agent with ID %s does not belong to cluster %s", host.getId(), clusterName ) );
-            return;
-        }
-
         try
         {
-            CommandResult result = host.execute( new RequestBuilder( "service cassandra start" ) );
-            if ( result.getExitCode() == 0 )
+            CommandResult result = host.execute( new RequestBuilder( serviceStopCommand ) );
+            if ( result.hasSucceeded() )
             {
-                result = host.execute( new RequestBuilder( "service cassandra status" ) );
-                if ( result.getExitCode() == 0 )
-                {
-                    if ( result.getStdOut().contains( "running..." ) )
-                    {
-                        trackerOperation.addLog( result.getStdOut() );
-                        trackerOperation.addLogDone( "Start succeeded" );
-                    }
-                    else
-                    {
-                        trackerOperation.addLogFailed( String.format( "Unexpected result, %s", result.getStdErr() ) );
-                    }
-                }
-                else
-                {
-                    trackerOperation.addLogFailed( String.format( "Start failed, %s", result.getStdErr() ) );
-                }
+                trackerOperation.addLog( result.getStdOut() );
+                trackerOperation.addLogDone( "Stop succeeded" );
             }
             else
             {
-                trackerOperation.addLogFailed( String.format( "Start failed, %s", result.getStdErr() ) );
+                trackerOperation.addLogFailed( String.format( "Stop failed, %s", result.getStdErr() ) );
             }
         }
         catch ( CommandException e )
         {
-            trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
+            trackerOperation.addLogFailed( String.format( "Command failed, %s", e.getMessage() ) );
             LOG.error( e.getMessage(), e );
-            return;
         }
     }
 }

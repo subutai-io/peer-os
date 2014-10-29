@@ -13,7 +13,6 @@ import org.apache.cxf.jaxrs.ext.form.Form;
 
 public class RestUtil
 {
-    public static final int RESPONSE_OK = 200;
 
 
     public static enum RequestType
@@ -50,7 +49,7 @@ public class RestUtil
                 }
             }
             response = client.get();
-            if ( response.getStatus() != RESPONSE_OK )
+            if ( !NumUtil.isIntBetween( response.getStatus(), 200, 299 ) )
             {
                 if ( response.hasEntity() )
                 {
@@ -110,7 +109,7 @@ public class RestUtil
                 }
             }
             response = client.form( form );
-            if ( response.getStatus() != RESPONSE_OK )
+            if ( !NumUtil.isIntBetween( response.getStatus(), 200, 299 ) )
             {
                 if ( response.hasEntity() )
                 {
