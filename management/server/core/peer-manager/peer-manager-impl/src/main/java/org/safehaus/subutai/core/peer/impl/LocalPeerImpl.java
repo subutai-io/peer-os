@@ -322,6 +322,9 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
         try
         {
             containerManager.destroy( containerHost.getAgent().getParentHostName(), containerHost.getHostname() );
+            ResourceHost resourceHost = getResourceHostByName( containerHost.getAgent().getParentHostName() );
+            resourceHost.removeContainerHost( result );
+            peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
         }
         catch ( ContainerDestroyException e )
         {

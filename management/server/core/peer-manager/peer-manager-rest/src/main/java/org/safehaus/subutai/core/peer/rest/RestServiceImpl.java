@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.exception.CommandException;
@@ -340,6 +341,75 @@ public class RestServiceImpl implements RestService
 
             Set<ContainerHost> result = localPeer.getContainerHostsByEnvironmentId( environmentId );
             return Response.ok( JsonUtil.toJson( result ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response destroyContainer( final String host )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+
+            localPeer.destroyContainer( containerHost );
+            return Response.ok().build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response startContainer( final String host )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+            localPeer.startContainer( containerHost );
+            return Response.ok().build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response stopContainer( final String host )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+            localPeer.stopContainer( containerHost );
+            return Response.ok().build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response isContainerConnected( @FormParam( "host" ) final String host )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+            localPeer.isConnected( containerHost );
+            return Response.ok().build();
         }
         catch ( PeerException e )
         {

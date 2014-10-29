@@ -174,7 +174,23 @@ public class RemotePeerRestClient implements RemotePeer
     @Override
     public boolean startContainer( final ContainerHost containerHost ) throws PeerException
     {
-        return false;
+        String path = "peer/container/start";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "host", JsonUtil.toJson( containerHost ) );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return true;
+        }
+        else
+        {
+            throw new PeerException( response.getEntity().toString() );
+        }
     }
 
 
@@ -188,14 +204,52 @@ public class RemotePeerRestClient implements RemotePeer
     @Override
     public void destroyContainer( final ContainerHost containerHost ) throws PeerException
     {
+        String path = "peer/container/destroy";
 
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "host", JsonUtil.toJson( containerHost ) );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return;
+        }
+        else
+        {
+            throw new PeerException( response.getEntity().toString() );
+        }
     }
 
 
     @Override
     public boolean isConnected( final Host host ) throws PeerException
     {
-        return false;
+
+        if ( !( host instanceof ContainerHost ) )
+        {
+            throw new PeerException( "Operation not allowed." );
+        }
+        String path = "peer/container/is_connected";
+
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "host", JsonUtil.toJson( host ) );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return true;
+        }
+        else
+        {
+            throw new PeerException( response.getEntity().toString() );
+        }
     }
 
 
@@ -204,7 +258,7 @@ public class RemotePeerRestClient implements RemotePeer
     {
         if ( !( host instanceof ContainerHost ) )
         {
-            throw new CommandException( "Remote execute not allowed." );
+            throw new CommandException( "Operation not allowed." );
         }
 
         String path = "peer/execute";
@@ -230,7 +284,7 @@ public class RemotePeerRestClient implements RemotePeer
         }
         else
         {
-            return null;
+            throw new CommandException( "Unknown response: " + response.getEntity().toString() );
         }
     }
 

@@ -90,28 +90,32 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public boolean startContainer( final ContainerHost containerHost ) throws PeerException
     {
-        return false;
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.startContainer( containerHost );
     }
 
 
     @Override
     public boolean stopContainer( final ContainerHost containerHost ) throws PeerException
     {
-        return false;
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.stopContainer( containerHost );
     }
 
 
     @Override
     public void destroyContainer( final ContainerHost containerHost ) throws PeerException
     {
-
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+        remotePeerRestClient.destroyContainer( containerHost );
     }
 
 
     @Override
     public boolean isConnected( final Host host ) throws PeerException
     {
-        return false;
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.isConnected( host );
     }
 
 
