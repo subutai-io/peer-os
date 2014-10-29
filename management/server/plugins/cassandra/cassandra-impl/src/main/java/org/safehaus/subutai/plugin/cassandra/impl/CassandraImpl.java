@@ -117,13 +117,19 @@ public class CassandraImpl implements Cassandra
             LOG.error( e.getMessage(), e );
         }
 
-        executor = Executors.newCachedThreadPool();
+        executor = Executors.newSingleThreadExecutor();
     }
 
 
     public void destroy()
     {
-        executor.shutdown();
+        this.serviceLocator = null;
+        this.tracker = null;
+        this.environmentManager = null;
+        this.pluginDAO = null;
+        this.dataSource = null;
+        this.executor.shutdown();
+        this.executor = null;
     }
 
 

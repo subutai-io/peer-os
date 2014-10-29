@@ -14,11 +14,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
@@ -28,7 +26,6 @@ import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.TopologyEnum;
@@ -43,7 +40,6 @@ import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -70,7 +66,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private PeerManager peerManager;
     private TopologyBuilder topologyBuilder;
-    private ServiceLocator serviceLocator;
+    //    private ServiceLocator serviceLocator;
     private EnvironmentDAO environmentDAO;
     private TemplateRegistry templateRegistry;
     private NetworkManager networkManager;
@@ -85,24 +81,56 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    public TemplateRegistry getTemplateRegistry()
+    {
+        return templateRegistry;
+    }
+
+
+    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
+    {
+        this.templateRegistry = templateRegistry;
+    }
+
+
+    public NetworkManager getNetworkManager()
+    {
+        return networkManager;
+    }
+
+
+    public void setNetworkManager( final NetworkManager networkManager )
+    {
+        this.networkManager = networkManager;
+    }
+
+
+    public Tracker getTracker()
+    {
+        return tracker;
+    }
+
+
+    public void setTracker( final Tracker tracker )
+    {
+        this.tracker = tracker;
+    }
+
+
     public void init()
     {
         try
         {
-            this.serviceLocator = new ServiceLocator();
-            this.peerManager = serviceLocator.getService( PeerManager.class );
-            this.tracker = serviceLocator.getService( Tracker.class );
-            this.templateRegistry = serviceLocator.getService( TemplateRegistry.class );
-            this.networkManager = serviceLocator.getService( NetworkManager.class );
+            //            this.serviceLocator = new ServiceLocator();
+            //            this.peerManager = serviceLocator.getService( PeerManager.class );
+            //            this.tracker = serviceLocator.getService( Tracker.class );
+            //            this.templateRegistry = serviceLocator.getService( TemplateRegistry.class );
+            //            this.networkManager = serviceLocator.getService( NetworkManager.class );
 
             this.topologyBuilder = new TopologyBuilder( this );
             this.environmentDAO = new EnvironmentDAO( dataSource );
         }
         catch ( SQLException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-        catch ( NamingException e )
         {
             LOG.error( e.getMessage(), e );
         }
@@ -141,8 +169,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
 
         saveBlueprint( GSON.toJson( blueprint ) );
-        EnvironmentBuildProcess process =
-                topologyBuilder.createEnvironmentBuildProcessB2P( blueprint.getId(), getPeerId() );
+        EnvironmentBuildProcess process = topologyBuilder
+                .createEnvironmentBuildProcessB2P( blueprint.getId(), peerManager.getLocalPeer().getId() );
 
 
         return buildEnvironment( process );
@@ -286,14 +314,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             TrackerOperation operation = tracker.createTrackerOperation( environment.getName(), environment.getName() );
 
             int containerCount = 0;
-            long timeout = 1000 * 60;
             for ( String key : process.getMessageMap().keySet() )
             {
                 CloneContainersMessage ccm = process.getMessageMap().get( key );
                 ccm.setEnvId( environment.getId() );
 
                 containerCount = containerCount + ccm.getNumberOfNodes();
-                timeout = 1000 * 30 * ccm.getNumberOfNodes();
 
                 //TODO: move template addition on create ccm
                 List<Template> templates = templateRegistry.getParentTemplates( ccm.getTemplate() );
@@ -309,7 +335,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     throw new EnvironmentBuildException( "Could not get installation template data" );
                 }
 
-                UUID peerId = getPeerId();
+                UUID peerId = peerManager.getLocalPeer().getId();
                 if ( peerId == null )
                 {
                     environment.setStatus( EnvironmentStatusEnum.BROKEN );
@@ -325,8 +351,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
                 try
                 {
-                    operation.addLog( String.format( "sending clone command: %s", ccm.toString() ) );
-                    //                    peerCommandDispatcher.invoke( ccm, timeout );
                     Set<ContainerHost> containers = peerManager.getPeer( ccm.getPeerId() ).
                             createContainers( peerId, ccm.getEnvId(), ccm.getTemplates(), ccm.getNumberOfNodes(),
                                     ccm.getStrategy(), null );
@@ -365,27 +389,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 if ( blueprint.isExchangeSshKeys() )
                 {
-                    /*try
-                    {
-                        peerManager.getPeer( getPeerId() ).configureSshHosts( environment.getContainers() );
-                    }
-                    catch ( PeerException e )
-                    {
-                        LOG.error( e.getMessage(), e );
-                    }*/
-                    networkManager.configSshHosts( environment.getContainers() );
+                    //                    networkManager.configSshHosts( environment.getContainers() );
                 }
                 if ( blueprint.isLinkHosts() )
                 {
-                    /*try
-                    {
-                        peerManager.getPeer( getPeerId() ).configureLinkHosts( environment.getContainers() );
-                    }
-                    catch ( PeerException e )
-                    {
-                        LOG.error( e.getMessage(), e );
-                    }*/
-                    networkManager.configLinkHosts( blueprint.getDomainName(), environment.getContainers() );
+                    //                    networkManager.configLinkHosts( blueprint.getDomainName(),
+                    // environment.getContainers() );
                 }
                 if ( environment.getContainers().size() != containerCount )
                 {
@@ -432,20 +441,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     new DefaultCommandMessage( PeerCommandType.GET_CONNECTED_CONTAINERS, peerId, null );
 
             cmd.setInput( environment.getId().toString() );
-            //            peerCommandDispatcher.invoke( cmd, TIMEOUT );
 
-            Set<PeerContainer> containers =
-                    JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<PeerContainer>>()
-                    {}.getType() );
+            Set<ContainerHost> containers =
+                    JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<ContainerHost>>()
+                    {
+                    }.getType() );
 
             if ( cmd.isSuccess() && containers != null )
             {
-                for ( Container c : containers )
+                for ( ContainerHost c : containers )
                 {
-                    //TODO pass proper constructor args
-                    ContainerHost ec = new ContainerHost( null, null, null );
-                    ec.setEnvironmentId( environment.getId() );
-                    freshContainers.add( ec );
+                    //                    ContainerHost ec = new ContainerHost(  );
+                    //                    ec.setEnvironmentId( environment.getId() );
+                    freshContainers.add( c );
                 }
             }
         }
@@ -456,11 +464,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public Environment getEnvironmentByUUID( final UUID environmentId )
     {
-        Environment environment = environmentDAO.getInfo( ENVIRONMENT, environmentId.toString(), Environment.class );
-
-        //        environmentBuilder.convertEnvironmentContainersToNodes( environment );
-
-        return environment;
+        return environmentDAO.getInfo( ENVIRONMENT, environmentId.toString(), Environment.class );
     }
 
 
@@ -568,14 +572,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private UUID getPeerId()
-    {
-        return peerManager.getPeerId();
-    }
-
-
     public PeerManager getPeerManager()
     {
         return peerManager;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
     }
 }
