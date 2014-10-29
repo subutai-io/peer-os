@@ -105,7 +105,7 @@ private:
 	int selectResult;
 	int readResult;
 	string sendout;
-	SubutaiResponsePack* watchRepsonse;
+	SubutaiResponsePack*    watchRepsonse;
 	SubutaiConnection*	watchConnection;
 	SubutaiLogger*		watchLogger;
 };
