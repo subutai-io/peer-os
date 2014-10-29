@@ -8,13 +8,11 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
 
 
 @Ignore
@@ -38,7 +36,7 @@ public class EnvironmentTest
     {
 
         Set<ContainerHost> set = new HashSet<>();
-//        environment.setContainers( set );
+        //        environment.setContainers( set );
         assertEquals( set, environment.getContainers() );
     }
 

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
@@ -13,7 +14,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 public class Environment
 {
 
-    //    private final ServiceLocator serviceLocator;
+    private final ServiceLocator serviceLocator;
     private UUID id;
     private String name;
     private Set<ContainerHost> containers;
@@ -26,7 +27,7 @@ public class Environment
         this.name = name;
         this.id = UUIDUtil.generateTimeBasedUUID();
         this.containers = new HashSet<>();
-        //        this.serviceLocator = new ServiceLocator();
+        this.serviceLocator = new ServiceLocator();
         this.status = EnvironmentStatusEnum.EMPTY;
         this.creationTimestamp = System.currentTimeMillis();
     }
@@ -88,19 +89,18 @@ public class Environment
     }
 
 
-    //    public void invoke( PeerCommandMessage commandMessage )
-    //    {
-    //        try
-    //        {
-    //            EnvironmentManager environmentManager = this.serviceLocator.getServiceNoCache( EnvironmentManager
-    // .class );
-    //            environmentManager.invoke( commandMessage );
-    //        }
-    //        catch ( NamingException e )
-    //        {
-    //            commandMessage.setProccessed( true );
-    //            commandMessage.setExceptionMessage( e.toString() );
-    //            //            commandMessage.setSuccess( false );
-    //        }
-    //    }
+    /*public void invoke( PeerCommandMessage commandMessage )
+    {
+        try
+        {
+            EnvironmentManager environmentManager = this.serviceLocator.getServiceNoCache( EnvironmentManager.class );
+            environmentManager.invoke( commandMessage );
+        }
+        catch ( NamingException e )
+        {
+            commandMessage.setProccessed( true );
+            commandMessage.setExceptionMessage( e.toString() );
+            //            commandMessage.setSuccess( false );
+        }
+    }*/
 }

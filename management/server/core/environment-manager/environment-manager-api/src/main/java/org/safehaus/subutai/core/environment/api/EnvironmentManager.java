@@ -68,6 +68,9 @@ public interface EnvironmentManager
 //    void invoke( PeerCommandMessage commandMessage );
 //
 //    void invoke( PeerCommandMessage commandMessage, long timeout );
+//    void invoke( PeerCommandMessage commandMessage );
+
+//    void invoke( PeerCommandMessage commandMessage, long timeout );
 
     Set<ContainerHost> getConnectedContainers( Environment environment );
 
