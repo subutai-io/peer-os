@@ -326,6 +326,15 @@ public class ResourceHost extends SubutaiHost
         return result;
     }
 
+
+    public void removeContainerHost( final Host result )
+    {
+        if ( containersHosts.contains( result ) )
+        {
+            containersHosts.remove( result );
+        }
+    }
+
     //
     //    @Override
     //    public boolean isConnected( final Host host )
