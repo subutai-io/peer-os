@@ -361,22 +361,22 @@
       <!-- queue -->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>message-queue-api</artifactId>
+        <artifactId>messenger-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>message-queue-impl</artifactId>
+        <artifactId>messenger-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>message-queue-cli</artifactId>
+        <artifactId>messenger-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>message-queue-rest</artifactId>
+        <artifactId>messenger-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
