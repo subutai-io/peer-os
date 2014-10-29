@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.exception.CommandException;
@@ -314,8 +313,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response execute( @FormParam("requestBuilder") final String requestBuilder,
-                             @FormParam("host") final String host )
+    public Response execute( final String requestBuilder, final String host )
     {
         try
         {
@@ -333,7 +331,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response environmentContainers( @FormParam( "environmentId" ) final String envId )
+    public Response environmentContainers( final String envId )
     {
         try
         {

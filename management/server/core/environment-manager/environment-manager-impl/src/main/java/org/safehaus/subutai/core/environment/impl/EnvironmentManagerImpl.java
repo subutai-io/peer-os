@@ -21,7 +21,6 @@ import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.ServiceLocator;
@@ -506,7 +505,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     private UUID getPeerId()
     {
-        return peerManager.getPeerId();
+        return peerManager.getLocalPeer().getId();
     }
 
 
@@ -516,19 +515,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         environmentDAO.deleteInfo( PROCESS, environmentBuildProcess.getId().toString() );
     }
 
-//
-//    @Override
-//    public void invoke( final PeerCommandMessage commandMessage )
-//    {
-//        peerCommandDispatcher.invoke( commandMessage );
-//    }
-//
-//
-//    @Override
-//    public void invoke( final PeerCommandMessage commandMessage, long timeout )
-//    {
-//        peerCommandDispatcher.invoke( commandMessage, timeout );
-//    }
+    //
+    //    @Override
+    //    public void invoke( final PeerCommandMessage commandMessage )
+    //    {
+    //        peerCommandDispatcher.invoke( commandMessage );
+    //    }
+    //
+    //
+    //    @Override
+    //    public void invoke( final PeerCommandMessage commandMessage, long timeout )
+    //    {
+    //        peerCommandDispatcher.invoke( commandMessage, timeout );
+    //    }
 
 
     @Override

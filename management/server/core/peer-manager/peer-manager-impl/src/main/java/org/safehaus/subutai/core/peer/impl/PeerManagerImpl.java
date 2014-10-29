@@ -615,7 +615,7 @@ public class PeerManagerImpl implements PeerManager
                 {
                     PeerContainer pc = new PeerContainer();
                     pc.setAgentId( agent.getUuid() );
-                    pc.setPeerId( agent.getSiteId() );
+                    pc.setPeerId( getPeerId() );
                     pc.setState( ContainerState.STARTED );
                     containers.add( pc );
                 }

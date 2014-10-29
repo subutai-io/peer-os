@@ -20,17 +20,19 @@ import com.google.common.base.Preconditions;
  */
 public abstract class SubutaiHost implements Host
 {
+    private UUID peerId;
     private Agent agent = NullAgent.getInstance();
     private Agent parentAgent = NullAgent.getInstance();
     private long lastHeartbeat = System.currentTimeMillis();
     transient private static final long INACTIVE_TIME = 5 * 1000 * 60; // 5 min
 
 
-    protected SubutaiHost( final Agent agent )
+    protected SubutaiHost( final Agent agent, UUID peerId )
     {
         Preconditions.checkNotNull( agent, "Agent is null" );
 
         this.agent = agent;
+        this.peerId = peerId;
     }
 
 
@@ -114,7 +116,7 @@ public abstract class SubutaiHost implements Host
     @Override
     public UUID getPeerId()
     {
-        return agent.getSiteId();
+        return peerId;
     }
 
 

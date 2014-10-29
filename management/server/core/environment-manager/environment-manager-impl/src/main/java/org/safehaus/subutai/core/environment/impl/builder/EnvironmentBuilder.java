@@ -98,7 +98,7 @@ public class EnvironmentBuilder
                                 physicalAgents, placementStrategy );
                 for ( Agent agent : agents )
                 {
-                    environmentContainers.add( new ContainerHost( agent ) );
+                    environmentContainers.add( new ContainerHost( agent, agent.getSiteId(), environment.getId() ) );
                 }
 
 
