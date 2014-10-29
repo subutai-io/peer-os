@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.message.api;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.peer.api.PeerInterface;
+import org.safehaus.subutai.core.peer.api.Peer;
 
 
 /**
@@ -31,7 +31,7 @@ public interface Messenger
      * @param timeToLive - time-to-live (in seconds) of message within which message is retried to be sent to recipient.
      * After ttl expires and message is still not sent, it expires
      */
-    public void sendMessage( final PeerInterface peer, final Message message, final String recipient,
+    public void sendMessage( final Peer peer, final Message message, final String recipient,
                              final int timeToLive ) throws MessageException;
 
     /**

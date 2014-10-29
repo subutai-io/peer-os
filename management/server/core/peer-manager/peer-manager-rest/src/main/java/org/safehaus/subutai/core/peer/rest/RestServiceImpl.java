@@ -314,8 +314,8 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response execute( @FormParam( "requestBuilder" ) final String requestBuilder,
-                             @FormParam( "host" ) final String host )
+    public Response execute( @FormParam("requestBuilder") final String requestBuilder,
+                             @FormParam("host") final String host )
     {
         try
         {
@@ -326,6 +326,24 @@ public class RestServiceImpl implements RestService
             return Response.ok( JsonUtil.toJson( result ) ).build();
         }
         catch ( CommandException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response environmentContainers( @FormParam( "environmentId" ) final String envId )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            UUID environmentId = UUID.fromString( envId );
+
+            Set<ContainerHost> result = localPeer.getContainerHostsByEnvironmentId( environmentId );
+            return Response.ok( JsonUtil.toJson( result ) ).build();
+        }
+        catch ( PeerException e )
         {
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }

@@ -7,7 +7,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
-import org.safehaus.subutai.core.peer.api.PeerInterface;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,13 +21,13 @@ public class PeerMessageSender implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerMessageSender.class.getName() );
 
-    private PeerInterface targetPeer;
+    private Peer targetPeer;
     private Set<Envelope> envelopes;
     private RestUtil restUtil;
     private MessengerDao messengerDao;
 
 
-    public PeerMessageSender( RestUtil restUtil, MessengerDao messengerDao, final PeerInterface targetPeer,
+    public PeerMessageSender( RestUtil restUtil, MessengerDao messengerDao, final Peer targetPeer,
                               final Set<Envelope> envelopes )
     {
         this.targetPeer = targetPeer;

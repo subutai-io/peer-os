@@ -18,16 +18,12 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.Container;
-import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
-import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
@@ -46,7 +42,7 @@ import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerContainer;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -58,7 +54,6 @@ import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
 
 
 /**
@@ -521,19 +516,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         environmentDAO.deleteInfo( PROCESS, environmentBuildProcess.getId().toString() );
     }
 
-
-    @Override
-    public void invoke( final PeerCommandMessage commandMessage )
-    {
-        peerCommandDispatcher.invoke( commandMessage );
-    }
-
-
-    @Override
-    public void invoke( final PeerCommandMessage commandMessage, long timeout )
-    {
-        peerCommandDispatcher.invoke( commandMessage, timeout );
-    }
+//
+//    @Override
+//    public void invoke( final PeerCommandMessage commandMessage )
+//    {
+//        peerCommandDispatcher.invoke( commandMessage );
+//    }
+//
+//
+//    @Override
+//    public void invoke( final PeerCommandMessage commandMessage, long timeout )
+//    {
+//        peerCommandDispatcher.invoke( commandMessage, timeout );
+//    }
 
 
     @Override
@@ -549,27 +544,43 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Set<ContainerHost> freshContainers = new HashSet<>();
         for ( UUID peerId : peers )
         {
-            PeerCommandMessage cmd =
 
-                    new DefaultCommandMessage( PeerCommandType.GET_CONNECTED_CONTAINERS, peerId, null );
-
-            cmd.setInput( environment.getId().toString() );
-            peerCommandDispatcher.invoke( cmd, TIMEOUT );
-
-            Set<PeerContainer> containers =
-                    JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<PeerContainer>>()
-                    {
-                    }.getType() );
-
-            if ( cmd.isSuccess() && containers != null )
+            Peer peer = peerManager.getPeer( peerId );
+            //            PeerCommandMessage cmd =
+            //
+            //                    new DefaultCommandMessage( PeerCommandType.GET_CONNECTED_CONTAINERS, peerId, null );
+            //
+            //            cmd.setInput( environment.getId().toString() );
+            //            peerCommandDispatcher.invoke( cmd, TIMEOUT );
+            try
             {
-                for ( Container c : containers )
+                Set<ContainerHost> containers = peer.getContainerHostsByEnvironmentId( environment.getId() );
+                for ( ContainerHost c : containers )
                 {
-                    ContainerHost ec = new ContainerHost( null );
-                    ec.setEnvironmentId( environment.getId() );
-                    freshContainers.add( ec );
+                    if ( c.isConnected() )
+                    {
+                        freshContainers.add( c );
+                    }
                 }
             }
+            catch ( PeerException e )
+            {
+                e.printStackTrace();
+            }
+            //            Set<PeerContainer> containers =
+            //                    JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<PeerContainer>>()
+            //                    {
+            //                    }.getType() );
+
+            //            if ( cmd.isSuccess() && containers != null )
+            //            {
+            //                for ( Container c : containers )
+            //                {
+            //                    ContainerHost ec = new ContainerHost( null );
+            //                    ec.setEnvironmentId( environment.getId() );
+            //                    freshContainers.add( ec );
+            //                }
+            //            }
         }
         return freshContainers;
     }

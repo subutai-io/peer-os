@@ -66,10 +66,10 @@ public class EnvironmentTest
     }
 
 
-    @Test
-    public void testInvoke() throws Exception
-    {
-        PeerCommandMessage peerCommandMessage = mock( PeerCommandMessage.class );
-        environment.invoke( peerCommandMessage );
-    }
+//    @Test
+//    public void testInvoke() throws Exception
+//    {
+//        PeerCommandMessage peerCommandMessage = mock( PeerCommandMessage.class );
+//        environment.invoke( peerCommandMessage );
+//    }
 }
