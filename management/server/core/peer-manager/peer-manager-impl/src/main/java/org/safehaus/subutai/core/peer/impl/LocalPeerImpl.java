@@ -56,6 +56,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 {
     private static final String SOURCE_MANAGEMENT = "MANAGEMENT_HOST";
     private static final int MAX_LXC_NAME = 15;
+    private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60; // 5 min
     private PeerManager peerManager;
     private ContainerManager containerManager;
     private TemplateRegistry templateRegistry;
@@ -347,7 +348,21 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
         {
             throw new PeerException( "Parent Host not found." );
         }
-        return result.isConnected();
+        if ( result instanceof ContainerHost )
+        {
+            return ContainerState.RUNNING.equals( ( ( ContainerHost ) result ).getState() ) && checkHeartbeat(
+                    result.getLastHeartbeat() );
+        }
+        else
+        {
+            return checkHeartbeat( result.getLastHeartbeat() );
+        }
+    }
+
+
+    private boolean checkHeartbeat( long lastHeartbeat )
+    {
+        return ( System.currentTimeMillis() - lastHeartbeat ) < HOST_INACTIVE_TIME;
     }
 
 
@@ -419,6 +434,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             {
                 containerHost.updateHeartbeat();
                 containerHost.setState( ContainerState.RUNNING );
+                peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
 
                 //                containerHost =
                 //                        new ContainerHost( PeerUtils.buildAgent( response ), getId(),
