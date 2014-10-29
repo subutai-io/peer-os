@@ -27,6 +27,7 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
+import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -152,6 +153,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                 containerHost.setTemplateName( templateName );
                 resourceHost.addContainerHost( containerHost );
                 result.add( containerHost );
+                peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
             }
         }
         catch ( PeerException | RegistryException e )
@@ -311,7 +313,23 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     @Override
     public void destroyContainer( final ContainerHost containerHost ) throws PeerException
     {
+        Host result = getContainerHostByName( containerHost.getHostname() );
+        if ( result == null )
+        {
+            throw new PeerException( "Container Host not found." );
+        }
 
+        try
+        {
+            containerManager.destroy( containerHost.getAgent().getParentHostName(), containerHost.getHostname() );
+            ResourceHost resourceHost = getResourceHostByName( containerHost.getAgent().getParentHostName() );
+            resourceHost.removeContainerHost( result );
+            peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
+        }
+        catch ( ContainerDestroyException e )
+        {
+            throw new PeerException( e.toString() );
+        }
     }
 
 
@@ -391,16 +409,20 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
             ContainerHost containerHost = resourceHost.getContainerHostByName( response.getHostname() );
 
-            if ( containerHost == null )
+            if ( containerHost != null )
             {
-                containerHost =
-                        new ContainerHost( PeerUtils.buildAgent( response ), getId(), response.getEnvironmentId() );
-                containerHost.setParentAgent( resourceHost.getAgent() );
-                resourceHost.addContainerHost( containerHost );
+                containerHost.updateHeartbeat();
+                containerHost.setState( ContainerState.RUNNING );
+
+                //                containerHost =
+                //                        new ContainerHost( PeerUtils.buildAgent( response ), getId(),
+                // response.getEnvironmentId() );
+                //                containerHost.setParentAgent( resourceHost.getAgent() );
+                //                resourceHost.addContainerHost( containerHost );
             }
-            containerHost.updateHeartbeat();
-            containerHost.setState( ContainerState.RUNNING );
-            peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
+            //            containerHost.updateHeartbeat();
+            //            containerHost.setState( ContainerState.RUNNING );
+            //            peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
         }
     }
 
