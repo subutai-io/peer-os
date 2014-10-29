@@ -18,7 +18,7 @@ import org.safehaus.subutai.core.messenger.api.MessageListener;
 import org.safehaus.subutai.core.messenger.api.MessageProcessor;
 import org.safehaus.subutai.core.messenger.api.MessageStatus;
 import org.safehaus.subutai.core.messenger.api.Messenger;
-import org.safehaus.subutai.core.peer.api.PeerInterface;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,21 +68,18 @@ public class MessengerImpl implements Messenger, MessageProcessor
     @Override
     public Message createMessage( final Object payload ) throws MessageException
     {
-        return new MessageImpl( peerManager.getSiteId(), payload );
+        return new MessageImpl( peerManager.getLocalPeer().getId(), payload );
     }
 
 
     @Override
-    public void sendMessage( final PeerInterface peer, final Message message, final String recipient,
-                             final int timeToLive ) throws MessageException
+    public void sendMessage( final Peer peer, final Message message, final String recipient, final int timeToLive )
+            throws MessageException
     {
         try
         {
-            //TODO use commented code to create Envelope when peer and peerManager are completed
-            //            Envelope envelope =
-            //                    new Envelope( message, peerManager.getLocalPeer().getId(), peer.getId(), recipient,
-            // timeToLive )
-            Envelope envelope = new Envelope( ( MessageImpl ) message, peerManager.getSiteId(), recipient, timeToLive );
+            Envelope envelope =
+                    new Envelope( ( MessageImpl ) message, peerManager.getLocalPeer().getId(), recipient, timeToLive );
 
             messengerDao.saveEnvelope( envelope );
         }

@@ -16,7 +16,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.util.RestUtil;
-import org.safehaus.subutai.core.peer.api.PeerInterface;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,7 +120,7 @@ public class MessageSender
         //try to send messages in parallel - one thread per peer
         for ( Map.Entry<UUID, Set<Envelope>> envelopsPerPeer : peerEnvelopesMap.entrySet() )
         {
-            PeerInterface targetPeer = peerManager.getPeer( envelopsPerPeer.getKey() );
+            Peer targetPeer = peerManager.getPeer( envelopsPerPeer.getKey() );
             completer.submit( new PeerMessageSender( restUtil, messengerDao, targetPeer, envelopsPerPeer.getValue() ) );
         }
 

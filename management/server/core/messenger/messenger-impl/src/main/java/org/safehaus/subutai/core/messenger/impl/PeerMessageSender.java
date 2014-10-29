@@ -8,7 +8,7 @@ import java.util.concurrent.Callable;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
-import org.safehaus.subutai.core.peer.api.PeerInterface;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,13 +22,13 @@ public class PeerMessageSender implements Callable<Boolean>
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerMessageSender.class.getName() );
 
-    private PeerInterface targetPeer;
+    private Peer targetPeer;
     private Set<Envelope> envelopes;
     private RestUtil restUtil;
     private MessengerDao messengerDao;
 
 
-    public PeerMessageSender( RestUtil restUtil, MessengerDao messengerDao, final PeerInterface targetPeer,
+    public PeerMessageSender( RestUtil restUtil, MessengerDao messengerDao, final Peer targetPeer,
                               final Set<Envelope> envelopes )
     {
         this.targetPeer = targetPeer;
@@ -48,8 +48,8 @@ public class PeerMessageSender implements Callable<Boolean>
                 Map<String, String> params = Maps.newHashMap();
                 params.put( "envelope", JsonUtil.toJson( envelope ) );
 
-                //TODO use targetPeer to obtain peer IP and port once it is implemented
-                String targetPeerIP = "172.16.131.203";
+                String targetPeerIP = targetPeer.getPeerInfo().getIp();
+                //TODO use targetPeer to obtain peer port once it is implemented
                 int targetPeerPort = 8181;
 
                 restUtil.request( RestUtil.RequestType.POST,
