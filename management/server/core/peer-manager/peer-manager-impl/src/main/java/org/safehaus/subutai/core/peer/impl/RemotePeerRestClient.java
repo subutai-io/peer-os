@@ -141,7 +141,33 @@ public class RemotePeerRestClient implements RemotePeer
     @Override
     public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId ) throws PeerException
     {
-        return null;
+
+        String path = "peer/environment/containers";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "environmentId", environmentId.toString() );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        String jsonObject = response.readEntity( String.class );
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            Set<ContainerHost> result = JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHost>>()
+            {
+            }.getType() );
+            return result;
+        }
+
+        if ( response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() )
+        {
+            throw new PeerException( response.getEntity().toString() );
+        }
+        else
+        {
+            return null;
+        }
     }
 
 
@@ -304,7 +330,4 @@ public class RemotePeerRestClient implements RemotePeer
 
         //return null;
     }
-
-
-
 }
