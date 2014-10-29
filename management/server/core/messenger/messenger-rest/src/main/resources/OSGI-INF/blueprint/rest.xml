@@ -5,11 +5,11 @@
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
 
-  <!--<cxf:bus id="cxfBusMessenger">-->
-    <!--<cxf:features>-->
-      <!--<cxf:logging />-->
-    <!--</cxf:features>-->
-  <!--</cxf:bus>-->
+  <cxf:bus id="cxfBusMessenger">
+    <cxf:features>
+      <cxf:logging />
+    </cxf:features>
+  </cxf:bus>
 
   <reference id="messageProcessor" availability="mandatory"
              interface="org.safehaus.subutai.core.messenger.api.MessageProcessor" />

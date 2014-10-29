@@ -131,7 +131,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public boolean isConnected( final Host host ) throws PeerException
     {
-        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
         return remotePeerRestClient.isConnected( host );
     }
 

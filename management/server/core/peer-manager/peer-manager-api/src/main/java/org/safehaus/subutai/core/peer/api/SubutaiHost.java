@@ -7,6 +7,7 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.NullAgent;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
@@ -24,7 +25,6 @@ public abstract class SubutaiHost implements Host
     private Agent agent = NullAgent.getInstance();
     private Agent parentAgent = NullAgent.getInstance();
     private long lastHeartbeat = System.currentTimeMillis();
-    transient private static final long INACTIVE_TIME = 5 * 1000 * 60; // 5 min
 
 
     protected SubutaiHost( final Agent agent, UUID peerId )
@@ -83,6 +83,21 @@ public abstract class SubutaiHost implements Host
             Peer peer = getPeer( this.getPeerId() );
             CommandResult commandResult = peer.execute( requestBuilder, this );
             return commandResult;
+        }
+        catch ( PeerException e )
+        {
+            throw new CommandException( e.toString() );
+        }
+    }
+
+
+    @Override
+    public void execute( final RequestBuilder requestBuilder, final CommandCallback callback ) throws CommandException
+    {
+        try
+        {
+            Peer peer = getPeer( this.getPeerId() );
+            peer.execute( requestBuilder, this, callback );
         }
         catch ( PeerException e )
         {
@@ -150,7 +165,17 @@ public abstract class SubutaiHost implements Host
     @Override
     public boolean isConnected()
     {
-        return ( System.currentTimeMillis() - lastHeartbeat ) < INACTIVE_TIME;
+        try
+        {
+            Peer peer = getPeer( this.getPeerId() );
+            return peer.isConnected( this );
+        }
+        catch ( PeerException e )
+        {
+
+            return false;
+        }
+        //return ( System.currentTimeMillis() - lastHeartbeat ) < INACTIVE_TIME;
     }
 
 
