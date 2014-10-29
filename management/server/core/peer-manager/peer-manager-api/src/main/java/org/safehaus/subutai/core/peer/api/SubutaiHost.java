@@ -24,7 +24,6 @@ public abstract class SubutaiHost implements Host
     private Agent agent = NullAgent.getInstance();
     private Agent parentAgent = NullAgent.getInstance();
     private long lastHeartbeat = System.currentTimeMillis();
-    transient private static final long INACTIVE_TIME = 5 * 1000 * 60; // 5 min
 
 
     protected SubutaiHost( final Agent agent, UUID peerId )
@@ -150,7 +149,17 @@ public abstract class SubutaiHost implements Host
     @Override
     public boolean isConnected()
     {
-        return ( System.currentTimeMillis() - lastHeartbeat ) < INACTIVE_TIME;
+        try
+        {
+            Peer peer = getPeer( this.getPeerId() );
+            return peer.isConnected( this );
+        }
+        catch ( PeerException e )
+        {
+
+            return false;
+        }
+        //return ( System.currentTimeMillis() - lastHeartbeat ) < INACTIVE_TIME;
     }
 
 

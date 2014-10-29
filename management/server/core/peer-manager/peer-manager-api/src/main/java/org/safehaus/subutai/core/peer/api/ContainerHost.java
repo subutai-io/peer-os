@@ -86,9 +86,9 @@ public class ContainerHost extends SubutaiHost
     }
 
 
-    @Override
-    public boolean isConnected()
-    {
-        return ContainerState.RUNNING.equals( state ) && super.isConnected();
-    }
+//    @Override
+    //    public boolean isConnected()
+    //    {
+    //        return ContainerState.RUNNING.equals( state ) && super.isConnected();
+    //    }
 }
