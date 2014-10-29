@@ -28,6 +28,7 @@
 #include <sys/wait.h>
 #include <pthread.h>
 #include <list>
+#include <lxc/lxccontainer.h>
 #include "SubutaiUserID.h"
 #include "SubutaiCommand.h"
 #include "SubutaiResponsePack.h"
