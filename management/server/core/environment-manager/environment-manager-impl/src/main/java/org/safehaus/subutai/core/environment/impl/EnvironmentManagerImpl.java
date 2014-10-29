@@ -389,12 +389,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 if ( blueprint.isExchangeSshKeys() )
                 {
-                    //                    networkManager.configSshHosts( environment.getContainers() );
+                    networkManager.configSshOnAgents( environment.getContainers() );
                 }
                 if ( blueprint.isLinkHosts() )
                 {
-                    //                    networkManager.configLinkHosts( blueprint.getDomainName(),
-                    // environment.getContainers() );
+                                        networkManager.configHostsOnAgents( environment.getContainers(), blueprint.getDomainName() );
                 }
                 if ( environment.getContainers().size() != containerCount )
                 {

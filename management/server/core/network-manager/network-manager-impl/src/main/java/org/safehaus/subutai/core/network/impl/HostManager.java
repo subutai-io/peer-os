@@ -1,14 +1,12 @@
 package org.safehaus.subutai.core.network.impl;
 
 
-import java.util.List;
 import java.util.Set;
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Container;
-import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,33 +22,19 @@ public class HostManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( HostManager.class.getName() );
 
-    private List<Agent> agentList;
-    private Set<Container> containers;
+    private Set<ContainerHost> containerHosts;
     private String domainName;
     private Commands commands;
 
 
-    public HostManager( Commands commands, List<Agent> agentList, String domainName )
+    public HostManager( Set<ContainerHost> containerHosts, String domainName )
     {
         Preconditions.checkNotNull( commands, "Commands are null" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( agentList ), "Agent list is empty" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ), "Agent list is empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ), "Domain name is empty" );
 
-        this.agentList = agentList;
+        this.containerHosts = containerHosts;
         this.domainName = domainName;
-        this.commands = commands;
-    }
-
-
-    public HostManager( final Set<Container> containers, final String domainName, final Commands commands )
-    {
-        Preconditions.checkNotNull( commands, "Commands are null" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containers ), "Containers are empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ), "Domain name is empty" );
-
-        this.containers = containers;
-        this.domainName = domainName;
-        this.commands = commands;
     }
 
 
@@ -63,43 +47,36 @@ public class HostManager
     private boolean write()
     {
 
-        Command command;
-        if ( !CollectionUtil.isCollectionEmpty( agentList ) )
-        {
-            command = commands.getAddIpHostToEtcHostsCommand( domainName, Sets.newHashSet( agentList ) );
-        }
-        else
-        {
-            command = commands.getEtcHostsCommand( domainName, containers );
-        }
 
-        try
+        if ( !CollectionUtil.isCollectionEmpty( containerHosts ) )
         {
-            command.execute();
-            return command.hasSucceeded();
-        }
-        catch ( CommandException e )
-        {
-            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
+            try
+            {
+                for ( ContainerHost host : containerHosts )
+                {
+                    CommandResult command = host.execute(
+                            commands.getAddIpHostToEtcHostsCommand( domainName, Sets.newHashSet( containerHosts ) ) );
+                    if ( !command.hasSucceeded() )
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            catch ( CommandException e )
+            {
+                LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
+            }
         }
         return false;
     }
 
 
-    public boolean execute( Agent agent )
+    public boolean execute( ContainerHost agent )
     {
         Preconditions.checkNotNull( agent, "Agent is null" );
 
-        agentList.add( agent );
-        return write();
-    }
-
-
-    public boolean execute( Container container )
-    {
-        Preconditions.checkNotNull( container, "Container is null" );
-
-        containers.add( container );
+        containerHosts.add( agent );
         return write();
     }
 }

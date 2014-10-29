@@ -1,12 +1,9 @@
 package org.safehaus.subutai.core.network.impl;
 
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -19,97 +16,29 @@ import com.google.common.base.Preconditions;
  */
 public class NetworkManagerImpl implements NetworkManager
 {
-    private final Commands commands;
 
 
     public NetworkManagerImpl( final CommandDispatcher commandDispatcher )
     {
         Preconditions.checkNotNull( commandDispatcher, "Command Dispatcher is null" );
-
-        this.commands = new Commands( commandDispatcher );
     }
 
 
     @Override
-    public boolean configSshOnAgents( List<Agent> agentList )
+    public boolean configSshOnAgents( Set<ContainerHost> containerHosts )
     {
-        return new SshManager( commands, agentList ).execute();
+        return new SshManager( containerHosts ).execute();
     }
 
 
     @Override
-    public boolean configSshOnAgents( List<Agent> agentList, Agent agent )
+    public boolean configSshOnAgents( Set<ContainerHost> containerHosts, ContainerHost containerHost )
     {
-        return new SshManager( commands, agentList ).execute( agent );
+        return new SshManager( containerHosts ).execute( containerHost );
     }
-
-
     @Override
-    public boolean configHostsOnAgents( List<Agent> agentList, String domainName )
+    public boolean configHostsOnAgents( Set<ContainerHost> containerHosts, String domainName )
     {
-        return new HostManager( commands, agentList, domainName ).execute();
-    }
-
-
-    @Override
-    public boolean configHostsOnAgents( List<Agent> agentList, Agent agent, String domainName )
-    {
-        return new HostManager( commands, agentList, domainName ).execute( agent );
-    }
-
-
-    @Override
-    public boolean configHosts( String domainName, final Set<Container> containers )
-    {
-        return new HostManager( containers, domainName, commands ).execute();
-    }
-
-
-    @Override
-    public boolean configHosts( String domainName, final Set<Container> containers, final Container container )
-    {
-        return new HostManager( containers, domainName, commands ).execute( container );
-    }
-
-
-    @Override
-    public boolean configSsh( final Set<Container> containers )
-    {
-        return new SshManager( containers, commands ).execute();
-    }
-
-
-    @Override
-    public boolean configSsh( final Set<Container> containers, final Container container )
-    {
-        return new SshManager( containers, commands ).execute( container );
-    }
-
-
-    @Override
-    @Deprecated
-    public boolean configSshHosts( final Set<ContainerHost> containers )
-    {
-        List<Agent> agentSet = new ArrayList<>();
-        for ( ContainerHost host : containers )
-        {
-            agentSet.add( host.getAgent() );
-        }
-        configSshOnAgents( agentSet );
-        return true;
-    }
-
-
-    @Override
-    @Deprecated
-    public boolean configLinkHosts( final String domainName, final Set<ContainerHost> containers )
-    {
-        List<Agent> agentSet = new ArrayList<>();
-        for ( ContainerHost host : containers )
-        {
-            agentSet.add( host.getAgent() );
-        }
-        configHostsOnAgents( agentSet, domainName );
-        return true;
+        return new HostManager( containerHosts, domainName ).execute();
     }
 }
