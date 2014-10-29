@@ -393,7 +393,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 }
                 if ( blueprint.isLinkHosts() )
                 {
-                                        networkManager.configHostsOnAgents( environment.getContainers(), blueprint.getDomainName() );
+                    networkManager.configHostsOnAgents( environment.getContainers(), blueprint.getDomainName() );
                 }
                 if ( environment.getContainers().size() != containerCount )
                 {
