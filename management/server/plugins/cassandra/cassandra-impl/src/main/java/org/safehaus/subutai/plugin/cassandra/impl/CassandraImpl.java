@@ -75,7 +75,7 @@ public class CassandraImpl implements Cassandra
     }
 
 
-    public ExecutorService getExecutor()
+    /*public ExecutorService getExecutor()
     {
         return executor;
     }
@@ -84,7 +84,7 @@ public class CassandraImpl implements Cassandra
     public void setExecutor( final ExecutorService executor )
     {
         this.executor = executor;
-    }
+    }*/
 
 
     public EnvironmentManager getEnvironmentManager()

@@ -64,7 +64,6 @@ public class Manager
     private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final ExecutorService executorService;
     private final Tracker tracker;
-    //    private final AgentManager agentManager;
     private final EnvironmentManager environmentManager;
     private final Cassandra cassandra;
     private final Table nodesTable;
@@ -79,7 +78,6 @@ public class Manager
         this.cassandra = serviceLocator.getService( Cassandra.class );
         this.executorService = executorService;
         this.tracker = serviceLocator.getService( Tracker.class );
-        //        this.agentManager = serviceLocator.getService( AgentManager.class );
         this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         contentRoot = new GridLayout();
@@ -597,13 +595,12 @@ public class Manager
 
     private void startAllNodes()
     {
-        for ( UUID agentUUID : config.getNodes() )
+        for ( UUID containerId : config.getNodes() )
         {
-            //            Agent agent = agentManager.getAgentByUUID( agentUUID );
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService
-                    .execute( new StartTask( cassandra, tracker, config.getClusterName(), agentUUID, new CompleteEvent()
+                    .execute( new StartTask( cassandra, tracker, config.getClusterName(), containerId, new CompleteEvent()
                     {
                         @Override
                         public void onComplete( String result )
