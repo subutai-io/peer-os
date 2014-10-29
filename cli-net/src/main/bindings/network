@@ -1,0 +1,9 @@
+#!/bin/bash
+
+function network {
+  echo "running network binding"
+}
+
+function network_description {
+  echo "does some network related staff"
+}
