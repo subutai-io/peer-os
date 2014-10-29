@@ -10,7 +10,8 @@
 
   <service ref="peerManager" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
-  <service ref="messenger" interface="org.safehaus.subutai.core.messenger.api.Messenger" />
+  <reference id="messenger" availability="mandatory"
+             interface="org.safehaus.subutai.core.messenger.api.Messenger" />
 
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
