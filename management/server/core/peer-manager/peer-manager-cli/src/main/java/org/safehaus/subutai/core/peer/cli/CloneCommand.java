@@ -67,7 +67,7 @@ public class CloneCommand extends OsgiCommandSupport
         List<Template> templates = templateRegistry.getParentTemplates( templateName );
         templates.add( template );
         Set<ContainerHost> containers = localPeer
-                .createContainers( peerManager.getSiteId(), environmentId, templates, quantity, strategyId, null );
+                .createContainers( peerManager.getPeerId(), environmentId, templates, quantity, strategyId, null );
 
         System.out.println(
                 String.format( "Containers successfully created.\nList of new %d containers:\n", containers.size() ) );

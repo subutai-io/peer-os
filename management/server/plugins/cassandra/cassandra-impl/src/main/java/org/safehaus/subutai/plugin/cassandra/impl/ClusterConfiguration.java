@@ -40,7 +40,7 @@ public class ClusterConfiguration
         String clusterNameParam = "cluster_name " + config.getClusterName();
         String dataDirParam = "data_dir " + config.getDataDirectory();
         String commitLogDirParam = "commitlog_dir " + config.getCommitLogDirectory();
-        String savedCacheDirParam = "saved_cache_dir " + config.getCommitLogDirectory();
+        String savedCacheDirParam = "saved_cache_dir " + config.getSavedCachesDirectory();
 
 
         StringBuilder sb = new StringBuilder();
@@ -64,13 +64,27 @@ public class ClusterConfiguration
             {
                 po.addLog( "Configuring node: " + containerHost.getId() );
 
+                // Setting permission
                 CommandResult commandResult = containerHost.execute( new RequestBuilder( permissionParam ) );
                 po.addLog( commandResult.getStdOut() );
 
+                // Setting cluster name
                 commandResult =
                         containerHost.execute( new RequestBuilder( String.format( script, clusterNameParam ) ) );
                 po.addLog( commandResult.getStdOut() );
 
+                // Create directories
+                commandResult = containerHost
+                        .execute( new RequestBuilder( String.format( "mkdir -p %s", config.getDataDirectory() ) ) );
+                po.addLog( commandResult.getStdOut() );
+                commandResult = containerHost
+                        .execute( new RequestBuilder( String.format( "mkdir -p %s", config.getCommitLogDirectory() ) ) );
+                po.addLog( commandResult.getStdOut() );
+                commandResult = containerHost
+                        .execute( new RequestBuilder( String.format( "mkdir -p %s", config.getSavedCachesDirectory() ) ) );
+                po.addLog( commandResult.getStdOut() );
+
+                // Configure directories
                 commandResult = containerHost.execute( new RequestBuilder( String.format( script, dataDirParam ) ) );
                 po.addLog( commandResult.getStdOut() );
 
@@ -82,17 +96,20 @@ public class ClusterConfiguration
                         containerHost.execute( new RequestBuilder( String.format( script, savedCacheDirParam ) ) );
                 po.addLog( commandResult.getStdOut() );
 
+                // Set RPC address
                 String rpcAddress =
                         String.format( ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s %s", "rpc_address",
                                 AgentUtil.getAgentIpByMask( containerHost.getAgent(), Common.IP_MASK ) );
                 commandResult = containerHost.execute( new RequestBuilder( rpcAddress ) );
                 po.addLog( commandResult.getStdOut() );
 
+                // Set listen address
                 String listenAddress = String.format( ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s %s",
                         "listen_address", AgentUtil.getAgentIpByMask( containerHost.getAgent(), Common.IP_MASK ) );
                 commandResult = containerHost.execute( new RequestBuilder( listenAddress ) );
                 po.addLog( commandResult.getStdOut() );
 
+                // Configure seeds
                 commandResult = containerHost.execute( new RequestBuilder( String.format( script, seedsParam ) ) );
                 po.addLog( commandResult.getStdOut() );
             }

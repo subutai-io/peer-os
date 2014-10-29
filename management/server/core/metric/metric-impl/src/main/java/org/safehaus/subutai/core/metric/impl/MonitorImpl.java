@@ -21,8 +21,8 @@ import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
-import org.safehaus.subutai.core.peer.api.PeerInterface;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.slf4j.Logger;
@@ -210,7 +210,7 @@ public class MonitorImpl implements Monitor
             containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
 
             //find container's owner peer
-            PeerInterface ownerPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
+            Peer ownerPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
 
             //if container is "owned" by local peer, alert local peer
             if ( peerManager.getLocalPeer().getId().compareTo( ownerPeer.getId() ) == 0 )
@@ -280,14 +280,21 @@ public class MonitorImpl implements Monitor
     }
 
 
+    @Override
     public void addMetricListener( MetricListener metricListener )
     {
-        metricListeners.add( metricListener );
+        if ( metricListener != null )
+        {
+            metricListeners.add( metricListener );
+        }
     }
 
-
+    @Override
     public void removeMetricListener( MetricListener metricListener )
     {
-        metricListeners.remove( metricListener );
+        if ( metricListener != null )
+        {
+            metricListeners.remove( metricListener );
+        }
     }
 }

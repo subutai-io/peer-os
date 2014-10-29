@@ -46,7 +46,7 @@ public class CommandImplTest
     public void testRemoteCommand()
     {
         RequestBuilder requestBuilder = mock( RequestBuilder.class );
-        when( peerManager.getSiteId() ).thenReturn( localPeerId );
+        when( peerManager.getPeerId() ).thenReturn( localPeerId );
         Container container = mock( Container.class );
         Container container2 = mock( Container.class );
         when( container.getPeerId() ).thenReturn( remotePeerId );
@@ -68,7 +68,7 @@ public class CommandImplTest
     @Test
     public void testRemoteCommand3()
     {
-        when( peerManager.getSiteId() ).thenReturn( localPeerId );
+        when( peerManager.getPeerId() ).thenReturn( localPeerId );
         Container container = mock( Container.class );
         Container container2 = mock( Container.class );
         when( container.getPeerId() ).thenReturn( remotePeerId );
@@ -90,7 +90,7 @@ public class CommandImplTest
     public void testRemoteCommand2()
     {
         RequestBuilder requestBuilder = mock( RequestBuilder.class );
-        when( peerManager.getSiteId() ).thenReturn( localPeerId );
+        when( peerManager.getPeerId() ).thenReturn( localPeerId );
         Agent container = mock( Agent.class );
         Agent container2 = mock( Agent.class );
         when( container.getSiteId() ).thenReturn( remotePeerId );
@@ -114,7 +114,7 @@ public class CommandImplTest
     public void testLocalCommand()
     {
         RequestBuilder requestBuilder = mock( RequestBuilder.class );
-        when( peerManager.getSiteId() ).thenReturn( localPeerId );
+        when( peerManager.getPeerId() ).thenReturn( localPeerId );
         Agent container = mock( Agent.class );
         Agent container2 = mock( Agent.class );
         when( container.getSiteId() ).thenReturn( localPeerId );
@@ -137,7 +137,7 @@ public class CommandImplTest
     @Test
     public void testLocalCommand3()
     {
-        when( peerManager.getSiteId() ).thenReturn( localPeerId );
+        when( peerManager.getPeerId() ).thenReturn( localPeerId );
         Agent container = mock( Agent.class );
         Agent container2 = mock( Agent.class );
         when( container.getSiteId() ).thenReturn( localPeerId );
@@ -160,7 +160,7 @@ public class CommandImplTest
     public void testLocalCommand2()
     {
         RequestBuilder requestBuilder = mock( RequestBuilder.class );
-        when( peerManager.getSiteId() ).thenReturn( localPeerId );
+        when( peerManager.getPeerId() ).thenReturn( localPeerId );
         Container container = mock( Container.class );
         Container container2 = mock( Container.class );
         when( container.getPeerId() ).thenReturn( localPeerId );

@@ -26,8 +26,8 @@ import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
-import org.safehaus.subutai.core.peer.api.PeerInterface;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
@@ -209,7 +209,7 @@ public class MonitorImplTest
         //set owner id as local peer
         when( containerHost.getCreatorPeerId() ).thenReturn( LOCAL_PEER_ID );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
-        PeerInterface ownerPeer = mock( PeerInterface.class );
+        Peer ownerPeer = mock( Peer.class );
         when( peerManager.getPeer( LOCAL_PEER_ID ) ).thenReturn( ownerPeer );
         when( ownerPeer.getId() ).thenReturn( LOCAL_PEER_ID );
 
@@ -228,7 +228,7 @@ public class MonitorImplTest
         //set owner id as local peer
         when( containerHost.getCreatorPeerId() ).thenReturn( REMOTE_PEER_ID );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
-        PeerInterface ownerPeer = mock( PeerInterface.class );
+        Peer ownerPeer = mock( Peer.class );
         when( peerManager.getPeer( REMOTE_PEER_ID ) ).thenReturn( ownerPeer );
         when( ownerPeer.getId() ).thenReturn( REMOTE_PEER_ID );
 

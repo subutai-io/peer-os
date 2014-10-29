@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.peer.ui.forms;
 
 
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
@@ -14,19 +14,19 @@ public class PeerManageActionsComponent extends HorizontalLayout
 {
     private Button positiveButton;
     private Button negativeButton;
-    private Peer peer;
+    private PeerInfo peer;
     private PeerManagerActionsListener listener;
 
 
     public interface PeerManagerActionsListener
     {
-        public void OnPositiveButtonTrigger( Peer peer );
+        public void OnPositiveButtonTrigger( PeerInfo peer );
 
-        public void OnNegativeButtonTrigger( Peer peer );
+        public void OnNegativeButtonTrigger( PeerInfo peer );
     }
 
 
-    public PeerManageActionsComponent( Peer p, PeerManagerActionsListener callback )
+    public PeerManageActionsComponent( PeerInfo p, PeerManagerActionsListener callback )
     {
         this.listener = callback;
 

@@ -8,6 +8,7 @@ import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
@@ -22,6 +23,7 @@ public class CheckServiceHandler extends AbstractOperationHandler<CassandraImpl>
     private static final Logger LOG = LoggerFactory.getLogger( CheckServiceHandler.class.getName() );
     private String clusterName;
     private UUID agentUUID;
+    String serviceStatusCommand = "service cassandra status";
 
 
     public CheckServiceHandler( final CassandraImpl manager, final String clusterName, UUID agentUUID )
@@ -63,37 +65,39 @@ public class CheckServiceHandler extends AbstractOperationHandler<CassandraImpl>
             return;
         }
 
-        if ( !config.getNodes().contains( UUID.fromString( host.getId().toString() ) ) )
-        {
-            trackerOperation.addLogFailed(
-                    String.format( "Agent with ID %s does not belong to cluster %s", host.getId(), clusterName ) );
-            return;
-        }
-
         try
         {
-
-            CommandResult result = host.execute( new RequestBuilder( "service cassandra status" ) );
-            if ( result.getExitCode() == 0 )
-            {
-                if ( result.getStdOut().contains( "running..." ) )
-                {
-                    trackerOperation.addLogDone( "Service running" );
-                }
-                else
-                {
-                    trackerOperation.addLogFailed( String.format( "Unexpected result, %s", result.getStdErr() ) );
-                }
-            }
-            else
-            {
-                trackerOperation.addLogFailed( String.format( "Checking service failed, %s", result.getStdErr() ) );
-            }
+            CommandResult result = host.execute( new RequestBuilder( serviceStatusCommand ) );
+            logStatusResults( trackerOperation, result );
         }
         catch ( CommandException e )
         {
             trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
-            return;
         }
+    }
+
+
+    private void logStatusResults( TrackerOperation po, CommandResult result )
+    {
+
+        StringBuilder log = new StringBuilder();
+
+        String status = "UNKNOWN";
+        if ( result.getExitCode() == 0 )
+        {
+            status = "Cassandra is running";
+        }
+        else if ( result.getExitCode() == 768 )
+        {
+            status = "Cassandra is not running";
+        }
+        else
+        {
+            status = result.getStdOut();
+        }
+
+        log.append( String.format( "%s", status ) );
+
+        po.addLogDone( log.toString() );
     }
 }

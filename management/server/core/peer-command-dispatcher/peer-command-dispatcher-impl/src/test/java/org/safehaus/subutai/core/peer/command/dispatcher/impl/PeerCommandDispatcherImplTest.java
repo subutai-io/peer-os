@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import static org.mockito.Mockito.doThrow;
@@ -45,9 +45,9 @@ public class PeerCommandDispatcherImplTest
         PeerCommandMessage message = mock( PeerCommandMessage.class );
         UUID uuid = UUID.randomUUID();
         message.setPeerId( uuid );
-        Peer peer = mock( Peer.class );
+        PeerInfo peer = mock( PeerInfo.class );
         peer.setId( uuid );
-        when( peerManager.getPeerByUUID( message.getPeerId() ) ).thenReturn( peer );
+        when( peerManager.getPeerInfo( message.getPeerId() ) ).thenReturn( peer );
         commandDispatcher.invoke( message, 1000 );
     }
 
@@ -58,9 +58,9 @@ public class PeerCommandDispatcherImplTest
         PeerCommandMessage message = mock( PeerCommandMessage.class );
         UUID uuid = UUID.randomUUID();
         message.setPeerId( uuid );
-        Peer peer = mock( Peer.class );
+        PeerInfo peer = mock( PeerInfo.class );
         peer.setId( uuid );
-        when( peerManager.getPeerByUUID( message.getPeerId() ) ).thenReturn( peer );
+        when( peerManager.getPeerInfo( message.getPeerId() ) ).thenReturn( peer );
         doThrow( new RuntimeException() ).when( client ).invoke( peer.getIp(), "8181", message );
         commandDispatcher.invoke( message, 1000 );
     }

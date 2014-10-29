@@ -16,11 +16,11 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "peer", name = "hosts")
+@Command( scope = "peer", name = "hosts" )
 public class HostsCommand extends OsgiCommandSupport
 {
 
-    DateFormat fmt = new SimpleDateFormat( "dd.MM.yy:HH:mm:ss.SS" );
+    DateFormat fmt = new SimpleDateFormat( "dd.MM.yy HH:mm:ss.SS" );
     private PeerManager peerManager;
 
 
@@ -74,7 +74,7 @@ public class HostsCommand extends OsgiCommandSupport
 
             if ( c.getCreatorPeerId() != null )
             {
-                containerInfo += peerManager.getPeerByUUID( c.getCreatorPeerId() ).getIp();
+                containerInfo += " "+peerManager.getPeer( c.getCreatorPeerId() ).getName();
             }
         }
 

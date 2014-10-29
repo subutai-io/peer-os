@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 
-@Command( scope = "monitor", name = "all-metrics",
+@Command( scope = "monitoring", name = "all-metrics",
         description = "List all metrics for given host within given number of last days up to given limit" )
 public class AllMetricsCommand extends OsgiCommandSupport
 {

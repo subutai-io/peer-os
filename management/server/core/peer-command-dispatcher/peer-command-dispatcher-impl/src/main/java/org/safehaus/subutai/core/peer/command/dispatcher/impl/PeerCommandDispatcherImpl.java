@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.peer.command.dispatcher.impl;
 
 
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
@@ -62,13 +62,13 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
     {
         try
         {
-            if ( peerManager.getSiteId().equals( peerCommand.getPeerId() ) )
+            if ( peerManager.getPeerId().equals( peerCommand.getPeerId() ) )
             {
                 peerManager.invoke( peerCommand );
             }
             else
             {
-                Peer peer = peerManager.getPeerByUUID( peerCommand.getPeerId() );
+                PeerInfo peer = peerManager.getPeerInfo( peerCommand.getPeerId() );
                 remotePeerRestClient = new RemotePeerRestClient();
                 remotePeerRestClient.invoke( peer.getIp(), port, peerCommand );
             }
@@ -86,7 +86,7 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
     {
         try
         {
-            Peer peer = peerManager.getPeerByUUID( message.getPeerId() );
+            PeerInfo peer = peerManager.getPeerInfo( message.getPeerId() );
             remotePeerRestClient = new RemotePeerRestClient( timeout );
             remotePeerRestClient.invoke( peer.getIp(), port, message );
         }

@@ -8,11 +8,18 @@ import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
+import org.safehaus.subutai.core.peer.api.RemotePeer;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +37,7 @@ import com.google.gson.GsonBuilder;
 /**
  * Remote Peer REST client
  */
-public class RemotePeerRestClient
+public class RemotePeerRestClient implements RemotePeer
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
@@ -42,17 +49,23 @@ public class RemotePeerRestClient
     private String baseUrl = "http://%s:%s/cxf";
 
 
-    public RemotePeerRestClient()
+    public RemotePeerRestClient( String ip, String port )
     {
         this.receiveTimeout = RECEIVE_TIMEOUT;
         this.connectionTimeout = CONNECTION_TIMEOUT;
+
+        baseUrl = String.format( baseUrl, ip, port );
+        LOG.info( baseUrl );
     }
 
 
-    public RemotePeerRestClient( long timeout )
+    public RemotePeerRestClient( long timeout, String ip, String port )
     {
         this.connectionTimeout = CONNECTION_TIMEOUT;
         this.receiveTimeout = timeout;
+
+        baseUrl = String.format( baseUrl, ip, port );
+        LOG.info( baseUrl );
     }
 
 
@@ -68,6 +81,20 @@ public class RemotePeerRestClient
     }
 
 
+    protected WebClient createWebClient()
+    {
+        WebClient client = WebClient.create( baseUrl );
+        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
+
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout( connectionTimeout );
+        httpClientPolicy.setReceiveTimeout( receiveTimeout );
+
+        httpConduit.setClient( httpClientPolicy );
+        return client;
+    }
+
+
     public String callRemoteRest()
     {
         WebClient client = WebClient.create( baseUrl );
@@ -76,34 +103,130 @@ public class RemotePeerRestClient
     }
 
 
-    public Set<ContainerHost> createRemoteContainers( String ip, String port, UUID ownerPeerId, UUID environmentId,
-                                                      List<Template> templates, int quantity, String strategyId,
-                                                      List<Criteria> criteria ) throws ContainerCreateException
+    @Override
+    public boolean isOnline() throws PeerException
+    {
+        return false;
+    }
+
+
+    @Override
+    public UUID getId()
+    {
+        return null;
+    }
+
+
+    @Override
+    public String getName()
+    {
+        return null;
+    }
+
+
+    @Override
+    public UUID getOwnerId()
+    {
+        return null;
+    }
+
+
+    @Override
+    public PeerInfo getPeerInfo()
+    {
+        return null;
+    }
+
+
+    @Override
+    public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId ) throws PeerException
+    {
+        return null;
+    }
+
+
+    @Override
+    public boolean startContainer( final ContainerHost containerHost ) throws PeerException
+    {
+        return false;
+    }
+
+
+    @Override
+    public boolean stopContainer( final ContainerHost containerHost ) throws PeerException
+    {
+        return false;
+    }
+
+
+    @Override
+    public void destroyContainer( final ContainerHost containerHost ) throws PeerException
+    {
+
+    }
+
+
+    @Override
+    public boolean isConnected( final Host host ) throws PeerException
+    {
+        return false;
+    }
+
+
+    @Override
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
+    {
+        if ( !( host instanceof ContainerHost ) )
+        {
+            throw new CommandException( "Remote execute not allowed." );
+        }
+
+        String path = "peer/execute";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "requestBuilder", JsonUtil.toJson( requestBuilder ) );
+        form.set( "host", JsonUtil.toJson( host ) );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        String jsonObject = response.readEntity( String.class );
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            CommandResult result = JsonUtil.fromJson( jsonObject, CommandResult.class );
+            return result;
+        }
+
+        if ( response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() )
+        {
+            throw new CommandException( response.getEntity().toString() );
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+
+    @Override
+    public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
+                                                final List<Template> templates, final int quantity,
+                                                final String strategyId, final List<Criteria> criteria )
+            throws ContainerCreateException
     {
         String path = "peer/container/create";
 
-        baseUrl = String.format( baseUrl, ip, port );
-        LOG.info( baseUrl );
-
-        WebClient client = WebClient.create( baseUrl );
+        WebClient client = createWebClient();
 
         Form form = new Form();
-        form.set( "ownerPeerId", ownerPeerId.toString() );
+        form.set( "ownerPeerId", creatorPeerId.toString() );
         form.set( "environmentId", environmentId.toString() );
         form.set( "templates", JsonUtil.toJson( templates ) );
         form.set( "quantity", quantity );
         form.set( "strategyId", strategyId );
         // TODO: implement criteria transfer
         form.set( "criteria", "" );
-
-
-        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
-
-        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-        httpClientPolicy.setConnectionTimeout( connectionTimeout );
-        httpClientPolicy.setReceiveTimeout( receiveTimeout );
-
-        httpConduit.setClient( httpClientPolicy );
 
         Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
                                   .accept( MediaType.APPLICATION_JSON ).form( form );
@@ -181,4 +304,7 @@ public class RemotePeerRestClient
 
         //return null;
     }
+
+
+
 }

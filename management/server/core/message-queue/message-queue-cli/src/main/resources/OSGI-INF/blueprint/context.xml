@@ -1,0 +1,17 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <reference id="peerManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <reference id="messenger" availability="mandatory"
+             interface="org.safehaus.subutai.core.message.api.Messenger" />
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="messenger/test">
+      <action class="org.safehaus.subutai.core.message.cli.TestCommand">
+        <argument ref="peerManager" />
+        <argument ref="messenger" />
+      </action>
+    </command>
+  </command-bundle>
+
+</blueprint>

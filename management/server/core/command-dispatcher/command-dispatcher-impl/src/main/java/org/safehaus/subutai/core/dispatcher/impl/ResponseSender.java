@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.slf4j.Logger;
@@ -217,7 +217,7 @@ public class ResponseSender
     {
         try
         {
-            Peer peer = peerManager.getPeerByUUID( request.getPeerId() );
+            PeerInfo peer = peerManager.getPeerInfo( request.getPeerId() );
 
             String message =
                     JsonUtil.toJson( new DispatcherMessage( sortedResponses, DispatcherMessageType.RESPONSE ) );

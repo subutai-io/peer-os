@@ -6,8 +6,8 @@ import org.safehaus.subutai.core.configuration.api.ConfigurationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
