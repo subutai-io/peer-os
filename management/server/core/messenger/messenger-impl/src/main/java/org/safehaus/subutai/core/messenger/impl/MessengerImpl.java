@@ -50,7 +50,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
         {
             this.peerManager = peerManager;
             this.messengerDao = new MessengerDao( dataSource );
-            this.messageSender = new MessageSender( peerManager, messengerDao );
+            this.messageSender = new MessageSender( peerManager, messengerDao, this );
         }
         catch ( DaoException e )
         {
@@ -143,20 +143,26 @@ public class MessengerImpl implements Messenger, MessageProcessor
         try
         {
             Envelope envelope = JsonUtil.fromJson( envelopeString, Envelope.class );
-            Message message = envelope.getMessage();
-
-            for ( MessageListener listener : listeners )
-            {
-                if ( listener.getRecipient().equalsIgnoreCase( envelope.getRecipient() ) )
-                {
-                    notificationExecutor.execute( new MessageNotifier( listener, message ) );
-                }
-            }
+            notifyListeners( envelope );
         }
         catch ( JsonSyntaxException e )
         {
             LOG.error( "Error in processMessage", e );
             throw new MessageException( e );
+        }
+    }
+
+
+    protected void notifyListeners( Envelope envelope )
+    {
+        Message message = envelope.getMessage();
+
+        for ( MessageListener listener : listeners )
+        {
+            if ( listener.getRecipient().equalsIgnoreCase( envelope.getRecipient() ) )
+            {
+                notificationExecutor.execute( new MessageNotifier( listener, message ) );
+            }
         }
     }
 
