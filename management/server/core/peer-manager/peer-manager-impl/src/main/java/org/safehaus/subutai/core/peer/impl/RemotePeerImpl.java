@@ -86,7 +86,8 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId ) throws PeerException
     {
-        return null;
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
+             return remotePeerRestClient.getContainerHostsByEnvironmentId( environmentId );
     }
 
 

@@ -6,12 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.naming.NamingException;
-
-import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
@@ -93,7 +89,7 @@ public class Environment
     }
 
 
-    public void invoke( PeerCommandMessage commandMessage )
+    /*public void invoke( PeerCommandMessage commandMessage )
     {
         try
         {
@@ -106,5 +102,5 @@ public class Environment
             commandMessage.setExceptionMessage( e.toString() );
             //            commandMessage.setSuccess( false );
         }
-    }
+    }*/
 }

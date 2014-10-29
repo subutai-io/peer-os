@@ -77,9 +77,14 @@ public interface RestService
                                       @FormParam("criteria") String criteria );
 
     @POST
-    @Path( "execute" )
+    @Path("execute")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response execute( @FormParam("requestBuilder") String requestBuilder, @FormParam("host") String host );
+
+    @POST
+    @Path( "environment/containers" )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response execute( @FormParam( "requestBuilder" ) String requestBuilder, @FormParam( "host" ) String host );
+    public Response environmentContainers( @FormParam( "environmentId" ) String envId );
 
     @GET
     @Path("ping")
