@@ -18,9 +18,9 @@ import com.google.common.collect.Maps;
 /**
  * Delivers messages to a specific peer
  */
-public class PeerMessageSender implements Callable<Boolean>
+public class RemotePeerMessageSender implements Callable<Boolean>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( PeerMessageSender.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RemotePeerMessageSender.class.getName() );
 
     private Peer targetPeer;
     private Set<Envelope> envelopes;
@@ -28,8 +28,8 @@ public class PeerMessageSender implements Callable<Boolean>
     private MessengerDao messengerDao;
 
 
-    public PeerMessageSender( RestUtil restUtil, MessengerDao messengerDao, final Peer targetPeer,
-                              final Set<Envelope> envelopes )
+    public RemotePeerMessageSender( RestUtil restUtil, MessengerDao messengerDao, final Peer targetPeer,
+                                    final Set<Envelope> envelopes )
     {
         this.targetPeer = targetPeer;
         this.envelopes = envelopes;
