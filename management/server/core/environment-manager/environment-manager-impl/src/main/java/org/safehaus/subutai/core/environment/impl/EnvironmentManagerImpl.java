@@ -18,7 +18,6 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
@@ -43,7 +42,6 @@ import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -433,18 +431,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             cmd.setInput( environment.getId().toString() );
 
-            Set<PeerContainer> containers =
-                    JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<PeerContainer>>()
+            Set<ContainerHost> containers =
+                    JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<ContainerHost>>()
                     {
                     }.getType() );
 
             if ( cmd.isSuccess() && containers != null )
             {
-                for ( Container c : containers )
+                for ( ContainerHost c : containers )
                 {
-                    ContainerHost ec = new ContainerHost( null );
-                    ec.setEnvironmentId( environment.getId() );
-                    freshContainers.add( ec );
+//                    ContainerHost ec = new ContainerHost(  );
+//                    ec.setEnvironmentId( environment.getId() );
+                    freshContainers.add( c );
                 }
             }
         }
