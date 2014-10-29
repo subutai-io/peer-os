@@ -24,9 +24,11 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.exception.DaoException;
+import org.safehaus.subutai.common.exception.RunCommandException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -36,11 +38,9 @@ import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.dispatcher.api.ContainerRequestBuilder;
-import org.safehaus.subutai.common.exception.RunCommandException;
-import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 
@@ -155,7 +155,7 @@ public class CommandDispatcherImplTest
     @Test
     public void testOnMessageForRequests() throws PeerMessageException
     {
-        Peer peer = mock( Peer.class );
+        PeerInfo peer = mock( PeerInfo.class );
         when( peer.getId() ).thenReturn( peerId );
         BatchRequest batchRequest = new BatchRequest( request, agentId, commandId );
         DispatcherMessage message =
@@ -208,7 +208,7 @@ public class CommandDispatcherImplTest
                 callbackTriggered.set( true );
             }
         } );
-        Peer peer = mock( Peer.class );
+        PeerInfo peer = mock( PeerInfo.class );
         when( peer.getId() ).thenReturn( peerId );
         String responseString = String.format( "{uuid:%s,taskUuid:%s,responseSequenceNumber:%s}", agentId.toString(),
                 commandId.toString(), 1 );
@@ -238,9 +238,9 @@ public class CommandDispatcherImplTest
         when( agent.getUuid() ).thenReturn( agentId );
         when( command.getRemoteRequests() ).thenReturn( remoteRequests );
         when( command.getCommandUUID() ).thenReturn( commandId );
-        Peer peer = mock( Peer.class );
+        PeerInfo peer = mock( PeerInfo.class );
         when( peer.getId() ).thenReturn( remotePeerId );
-        when( peerManager.getPeerByUUID( remotePeerId ) ).thenReturn( peer );
+        when( peerManager.getPeerInfo( remotePeerId ) ).thenReturn( peer );
         when( peerManager.isPeerReachable( peer ) ).thenReturn( true );
         when( peerManager.getConnectedAgents( peer, environmentId.toString() ) ).thenReturn( Sets.newHashSet( agent ) );
 
@@ -257,7 +257,7 @@ public class CommandDispatcherImplTest
     {
         RequestBuilder requestBuilder = mock( RequestBuilder.class );
         Container container = mock( Container.class );
-        when( peerManager.getSiteId() ).thenReturn( peerId );
+        when( peerManager.getPeerId() ).thenReturn( peerId );
         when( container.getPeerId() ).thenReturn( peerId );
         when( container.getAgentId() ).thenReturn( agentId );
         when( requestBuilder.build( eq( agentId ), any( UUID.class ) ) ).thenReturn( request );
@@ -276,7 +276,7 @@ public class CommandDispatcherImplTest
     {
         ContainerRequestBuilder requestBuilder = mock( ContainerRequestBuilder.class );
         Container container = mock( Container.class );
-        when( peerManager.getSiteId() ).thenReturn( peerId );
+        when( peerManager.getPeerId() ).thenReturn( peerId );
         when( container.getPeerId() ).thenReturn( remotePeerId );
         when( container.getAgentId() ).thenReturn( agentId );
         when( container.getEnvironmentId() ).thenReturn( environmentId );
@@ -300,7 +300,7 @@ public class CommandDispatcherImplTest
         RequestBuilder requestBuilder = mock( RequestBuilder.class );
         Agent agent = mock( Agent.class );
         when( agent.getUuid() ).thenReturn( agentId );
-        when( peerManager.getSiteId() ).thenReturn( peerId );
+        when( peerManager.getPeerId() ).thenReturn( peerId );
         when( agent.getSiteId() ).thenReturn( peerId );
         when( requestBuilder.build( eq( agentId ), any( UUID.class ) ) ).thenReturn( request );
 
@@ -319,7 +319,7 @@ public class CommandDispatcherImplTest
         AgentRequestBuilder requestBuilder = mock( AgentRequestBuilder.class );
         Agent agent = mock( Agent.class );
         when( agent.getUuid() ).thenReturn( agentId );
-        when( peerManager.getSiteId() ).thenReturn( peerId );
+        when( peerManager.getPeerId() ).thenReturn( peerId );
         when( agent.getSiteId() ).thenReturn( remotePeerId );
         when( agent.getEnvironmentId() ).thenReturn( environmentId );
         when( requestBuilder.getAgent() ).thenReturn( agent );
@@ -338,7 +338,7 @@ public class CommandDispatcherImplTest
     @Test( expected = PeerMessageException.class )
     public void testOnMessageForRequestsThrowDbException() throws PeerMessageException, DaoException, SQLException
     {
-        Peer peer = mock( Peer.class );
+        PeerInfo peer = mock( PeerInfo.class );
         when( peer.getId() ).thenReturn( peerId );
         BatchRequest batchRequest = new BatchRequest( request, agentId, commandId );
         DispatcherMessage message =
@@ -354,7 +354,7 @@ public class CommandDispatcherImplTest
     public void shouldThrowPeerException() throws PeerMessageException, DaoException
     {
 
-        commandDispatcher.onMessage( mock( Peer.class ), "" );
+        commandDispatcher.onMessage( mock( PeerInfo.class ), "" );
     }
 
 
@@ -385,9 +385,9 @@ public class CommandDispatcherImplTest
         when( agent.getUuid() ).thenReturn( agentId );
         when( command.getRemoteRequests() ).thenReturn( remoteRequests );
         when( command.getCommandUUID() ).thenReturn( commandId );
-        Peer peer = mock( Peer.class );
+        PeerInfo peer = mock( PeerInfo.class );
         when( peer.getId() ).thenReturn( remotePeerId );
-        when( peerManager.getPeerByUUID( remotePeerId ) ).thenReturn( peer );
+        when( peerManager.getPeerInfo( remotePeerId ) ).thenReturn( peer );
         when( peerManager.isPeerReachable( peer ) ).thenReturn( true );
         when( peerManager.getConnectedAgents( peer, environmentId.toString() ) ).thenReturn( Sets.newHashSet( agent ) );
         when( peerManager.sendPeerMessage( eq( peer ), eq( Common.DISPATCHER_NAME ), anyString() ) )
@@ -410,9 +410,9 @@ public class CommandDispatcherImplTest
         when( agent.getUuid() ).thenReturn( agentId );
         when( command.getRemoteRequests() ).thenReturn( remoteRequests );
         when( command.getCommandUUID() ).thenReturn( commandId );
-        Peer peer = mock( Peer.class );
+        PeerInfo peer = mock( PeerInfo.class );
         when( peer.getId() ).thenReturn( remotePeerId );
-        when( peerManager.getPeerByUUID( remotePeerId ) ).thenReturn( null );
+        when( peerManager.getPeerInfo( remotePeerId ) ).thenReturn( null );
         when( peerManager.isPeerReachable( peer ) ).thenReturn( true );
         when( peerManager.getConnectedAgents( peer, environmentId.toString() ) ).thenReturn( Sets.newHashSet( agent ) );
 
@@ -433,9 +433,9 @@ public class CommandDispatcherImplTest
         when( agent.getUuid() ).thenReturn( agentId );
         when( command.getRemoteRequests() ).thenReturn( remoteRequests );
         when( command.getCommandUUID() ).thenReturn( commandId );
-        Peer peer = mock( Peer.class );
+        PeerInfo peer = mock( PeerInfo.class );
         when( peer.getId() ).thenReturn( remotePeerId );
-        when( peerManager.getPeerByUUID( remotePeerId ) ).thenReturn( peer );
+        when( peerManager.getPeerInfo( remotePeerId ) ).thenReturn( peer );
         Mockito.doThrow( new PeerException( "" ) ).when( peerManager ).isPeerReachable( peer );
 
         commandDispatcher.runCommandAsync( command, MockUtils.getDummyCallback() );
@@ -455,9 +455,9 @@ public class CommandDispatcherImplTest
         when( agent.getUuid() ).thenReturn( agentId );
         when( command.getRemoteRequests() ).thenReturn( remoteRequests );
         when( command.getCommandUUID() ).thenReturn( commandId );
-        Peer peer = mock( Peer.class );
+        PeerInfo peer = mock( PeerInfo.class );
         when( peer.getId() ).thenReturn( remotePeerId );
-        when( peerManager.getPeerByUUID( remotePeerId ) ).thenReturn( peer );
+        when( peerManager.getPeerInfo( remotePeerId ) ).thenReturn( peer );
         when( peerManager.isPeerReachable( peer ) ).thenReturn( true );
         when( peerManager.getConnectedAgents( peer, environmentId.toString() ) )
                 .thenReturn( Collections.<Agent>emptySet() );
@@ -479,9 +479,9 @@ public class CommandDispatcherImplTest
         when( agent.getUuid() ).thenReturn( agentId );
         when( command.getRemoteRequests() ).thenReturn( remoteRequests );
         when( command.getCommandUUID() ).thenReturn( commandId );
-        Peer peer = mock( Peer.class );
+        PeerInfo peer = mock( PeerInfo.class );
         when( peer.getId() ).thenReturn( remotePeerId );
-        when( peerManager.getPeerByUUID( remotePeerId ) ).thenReturn( peer );
+        when( peerManager.getPeerInfo( remotePeerId ) ).thenReturn( peer );
         when( peerManager.isPeerReachable( peer ) ).thenReturn( false );
         when( peerManager.getConnectedAgents( peer, environmentId.toString() ) ).thenReturn( Sets.newHashSet( agent ) );
 

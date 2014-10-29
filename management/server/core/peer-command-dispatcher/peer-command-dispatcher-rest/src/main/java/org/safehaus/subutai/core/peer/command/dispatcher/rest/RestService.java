@@ -13,7 +13,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 
 
 public interface RestService
@@ -24,7 +24,7 @@ public interface RestService
     @Path("peer")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.TEXT_PLAIN)
-    public Peer registerPeer( @QueryParam("peer") String peer );
+    public PeerInfo registerPeer( @QueryParam("peer") String peer );
 
     //    @POST
     //    @Path("containers")

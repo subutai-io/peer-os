@@ -509,10 +509,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    // TODO: Implement it via PCD
     private UUID getPeerId()
     {
-        return peerManager.getSiteId();
+        return peerManager.getPeerId();
     }
 
 

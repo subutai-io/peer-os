@@ -8,29 +8,18 @@ import javax.naming.NamingException;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CommandResult;
-import org.safehaus.subutai.common.protocol.CommandStatus;
 import org.safehaus.subutai.common.protocol.NullAgent;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
-import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
 
 /**
- * Base subutai host class.
+ * Base Subutai host class.
  */
 public abstract class SubutaiHost implements Host
 {
-    private static final Logger LOG = LoggerFactory.getLogger( SubutaiHost.class );
-
     private Agent agent = NullAgent.getInstance();
     private Agent parentAgent = NullAgent.getInstance();
     private long lastHeartbeat = System.currentTimeMillis();
@@ -69,7 +58,11 @@ public abstract class SubutaiHost implements Host
         try
         {
             PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
-            peerManager.getPeer( peerId );
+            result = peerManager.getPeer( peerId );
+            if ( result == null )
+            {
+                throw new PeerException( "Peer not registered." );
+            }
         }
         catch ( NamingException e )
         {
@@ -81,94 +74,19 @@ public abstract class SubutaiHost implements Host
 
 
     @Override
-    public CommandResult execute( final RequestBuilder requestBuilder,
-                                  final org.safehaus.subutai.common.protocol.CommandCallback commandCallback )
-            throws CommandException
-    {
-
-        CommandDispatcher commandDispatcher = getCommandDispatcher();
-
-        Command command = commandDispatcher.createCommand( requestBuilder, Sets.newHashSet( agent ) );
-        command.execute( new HostCommandCallback( commandCallback ) );
-
-        AgentResult agentResult = command.getResults().get( agent.getUuid() );
-
-        if ( agentResult != null )
-        {
-            return new CommandResult( agentResult.getExitCode(), agentResult.getStdOut(), agentResult.getStdErr(),
-                    command.getCommandStatus() );
-        }
-        else
-        {
-            return new CommandResult( null, null, null, CommandStatus.TIMEOUT );
-        }
-    }
-
-
-    @Override
-    public void executeAsync( final RequestBuilder requestBuilder ) throws CommandException
-    {
-        executeAsync( requestBuilder, new org.safehaus.subutai.common.protocol.CommandCallback()
-        {
-            @Override
-            public void onResponse( final Response response, final CommandResult commandResult )
-            {
-
-            }
-        } );
-    }
-
-
-    @Override
-    public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException
-    {
-        return execute( requestBuilder, new org.safehaus.subutai.common.protocol.CommandCallback()
-        {
-            @Override
-            public void onResponse( final Response response, final CommandResult commandResult )
-            {
-
-            }
-        } );
-    }
-
-
-    @Override
-    public void executeAsync( final RequestBuilder requestBuilder,
-                              final org.safehaus.subutai.common.protocol.CommandCallback commandCallback )
-            throws CommandException
-    {
-
-        CommandDispatcher commandDispatcher = getCommandDispatcher();
-
-        Command command = commandDispatcher.createCommand( requestBuilder, Sets.newHashSet( agent ) );
-        command.executeAsync( new HostCommandCallback( commandCallback ) );
-    }
-
-
-    public void executeAsync( RequestBuilder requestBilder, CommandCallback commandCallback ) throws CommandException
-    {
-        CommandDispatcher commandDispatcher = getCommandDispatcher();
-
-        Command command = commandDispatcher.createCommand( requestBilder, Sets.newHashSet( agent ) );
-        command.executeAsync( commandCallback );
-    }
-
-
-    private CommandDispatcher getCommandDispatcher() throws CommandException
+    public CommandResult execute( final RequestBuilder requestBuilder ) throws CommandException
     {
         try
         {
-            return ServiceLocator.getServiceNoCache( CommandDispatcher.class );
+            Peer peer = getPeer( this.getPeerId() );
+            CommandResult commandResult = peer.execute( requestBuilder, this );
+            return commandResult;
         }
-        catch ( NamingException e )
+        catch ( PeerException e )
         {
-            throw new CommandException( e );
+            throw new CommandException( e.toString() );
         }
     }
-
-
-    //    public abstract boolean isConnected( Host host );
 
 
     public String echo( String text ) throws CommandException

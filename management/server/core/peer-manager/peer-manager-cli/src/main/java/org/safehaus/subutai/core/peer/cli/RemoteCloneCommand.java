@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.PeerInterface;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RemotePeer;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -64,7 +64,7 @@ public class RemoteCloneCommand extends OsgiCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        PeerInterface peer = peerManager.getPeer( UUID.fromString( peerId ) );
+        Peer peer = peerManager.getPeer( UUID.fromString( peerId ) );
         if ( peer == null || !( peer instanceof RemotePeer ) )
         {
             System.out.println( "Could not get RemotePeer interface." );
@@ -76,7 +76,7 @@ public class RemoteCloneCommand extends OsgiCommandSupport
         List<Template> templates = templateRegistry.getParentTemplates( templateName );
         templates.add( template );
         Set<ContainerHost> containers =
-                peer.createContainers( peerManager.getSiteId(), environmentId, templates, quantity, strategyId, null );
+                peer.createContainers( peerManager.getPeerId(), environmentId, templates, quantity, strategyId, null );
 
         System.out.println(
                 String.format( "Containers successfully created.\nList of new %d containers:\n", containers.size() ) );
