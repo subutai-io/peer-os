@@ -66,7 +66,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
 
 
     @Override
-    public Message createMessage( final Object payload ) throws MessageException
+    public Message createMessage( final Object payload )
     {
         return new MessageImpl( peerManager.getLocalPeer().getId(), payload );
     }

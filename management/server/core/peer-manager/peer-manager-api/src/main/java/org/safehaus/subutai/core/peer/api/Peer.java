@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
@@ -42,4 +43,7 @@ public interface Peer
     public boolean isConnected( Host host ) throws PeerException;
 
     public CommandResult execute( RequestBuilder requestBuilder, Host host ) throws CommandException;
+
+    public void execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+            throws CommandException;
 }

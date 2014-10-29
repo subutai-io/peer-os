@@ -9,9 +9,9 @@ package org.safehaus.subutai.core.command.impl;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
-import org.safehaus.subutai.core.command.api.command.CacheEntry;
-import org.safehaus.subutai.core.command.api.command.CacheEntryWithExpiryCallback;
-import org.safehaus.subutai.core.command.api.command.EntryExpiryCallback;
+import org.safehaus.subutai.common.cache.CacheEntry;
+import org.safehaus.subutai.common.cache.CacheEntryWithExpiryCallback;
+import org.safehaus.subutai.common.cache.EntryExpiryCallback;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

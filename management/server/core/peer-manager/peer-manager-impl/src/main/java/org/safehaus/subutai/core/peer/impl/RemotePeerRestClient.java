@@ -9,6 +9,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
@@ -210,6 +211,14 @@ public class RemotePeerRestClient implements RemotePeer
 
 
     @Override
+    public void execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+            throws CommandException
+    {
+
+    }
+
+
+    @Override
     public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
                                                 final List<Template> templates, final int quantity,
                                                 final String strategyId, final List<Criteria> criteria )
@@ -235,8 +244,7 @@ public class RemotePeerRestClient implements RemotePeer
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             Set<ContainerHost> result = JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHost>>()
-            {
-            }.getType() );
+            {}.getType() );
             return result;
         }
 
@@ -304,7 +312,4 @@ public class RemotePeerRestClient implements RemotePeer
 
         //return null;
     }
-
-
-
 }
