@@ -35,14 +35,17 @@ public class MessageSender
     private final ScheduledExecutorService mainLoopExecutor = Executors.newSingleThreadScheduledExecutor();
     private final PeerManager peerManager;
     private final MessengerDao messengerDao;
+    private final MessengerImpl messenger;
     private ExecutorService restExecutor = Executors.newCachedThreadPool();
     protected RestUtil restUtil;
 
 
-    public MessageSender( final PeerManager peerManager, final MessengerDao messengerDao )
+    public MessageSender( final PeerManager peerManager, final MessengerDao messengerDao,
+                          final MessengerImpl messenger )
     {
         this.peerManager = peerManager;
         this.messengerDao = messengerDao;
+        this.messenger = messenger;
         this.restUtil = new RestUtil();
     }
 
@@ -121,7 +124,15 @@ public class MessageSender
         for ( Map.Entry<UUID, Set<Envelope>> envelopsPerPeer : peerEnvelopesMap.entrySet() )
         {
             Peer targetPeer = peerManager.getPeer( envelopsPerPeer.getKey() );
-            completer.submit( new PeerMessageSender( restUtil, messengerDao, targetPeer, envelopsPerPeer.getValue() ) );
+            if ( peerManager.getLocalPeer().getId().compareTo( targetPeer.getId() ) == 0 )
+            {
+                completer.submit( new LocalPeerMessageSender( messenger, messengerDao, envelopsPerPeer.getValue() ) );
+            }
+            else
+            {
+                completer.submit(
+                        new RemotePeerMessageSender( restUtil, messengerDao, targetPeer, envelopsPerPeer.getValue() ) );
+            }
         }
 
         //wait for completion
