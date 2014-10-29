@@ -9,6 +9,7 @@ import java.util.concurrent.Semaphore;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.CommandStatus;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
@@ -145,7 +146,14 @@ public class RemotePeerImpl implements RemotePeer
 
         callback.waitCompletion();
 
-        return callback.getCommandResult();
+        CommandResult commandResult = callback.getCommandResult();
+
+        if ( commandResult == null )
+        {
+            commandResult = new CommandResult( requestBuilder.getCommandId(), null, null, null, CommandStatus.TIMEOUT );
+        }
+
+        return commandResult;
     }
 
 

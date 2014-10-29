@@ -449,12 +449,12 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
         if ( agentResult != null )
         {
-            return new CommandResult( command.getCommandUUID(), agentResult.getExitCode(), agentResult.getStdOut(),
+            return new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(), agentResult.getStdOut(),
                     agentResult.getStdErr(), command.getCommandStatus() );
         }
         else
         {
-            return new CommandResult( command.getCommandUUID(), null, null, null, CommandStatus.TIMEOUT );
+            return new CommandResult( requestBuilder.getCommandId(), null, null, null, CommandStatus.TIMEOUT );
         }
     }
 
@@ -475,8 +475,8 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             public void onResponse( final Response response, final AgentResult agentResult, final Command command )
             {
                 callback.onResponse( response,
-                        new CommandResult( command.getCommandUUID(), agentResult.getExitCode(), agentResult.getStdOut(),
-                                agentResult.getStdErr(), command.getCommandStatus() ) );
+                        new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(),
+                                agentResult.getStdOut(), agentResult.getStdErr(), command.getCommandStatus() ) );
             }
         } );
     }
