@@ -16,8 +16,8 @@ import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.PeerStatus;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
@@ -59,11 +59,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Peer registerPeer( String config )
+    public PeerInfo registerPeer( String config )
     {
         if ( config != null )
         {
-            Peer peer = GSON.fromJson( config, Peer.class );
+            PeerInfo peer = GSON.fromJson( config, PeerInfo.class );
             peerManager.register( peer );
             return peer;
         }
@@ -103,7 +103,7 @@ public class RestServiceImpl implements RestService
     @Override
     public String getPeerJsonFormat()
     {
-        Peer peer = getSamplePeer();
+        PeerInfo peer = getSamplePeer();
         return GSON.toJson( peer );
     }
 
@@ -112,7 +112,7 @@ public class RestServiceImpl implements RestService
     public String getId()
     {
 
-        UUID id = peerManager.getSiteId();
+        UUID id = peerManager.getPeerId();
         return GSON.toJson( id );
     }
 
@@ -201,7 +201,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response processRegisterRequest( String peer )
     {
-        Peer p = GSON.fromJson( peer, Peer.class );
+        PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
         peerManager.register( p );
         return Response.ok( GSON.toJson( p ) ).build();
     }
@@ -226,19 +226,19 @@ public class RestServiceImpl implements RestService
     @Override
     public Response updatePeer( String peer )
     {
-        Peer p = GSON.fromJson( peer, Peer.class );
+        PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
         peerManager.update( p );
         return Response.ok( GSON.toJson( p ) ).build();
     }
 
 
-    private Peer getSamplePeer()
+    private PeerInfo getSamplePeer()
     {
         String localIp = getLocalIp();
-        Peer peer = new Peer();
+        PeerInfo peer = new PeerInfo();
         peer.setName( "Peer on " + localIp );
         peer.setIp( localIp );
-        peer.setId( peerManager.getSiteId() );
+        peer.setId( peerManager.getPeerId() );
         peer.setStatus( PeerStatus.REQUESTED );
         return peer;
     }

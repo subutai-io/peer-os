@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.peer.cli;
 
 
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Command;
@@ -34,9 +34,9 @@ public class RegisterCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Peer peer = getSamplePeer();
+        PeerInfo peerInfo = getSamplePeer();
 
-        if ( peerManager.register( peer ) )
+        if ( peerManager.register( peerInfo ) )
         {
             System.out.println( "Peer registered." );
         }
@@ -49,12 +49,12 @@ public class RegisterCommand extends OsgiCommandSupport
     }
 
 
-    private Peer getSamplePeer()
+    private PeerInfo getSamplePeer()
     {
-        Peer peer = new Peer();
-        peer.setName( "Peer name" );
-        peer.setIp( "10.10.10.10" );
-        peer.setId( UUIDUtil.generateTimeBasedUUID() );
-        return peer;
+        PeerInfo peerInfo = new PeerInfo();
+        peerInfo.setName( "Peer name" );
+        peerInfo.setIp( "10.10.10.10" );
+        peerInfo.setId( UUIDUtil.generateTimeBasedUUID() );
+        return peerInfo;
     }
 }

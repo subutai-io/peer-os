@@ -13,7 +13,7 @@ import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 
@@ -174,7 +174,7 @@ public class ResponseSenderTest
 
         act();
 
-        verify( peerManager, atLeastOnce() ).sendPeerMessage( any( Peer.class ), anyString(), anyString() );
+        verify( peerManager, atLeastOnce() ).sendPeerMessage( any( PeerInfo.class ), anyString(), anyString() );
         verify( dispatcher, atLeastOnce() ).deleteRemoteResponse( Matchers.<RemoteResponse>anyObject() );
         verify( dispatcher, atLeastOnce() ).saveRemoteRequest( any( RemoteRequest.class ) );
     }
@@ -204,7 +204,7 @@ public class ResponseSenderTest
 
         act();
 
-        verify( peerManager, atLeastOnce() ).sendPeerMessage( any( Peer.class ), anyString(), anyString() );
+        verify( peerManager, atLeastOnce() ).sendPeerMessage( any( PeerInfo.class ), anyString(), anyString() );
         verify( dispatcher, atLeastOnce() ).deleteRemoteResponse( any( RemoteResponse.class ) );
         verify( dispatcher, atLeastOnce() ).deleteRemoteRequest( any( UUID.class ) );
     }
@@ -232,7 +232,7 @@ public class ResponseSenderTest
         when( dispatcher.getRemoteResponses( any( UUID.class ) ) )
                 .thenReturn( Sets.newHashSet( remoteResponse, remoteResponse2 ) );
 
-        when( peerManager.sendPeerMessage( any( Peer.class ), anyString(), anyString() ) )
+        when( peerManager.sendPeerMessage( any( PeerInfo.class ), anyString(), anyString() ) )
                 .thenThrow( new PeerMessageException( "" ) );
 
 

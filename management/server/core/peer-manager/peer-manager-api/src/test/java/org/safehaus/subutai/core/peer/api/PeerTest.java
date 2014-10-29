@@ -12,13 +12,13 @@ import static org.mockito.Mockito.mock;
  */
 public class PeerTest
 {
-    Peer peer;
+    PeerInfo peerInfo;
 
 
     @Before
     public void init()
     {
-        peer = mock( Peer.class );
+        peerInfo = mock( PeerInfo.class );
     }
 
 
