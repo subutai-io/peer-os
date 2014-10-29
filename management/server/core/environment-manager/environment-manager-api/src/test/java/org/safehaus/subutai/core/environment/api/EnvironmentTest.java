@@ -62,4 +62,12 @@ public class EnvironmentTest
         UUID uuid = environment.getId();
         assertNotNull( uuid );
     }
+
+
+//    @Test
+//    public void testInvoke() throws Exception
+//    {
+//        PeerCommandMessage peerCommandMessage = mock( PeerCommandMessage.class );
+//        environment.invoke( peerCommandMessage );
+//    }
 }

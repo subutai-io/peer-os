@@ -146,7 +146,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             for ( Agent agent : agents )
             {
                 ResourceHost resourceHost = getResourceHostByName( agent.getParentHostName() );
-                ContainerHost containerHost = new ContainerHost( agent );
+                ContainerHost containerHost = new ContainerHost( agent, getId(), environmentId );
                 containerHost.setParentAgent( resourceHost.getAgent() );
                 containerHost.setCreatorPeerId( creatorPeerId );
                 containerHost.setTemplateName( templateName );
@@ -356,7 +356,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             {
                 if ( managementHost == null )
                 {
-                    managementHost = new ManagementHost( PeerUtils.buildAgent( response ) );
+                    managementHost = new ManagementHost( PeerUtils.buildAgent( response ), getId() );
                     managementHost.setParentAgent( NullAgent.getInstance() );
                 }
                 managementHost.updateHeartbeat();
@@ -374,7 +374,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                 ResourceHost host = managementHost.getResourceHostByName( response.getHostname() );
                 if ( host == null )
                 {
-                    host = new ResourceHost( PeerUtils.buildAgent( response ) );
+                    host = new ResourceHost( PeerUtils.buildAgent( response ), getId() );
                     host.setParentAgent( managementHost.getAgent() );
                     managementHost.addResourceHost( host );
                 }
@@ -393,7 +393,8 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
             if ( containerHost == null )
             {
-                containerHost = new ContainerHost( PeerUtils.buildAgent( response ) );
+                containerHost =
+                        new ContainerHost( PeerUtils.buildAgent( response ), getId(), response.getEnvironmentId() );
                 containerHost.setParentAgent( resourceHost.getAgent() );
                 resourceHost.addContainerHost( containerHost );
             }
