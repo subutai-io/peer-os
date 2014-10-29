@@ -29,19 +29,19 @@
     <!-- queue -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>message-queue-api</artifactId>
+      <artifactId>messenger-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>message-queue-impl</artifactId>
+      <artifactId>messenger-impl</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>message-queue-cli</artifactId>
+      <artifactId>messenger-cli</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>message-queue-rest</artifactId>
+      <artifactId>messenger-rest</artifactId>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
