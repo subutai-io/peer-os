@@ -436,14 +436,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             Set<PeerContainer> containers =
                     JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<PeerContainer>>()
-                    {
-                    }.getType() );
+                    {}.getType() );
 
             if ( cmd.isSuccess() && containers != null )
             {
                 for ( Container c : containers )
                 {
-                    ContainerHost ec = new ContainerHost( null );
+                    //TODO pass proper constructor args
+                    ContainerHost ec = new ContainerHost( null, null, null );
                     ec.setEnvironmentId( environment.getId() );
                     freshContainers.add( ec );
                 }

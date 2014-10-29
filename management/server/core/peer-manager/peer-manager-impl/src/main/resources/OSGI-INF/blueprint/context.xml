@@ -33,7 +33,9 @@
     <property name="templateRegistry" ref="templateRegistry" />
     <property name="communicationManager" ref="communicationManager" />
     <property name="strategyManager" ref="strategyManager" />
+
     <argument ref="dataSource" />
+    <argument ref="messenger" />
   </bean>
 
 </blueprint>
