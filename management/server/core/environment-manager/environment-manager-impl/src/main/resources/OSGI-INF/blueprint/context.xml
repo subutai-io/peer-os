@@ -9,10 +9,22 @@
 
   <service ref="environmentManager" interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
+  <reference id="templateRegistry" availability="mandatory"
+             interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
+  <reference id="networkManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.network.api.NetworkManager" />
+  <reference id="peerManager"
+             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <reference id="tracker" interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+
   <bean id="environmentManager" scope="singleton"
         init-method="init"
         destroy-method="destroy"
         class="org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl">
+    <property name="templateRegistry" ref="templateRegistry" />
+    <property name="networkManager" ref="networkManager" />
+    <property name="tracker" ref="tracker" />
+    <property name="peerManager" ref="peerManager" />
     <argument ref="dataSource" />
   </bean>
 
