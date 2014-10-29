@@ -10,21 +10,25 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.PeerStatus;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
@@ -68,13 +72,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Peer registerPeer( String config )
+    public PeerInfo registerPeer( String config )
     {
         if ( config != null )
         {
-            Peer peer = GSON.fromJson( config, Peer.class );
-            peerManager.register( peer );
-            return peer;
+            PeerInfo peerInfo = GSON.fromJson( config, PeerInfo.class );
+            peerManager.register( peerInfo );
+            return peerInfo;
         }
         else
         {
@@ -112,8 +116,8 @@ public class RestServiceImpl implements RestService
     @Override
     public String getPeerJsonFormat()
     {
-        Peer peer = getSamplePeer();
-        return GSON.toJson( peer );
+        PeerInfo peerInfo = getSamplePeer();
+        return GSON.toJson( peerInfo );
     }
 
 
@@ -121,7 +125,7 @@ public class RestServiceImpl implements RestService
     public String getId()
     {
 
-        UUID id = peerManager.getSiteId();
+        UUID id = peerManager.getPeerId();
         return GSON.toJson( id );
     }
 
@@ -210,7 +214,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response processRegisterRequest( String peer )
     {
-        Peer p = GSON.fromJson( peer, Peer.class );
+        PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
         peerManager.register( p );
         return Response.ok( GSON.toJson( p ) ).build();
     }
@@ -235,21 +239,21 @@ public class RestServiceImpl implements RestService
     @Override
     public Response updatePeer( String peer )
     {
-        Peer p = GSON.fromJson( peer, Peer.class );
+        PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
         peerManager.update( p );
         return Response.ok( GSON.toJson( p ) ).build();
     }
 
 
-    private Peer getSamplePeer()
+    private PeerInfo getSamplePeer()
     {
         String localIp = getLocalIp();
-        Peer peer = new Peer();
-        peer.setName( "Peer on " + localIp );
-        peer.setIp( localIp );
-        peer.setId( peerManager.getSiteId() );
-        peer.setStatus( PeerStatus.REQUESTED );
-        return peer;
+        PeerInfo peerInfo = new PeerInfo();
+        peerInfo.setName( "Peer on " + localIp );
+        peerInfo.setIp( localIp );
+        peerInfo.setId( peerManager.getPeerId() );
+        peerInfo.setStatus( PeerStatus.REQUESTED );
+        return peerInfo;
     }
 
 
@@ -303,6 +307,111 @@ public class RestServiceImpl implements RestService
             //            return Response.ok().entity( result ).build();
         }
         catch ( ContainerCreateException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response execute( final String requestBuilder, final String host )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            RequestBuilder rb = JsonUtil.fromJson( requestBuilder, RequestBuilder.class );
+            ContainerHost h = JsonUtil.fromJson( requestBuilder, ContainerHost.class );
+            CommandResult result = localPeer.execute( rb, h );
+            return Response.ok( JsonUtil.toJson( result ) ).build();
+        }
+        catch ( CommandException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response environmentContainers( final String envId )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            UUID environmentId = UUID.fromString( envId );
+
+            Set<ContainerHost> result = localPeer.getContainerHostsByEnvironmentId( environmentId );
+            return Response.ok( JsonUtil.toJson( result ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response destroyContainer( final String host )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+
+            localPeer.destroyContainer( containerHost );
+            return Response.ok().build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response startContainer( final String host )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+            localPeer.startContainer( containerHost );
+            return Response.ok().build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response stopContainer( final String host )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+            localPeer.stopContainer( containerHost );
+            return Response.ok().build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response isContainerConnected( @FormParam( "host" ) final String host )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+            localPeer.isConnected( containerHost );
+            return Response.ok().build();
+        }
+        catch ( PeerException e )
         {
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }

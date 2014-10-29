@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -200,13 +201,13 @@ public class PeerGroupComponent extends CustomComponent
 
     private Table createPeersTable()
     {
-        List<Peer> peers = peerManagerPortalModule.getPeerManager().peers();
+        List<PeerInfo> peers = peerManagerPortalModule.getPeerManager().peers();
         Table info = new Table();
         info.setHeight( "500px" );
         info.setWidth( "800px" );
         info.addContainerProperty( "Name", String.class, null );
         info.addContainerProperty( "Select", CheckBox.class, null );
-        for ( Peer peer : peers )
+        for ( PeerInfo peer : peers )
         {
             CheckBox checkBox = new CheckBox();
             info.addItem( new Object[] { peer.getName(), checkBox }, peer );

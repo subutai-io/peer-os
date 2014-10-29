@@ -40,7 +40,7 @@
     <module>template-registry</module>
     <module>tracker</module>
     <module>metric</module>
-    <module>message-queue</module>
+    <module>messenger</module>
   </modules>
 
 </project>

@@ -10,6 +10,9 @@
 
   <service ref="peerManager" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
+  <reference id="messenger" availability="mandatory"
+             interface="org.safehaus.subutai.core.messenger.api.Messenger" />
+
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
 
@@ -31,7 +34,9 @@
     <property name="templateRegistry" ref="templateRegistry" />
     <property name="communicationManager" ref="communicationManager" />
     <property name="strategyManager" ref="strategyManager" />
+
     <argument ref="dataSource" />
+    <argument ref="messenger" />
   </bean>
 
 </blueprint>

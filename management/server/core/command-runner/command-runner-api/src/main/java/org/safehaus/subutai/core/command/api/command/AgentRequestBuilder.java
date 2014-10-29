@@ -52,6 +52,7 @@ public class AgentRequestBuilder extends RequestBuilder
     }
 
 
+    @Override
     public Request build( final UUID taskUUID )
     {
         return super.build( agent.getUuid(), taskUUID );
