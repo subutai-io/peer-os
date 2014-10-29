@@ -24,7 +24,7 @@ public abstract class SubutaiHost implements Host
     private UUID peerId;
     private Agent agent = NullAgent.getInstance();
     private Agent parentAgent = NullAgent.getInstance();
-    private long lastHeartbeat = System.currentTimeMillis();
+    protected long lastHeartbeat = System.currentTimeMillis();
 
 
     protected SubutaiHost( final Agent agent, UUID peerId )
