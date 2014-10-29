@@ -432,7 +432,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     new DefaultCommandMessage( PeerCommandType.GET_CONNECTED_CONTAINERS, peerId, null );
 
             cmd.setInput( environment.getId().toString() );
-            //            peerCommandDispatcher.invoke( cmd, TIMEOUT );
 
             Set<PeerContainer> containers =
                     JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<PeerContainer>>()
@@ -456,11 +455,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public Environment getEnvironmentByUUID( final UUID environmentId )
     {
-        Environment environment = environmentDAO.getInfo( ENVIRONMENT, environmentId.toString(), Environment.class );
-
-        //        environmentBuilder.convertEnvironmentContainersToNodes( environment );
-
-        return environment;
+        return environmentDAO.getInfo( ENVIRONMENT, environmentId.toString(), Environment.class );
     }
 
 
