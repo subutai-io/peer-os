@@ -1,9 +1,46 @@
 #!/bin/bash
 
+function network_usage {
+echo -------------------------------------------------------------------------------
+echo
+echo Usage:   Establish a tunnnel between subutai peers
+echo "        "subutai network tunnelPortName tunnelIpAddress ofPortNumber
+echo
+echo -------------------------------------------------------------------------------
+}
+
 function network {
-  echo "running network binding"
+
+  local tunnelPortName="$1"
+  local tunnelIpAddress="$2"
+  local ofPortNumber="$3"
+  local extra="$4"
+
+  if [ -z "$tunnelPortName" ]; then
+    msg_error "TunnelPortName Parameter not provided. Aborting ..."
+    show_usage "`network_usage`"
+  fi
+
+  if [ -z "$tunnelIpAddress" ]; then
+    msg_error "TunnelIpAddress Parameter not provided. Aborting ..."
+    show_usage "`network_usage`"
+  fi
+
+  if [ -z "$ofPortNumber" ]; then
+    msg_error "ofPortNumber Parameter not provided. Aborting ..."
+    show_usage "`network_usage`"
+  fi
+
+  if [ "$extra" ]; then
+    msg_error "extra Parameter provided. Aborting ..."
+    show_usage "`network_usage`"
+  fi
+
+  ovs-vsctl --may-exist add-port br-tun $tunnelPortName
+  ovs-vsctl set Interface $tunnelPortName type=vxlan options:key=flow options:remote_ip=$tunnelIpAddress ofport_request=$ofPortNumber
 }
 
 function network_description {
-  echo "does some network related staff"
+  echo "Establish a tunnel between subutai peers"
 }
+
