@@ -443,7 +443,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 for ( Container c : containers )
                 {
-                    ContainerHost ec = new ContainerHost( null );
+                    ContainerHost ec = new ContainerHost( null, null, null );
                     ec.setEnvironmentId( environment.getId() );
                     freshContainers.add( ec );
                 }
