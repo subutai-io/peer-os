@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.CommandStatus;
 import org.safehaus.subutai.common.protocol.NullAgent;
@@ -30,6 +31,7 @@ import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
+import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -65,8 +67,12 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     public LocalPeerImpl( PeerManager peerManager, ContainerManager containerManager, TemplateRegistry templateRegistry,
-                          PeerDAO peerDao, CommunicationManager communicationManager, CommandRunner commandRunner )
+                          PeerDAO peerDao, CommunicationManager communicationManager, CommandRunner commandRunner,
+                          Messenger messenger )
     {
+        //subscribe to command request messages from remote peer
+        messenger.addMessageListener( new CommandRequestMessageListener( this, messenger, peerManager ) );
+
         this.peerManager = peerManager;
         this.containerManager = containerManager;
         this.templateRegistry = templateRegistry;
@@ -443,12 +449,35 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
         if ( agentResult != null )
         {
-            return new CommandResult( agentResult.getExitCode(), agentResult.getStdOut(), agentResult.getStdErr(),
-                    command.getCommandStatus() );
+            return new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(), agentResult.getStdOut(),
+                    agentResult.getStdErr(), command.getCommandStatus() );
         }
         else
         {
-            return new CommandResult( null, null, null, CommandStatus.TIMEOUT );
+            return new CommandResult( requestBuilder.getCommandId(), null, null, null, CommandStatus.TIMEOUT );
         }
+    }
+
+
+    @Override
+    public void execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+            throws CommandException
+    {
+        if ( !host.isConnected() )
+        {
+            throw new CommandException( "Host disconnected." );
+        }
+        final Agent agent = host.getAgent();
+        Command command = commandRunner.createCommand( requestBuilder, Sets.newHashSet( agent ) );
+        command.executeAsync( new org.safehaus.subutai.core.command.api.command.CommandCallback()
+        {
+            @Override
+            public void onResponse( final Response response, final AgentResult agentResult, final Command command )
+            {
+                callback.onResponse( response,
+                        new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(),
+                                agentResult.getStdOut(), agentResult.getStdErr(), command.getCommandStatus() ) );
+            }
+        } );
     }
 }

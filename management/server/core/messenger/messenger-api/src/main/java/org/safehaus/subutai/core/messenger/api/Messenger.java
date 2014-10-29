@@ -19,7 +19,7 @@ public interface Messenger
      *
      * @return - message
      */
-    public Message createMessage( Object payload ) throws MessageException;
+    public Message createMessage( Object payload );
 
 
     /**

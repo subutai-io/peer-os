@@ -4,18 +4,26 @@ package org.safehaus.subutai.core.peer.impl;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Semaphore;
 
 import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.CommandStatus;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
+import org.safehaus.subutai.core.messenger.api.Message;
+import org.safehaus.subutai.core.messenger.api.MessageException;
+import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.RemotePeer;
 import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -23,12 +31,21 @@ import org.safehaus.subutai.core.strategy.api.Criteria;
  */
 public class RemotePeerImpl implements RemotePeer
 {
+    private static final Logger LOG = LoggerFactory.getLogger( RemotePeerImpl.class.getName() );
+
     protected PeerInfo peerInfo;
+    protected Messenger messenger;
+    private CommandResponseMessageListener commandResponseMessageListener;
 
 
-    public RemotePeerImpl( final PeerInfo peerInfo )
+    public RemotePeerImpl( final PeerInfo peerInfo, final Messenger messenger )
     {
+        //subscribe to command response messages from remote peer
+        commandResponseMessageListener = new CommandResponseMessageListener();
+        messenger.addMessageListener( commandResponseMessageListener );
+
         this.peerInfo = peerInfo;
+        this.messenger = messenger;
     }
 
 
@@ -122,7 +139,53 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
-        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
-        return remotePeerRestClient.execute( requestBuilder, host );
+
+        BlockingCommandCallback callback = new BlockingCommandCallback();
+
+        executeAsync( requestBuilder, host, callback, callback.getCompletionSemaphore() );
+
+        callback.waitCompletion();
+
+        CommandResult commandResult = callback.getCommandResult();
+
+        if ( commandResult == null )
+        {
+            commandResult = new CommandResult( requestBuilder.getCommandId(), null, null, null, CommandStatus.TIMEOUT );
+        }
+
+        return commandResult;
+    }
+
+
+    @Override
+    public void execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+            throws CommandException
+    {
+        executeAsync( requestBuilder, host, callback, null );
+    }
+
+
+    private void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback,
+                               Semaphore semaphore ) throws CommandException
+    {
+        if ( !host.isConnected() )
+        {
+            throw new CommandException( "Host disconnected." );
+        }
+        //cache callback
+        commandResponseMessageListener
+                .addCallback( requestBuilder.getCommandId(), callback, requestBuilder.getTimeout(), semaphore );
+
+        //send command message to remote peer
+        try
+        {
+            Message message = messenger.createMessage( new CommandRequest( requestBuilder, host ) );
+            messenger.sendMessage( this, message, CommandRecipientType.COMMAND_REQUEST.name(),
+                    requestBuilder.getTimeout() );
+        }
+        catch ( MessageException e )
+        {
+            throw new CommandException( e );
+        }
     }
 }
