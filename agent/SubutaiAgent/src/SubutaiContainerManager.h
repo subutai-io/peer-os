@@ -2,6 +2,7 @@
 #define __SUBUTAI_CONTAINER_MANAGER_H__
 
 #include <string>
+#include <vector>
 #include <lxc/lxccontainer.h>
 
 using namespace std;
@@ -12,7 +13,7 @@ class SubutaiContainerManager {
         ~SubutaiContainerManager();
         bool findContainer(string container_name);
         bool isContainerRunning(string container_name);
-        bool RunProgram(string program, char* params[]);
+        bool RunProgram(string program, vector<string> params);
     private:
         string          _lxc_path;
         lxc_container*  _current_container;
