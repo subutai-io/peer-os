@@ -6,17 +6,15 @@
     <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/qwerService)
     </non-jta-data-source>
-    <!--<class>org.safehaus.subutai.common.protocol.Agent</class>-->
+    <class>org.safehaus.subutai.common.protocol.Agent</class>
     <class>org.safehaus.subutai.common.protocol.Template</class>
-    <!--<class>org.safehaus.subutai.common.protocol.EnvironmentBlueprint</class>-->
+    <class>org.safehaus.subutai.common.protocol.EnvironmentBlueprint</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
-      <!--<property name="openjpa.RuntimeUnenhancedClasses" value="supported" />-->
+      <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />
       <property name="openjpa.Log" value="DefaultLevel=INFO, Tool=INFO" />
       <property name="openjpa.jdbc.DBDictionary" value="h2" />
       <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)" />
-      <property name="openjpa.ConnectionUserName" value="sa" />
-      <property name="openjpa.ConnectionPassword" value="" />
     </properties>
   </persistence-unit>
 </persistence>

@@ -7,12 +7,12 @@
   <reference id="emf" interface="javax.persistence.EntityManagerFactory" filter="(osgi.unit.name=commonUnit)" />
 
   <!--AgentService-->
-  <!--<bean id="agentServiceImpl" class="org.safehaus.subutai.common.protocol.impl.AgentServiceImpl" init-method="test">-->
-  <!--<property ref="emf" name="entityManagerFactory" />-->
-  <!--</bean>-->
+  <bean id="agentServiceImpl" class="org.safehaus.subutai.common.protocol.impl.AgentServiceImpl" init-method="test">
+    <property ref="emf" name="entityManagerFactory" />
+  </bean>
 
-  <!--<service ref="agentServiceImpl"-->
-  <!--interface="org.safehaus.subutai.common.protocol.api.AgentService" />-->
+  <service ref="agentServiceImpl"
+           interface="org.safehaus.subutai.common.protocol.api.AgentService" />
 
   <!--TemplateService-->
   <bean id="templateServiceImpl" class="org.safehaus.subutai.common.protocol.impl.TemplateServiceImpl"
@@ -23,12 +23,14 @@
   <service ref="templateServiceImpl"
            interface="org.safehaus.subutai.common.protocol.api.TemplateService" />
 
-  <!--<bean id="environmentBlueprintServiceImpl" class="org.safehaus.subutai.common.protocol.impl.EnvironmentBlueprintServiceImpl" init-method="test">-->
-  <!--<property ref="emf" name="entityManagerFactory" />-->
-  <!--</bean>-->
+  <!--EnvironmentBlueprint-->
+  <bean id="environmentBlueprintServiceImpl"
+        class="org.safehaus.subutai.common.protocol.impl.EnvironmentBlueprintServiceImpl" init-method="test">
+    <property ref="emf" name="entityManagerFactory" />
+  </bean>
 
-  <!--<service ref="environmentBlueprintServiceImpl"-->
-  <!--interface="org.safehaus.subutai.common.protocol.api.EnvironmentBlueprintService" />-->
+  <service ref="environmentBlueprintServiceImpl"
+           interface="org.safehaus.subutai.common.protocol.api.EnvironmentBlueprintService" />
 
   <!--<bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">-->
   <!--<property name="URL" value="jdbc:h2:/root/db/agentDB" />-->
