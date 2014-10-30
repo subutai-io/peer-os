@@ -449,30 +449,12 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
 
-        if ( !host.isConnected() )
-        {
-            throw new CommandException( "Host disconnected." );
-        }
-        Agent agent = host.getAgent();
-        Command command = commandRunner.createCommand( requestBuilder, Sets.newHashSet( agent ) );
-        command.execute();
-
-        AgentResult agentResult = command.getResults().get( agent.getUuid() );
-
-        if ( agentResult != null )
-        {
-            return new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(), agentResult.getStdOut(),
-                    agentResult.getStdErr(), command.getCommandStatus() );
-        }
-        else
-        {
-            return new CommandResult( requestBuilder.getCommandId(), null, null, null, CommandStatus.TIMEOUT );
-        }
+        return execute( requestBuilder, host, null );
     }
 
 
     @Override
-    public void execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
             throws CommandException
     {
         if ( !host.isConnected() )
@@ -486,11 +468,26 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             @Override
             public void onResponse( final Response response, final AgentResult agentResult, final Command command )
             {
-                callback.onResponse( response,
-                        new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(),
-                                agentResult.getStdOut(), agentResult.getStdErr(), command.getCommandStatus() ) );
+                if ( callback != null )
+                {
+                    callback.onResponse( response,
+                            new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(),
+                                    agentResult.getStdOut(), agentResult.getStdErr(), command.getCommandStatus() ) );
+                }
             }
         } );
+
+        AgentResult agentResult = command.getResults().get( agent.getUuid() );
+
+        if ( agentResult != null )
+        {
+            return new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(), agentResult.getStdOut(),
+                    agentResult.getStdErr(), command.getCommandStatus() );
+        }
+        else
+        {
+            return new CommandResult( requestBuilder.getCommandId(), null, null, null, CommandStatus.TIMEOUT );
+        }
     }
 
 
@@ -509,11 +506,21 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             @Override
             public void onResponse( final Response response, final AgentResult agentResult, final Command command )
             {
-                callback.onResponse( response,
-                        new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(),
-                                agentResult.getStdOut(), agentResult.getStdErr(), command.getCommandStatus() ) );
+                if ( callback != null )
+                {
+                    callback.onResponse( response,
+                            new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(),
+                                    agentResult.getStdOut(), agentResult.getStdErr(), command.getCommandStatus() ) );
+                }
             }
         } );
+    }
+
+
+    @Override
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException
+    {
+        executeAsync( requestBuilder, host, null );
     }
 
 

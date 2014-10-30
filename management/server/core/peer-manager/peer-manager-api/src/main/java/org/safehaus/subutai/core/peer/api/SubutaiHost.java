@@ -78,11 +78,18 @@ public abstract class SubutaiHost implements Host
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder ) throws CommandException
     {
+        return execute( requestBuilder, null );
+    }
+
+
+    @Override
+    public CommandResult execute( final RequestBuilder requestBuilder, final CommandCallback callback )
+            throws CommandException
+    {
         try
         {
             Peer peer = getPeer( this.getPeerId() );
-            CommandResult commandResult = peer.execute( requestBuilder, this );
-            return commandResult;
+            return peer.execute( requestBuilder, this, callback );
         }
         catch ( PeerException e )
         {
@@ -92,12 +99,20 @@ public abstract class SubutaiHost implements Host
 
 
     @Override
-    public void execute( final RequestBuilder requestBuilder, final CommandCallback callback ) throws CommandException
+    public void executeAsync( final RequestBuilder requestBuilder ) throws CommandException
+    {
+        executeAsync( requestBuilder, null );
+    }
+
+
+    @Override
+    public void executeAsync( final RequestBuilder requestBuilder, final CommandCallback callback )
+            throws CommandException
     {
         try
         {
             Peer peer = getPeer( this.getPeerId() );
-            peer.execute( requestBuilder, this, callback );
+            peer.executeAsync( requestBuilder, this, callback );
         }
         catch ( PeerException e )
         {
