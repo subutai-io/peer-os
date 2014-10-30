@@ -63,8 +63,9 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 LOG.info( "Refreshing containers state..." );
                 if ( environment != null )
                 {
-                    Set<ContainerHost> containers = environmentManager.getConnectedContainers( environment );
-                    refreshContainers( containers );
+                    //                    Set<ContainerHost> containers = environmentManager.getConnectedContainers(
+                    // environment );
+                    refreshContainers();
                 }
                 LOG.info( "Refreshing done." );
             }
@@ -197,6 +198,29 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
     public Set<ContainerHost> getSelectedContainers()
     {
         return Collections.unmodifiableSet( selectedContainers );
+    }
+
+
+    private void refreshContainers()
+    {
+        for ( Object itemObj : container.getItemIds() )
+        {
+            String itemId = ( String ) itemObj;
+            if ( itemId.indexOf( ':' ) < 0 )
+            {
+                continue;
+            }
+            Item item = container.getItem( itemId );
+            Object o = item.getItemProperty( "value" ).getValue();
+            if ( ( o instanceof ContainerHost ) && ( ( ( ContainerHost ) o ).isConnected() ) )
+            {
+                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
+            }
+            else
+            {
+                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual-stopped.png" ) );
+            }
+        }
     }
 
 
