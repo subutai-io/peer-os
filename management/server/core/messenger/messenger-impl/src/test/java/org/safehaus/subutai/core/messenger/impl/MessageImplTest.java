@@ -15,6 +15,9 @@ import static org.junit.Assert.assertEquals;
 public class MessageImplTest
 {
 
+    private static final UUID SOURCE_PEER_ID = UUID.randomUUID();
+    private static final Object PAYLOAD = new Object();
+
 
     static class CustomObject implements Serializable
     {
@@ -86,5 +89,19 @@ public class MessageImplTest
         MessageImpl message = new MessageImpl( UUID.randomUUID(), customObject );
 
         assertEquals( customObject, message.getPayload( CustomObject.class ) );
+    }
+
+
+    @Test( expected = NullPointerException.class )
+    public void constructorShouldFailOnNullSourcePeerId() throws Exception
+    {
+        new MessageImpl( null, PAYLOAD );
+    }
+
+
+    @Test( expected = NullPointerException.class )
+    public void constructorShouldFailOnNullPayload() throws Exception
+    {
+        new MessageImpl( SOURCE_PEER_ID, null );
     }
 }
