@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -17,7 +16,6 @@ import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -54,7 +52,7 @@ public class CassandraImpl implements Cassandra
     private EnvironmentManager environmentManager;
     private PluginDao pluginDAO;
     private DataSource dataSource;
-    private ServiceLocator serviceLocator;
+    //    private ServiceLocator serviceLocator;
 
 
     public CassandraImpl( DataSource dataSource )
@@ -103,16 +101,12 @@ public class CassandraImpl implements Cassandra
     {
         try
         {
-            this.serviceLocator = new ServiceLocator();
-            this.tracker = serviceLocator.getService( Tracker.class );
-            this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+            //            this.serviceLocator = new ServiceLocator();
+            //            this.tracker = serviceLocator.getService( Tracker.class );
+            //            this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
             this.pluginDAO = new PluginDao( dataSource );
         }
         catch ( SQLException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-        catch ( NamingException e )
         {
             LOG.error( e.getMessage(), e );
         }
@@ -123,7 +117,7 @@ public class CassandraImpl implements Cassandra
 
     public void destroy()
     {
-        this.serviceLocator = null;
+        //        this.serviceLocator = null;
         this.tracker = null;
         this.environmentManager = null;
         this.pluginDAO = null;
