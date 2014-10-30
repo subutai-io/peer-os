@@ -31,7 +31,6 @@ import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
-import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -68,11 +67,8 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     public LocalPeerImpl( PeerManager peerManager, ContainerManager containerManager, TemplateRegistry templateRegistry,
-                          PeerDAO peerDao, CommunicationManager communicationManager, CommandRunner commandRunner,
-                          Messenger messenger )
+                          PeerDAO peerDao, CommunicationManager communicationManager, CommandRunner commandRunner )
     {
-        //subscribe to command request messages from remote peer
-        messenger.addMessageListener( new CommandRequestMessageListener( this, messenger, peerManager ) );
 
         this.peerManager = peerManager;
         this.containerManager = containerManager;
@@ -453,13 +449,33 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
 
+        return execute( requestBuilder, host, null );
+    }
+
+
+    @Override
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+            throws CommandException
+    {
         if ( !host.isConnected() )
         {
             throw new CommandException( "Host disconnected." );
         }
         Agent agent = host.getAgent();
         Command command = commandRunner.createCommand( requestBuilder, Sets.newHashSet( agent ) );
-        command.execute();
+        command.execute( new org.safehaus.subutai.core.command.api.command.CommandCallback()
+        {
+            @Override
+            public void onResponse( final Response response, final AgentResult agentResult, final Command command )
+            {
+                if ( callback != null )
+                {
+                    callback.onResponse( response,
+                            new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(),
+                                    agentResult.getStdOut(), agentResult.getStdErr(), command.getCommandStatus() ) );
+                }
+            }
+        } );
 
         AgentResult agentResult = command.getResults().get( agent.getUuid() );
 
@@ -476,7 +492,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public void execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
             throws CommandException
     {
         if ( !host.isConnected() )
@@ -490,11 +506,21 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             @Override
             public void onResponse( final Response response, final AgentResult agentResult, final Command command )
             {
-                callback.onResponse( response,
-                        new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(),
-                                agentResult.getStdOut(), agentResult.getStdErr(), command.getCommandStatus() ) );
+                if ( callback != null )
+                {
+                    callback.onResponse( response,
+                            new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(),
+                                    agentResult.getStdOut(), agentResult.getStdErr(), command.getCommandStatus() ) );
+                }
             }
         } );
+    }
+
+
+    @Override
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException
+    {
+        executeAsync( requestBuilder, host, null );
     }
 
 

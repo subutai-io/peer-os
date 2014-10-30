@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-//import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.server.ui.component.ConcurrentComponent;
 import org.slf4j.Logger;
@@ -33,11 +32,13 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.UI;
 
+//import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+
 
 /**
  * Container tree
  */
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 
 public final class EnvironmentTree extends ConcurrentComponent implements Disposable
 {
@@ -62,8 +63,9 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 LOG.info( "Refreshing containers state..." );
                 if ( environment != null )
                 {
-                    Set<ContainerHost> containers = environmentManager.getConnectedContainers( environment );
-                    refreshContainers( containers );
+                    //                    Set<ContainerHost> containers = environmentManager.getConnectedContainers(
+                    // environment );
+                    refreshContainers();
                 }
                 LOG.info( "Refreshing done." );
             }
@@ -161,12 +163,6 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         tree.removeAllItems();
         if ( environment != null )
         {
-            Set<String> peers = new HashSet<>();
-
-            for ( ContainerHost ec : environment.getContainers() )
-            {
-                peers.add( ec.getPeerId().toString() );
-            }
 
             for ( ContainerHost ec : environment.getContainers() )
             {
@@ -180,7 +176,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 {
                     peer = container.addItem( peerId );
                     container.setChildrenAllowed( peerId, true );
-                    tree.setItemCaption( itemId, peerId.toString() );
+                    tree.setItemCaption( itemId, peerId );
                     peer.getItemProperty( "value" ).setValue( null );
                 }
                 Item item = container.addItem( itemId );
@@ -202,6 +198,29 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
     public Set<ContainerHost> getSelectedContainers()
     {
         return Collections.unmodifiableSet( selectedContainers );
+    }
+
+
+    private void refreshContainers()
+    {
+        for ( Object itemObj : container.getItemIds() )
+        {
+            String itemId = ( String ) itemObj;
+            if ( itemId.indexOf( ':' ) < 0 )
+            {
+                continue;
+            }
+            Item item = container.getItem( itemId );
+            Object o = item.getItemProperty( "value" ).getValue();
+            if ( ( o instanceof ContainerHost ) && ( ( ( ContainerHost ) o ).isConnected() ) )
+            {
+                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
+            }
+            else
+            {
+                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual-stopped.png" ) );
+            }
+        }
     }
 
 

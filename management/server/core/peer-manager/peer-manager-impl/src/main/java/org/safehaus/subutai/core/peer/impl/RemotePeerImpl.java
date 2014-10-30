@@ -38,14 +38,12 @@ public class RemotePeerImpl implements RemotePeer
     private CommandResponseMessageListener commandResponseMessageListener;
 
 
-    public RemotePeerImpl( final PeerInfo peerInfo, final Messenger messenger )
+    public RemotePeerImpl( final PeerInfo peerInfo, final Messenger messenger,
+                           CommandResponseMessageListener commandResponseMessageListener )
     {
-        //subscribe to command response messages from remote peer
-        commandResponseMessageListener = new CommandResponseMessageListener();
-        messenger.addMessageListener( commandResponseMessageListener );
-
         this.peerInfo = peerInfo;
         this.messenger = messenger;
+        this.commandResponseMessageListener = commandResponseMessageListener;
     }
 
 
@@ -140,13 +138,21 @@ public class RemotePeerImpl implements RemotePeer
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
 
-        BlockingCommandCallback callback = new BlockingCommandCallback();
+        return execute( requestBuilder, host, null );
+    }
 
-        executeAsync( requestBuilder, host, callback, callback.getCompletionSemaphore() );
 
-        callback.waitCompletion();
+    @Override
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+            throws CommandException
+    {
+        BlockingCommandCallback blockingCommandCallback = new BlockingCommandCallback( callback );
 
-        CommandResult commandResult = callback.getCommandResult();
+        executeAsync( requestBuilder, host, blockingCommandCallback, blockingCommandCallback.getCompletionSemaphore() );
+
+        blockingCommandCallback.waitCompletion();
+
+        CommandResult commandResult = blockingCommandCallback.getCommandResult();
 
         if ( commandResult == null )
         {
@@ -158,10 +164,17 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
             throws CommandException
     {
         executeAsync( requestBuilder, host, callback, null );
+    }
+
+
+    @Override
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException
+    {
+        executeAsync( requestBuilder, host, null );
     }
 
 
@@ -185,8 +198,7 @@ public class RemotePeerImpl implements RemotePeer
         try
         {
             Message message = messenger.createMessage( new CommandRequest( requestBuilder, ( ContainerHost ) host ) );
-            messenger.sendMessage( this, message, CommandRecipientType.COMMAND_REQUEST.name(),
-                    requestBuilder.getTimeout() );
+            messenger.sendMessage( this, message, CommandRecipientType.COMMAND_REQUEST.name(), 10 );
         }
         catch ( MessageException e )
         {
