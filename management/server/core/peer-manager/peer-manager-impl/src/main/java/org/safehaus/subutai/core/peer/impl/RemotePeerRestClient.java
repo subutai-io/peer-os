@@ -156,8 +156,7 @@ public class RemotePeerRestClient implements RemotePeer
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             Set<ContainerHost> result = JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHost>>()
-            {
-            }.getType() );
+            {}.getType() );
             return result;
         }
 
@@ -291,7 +290,15 @@ public class RemotePeerRestClient implements RemotePeer
 
 
     @Override
-    public void execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+            throws CommandException
+    {
+        return null;
+    }
+
+
+    @Override
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
             throws CommandException
     {
 
@@ -299,8 +306,7 @@ public class RemotePeerRestClient implements RemotePeer
 
 
     @Override
-    public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
-            throws CommandException
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
 
     }
