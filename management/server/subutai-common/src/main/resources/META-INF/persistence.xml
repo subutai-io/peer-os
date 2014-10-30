@@ -6,9 +6,9 @@
     <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/qwerService)
     </non-jta-data-source>
-    <class>org.safehaus.subutai.common.protocol.Agent</class>
+    <!--<class>org.safehaus.subutai.common.protocol.Agent</class>-->
     <class>org.safehaus.subutai.common.protocol.Template</class>
-    <class>org.safehaus.subutai.common.protocol.EnvironmentBlueprint</class>
+    <!--<class>org.safehaus.subutai.common.protocol.EnvironmentBlueprint</class>-->
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <!--<property name="openjpa.RuntimeUnenhancedClasses" value="supported" />-->

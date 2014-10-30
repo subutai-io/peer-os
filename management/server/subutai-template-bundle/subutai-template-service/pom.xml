@@ -16,10 +16,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>subutai-common</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
     </dependency>

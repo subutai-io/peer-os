@@ -6,7 +6,7 @@
     <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/templateInterface)
     </non-jta-data-source>
-    <class>org.safehaus.subutai.common.protocol.Template</class>
+    <class>org.safehaus.subutai.common.template.Template</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />

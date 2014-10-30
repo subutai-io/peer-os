@@ -5,13 +5,13 @@
     >
   <reference id="emf" interface="javax.persistence.EntityManagerFactory" filter="(osgi.unit.name=templateUnit)" />
 
-  <bean id="templateServiceImpl" class="org.safehaus.subutai.common.protocol.impl.TemplateServiceImpl"
+  <bean id="templateServiceImpl" class="org.safehaus.subutai.common.template.impl.TemplateServiceImpl"
         init-method="test">
     <property ref="emf" name="entityManagerFactory" />
   </bean>
 
   <service ref="templateServiceImpl"
-           interface="org.safehaus.subutai.common.protocol.api.TemplateService" />
+           interface="org.safehaus.subutai.common.template.api.TemplateService" />
 
   <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
     <property name="URL" value="jdbc:h2:/root/db/templatesDB2" />
