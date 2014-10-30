@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 
@@ -30,6 +31,8 @@ public interface Host extends Serializable
     public String getHostname();
 
     public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException;
+
+    public void execute( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
 
     public boolean isConnected();
 

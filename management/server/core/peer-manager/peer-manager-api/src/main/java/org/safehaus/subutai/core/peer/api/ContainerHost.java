@@ -86,9 +86,15 @@ public class ContainerHost extends SubutaiHost
     }
 
 
-    @Override
-    public boolean isConnected()
+    public void updateHeartbeat()
     {
-        return ContainerState.RUNNING.equals( state ) && super.isConnected();
+        lastHeartbeat = System.currentTimeMillis();
+        setState( ContainerState.RUNNING );
     }
+
+    //    @Override
+    //    public boolean isConnected()
+    //    {
+    //        return ContainerState.RUNNING.equals( state ) && super.isConnected();
+    //    }
 }

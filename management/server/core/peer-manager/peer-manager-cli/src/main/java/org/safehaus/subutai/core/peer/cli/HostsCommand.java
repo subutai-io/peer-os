@@ -16,7 +16,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command( scope = "peer", name = "hosts" )
+@Command(scope = "peer", name = "hosts")
 public class HostsCommand extends OsgiCommandSupport
 {
 
@@ -69,15 +69,16 @@ public class HostsCommand extends OsgiCommandSupport
             containerInfo += c.getState();
             if ( c.getEnvironmentId() != null )
             {
-                containerInfo += c.getEnvironmentId();
+                containerInfo += " " + c.getEnvironmentId();
             }
 
             if ( c.getCreatorPeerId() != null )
             {
-                containerInfo += " "+peerManager.getPeer( c.getCreatorPeerId() ).getName();
+                containerInfo += " " + peerManager.getPeer( c.getCreatorPeerId() ).getPeerInfo().getIp();
             }
         }
 
-        System.out.println( String.format( "%s+--%s %s", padding, host.getHostname(), containerInfo ) );
+        System.out
+                .println( String.format( "%s+--%s %s %s", padding, host.getHostname(), host.getId(), containerInfo ) );
     }
 }
