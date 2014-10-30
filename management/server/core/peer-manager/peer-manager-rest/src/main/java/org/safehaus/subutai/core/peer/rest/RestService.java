@@ -92,7 +92,7 @@ public interface RestService
     public Response stopContainer( @FormParam( "host" ) String host );
 
     @POST
-    @Path( "container/is_connected" )
+    @Path( "container/isconnected" )
     @Produces( MediaType.APPLICATION_JSON )
     public Response isContainerConnected( @FormParam( "host" ) String host );
 

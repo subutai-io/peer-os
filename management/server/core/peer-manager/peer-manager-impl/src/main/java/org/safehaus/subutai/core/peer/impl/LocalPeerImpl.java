@@ -496,4 +496,20 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             }
         } );
     }
+
+
+    @Override
+    public void clean()
+    {
+
+        if ( managementHost == null || managementHost.getId() == null )
+        {
+            return;
+        }
+        UUID id = managementHost.getId();
+        peerDAO.deleteInfo( SOURCE_MANAGEMENT, id.toString() );
+        managementHost = null;
+        peerDAO.deleteInfo( SOURCE_MANAGEMENT, id.toString() );
+    }
 }
+

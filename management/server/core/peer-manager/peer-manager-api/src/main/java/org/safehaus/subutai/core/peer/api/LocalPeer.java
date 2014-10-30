@@ -20,4 +20,6 @@ public interface LocalPeer extends Peer
     void init();
 
     void shutdown();
+
+    public void clean();
 }
