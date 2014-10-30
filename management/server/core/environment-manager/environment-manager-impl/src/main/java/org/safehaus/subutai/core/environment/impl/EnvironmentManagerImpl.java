@@ -38,6 +38,7 @@ import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
 import org.safehaus.subutai.core.environment.impl.builder.TopologyBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -336,6 +337,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 }
 
                 UUID peerId = peerManager.getLocalPeer().getId();
+
                 if ( peerId == null )
                 {
                     environment.setStatus( EnvironmentStatusEnum.BROKEN );
@@ -389,11 +391,25 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 if ( blueprint.isExchangeSshKeys() )
                 {
-                    networkManager.configSshOnAgents( environment.getContainers() );
+                    try
+                    {
+                        networkManager.configSshOnAgents( environment.getContainers() );
+                    }
+                    catch ( NetworkManagerException e )
+                    {
+                        throw new EnvironmentBuildException( e.getMessage() );
+                    }
                 }
                 if ( blueprint.isLinkHosts() )
                 {
-                    networkManager.configHostsOnAgents( environment.getContainers(), blueprint.getDomainName() );
+                    try
+                    {
+                        networkManager.configHostsOnAgents( environment.getContainers(), blueprint.getDomainName() );
+                    }
+                    catch ( NetworkManagerException e )
+                    {
+                        throw new EnvironmentBuildException( e.getMessage() );
+                    }
                 }
                 if ( environment.getContainers().size() != containerCount )
                 {

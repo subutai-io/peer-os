@@ -35,14 +35,21 @@ public class SshManager
     }
 
 
-    public boolean execute()
+    public boolean execute() throws SSHManagerException
     {
-
-        return create() && read() && write() && config();
+        try
+        {
+            return create() && read() && write() && config();
+        }
+        catch ( CommandException | SSHManagerException e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new SSHManagerException( e.getMessage() );
+        }
     }
 
 
-    private boolean create()
+    private boolean create() throws CommandException, SSHManagerException
     {
 
         if ( !CollectionUtil.isCollectionEmpty( containerHosts ) )
@@ -56,20 +63,25 @@ public class SshManager
                             "chmod 700 /root/.ssh && " +
                             "ssh-keygen -t dsa -P '' -f /root/.ssh/id_dsa" ) );
 
-                    return command.hasSucceeded();
+                    if ( !command.hasSucceeded() )
+                    {
+                        throw new SSHManagerException( command.getStdOut() );
+                    }
                 }
                 catch ( CommandException e )
                 {
                     LOG.error( String.format( "Error in create: %s", e.getMessage() ), e );
+                    throw new SSHManagerException( e.getMessage() );
                 }
             }
         }
-        return false;
+        return true;
     }
 
 
-    private boolean read()
+    private boolean read() throws SSHManagerException
     {
+        StringBuilder value = new StringBuilder();
         if ( !CollectionUtil.isCollectionEmpty( containerHosts ) )
         {
             for ( ContainerHost host : containerHosts )
@@ -77,32 +89,28 @@ public class SshManager
                 try
                 {
                     CommandResult command = host.execute( new RequestBuilder( "cat /root/.ssh/id_dsa.pub" ) );
-                    StringBuilder value = new StringBuilder();
-                    if ( !command.hasCompleted() )
+                    if ( !command.hasSucceeded() )
                     {
-                        return false;
+                        throw new SSHManagerException( command.getStdErr() );
                     }
-
                     if ( !Strings.isNullOrEmpty( command.getStdOut() ) )
                     {
                         value.append( command.getStdOut() );
                     }
-
-                    keys = value.toString();
-
-                    return !Strings.isNullOrEmpty( keys ) && command.hasSucceeded();
                 }
                 catch ( CommandException e )
                 {
                     LOG.error( String.format( "Error in read: %s", e.getMessage() ), e );
+                    throw new SSHManagerException( e.getMessage() );
                 }
             }
         }
-        return false;
+        keys = value.toString();
+        return !Strings.isNullOrEmpty( keys );
     }
 
 
-    private boolean write()
+    private boolean write() throws SSHManagerException
     {
         if ( !CollectionUtil.isCollectionEmpty( containerHosts ) )
         {
@@ -115,19 +123,23 @@ public class SshManager
                             "echo '%s' > /root/.ssh/authorized_keys && " +
                             "chmod 644 /root/.ssh/authorized_keys", keys ) ) );
 
-                    return command.hasSucceeded();
+                    if ( !command.hasSucceeded() )
+                    {
+                        throw new SSHManagerException( command.getStdOut() );
+                    }
                 }
                 catch ( CommandException e )
                 {
                     LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
+                    throw new SSHManagerException( e.getMessage() );
                 }
             }
         }
-        return false;
+        return true;
     }
 
 
-    private boolean config()
+    private boolean config() throws SSHManagerException
     {
 
         if ( !CollectionUtil.isCollectionEmpty( containerHosts ) )
@@ -140,33 +152,47 @@ public class SshManager
                             "echo '    StrictHostKeyChecking no' >> /root/.ssh/config && " +
                             "chmod 644 /root/.ssh/config" ) );
 
-                    return command.hasSucceeded();
+                    if ( !command.hasSucceeded() )
+                    {
+                        throw new SSHManagerException( command.getStdOut() );
+                    }
                 }
                 catch ( CommandException e )
                 {
                     LOG.error( String.format( "Error in config: %s", e.getMessage() ), e );
+                    throw new SSHManagerException( e.getMessage() );
                 }
             }
         }
-        return false;
+        return true;
     }
 
 
-    public boolean execute( ContainerHost containerHost )
+    public boolean execute( ContainerHost containerHost ) throws SSHManagerException
     {
-        Preconditions.checkNotNull( containerHost, "Agent is null" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
 
         if ( create( containerHost ) )
         {
             containerHosts.add( containerHost );
 
-            return read() && write() && config();
+            try
+            {
+                read();
+                write();
+                config();
+            }
+            catch ( SSHManagerException e )
+            {
+                LOG.error( e.getMessage(), e );
+                throw new SSHManagerException( e.getMessage() );
+            }
         }
-        return false;
+        return true;
     }
 
 
-    private boolean create( ContainerHost containerHost )
+    private boolean create( ContainerHost containerHost ) throws SSHManagerException
     {
         try
         {
@@ -175,12 +201,16 @@ public class SshManager
                     "chmod 700 /root/.ssh && " +
                     "ssh-keygen -t dsa -P '' -f /root/.ssh/id_dsa" ) );
 
-            return command.hasSucceeded();
+            if ( !command.hasSucceeded() )
+            {
+                throw new SSHManagerException( command.getStdOut() );
+            }
         }
         catch ( CommandException e )
         {
             LOG.error( String.format( "Error in create: %s", e.getMessage() ), e );
+            throw new SSHManagerException( e.getMessage() );
         }
-        return false;
+        return true;
     }
 }
