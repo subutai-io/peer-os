@@ -26,17 +26,20 @@ public class CommandResponseMessageListener extends MessageListener
 
     public void addCallback( UUID commandId, CommandCallback callback, int timeout, final Semaphore semaphore )
     {
-        callbacks.put( commandId, callback, timeout * 1000 + 20000, new EntryExpiryCallback<CommandCallback>()
+        if ( callback != null )
         {
-            @Override
-            public void onEntryExpiry( final CommandCallback entry )
+            callbacks.put( commandId, callback, timeout * 1000 + 20000, new EntryExpiryCallback<CommandCallback>()
             {
-                if ( semaphore != null )
+                @Override
+                public void onEntryExpiry( final CommandCallback entry )
                 {
-                    semaphore.release();
+                    if ( semaphore != null )
+                    {
+                        semaphore.release();
+                    }
                 }
-            }
-        } );
+            } );
+        }
     }
 
 
