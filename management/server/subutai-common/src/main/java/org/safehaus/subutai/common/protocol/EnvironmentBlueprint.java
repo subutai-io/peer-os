@@ -5,6 +5,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.UUIDUtil;
 
@@ -12,8 +17,15 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 /**
  * Environment Blueprint class
  */
+@Entity( name = "EnvironmentBlueprint" )
+@NamedQueries( {
+        @NamedQuery( name = "EnvironmentBlueprint.getAll", query = "SELECT eb FROM EnvironmentBlueprint eb" )
+} )
+@XmlRootElement( name = "" )
 public class EnvironmentBlueprint
 {
+
+    public static final String QUERY_GET_ALL = "EnvironmentBlueprint.getAll";
 
     private Set<NodeGroup> nodeGroups;
     private String name;

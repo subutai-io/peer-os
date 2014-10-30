@@ -3,22 +3,21 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>subutai-template-bundle</artifactId>
+    <artifactId>mgmt-server-parent</artifactId>
     <groupId>org.safehaus.subutai</groupId>
     <version>2.0.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>subutai-template-impl</artifactId>
-  <name>Subutai Common Template Impl</name>
-  <description>Subutai Common Template Impl</description>
+  <artifactId>subutai-common-implementation</artifactId>
+  <name>Subutai Common Impl</name>
+  <description>Subutai Common Impl</description>
   <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
       <groupId>org.safehaus.subutai</groupId>
-      <artifactId>subutai-template-service</artifactId>
-      <version>2.0.0</version>
+      <artifactId>subutai-common</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -42,11 +41,11 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.common.template.impl</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.common.impl</Bundle-SymbolicName>
             <Export-Package>
               {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
-              org.apache.http;org.apache.http.*
             </Export-Package>
+            <import>*</import>
           </instructions>
         </configuration>
       </plugin>

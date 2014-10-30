@@ -6,6 +6,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -14,8 +19,15 @@ import com.google.common.base.Strings;
  * Used to define a physical/lxc host on the network. It could be management server, physical server or container. It
  * just defines a host on the network.
  */
+@Entity(name = "Agent")
+@NamedQueries({
+        @NamedQuery(name = "Agent.getAll", query = "SELECT a FROM Agent a")
+})
+@XmlRootElement(name = "")
 public class Agent implements Serializable, Comparable<Agent>
 {
+
+    public static final String QUERY_GET_ALL = "Agent.getAll";
 
     private UUID uuid;
     private String macAddress;

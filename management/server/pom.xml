@@ -22,6 +22,8 @@
     <module>subutai-features</module>
     <module>server-karaf</module>
     <module>subutai-template-bundle</module>
+    <module>subutai-common-implementation</module>
+    <module>subutai-common-datasource</module>
   </modules>
 
   <description>Parent project for the Subutai Server Artifacts</description>

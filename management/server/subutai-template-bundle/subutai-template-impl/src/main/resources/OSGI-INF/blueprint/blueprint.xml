@@ -5,15 +5,16 @@
     >
   <reference id="emf" interface="javax.persistence.EntityManagerFactory" filter="(osgi.unit.name=templateUnit)" />
 
-  <bean id="personServiceBean" class="org.safehaus.subutai.common.protocol.impl.TemplateServiceImpl">
+  <bean id="templateServiceImpl" class="org.safehaus.subutai.common.protocol.impl.TemplateServiceImpl"
+        init-method="test">
     <property ref="emf" name="entityManagerFactory" />
   </bean>
 
-  <service ref="personServiceBean"
-           interface="org.safehaus.subutai.common.protocol.service.TemplateService" />
+  <service ref="templateServiceImpl"
+           interface="org.safehaus.subutai.common.protocol.api.TemplateService" />
 
   <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/root/db/templatesDB" />
+    <property name="URL" value="jdbc:h2:/root/db/templatesDB2" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>

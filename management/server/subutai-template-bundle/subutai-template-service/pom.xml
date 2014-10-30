@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <artifactId>subutai-template-bundle</artifactId>
@@ -10,11 +10,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>subutai-template-service</artifactId>
-  <name>Subutai Template Service</name>
-  <description>Subutai Template Service</description>
+  <name>Subutai Common Template Service</name>
+  <description>Subutai Common Template Service</description>
   <packaging>bundle</packaging>
 
   <dependencies>
+    <dependency>
+      <groupId>org.safehaus.subutai</groupId>
+      <artifactId>subutai-common</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
@@ -39,8 +43,10 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Bundle-SymbolicName>${project.groupId}.common.template.api</Bundle-SymbolicName>
             <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
-            <Export-Package>com.apogado.blogjpa.commons</Export-Package>
+            <Export-Package>{local-packages},{local-packages}.*;version=${project.version};-noimport:=true
+            </Export-Package>
             <Import-Package>*</Import-Package>
           </instructions>
         </configuration>

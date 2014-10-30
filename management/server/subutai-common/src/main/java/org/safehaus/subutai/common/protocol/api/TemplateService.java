@@ -1,4 +1,4 @@
-package org.safehaus.subutai.common.protocol.service;
+package org.safehaus.subutai.common.protocol.api;
 
 
 import java.util.List;
@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.protocol.Template;
  */
 public interface TemplateService
 {
-    public Template createTemplate( Template template );
+    public Template createTemplate( Template templateClone );
 
     public Template getTemplate( long id );
 
