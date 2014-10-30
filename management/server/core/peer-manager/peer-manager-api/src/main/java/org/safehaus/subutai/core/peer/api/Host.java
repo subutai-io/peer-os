@@ -32,7 +32,11 @@ public interface Host extends Serializable
 
     public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException;
 
-    public void execute( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
+    public CommandResult execute( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
+
+    public void executeAsync( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
+
+    public void executeAsync( RequestBuilder requestBuilder ) throws CommandException;
 
     public boolean isConnected();
 

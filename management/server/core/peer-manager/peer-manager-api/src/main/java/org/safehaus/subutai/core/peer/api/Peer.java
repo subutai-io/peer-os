@@ -44,6 +44,11 @@ public interface Peer
 
     public CommandResult execute( RequestBuilder requestBuilder, Host host ) throws CommandException;
 
-    public void execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+    public CommandResult execute( RequestBuilder requestBuilder, Host host, CommandCallback callback )
             throws CommandException;
+
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+            throws CommandException;
+
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException;
 }
