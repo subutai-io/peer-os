@@ -373,8 +373,8 @@ public class RestServiceImpl implements RestService
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
             ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
-            localPeer.startContainer( containerHost );
-            return Response.ok().build();
+            Boolean result = localPeer.startContainer( containerHost );
+            return Response.ok( result.toString() ).build();
         }
         catch ( PeerException e )
         {
@@ -390,8 +390,8 @@ public class RestServiceImpl implements RestService
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
             ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
-            localPeer.stopContainer( containerHost );
-            return Response.ok().build();
+            Boolean result = localPeer.stopContainer( containerHost );
+            return Response.ok( result.toString() ).build();
         }
         catch ( PeerException e )
         {
@@ -407,8 +407,8 @@ public class RestServiceImpl implements RestService
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
             ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
-            localPeer.isConnected( containerHost );
-            return Response.ok().build();
+            Boolean result = localPeer.isConnected( containerHost );
+            return Response.ok( result.toString() ).build();
         }
         catch ( PeerException e )
         {
