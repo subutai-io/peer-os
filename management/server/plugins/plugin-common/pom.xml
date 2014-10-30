@@ -28,10 +28,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>lxc-manager-api</artifactId>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>vaadin-custom</artifactId>

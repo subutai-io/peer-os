@@ -8,7 +8,6 @@ package org.safehaus.subutai.core.environment.impl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,15 +16,11 @@ import java.util.UUID;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.common.protocol.PeerCommandMessage;
-import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.TopologyEnum;
@@ -38,6 +33,7 @@ import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
 import org.safehaus.subutai.core.environment.impl.builder.TopologyBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -50,7 +46,6 @@ import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
 
 
 /**
@@ -336,6 +331,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 }
 
                 UUID peerId = peerManager.getLocalPeer().getId();
+
                 if ( peerId == null )
                 {
                     environment.setStatus( EnvironmentStatusEnum.BROKEN );
@@ -389,12 +385,25 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 if ( blueprint.isExchangeSshKeys() )
                 {
-                    //                    networkManager.configSshHosts( environment.getContainers() );
+                    try
+                    {
+                        networkManager.configSshOnAgents( environment.getContainers() );
+                    }
+                    catch ( NetworkManagerException e )
+                    {
+                        throw new EnvironmentBuildException( e.getMessage() );
+                    }
                 }
                 if ( blueprint.isLinkHosts() )
                 {
-                    //                    networkManager.configLinkHosts( blueprint.getDomainName(),
-                    // environment.getContainers() );
+                    try
+                    {
+                        networkManager.configHostsOnAgents( environment.getContainers(), blueprint.getDomainName() );
+                    }
+                    catch ( NetworkManagerException e )
+                    {
+                        throw new EnvironmentBuildException( e.getMessage() );
+                    }
                 }
                 if ( environment.getContainers().size() != containerCount )
                 {
@@ -420,44 +429,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void deleteBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
     {
         environmentDAO.deleteInfo( PROCESS, environmentBuildProcess.getId().toString() );
-    }
-
-
-    @Override
-    public Set<ContainerHost> getConnectedContainers( final Environment environment )
-    {
-
-        Set<UUID> peers = new HashSet<>();
-        for ( ContainerHost ec : environment.getContainers() )
-        {
-            peers.add( ec.getPeerId() );
-        }
-
-        Set<ContainerHost> freshContainers = new HashSet<>();
-        for ( UUID peerId : peers )
-        {
-            PeerCommandMessage cmd =
-
-                    new DefaultCommandMessage( PeerCommandType.GET_CONNECTED_CONTAINERS, peerId, null );
-
-            cmd.setInput( environment.getId().toString() );
-
-            Set<ContainerHost> containers =
-                    JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<ContainerHost>>()
-                    {
-                    }.getType() );
-
-            if ( cmd.isSuccess() && containers != null )
-            {
-                for ( ContainerHost c : containers )
-                {
-                    //                    ContainerHost ec = new ContainerHost(  );
-                    //                    ec.setEnvironmentId( environment.getId() );
-                    freshContainers.add( c );
-                }
-            }
-        }
-        return freshContainers;
     }
 
 
@@ -541,31 +512,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             return environmentDAO.getBlueprint( blueprintId );
         }
         catch ( EnvironmentPersistenceException e )
-        {
-            throw new EnvironmentManagerException( e.getMessage() );
-        }
-    }
-
-
-    @Override
-    public boolean saveBuildProcessNG2PG( final UUID blueprintId, final UUID peerGroupId )
-            throws EnvironmentManagerException
-    {
-        TopologyBuilder topologyBuilder = new TopologyBuilder( this );
-        try
-        {
-            EnvironmentBuildProcess process =
-                    topologyBuilder.createEnvironmentBuildProcessNG2PG( blueprintId, peerGroupId );
-            if ( process != null )
-            {
-                return environmentDAO.saveInfo( PROCESS, process.getId().toString(), process );
-            }
-            else
-            {
-                return false;
-            }
-        }
-        catch ( EnvironmentBuildException e )
         {
             throw new EnvironmentManagerException( e.getMessage() );
         }

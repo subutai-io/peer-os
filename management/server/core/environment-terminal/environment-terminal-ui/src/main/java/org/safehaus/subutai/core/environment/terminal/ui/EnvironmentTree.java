@@ -1,10 +1,8 @@
 package org.safehaus.subutai.core.environment.terminal.ui;
 
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -63,8 +61,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 LOG.info( "Refreshing containers state..." );
                 if ( environment != null )
                 {
-                    Set<ContainerHost> containers = environmentManager.getConnectedContainers( environment );
-                    refreshContainers( containers );
+                    refreshContainers();
                 }
                 LOG.info( "Refreshing done." );
             }
@@ -200,37 +197,23 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
     }
 
 
-    private void refreshContainers( final Set<ContainerHost> freshContainers )
+    private void refreshContainers()
     {
-
-        if ( freshContainers == null || freshContainers.size() < 1 )
-        {
-            return;
-        }
-
-        List<String> agentIdList = new ArrayList<>();
-        for ( ContainerHost container : freshContainers )
-        {
-
-            agentIdList.add( String
-                    .format( "%s:%s", container.getPeerId().toString(), container.getCreatorPeerId().toString() ) );
-        }
-
         for ( Object itemObj : container.getItemIds() )
         {
             String itemId = ( String ) itemObj;
             if ( itemId.indexOf( ':' ) < 0 )
             {
-                continue;    // peer
+                continue;
             }
-            if ( agentIdList.contains( itemId ) )
+            Item item = container.getItem( itemId );
+            Object o = item.getItemProperty( "value" ).getValue();
+            if ( ( o instanceof ContainerHost ) && ( ( ( ContainerHost ) o ).isConnected() ) )
             {
-                Item item = container.getItem( itemId );
                 item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
             }
             else
             {
-                Item item = container.getItem( itemId );
                 item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual-stopped.png" ) );
             }
         }
