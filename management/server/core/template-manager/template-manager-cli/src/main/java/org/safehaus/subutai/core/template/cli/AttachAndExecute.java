@@ -1,11 +1,8 @@
 package org.safehaus.subutai.core.template.cli;
 
 
-import java.util.concurrent.TimeUnit;
-
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
@@ -16,7 +13,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 public class AttachAndExecute extends OsgiCommandSupport
 {
 
-    ContainerManager containerManager;
+//    ContainerManager containerManager;
     AgentManager agentManager;
 
     @Argument( index = 0, required = true )
@@ -29,10 +26,10 @@ public class AttachAndExecute extends OsgiCommandSupport
     private int timeoutInSeconds = 60;
 
 
-    public void setContainerManager( ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
-    }
+//    public void setContainerManager( ContainerManager containerManager )
+//    {
+//        this.containerManager = containerManager;
+//    }
 
 
     public void setAgentManager( AgentManager agentManager )
@@ -46,7 +43,7 @@ public class AttachAndExecute extends OsgiCommandSupport
     {
 
         Agent a = agentManager.getAgentByHostname( hostname );
-        boolean b = containerManager.attachAndExecute( a, cloneName, command, timeoutInSeconds, TimeUnit.SECONDS );
+        /*boolean b = containerManager.attachAndExecute( a, cloneName, command, timeoutInSeconds, TimeUnit.SECONDS );
         if ( b )
         {
             System.out.println( "Command successfully executed" );
@@ -54,7 +51,7 @@ public class AttachAndExecute extends OsgiCommandSupport
         else
         {
             System.out.println( "Failed to execute command" );
-        }
+        }*/
         return null;
     }
 }

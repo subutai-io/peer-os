@@ -1,22 +1,18 @@
 package org.safehaus.subutai.core.network.impl;
 
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Container;
-import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -27,205 +23,194 @@ public class SshManager
 
     private static final Logger LOG = LoggerFactory.getLogger( SshManager.class.getName() );
 
-    private List<Agent> agentList;
-    private Set<Container> containers;
+    private Set<ContainerHost> containerHosts;
+
     private String keys;
-    private Commands commands;
 
 
-    public SshManager( Commands commands, List<Agent> agentList )
+    public SshManager( Set<ContainerHost> containerHosts )
     {
-        Preconditions.checkNotNull( commands, "Commands are null" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( agentList ), "Agent list is empty" );
-
-        this.agentList = agentList;
-        this.commands = commands;
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ), "Agent list is empty" );
+        this.containerHosts = containerHosts;
     }
 
 
-    public SshManager( final Set<Container> containers, final Commands commands )
+    public boolean execute() throws SSHManagerException
     {
-        Preconditions.checkNotNull( commands, "Commands are null" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containers ), "Containers are empty" );
-
-        this.containers = containers;
-        this.commands = commands;
-    }
-
-
-    public boolean execute()
-    {
-
-        return create() && read() && write() && config();
-    }
-
-
-    private boolean create()
-    {
-        Command command;
-        if ( !CollectionUtil.isCollectionEmpty( agentList ) )
-        {
-            command = commands.getCreateSSHCommand( agentList );
-        }
-        else
-        {
-            command = commands.getCreateSSHCommand( containers );
-        }
         try
         {
-            command.execute();
-            return command.hasSucceeded();
+            return create() && read() && write() && config();
         }
-        catch ( CommandException e )
+        catch ( CommandException | SSHManagerException e )
         {
-            LOG.error( String.format( "Error in create: %s", e.getMessage() ), e );
+            LOG.error( e.getMessage(), e );
+            throw new SSHManagerException( e.getMessage() );
         }
-        return false;
     }
 
 
-    private boolean read()
+    private boolean create() throws CommandException, SSHManagerException
     {
-        Command command;
-        if ( !CollectionUtil.isCollectionEmpty( agentList ) )
+
+        if ( !CollectionUtil.isCollectionEmpty( containerHosts ) )
         {
-            command = commands.getReadSSHCommand( agentList );
-        }
-        else
-        {
-            command = commands.getReadSSHCommand( containers );
-        }
-        try
-        {
-            command.execute();
-            StringBuilder value = new StringBuilder();
-            if ( !command.hasCompleted() )
+            for ( ContainerHost host : containerHosts )
             {
-                return false;
-            }
-            for ( AgentResult result : command.getResults().values() )
-            {
-                if ( !Strings.isNullOrEmpty( result.getStdOut() ) )
+                try
                 {
-                    value.append( result.getStdOut() );
+                    CommandResult command = host.execute( new RequestBuilder( "rm -Rf /root/.ssh && " +
+                            "mkdir -p /root/.ssh && " +
+                            "chmod 700 /root/.ssh && " +
+                            "ssh-keygen -t dsa -P '' -f /root/.ssh/id_dsa" ) );
+
+                    if ( !command.hasSucceeded() )
+                    {
+                        throw new SSHManagerException( command.getStdOut() );
+                    }
+                }
+                catch ( CommandException e )
+                {
+                    LOG.error( String.format( "Error in create: %s", e.getMessage() ), e );
+                    throw new SSHManagerException( e.getMessage() );
                 }
             }
-            keys = value.toString();
-
-            return !Strings.isNullOrEmpty( keys ) && command.hasSucceeded();
         }
-        catch ( CommandException e )
-        {
-            LOG.error( String.format( "Error in read: %s", e.getMessage() ), e );
-        }
-        return false;
+        return true;
     }
 
 
-    private boolean write()
+    private boolean read() throws SSHManagerException
     {
-        Command command;
-        if ( !CollectionUtil.isCollectionEmpty( agentList ) )
+        StringBuilder value = new StringBuilder();
+        if ( !CollectionUtil.isCollectionEmpty( containerHosts ) )
         {
-            command = commands.getWriteSSHCommand( agentList, keys );
+            for ( ContainerHost host : containerHosts )
+            {
+                try
+                {
+                    CommandResult command = host.execute( new RequestBuilder( "cat /root/.ssh/id_dsa.pub" ) );
+                    if ( !command.hasSucceeded() )
+                    {
+                        throw new SSHManagerException( command.getStdErr() );
+                    }
+                    if ( !Strings.isNullOrEmpty( command.getStdOut() ) )
+                    {
+                        value.append( command.getStdOut() );
+                    }
+                }
+                catch ( CommandException e )
+                {
+                    LOG.error( String.format( "Error in read: %s", e.getMessage() ), e );
+                    throw new SSHManagerException( e.getMessage() );
+                }
+            }
         }
-        else
+        keys = value.toString();
+        return !Strings.isNullOrEmpty( keys );
+    }
+
+
+    private boolean write() throws SSHManagerException
+    {
+        if ( !CollectionUtil.isCollectionEmpty( containerHosts ) )
         {
-            command = commands.getWriteSSHCommand( containers, keys );
+            for ( ContainerHost host : containerHosts )
+            {
+                try
+                {
+                    CommandResult command = host.execute( new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
+                            "chmod 700 /root/.ssh && " +
+                            "echo '%s' > /root/.ssh/authorized_keys && " +
+                            "chmod 644 /root/.ssh/authorized_keys", keys ) ) );
+
+                    if ( !command.hasSucceeded() )
+                    {
+                        throw new SSHManagerException( command.getStdOut() );
+                    }
+                }
+                catch ( CommandException e )
+                {
+                    LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
+                    throw new SSHManagerException( e.getMessage() );
+                }
+            }
         }
+        return true;
+    }
+
+
+    private boolean config() throws SSHManagerException
+    {
+
+        if ( !CollectionUtil.isCollectionEmpty( containerHosts ) )
+        {
+            for ( ContainerHost host : containerHosts )
+            {
+                try
+                {
+                    CommandResult command = host.execute( new RequestBuilder( "echo 'Host *' > /root/.ssh/config && " +
+                            "echo '    StrictHostKeyChecking no' >> /root/.ssh/config && " +
+                            "chmod 644 /root/.ssh/config" ) );
+
+                    if ( !command.hasSucceeded() )
+                    {
+                        throw new SSHManagerException( command.getStdOut() );
+                    }
+                }
+                catch ( CommandException e )
+                {
+                    LOG.error( String.format( "Error in config: %s", e.getMessage() ), e );
+                    throw new SSHManagerException( e.getMessage() );
+                }
+            }
+        }
+        return true;
+    }
+
+
+    public boolean execute( ContainerHost containerHost ) throws SSHManagerException
+    {
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+
+        if ( create( containerHost ) )
+        {
+            containerHosts.add( containerHost );
+
+            try
+            {
+                read();
+                write();
+                config();
+            }
+            catch ( SSHManagerException e )
+            {
+                LOG.error( e.getMessage(), e );
+                throw new SSHManagerException( e.getMessage() );
+            }
+        }
+        return true;
+    }
+
+
+    private boolean create( ContainerHost containerHost ) throws SSHManagerException
+    {
         try
         {
-            command.execute();
-            return command.hasSucceeded();
-        }
-        catch ( CommandException e )
-        {
-            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
-        }
-        return false;
-    }
+            CommandResult command = containerHost.execute( new RequestBuilder( "rm -Rf /root/.ssh && " +
+                    "mkdir -p /root/.ssh && " +
+                    "chmod 700 /root/.ssh && " +
+                    "ssh-keygen -t dsa -P '' -f /root/.ssh/id_dsa" ) );
 
-
-    private boolean config()
-    {
-        Command command;
-        if ( !CollectionUtil.isCollectionEmpty( agentList ) )
-        {
-            command = commands.getConfigSSHCommand( agentList );
-        }
-        else
-        {
-            command = commands.getConfigSSHCommand( containers );
-        }
-        try
-        {
-            command.execute();
-            return command.hasSucceeded();
-        }
-        catch ( CommandException e )
-        {
-            LOG.error( String.format( "Error in config: %s", e.getMessage() ), e );
-        }
-        return false;
-    }
-
-
-    public boolean execute( Agent agent )
-    {
-        Preconditions.checkNotNull( agent, "Agent is null" );
-
-        if ( create( agent ) )
-        {
-            agentList.add( agent );
-
-            return read() && write() && config();
-        }
-        return false;
-    }
-
-
-    public boolean execute( Container container )
-    {
-        Preconditions.checkNotNull( container, "Container is null" );
-
-        if ( create( container ) )
-        {
-            containers.add( container );
-
-            return read() && write() && config();
-        }
-        return false;
-    }
-
-
-    private boolean create( Agent agent )
-    {
-        Command command = commands.getCreateSSHCommand( Arrays.asList( agent ) );
-        try
-        {
-            command.execute();
-            return command.hasSucceeded();
+            if ( !command.hasSucceeded() )
+            {
+                throw new SSHManagerException( command.getStdOut() );
+            }
         }
         catch ( CommandException e )
         {
             LOG.error( String.format( "Error in create: %s", e.getMessage() ), e );
+            throw new SSHManagerException( e.getMessage() );
         }
-        return false;
-    }
-
-
-    private boolean create( Container container )
-    {
-        Command command = commands.getCreateSSHCommand( Sets.newHashSet( container ) );
-        try
-        {
-            command.execute();
-            return command.hasSucceeded();
-        }
-        catch ( CommandException e )
-        {
-            LOG.error( String.format( "Error in create: %s", e.getMessage() ), e );
-        }
-        return false;
+        return true;
     }
 }

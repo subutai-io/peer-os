@@ -81,14 +81,14 @@
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- command-dispatcher -->
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>command-dispatcher-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>command-dispatcher-impl</artifactId>
-    </dependency>
+    </dependency>-->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- command-runner -->
     <dependency>
@@ -226,14 +226,14 @@
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- lxc-manager -->
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>lxc-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>lxc-manager-impl</artifactId>
-    </dependency>
+    </dependency>-->
     <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>lxc-manager-ui</artifactId>
@@ -427,14 +427,35 @@
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- plugins -->
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>plugin-common</artifactId>
-    </dependency>
+    </dependency>-->
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- hadoop -->
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>cassandra-plugin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>cassandra-plugin-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>cassandra-plugin-cli</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>cassandra-plugin-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>cassandra-plugin-ui</artifactId>
+    </dependency>
+
+
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hadoop-plugin-api</artifactId>
     </dependency>
@@ -806,27 +827,6 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-ui</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>hipi-plugin-api</artifactId>
     </dependency>
     <dependency>
@@ -846,7 +846,6 @@
       <artifactId>hipi-plugin-ui</artifactId>
     </dependency>
 
-    <!-- nutch -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>nutch-plugin-api</artifactId>
@@ -868,7 +867,6 @@
       <artifactId>nutch-plugin-ui</artifactId>
     </dependency>
 
-    <!-- jetty -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>jetty-plugin-api</artifactId>
@@ -880,7 +878,8 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>jetty-plugin-ui</artifactId>
-    </dependency>
+    </dependency>-->
+
   </dependencies>
 
   <build>
