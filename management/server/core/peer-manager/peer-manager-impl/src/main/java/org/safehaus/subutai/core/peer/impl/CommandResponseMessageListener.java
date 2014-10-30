@@ -26,7 +26,7 @@ public class CommandResponseMessageListener extends MessageListener
 
     public void addCallback( UUID commandId, CommandCallback callback, int timeout, final Semaphore semaphore )
     {
-        callbacks.put( commandId, callback, timeout * 1000 + 10000, new EntryExpiryCallback<CommandCallback>()
+        callbacks.put( commandId, callback, timeout * 1000 + 20000, new EntryExpiryCallback<CommandCallback>()
         {
             @Override
             public void onEntryExpiry( final CommandCallback entry )
