@@ -78,6 +78,7 @@ public class HostsCommand extends OsgiCommandSupport
             }
         }
 
-        System.out.println( String.format( "%s+--%s %s", padding, host.getHostname(), containerInfo ) );
+        System.out
+                .println( String.format( "%s+--%s %s %s", padding, host.getHostname(), host.getId(), containerInfo ) );
     }
 }

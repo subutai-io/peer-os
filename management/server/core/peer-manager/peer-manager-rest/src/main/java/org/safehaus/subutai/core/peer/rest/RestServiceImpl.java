@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.exception.CommandException;
@@ -402,7 +401,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response isContainerConnected( @FormParam( "host" ) final String host )
+    public Response isContainerConnected( final String host )
     {
         try
         {

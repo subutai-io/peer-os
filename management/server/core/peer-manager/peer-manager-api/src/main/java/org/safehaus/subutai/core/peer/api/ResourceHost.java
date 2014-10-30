@@ -335,6 +335,24 @@ public class ResourceHost extends SubutaiHost
         }
     }
 
+
+    public Host getContainerHostById( final UUID id )
+    {
+        ContainerHost result = null;
+        Iterator iterator = containersHosts.iterator();
+
+        while ( result == null && iterator.hasNext() )
+        {
+            ContainerHost host = ( ContainerHost ) iterator.next();
+
+            if ( host.getId().equals( id ) )
+            {
+                result = host;
+            }
+        }
+        return result;
+    }
+
     //
     //    @Override
     //    public boolean isConnected( final Host host )

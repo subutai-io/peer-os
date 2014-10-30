@@ -69,7 +69,7 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/stop-lxc">
+    <command name="peer/stop-container">
       <action class="org.safehaus.subutai.core.peer.cli.StopLxcCommand">
         <property name="peerManager" ref="peerManager" />
       </action>
@@ -78,8 +78,16 @@
 
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/start-lxc">
+    <command name="peer/start-container">
       <action class="org.safehaus.subutai.core.peer.cli.StartLxcCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/clean">
+      <action class="org.safehaus.subutai.core.peer.cli.CleanCommand">
         <property name="peerManager" ref="peerManager" />
       </action>
     </command>
