@@ -42,7 +42,7 @@ public class RemotePeerRestClient implements RemotePeer
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
-    private static final long RECEIVE_TIMEOUT = 1000 * 60 * 5;
+    private static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 5;
     private static final long CONNECTION_TIMEOUT = 1000 * 60 * 1;
     private final long receiveTimeout;
     private final long connectionTimeout;
@@ -52,7 +52,7 @@ public class RemotePeerRestClient implements RemotePeer
 
     public RemotePeerRestClient( String ip, String port )
     {
-        this.receiveTimeout = RECEIVE_TIMEOUT;
+        this.receiveTimeout = DEFAULT_RECEIVE_TIMEOUT;
         this.connectionTimeout = CONNECTION_TIMEOUT;
 
         baseUrl = String.format( baseUrl, ip, port );
@@ -324,7 +324,8 @@ public class RemotePeerRestClient implements RemotePeer
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             Set<ContainerHost> result = JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHost>>()
-            {}.getType() );
+            {
+            }.getType() );
             return result;
         }
 
