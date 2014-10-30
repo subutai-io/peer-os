@@ -28,7 +28,7 @@ import com.google.gson.reflect.TypeToken;
  */
 public class MessengerDao
 {
-    private static final Logger LOG = LoggerFactory.getLogger( MessengerDao.class.getName() );
+    protected static Logger LOG = LoggerFactory.getLogger( MessengerDao.class.getName() );
     private static final int WIDENING_INTERVAL_SEC = 5;
     private static final int MESSAGE_LIMIT_PER_PEER = 10;
 
