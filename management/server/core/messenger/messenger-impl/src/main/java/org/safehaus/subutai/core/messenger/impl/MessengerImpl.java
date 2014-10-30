@@ -33,8 +33,8 @@ import com.google.gson.JsonSyntaxException;
  */
 public class MessengerImpl implements Messenger, MessageProcessor
 {
-    private static final Logger LOG = LoggerFactory.getLogger( MessengerImpl.class.getName() );
-    private final Set<MessageListener> listeners =
+    protected static Logger LOG = LoggerFactory.getLogger( MessengerImpl.class.getName() );
+    protected final Set<MessageListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MessageListener, Boolean>() );
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     private final PeerManager peerManager;
@@ -144,7 +144,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
             Envelope envelope = JsonUtil.fromJson( envelopeString, Envelope.class );
             notifyListeners( envelope );
         }
-        catch ( JsonSyntaxException e )
+        catch ( NullPointerException | JsonSyntaxException e )
         {
             LOG.error( "Error in processMessage", e );
             throw new MessageException( e );

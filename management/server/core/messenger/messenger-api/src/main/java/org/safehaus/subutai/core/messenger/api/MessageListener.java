@@ -13,7 +13,7 @@ import com.google.common.base.Strings;
 public abstract class MessageListener
 {
 
-    private static final int MAX_RECIPIENT_ID_LEN = 50;
+    public static final int MAX_RECIPIENT_ID_LEN = 50;
     private String recipient;
 
 
