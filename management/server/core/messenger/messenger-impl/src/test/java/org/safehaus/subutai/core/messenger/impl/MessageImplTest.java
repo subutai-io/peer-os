@@ -6,7 +6,12 @@ import java.util.UUID;
 
 import org.junit.Test;
 
+import org.apache.commons.lang3.StringUtils;
+
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 
 /**
@@ -17,6 +22,8 @@ public class MessageImplTest
 
     private static final UUID SOURCE_PEER_ID = UUID.randomUUID();
     private static final Object PAYLOAD = new Object();
+    private static final String SENDER = "sender";
+    MessageImpl message = new MessageImpl( SOURCE_PEER_ID, PAYLOAD );
 
 
     static class CustomObject implements Serializable
@@ -103,5 +110,50 @@ public class MessageImplTest
     public void constructorShouldFailOnNullPayload() throws Exception
     {
         new MessageImpl( SOURCE_PEER_ID, null );
+    }
+
+
+    @Test
+    public void testGetSourcePeerId() throws Exception
+    {
+
+        assertEquals( SOURCE_PEER_ID, message.getSourcePeerId() );
+    }
+
+
+    @Test
+    public void testGetId() throws Exception
+    {
+
+        assertNotNull( message.getId() );
+    }
+
+
+    @Test
+    public void testGetSetSender() throws Exception
+    {
+
+        message.setSender( SENDER );
+
+        assertEquals( SENDER, message.getSender() );
+    }
+
+
+    @Test( expected = IllegalArgumentException.class )
+    public void testLongSender() throws Exception
+    {
+        MessageImpl message = new MessageImpl( SOURCE_PEER_ID, PAYLOAD );
+
+        message.setSender( StringUtils.repeat( "s", MessageImpl.MAX_SENDER_LEN + 1 ) );
+    }
+
+
+    @Test
+    public void testToString() throws Exception
+    {
+
+        assertThat( message.toString(), containsString( SOURCE_PEER_ID.toString() ) );
+        message.setSender( SENDER );
+        assertThat( message.toString(), containsString( SENDER ) );
     }
 }
