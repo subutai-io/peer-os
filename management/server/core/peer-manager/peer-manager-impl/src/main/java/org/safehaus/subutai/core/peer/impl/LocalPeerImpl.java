@@ -31,7 +31,6 @@ import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
-import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -68,11 +67,8 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     public LocalPeerImpl( PeerManager peerManager, ContainerManager containerManager, TemplateRegistry templateRegistry,
-                          PeerDAO peerDao, CommunicationManager communicationManager, CommandRunner commandRunner,
-                          Messenger messenger )
+                          PeerDAO peerDao, CommunicationManager communicationManager, CommandRunner commandRunner )
     {
-        //subscribe to command request messages from remote peer
-        messenger.addMessageListener( new CommandRequestMessageListener( this, messenger, peerManager ) );
 
         this.peerManager = peerManager;
         this.containerManager = containerManager;

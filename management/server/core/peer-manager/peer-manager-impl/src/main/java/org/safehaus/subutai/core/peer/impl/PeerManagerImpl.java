@@ -89,6 +89,7 @@ public class PeerManagerImpl implements PeerManager
     private StrategyManager strategyManager;
     private PeerInfo peerInfo;
     private Messenger messenger;
+    private CommandResponseMessageListener commandResponseMessageListener;
 
 
     public PeerManagerImpl( final DataSource dataSource, final Messenger messenger )
@@ -124,8 +125,14 @@ public class PeerManagerImpl implements PeerManager
             peerInfo = result.get( 0 );
         }
         localPeer = new LocalPeerImpl( this, containerManager, templateRegistry, peerDAO, communicationManager,
-                commandRunner, messenger );
+                commandRunner );
         localPeer.init();
+
+        //subscribe to command request messages from remote peer
+        messenger.addMessageListener( new CommandRequestMessageListener( localPeer, messenger, this ) );
+        //subscribe to command response messages from remote peer
+        commandResponseMessageListener = new CommandResponseMessageListener();
+        messenger.addMessageListener( commandResponseMessageListener );
     }
 
 
@@ -779,7 +786,7 @@ public class PeerManagerImpl implements PeerManager
 
         if ( peerInfo != null )
         {
-            return new RemotePeerImpl( peerInfo, messenger );
+            return new RemotePeerImpl( peerInfo, messenger, commandResponseMessageListener );
         }
         return null;
     }

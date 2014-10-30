@@ -85,8 +85,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
     {
         try
         {
-            Envelope envelope =
-                    new Envelope( ( MessageImpl ) message, peerManager.getLocalPeer().getId(), recipient, timeToLive );
+            Envelope envelope = new Envelope( ( MessageImpl ) message, peer.getId(), recipient, timeToLive );
 
             messengerDao.saveEnvelope( envelope );
         }
