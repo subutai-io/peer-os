@@ -49,5 +49,21 @@ bool SubutaiContainerManager::RunProgram(string program, vector<string> params) 
     }    
     _params[i + 1] = NULL;
     lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT;
+    int fd[2];
+    pipe(fd);
+    int _stdout = dup(1);
+    dup2(fd[1], 1);
+    char buffer[1000];
     _current_container->attach_run_wait(_current_container, &opts, program.c_str(), _params);
+    fflush(stdout);
+    string command_output;
+    while (1) {
+        ssize_t size = read(fd[0], buffer, 1000);
+        command_output += buffer;
+        if (size < 1000) {
+            buffer[size] = '\0';
+            command_output += buffer;
+        }
+    }
+    dup2(_stdout, 1);
 }

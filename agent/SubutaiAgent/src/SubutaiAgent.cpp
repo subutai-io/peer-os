@@ -151,7 +151,7 @@ int main(int argc,char *argv[],char *envp[])
     if(!thread.getUserID().checkRootUser())
     {
         //user is not root SubutaiAgent Will be closed
-        cout << "Main Process User is not root.. Subutai Agent is going to be closed.."<<endl;
+        cout << "Main Process User is not root.. Subutai Agent is going to be closed.." << endl;
         close(STDIN_FILENO);
         close(STDOUT_FILENO);
         close(STDERR_FILENO);
@@ -164,7 +164,7 @@ int main(int argc,char *argv[],char *envp[])
         FILE* dumplog = fopen("/etc/subutai-agent_dump.log","a+");
         string log = "<DEBUG> /var/log/subutai-agent/ folder does not exist.. "
             "Subutai Agent is going to be closed.. \n";
-        fputs(log.c_str(),dumplog);
+        fputs(log.c_str(), dumplog);
         fflush(dumplog);
         close(STDIN_FILENO);
         close(STDOUT_FILENO);
