@@ -299,6 +299,14 @@ public class RemotePeerRestClient implements RemotePeer
 
 
     @Override
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+            throws CommandException
+    {
+
+    }
+
+
+    @Override
     public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
                                                 final List<Template> templates, final int quantity,
                                                 final String strategyId, final List<Criteria> criteria )

@@ -42,7 +42,7 @@ public class CommandRequestMessageListener extends MessageListener
 
         try
         {
-            localPeer.execute( commandRequest.getRequestBuilder(), commandRequest.getHost(), new CommandCallback()
+            localPeer.executeAsync( commandRequest.getRequestBuilder(), commandRequest.getHost(), new CommandCallback()
             {
                 @Override
                 public void onResponse( final Response response, final CommandResult commandResult )
