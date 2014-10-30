@@ -38,14 +38,12 @@ public class RemotePeerImpl implements RemotePeer
     private CommandResponseMessageListener commandResponseMessageListener;
 
 
-    public RemotePeerImpl( final PeerInfo peerInfo, final Messenger messenger )
+    public RemotePeerImpl( final PeerInfo peerInfo, final Messenger messenger,
+                           CommandResponseMessageListener commandResponseMessageListener )
     {
-        //subscribe to command response messages from remote peer
-        commandResponseMessageListener = new CommandResponseMessageListener();
-        messenger.addMessageListener( commandResponseMessageListener );
-
         this.peerInfo = peerInfo;
         this.messenger = messenger;
+        this.commandResponseMessageListener = commandResponseMessageListener;
     }
 
 
@@ -185,8 +183,7 @@ public class RemotePeerImpl implements RemotePeer
         try
         {
             Message message = messenger.createMessage( new CommandRequest( requestBuilder, ( ContainerHost ) host ) );
-            messenger.sendMessage( this, message, CommandRecipientType.COMMAND_REQUEST.name(),
-                    requestBuilder.getTimeout() );
+            messenger.sendMessage( this, message, CommandRecipientType.COMMAND_REQUEST.name(), 10 );
         }
         catch ( MessageException e )
         {

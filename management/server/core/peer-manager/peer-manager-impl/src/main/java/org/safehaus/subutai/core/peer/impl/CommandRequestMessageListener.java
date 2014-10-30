@@ -52,9 +52,8 @@ public class CommandRequestMessageListener extends MessageListener
                         Message commandResponseMsg =
                                 messenger.createMessage( new CommandResponse( response, commandResult ) );
                         Peer sourcePeer = peerManager.getPeer( message.getSourcePeerId() );
-                        long timeLeft =
-                                commandRequest.getRequestBuilder().getTimeout() * 1000 - ( System.currentTimeMillis()
-                                        - commandRequest.getCreateDate().getTime() );
+                        long timeLeft = ( commandRequest.getRequestBuilder().getTimeout() * 1000 + 10000 ) - (
+                                System.currentTimeMillis() - commandRequest.getCreateDate().getTime() );
                         //send response only if timeout is still not expired
                         if ( timeLeft > 0 )
                         {

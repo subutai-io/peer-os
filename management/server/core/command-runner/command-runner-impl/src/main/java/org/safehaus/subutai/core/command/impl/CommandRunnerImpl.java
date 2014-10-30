@@ -115,7 +115,7 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
 
         //put command to cache
         boolean queued = commandExecutors
-                .put( commandImpl.getCommandUUID(), commandExecutor, inactiveCommandDropTimeout * 1000 + 2000,
+                .put( commandImpl.getCommandUUID(), commandExecutor, inactiveCommandDropTimeout * 1000,
                         new CommandExecutorExpiryCallback() );
 
         if ( queued )
