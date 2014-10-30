@@ -8,7 +8,6 @@ package org.safehaus.subutai.core.environment.impl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +36,6 @@ import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -435,38 +433,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Set<ContainerHost> getConnectedContainers( final Environment environment )
-    {
-
-        Set<UUID> peers = new HashSet<>();
-        for ( ContainerHost ec : environment.getContainers() )
-        {
-            peers.add( ec.getPeerId() );
-        }
-
-        Set<ContainerHost> freshContainers = new HashSet<>();
-        for ( UUID peerId : peers )
-        {
-
-            Peer peer = peerManager.getPeer( peerId );
-            Set<ContainerHost> containers = new HashSet();
-            try
-            {
-                for ( ContainerHost c : peer.getContainerHostsByEnvironmentId( environment.getId() ) )
-                {
-                    containers.add(c);
-                }
-            }
-            catch ( PeerException e )
-            {
-                LOG.warn( "Error on getting environment containers: " + e.toString() );
-            }
-        }
-        return freshContainers;
-    }
-
-
-    @Override
     public Environment getEnvironmentByUUID( final UUID environmentId )
     {
         return environmentDAO.getInfo( ENVIRONMENT, environmentId.toString(), Environment.class );
@@ -546,31 +512,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             return environmentDAO.getBlueprint( blueprintId );
         }
         catch ( EnvironmentPersistenceException e )
-        {
-            throw new EnvironmentManagerException( e.getMessage() );
-        }
-    }
-
-
-    @Override
-    public boolean saveBuildProcessNG2PG( final UUID blueprintId, final UUID peerGroupId )
-            throws EnvironmentManagerException
-    {
-        TopologyBuilder topologyBuilder = new TopologyBuilder( this );
-        try
-        {
-            EnvironmentBuildProcess process =
-                    topologyBuilder.createEnvironmentBuildProcessNG2PG( blueprintId, peerGroupId );
-            if ( process != null )
-            {
-                return environmentDAO.saveInfo( PROCESS, process.getId().toString(), process );
-            }
-            else
-            {
-                return false;
-            }
-        }
-        catch ( EnvironmentBuildException e )
         {
             throw new EnvironmentManagerException( e.getMessage() );
         }

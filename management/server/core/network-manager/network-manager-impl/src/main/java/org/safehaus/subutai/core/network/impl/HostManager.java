@@ -29,22 +29,22 @@ public class HostManager
 
     public HostManager( Set<ContainerHost> containerHosts, String domainName )
     {
-        Preconditions.checkNotNull( commands, "Commands are null" );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ), "Agent list is empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ), "Domain name is empty" );
 
         this.containerHosts = containerHosts;
         this.domainName = domainName;
+        this.commands = new Commands();
     }
 
 
-    public boolean execute()
+    public boolean execute() throws HostManagerException
     {
         return write();
     }
 
 
-    private boolean write()
+    private boolean write() throws HostManagerException
     {
 
 
@@ -52,31 +52,30 @@ public class HostManager
         {
             try
             {
-                for ( ContainerHost host : containerHosts )
+                for ( ContainerHost containerHost : containerHosts )
                 {
-                    CommandResult command = host.execute(
+                    CommandResult command = containerHost.execute(
                             commands.getAddIpHostToEtcHostsCommand( domainName, Sets.newHashSet( containerHosts ) ) );
                     if ( !command.hasSucceeded() )
                     {
-                        return false;
+                        throw new HostManagerException( command.getStdOut() );
                     }
                 }
-                return true;
             }
             catch ( CommandException e )
             {
                 LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
+                throw new HostManagerException( e.getMessage() );
             }
         }
-        return false;
+        return true;
     }
 
 
-    public boolean execute( ContainerHost agent )
+    public boolean execute( ContainerHost containerHost ) throws HostManagerException
     {
-        Preconditions.checkNotNull( agent, "Agent is null" );
-
-        containerHosts.add( agent );
+        Preconditions.checkNotNull( containerHost, "Agent is null" );
+        containerHosts.add( containerHost );
         return write();
     }
 }

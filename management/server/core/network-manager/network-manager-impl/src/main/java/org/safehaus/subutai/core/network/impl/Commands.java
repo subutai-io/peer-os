@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.network.impl;
 
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -9,12 +8,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.AgentUtil;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -23,47 +17,35 @@ import com.google.common.collect.Sets;
 public class Commands
 {
 
-    private final CommandDispatcher commandDispatcher;
-
-
-    public Commands( final CommandDispatcher commandDispatcher )
+    public RequestBuilder getCreateSSHCommand()
     {
-        Preconditions.checkNotNull( commandDispatcher, "Command Dispatcher is null" );
-
-        this.commandDispatcher = commandDispatcher;
-    }
-
-
-    public Command getCreateSSHCommand( List<Agent> agentList )
-    {
-        return commandDispatcher.createCommand( new RequestBuilder( "rm -Rf /root/.ssh && " +
+        return new RequestBuilder( "rm -Rf /root/.ssh && " +
                 "mkdir -p /root/.ssh && " +
                 "chmod 700 /root/.ssh && " +
-                "ssh-keygen -t dsa -P '' -f /root/.ssh/id_dsa" ), Sets.newHashSet( agentList ) );
+                "ssh-keygen -t dsa -P '' -f /root/.ssh/id_dsa" );
     }
 
 
-    public Command getReadSSHCommand( List<Agent> agentList )
+    public RequestBuilder getReadSSHCommand( List<Agent> agentList )
     {
-        return commandDispatcher
-                .createCommand( new RequestBuilder( "cat /root/.ssh/id_dsa.pub" ), Sets.newHashSet( agentList ) );
+        return new RequestBuilder( "cat /root/.ssh/id_dsa.pub" );
     }
 
 
-    public Command getWriteSSHCommand( List<Agent> agentList, String key )
+    public RequestBuilder getWriteSSHCommand( String key )
     {
-        return commandDispatcher.createCommand( new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
+        return new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
                 "chmod 700 /root/.ssh && " +
                 "echo '%s' > /root/.ssh/authorized_keys && " +
-                "chmod 644 /root/.ssh/authorized_keys", key ) ), Sets.newHashSet( agentList ) );
+                "chmod 644 /root/.ssh/authorized_keys", key ) );
     }
 
 
-    public Command getConfigSSHCommand( List<Agent> agentList )
+    public RequestBuilder getConfigSSHCommand()
     {
-        return commandDispatcher.createCommand( new RequestBuilder( "echo 'Host *' > /root/.ssh/config && " +
+        return new RequestBuilder( "echo 'Host *' > /root/.ssh/config && " +
                 "echo '    StrictHostKeyChecking no' >> /root/.ssh/config && " +
-                "chmod 644 /root/.ssh/config" ), new HashSet<>( agentList ) );
+                "chmod 644 /root/.ssh/config" );
     }
 
 

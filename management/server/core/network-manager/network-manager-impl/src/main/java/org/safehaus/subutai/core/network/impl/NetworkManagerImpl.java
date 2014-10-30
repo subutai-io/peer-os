@@ -3,12 +3,9 @@ package org.safehaus.subutai.core.network.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-
-import com.google.common.base.Preconditions;
 
 
 /**
@@ -16,12 +13,6 @@ import com.google.common.base.Preconditions;
  */
 public class NetworkManagerImpl implements NetworkManager
 {
-
-
-    public NetworkManagerImpl( final CommandDispatcher commandDispatcher )
-    {
-        Preconditions.checkNotNull( commandDispatcher, "Command Dispatcher is null" );
-    }
 
 
     @Override
@@ -55,7 +46,15 @@ public class NetworkManagerImpl implements NetworkManager
 
     @Override
     public boolean configHostsOnAgents( Set<ContainerHost> containerHosts, String domainName )
+            throws NetworkManagerException
     {
-        return new HostManager( containerHosts, domainName ).execute();
+        try
+        {
+            return new HostManager( containerHosts, domainName ).execute();
+        }
+        catch ( HostManagerException e )
+        {
+            throw new NetworkManagerException( e.getMessage() );
+        }
     }
 }
