@@ -233,7 +233,7 @@ public class RemotePeerRestClient implements RemotePeer
         {
             throw new PeerException( "Operation not allowed." );
         }
-        String path = "peer/container/is_connected";
+        String path = "peer/container/isconnected";
 
 
         WebClient client = createWebClient();
