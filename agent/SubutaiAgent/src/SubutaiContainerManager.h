@@ -13,7 +13,7 @@ using namespace std;
 
 struct SubutaiContainer {
     string uuid;
-    int id;
+    string hostname;
     lxc_container* container;
 };
 
@@ -22,12 +22,17 @@ class SubutaiContainerManager {
         SubutaiContainerManager(string lxc_path);
         ~SubutaiContainerManager();
         SubutaiContainer findContainer(string container_name);
+        vector<SubutaiContainer> findAllContainers(string lxc_path);
+        vector<SubutaiContainer> findActiveContainers(string lxc_path);
+        vector<SubutaiContainer> findDefinedContainers(string lxc_path);
         bool isContainerRunning(string container_name);
         bool RunProgram(string program, vector<string> params);
     private:
         string          _lxc_path;
         lxc_container*  _current_container;
-        vector<SubutaiContainer> _containers;
+        vector<SubutaiContainer> _allContainers;
+        vector<SubutaiContainer> _definedContainers;
+        vector<SubutaiContainer> _activeContainers;
 };
 
 #endif

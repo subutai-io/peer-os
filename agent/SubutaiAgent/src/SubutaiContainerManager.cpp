@@ -1,19 +1,12 @@
 #include "SubutaiContainerManager.h"
 
-SubutaiContainerManager::SubutaiContainerManager(string lxc_path) : _lxc_path(lxc_path) 
+SubutaiContainerManager::SubutaiContainerManager(string lxc_path)
 {
     // Check for running containers in case we just started an app
     // after crash
-    char** names;
-    lxc_container** cont;
-    int num = list_active_containers(_lxc_path.c_str(), &names, &cont);
-    for (int i = 0; i < num; i++) {
-        SubutaiContainer c;
-        c.uuid = "";
-        c.id = 0;
-        c.container = cont[i];
-        _containers.push_back(c);
-    }
+    findDefinedContainers(lxc_path);
+    findActiveContainers(lxc_path);
+    findAllContainers(lxc_path);
 }
 
 SubutaiContainerManager::~SubutaiContainerManager() 
@@ -23,17 +16,57 @@ SubutaiContainerManager::~SubutaiContainerManager()
 
 bool SubutaiContainerManager::isContainerRunning(string container_name) 
 {
-    for (vector<SubutaiContainer>::iterator it = _containers.begin(); it != _containers.end(); it++) {
-        if ((*it).uuid.compare(container_name) == 0) {
+    for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
+        if ((*it).hostname.compare(container_name) == 0) {
             return true;
         }
     }
     return false;
 }
 
+vector<SubutaiContainer> SubutaiContainerManager::findDefinedContainers(string lxc_path) : _lxc_path(lxc_path)
+{
+	char** names;
+	lxc_container** cont;
+	int num = list_defined_containers(_lxc_path.c_str(), &names, &cont);
+	    for (int i = 0; i < num; i++) {
+	        SubutaiContainer c;
+	        c.uuid = "";
+	        c.hostname = names[i];
+	        c.container = cont[i];
+	        _definedContainers.push_back(c);
+	    }
+}
+vector<SubutaiContainer> SubutaiContainerManager::findActiveContainers(string lxc_path) : _lxc_path(lxc_path)
+{
+	char** names;
+	lxc_container** cont;
+	int num = list_active_containers(_lxc_path.c_str(), &names, &cont);
+	    for (int i = 0; i < num; i++) {
+	        SubutaiContainer c;
+	        c.uuid = "";
+	        c.hostname = names[i];
+	        c.container = cont[i];
+	        _activeContainers.push_back(c);
+	    }
+}
+vector<SubutaiContainer> SubutaiContainerManager::findAllContainers(string lxc_path) : _lxc_path(lxc_path)
+{
+	char** names;
+	lxc_container** cont;
+	int num = list_all_containers(_lxc_path.c_str(), &names, &cont);
+	    for (int i = 0; i < num; i++) {
+	        SubutaiContainer c;
+	        c.uuid = "";
+	        c.hostname = names[i];
+	        c.container = cont[i];
+	        _allContainers.push_back(c);
+	    }
+}
+
 SubutaiContainer SubutaiContainerManager::findContainer(string container_name) {
-    for (vector<SubutaiContainer>::iterator it = _containers.begin(); it != _containers.end(); it++) {
-        if ((*it).uuid.compare(container_name) == 0) {
+    for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
+        if ((*it).hostname.compare(container_name) == 0) {
             return (*it);
         }
     }
