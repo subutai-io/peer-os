@@ -12,6 +12,7 @@ import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.ui.clone.Cloner;
 import org.safehaus.subutai.core.container.ui.manage.Manager;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.server.ui.component.AgentTree;
 
@@ -27,6 +28,7 @@ public class ContainerComponent extends CustomComponent implements Disposable
 
     private static final String MANAGER_TAB_CAPTION = "Manage";
     private final AgentTree agentTree;
+    private final ContainerTree containerTree;
 
 
     public ContainerComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -36,13 +38,23 @@ public class ContainerComponent extends CustomComponent implements Disposable
         final AgentManager agentManager = serviceLocator.getService( AgentManager.class );
         final QuotaManager quotaManager = serviceLocator.getService( QuotaManager.class );
         final StrategyManager strategyManager = serviceLocator.getService( StrategyManager.class );
+        final PeerManager peerManager = serviceLocator.getService( PeerManager.class );
+
         setHeight( 100, Unit.PERCENTAGE );
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setStyleName( Runo.SPLITPANEL_SMALL );
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
+
+
         agentTree = new AgentTree( agentManager );
-        horizontalSplit.setFirstComponent( agentTree );
+        containerTree = new ContainerTree( peerManager.getLocalPeer() );
+
+        VerticalLayout treeLayout = new VerticalLayout();
+        treeLayout.addComponent( agentTree );
+        treeLayout.addComponent( containerTree );
+
+        horizontalSplit.setFirstComponent( treeLayout );
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing( true );

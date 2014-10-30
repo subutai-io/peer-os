@@ -2,6 +2,7 @@ package org.safehaus.subutai.common.protocol.impl;
 
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -164,7 +165,8 @@ public class EnvironmentBlueprintServiceImpl implements EnvironmentBlueprintServ
     public void test()
     {
         LOGGER.warn( "Starting EnvironmentBlueprintServiceImpl test" );
-        EnvironmentBlueprint blueprint = new EnvironmentBlueprint();
+        EnvironmentBlueprint blueprint =
+                new EnvironmentBlueprint( UUID.randomUUID().toString(), "domainName", true, true );
         this.createEnvironmentBlueprint( blueprint );
         List<EnvironmentBlueprint> blueprints = this.getEnvironmentBlueprintsAgents();
         for ( EnvironmentBlueprint environmentBlueprint : blueprints )
