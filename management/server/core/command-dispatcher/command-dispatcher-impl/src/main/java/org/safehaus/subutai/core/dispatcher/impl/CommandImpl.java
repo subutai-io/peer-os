@@ -155,7 +155,7 @@ public class CommandImpl extends AbstractCommand
      * Creates command using supplied set of {@code BatchRequest} objects. Used when remote command is received for
      * execution.
      *
-     * @param batchRequests - requests to execute
+     * @param batchRequests - requests to executeAsync
      */
     protected CommandImpl( Set<BatchRequest> batchRequests, CommandRunnerBase commandRunner )
     {
@@ -188,7 +188,7 @@ public class CommandImpl extends AbstractCommand
     /**
      * Creates command using supplied set of {@code Request} objects. Used when command involves also local agents
      *
-     * @param requests - requests to execute
+     * @param requests - requests to executeAsync
      */
     protected CommandImpl( Collection<Request> requests, CommandRunnerBase commandRunner )
     {
