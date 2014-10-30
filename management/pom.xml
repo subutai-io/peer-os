@@ -287,7 +287,7 @@
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- lxc-manager -->
-      <dependency>
+      <!--<dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>lxc-manager-api</artifactId>
         <version>${project.version}</version>
@@ -296,7 +296,7 @@
         <groupId>${project.groupId}</groupId>
         <artifactId>lxc-manager-impl</artifactId>
         <version>${project.version}</version>
-      </dependency>
+      </dependency>-->
       <!--<dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>lxc-manager-ui</artifactId>
@@ -866,94 +866,13 @@
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- plugins -->
-      <dependency>
+      <!--<dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>plugin-common</artifactId>
         <version>${project.version}</version>
-      </dependency>
+      </dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- hadoop -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hadoop-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hadoop-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hadoop-plugin-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hadoop-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hadoop-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <!-- oozie -->
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>oozie-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>oozie-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>oozie-plugin-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>oozie-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>oozie-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <!-- accumulo -->
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>accumulo-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>accumulo-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>accumulo-plugin-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>accumulo-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>accumulo-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <!-- cassandra -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -981,7 +900,84 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- jetty -->
+     <!-- <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hadoop-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hadoop-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hadoop-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hadoop-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hadoop-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>oozie-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>oozie-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>oozie-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>oozie-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>oozie-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>accumulo-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>accumulo-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>accumulo-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>accumulo-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>accumulo-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>jetty-plugin-api</artifactId>
@@ -997,7 +993,6 @@
         <artifactId>jetty-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- elasticsearch -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1024,7 +1019,6 @@
         <artifactId>elasticsearch-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- flume -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1051,7 +1045,6 @@
         <artifactId>flume-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- hbase -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1078,7 +1071,6 @@
         <artifactId>hbase-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- hive -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1105,7 +1097,6 @@
         <artifactId>hive-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- lucene -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1132,7 +1123,6 @@
         <artifactId>lucene-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- mahout -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1159,7 +1149,6 @@
         <artifactId>mahout-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- mongodb -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1186,7 +1175,6 @@
         <artifactId>mongodb-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- pig -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1213,7 +1201,6 @@
         <artifactId>pig-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- presto -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1240,7 +1227,6 @@
         <artifactId>presto-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- shark -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1267,7 +1253,6 @@
         <artifactId>shark-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- solr -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1294,7 +1279,6 @@
         <artifactId>solr-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- spark -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1321,7 +1305,6 @@
         <artifactId>spark-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- sqoop -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1348,7 +1331,6 @@
         <artifactId>sqoop-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- storm -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1376,7 +1358,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- zookeeper -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>zookeeper-plugin-api</artifactId>
@@ -1403,7 +1384,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- hipi -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>hipi-plugin-api</artifactId>
@@ -1430,7 +1410,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- nutch -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>nutch-plugin-api</artifactId>
@@ -1456,6 +1435,7 @@
         <artifactId>nutch-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+      -->
     </dependencies>
   </dependencyManagement>
 
