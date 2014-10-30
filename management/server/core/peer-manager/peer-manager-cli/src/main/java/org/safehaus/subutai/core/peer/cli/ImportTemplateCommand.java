@@ -9,7 +9,6 @@ import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import org.apache.karaf.shell.commands.Argument;
@@ -26,7 +25,7 @@ public class ImportTemplateCommand extends OsgiCommandSupport
 
     private PeerManager peerManager;
 
-    private PeerCommandDispatcher peerCommandDispatcher;
+//    private PeerCommandDispatcher peerCommandDispatcher;
 
     private TemplateRegistry templateRegistry;
 
@@ -48,11 +47,11 @@ public class ImportTemplateCommand extends OsgiCommandSupport
         this.peerManager = peerManager;
     }
 
-
-    public void setPeerCommandDispatcher( final PeerCommandDispatcher peerCommandDispatcher )
-    {
-        this.peerCommandDispatcher = peerCommandDispatcher;
-    }
+//
+//    public void setPeerCommandDispatcher( final PeerCommandDispatcher peerCommandDispatcher )
+//    {
+//        this.peerCommandDispatcher = peerCommandDispatcher;
+//    }
 
 
     public void setTemplateRegistry( final TemplateRegistry templateRegistry )
@@ -77,7 +76,7 @@ public class ImportTemplateCommand extends OsgiCommandSupport
                 new DefaultCommandMessage( PeerCommandType.GET_TEMPLATE, UUID.fromString( peerId ), null );
 
         getTemplateCommand.setInput( templateName );
-        peerCommandDispatcher.invoke( getTemplateCommand );
+//        peerCommandDispatcher.invoke( getTemplateCommand );
         if ( getTemplateCommand.isSuccess() )
         {
             template = JsonUtil.fromJson( getTemplateCommand.getResult().toString(), Template.class );

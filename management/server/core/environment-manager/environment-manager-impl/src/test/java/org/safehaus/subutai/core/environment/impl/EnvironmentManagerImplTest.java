@@ -22,7 +22,6 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
-import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import static org.mockito.Mockito.mock;
@@ -46,11 +45,7 @@ public class EnvironmentManagerImplTest
     @Mock
     NetworkManager networkManager;
     @Mock
-    PeerCommandDispatcher pcd;
-    @Mock
     TemplateRegistry registry;
-    @Mock
-    PeerCommandDispatcher peerCommandDispatcher;
     @Mock
     EnvironmentBlueprint environmentBlueprint;
     @Mock
@@ -60,7 +55,6 @@ public class EnvironmentManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-
         manager = new EnvironmentManagerImpl( dataSource );
         manager.setEnvironmentDAO( environmentDao );
     }
