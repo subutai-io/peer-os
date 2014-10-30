@@ -138,7 +138,7 @@ public class RemotePeerImpl implements RemotePeer
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
 
-        BlockingCommandCallback callback = new BlockingCommandCallback();
+        BlockingCommandCallback callback = new BlockingCommandCallback( null );
 
         executeAsync( requestBuilder, host, callback, callback.getCompletionSemaphore() );
 
@@ -157,6 +157,18 @@ public class RemotePeerImpl implements RemotePeer
 
     @Override
     public void execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+            throws CommandException
+    {
+        BlockingCommandCallback blockingCommandCallback = new BlockingCommandCallback( callback );
+
+        executeAsync( requestBuilder, host, blockingCommandCallback, blockingCommandCallback.getCompletionSemaphore() );
+
+        blockingCommandCallback.waitCompletion();
+    }
+
+
+    @Override
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
             throws CommandException
     {
         executeAsync( requestBuilder, host, callback, null );
