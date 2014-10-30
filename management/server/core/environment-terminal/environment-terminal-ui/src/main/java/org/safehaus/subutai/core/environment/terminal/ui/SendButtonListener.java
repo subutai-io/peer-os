@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Response;
@@ -13,7 +14,6 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.common.util.StringUtil;
-import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.slf4j.Logger;
@@ -32,15 +32,12 @@ public class SendButtonListener implements Button.ClickListener
 
     private final TerminalForm form;
     private final ExecutorService executor;
-    private final CommandDispatcher commandDispatcher;
 
 
-    public SendButtonListener( final CommandDispatcher commandDispatcher, final TerminalForm form,
-                               ExecutorService executor )
+    public SendButtonListener( final TerminalForm form, ExecutorService executor )
     {
         this.form = form;
         this.executor = executor;
-        this.commandDispatcher = commandDispatcher;
     }
 
 
@@ -84,11 +81,7 @@ public class SendButtonListener implements Button.ClickListener
             for ( ContainerHost host : containers )
             {
                 executor.execute( new ExecuteCommandTask( form, host, requestBuilder ) );
-                //                    host.execute( requestBuilder );
-
             }
-            //            Command command = commandDispatcher.createContainerCommand( requestBuilder, containerSet );
-            //                        executor.execute( new ExecuteCommandTask( form, command ) );
         }
     }
 
@@ -115,7 +108,6 @@ public class SendButtonListener implements Button.ClickListener
     {
 
         private final TerminalForm form;
-        //        private final Command command;
         private Host host;
         private RequestBuilder requestBuilder;
 
@@ -123,7 +115,6 @@ public class SendButtonListener implements Button.ClickListener
         private ExecuteCommandTask( TerminalForm form, Host host, RequestBuilder requestBuilder )
         {
             this.form = form;
-            //            this.command = command;
             this.host = host;
             this.requestBuilder = requestBuilder;
             form.taskCount.incrementAndGet();
@@ -135,18 +126,14 @@ public class SendButtonListener implements Button.ClickListener
 
             try
             {
-                CommandResult result = host.execute( requestBuilder );
-                displayResponse( result );
-                //                command.execute( new CommandCallback()
-                //                {
-                //
-                //                    @Override
-                //                    public void onResponse( Response response, AgentResult agentResult,
-                // Command command )
-                //                    {
-                //                        displayResponse( response );
-                //                    }
-                //                } );
+                host.execute( requestBuilder, new CommandCallback()
+                {
+                    @Override
+                    public void onResponse( final Response response, final CommandResult commandResult )
+                    {
+                        displayResponse( response );
+                    }
+                } );
             }
             catch ( CommandException e )
             {
@@ -160,27 +147,6 @@ public class SendButtonListener implements Button.ClickListener
                 {
                     form.indicator.setVisible( false );
                 }
-            }
-        }
-
-
-        private void displayResponse( CommandResult commandResult )
-        {
-            StringBuilder out = new StringBuilder();
-            if ( !Strings.isNullOrEmpty( commandResult.getStdOut() ) )
-            {
-                out.append( commandResult.getStdOut() ).append( "\n" );
-            }
-            if ( !Strings.isNullOrEmpty( commandResult.getStdErr() ) )
-            {
-                out.append( commandResult.getStdErr() ).append( "\n" );
-            }
-
-            out.append( "Exit code: " ).append( commandResult.getExitCode() ).append( "\n\n" );
-
-            if ( out.length() > 0 )
-            {
-                form.addOutput( out.toString() );
             }
         }
 
