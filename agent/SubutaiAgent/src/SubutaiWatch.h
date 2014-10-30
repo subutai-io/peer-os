@@ -38,8 +38,8 @@
 #include <list>
 #include <unistd.h>
 #include <time.h>
-#include<boost/date_time/posix_time/posix_time_types.hpp>
-#include<string>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <string>
 #include "SubutaiConnection.h"
 #include "SubutaiResponsePack.h"
 #include "SubutaiLogger.h"

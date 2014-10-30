@@ -18,20 +18,20 @@
 /**
  *  \details   Default constructor of SubutaiConnection class.
  */
-SubutaiConnection::SubutaiConnection(const char * id, const char * subscribedTopic, const char * publishedTopic
-		, const char * broadcastTopic, const char * host, int port) : mosqpp::mosquittopp(id)
+SubutaiConnection::SubutaiConnection(const char * id, const char * subscribedTopic, const char * publishedTopic, 
+        const char * broadcastTopic, const char * host, int port) : mosqpp::mosquittopp(id)
 {
-	this->keepalive = 60;
-	this->id = id;
-	this->port = port;
-	this->host = host;
-	this->subscribedTopic = subscribedTopic;
-	this->broadcastTopic = broadcastTopic;
-	this->publishedTopic = publishedTopic;
-	this->reveivedMessage=false;
-	this->connectionStatus=false;
-	this->bufferSize = 10000;
-	this->certpath = "/etc/subutai-agent/";
+    this->keepalive =           60;
+    this->id =                  id;
+    this->port =                port;
+    this->host =                host;
+    this->subscribedTopic =     subscribedTopic;
+    this->broadcastTopic =      broadcastTopic;
+    this->publishedTopic =      publishedTopic;
+    this->reveivedMessage =     false;
+    this->connectionStatus =    false;
+    this->bufferSize =          10000;
+    this->certpath =            "/etc/subutai-agent/";
 };
 
 /**
@@ -39,16 +39,16 @@ SubutaiConnection::SubutaiConnection(const char * id, const char * subscribedTop
  */
 static int password_callback(char* buf, int size, int rwflag, void* userdata)
 {
-	pugi::xml_document doc;
-	if(doc.load_file("/etc/subutai-agent/agent.xml").status)		//if the settings file does not exist
-	{
-		return 100;
-		exit(1);
-	}
-	string clientpasswd = doc.child("Settings").child_value("clientpasswd") ;		//reading cleintpassword
-	strncpy(buf,clientpasswd.c_str(),size);
-	buf[size-1] = '\0';
-	return strlen(buf);
+    pugi::xml_document doc;
+    if(doc.load_file("/etc/subutai-agent/agent.xml").status)		//if the settings file does not exist
+    {
+        return 100;
+        exit(1);
+    }
+    string clientpasswd = doc.child("Settings").child_value("clientpasswd") ;		//reading cleintpassword
+    strncpy(buf, clientpasswd.c_str(),size);
+    buf[size - 1] = '\0';
+    return strlen(buf);
 }
 
 /**
@@ -58,22 +58,24 @@ static int password_callback(char* buf, int size, int rwflag, void* userdata)
  */
 bool SubutaiConnection::openSession()
 {
-	tls_opts_set(1, "tlsv1.1", NULL);
-	string ca = certpath + "ca.crt";
-	string clientCrt = certpath + "client.crt";
-	string clientKey = certpath + "client.key";
-	int sslresult = tls_set(ca.c_str(),NULL,clientCrt.c_str(),clientKey.c_str(),password_callback);
-	int result = connect(this->host, this->port, this->keepalive);
-	if(result == MOSQ_ERR_SUCCESS && sslresult == MOSQ_ERR_SUCCESS)
-	{
-		subscribe(NULL,this->subscribedTopic,2); //subscribed to agent own Topic.
-		subscribe(NULL,this->broadcastTopic,2); //subscribed to broadcastTopic.
-		this->connectionStatus=true;
-		return true;
-		//	if(result == MOSQ_ERR_SUCCESS)
-	}
-	else
-		return false;
+    tls_opts_set(1, "tlsv1.1", NULL);
+    string ca = certpath + "ca.crt";
+    string clientCrt = certpath + "client.crt";
+    string clientKey = certpath + "client.key";
+    int sslresult = tls_set(ca.c_str(),NULL,clientCrt.c_str(),clientKey.c_str(),password_callback);
+    int result = connect(this->host, this->port, this->keepalive);
+    if(result == MOSQ_ERR_SUCCESS && sslresult == MOSQ_ERR_SUCCESS)
+    {
+        subscribe(NULL, this->subscribedTopic,2); //subscribed to agent own Topic.
+        subscribe(NULL, this->broadcastTopic,2); //subscribed to broadcastTopic.
+        this->connectionStatus=true;
+        return true;
+        //	if(result == MOSQ_ERR_SUCCESS)
+    }
+    else 
+    {
+        return false;
+    }
 }
 
 /**
@@ -82,15 +84,17 @@ bool SubutaiConnection::openSession()
  */
 bool SubutaiConnection::reConnect()
 {
-	int result;
-	result = reconnect();
-	if(result == MOSQ_ERR_SUCCESS)
-	{
-		cout << "Successfully reconnected to server.." << endl;
-		return true;
-	}
-	else
-		return false;
+    int result;
+    result = reconnect();
+    if(result == MOSQ_ERR_SUCCESS)
+    {
+        cout << "Successfully reconnected to server.." << endl;
+        return true;
+    }
+    else 
+    {
+        return false;
+    }
 }
 
 /**
@@ -98,8 +102,8 @@ bool SubutaiConnection::reConnect()
  */
 SubutaiConnection::~SubutaiConnection()
 {
-	loop_stop();              // Kill the thread
-	mosqpp::lib_cleanup();    // Mosquitto library cleanup
+    loop_stop();              // Kill the thread
+    mosqpp::lib_cleanup();    // Mosquitto library cleanup
 }
 
 /**
@@ -107,9 +111,9 @@ SubutaiConnection::~SubutaiConnection()
  */
 bool SubutaiConnection::sendMessage(string message)
 {
-	const  char * _message = message.c_str();
-	int ret = publish(NULL,this->publishedTopic,strlen(_message),_message,2,true);
-	return ( ret == MOSQ_ERR_SUCCESS );
+    const  char * _message = message.c_str();
+    int ret = publish(NULL,this->publishedTopic,strlen(_message),_message,2,true);
+    return (ret == MOSQ_ERR_SUCCESS);
 }
 
 /**
@@ -117,8 +121,8 @@ bool SubutaiConnection::sendMessage(string message)
  */
 void SubutaiConnection::on_disconnect(int rc)
 {
-	std::cout << " SubutaiConnection - disconnection(" << rc << ")" << std::endl;
-	this->connectionStatus=false;
+    std::cout << " SubutaiConnection - disconnection(" << rc << ")" << std::endl;
+    this->connectionStatus = false;
 }
 
 /**
@@ -126,20 +130,20 @@ void SubutaiConnection::on_disconnect(int rc)
  */
 void SubutaiConnection::on_connect(int rc)
 {
-	if ( rc == 0 )
-	{
-		cout << " SubutaiConnection - connected with server" << endl;
-		if(connectionStatus==false)
-		{
-			subscribe(NULL,this->subscribedTopic,2); // resubscribe to agent own Topic.
-			subscribe(NULL,this->broadcastTopic,2); //resubscribe to broadcastTopic.
-		}
-		connectionStatus=true;
-	}
-	else
-	{
-		cout << " SubutaiConnection - Impossible to connect with server(" << rc << ")" << endl;
-	}
+    if (rc == 0)
+    {
+        cout << " SubutaiConnection - connected with server" << endl;
+        if(connectionStatus == false)
+        {
+            subscribe(NULL, this->subscribedTopic,2); // resubscribe to agent own Topic.
+            subscribe(NULL, this->broadcastTopic,2); //resubscribe to broadcastTopic.
+        }
+        connectionStatus=true;
+    }
+    else
+    {
+        cout << " SubutaiConnection - Impossible to connect with server(" << rc << ")" << endl;
+    }
 }
 
 /**
@@ -147,7 +151,7 @@ void SubutaiConnection::on_connect(int rc)
  */
 void SubutaiConnection::on_publish(int mid)
 {
-	cout << " SubutaiConnection - Message (" << mid << ") succeed to be published " << endl;
+    cout << " SubutaiConnection - Message (" << mid << ") succeed to be published " << endl;
 }
 
 /**
@@ -155,7 +159,7 @@ void SubutaiConnection::on_publish(int mid)
  */
 void SubutaiConnection::on_subscribe(int mid)
 {
-	cout << "Subscriptions succesfully Done!"  << endl;
+    cout << "Subscriptions succesfully Done!"  << endl;
 }
 
 /**
@@ -163,19 +167,19 @@ void SubutaiConnection::on_subscribe(int mid)
  */
 void SubutaiConnection::on_message(const struct mosquitto_message *message)
 {
-	char buf[this->bufferSize+1];
+    char buf[this->bufferSize+1];
 
-	if(!strcmp(message->topic, this->subscribedTopic) || !strcmp(message->topic, this->broadcastTopic))
-	{
-		memset(buf, 0, (this->bufferSize+1)*sizeof(char));
-		/* Copy N-1 bytes to ensure always 0 terminated. */
-		memcpy(buf, message->payload, this->bufferSize*sizeof(char));
+    if(!strcmp(message->topic, this->subscribedTopic) || !strcmp(message->topic, this->broadcastTopic))
+    {
+        memset(buf, 0, (this->bufferSize+1)*sizeof(char));
+        /* Copy N-1 bytes to ensure always 0 terminated. */
+        memcpy(buf, message->payload, this->bufferSize*sizeof(char));
 
-		this->reveivedMessage = true; //setting message status true
-		setMessage((string)buf); //setting message from buffer
-	}
-	else
-		cout << "Error!" << endl;
+        this->reveivedMessage = true; //setting message status true
+        setMessage((string)buf); //setting message from buffer
+    }
+    else
+        cout << "Error!" << endl;
 }
 
 /**
@@ -183,7 +187,7 @@ void SubutaiConnection::on_message(const struct mosquitto_message *message)
  */
 bool SubutaiConnection::checkMessageStatus()
 {
-	return reveivedMessage;
+    return reveivedMessage;
 }
 
 /**
@@ -191,7 +195,7 @@ bool SubutaiConnection::checkMessageStatus()
  */
 void SubutaiConnection::resetMessageStatus()
 {
-	this->reveivedMessage = false;
+    this->reveivedMessage = false;
 }
 
 /**
@@ -200,7 +204,7 @@ void SubutaiConnection::resetMessageStatus()
  */
 string SubutaiConnection::getMessage()
 {
-	return this->messsage;
+    return this->messsage;
 }
 
 /**
@@ -209,7 +213,7 @@ string SubutaiConnection::getMessage()
  */
 void SubutaiConnection::setMessage(string message)
 {
-	this->messsage = message;
+    this->messsage = message;
 }
 
 /**
@@ -218,7 +222,7 @@ void SubutaiConnection::setMessage(string message)
  */
 string SubutaiConnection::getID()
 {
-	string uuid= this->id;
-	return uuid;
+    string uuid= this->id;
+    return uuid;
 }
 
