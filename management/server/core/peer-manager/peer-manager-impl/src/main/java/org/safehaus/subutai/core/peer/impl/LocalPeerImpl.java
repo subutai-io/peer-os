@@ -479,6 +479,29 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
         {
             throw new CommandException( "Host disconnected." );
         }
+        Agent agent = host.getAgent();
+        Command command = commandRunner.createCommand( requestBuilder, Sets.newHashSet( agent ) );
+        command.execute( new org.safehaus.subutai.core.command.api.command.CommandCallback()
+        {
+            @Override
+            public void onResponse( final Response response, final AgentResult agentResult, final Command command )
+            {
+                callback.onResponse( response,
+                        new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(),
+                                agentResult.getStdOut(), agentResult.getStdErr(), command.getCommandStatus() ) );
+            }
+        } );
+    }
+
+
+    @Override
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+            throws CommandException
+    {
+        if ( !host.isConnected() )
+        {
+            throw new CommandException( "Host disconnected." );
+        }
         final Agent agent = host.getAgent();
         Command command = commandRunner.createCommand( requestBuilder, Sets.newHashSet( agent ) );
         command.executeAsync( new org.safehaus.subutai.core.command.api.command.CommandCallback()
