@@ -104,7 +104,7 @@ public class MessengerDao
             {
                 ResultSet messagesRs = dbUtil.select(
                         //select messages where
-                        "select envelope, attempts, isSent, createDate from messages where " +
+                        "select envelope, isSent, createDate from messages where " +
                                 //widening interval attempt has passed
                                 "CURRENT_TIMESTAMP() >= dateadd('SECOND', attempts * ?, createDate) and " +
                                 //the message is still not sent
@@ -132,8 +132,7 @@ public class MessengerDao
     {
         try
         {
-            dbUtil.update( "update messages set isSent = true where messageId = ?",
-                    envelope.getMessage().getId() );
+            dbUtil.update( "update messages set isSent = true where messageId = ?", envelope.getMessage().getId() );
         }
         catch ( SQLException e )
         {
@@ -182,8 +181,8 @@ public class MessengerDao
     {
         try
         {
-            ResultSet resultSet = dbUtil.select(
-                    "select envelope, attempts, isSent, createDate from messages where messageId = ?", messageId );
+            ResultSet resultSet =
+                    dbUtil.select( "select envelope, isSent, createDate from messages where messageId = ?", messageId );
             Set<Envelope> envelopes = retrieveEnvelopsFromResultSet( resultSet );
 
             if ( !CollectionUtil.isCollectionEmpty( envelopes ) )
@@ -216,7 +215,6 @@ public class MessengerDao
 
                     Envelope envelope = JsonUtil.fromJson( envelopeJson, Envelope.class );
                     envelope.setSent( resultSet.getBoolean( "isSent" ) );
-                    envelope.setAttempts( resultSet.getInt( "attempts" ) );
                     envelope.setCreateDate( resultSet.getTimestamp( "createDate" ) );
 
                     envelopes.add( envelope );
