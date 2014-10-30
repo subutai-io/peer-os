@@ -1,10 +1,8 @@
 package org.safehaus.subutai.core.network.impl;
 
 
-import java.util.List;
 import java.util.Set;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.AgentUtil;
@@ -26,7 +24,7 @@ public class Commands
     }
 
 
-    public RequestBuilder getReadSSHCommand( List<Agent> agentList )
+    public RequestBuilder getReadSSHCommand(  )
     {
         return new RequestBuilder( "cat /root/.ssh/id_dsa.pub" );
     }
