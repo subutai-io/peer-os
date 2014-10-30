@@ -77,9 +77,34 @@ public interface RestService
                                       @FormParam("criteria") String criteria );
 
     @POST
-    @Path( "execute" )
+    @Path( "container/destroy" )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response execute( @FormParam( "requestBuilder" ) String requestBuilder, @FormParam( "host" ) String host );
+    public Response destroyContainer( @FormParam( "host" ) String host );
+
+    @POST
+    @Path( "container/start" )
+    @Produces( MediaType.APPLICATION_JSON )
+    public Response startContainer( @FormParam( "host" ) String host );
+
+    @POST
+    @Path( "container/stop" )
+    @Produces( MediaType.APPLICATION_JSON )
+    public Response stopContainer( @FormParam( "host" ) String host );
+
+    @POST
+    @Path( "container/isconnected" )
+    @Produces( MediaType.APPLICATION_JSON )
+    public Response isContainerConnected( @FormParam( "host" ) String host );
+
+    @POST
+    @Path("execute")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response execute( @FormParam("requestBuilder") String requestBuilder, @FormParam("host") String host );
+
+    @POST
+    @Path("environment/containers")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response environmentContainers( @FormParam("environmentId") String envId );
 
     @GET
     @Path("ping")

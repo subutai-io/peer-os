@@ -31,9 +31,9 @@ public class ResourceHost extends SubutaiHost
     Set<ContainerHost> containersHosts = new HashSet();
 
 
-    public ResourceHost( final Agent agent )
+    public ResourceHost( final Agent agent, UUID peerId )
     {
-        super( agent );
+        super( agent, peerId );
     }
 
 
@@ -314,9 +314,40 @@ public class ResourceHost extends SubutaiHost
         Set<ContainerHost> result = new HashSet<>();
         for ( ContainerHost containerHost : getContainersHosts() )
         {
+            if ( containerHost.getEnvironmentId() == null )
+            {
+                continue;
+            }
             if ( containerHost.getEnvironmentId().equals( environmentId ) )
             {
                 result.add( containerHost );
+            }
+        }
+        return result;
+    }
+
+
+    public void removeContainerHost( final Host result )
+    {
+        if ( containersHosts.contains( result ) )
+        {
+            containersHosts.remove( result );
+        }
+    }
+
+
+    public Host getContainerHostById( final UUID id )
+    {
+        ContainerHost result = null;
+        Iterator iterator = containersHosts.iterator();
+
+        while ( result == null && iterator.hasNext() )
+        {
+            ContainerHost host = ( ContainerHost ) iterator.next();
+
+            if ( host.getId().equals( id ) )
+            {
+                result = host;
             }
         }
         return result;

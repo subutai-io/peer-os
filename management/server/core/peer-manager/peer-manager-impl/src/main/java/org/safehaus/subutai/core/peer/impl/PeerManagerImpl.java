@@ -41,6 +41,7 @@ import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
+import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
@@ -87,12 +88,15 @@ public class PeerManagerImpl implements PeerManager
     private LocalPeer localPeer;
     private StrategyManager strategyManager;
     private PeerInfo peerInfo;
+    private Messenger messenger;
+    private CommandResponseMessageListener commandResponseMessageListener;
 
 
-    public PeerManagerImpl( final DataSource dataSource )
+    public PeerManagerImpl( final DataSource dataSource, final Messenger messenger )
     {
         Preconditions.checkNotNull( dataSource, "Data source is null" );
         this.dataSource = dataSource;
+        this.messenger = messenger;
     }
 
 
@@ -123,6 +127,12 @@ public class PeerManagerImpl implements PeerManager
         localPeer = new LocalPeerImpl( this, containerManager, templateRegistry, peerDAO, communicationManager,
                 commandRunner );
         localPeer.init();
+
+        //subscribe to command request messages from remote peer
+        messenger.addMessageListener( new CommandRequestMessageListener( localPeer, messenger, this ) );
+        //subscribe to command response messages from remote peer
+        commandResponseMessageListener = new CommandResponseMessageListener();
+        messenger.addMessageListener( commandResponseMessageListener );
     }
 
 
@@ -463,8 +473,7 @@ public class PeerManagerImpl implements PeerManager
                 params.put( Common.ENV_ID_PARAM_NAME, environmentId );
                 String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peerInfo.getIp() ), params );
                 return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>()
-                {
-                }.getType() );
+                {}.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
             {
@@ -615,7 +624,7 @@ public class PeerManagerImpl implements PeerManager
                 {
                     PeerContainer pc = new PeerContainer();
                     pc.setAgentId( agent.getUuid() );
-                    pc.setPeerId( agent.getSiteId() );
+                    pc.setPeerId( getPeerId() );
                     pc.setState( ContainerState.STARTED );
                     containers.add( pc );
                 }
@@ -777,7 +786,7 @@ public class PeerManagerImpl implements PeerManager
 
         if ( peerInfo != null )
         {
-            return new RemotePeerImpl( peerInfo );
+            return new RemotePeerImpl( peerInfo, messenger, commandResponseMessageListener );
         }
         return null;
     }

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.core.command.api.command;
+package org.safehaus.subutai.common.cache;
 
 
 import java.util.Collections;
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ExpiringCache<K, V>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( AbstractCommand.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ExpiringCache.class.getName() );
 
     private static final long EVICTION_RUN_INTERVAL_MS = 10;
     private final Map<K, CacheEntry<V>> entries = new ConcurrentHashMap<>();

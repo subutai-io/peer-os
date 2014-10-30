@@ -10,7 +10,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "peer", name = "stop-lxc")
+@Command(scope = "peer", name = "stop-container")
 public class StopLxcCommand extends OsgiCommandSupport
 {
 

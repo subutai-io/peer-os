@@ -9,6 +9,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
@@ -41,7 +42,7 @@ public class RemotePeerRestClient implements RemotePeer
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
-    private static final long RECEIVE_TIMEOUT = 1000 * 60 * 5;
+    private static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 5;
     private static final long CONNECTION_TIMEOUT = 1000 * 60 * 1;
     private final long receiveTimeout;
     private final long connectionTimeout;
@@ -51,7 +52,7 @@ public class RemotePeerRestClient implements RemotePeer
 
     public RemotePeerRestClient( String ip, String port )
     {
-        this.receiveTimeout = RECEIVE_TIMEOUT;
+        this.receiveTimeout = DEFAULT_RECEIVE_TIMEOUT;
         this.connectionTimeout = CONNECTION_TIMEOUT;
 
         baseUrl = String.format( baseUrl, ip, port );
@@ -141,35 +142,130 @@ public class RemotePeerRestClient implements RemotePeer
     @Override
     public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId ) throws PeerException
     {
-        return null;
+
+        String path = "peer/environment/containers";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "environmentId", environmentId.toString() );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        String jsonObject = response.readEntity( String.class );
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            Set<ContainerHost> result = JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHost>>()
+            {}.getType() );
+            return result;
+        }
+
+        if ( response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() )
+        {
+            throw new PeerException( response.getEntity().toString() );
+        }
+        else
+        {
+            return null;
+        }
     }
 
 
     @Override
     public boolean startContainer( final ContainerHost containerHost ) throws PeerException
     {
-        return false;
+        String path = "peer/container/start";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "host", JsonUtil.toJson( containerHost ) );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), Boolean.class );
+        }
+        else
+        {
+            throw new PeerException( response.getEntity().toString() );
+        }
     }
 
 
     @Override
     public boolean stopContainer( final ContainerHost containerHost ) throws PeerException
     {
-        return false;
+        String path = "peer/container/stop";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "host", JsonUtil.toJson( containerHost ) );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), Boolean.class );
+        }
+        else
+        {
+            throw new PeerException( response.getEntity().toString() );
+        }
     }
 
 
     @Override
     public void destroyContainer( final ContainerHost containerHost ) throws PeerException
     {
+        String path = "peer/container/destroy";
 
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "host", JsonUtil.toJson( containerHost ) );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return;
+        }
+        else
+        {
+            throw new PeerException( response.getEntity().toString() );
+        }
     }
 
 
     @Override
     public boolean isConnected( final Host host ) throws PeerException
     {
-        return false;
+
+        if ( !( host instanceof ContainerHost ) )
+        {
+            throw new PeerException( "Operation not allowed." );
+        }
+        String path = "peer/container/isconnected";
+
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "host", JsonUtil.toJson( host ) );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), Boolean.class );
+        }
+        else
+        {
+            throw new PeerException( response.getEntity().toString() );
+        }
     }
 
 
@@ -178,7 +274,7 @@ public class RemotePeerRestClient implements RemotePeer
     {
         if ( !( host instanceof ContainerHost ) )
         {
-            throw new CommandException( "Remote execute not allowed." );
+            throw new CommandException( "Operation not allowed." );
         }
 
         String path = "peer/execute";
@@ -204,8 +300,31 @@ public class RemotePeerRestClient implements RemotePeer
         }
         else
         {
-            return null;
+            throw new CommandException( "Unknown response: " + response.getEntity().toString() );
         }
+    }
+
+
+    @Override
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+            throws CommandException
+    {
+        return null;
+    }
+
+
+    @Override
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+            throws CommandException
+    {
+
+    }
+
+
+    @Override
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException
+    {
+
     }
 
 
@@ -304,7 +423,4 @@ public class RemotePeerRestClient implements RemotePeer
 
         //return null;
     }
-
-
-
 }

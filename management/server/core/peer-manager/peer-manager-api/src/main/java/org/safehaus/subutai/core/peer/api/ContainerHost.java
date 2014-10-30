@@ -19,9 +19,10 @@ public class ContainerHost extends SubutaiHost
     private ContainerState state = ContainerState.UNKNOWN;
 
 
-    public ContainerHost( final Agent agent )
+    public ContainerHost( final Agent agent, UUID peerId, UUID environmentId )
     {
-        super( agent );
+        super( agent, peerId );
+        this.environmentId = environmentId;
     }
 
 
@@ -85,9 +86,15 @@ public class ContainerHost extends SubutaiHost
     }
 
 
-    @Override
-    public boolean isConnected()
+    public void updateHeartbeat()
     {
-        return ContainerState.RUNNING.equals( state ) && super.isConnected();
+        lastHeartbeat = System.currentTimeMillis();
+        setState( ContainerState.RUNNING );
     }
+
+    //    @Override
+    //    public boolean isConnected()
+    //    {
+    //        return ContainerState.RUNNING.equals( state ) && super.isConnected();
+    //    }
 }
