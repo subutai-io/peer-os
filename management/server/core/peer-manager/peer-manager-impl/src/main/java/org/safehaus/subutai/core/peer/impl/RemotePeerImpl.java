@@ -172,6 +172,11 @@ public class RemotePeerImpl implements RemotePeer
         {
             throw new CommandException( "Host disconnected." );
         }
+
+        if ( !( host instanceof ContainerHost ) )
+        {
+            throw new CommandException( "Operation not allowed" );
+        }
         //cache callback
         commandResponseMessageListener
                 .addCallback( requestBuilder.getCommandId(), callback, requestBuilder.getTimeout(), semaphore );
@@ -179,7 +184,7 @@ public class RemotePeerImpl implements RemotePeer
         //send command message to remote peer
         try
         {
-            Message message = messenger.createMessage( new CommandRequest( requestBuilder, host ) );
+            Message message = messenger.createMessage( new CommandRequest( requestBuilder, ( ContainerHost ) host ) );
             messenger.sendMessage( this, message, CommandRecipientType.COMMAND_REQUEST.name(),
                     requestBuilder.getTimeout() );
         }

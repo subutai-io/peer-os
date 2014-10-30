@@ -4,17 +4,17 @@ package org.safehaus.subutai.core.peer.impl;
 import java.util.Date;
 
 import org.safehaus.subutai.common.protocol.RequestBuilder;
-import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
 public class CommandRequest
 {
     private RequestBuilder requestBuilder;
-    private Host host;
+    private ContainerHost host;
     private Date createDate;
 
 
-    public CommandRequest( final RequestBuilder requestBuilder, final Host host )
+    public CommandRequest( final RequestBuilder requestBuilder, final ContainerHost host )
     {
         this.requestBuilder = requestBuilder;
         this.host = host;
@@ -28,7 +28,7 @@ public class CommandRequest
     }
 
 
-    public Host getHost()
+    public ContainerHost getHost()
     {
         return host;
     }
