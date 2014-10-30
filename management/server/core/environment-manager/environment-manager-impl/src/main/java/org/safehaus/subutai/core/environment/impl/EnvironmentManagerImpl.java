@@ -17,15 +17,11 @@ import java.util.UUID;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.common.protocol.PeerCommandMessage;
-import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.TopologyEnum;
@@ -40,6 +36,7 @@ import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -50,7 +47,6 @@ import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
 
 
 /**
@@ -436,25 +432,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Set<ContainerHost> freshContainers = new HashSet<>();
         for ( UUID peerId : peers )
         {
-            PeerCommandMessage cmd =
 
-                    new DefaultCommandMessage( PeerCommandType.GET_CONNECTED_CONTAINERS, peerId, null );
-
-            cmd.setInput( environment.getId().toString() );
-
-            Set<ContainerHost> containers =
-                    JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<ContainerHost>>()
-                    {
-                    }.getType() );
-
-            if ( cmd.isSuccess() && containers != null )
+            Peer peer = peerManager.getPeer( peerId );
+            Set<ContainerHost> containers = new HashSet();
+            try
             {
-                for ( ContainerHost c : containers )
+                for ( ContainerHost c : peer.getContainerHostsByEnvironmentId( environment.getId() ) )
                 {
-                    //                    ContainerHost ec = new ContainerHost(  );
-                    //                    ec.setEnvironmentId( environment.getId() );
-                    freshContainers.add( c );
+                    containers.add(c);
                 }
+            }
+            catch ( PeerException e )
+            {
+                LOG.warn( "Error on getting environment containers: " + e.toString() );
             }
         }
         return freshContainers;
