@@ -53,11 +53,11 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>org.safehaus.subutai</groupId>
       <artifactId>command-dispatcher-impl</artifactId>
       <scope>test</scope>
-    </dependency>
+    </dependency>-->
   </dependencies>
 
   <build>

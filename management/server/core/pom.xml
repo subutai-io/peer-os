@@ -18,7 +18,7 @@
   <modules>
     <module>agent-manager</module>
     <module>apt-repository-manager</module>
-    <module>command-dispatcher</module>
+    <!--<module>command-dispatcher</module>-->
     <module>command-runner</module>
     <module>communication-manager</module>
     <module>config-point-tracker</module>
