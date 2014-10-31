@@ -49,8 +49,7 @@ public class CommandResponseMessageListener extends MessageListener
     {
         final CommandResponse commandResponse = message.getPayload( CommandResponse.class );
 
-        UUID commandId = commandResponse.getCommandResult().getCommandId();
-        CommandCallback callback = callbacks.get( commandId );
+        CommandCallback callback = callbacks.get( commandResponse.getRequestId() );
 
         if ( callback != null )
         {

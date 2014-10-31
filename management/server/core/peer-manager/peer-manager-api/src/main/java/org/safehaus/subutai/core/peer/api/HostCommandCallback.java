@@ -26,7 +26,7 @@ public class HostCommandCallback extends CommandCallback
     public void onResponse( final Response response, final AgentResult agentResult, final Command command )
     {
         commandCallback.onResponse( response,
-                new CommandResult( command.getCommandUUID(), agentResult.getExitCode(), agentResult.getStdOut(),
-                        agentResult.getStdErr(), command.getCommandStatus() ) );
+                new CommandResult( agentResult.getExitCode(), agentResult.getStdOut(), agentResult.getStdErr(),
+                        command.getCommandStatus() ) );
     }
 }

@@ -139,7 +139,6 @@ public class MockUtils
     {
         RequestBuilder requestBuilder = mock( RequestBuilder.class );
         when( requestBuilder.getTimeout() ).thenReturn( timeout );
-        when( requestBuilder.getCommandId() ).thenReturn( UUID.randomUUID() );
 
         return requestBuilder;
     }

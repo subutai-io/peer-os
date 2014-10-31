@@ -49,8 +49,8 @@ public class CommandRequestMessageListener extends MessageListener
                 {
                     try
                     {
-                        Message commandResponseMsg =
-                                messenger.createMessage( new CommandResponse( response, commandResult ) );
+                        Message commandResponseMsg = messenger.createMessage(
+                                new CommandResponse( commandRequest.getRequestId(), response, commandResult ) );
                         Peer sourcePeer = peerManager.getPeer( message.getSourcePeerId() );
                         long timeLeft = ( commandRequest.getRequestBuilder().getTimeout() * 1000
                                 + Constants.COMMAND_REQUEST_MESSAGE_TIMEOUT * 1000 ) - ( System.currentTimeMillis()

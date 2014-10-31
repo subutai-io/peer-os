@@ -178,7 +178,7 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( commandResult == null )
         {
-            commandResult = new CommandResult( requestBuilder.getCommandId(), null, null, null, CommandStatus.TIMEOUT );
+            commandResult = new CommandResult( null, null, null, CommandStatus.TIMEOUT );
         }
 
         return commandResult;
@@ -219,14 +219,16 @@ public class RemotePeerImpl implements RemotePeer
         {
             throw new CommandException( "Operation not allowed" );
         }
+
+        CommandRequest request = new CommandRequest( requestBuilder, ( ContainerHost ) host );
         //cache callback
         commandResponseMessageListener
-                .addCallback( requestBuilder.getCommandId(), callback, requestBuilder.getTimeout(), semaphore );
+                .addCallback( request.getRequestId(), callback, requestBuilder.getTimeout(), semaphore );
 
         //send command message to remote peer
         try
         {
-            Message message = messenger.createMessage( new CommandRequest( requestBuilder, ( ContainerHost ) host ) );
+            Message message = messenger.createMessage( request );
             messenger.sendMessage( this, message, RecipientType.COMMAND_REQUEST.name(),
                     Constants.COMMAND_REQUEST_MESSAGE_TIMEOUT );
         }
