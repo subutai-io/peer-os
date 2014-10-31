@@ -22,9 +22,9 @@ class SubutaiContainerManager {
         SubutaiContainerManager(string lxc_path);
         ~SubutaiContainerManager();
         SubutaiContainer findContainer(string container_name);
-        void findAllContainers(string lxc_path);
-        void findActiveContainers(string lxc_path);
-        void findDefinedContainers(string lxc_path);
+        void findAllContainers();
+        void findActiveContainers();
+        void findDefinedContainers();
         bool isContainerRunning(string container_name);
         bool RunProgram(string program, vector<string> params);
     private:
