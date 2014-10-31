@@ -20,6 +20,7 @@ import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MetricListener;
@@ -40,7 +41,10 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -241,13 +245,16 @@ public class MonitorImplTest
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         Peer ownerPeer = mock( Peer.class );
         when( peerManager.getPeer( REMOTE_PEER_ID ) ).thenReturn( ownerPeer );
-        when( ownerPeer.getId() ).thenReturn( REMOTE_PEER_ID );
+        when( ownerPeer.isLocal() ).thenReturn( false );
+        Message message = mock( Message.class );
+        when( messenger.createMessage( any() ) ).thenReturn( message );
 
 
         monitor.alertThresholdExcess( METRIC_JSON );
 
-        //todo complete the test when message queue willbe implemented
 
+        verify( messenger ).createMessage( isA( ContainerHostMetric.class ) );
+        verify( messenger ).sendMessage( eq( ownerPeer ), isA( Message.class ), anyString(), anyInt() );
     }
 
 

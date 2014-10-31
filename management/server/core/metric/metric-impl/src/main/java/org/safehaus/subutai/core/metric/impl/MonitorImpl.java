@@ -37,8 +37,6 @@ import com.google.gson.JsonSyntaxException;
 
 /**
  * Implementation of Monitor
- *
- * TODO subscribe to message queue (once implemented) for getting remote alerts
  */
 public class MonitorImpl implements Monitor
 {
@@ -69,7 +67,7 @@ public class MonitorImpl implements Monitor
         this.monitorDao = new MonitorDao( dataSource );
         this.peerManager = peerManager;
         this.messenger = messenger;
-        this.messenger.addMessageListener( new RemoteAlertListener() );
+        this.messenger.addMessageListener( new RemoteAlertListener( this ) );
     }
 
 
@@ -246,8 +244,6 @@ public class MonitorImpl implements Monitor
     /**
      * This methods is called by REST endpoint when a remote peer sends an alert from one of its hosted containers
      * belonging to this peer or when local "own" container is under stress
-     *
-     * TODO call this method once remote alert arrives
      *
      * @param metric - {@code ContainerHostMetric} metric of the host where thresholds are being exceeded
      */
