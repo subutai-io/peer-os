@@ -124,7 +124,7 @@ public class MessageSender
         for ( Map.Entry<UUID, Set<Envelope>> envelopsPerPeer : peerEnvelopesMap.entrySet() )
         {
             Peer targetPeer = peerManager.getPeer( envelopsPerPeer.getKey() );
-            if ( peerManager.getLocalPeer().getId().compareTo( targetPeer.getId() ) == 0 )
+            if ( targetPeer.isLocal() )
             {
                 completer.submit( new LocalPeerMessageSender( messenger, messengerDao, envelopsPerPeer.getValue() ) );
             }

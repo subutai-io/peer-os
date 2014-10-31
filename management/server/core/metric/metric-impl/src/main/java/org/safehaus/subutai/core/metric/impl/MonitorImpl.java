@@ -15,6 +15,8 @@ import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.messenger.api.Message;
+import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MetricListener;
@@ -45,6 +47,8 @@ public class MonitorImpl implements Monitor
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class.getName() );
     //max length of subscriber id to store in database varchar(100) field
     private static final int MAX_SUBSCRIBER_ID_LEN = 100;
+    //alert timeout in seconds
+    private static final int ALERT_TIMEOUT = 30;
     //set of metric subscribers
     protected Set<MetricListener> metricListeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MetricListener, Boolean>() );
@@ -220,17 +224,18 @@ public class MonitorImpl implements Monitor
             Peer ownerPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
 
             //if container is "owned" by local peer, alert local peer
-            if ( peerManager.getLocalPeer().getId().compareTo( ownerPeer.getId() ) == 0 )
+            if ( ownerPeer.isLocal() )
             {
                 alertThresholdExcess( containerHostMetric );
             }
             //send metric to owner peer
             else
             {
-                //TODO send alert to ownerPeer once message queue is implemented
+                Message message = messenger.createMessage( containerHostMetric );
+                messenger.sendMessage( ownerPeer, message, RemoteAlertListener.ALERT_RECIPIENT, ALERT_TIMEOUT );
             }
         }
-        catch ( PeerException | RuntimeException e )
+        catch ( PeerException | MessageException | RuntimeException e )
         {
             LOG.error( "Error in alertThresholdExcess", e );
             throw new MonitorException( e );
@@ -240,7 +245,7 @@ public class MonitorImpl implements Monitor
 
     /**
      * This methods is called by REST endpoint when a remote peer sends an alert from one of its hosted containers
-     * belonging to this peer
+     * belonging to this peer or when local "own" container is under stress
      *
      * TODO call this method once remote alert arrives
      *

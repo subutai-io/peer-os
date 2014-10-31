@@ -178,6 +178,13 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @Override
+    public boolean isLocal()
+    {
+        return false;
+    }
+
+
     private void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback,
                                Semaphore semaphore ) throws CommandException
     {

@@ -222,7 +222,7 @@ public class MonitorImplTest
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         Peer ownerPeer = mock( Peer.class );
         when( peerManager.getPeer( LOCAL_PEER_ID ) ).thenReturn( ownerPeer );
-        when( ownerPeer.getId() ).thenReturn( LOCAL_PEER_ID );
+        when( ownerPeer.isLocal() ).thenReturn( true );
 
 
         monitor.alertThresholdExcess( METRIC_JSON );

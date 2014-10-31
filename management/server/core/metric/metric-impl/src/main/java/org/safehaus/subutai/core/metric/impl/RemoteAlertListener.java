@@ -10,7 +10,7 @@ import org.safehaus.subutai.core.messenger.api.MessageListener;
  */
 public class RemoteAlertListener extends MessageListener
 {
-    private static final String ALERT_RECIPIENT = "alert";
+    public static final String ALERT_RECIPIENT = "alert";
 
 
     protected RemoteAlertListener()
