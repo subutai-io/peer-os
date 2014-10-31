@@ -1,4 +1,5 @@
 #!/bin/bash
+. /usr/share/subutai-cli/subutai/lib/net-ops
 
 function management_network_usage {
 echo -------------------------------------------------------------------------------
@@ -20,7 +21,7 @@ echo
 echo Usage:   Show flow table and Port informations in a brdige                
 echo "        "subutai \[-qh\] management_network -s BRIDGENAME
 echo
-echo Usage:   Delete a Open flow rule from a brdige                 
+echo Usage:   Delete a Open flow rule from a bridge                 
 echo "        "subutai \[-qh\] management_network -d BRIDGENAME MATCHCASE
 echo -------------------------------------------------------------------------------
 }
@@ -90,6 +91,8 @@ function management_network {
   done
   
   if [ "true" == "$createTunnel" ]; then  
+     net_assert_name $1
+
      tunnelPortName="$1"
      tunnelIpAddress="$2"
      tunnelType="$3"
