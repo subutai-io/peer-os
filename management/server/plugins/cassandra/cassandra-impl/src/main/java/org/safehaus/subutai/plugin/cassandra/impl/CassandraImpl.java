@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -17,13 +16,13 @@ import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
+import org.safehaus.subutai.plugin.cassandra.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckClusterHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckNodeHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckServiceHandler;
@@ -34,13 +33,14 @@ import org.safehaus.subutai.plugin.cassandra.impl.handler.StartServiceHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StopClusterHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StopServiceHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.UninstallClusterHandler;
-import org.safehaus.subutai.plugin.common.PluginDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+
+//import org.safehaus.subutai.plugin.common.PluginDao;
 
 //import org.safehaus.subutai.core.agent.api.AgentManager;
 
@@ -52,9 +52,9 @@ public class CassandraImpl implements Cassandra
     private Tracker tracker;
     private ExecutorService executor;
     private EnvironmentManager environmentManager;
-    private PluginDao pluginDAO;
+    private PluginDAO pluginDAO;
     private DataSource dataSource;
-    private ServiceLocator serviceLocator;
+    //    private ServiceLocator serviceLocator;
 
 
     public CassandraImpl( DataSource dataSource )
@@ -103,16 +103,12 @@ public class CassandraImpl implements Cassandra
     {
         try
         {
-            this.serviceLocator = new ServiceLocator();
-            this.tracker = serviceLocator.getService( Tracker.class );
-            this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
-            this.pluginDAO = new PluginDao( dataSource );
+            //            this.serviceLocator = new ServiceLocator();
+            //            this.tracker = serviceLocator.getService( Tracker.class );
+            //            this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+            this.pluginDAO = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-        catch ( NamingException e )
         {
             LOG.error( e.getMessage(), e );
         }
@@ -123,7 +119,7 @@ public class CassandraImpl implements Cassandra
 
     public void destroy()
     {
-        this.serviceLocator = null;
+        //        this.serviceLocator = null;
         this.tracker = null;
         this.environmentManager = null;
         this.pluginDAO = null;
@@ -165,7 +161,7 @@ public class CassandraImpl implements Cassandra
     }
 
 
-    public PluginDao getPluginDAO()
+    public PluginDAO getPluginDAO()
     {
         return pluginDAO;
     }

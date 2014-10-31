@@ -29,10 +29,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>lxc-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>monitoring-api</artifactId>
     </dependency>
     <dependency>
@@ -50,10 +46,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>peer-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>peer-command-dispatcher-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.safehaus.subutai</groupId>

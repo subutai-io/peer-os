@@ -19,7 +19,7 @@ public class CommandResponseMessageListener extends MessageListener
 
     public CommandResponseMessageListener()
     {
-        super( CommandRecipientType.COMMAND_RESPONSE.name() );
+        super( RecipientType.COMMAND_RESPONSE.name() );
         callbacks = new ExpiringCache<>();
     }
 
@@ -28,17 +28,18 @@ public class CommandResponseMessageListener extends MessageListener
     {
         if ( callback != null )
         {
-            callbacks.put( commandId, callback, timeout * 1000 + 20000, new EntryExpiryCallback<CommandCallback>()
-            {
-                @Override
-                public void onEntryExpiry( final CommandCallback entry )
-                {
-                    if ( semaphore != null )
+            callbacks.put( commandId, callback, timeout * 1000 + Constants.COMMAND_REQUEST_MESSAGE_TIMEOUT * 2 * 1000,
+                    new EntryExpiryCallback<CommandCallback>()
                     {
-                        semaphore.release();
-                    }
-                }
-            } );
+                        @Override
+                        public void onEntryExpiry( final CommandCallback entry )
+                        {
+                            if ( semaphore != null )
+                            {
+                                semaphore.release();
+                            }
+                        }
+                    } );
         }
     }
 
@@ -48,8 +49,7 @@ public class CommandResponseMessageListener extends MessageListener
     {
         final CommandResponse commandResponse = message.getPayload( CommandResponse.class );
 
-        UUID commandId = commandResponse.getCommandResult().getCommandId();
-        CommandCallback callback = callbacks.get( commandId );
+        CommandCallback callback = callbacks.get( commandResponse.getRequestId() );
 
         if ( callback != null )
         {

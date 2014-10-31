@@ -16,6 +16,7 @@ import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -156,7 +157,8 @@ public class RemotePeerRestClient implements RemotePeer
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             Set<ContainerHost> result = JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHost>>()
-            {}.getType() );
+            {
+            }.getType() );
             return result;
         }
 
@@ -172,30 +174,7 @@ public class RemotePeerRestClient implements RemotePeer
 
 
     @Override
-    public boolean startContainer( final ContainerHost containerHost ) throws PeerException
-    {
-        String path = "peer/container/start";
-
-        WebClient client = createWebClient();
-
-        Form form = new Form();
-        form.set( "host", JsonUtil.toJson( containerHost ) );
-        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
-                                  .accept( MediaType.APPLICATION_JSON ).post( form );
-
-        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-        {
-            return JsonUtil.fromJson( response.readEntity( String.class ), Boolean.class );
-        }
-        else
-        {
-            throw new PeerException( response.getEntity().toString() );
-        }
-    }
-
-
-    @Override
-    public boolean stopContainer( final ContainerHost containerHost ) throws PeerException
+    public void stopContainer( final ContainerHost containerHost ) throws PeerException
     {
         String path = "peer/container/stop";
 
@@ -208,7 +187,30 @@ public class RemotePeerRestClient implements RemotePeer
 
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
-            return JsonUtil.fromJson( response.readEntity( String.class ), Boolean.class );
+            return;
+        }
+        else
+        {
+            throw new PeerException( response.getEntity().toString() );
+        }
+    }
+
+
+    @Override
+    public void startContainer( final ContainerHost containerHost ) throws PeerException
+    {
+        String path = "peer/container/start";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "host", JsonUtil.toJson( containerHost ) );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return;
         }
         else
         {
@@ -270,6 +272,55 @@ public class RemotePeerRestClient implements RemotePeer
 
 
     @Override
+    public String getQuota( final ContainerHost host, final QuotaEnum quota ) throws PeerException
+    {
+        throw new PeerException( "Operation not allowed.");
+        //        String path = "peer/container/getquota";
+        //
+        //
+        //        WebClient client = createWebClient();
+        //
+        //        Form form = new Form();
+        //        form.set( "host", JsonUtil.toJson( host ) );
+        //        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+        //                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+        //
+        //        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        //        {
+        //            return response.readEntity( String.class );
+        //        }
+        //        else
+        //        {
+        //            throw new PeerException( response.getEntity().toString() );
+        //        }
+    }
+
+
+    @Override
+    public void setQuota( final ContainerHost host, final QuotaEnum quota, final String value ) throws PeerException
+    {
+        throw new PeerException( "Operation not allowed.");
+//        String path = "peer/container/setquota";
+//
+//
+//        WebClient client = createWebClient();
+//
+//        Form form = new Form();
+//        form.set( "host", JsonUtil.toJson( host ) );
+//        form.set( "quota", quota );
+//        form.set( "value", value );
+//
+//        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+//                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+//
+//        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+//        {
+//            throw new PeerException( response.getEntity().toString() );
+//        }
+    }
+
+
+    @Override
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
         if ( !( host instanceof ContainerHost ) )
@@ -325,6 +376,13 @@ public class RemotePeerRestClient implements RemotePeer
     public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
 
+    }
+
+
+    @Override
+    public boolean isLocal()
+    {
+        return false;
     }
 
 

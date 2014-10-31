@@ -37,7 +37,7 @@
       <action class="org.safehaus.subutai.core.peer.cli.ImportTemplateCommand">
         <property name="peerManager" ref="peerManager" />
         <property name="templateRegistry" ref="templateRegistry" />
-        <property name="peerCommandDispatcher" ref="peerCommandDispatcher" />
+        <!--<property name="peerCommandDispatcher" ref="peerCommandDispatcher" />-->
       </action>
     </command>
   </command-bundle>
@@ -96,7 +96,7 @@
   <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
-  <reference id="peerCommandDispatcher" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher" />
+  <!--<reference id="peerCommandDispatcher" availability="mandatory"
+             interface="org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher" />-->
 
 </blueprint>

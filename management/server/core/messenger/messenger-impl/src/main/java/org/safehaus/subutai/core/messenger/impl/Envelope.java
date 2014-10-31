@@ -19,7 +19,6 @@ public class Envelope
     private final UUID targetPeerId;
     private final String recipient;
     private final int timeToLive;
-    private transient int attempts;
     private transient boolean isSent;
     private transient Timestamp createDate;
 
@@ -60,18 +59,6 @@ public class Envelope
     public int getTimeToLive()
     {
         return timeToLive;
-    }
-
-
-    public int getAttempts()
-    {
-        return attempts;
-    }
-
-
-    public void setAttempts( final int attempts )
-    {
-        this.attempts = attempts;
     }
 
 

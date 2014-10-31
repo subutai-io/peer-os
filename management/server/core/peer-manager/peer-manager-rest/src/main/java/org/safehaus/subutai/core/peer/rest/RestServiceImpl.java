@@ -86,18 +86,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    //    @Override
-    //    public String createContainers( final String createContainersMsg )
-    //    {
-    //        CloneContainersMessage ccm = GSON.fromJson( createContainersMsg, CloneContainersMessage.class );
-    //        LOG.info( "Message to clone container received for environment: " + ccm.getEnvId() );
-    ////        peerManager.createContainers( ccm );
-    //
-    //        return JsonUtil.toJson( ccm.getResult() );
-    //
-    //    }
-
-
     @Override
     public String getCreateContainersMsgJsonFormat()
     {
@@ -373,8 +361,8 @@ public class RestServiceImpl implements RestService
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
             ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
-            Boolean result = localPeer.startContainer( containerHost );
-            return Response.ok( result.toString() ).build();
+            localPeer.startContainer( containerHost );
+            return Response.ok().build();
         }
         catch ( PeerException e )
         {
@@ -390,8 +378,8 @@ public class RestServiceImpl implements RestService
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
             ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
-            Boolean result = localPeer.stopContainer( containerHost );
-            return Response.ok( result.toString() ).build();
+            localPeer.stopContainer( containerHost );
+            return Response.ok().build();
         }
         catch ( PeerException e )
         {
@@ -415,4 +403,39 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
+
+    //
+    //    @Override
+    //    public Response getQuota( @FormParam( "host" ) final String host, @FormParam( "host" ) final String quota )
+    //    {
+    //        try
+    //        {
+    //            LocalPeer localPeer = peerManager.getLocalPeer();
+    //            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+    //            String result = localPeer.getQuota( containerHost, QuotaEnum.valueOf( quota ) );
+    //            return Response.ok( result.toString() ).build();
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+    //        }
+    //    }
+    //
+    //
+    //    @Override
+    //    public Response setQuota( @FormParam( "host" ) final String host, @FormParam( "host" ) final String quota,
+    //                              @FormParam( "value" ) final String value )
+    //    {
+    //        try
+    //        {
+    //            LocalPeer localPeer = peerManager.getLocalPeer();
+    //            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+    //            localPeer.setQuota( containerHost, QuotaEnum.valueOf( quota ), value );
+    //            return Response.ok().build();
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+    //        }
+    //    }
 }

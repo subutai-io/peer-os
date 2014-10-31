@@ -18,7 +18,6 @@
     <module>messenger-api</module>
     <module>messenger-impl</module>
     <module>messenger-rest</module>
-    <module>messenger-cli</module>
   </modules>
 
 </project>
