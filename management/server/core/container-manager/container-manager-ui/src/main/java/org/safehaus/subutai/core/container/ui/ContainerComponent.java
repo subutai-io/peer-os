@@ -62,7 +62,8 @@ public class ContainerComponent extends CustomComponent implements Disposable
         TabSheet commandsSheet = new TabSheet();
         commandsSheet.setStyleName( Runo.TABSHEET_SMALL );
         commandsSheet.setSizeFull();
-        final Manager manager = new Manager( executorService, agentManager, containerManager, quotaManager );
+        final Manager manager =
+                new Manager( executorService, agentManager, containerManager, quotaManager, peerManager );
         commandsSheet.addTab( new Cloner( containerManager, strategyManager, agentTree ), "Clone" );
         commandsSheet.addTab( manager, MANAGER_TAB_CAPTION );
         commandsSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
@@ -74,7 +75,7 @@ public class ContainerComponent extends CustomComponent implements Disposable
                 String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
                 if ( caption.equals( MANAGER_TAB_CAPTION ) )
                 {
-                    manager.getLxcInfo();
+                    manager.getContainerInfo();
                 }
             }
         } );
