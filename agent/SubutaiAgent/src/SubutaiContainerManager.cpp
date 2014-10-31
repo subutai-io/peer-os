@@ -108,9 +108,10 @@ string SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string progra
     int _stdout = dup(1);
     dup2(fd[1], 1);
     char buffer[1000];
-    cont->container->attach_run_wait(_current_container, &opts, program.c_str(), _params);
+    int exit_code = cont->container->attach_run_wait(_current_container, &opts, program.c_str(), _params);
     fflush(stdout);
-    string command_output;
+    string command_output = "";
+    // TODO: Implement checking of buffer size here
     while (1) {
         ssize_t size = read(fd[0], buffer, 1000);
         command_output += buffer;
@@ -132,7 +133,7 @@ void SubutaiContainerManager::CollectInfo() {
     vector<string> params;
     params.push_back("-a");
     for (ContainerIterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
-        UpdateNetworkingInfo(&(*it), RunProgram(&(*it), "ipconfig", params));
+        UpdateNetworkingInfo(&(*it), RunProgram(&(*it), "/bin/ifconfig", params));
     }
 }
 
@@ -180,7 +181,7 @@ void SubutaiContainerManager::UpdateUsersList(SubutaiContainer* cont) {
     cont->users.clear();
     vector<string> params;
     params.push_back("/etc/passwd");
-    string passwd = RunProgram(cont, "cat", params);
+    string passwd = RunProgram(cont, "/bin/cat", params);
     size_t n = 0;
     size_t p = 0;
     stringstream ss(passwd);
