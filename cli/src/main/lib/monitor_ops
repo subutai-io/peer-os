@@ -24,7 +24,12 @@ function get_used_ram {
   local lxc=$1
   lxc_assert $lxc > /dev/null
 
-  echo "16111232"
+  used_ram=$(cat /sys/fs/cgroup/memory/lxc/$lxc/memory.usage_in_bytes)
+  local status=$?
+
+  if [ $status == 0 ]; then
+    echo $used_ram
+  fi
 }
 
 
