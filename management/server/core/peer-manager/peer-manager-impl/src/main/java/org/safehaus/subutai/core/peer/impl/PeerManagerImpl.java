@@ -138,7 +138,7 @@ public class PeerManagerImpl implements PeerManager
         messenger.addMessageListener( new CreateContainerRequestListener( localPeer, messenger, this ) );
         //subscribe to create containers responses from remote peer
         createContainerResponseListener = new CreateContainerResponseListener();
-        messenger.addMessageListener( commandResponseMessageListener );
+        messenger.addMessageListener( createContainerResponseListener );
     }
 
 
