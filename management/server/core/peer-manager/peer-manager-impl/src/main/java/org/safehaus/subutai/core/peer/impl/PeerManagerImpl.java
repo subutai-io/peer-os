@@ -41,6 +41,7 @@ import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -81,6 +82,7 @@ public class PeerManagerImpl implements PeerManager
     private PeerDAO peerDAO;
     private ContainerManager containerManager;
     private CommandRunner commandRunner;
+    private QuotaManager quotaManager;
     private TemplateRegistry templateRegistry;
     private DataSource dataSource;
     private Set<PeerContainer> containers = new HashSet<>();
@@ -90,6 +92,7 @@ public class PeerManagerImpl implements PeerManager
     private PeerInfo peerInfo;
     private Messenger messenger;
     private CommandResponseMessageListener commandResponseMessageListener;
+    private CreateContainerResponseListener createContainerResponseListener;
 
 
     public PeerManagerImpl( final DataSource dataSource, final Messenger messenger )
@@ -125,7 +128,7 @@ public class PeerManagerImpl implements PeerManager
             peerInfo = result.get( 0 );
         }
         localPeer = new LocalPeerImpl( this, containerManager, templateRegistry, peerDAO, communicationManager,
-                commandRunner );
+                commandRunner, quotaManager );
         localPeer.init();
 
         //subscribe to command request messages from remote peer
@@ -133,6 +136,11 @@ public class PeerManagerImpl implements PeerManager
         //subscribe to command response messages from remote peer
         commandResponseMessageListener = new CommandResponseMessageListener();
         messenger.addMessageListener( commandResponseMessageListener );
+        //subscribe to create container requests from remote peer
+        messenger.addMessageListener( new CreateContainerRequestListener( localPeer, messenger, this ) );
+        //subscribe to create containers responses from remote peer
+        createContainerResponseListener = new CreateContainerResponseListener();
+        messenger.addMessageListener( createContainerResponseListener );
     }
 
 
@@ -181,6 +189,12 @@ public class PeerManagerImpl implements PeerManager
     public void setContainerManager( final ContainerManager containerManager )
     {
         this.containerManager = containerManager;
+    }
+
+
+    public void setQuotaManager( final QuotaManager quotaManager )
+    {
+        this.quotaManager = quotaManager;
     }
 
 
@@ -473,7 +487,8 @@ public class PeerManagerImpl implements PeerManager
                 params.put( Common.ENV_ID_PARAM_NAME, environmentId );
                 String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peerInfo.getIp() ), params );
                 return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>()
-                {}.getType() );
+                {
+                }.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
             {
@@ -786,7 +801,8 @@ public class PeerManagerImpl implements PeerManager
 
         if ( peerInfo != null )
         {
-            return new RemotePeerImpl( peerInfo, messenger, commandResponseMessageListener );
+            return new RemotePeerImpl( peerInfo, messenger, commandResponseMessageListener,
+                    createContainerResponseListener );
         }
         return null;
     }

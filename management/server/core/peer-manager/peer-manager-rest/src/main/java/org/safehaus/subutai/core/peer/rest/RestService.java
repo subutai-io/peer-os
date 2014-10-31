@@ -26,13 +26,6 @@ public interface RestService
     @Consumes(MediaType.TEXT_PLAIN)
     public PeerInfo registerPeer( @QueryParam("peer") String peer );
 
-    //    @POST
-    //    @Path("containers")
-    //    @Produces(MediaType.APPLICATION_JSON)
-    //    @Consumes(MediaType.TEXT_PLAIN)
-    //    public String createContainers( String createContainersMsg );
-    //
-
     @GET
     @Path("containers/format")
     @Produces(MediaType.APPLICATION_JSON)
@@ -77,24 +70,35 @@ public interface RestService
                                       @FormParam("criteria") String criteria );
 
     @POST
-    @Path( "container/destroy" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response destroyContainer( @FormParam( "host" ) String host );
+    @Path("container/destroy")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response destroyContainer( @FormParam("host") String host );
 
     @POST
-    @Path( "container/start" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response startContainer( @FormParam( "host" ) String host );
+    @Path("container/start")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response startContainer( @FormParam("host") String host );
 
     @POST
-    @Path( "container/stop" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response stopContainer( @FormParam( "host" ) String host );
+    @Path("container/stop")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response stopContainer( @FormParam("host") String host );
 
     @POST
-    @Path( "container/isconnected" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response isContainerConnected( @FormParam( "host" ) String host );
+    @Path("container/isconnected")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response isContainerConnected( @FormParam("host") String host );
+
+    //    @POST
+    //    @Path( "container/getquota" )
+    //    @Produces( MediaType.APPLICATION_JSON )
+    //    public Response getQuota( @FormParam( "host" ) String host, @FormParam( "host" ) String quota );
+    //
+    //    @POST
+    //    @Path( "container/setquota" )
+    //    @Produces( MediaType.APPLICATION_JSON )
+    //    public Response setQuota( @FormParam( "host" ) String host, @FormParam( "host" ) String quota,
+    //                              @FormParam( "value" ) String value );
 
     @POST
     @Path("execute")

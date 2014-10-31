@@ -12,6 +12,7 @@ import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
@@ -157,7 +158,7 @@ public class EnvironmentsForm
 
     private Window configWindow( final Environment environment )
     {
-        Window window = createWindow( MANAGE_TITLE );
+        Window window = createWindow( "Configure container network properties" );
         window.setContent( genConfigureContainersTable( environment, environment.getContainers() ) );
         return window;
     }
@@ -166,24 +167,42 @@ public class EnvironmentsForm
     private VerticalLayout genConfigureContainersTable( Environment environment, Set<ContainerHost> containers )
     {
         VerticalLayout vl = new VerticalLayout();
+        CheckBox autoHostname = new CheckBox( "Assign auto Hostname" );
+        vl.addComponent( autoHostname );
+        CheckBox autoIP = new CheckBox( "Assign auto IP" );
+        vl.addComponent( autoIP );
 
         Table containersTable = new Table();
         containersTable.addContainerProperty( NAME, String.class, null );
         containersTable.addContainerProperty( "Peer", String.class, null );
-        containersTable.addContainerProperty( "IP", TextField.class, null );
+        containersTable.addContainerProperty( "Hostname", TextField.class, null );
+//        containersTable.addContainerProperty( "IP 1", TextField.class, null );
+        containersTable.addContainerProperty( "IP 2", TextField.class, null );
         containersTable.setPageLength( 10 );
         containersTable.setSelectable( false );
         containersTable.setEnabled( true );
         containersTable.setImmediate( true );
         containersTable.setSizeFull();
 
+
+        int ipInt = 10;
         for ( ContainerHost container : containers )
         {
-            TextField field = new TextField();
-            field.setWidth( "200px" );
-            field.setValue( "should be ip" );
+
+            TextField fieldHostname = new TextField();
+            fieldHostname.setWidth( "120px" );
+            fieldHostname.setValue( container.getAgent().getHostname() );
+
+            /*TextField fieldIp = new TextField();
+            fieldIp.setWidth( "120px" );
+            fieldIp.setValue( container.getAgent().getListIP().get( 0 ) );*/
+
+            TextField fieldIp2 = new TextField();
+            fieldIp2.setWidth( "120px" );
+            fieldIp2.setValue( "192.168.50." + ipInt++ );
+
             containersTable.addItem( new Object[] {
-                    container.getTemplateName(), container.getPeerId().toString(), field
+                    container.getTemplateName(), container.getPeerId().toString(), fieldHostname, /*fieldIp,*/ fieldIp2,
             }, null );
         }
 
@@ -206,7 +225,7 @@ public class EnvironmentsForm
     {
         Window window = new Window();
         window.setCaption( caption );
-        window.setWidth( "800px" );
+        window.setWidth( "900px" );
         window.setHeight( "500px" );
         window.setModal( true );
         window.setClosable( true );

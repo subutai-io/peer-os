@@ -28,7 +28,7 @@ import com.google.gson.reflect.TypeToken;
  */
 public class MessengerDao
 {
-    private static final Logger LOG = LoggerFactory.getLogger( MessengerDao.class.getName() );
+    protected static Logger LOG = LoggerFactory.getLogger( MessengerDao.class.getName() );
     private static final int WIDENING_INTERVAL_SEC = 5;
     private static final int MESSAGE_LIMIT_PER_PEER = 10;
 
@@ -104,7 +104,7 @@ public class MessengerDao
             {
                 ResultSet messagesRs = dbUtil.select(
                         //select messages where
-                        "select envelope, attempts, isSent, createDate from messages where " +
+                        "select envelope, isSent, createDate from messages where " +
                                 //widening interval attempt has passed
                                 "CURRENT_TIMESTAMP() >= dateadd('SECOND', attempts * ?, createDate) and " +
                                 //the message is still not sent
@@ -132,8 +132,7 @@ public class MessengerDao
     {
         try
         {
-            dbUtil.update( "update messages set isSent = true where messageId = ?",
-                    envelope.getMessage().getId() );
+            dbUtil.update( "update messages set isSent = true where messageId = ?", envelope.getMessage().getId() );
         }
         catch ( SQLException e )
         {
@@ -182,8 +181,8 @@ public class MessengerDao
     {
         try
         {
-            ResultSet resultSet = dbUtil.select(
-                    "select envelope, attempts, isSent, createDate from messages where messageId = ?", messageId );
+            ResultSet resultSet =
+                    dbUtil.select( "select envelope, isSent, createDate from messages where messageId = ?", messageId );
             Set<Envelope> envelopes = retrieveEnvelopsFromResultSet( resultSet );
 
             if ( !CollectionUtil.isCollectionEmpty( envelopes ) )
@@ -201,6 +200,9 @@ public class MessengerDao
     }
 
 
+
+
+
     public Set<Envelope> retrieveEnvelopsFromResultSet( ResultSet resultSet )
     {
         Set<Envelope> envelopes = Sets.newHashSet();
@@ -216,7 +218,6 @@ public class MessengerDao
 
                     Envelope envelope = JsonUtil.fromJson( envelopeJson, Envelope.class );
                     envelope.setSent( resultSet.getBoolean( "isSent" ) );
-                    envelope.setAttempts( resultSet.getInt( "attempts" ) );
                     envelope.setCreateDate( resultSet.getTimestamp( "createDate" ) );
 
                     envelopes.add( envelope );

@@ -2,8 +2,8 @@
 
   <reference id="templateManager" availability="mandatory"
              interface="org.safehaus.subutai.core.template.api.TemplateManager" />
-  <reference id="containerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.container.api.container.ContainerManager" />
+  <!--<reference id="containerManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.container.api.container.ContainerManager" />-->
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
@@ -66,7 +66,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="container/attach">
       <action class="org.safehaus.subutai.core.template.cli.AttachAndExecute">
-        <property name="containerManager" ref="containerManager" />
+        <!--<property name="containerManager" ref="containerManager" />-->
         <property name="agentManager" ref="agentManager" />
       </action>
     </command>

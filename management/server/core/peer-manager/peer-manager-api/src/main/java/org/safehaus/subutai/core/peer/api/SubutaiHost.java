@@ -177,6 +177,15 @@ public abstract class SubutaiHost implements Host
     }
 
 
+    public void resetHeartbeat()
+    {
+        if ( lastHeartbeat > 10 * 100 * 6 )
+        {
+            lastHeartbeat -= 10 * 10 * 6;
+        }
+    }
+
+
     @Override
     public boolean isConnected()
     {
@@ -194,7 +203,6 @@ public abstract class SubutaiHost implements Host
     }
 
 
-    @Override
     public long getLastHeartbeat()
     {
         return lastHeartbeat;

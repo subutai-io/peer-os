@@ -13,6 +13,7 @@ import org.safehaus.subutai.common.protocol.CommandStatus;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
@@ -35,15 +36,19 @@ public class RemotePeerImpl implements RemotePeer
 
     protected PeerInfo peerInfo;
     protected Messenger messenger;
+
     private CommandResponseMessageListener commandResponseMessageListener;
+    private CreateContainerResponseListener createContainerResponseListener;
 
 
     public RemotePeerImpl( final PeerInfo peerInfo, final Messenger messenger,
-                           CommandResponseMessageListener commandResponseMessageListener )
+                           CommandResponseMessageListener commandResponseMessageListener,
+                           CreateContainerResponseListener createContainerResponseListener )
     {
         this.peerInfo = peerInfo;
         this.messenger = messenger;
         this.commandResponseMessageListener = commandResponseMessageListener;
+        this.createContainerResponseListener = createContainerResponseListener;
     }
 
 
@@ -96,25 +101,44 @@ public class RemotePeerImpl implements RemotePeer
                                                 final String strategyId, final List<Criteria> criteria )
             throws ContainerCreateException
     {
-        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
-        return remotePeerRestClient
-                .createContainers( creatorPeerId, environmentId, templates, quantity, strategyId, criteria );
+        //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(),
+        // "8181" );
+        //        return remotePeerRestClient
+        //                .createContainers( creatorPeerId, environmentId, templates, quantity, strategyId, criteria );
+        try
+        {
+            //send create request
+            CreateContainerRequest request =
+                    new CreateContainerRequest( creatorPeerId, environmentId, templates, quantity, strategyId,
+                            criteria );
+            Message createContainerMessage = messenger.createMessage( request );
+            messenger.sendMessage( this, createContainerMessage, RecipientType.CONTAINER_CREATE_REQUEST.name(),
+                    Constants.CREATE_CONTAINER_REQUEST_TIMEOUT );
+
+            //wait for response
+            return createContainerResponseListener.waitContainers( request.getRequestId() );
+        }
+        catch ( MessageException e )
+        {
+            LOG.error( "Error in createContainers", e );
+            throw new ContainerCreateException( e.getMessage() );
+        }
     }
 
 
     @Override
-    public boolean startContainer( final ContainerHost containerHost ) throws PeerException
+    public void startContainer( final ContainerHost containerHost ) throws PeerException
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
-        return remotePeerRestClient.startContainer( containerHost );
+        remotePeerRestClient.startContainer( containerHost );
     }
 
 
     @Override
-    public boolean stopContainer( final ContainerHost containerHost ) throws PeerException
+    public void stopContainer( final ContainerHost containerHost ) throws PeerException
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
-        return remotePeerRestClient.stopContainer( containerHost );
+        remotePeerRestClient.stopContainer( containerHost );
     }
 
 
@@ -131,6 +155,25 @@ public class RemotePeerImpl implements RemotePeer
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
         return remotePeerRestClient.isConnected( host );
+    }
+
+
+    @Override
+    public String getQuota( final ContainerHost host, final QuotaEnum quota ) throws PeerException
+    {
+        throw new PeerException( "Operation not allowed.");
+//        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+//        return remotePeerRestClient.getQuota( host, quota );
+    }
+
+
+    @Override
+    public void setQuota( final ContainerHost host, final QuotaEnum quota, final String value ) throws PeerException
+    {
+        throw new PeerException( "Operation not allowed.");
+        //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(),
+        // "8181" );
+        //        remotePeerRestClient.setQuota( host, quota, value );
     }
 
 
@@ -156,7 +199,7 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( commandResult == null )
         {
-            commandResult = new CommandResult( requestBuilder.getCommandId(), null, null, null, CommandStatus.TIMEOUT );
+            commandResult = new CommandResult( null, null, null, CommandStatus.TIMEOUT );
         }
 
         return commandResult;
@@ -178,6 +221,13 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @Override
+    public boolean isLocal()
+    {
+        return false;
+    }
+
+
     private void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback,
                                Semaphore semaphore ) throws CommandException
     {
@@ -190,15 +240,18 @@ public class RemotePeerImpl implements RemotePeer
         {
             throw new CommandException( "Operation not allowed" );
         }
+
+        CommandRequest request = new CommandRequest( requestBuilder, ( ContainerHost ) host );
         //cache callback
         commandResponseMessageListener
-                .addCallback( requestBuilder.getCommandId(), callback, requestBuilder.getTimeout(), semaphore );
+                .addCallback( request.getRequestId(), callback, requestBuilder.getTimeout(), semaphore );
 
         //send command message to remote peer
         try
         {
-            Message message = messenger.createMessage( new CommandRequest( requestBuilder, ( ContainerHost ) host ) );
-            messenger.sendMessage( this, message, CommandRecipientType.COMMAND_REQUEST.name(), 10 );
+            Message message = messenger.createMessage( request );
+            messenger.sendMessage( this, message, RecipientType.COMMAND_REQUEST.name(),
+                    Constants.COMMAND_REQUEST_MESSAGE_TIMEOUT );
         }
         catch ( MessageException e )
         {

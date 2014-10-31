@@ -14,6 +14,7 @@
  *    @copyright 2014 Safehaus.org
  */
 #include "SubutaiContainer.h"
+#include <lxc/lxccontainer.h>
 /**
  *  \details   Default constructor of SubutaiEnvironment class.
  */

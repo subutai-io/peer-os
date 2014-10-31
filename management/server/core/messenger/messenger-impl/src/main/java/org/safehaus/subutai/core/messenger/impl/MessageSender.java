@@ -29,15 +29,16 @@ import com.google.common.collect.Maps;
  */
 public class MessageSender
 {
-    private static final Logger LOG = LoggerFactory.getLogger( MessageSender.class.getName() );
-    private static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
-
-    private final ScheduledExecutorService mainLoopExecutor = Executors.newSingleThreadScheduledExecutor();
+    public static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
     private final PeerManager peerManager;
     private final MessengerDao messengerDao;
     private final MessengerImpl messenger;
-    private ExecutorService restExecutor = Executors.newCachedThreadPool();
+
+    protected static Logger LOG = LoggerFactory.getLogger( MessageSender.class.getName() );
+    protected ScheduledExecutorService mainLoopExecutor = Executors.newSingleThreadScheduledExecutor();
+    protected ExecutorService restExecutor = Executors.newCachedThreadPool();
     protected RestUtil restUtil;
+    protected CompletionService<Boolean> completer = new ExecutorCompletionService<>( restExecutor );
 
 
     public MessageSender( final PeerManager peerManager, final MessengerDao messengerDao,
@@ -80,7 +81,7 @@ public class MessageSender
     }
 
 
-    private void purgeExpiredMessages()
+    protected void purgeExpiredMessages()
     {
         messengerDao.purgeExpiredMessages();
     }
@@ -118,13 +119,12 @@ public class MessageSender
             peerEnvelopes.add( envelope );
         }
 
-        CompletionService<Boolean> completer = new ExecutorCompletionService<>( restExecutor );
 
         //try to send messages in parallel - one thread per peer
         for ( Map.Entry<UUID, Set<Envelope>> envelopsPerPeer : peerEnvelopesMap.entrySet() )
         {
             Peer targetPeer = peerManager.getPeer( envelopsPerPeer.getKey() );
-            if ( peerManager.getLocalPeer().getId().compareTo( targetPeer.getId() ) == 0 )
+            if ( targetPeer.isLocal() )
             {
                 completer.submit( new LocalPeerMessageSender( messenger, messengerDao, envelopsPerPeer.getValue() ) );
             }
@@ -144,9 +144,9 @@ public class MessageSender
                 future.get();
             }
         }
-        catch ( InterruptedException | ExecutionException ignore )
+        catch ( InterruptedException | ExecutionException e )
         {
-            LOG.warn( ignore.getMessage() );
+            LOG.warn( "ignore", e );
         }
     }
 }

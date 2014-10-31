@@ -26,14 +26,19 @@
       <artifactId>container-manager-api</artifactId>
     </dependency>
 
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>command-dispatcher-api</artifactId>
-    </dependency>
+    </dependency>-->
 
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>lxc-quota-manager-api</artifactId>
     </dependency>
 
     <dependency>

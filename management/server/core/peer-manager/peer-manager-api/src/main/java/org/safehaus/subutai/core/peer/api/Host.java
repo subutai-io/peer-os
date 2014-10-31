@@ -41,8 +41,4 @@ public interface Host extends Serializable
     public boolean isConnected();
 
     public long getLastHeartbeat();
-
-    //    public PeerInfo getPeer( UUID peerId ) throws PeerException;
-
-    //    public void updateHeartbeat();
 }
