@@ -51,4 +51,6 @@ public interface Peer
             throws CommandException;
 
     public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException;
+
+    public boolean isLocal();
 }

@@ -329,6 +329,13 @@ public class RemotePeerRestClient implements RemotePeer
 
 
     @Override
+    public boolean isLocal()
+    {
+        return false;
+    }
+
+
+    @Override
     public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
                                                 final List<Template> templates, final int quantity,
                                                 final String strategyId, final List<Criteria> criteria )

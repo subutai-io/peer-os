@@ -9,11 +9,14 @@
 
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <reference id="messenger" availability="mandatory"
+             interface="org.safehaus.subutai.core.messenger.api.Messenger" />
 
   <bean id="monitor" class="org.safehaus.subutai.core.metric.impl.MonitorImpl"
         scope="singleton" activation="eager" destroy-method="destroy">
     <argument ref="dataSource" />
     <argument ref="peerManager" />
+    <argument ref="messenger" />
   </bean>
 
   <service ref="monitor" interface="org.safehaus.subutai.core.metric.api.Monitor" />
