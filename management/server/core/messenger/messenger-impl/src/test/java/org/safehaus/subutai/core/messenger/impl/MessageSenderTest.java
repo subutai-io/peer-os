@@ -116,14 +116,14 @@ public class MessageSenderTest
         when( peerManager.getPeer( TARGET_PEER_ID ) ).thenReturn( peer );
         when( peer.getId() ).thenReturn( TARGET_PEER_ID );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
-        when( localPeer.getId() ).thenReturn( LOCAL_PEER_ID );
+        when( localPeer.isLocal() ).thenReturn( false );
         when( completer.take() ).thenReturn( future );
 
         messageSender.deliverMessages();
 
         verify( completer ).submit( isA( RemotePeerMessageSender.class ) );
 
-        when( peer.getId() ).thenReturn( LOCAL_PEER_ID );
+        when( peer.isLocal() ).thenReturn( true );
 
         messageSender.deliverMessages();
 
