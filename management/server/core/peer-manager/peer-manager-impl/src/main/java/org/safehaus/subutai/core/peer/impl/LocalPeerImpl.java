@@ -535,8 +535,8 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                 if ( callback != null )
                 {
                     callback.onResponse( response,
-                            new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(),
-                                    agentResult.getStdOut(), agentResult.getStdErr(), command.getCommandStatus() ) );
+                            new CommandResult( agentResult.getExitCode(), agentResult.getStdOut(),
+                                    agentResult.getStdErr(), command.getCommandStatus() ) );
                 }
             }
         } );
@@ -545,12 +545,12 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
         if ( agentResult != null )
         {
-            return new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(), agentResult.getStdOut(),
-                    agentResult.getStdErr(), command.getCommandStatus() );
+            return new CommandResult( agentResult.getExitCode(), agentResult.getStdOut(), agentResult.getStdErr(),
+                    command.getCommandStatus() );
         }
         else
         {
-            return new CommandResult( requestBuilder.getCommandId(), null, null, null, CommandStatus.TIMEOUT );
+            return new CommandResult( null, null, null, CommandStatus.TIMEOUT );
         }
     }
 
@@ -573,8 +573,8 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                 if ( callback != null )
                 {
                     callback.onResponse( response,
-                            new CommandResult( requestBuilder.getCommandId(), agentResult.getExitCode(),
-                                    agentResult.getStdOut(), agentResult.getStdErr(), command.getCommandStatus() ) );
+                            new CommandResult( agentResult.getExitCode(), agentResult.getStdOut(),
+                                    agentResult.getStdErr(), command.getCommandStatus() ) );
                 }
             }
         } );
