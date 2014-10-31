@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# ==========================================================================
+# Set of functions that replace lxc-xxx functionality with a mix of utility
+# functions.
+# ==========================================================================
+
+function net_assert_name {
+  local lxc="$1"
+  if [ -n "`echo $lxc | grep '-'`" ]; then
+    msg_error "Arg \"$lxc\" contains illegal dash character."
+    exit 1
+  fi
+}
+
+
