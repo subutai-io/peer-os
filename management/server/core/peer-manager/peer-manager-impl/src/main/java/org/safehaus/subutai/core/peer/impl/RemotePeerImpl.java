@@ -35,11 +35,14 @@ public class RemotePeerImpl implements RemotePeer
 
     protected PeerInfo peerInfo;
     protected Messenger messenger;
+
     private CommandResponseMessageListener commandResponseMessageListener;
+    private CreateContainerResponseListener createContainerResponseListener;
 
 
     public RemotePeerImpl( final PeerInfo peerInfo, final Messenger messenger,
-                           CommandResponseMessageListener commandResponseMessageListener )
+                           CommandResponseMessageListener commandResponseMessageListener,
+                           CreateContainerResponseListener createContainerResponseListener )
     {
         this.peerInfo = peerInfo;
         this.messenger = messenger;
@@ -96,9 +99,28 @@ public class RemotePeerImpl implements RemotePeer
                                                 final String strategyId, final List<Criteria> criteria )
             throws ContainerCreateException
     {
-        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
-        return remotePeerRestClient
-                .createContainers( creatorPeerId, environmentId, templates, quantity, strategyId, criteria );
+        //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(),
+        // "8181" );
+        //        return remotePeerRestClient
+        //                .createContainers( creatorPeerId, environmentId, templates, quantity, strategyId, criteria );
+        try
+        {
+            //send create request
+            CreateContainerRequest request =
+                    new CreateContainerRequest( creatorPeerId, environmentId, templates, quantity, strategyId,
+                            criteria );
+            Message createContainerMessage = messenger.createMessage( request );
+            messenger.sendMessage( this, createContainerMessage, RecipientType.CONTAINER_CREATE_REQUEST.name(),
+                    Constants.CREATE_CONTAINER_REQUEST_TIMEOUT );
+
+            //wait for response
+            return createContainerResponseListener.waitContainers( request.getRequestId() );
+        }
+        catch ( MessageException e )
+        {
+            LOG.error( "Error in createContainers", e );
+            throw new ContainerCreateException( e.getMessage() );
+        }
     }
 
 
@@ -205,7 +227,8 @@ public class RemotePeerImpl implements RemotePeer
         try
         {
             Message message = messenger.createMessage( new CommandRequest( requestBuilder, ( ContainerHost ) host ) );
-            messenger.sendMessage( this, message, CommandRecipientType.COMMAND_REQUEST.name(), 10 );
+            messenger.sendMessage( this, message, RecipientType.COMMAND_REQUEST.name(),
+                    Constants.COMMAND_REQUEST_MESSAGE_TIMEOUT );
         }
         catch ( MessageException e )
         {
