@@ -16,13 +16,13 @@
 
 #include "SubutaiContainerManager.h"
 
-SubutaiContainerManager::SubutaiContainerManager(string lxc_path) : _lxc_path(lxc_path)
+SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger* logger) : _lxc_path(lxc_path), _logger(logger)
 {
     // Check for running containers in case we just started an app
     // after crash
-    findDefinedContainers(lxc_path);
-    findActiveContainers(lxc_path);
-    findAllContainers(lxc_path);
+    findDefinedContainers();
+    findActiveContainers();
+    findAllContainers();
 }
 
 SubutaiContainerManager::~SubutaiContainerManager() 
@@ -42,11 +42,11 @@ bool SubutaiContainerManager::isContainerRunning(string container_name)
     return false;
 }
 
-void SubutaiContainerManager::findDefinedContainers(string lxc_path)
+void SubutaiContainerManager::findDefinedContainers()
 {
     char** names;
     lxc_container** cont;
-    int num = list_defined_containers(lxc_path.c_str(), &names, &cont);
+    int num = list_defined_containers(_lxc_path.c_str(), &names, &cont);
     for (int i = 0; i < num; i++) {
         SubutaiContainer c;
         c.uuid = "";
@@ -55,11 +55,11 @@ void SubutaiContainerManager::findDefinedContainers(string lxc_path)
         _definedContainers.push_back(c);
     }
 }
-void SubutaiContainerManager::findActiveContainers(string lxc_path)
+void SubutaiContainerManager::findActiveContainers()
 {
     char** names;
     lxc_container** cont;
-    int num = list_active_containers(lxc_path.c_str(), &names, &cont);
+    int num = list_active_containers(_lxc_path.c_str(), &names, &cont);
     for (int i = 0; i < num; i++) {
         SubutaiContainer c;
         c.uuid = "";
@@ -68,11 +68,11 @@ void SubutaiContainerManager::findActiveContainers(string lxc_path)
         _activeContainers.push_back(c);
     }
 }
-void SubutaiContainerManager::findAllContainers(string lxc_path)
+void SubutaiContainerManager::findAllContainers()
 {
     char** names;
     lxc_container** cont;
-    int num = list_all_containers(lxc_path.c_str(), &names, &cont);
+    int num = list_all_containers(_lxc_path.c_str(), &names, &cont);
     for (int i = 0; i < num; i++) {
         SubutaiContainer c;
         c.uuid = "";
@@ -90,7 +90,7 @@ SubutaiContainer SubutaiContainerManager::findContainer(string container_name) {
     }
 }
 
-bool SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string program, vector<string> params) {
+string SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string program, vector<string> params) {
     char* _params[params.size() + 2];
     _params[0] = const_cast<char*>(program.c_str());
     vector<string>::iterator it;
@@ -118,7 +118,7 @@ bool SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string program,
         }
     }
     dup2(_stdout, 1);
-    return true;
+    return command_output;
 }
 
 /*
@@ -126,7 +126,48 @@ bool SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string program,
  * 
  */
 void SubutaiContainerManager::CollectInfo() {
+    vector<string> params;
+    params.push_back("-a");
     for (ContainerIterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
-         
+        UpdateNetworkingInfo(&(*it), RunProgram(&(*it), "ipconfig", params));
+    }
+}
+
+/*
+ * \details     Parses output of ifconfig and updates Container
+ */
+void SubutaiContainerManager::UpdateNetworkingInfo(SubutaiContainer* cont, string data) {
+    // Clear previously stored data
+    cont->ip.clear();
+    cont->mac.clear();
+    size_t n = 0;
+    size_t p = 0;
+    vector<string> res;
+    bool nextIsMac = false;
+    bool nextIsIp = false;
+    // Tokenize the data by spaces and extract mac and ip
+    while ((n = data.find_first_of(" ", p)) != string::npos) {
+        if (n - p != 0) {
+            if (nextIsMac) {
+                cont->mac.push_back(data.substr(p, n - p));
+                nextIsMac = false;
+            } else if (nextIsIp) {
+                // On a some systems ifconfig may differ from others by adding
+                // a space after "inet addr:"
+                string bad_part = "addr:";
+                string ip = data.substr(p, n - p);
+                if (ip.substr(0, bad_part.length()).compare(bad_part) == 0) {
+                    ip = data.substr(bad_part.length(), ip.length());
+                } 
+                cont->ip.push_back(ip);
+                nextIsIp = false;
+            }
+            if (data.substr(p, n - p).compare("HWaddr") == 0) {
+                nextIsMac = true;
+            } else if (data.substr(p, n - p).compare("inet") == 0) {
+                nextIsIp = true;
+            }
+        }
+        p = n + 1;
     }
 }

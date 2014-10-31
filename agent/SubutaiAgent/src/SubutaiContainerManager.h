@@ -32,34 +32,40 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "SubutaiLogger.h"
+
 using namespace std;
 
 struct SubutaiContainer {
     string uuid;
     string hostname;
     lxc_container* container;
+    vector<string> ip;
+    vector<string> mac;
 };
 
 typedef std::vector<SubutaiContainer>::iterator ContainerIterator;
 
 class SubutaiContainerManager {
     public:
-        SubutaiContainerManager(string lxc_path);
+        SubutaiContainerManager(string lxc_path, SubutaiLogger* logger);
         ~SubutaiContainerManager();
         void init();
         SubutaiContainer findContainer(string container_name);
-        void findAllContainers(string lxc_path);
-        void findActiveContainers(string lxc_path);
-        void findDefinedContainers(string lxc_path);
+        void findAllContainers();
+        void findActiveContainers();
+        void findDefinedContainers();
         bool isContainerRunning(string container_name);
-        bool RunProgram(SubutaiContainer* cont, string program, vector<string> params);
+        string RunProgram(SubutaiContainer* cont, string program, vector<string> params);
         void CollectInfo();
+        void UpdateNetworkingInfo(SubutaiContainer* cont, string data);
     private:
-        string          _lxc_path;
-        lxc_container*  _current_container;
-        vector<SubutaiContainer> _allContainers;
-        vector<SubutaiContainer> _definedContainers;
-        vector<SubutaiContainer> _activeContainers;
+        string                          _lxc_path;
+        SubutaiLogger*                  _logger;
+        lxc_container*                  _current_container;
+        vector<SubutaiContainer>        _allContainers;
+        vector<SubutaiContainer>        _definedContainers;
+        vector<SubutaiContainer>        _activeContainers;
 };
 
 #endif

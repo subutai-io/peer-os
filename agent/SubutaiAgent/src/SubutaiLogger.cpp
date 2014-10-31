@@ -137,35 +137,35 @@ void SubutaiLogger::writeLog(int level,string log)
             {
                 case 7:
                     log = getLocaltime()+" <DEBUG>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 6:
                     log =getLocaltime()+" <INFO>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 5:
                     log = getLocaltime()+" <NOTICE>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 4:
                     log =getLocaltime()+" <WARNING>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 3:
                     log = getLocaltime()+" <ERROR>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 2:
                     log = getLocaltime()+" <CRITICAL>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 1:
                     log = getLocaltime()+" <ALERT>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 0:
                     log = getLocaltime()+" <EMERGENCY>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
             }
             break;
@@ -174,31 +174,31 @@ void SubutaiLogger::writeLog(int level,string log)
             {
                 case 6:
                     log =getLocaltime()+" <INFO>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 5:
                     log = getLocaltime()+" <NOTICE>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 4:
                     log =getLocaltime()+" <WARNING>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 3:
                     log = getLocaltime()+" <ERROR>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 2:
                     log = getLocaltime()+" <CRITICAL>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 1:
                     log = getLocaltime()+" <ALERT>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 0:
                     log = getLocaltime()+" <EMERGENCY>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
             }
             break;
@@ -207,27 +207,27 @@ void SubutaiLogger::writeLog(int level,string log)
             {
                 case 5:
                     log = getLocaltime()+" <NOTICE>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 4:
                     log =getLocaltime()+" <WARNING>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 3:
                     log = getLocaltime()+" <ERROR>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 2:
                     log = getLocaltime()+" <CRITICAL>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 1:
                     log = getLocaltime()+" <ALERT>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 0:
                     log = getLocaltime()+" <EMERGENCY>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
             }
             break;
@@ -236,23 +236,23 @@ void SubutaiLogger::writeLog(int level,string log)
             {
                 case 4:
                     log =getLocaltime()+" <WARNING>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 3:
                     log = getLocaltime()+" <ERROR>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 2:
                     log = getLocaltime()+" <CRITICAL>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 1:
                     log = getLocaltime()+" <ALERT>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 0:
                     log = getLocaltime()+" <EMERGENCY>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
             }
             break;
@@ -261,19 +261,19 @@ void SubutaiLogger::writeLog(int level,string log)
             {
                 case 3:
                     log = getLocaltime()+" <ERROR>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 2:
                     log = getLocaltime()+" <CRITICAL>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 1:
                     log = getLocaltime()+" <ALERT>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 0:
                     log = getLocaltime()+" <EMERGENCY>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
             }
             break;
@@ -282,15 +282,15 @@ void SubutaiLogger::writeLog(int level,string log)
             {
                 case 2:
                     log = getLocaltime()+" <CRITICAL>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 1:
                     log = getLocaltime()+" <ALERT>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 0:
                     log = getLocaltime()+" <EMERGENCY>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
             }
             break;
@@ -299,11 +299,11 @@ void SubutaiLogger::writeLog(int level,string log)
             {
                 case 1:
                     log = getLocaltime()+" <ALERT>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
                 case 0:
                     log = getLocaltime()+" <EMERGENCY>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
             }
             break;
@@ -312,7 +312,7 @@ void SubutaiLogger::writeLog(int level,string log)
             {
                 case 0:
                     log = getLocaltime()+" <EMERGENCY>"+log + "\n";
-                    fputs(log.c_str(),this->logFile);
+                    fputs(log.c_str(), this->logFile);
                     break;
             }
             break;
