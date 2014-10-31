@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.common.base.Preconditions;
@@ -21,11 +23,11 @@ import com.google.gson.annotations.Expose;
 /**
  * Template represents template entry in registry
  */
-@Entity(name = "Template")
-@NamedQueries({
-        @NamedQuery(name = "Template.getAll", query = "SELECT t FROM Template t")
-})
-@XmlRootElement(name = "")
+@Entity( name = "Template" )
+@NamedQueries( {
+        @NamedQuery( name = "Template.getAll", query = "SELECT t FROM Template t" )
+} )
+@XmlRootElement( name = "" )
 public class Template
 {
 
@@ -71,11 +73,13 @@ public class Template
 
     //children of template, this property is calculated upon need and is null by default (see REST API for calculation)
     @Expose
+    @OneToMany( targetEntity = Template.class )
     private List<Template> children;
 
     //subutai products present only in this template excluding all subutai products present in the whole ancestry
     // lineage above
     @Expose
+    @ElementCollection( targetClass = String.class )
     private Set<String> products;
 
     //template's md5sum hash
@@ -84,6 +88,7 @@ public class Template
 
     //indicates whether this template is in use on any of FAIs connected to Subutai
     @Expose
+    @ElementCollection( targetClass = String.class )
     private Set<String> faisUsingThisTemplate = new HashSet<>();
 
     //indicates where template is generated
@@ -304,22 +309,6 @@ public class Template
         result.setPeerId( peerId );
         return result;
     }
-
-
-    //    public static Template valueOf( String json )
-    //    {
-    //        ObjectMapper mapper = new ObjectMapper(); //Jackson's JSON marshaller
-    //        Template o = null;
-    //        try
-    //        {
-    //            o = mapper.readValue( json, Template.class );
-    //        }
-    //        catch ( IOException e )
-    //        {
-    //            throw new WebApplicationException( e );
-    //        }
-    //        return o;
-    //    }
 
 
     @Override

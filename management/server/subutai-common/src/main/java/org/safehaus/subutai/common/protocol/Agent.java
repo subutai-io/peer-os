@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -32,7 +33,10 @@ public class Agent implements Serializable, Comparable<Agent>
     private UUID uuid;
     private String macAddress;
     private String hostname;
+
+    @ElementCollection( targetClass = String.class )
     private List<String> listIP;
+
     private boolean isLXC;
     private String parentHostName;
     private String transportId;

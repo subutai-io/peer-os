@@ -5,9 +5,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.safehaus.subutai.common.settings.Common;
@@ -27,11 +29,15 @@ public class EnvironmentBlueprint
 
     public static final String QUERY_GET_ALL = "EnvironmentBlueprint.getAll";
 
+    @OneToMany( targetEntity = NodeGroup.class )
     private Set<NodeGroup> nodeGroups;
+
     private String name;
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private boolean linkHosts;
     private boolean exchangeSshKeys;
+
+    @Column( name = "ENV_ID" )
     private UUID id;
 
 
