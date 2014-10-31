@@ -249,7 +249,7 @@ int main(int argc,char *argv[],char *envp[])
             environment.getAgentEnvironmentIdValue(),environment.getAgentIpValue());
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Registration Message:", sendout));
     connection->sendMessage(sendout);
-    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Shared Memory MessageQueue is initializing.."));
+    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Shared Memory MessageQueue is initializing.."));
     message_queue messageQueue
         (open_or_create,        //only create
          "message_queue",       //name
