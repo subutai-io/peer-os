@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.container.ui.executor;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.container.api.ContainerManager;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 
 
 /**
@@ -11,15 +11,17 @@ import org.safehaus.subutai.core.container.api.ContainerManager;
  */
 public class CloneCommandFactory implements AgentCommandFactory
 {
-    private ContainerManager containerManager;
+    //    private ContainerManager containerManager;
+    private LocalPeer localPeer;
     private String hostName;
     private String templateName;
     private UUID envId;
 
 
-    public CloneCommandFactory( ContainerManager containerManager, UUID envId, String hostname, String templateName )
+    public CloneCommandFactory( LocalPeer localPeer, UUID envId, String hostname, String templateName )
     {
-        this.containerManager = containerManager;
+        //        this.containerManager = containerManager;
+        this.localPeer = localPeer;
         this.hostName = hostname;
         this.templateName = templateName;
         this.envId = envId;
@@ -29,6 +31,6 @@ public class CloneCommandFactory implements AgentCommandFactory
     @Override
     public AgentCommand newCommand( String cloneName )
     {
-        return new CloneCommand( containerManager, hostName, templateName, cloneName, envId );
+        return new CloneCommand( localPeer, hostName, templateName, cloneName, envId );
     }
 }

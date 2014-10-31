@@ -8,7 +8,6 @@ import javax.naming.NamingException;
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.ui.clone.Cloner;
 import org.safehaus.subutai.core.container.ui.manage.Manager;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
@@ -34,7 +33,7 @@ public class ContainerComponent extends CustomComponent implements Disposable
     public ContainerComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
 
-        final ContainerManager containerManager = serviceLocator.getService( ContainerManager.class );
+        //        final ContainerManager containerManager = serviceLocator.getService( ContainerManager.class );
         final AgentManager agentManager = serviceLocator.getService( AgentManager.class );
         final QuotaManager quotaManager = serviceLocator.getService( QuotaManager.class );
         final StrategyManager strategyManager = serviceLocator.getService( StrategyManager.class );
@@ -62,8 +61,8 @@ public class ContainerComponent extends CustomComponent implements Disposable
         TabSheet commandsSheet = new TabSheet();
         commandsSheet.setStyleName( Runo.TABSHEET_SMALL );
         commandsSheet.setSizeFull();
-        final Manager manager = new Manager( executorService, agentManager, containerManager, quotaManager );
-        commandsSheet.addTab( new Cloner( containerManager, strategyManager, agentTree ), "Clone" );
+        final Manager manager = new Manager( executorService, agentManager, quotaManager, peerManager );
+        commandsSheet.addTab( new Cloner( peerManager.getLocalPeer(), strategyManager, containerTree ), "Clone" );
         commandsSheet.addTab( manager, MANAGER_TAB_CAPTION );
         commandsSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
@@ -74,7 +73,7 @@ public class ContainerComponent extends CustomComponent implements Disposable
                 String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
                 if ( caption.equals( MANAGER_TAB_CAPTION ) )
                 {
-                    manager.getLxcInfo();
+                    manager.getContainerInfo();
                 }
             }
         } );
