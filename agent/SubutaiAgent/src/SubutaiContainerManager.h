@@ -35,17 +35,9 @@
 #include <map>
 
 #include "SubutaiLogger.h"
+#include "SubutaiContainer.h"
 
 using namespace std;
-
-struct SubutaiContainer {
-    string uuid;
-    string hostname;
-    lxc_container* container;
-    vector<string> ip;
-    vector<string> mac;
-    map<int, string> users;
-};
 
 typedef std::vector<SubutaiContainer>::iterator ContainerIterator;
 
@@ -61,8 +53,11 @@ class SubutaiContainerManager {
         bool isContainerRunning(string container_name);
         string RunProgram(SubutaiContainer* cont, string program, vector<string> params);
         void CollectInfo();
+
         void UpdateNetworkingInfo(SubutaiContainer* cont, string data);
         void UpdateUsersList(SubutaiContainer* cont);
+        void registerAllContainers(SubutaiConnection* connection);
+
     private:
         string                          _lxc_path;
         SubutaiLogger*                  _logger;
