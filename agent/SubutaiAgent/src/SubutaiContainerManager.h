@@ -35,10 +35,9 @@
 using namespace std;
 
 struct SubutaiContainer {
-    string uuid;                        // UUID of container
-    string last_response;               // Last command execution result
-    int id;                             // ID of container
-    lxc_container* container;           
+    string uuid;
+    string hostname;
+    lxc_container* container;
 };
 
 class SubutaiContainerManager {
@@ -47,12 +46,17 @@ class SubutaiContainerManager {
         ~SubutaiContainerManager();
         void init();
         SubutaiContainer findContainer(string container_name);
+        void findAllContainers(string lxc_path);
+        void findActiveContainers(string lxc_path);
+        void findDefinedContainers(string lxc_path);
         bool isContainerRunning(string container_name);
         bool RunProgram(SubutaiContainer* cont, string program, vector<string> params);
     private:
         string          _lxc_path;
         lxc_container*  _current_container;
-        vector<SubutaiContainer> _containers;
+        vector<SubutaiContainer> _allContainers;
+        vector<SubutaiContainer> _definedContainers;
+        vector<SubutaiContainer> _activeContainers;
 };
 
 #endif
