@@ -16,6 +16,7 @@
 
 #include "SubutaiContainerManager.h"
 
+
 SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger* logger) : _lxc_path(lxc_path), _logger(logger)
 {
     // Check for running containers in case we just started an app
@@ -42,42 +43,43 @@ bool SubutaiContainerManager::isContainerRunning(string container_name)
 
 void SubutaiContainerManager::findDefinedContainers()
 {
-    char** names;
-    lxc_container** cont;
-    int num = list_defined_containers(_lxc_path.c_str(), &names, &cont);
-    for (int i = 0; i < num; i++) {
-        SubutaiContainer c;
-        c.uuid = "";
-        c.hostname = names[i];
-        c.container = cont[i];
-        _definedContainers.push_back(c);
-    }
+	char** names;
+	lxc_container** cont;
+	int num = list_defined_containers(_lxc_path.c_str(), &names, &cont);
+	    for (int i = 0; i < num; i++) {
+	        SubutaiContainer c;
+	        c.uuid = "";
+	        c.hostname = names[i];
+	        c.container = cont[i];
+	        _definedContainers.push_back(c);
+	    }
 }
 void SubutaiContainerManager::findActiveContainers()
 {
-    char** names;
-    lxc_container** cont;
-    int num = list_active_containers(_lxc_path.c_str(), &names, &cont);
-    for (int i = 0; i < num; i++) {
-        SubutaiContainer c;
-        c.uuid = "";
-        c.hostname = names[i];
-        c.container = cont[i];
-        _activeContainers.push_back(c);
-    }
+	char** names;
+	lxc_container** cont;
+	int num = list_active_containers(_lxc_path.c_str(), &names, &cont);
+	    for (int i = 0; i < num; i++) {
+	        SubutaiContainer c;
+	        c.uuid = "";
+	        c.hostname = names[i];
+	        c.container = cont[i];
+	        _activeContainers.push_back(c);
+	    }
 }
 void SubutaiContainerManager::findAllContainers()
 {
-    char** names;
-    lxc_container** cont;
-    int num = list_all_containers(_lxc_path.c_str(), &names, &cont);
-    for (int i = 0; i < num; i++) {
-        SubutaiContainer c;
-        c.uuid = "";
-        c.hostname = names[i];
-        c.container = cont[i];
-        _allContainers.push_back(c);
-    }
+	char** names;
+	lxc_container** cont;
+	int num = list_all_containers(_lxc_path.c_str(), &names, &cont);
+	    for (int i = 0; i < num; i++) {
+	        SubutaiContainer c;
+	        c.uuid = "";
+	        c.hostname = names[i];
+	        c.container = cont[i];
+	        _allContainers.push_back(c);
+	    }
+
 }
 
 SubutaiContainer SubutaiContainerManager::findContainer(string container_name) {
@@ -118,6 +120,7 @@ string SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string progra
         }
     }
     dup2(_stdout, 1);
+
     return command_output;
 }
 
