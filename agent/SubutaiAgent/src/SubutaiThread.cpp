@@ -44,7 +44,7 @@ bool SubutaiThread::checkCWD(SubutaiCommand *command)
     if ((chdir(command->getWorkingDirectory().c_str())) < 0)
     {		
         //changing working directory first
-        logger.writeLog(3, logger.setLogData("<SubutaiThread::checkCWD> " " Changing working Directory failed..","pid", toString(getpid()), "CWD", command->getWorkingDirectory()));
+        logger.writeLog(3, logger.setLogData("<SubutaiThread::checkCWD> " " Changing working Directory failed..", "pid", toString(getpid()), "CWD", command->getWorkingDirectory()));
         return false;
     }
     else
@@ -358,12 +358,12 @@ void SubutaiThread::checkAndWrite(message_queue *messageQueue,SubutaiCommand* co
         }
         else if ( outBuffsize >= MaxBuffSize )
         {
-            string divisionOut = this->getoutBuff().substr(MaxBuffSize,(outBuffsize-MaxBuffSize));	//cut the excess string from buffer
-            this->getoutBuff() = this->getoutBuff().substr(0,MaxBuffSize);
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ","Excess_DataSize:",toString(divisionOut.size())));
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ","CuttedDataSize:",toString(outBuffsize)));
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ","Excess_Data:",divisionOut));
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ","CuttedData:",this->getoutBuff()));
+            string divisionOut = this->getoutBuff().substr(MaxBuffSize, (outBuffsize-MaxBuffSize));	//cut the excess string from buffer
+            this->getoutBuff() = this->getoutBuff().substr(0, MaxBuffSize);
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ", "Excess_DataSize:", toString(divisionOut.size())));
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ", "CuttedDataSize:", toString(outBuffsize)));
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ", "Excess_Data:", divisionOut));
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ", "CuttedData:", this->getoutBuff()));
 
             checkAndSend(messageQueue,command);
             this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> checkAndSend method finished"));

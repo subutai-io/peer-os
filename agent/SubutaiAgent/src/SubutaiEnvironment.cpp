@@ -61,15 +61,15 @@ int SubutaiEnvironment::getAgentSettings()
     }
     connectionUrl = doc.child("Settings").child_value("BrokerIP") ;		//reading url
     logLevel = doc.child("Settings").child_value("log_level") ;		//reading loglevel
-    clientPassword = doc.child("Settings").child_value("clientpasswd") ;		//reading cleintpassword
-    connectionPort = doc.child("Settings").child_value("Port");
-    connectionOptions = doc.child("Settings").child_value("reconnect_timeout");
+    clientPassword =            doc.child("Settings").child_value("clientpasswd") ;		//reading cleintpassword
+    connectionPort =            doc.child("Settings").child_value("Port");
+    connectionOptions =         doc.child("Settings").child_value("reconnect_timeout");
 
-    environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","ConnectionUrl: ",connectionUrl));
-    environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","ConnectionPort: ",connectionPort));
-    environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","ConnectionOptions:",connectionOptions));
-    environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","LogLevel:",logLevel));
-    environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Agent.xml is read successfully.."));
+    environmentLogger->writeLog(6, environmentLogger->setLogData("<SubutaiAgent>", "ConnectionUrl: ", connectionUrl));
+    environmentLogger->writeLog(6, environmentLogger->setLogData("<SubutaiAgent>", "ConnectionPort: ", connectionPort));
+    environmentLogger->writeLog(6, environmentLogger->setLogData("<SubutaiAgent>", "ConnectionOptions:", connectionOptions));
+    environmentLogger->writeLog(6, environmentLogger->setLogData("<SubutaiAgent>", "LogLevel:", logLevel));
+    environmentLogger->writeLog(6, environmentLogger->setLogData("<SubutaiAgent>", "Agent.xml is read successfully.."));
     int loglevel;
     stringstream(logLevel) >> loglevel;
     environmentLogger->setLogLevel(loglevel);

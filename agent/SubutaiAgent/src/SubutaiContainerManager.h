@@ -18,8 +18,9 @@
  *  @class     SubutaiContainerManager.h
  *  @details   Manages containers on current host, uses LXC API.
  *  @author    Mikhail Savochkin
+ *  @author    Ozlem Ceren Sahin
  *  @version   1.1.0
- *  @date      Oct 30, 2014
+ *  @date      Oct 31, 2014
  */
 #ifndef __SUBUTAI_CONTAINER_MANAGER_H__
 #define __SUBUTAI_CONTAINER_MANAGER_H__
@@ -31,6 +32,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <map>
 
 #include "SubutaiLogger.h"
 
@@ -42,6 +44,7 @@ struct SubutaiContainer {
     lxc_container* container;
     vector<string> ip;
     vector<string> mac;
+    map<int, string> users;
 };
 
 typedef std::vector<SubutaiContainer>::iterator ContainerIterator;
@@ -59,6 +62,7 @@ class SubutaiContainerManager {
         string RunProgram(SubutaiContainer* cont, string program, vector<string> params);
         void CollectInfo();
         void UpdateNetworkingInfo(SubutaiContainer* cont, string data);
+        void UpdateUsersList(SubutaiContainer* cont);
     private:
         string                          _lxc_path;
         SubutaiLogger*                  _logger;

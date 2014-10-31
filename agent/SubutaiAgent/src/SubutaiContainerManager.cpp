@@ -20,8 +20,6 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger*
 {
     // Check for running containers in case we just started an app
     // after crash
-    findDefinedContainers();
-    findActiveContainers();
     findAllContainers();
 }
 
@@ -90,6 +88,9 @@ SubutaiContainer SubutaiContainerManager::findContainer(string container_name) {
     }
 }
 
+/*
+ * \details     Runs lxc's attach_run_wait function to specified container
+ */
 string SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string program, vector<string> params) {
     char* _params[params.size() + 2];
     _params[0] = const_cast<char*>(program.c_str());
@@ -107,7 +108,6 @@ string SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string progra
     char buffer[1000];
     cont->container->attach_run_wait(_current_container, &opts, program.c_str(), _params);
     fflush(stdout);
-    // TODO: Decide where to keep this command output
     string command_output;
     while (1) {
         ssize_t size = read(fd[0], buffer, 1000);
@@ -135,6 +135,7 @@ void SubutaiContainerManager::CollectInfo() {
 
 /*
  * \details     Parses output of ifconfig and updates Container
+ *              We can move this to some another class where we will collect all usefull common methods
  */
 void SubutaiContainerManager::UpdateNetworkingInfo(SubutaiContainer* cont, string data) {
     // Clear previously stored data
@@ -169,5 +170,37 @@ void SubutaiContainerManager::UpdateNetworkingInfo(SubutaiContainer* cont, strin
             }
         }
         p = n + 1;
+    }
+}
+
+void SubutaiContainerManager::UpdateUsersList(SubutaiContainer* cont) {
+    cont->users.clear();
+    vector<string> params;
+    params.push_back("/etc/passwd");
+    string passwd = RunProgram(cont, "cat", params);
+    size_t n = 0;
+    size_t p = 0;
+    stringstream ss(passwd);
+    string line;
+    while (getline(ss, line, '\n')) {
+        int c = 0;
+        int uid;
+        string uname;
+        while ((n = line.find_first_of(":", p)) != string::npos) {
+            c++;
+            if (n - p != 0) {
+                if (c == 1) {
+                    // This is a username
+                    uname = line.substr(p, n - p);
+                } else if (c == 3) {
+                    // This is a uid
+                    stringstream conv(line.substr(p, n - p));
+                    if (!(conv >> uid)) {
+                        uid = -1; // We failed to convert string to int
+                    }
+                }
+            }
+            cont->users.insert(make_pair(uid, uname));
+        }
     }
 }
