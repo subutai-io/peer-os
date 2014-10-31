@@ -525,6 +525,13 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
+    public boolean isLocal()
+    {
+        return true;
+    }
+
+
+    @Override
     public void clean()
     {
 

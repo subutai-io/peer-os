@@ -15,6 +15,9 @@ import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.messenger.api.Message;
+import org.safehaus.subutai.core.messenger.api.MessageException;
+import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MetricListener;
 import org.safehaus.subutai.core.metric.api.Monitor;
@@ -34,14 +37,16 @@ import com.google.gson.JsonSyntaxException;
 
 /**
  * Implementation of Monitor
- *
- * TODO subscribe to message queue (once implemented) for getting remote alerts
  */
 public class MonitorImpl implements Monitor
 {
+    private static final String ENVIRONMENT_IS_NULL_MSG = "Environment is null";
+    private static final String METRIC_IS_NULL_MSG = "Metric listener is null";
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class.getName() );
     //max length of subscriber id to store in database varchar(100) field
     private static final int MAX_SUBSCRIBER_ID_LEN = 100;
+    //alert timeout in seconds
+    private static final int ALERT_TIMEOUT = 30;
     //set of metric subscribers
     protected Set<MetricListener> metricListeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MetricListener, Boolean>() );
@@ -50,22 +55,26 @@ public class MonitorImpl implements Monitor
 
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
+    protected Messenger messenger;
 
 
-    public MonitorImpl( final DataSource dataSource, PeerManager peerManager ) throws DaoException
+    public MonitorImpl( final DataSource dataSource, PeerManager peerManager, Messenger messenger ) throws DaoException
     {
         Preconditions.checkNotNull( dataSource, "Data source is null" );
         Preconditions.checkNotNull( peerManager, "Peer manager is null" );
+        Preconditions.checkNotNull( messenger, "Messenger is null" );
 
         this.monitorDao = new MonitorDao( dataSource );
         this.peerManager = peerManager;
+        this.messenger = messenger;
+        this.messenger.addMessageListener( new RemoteAlertListener( this ) );
     }
 
 
     @Override
     public Set<ContainerHostMetric> getContainerMetrics( final Environment environment ) throws MonitorException
     {
-        Preconditions.checkNotNull( environment, "Environment is null" );
+        Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
 
         Set<ContainerHostMetric> metrics = new HashSet<>();
         try
@@ -143,8 +152,8 @@ public class MonitorImpl implements Monitor
     public void startMonitoring( final MetricListener metricListener, final Environment environment )
             throws MonitorException
     {
-        Preconditions.checkNotNull( metricListener, "Metric listener is null" );
-        Preconditions.checkNotNull( environment, "Environment is null" );
+        Preconditions.checkNotNull( metricListener, METRIC_IS_NULL_MSG );
+        Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
         //make sure subscriber id is truncated to 100 characters
         String subscriberId = metricListener.getSubscriberId();
         if ( subscriberId.length() > MAX_SUBSCRIBER_ID_LEN )
@@ -168,8 +177,8 @@ public class MonitorImpl implements Monitor
     public void stopMonitoring( final MetricListener metricListener, final Environment environment )
             throws MonitorException
     {
-        Preconditions.checkNotNull( metricListener, "Metric listener is null" );
-        Preconditions.checkNotNull( environment, "Environment is null" );
+        Preconditions.checkNotNull( metricListener, METRIC_IS_NULL_MSG );
+        Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
         //make sure subscriber id is truncated to 100 characters
         String subscriberId = metricListener.getSubscriberId();
         if ( subscriberId.length() > MAX_SUBSCRIBER_ID_LEN )
@@ -213,17 +222,18 @@ public class MonitorImpl implements Monitor
             Peer ownerPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
 
             //if container is "owned" by local peer, alert local peer
-            if ( peerManager.getLocalPeer().getId().compareTo( ownerPeer.getId() ) == 0 )
+            if ( ownerPeer.isLocal() )
             {
                 alertThresholdExcess( containerHostMetric );
             }
             //send metric to owner peer
             else
             {
-                //TODO send alert to ownerPeer once message queue is implemented
+                Message message = messenger.createMessage( containerHostMetric );
+                messenger.sendMessage( ownerPeer, message, RemoteAlertListener.ALERT_RECIPIENT, ALERT_TIMEOUT );
             }
         }
-        catch ( PeerException | RuntimeException e )
+        catch ( PeerException | MessageException | RuntimeException e )
         {
             LOG.error( "Error in alertThresholdExcess", e );
             throw new MonitorException( e );
@@ -233,9 +243,7 @@ public class MonitorImpl implements Monitor
 
     /**
      * This methods is called by REST endpoint when a remote peer sends an alert from one of its hosted containers
-     * belonging to this peer
-     *
-     * TODO call this method once remote alert arrives
+     * belonging to this peer or when local "own" container is under stress
      *
      * @param metric - {@code ContainerHostMetric} metric of the host where thresholds are being exceeded
      */
@@ -288,6 +296,7 @@ public class MonitorImpl implements Monitor
             metricListeners.add( metricListener );
         }
     }
+
 
     @Override
     public void removeMetricListener( MetricListener metricListener )

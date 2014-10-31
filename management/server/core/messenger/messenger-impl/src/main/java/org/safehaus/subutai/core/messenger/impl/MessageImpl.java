@@ -16,7 +16,7 @@ import com.google.common.base.Preconditions;
  */
 public class MessageImpl implements Message
 {
-    private static final int MAX_SENDER_LEN = 50;
+    public static final int MAX_SENDER_LEN = 50;
     private final UUID id;
     private final UUID sourcePeerId;
     private String sender;
@@ -25,6 +25,7 @@ public class MessageImpl implements Message
 
     public MessageImpl( UUID sourcePeerId, Object payload )
     {
+        Preconditions.checkNotNull( sourcePeerId, "Source peer id is null" );
         Preconditions.checkNotNull( payload, "Payload is null" );
 
         this.sourcePeerId = sourcePeerId;
