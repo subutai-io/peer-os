@@ -47,6 +47,7 @@ public class RemotePeerImpl implements RemotePeer
         this.peerInfo = peerInfo;
         this.messenger = messenger;
         this.commandResponseMessageListener = commandResponseMessageListener;
+        this.createContainerResponseListener = createContainerResponseListener;
     }
 
 
