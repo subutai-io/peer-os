@@ -1,6 +1,23 @@
+/**
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ *
+ *    @copyright 2014 Safehaus.org
+ */
+
 #include "SubutaiContainerManager.h"
 
-SubutaiContainerManager::SubutaiContainerManager(string lxc_path) : _lxc_path(lxc_path)
+
+SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger* logger) : _lxc_path(lxc_path), _logger(logger)
 {
     // Check for running containers in case we just started an app
     // after crash
@@ -11,7 +28,9 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path) : _lxc_path(lx
 
 SubutaiContainerManager::~SubutaiContainerManager() 
 {
+}
 
+void SubutaiContainerManager::init() {
 }
 
 bool SubutaiContainerManager::isContainerRunning(string container_name) 
@@ -62,6 +81,7 @@ void SubutaiContainerManager::findAllContainers()
 	        c.container = cont[i];
 	        _allContainers.push_back(c);
 	    }
+
 }
 
 SubutaiContainer SubutaiContainerManager::findContainer(string container_name) {
@@ -72,7 +92,7 @@ SubutaiContainer SubutaiContainerManager::findContainer(string container_name) {
     }
 }
 
-bool SubutaiContainerManager::RunProgram(string program, vector<string> params) {
+string SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string program, vector<string> params) {
     char* _params[params.size() + 2];
     _params[0] = const_cast<char*>(program.c_str());
     vector<string>::iterator it;
@@ -87,8 +107,9 @@ bool SubutaiContainerManager::RunProgram(string program, vector<string> params) 
     int _stdout = dup(1);
     dup2(fd[1], 1);
     char buffer[1000];
-    _current_container->attach_run_wait(_current_container, &opts, program.c_str(), _params);
+    cont->container->attach_run_wait(_current_container, &opts, program.c_str(), _params);
     fflush(stdout);
+    // TODO: Decide where to keep this command output
     string command_output;
     while (1) {
         ssize_t size = read(fd[0], buffer, 1000);
@@ -99,5 +120,57 @@ bool SubutaiContainerManager::RunProgram(string program, vector<string> params) 
         }
     }
     dup2(_stdout, 1);
-    return true;
+
+    return command_output;
+}
+
+/*
+ * \details     Collect info from running containers for heartbeat packets
+ * 
+ */
+void SubutaiContainerManager::CollectInfo() {
+    vector<string> params;
+    params.push_back("-a");
+    for (ContainerIterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
+        UpdateNetworkingInfo(&(*it), RunProgram(&(*it), "ipconfig", params));
+    }
+}
+
+/*
+ * \details     Parses output of ifconfig and updates Container
+ */
+void SubutaiContainerManager::UpdateNetworkingInfo(SubutaiContainer* cont, string data) {
+    // Clear previously stored data
+    cont->ip.clear();
+    cont->mac.clear();
+    size_t n = 0;
+    size_t p = 0;
+    vector<string> res;
+    bool nextIsMac = false;
+    bool nextIsIp = false;
+    // Tokenize the data by spaces and extract mac and ip
+    while ((n = data.find_first_of(" ", p)) != string::npos) {
+        if (n - p != 0) {
+            if (nextIsMac) {
+                cont->mac.push_back(data.substr(p, n - p));
+                nextIsMac = false;
+            } else if (nextIsIp) {
+                // On a some systems ifconfig may differ from others by adding
+                // a space after "inet addr:"
+                string bad_part = "addr:";
+                string ip = data.substr(p, n - p);
+                if (ip.substr(0, bad_part.length()).compare(bad_part) == 0) {
+                    ip = data.substr(bad_part.length(), ip.length());
+                } 
+                cont->ip.push_back(ip);
+                nextIsIp = false;
+            }
+            if (data.substr(p, n - p).compare("HWaddr") == 0) {
+                nextIsMac = true;
+            } else if (data.substr(p, n - p).compare("inet") == 0) {
+                nextIsIp = true;
+            }
+        }
+        p = n + 1;
+    }
 }

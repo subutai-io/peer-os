@@ -42,6 +42,7 @@
 #include "SubutaiLogger.h"
 #include "SubutaiWatch.h"
 #include "SubutaiEnvironment.h"
+#include "SubutaiContainerManager.h"
 
 /**
  *  \details   This method designed for Typically conversion from integer to string.
@@ -188,6 +189,11 @@ int main(int argc,char *argv[],char *envp[])
     environment.getAgentParentHostname();
     environment.getAgentEnvironmentId();
     clientAddress = environment.getAgentUuidValue();
+
+    /*
+     * Starting Container Manager
+     */
+    //SubutaiContainerManager cman("/var/lib/lxc");
 
     /*
      * Opening MQTT Connection
