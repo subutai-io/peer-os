@@ -11,13 +11,15 @@ import org.safehaus.subutai.common.protocol.Template;
  */
 public interface TemplateService
 {
-    public Template createTemplate( Template templateClone );
+    public Template saveTemplate( Template templateClone );
 
     public Template getTemplate( long id );
 
-    public List<Template> getTemplates();
+    public List<Template> getAllTemplates();
 
-    public void deleteTemplate( long id );
+    public void removeTemplate( long id );
+
+    public void removeTemplate( Template template );
 
     public List<Template> getChildTemplates( String parentTemplateName, String lxcArch );
 

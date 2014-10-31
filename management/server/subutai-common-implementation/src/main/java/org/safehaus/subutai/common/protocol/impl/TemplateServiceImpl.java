@@ -38,7 +38,7 @@ public class TemplateServiceImpl implements TemplateService
 
 
     @Override
-    public Template createTemplate( Template Template )
+    public Template saveTemplate( Template Template )
     {
         if ( Template.getTemplateName() == null || "".equals( Template.getTemplateName() ) )
         {
@@ -112,7 +112,7 @@ public class TemplateServiceImpl implements TemplateService
 
 
     @Override
-    public List<Template> getTemplates()
+    public List<Template> getAllTemplates()
     {
         EntityManager entityManager = null;
 
@@ -136,7 +136,7 @@ public class TemplateServiceImpl implements TemplateService
 
 
     @Override
-    public void deleteTemplate( final long id )
+    public void removeTemplate( final long id )
     {
         EntityManager entityManager = null;
         try
@@ -151,6 +151,33 @@ public class TemplateServiceImpl implements TemplateService
         catch ( Exception ex )
         {
             LOGGER.error( "Exception deleting template with id: %d", id );
+            throw new RuntimeException( ex );
+        }
+        finally
+        {
+            if ( entityManager != null )
+            {
+                entityManager.close();
+            }
+        }
+    }
+
+
+    @Override
+    public void removeTemplate( Template template )
+    {
+        EntityManager entityManager = null;
+        try
+        {
+            entityManager = entityManagerFactory.createEntityManager();
+            entityManager.getTransaction().begin();
+            entityManager.remove( template );
+            entityManager.getTransaction().commit();
+            LOGGER.info( String.format( "Template deleted : %s", template.getTemplateName() ) );
+        }
+        catch ( Exception ex )
+        {
+            LOGGER.error( "Exception deleting template : %s", template.getTemplateName() );
             throw new RuntimeException( ex );
         }
         finally
@@ -218,8 +245,8 @@ public class TemplateServiceImpl implements TemplateService
         Template template =
                 new Template( Common.DEFAULT_LXC_ARCH, UUID.randomUUID().toString(), "configPath", "subutaiParent",
                         "gitBranch", "gitUUID", "packageManifest", "md5sum" );
-        createTemplate( template );
-        List<Template> templates = getTemplates();
+        saveTemplate( template );
+        List<Template> templates = getAllTemplates();
         for ( Template template1 : templates )
         {
             LOGGER.warn( "Template name saved in database: " + template1.getTemplateName() );

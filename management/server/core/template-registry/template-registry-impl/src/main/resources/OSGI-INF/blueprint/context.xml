@@ -7,9 +7,12 @@
     <property name="password" value="" />
   </bean>
 
+  <service id="templateDAO" interface="org.safehaus.subutai.common.protocol.api.TemplateService" />
+
   <bean id="templateRegistry" scope="singleton" activation="eager"
         class="org.safehaus.subutai.core.registry.impl.TemplateRegistryImpl">
     <argument ref="dataSource" />
+    <property name="templateDAO" ref="templateDAO" />
   </bean>
 
   <service ref="templateRegistry"
