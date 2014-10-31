@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MetricListener;
 import org.safehaus.subutai.core.metric.api.Monitor;
@@ -52,15 +53,19 @@ public class MonitorImpl implements Monitor
 
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
+    protected Messenger messenger;
 
 
-    public MonitorImpl( final DataSource dataSource, PeerManager peerManager ) throws DaoException
+    public MonitorImpl( final DataSource dataSource, PeerManager peerManager, Messenger messenger ) throws DaoException
     {
         Preconditions.checkNotNull( dataSource, "Data source is null" );
         Preconditions.checkNotNull( peerManager, "Peer manager is null" );
+        Preconditions.checkNotNull( messenger, "Messenger is null" );
 
         this.monitorDao = new MonitorDao( dataSource );
         this.peerManager = peerManager;
+        this.messenger = messenger;
+        this.messenger.addMessageListener( new RemoteAlertListener() );
     }
 
 
