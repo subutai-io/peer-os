@@ -16,7 +16,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
@@ -24,7 +23,7 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
+import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.network.api.NetworkManager;
@@ -37,6 +36,7 @@ import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
 import org.safehaus.subutai.plugin.hadoop.impl.common.HadoopSetupStrategy;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.AddOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.InstallOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.RemoveNodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.UninstallOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.BlockTaskTrackerOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.RestartJobTrackerOperationHandler;
@@ -49,7 +49,6 @@ import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.StopTaskTracke
 import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.UnblockTaskTrackerOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.BlockDataNodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.CheckDecommissionStatusOperationHandler;
-import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.DestroyNodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.ExcludeNodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.IncludeNodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.RestartNameNodeOperationHandler;
@@ -521,7 +520,7 @@ public class HadoopImpl implements Hadoop
         Preconditions.checkArgument( !Strings.isNullOrEmpty( agent.getHostname() ), "Lxc hostname is null or empty" );
 
         AbstractOperationHandler operationHandler =
-                new DestroyNodeOperationHandler( this, hadoopClusterConfig.getClusterName(), agent.getHostname() );
+                new RemoveNodeOperationHandler( this, hadoopClusterConfig.getClusterName(), agent.getHostname() );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -632,11 +631,10 @@ public class HadoopImpl implements Hadoop
 
 
     @Override
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( final HadoopClusterConfig config )
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final HadoopClusterConfig config )
             throws ClusterSetupException
     {
 
-        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint
@@ -666,11 +664,9 @@ public class HadoopImpl implements Hadoop
 
         environmentBlueprint.setNodeGroups( nodeGroups );
 
-        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
-        environmentBuildTask.setPhysicalNodes( convertAgent2Hostname() );
 
 
-        return environmentBuildTask;
+        return environmentBlueprint;
     }
 
 

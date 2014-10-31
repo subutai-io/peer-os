@@ -71,6 +71,7 @@ public interface Hadoop extends ApiBase<HadoopClusterConfig>
     public ClusterSetupStrategy getClusterSetupStrategy( TrackerOperation po, HadoopClusterConfig hadoopClusterConfig,
                                                          Environment environment );
 
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( final HadoopClusterConfig config )
+    public org.safehaus.subutai.common.protocol.EnvironmentBlueprint getDefaultEnvironmentBlueprint(
+            final HadoopClusterConfig config )
             throws ClusterSetupException;
 }

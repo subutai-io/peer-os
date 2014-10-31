@@ -14,8 +14,10 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
@@ -97,21 +99,29 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
             po.addLog( "Lxc containers created successfully" );
 
             //continue installation here
-            installHadoopCluster();
+            installHadoopCluster( environment );
 
             po.addLogDone(
                     String.format( "Cluster '%s' \nInstallation finished", hadoopClusterConfig.getClusterName() ) );
         }
         catch ( EnvironmentBuildException e )
         {
-            destroyLXC( po, "Destroying lxc containers after cluster installation failure.\n" + e.getMessage() );
+            try
+            {
+                hadoopManager.getEnvironmentManager().destroyEnvironment( environment.getId() );
+            }
+            catch ( EnvironmentDestroyException destroyException )
+            {
+                po.addLogFailed( String.format( "Failed to destroy environment %s. \n%s ", environment, destroyException ) );
+                destroyException.printStackTrace();
+            }
         }
 
         return hadoopClusterConfig;
     }
 
 
-    private void installHadoopCluster() throws ClusterSetupException
+    private void installHadoopCluster( Environment environment ) throws ClusterSetupException
     {
 
         po.addLog( "Hadoop installation started" );
@@ -138,31 +148,31 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     }
 
 
-    private void destroyLXC( TrackerOperation po, String log )
-    {
-        //destroy all lxcs also
-        po.addLog( "Destroying lxc containers" );
-        try
-        {
-            for ( Agent agent : hadoopClusterConfig.getAllNodes() )
-            {
-                hadoopManager.getContainerManager().cloneDestroy( agent.getParentHostName(), agent.getHostname() );
-            }
-            po.addLog( "Lxc containers successfully destroyed" );
-        }
-        catch ( LxcDestroyException ex )
-        {
-            po.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
-        }
-        po.addLogFailed( log );
-    }
+    //    private void destroyLXC( TrackerOperation po, String log )
+    //    {
+    //        //destroy all lxcs also
+    //        po.addLog( "Destroying lxc containers" );
+    //        try
+    //        {
+    //            for ( Agent agent : hadoopClusterConfig.getAllNodes() )
+    //            {
+    //                hadoopManager.getContainerManager().cloneDestroy( agent.getParentHostName(), agent.getHostname() );
+    //            }
+    //            po.addLog( "Lxc containers successfully destroyed" );
+    //        }
+    //        catch ( LxcDestroyException ex )
+    //        {
+    //            po.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
+    //        }
+    //        po.addLogFailed( log );
+    //    }
 
 
     private void setMasterNodes() throws ClusterSetupException
     {
         Set<Agent> masterNodes = new HashSet<>();
 
-        for ( EnvironmentContainer environmentContainer : this.environment.getContainers() )
+        for ( ContainerHost environmentContainer : this.environment.getContainers() )
         {
             if ( NodeType.MASTER_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {

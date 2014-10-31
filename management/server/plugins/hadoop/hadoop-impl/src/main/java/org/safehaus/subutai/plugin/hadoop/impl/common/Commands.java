@@ -1,11 +1,14 @@
 package org.safehaus.subutai.plugin.hadoop.impl.common;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 import com.google.common.base.Preconditions;
@@ -19,46 +22,53 @@ import com.google.common.collect.Sets;
 public class Commands
 {
     public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME.toLowerCase();
-    private final CommandRunnerBase commandRunner;
+    private final Environment environment;
 
-
-    public Commands( final CommandRunnerBase commandRunner )
+    public Commands( final Environment environment )
     {
-        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        Preconditions.checkNotNull( environment, "Environment is null" );
 
-        this.commandRunner = commandRunner;
+        this.environment = environment;
     }
 
 
-    public Command getInstallCommand( HadoopClusterConfig hadoopClusterConfig )
-    {
-        return commandRunner.createCommand( "Installing hadoop deb package",
-                new RequestBuilder( "sleep 10;" + "apt-get --force-yes --assume-yes install " + PACKAGE_NAME )
-                        .withTimeout( 180 ), Sets.newHashSet( hadoopClusterConfig.getAllNodes() ) );
-    }
+    //    public Command getInstallCommand( HadoopClusterConfig hadoopClusterConfig )
+    //    {
+    //        return commandRunner.createCommand( "Installing hadoop deb package",
+    //                new RequestBuilder( "sleep 10;" + "apt-get --force-yes --assume-yes install " + PACKAGE_NAME )
+    //                        .withTimeout( 180 ), Sets.newHashSet( hadoopClusterConfig.getAllNodes() ) );
+    //    }
 
 
-    public Command getInstallCommand( Agent agent )
-    {
-        return commandRunner.createCommand( "Installing hadoop deb package",
-                new RequestBuilder( "sleep 10;" + "apt-get --force-yes --assume-yes install " + PACKAGE_NAME )
-                        .withTimeout( 180 ), Sets.newHashSet( agent ) );
-    }
+    //    public Command getInstallCommand( Agent agent )
+    //    {
+    //        return commandRunner.createCommand( "Installing hadoop deb package",
+    //                new RequestBuilder( "sleep 10;" + "apt-get --force-yes --assume-yes install " + PACKAGE_NAME )
+    //                        .withTimeout( 180 ), Sets.newHashSet( agent ) );
+    //    }
 
 
     public Command getClearMastersCommand( HadoopClusterConfig hadoopClusterConfig )
     {
-        return commandRunner.createCommand( "Clear master nodes for NameNode",
-                new RequestBuilder( ". /etc/profile && " + "hadoop-master-slave.sh masters clear" ),
+
+        return ( "Clear master nodes for NameNode",
+        new RequestBuilder( ". /etc/profile && " + "hadoop-master-slave.sh masters clear" ),
                 Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
 
     public Command getClearSlavesCommand( HadoopClusterConfig hadoopClusterConfig )
     {
-        return commandRunner.createCommand( "Clear slave nodes for NameNode and JobTracker",
-                new RequestBuilder( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear" ),
-                Sets.newHashSet( hadoopClusterConfig.getNameNode(), hadoopClusterConfig.getJobTracker() ) );
+        UUID nameNode = hadoopClusterConfig.getNameNode();
+        ContainerHost containerHost = environment.getContainerHostByUUID( nameNode );
+        if ( containerHost != null ) {
+            containerHost.execute( )
+            return commandRunner.createCommand( "Clear slave nodes for NameNode and JobTracker",
+                    new RequestBuilder( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear" ),
+                    Sets.newHashSet( nameNode, hadoopClusterConfig.getJobTracker() ) );
+        }
+        return null;
+
     }
 
 
@@ -116,8 +126,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Set DataNodes for NameNode", new RequestBuilder(
-                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ",
-                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
+                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ",
+                        agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
 
@@ -140,8 +150,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Set TaskTrackers for JobTracker", new RequestBuilder(
-                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ",
-                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
+                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ",
+                        agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
     }
 
 
@@ -149,8 +159,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Remove DataNode from NameNode", new RequestBuilder(
-                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
-                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
+                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
+                        agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
 
@@ -158,8 +168,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Remove TaskTrackers from JobTracker", new RequestBuilder(
-                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
-                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
+                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
+                        agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
     }
 
 
