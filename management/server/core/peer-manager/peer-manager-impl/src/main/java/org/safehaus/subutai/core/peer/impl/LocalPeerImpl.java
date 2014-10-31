@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -86,6 +87,11 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
         if ( result.size() > 0 )
         {
             managementHost = result.get( 0 );
+            managementHost.resetHeartbeat();
+            for ( ResourceHost resourceHost : managementHost.getResourceHosts() )
+            {
+                resourceHost.resetHeartbeat();
+            }
         }
         communicationManager.addListener( this );
     }
@@ -124,6 +130,41 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     public PeerInfo getPeerInfo()
     {
         return peerManager.getLocalPeerInfo();
+    }
+
+
+    @Override
+    public ContainerHost createContainer( final String hostName, final String templateName, final String cloneName,
+                                          final UUID envId ) throws ContainerCreateException
+    {
+        try
+        {
+            Set<Agent> agents = containerManager
+                    .clone( envId, getResourceHostByName( hostName ).getAgent(), templateName,
+                            Sets.newHashSet( cloneName ) );
+
+            if ( agents.size() == 1 )
+            {
+                Agent agent = agents.iterator().next();
+                ResourceHost resourceHost = getResourceHostByName( agent.getParentHostName() );
+                ContainerHost containerHost = new ContainerHost( agent, getId(), envId );
+                containerHost.setParentAgent( resourceHost.getAgent() );
+                containerHost.setCreatorPeerId( getId() );
+                containerHost.setTemplateName( templateName );
+                containerHost.updateHeartbeat();
+                resourceHost.addContainerHost( containerHost );
+                peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
+                return containerHost;
+            }
+            else
+            {
+                throw new ContainerCreateException( "There are more than one created containers." );
+            }
+        }
+        catch ( PeerException e )
+        {
+            throw new ContainerCreateException( e.toString() );
+        }
     }
 
 
@@ -275,7 +316,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public boolean startContainer( final ContainerHost containerHost ) throws PeerException
+    public void startContainer( final ContainerHost containerHost ) throws PeerException
     {
         ResourceHost resourceHost = getManagementHost().getResourceHostByName( containerHost.getParentHostname() );
         try
@@ -284,18 +325,21 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             {
                 containerHost.setState( ContainerState.RUNNING );
             }
-            return true;
         }
         catch ( CommandException e )
         {
             containerHost.setState( ContainerState.UNKNOWN );
             throw new PeerException( String.format( "Could not start LXC container [%s]", e.toString() ) );
         }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Could not stop LXC container [%s]", e.toString() ) );
+        }
     }
 
 
     @Override
-    public boolean stopContainer( final ContainerHost containerHost ) throws PeerException
+    public void stopContainer( final ContainerHost containerHost ) throws PeerException
     {
         ResourceHost resourceHost = getManagementHost().getResourceHostByName( containerHost.getParentHostname() );
         try
@@ -304,11 +348,14 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             {
                 containerHost.setState( ContainerState.STOPPED );
             }
-            return true;
         }
         catch ( CommandException e )
         {
             containerHost.setState( ContainerState.UNKNOWN );
+            throw new PeerException( String.format( "Could not stop LXC container [%s]", e.toString() ) );
+        }
+        catch ( Exception e )
+        {
             throw new PeerException( String.format( "Could not stop LXC container [%s]", e.toString() ) );
         }
     }
@@ -333,6 +380,10 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
         catch ( ContainerDestroyException e )
         {
             throw new PeerException( e.toString() );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Could not stop LXC container [%s]", e.toString() ) );
         }
     }
 
@@ -374,6 +425,20 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     public Set<ResourceHost> getResourceHosts() throws PeerException
     {
         return getManagementHost().getResourceHosts();
+    }
+
+
+    @Override
+    public List<String> getTemplates()
+    {
+        List<Template> templates = templateRegistry.getAllTemplates();
+
+        List<String> result = new ArrayList<String>();
+        for ( Template template : templates )
+        {
+            result.add( template.getTemplateName() );
+        }
+        return result;
     }
 
 
@@ -448,7 +513,6 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
-
         return execute( requestBuilder, host, null );
     }
 
@@ -534,7 +598,6 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     @Override
     public void clean()
     {
-
         if ( managementHost == null || managementHost.getId() == null )
         {
             return;

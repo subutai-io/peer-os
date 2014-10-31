@@ -34,9 +34,9 @@ public interface Peer
                                                 int quantity, String strategyId, List<Criteria> criteria )
             throws ContainerCreateException;
 
-    public boolean startContainer( ContainerHost containerHost ) throws PeerException;
+    public void startContainer( ContainerHost containerHost ) throws PeerException;
 
-    public boolean stopContainer( ContainerHost containerHost ) throws PeerException;
+    public void stopContainer( ContainerHost containerHost ) throws PeerException;
 
     public void destroyContainer( ContainerHost containerHost ) throws PeerException;
 
