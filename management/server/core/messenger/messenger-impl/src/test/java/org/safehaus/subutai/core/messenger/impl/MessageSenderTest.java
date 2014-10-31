@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.messenger.impl;
 import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -31,7 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class MessageSenderTest
 {
     private static final UUID LOCAL_PEER_ID = UUID.randomUUID();
@@ -130,10 +129,10 @@ public class MessageSenderTest
 
         verify( completer ).submit( isA( LocalPeerMessageSender.class ) );
 
-        doThrow( new InterruptedException( ) ).when( completer ).take();
+        doThrow( new InterruptedException() ).when( completer ).take();
 
         messageSender.deliverMessages();
 
-        verify( logger ).warn( anyString() );
+        verify( logger ).warn( anyString(), isA( InterruptedException.class ) );
     }
 }

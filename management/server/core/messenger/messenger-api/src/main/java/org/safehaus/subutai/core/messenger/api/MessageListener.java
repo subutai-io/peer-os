@@ -30,7 +30,10 @@ public abstract class MessageListener
     public abstract void onMessage( Message message );
 
 
-    public String getRecipient() {return recipient;}
+    public String getRecipient()
+    {
+        return recipient;
+    }
 
 
     @Override

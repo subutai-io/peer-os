@@ -144,9 +144,9 @@ public class MessageSender
                 future.get();
             }
         }
-        catch ( InterruptedException | ExecutionException ignore )
+        catch ( InterruptedException | ExecutionException e )
         {
-            LOG.warn( ignore.getMessage() );
+            LOG.warn( "ignore", e );
         }
     }
 }
