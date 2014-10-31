@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.container.ui.common.Buttons;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
@@ -54,7 +53,6 @@ public class Manager extends VerticalLayout
     private final Label indicator;
     private final Button infoBtn;
     private final TreeTable lxcTable;
-    private final ContainerManager containerManager;
     private final PeerManager peerManager;
     private final AgentManager agentManager;
     private final QuotaManager quotaManager;
@@ -132,13 +130,12 @@ public class Manager extends VerticalLayout
                     final String physicalHostname = ( String ) row.getItemProperty( HOST_NAME ).getValue();
                     final ResourceHost resourceHost =
                             peerManager.getLocalPeer().getResourceHostByName( physicalHostname );
-                    if ( resourceHost != null )
+                    if ( resourceHost == null )
                     {
                         return;
                     }
                     if ( action == START_ALL )
                     {
-
                         for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
                         {
                             startContainer( containerHost );
@@ -178,8 +175,8 @@ public class Manager extends VerticalLayout
     };
 
 
-    public Manager( final ExecutorService executorService, final AgentManager agentManager,
-                    ContainerManager containerManager, QuotaManager quotaManager, PeerManager peerManager )
+    public Manager( final ExecutorService executorService, final AgentManager agentManager, QuotaManager quotaManager,
+                    PeerManager peerManager )
     {
 
         this.executorService = executorService;
@@ -188,7 +185,6 @@ public class Manager extends VerticalLayout
         setMargin( true );
 
         this.agentManager = agentManager;
-        this.containerManager = containerManager;
         this.peerManager = peerManager;
 
         lxcTable = createTableTemplate( "Lxc containers", 500 );
@@ -253,8 +249,6 @@ public class Manager extends VerticalLayout
 
     private void destroyContainer( final ContainerHost containerHost )
     {
-        showHideIndicator( true );
-
         final LocalPeer localPeer = peerManager.getLocalPeer();
         if ( containerHost != null )
         {
@@ -262,6 +256,7 @@ public class Manager extends VerticalLayout
             {
                 public void run()
                 {
+                    showHideIndicator( true );
                     try
                     {
                         localPeer.destroyContainer( containerHost );
@@ -278,7 +273,6 @@ public class Manager extends VerticalLayout
                     {
                         show( String.format( "Could not destroy container. Error occurred: (%s)", e.toString() ) );
                     }
-
                     showHideIndicator( false );
                 }
             } );
@@ -288,8 +282,6 @@ public class Manager extends VerticalLayout
 
     private void startContainer( final ContainerHost containerHost )
     {
-        showHideIndicator( true );
-
         final LocalPeer localPeer = peerManager.getLocalPeer();
         if ( containerHost != null )
         {
@@ -297,6 +289,7 @@ public class Manager extends VerticalLayout
             {
                 public void run()
                 {
+                    showHideIndicator( true );
                     try
                     {
                         localPeer.startContainer( containerHost );
@@ -316,7 +309,6 @@ public class Manager extends VerticalLayout
                     {
                         show( String.format( "Could not start container. Error occurred: (%s)", e.toString() ) );
                     }
-
                     showHideIndicator( false );
                 }
             } );
@@ -326,7 +318,6 @@ public class Manager extends VerticalLayout
 
     private void stopContainer( final ContainerHost containerHost )
     {
-        showHideIndicator( true );
 
         final LocalPeer localPeer = peerManager.getLocalPeer();
         if ( containerHost != null )
@@ -335,6 +326,7 @@ public class Manager extends VerticalLayout
             {
                 public void run()
                 {
+                    showHideIndicator( true );
                     try
                     {
                         localPeer.stopContainer( containerHost );

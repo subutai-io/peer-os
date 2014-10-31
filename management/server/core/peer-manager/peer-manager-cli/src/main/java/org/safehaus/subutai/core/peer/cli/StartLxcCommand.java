@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.peer.cli;
 
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Argument;
@@ -37,11 +38,18 @@ public class StartLxcCommand extends OsgiCommandSupport
 
         if ( host == null )
         {
-            System.out.println( "LXC not found." );
+            System.out.println( "Container not found." );
+        }
+        try
+        {
+            localPeer.stopContainer( host );
+            System.out.println( "Container started successfully" );
+        }
+        catch ( PeerException e )
+        {
+            System.out.println( "Could not start container. Error occurred: " + e.toString() );
         }
 
-        boolean result = localPeer.startContainer( host );
-        System.out.println( String.format( "%s", result ? "LXC started successfully" : "Could not start LXC" ) );
         return null;
     }
 }
