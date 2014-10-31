@@ -39,6 +39,8 @@ import com.google.gson.JsonSyntaxException;
  */
 public class MonitorImpl implements Monitor
 {
+    private static final String ENVIRONMENT_IS_NULL_MSG = "Environment is null";
+    private static final String METRIC_IS_NULL_MSG = "Metric listener is null";
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class.getName() );
     //max length of subscriber id to store in database varchar(100) field
     private static final int MAX_SUBSCRIBER_ID_LEN = 100;
@@ -65,7 +67,7 @@ public class MonitorImpl implements Monitor
     @Override
     public Set<ContainerHostMetric> getContainerMetrics( final Environment environment ) throws MonitorException
     {
-        Preconditions.checkNotNull( environment, "Environment is null" );
+        Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
 
         Set<ContainerHostMetric> metrics = new HashSet<>();
         try
@@ -143,8 +145,8 @@ public class MonitorImpl implements Monitor
     public void startMonitoring( final MetricListener metricListener, final Environment environment )
             throws MonitorException
     {
-        Preconditions.checkNotNull( metricListener, "Metric listener is null" );
-        Preconditions.checkNotNull( environment, "Environment is null" );
+        Preconditions.checkNotNull( metricListener, METRIC_IS_NULL_MSG );
+        Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
         //make sure subscriber id is truncated to 100 characters
         String subscriberId = metricListener.getSubscriberId();
         if ( subscriberId.length() > MAX_SUBSCRIBER_ID_LEN )
@@ -168,8 +170,8 @@ public class MonitorImpl implements Monitor
     public void stopMonitoring( final MetricListener metricListener, final Environment environment )
             throws MonitorException
     {
-        Preconditions.checkNotNull( metricListener, "Metric listener is null" );
-        Preconditions.checkNotNull( environment, "Environment is null" );
+        Preconditions.checkNotNull( metricListener, METRIC_IS_NULL_MSG );
+        Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
         //make sure subscriber id is truncated to 100 characters
         String subscriberId = metricListener.getSubscriberId();
         if ( subscriberId.length() > MAX_SUBSCRIBER_ID_LEN )
@@ -288,6 +290,7 @@ public class MonitorImpl implements Monitor
             metricListeners.add( metricListener );
         }
     }
+
 
     @Override
     public void removeMetricListener( MetricListener metricListener )
