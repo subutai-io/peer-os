@@ -33,6 +33,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
@@ -244,6 +245,12 @@ public class Manager extends VerticalLayout
     }
 
 
+    private void show( String msg )
+    {
+        Notification.show( msg );
+    }
+
+
     private void destroyContainer( final ContainerHost containerHost )
     {
         showHideIndicator( true );
@@ -263,16 +270,13 @@ public class Manager extends VerticalLayout
                             @Override
                             public void run()
                             {
-                                Property lxcStatus =
-                                        lxcTable.getItem( containerHost.getHostname() ).getItemProperty( LXC_STATUS );
-                                Label lbl = ( Label ) lxcStatus.getValue();
-                                lbl.setValue( "STOPPED" );
+                                lxcTable.removeItem( containerHost.getHostname() );
                             }
                         } );
                     }
                     catch ( PeerException e )
                     {
-                        e.printStackTrace();
+                        show( String.format( "Could not destroy container. Error occurred: (%s)", e.toString() ) );
                     }
 
                     showHideIndicator( false );
@@ -304,13 +308,13 @@ public class Manager extends VerticalLayout
                                 Property lxcStatus =
                                         lxcTable.getItem( containerHost.getHostname() ).getItemProperty( LXC_STATUS );
                                 Label lbl = ( Label ) lxcStatus.getValue();
-                                lbl.setValue( "STOPPED" );
+                                lbl.setValue( "RUNNING" );
                             }
                         } );
                     }
                     catch ( PeerException e )
                     {
-                        e.printStackTrace();
+                        show( String.format( "Could not start container. Error occurred: (%s)", e.toString() ) );
                     }
 
                     showHideIndicator( false );
@@ -348,7 +352,7 @@ public class Manager extends VerticalLayout
                     }
                     catch ( PeerException e )
                     {
-                        e.printStackTrace();
+                        show( String.format( "Could not stop container. Error occurred: (%s)", e.toString() ) );
                     }
 
                     showHideIndicator( false );
@@ -416,7 +420,7 @@ public class Manager extends VerticalLayout
         }
         catch ( PeerException e )
         {
-            LOG.error( e.toString() );
+            show( String.format( "Could not build container list. Error occurred: (%s)", e.toString() ) );
         }
     }
 
@@ -427,14 +431,13 @@ public class Manager extends VerticalLayout
 
         for ( ResourceHost resourceHost : resourceHosts )
         {
+            final Object parentId = lxcTable.addItem( new Object[] {
+                    resourceHost.getHostname(), new Label(), null, null, null
+            }, resourceHost.getHostname() );
+
             for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
             {
                 boolean emptyTree = true;
-                final Object parentId = lxcTable.addItem( new Object[] {
-                        resourceHost.getHostname(), new Label(), null, null, null
-                }, resourceHost.getHostname() );
-
-
                 Label containerStatus = new Label();
                 Button updateQuota = new Button( "Update" );
                 updateQuota.addStyleName( "default" );

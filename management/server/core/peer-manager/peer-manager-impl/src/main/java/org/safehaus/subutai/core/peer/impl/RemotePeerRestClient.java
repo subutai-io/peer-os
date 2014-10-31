@@ -156,7 +156,8 @@ public class RemotePeerRestClient implements RemotePeer
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             Set<ContainerHost> result = JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHost>>()
-            {}.getType() );
+            {
+            }.getType() );
             return result;
         }
 
@@ -172,30 +173,7 @@ public class RemotePeerRestClient implements RemotePeer
 
 
     @Override
-    public boolean startContainer( final ContainerHost containerHost ) throws PeerException
-    {
-        String path = "peer/container/start";
-
-        WebClient client = createWebClient();
-
-        Form form = new Form();
-        form.set( "host", JsonUtil.toJson( containerHost ) );
-        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
-                                  .accept( MediaType.APPLICATION_JSON ).post( form );
-
-        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-        {
-            return JsonUtil.fromJson( response.readEntity( String.class ), Boolean.class );
-        }
-        else
-        {
-            throw new PeerException( response.getEntity().toString() );
-        }
-    }
-
-
-    @Override
-    public boolean stopContainer( final ContainerHost containerHost ) throws PeerException
+    public void stopContainer( final ContainerHost containerHost ) throws PeerException
     {
         String path = "peer/container/stop";
 
@@ -208,7 +186,30 @@ public class RemotePeerRestClient implements RemotePeer
 
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
-            return JsonUtil.fromJson( response.readEntity( String.class ), Boolean.class );
+            return;
+        }
+        else
+        {
+            throw new PeerException( response.getEntity().toString() );
+        }
+    }
+
+
+    @Override
+    public void startContainer( final ContainerHost containerHost ) throws PeerException
+    {
+        String path = "peer/container/start";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "host", JsonUtil.toJson( containerHost ) );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return;
         }
         else
         {

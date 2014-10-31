@@ -96,48 +96,103 @@ public class RemotePeerImpl implements RemotePeer
                                                 final String strategyId, final List<Criteria> criteria )
             throws ContainerCreateException
     {
-        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
-        return remotePeerRestClient
-                .createContainers( creatorPeerId, environmentId, templates, quantity, strategyId, criteria );
+
+        try
+        {
+            RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
+            return remotePeerRestClient
+                    .createContainers( creatorPeerId, environmentId, templates, quantity, strategyId, criteria );
+        }
+        catch ( ContainerCreateException cce )
+        {
+            throw cce;
+        }
+        catch ( Exception e )
+        {
+            throw new ContainerCreateException( e.toString() );
+        }
     }
 
 
     @Override
-    public boolean startContainer( final ContainerHost containerHost ) throws PeerException
+    public void startContainer( final ContainerHost containerHost ) throws PeerException
     {
-        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
-        return remotePeerRestClient.startContainer( containerHost );
+        try
+        {
+            RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+            remotePeerRestClient.startContainer( containerHost );
+        }
+        catch ( PeerException pe )
+        {
+            throw pe;
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( e.toString() );
+        }
     }
 
 
     @Override
-    public boolean stopContainer( final ContainerHost containerHost ) throws PeerException
+    public void stopContainer( final ContainerHost containerHost ) throws PeerException
     {
-        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
-        return remotePeerRestClient.stopContainer( containerHost );
+        try
+        {
+            RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+            remotePeerRestClient.stopContainer( containerHost );
+        }
+        catch ( PeerException pe )
+        {
+            throw pe;
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( e.toString() );
+        }
     }
 
 
     @Override
     public void destroyContainer( final ContainerHost containerHost ) throws PeerException
     {
-        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
-        remotePeerRestClient.destroyContainer( containerHost );
+        try
+        {
+            RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+            remotePeerRestClient.destroyContainer( containerHost );
+        }
+        catch ( PeerException pe )
+        {
+            throw pe;
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( e.toString() );
+        }
     }
 
 
     @Override
     public boolean isConnected( final Host host ) throws PeerException
     {
-        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
-        return remotePeerRestClient.isConnected( host );
+        try
+        {
+            RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+            return remotePeerRestClient.isConnected( host );
+        }
+        catch ( PeerException pe )
+        {
+            throw pe;
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( e.toString() );
+        }
     }
 
 
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
-
         return execute( requestBuilder, host, null );
     }
 

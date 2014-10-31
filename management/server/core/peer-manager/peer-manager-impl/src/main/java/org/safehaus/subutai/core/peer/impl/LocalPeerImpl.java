@@ -275,7 +275,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public boolean startContainer( final ContainerHost containerHost ) throws PeerException
+    public void startContainer( final ContainerHost containerHost ) throws PeerException
     {
         ResourceHost resourceHost = getManagementHost().getResourceHostByName( containerHost.getParentHostname() );
         try
@@ -284,18 +284,21 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             {
                 containerHost.setState( ContainerState.RUNNING );
             }
-            return true;
         }
         catch ( CommandException e )
         {
             containerHost.setState( ContainerState.UNKNOWN );
             throw new PeerException( String.format( "Could not start LXC container [%s]", e.toString() ) );
         }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Could not stop LXC container [%s]", e.toString() ) );
+        }
     }
 
 
     @Override
-    public boolean stopContainer( final ContainerHost containerHost ) throws PeerException
+    public void stopContainer( final ContainerHost containerHost ) throws PeerException
     {
         ResourceHost resourceHost = getManagementHost().getResourceHostByName( containerHost.getParentHostname() );
         try
@@ -304,11 +307,14 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             {
                 containerHost.setState( ContainerState.STOPPED );
             }
-            return true;
         }
         catch ( CommandException e )
         {
             containerHost.setState( ContainerState.UNKNOWN );
+            throw new PeerException( String.format( "Could not stop LXC container [%s]", e.toString() ) );
+        }
+        catch ( Exception e )
+        {
             throw new PeerException( String.format( "Could not stop LXC container [%s]", e.toString() ) );
         }
     }
@@ -333,6 +339,10 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
         catch ( ContainerDestroyException e )
         {
             throw new PeerException( e.toString() );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( String.format( "Could not stop LXC container [%s]", e.toString() ) );
         }
     }
 
@@ -448,7 +458,6 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
-
         return execute( requestBuilder, host, null );
     }
 
@@ -534,7 +543,6 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     @Override
     public void clean()
     {
-
         if ( managementHost == null || managementHost.getId() == null )
         {
             return;
