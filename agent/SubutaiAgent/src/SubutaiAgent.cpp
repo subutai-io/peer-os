@@ -250,6 +250,7 @@ int main(int argc,char *argv[],char *envp[])
 
     connection->sendMessage(sendout);
 
+
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Shared Memory MessageQueue is initializing.."));
 
     message_queue messageQueue
