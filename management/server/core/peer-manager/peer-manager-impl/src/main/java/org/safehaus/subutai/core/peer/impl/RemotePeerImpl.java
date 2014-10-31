@@ -13,6 +13,7 @@ import org.safehaus.subutai.common.protocol.CommandStatus;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
@@ -154,6 +155,25 @@ public class RemotePeerImpl implements RemotePeer
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
         return remotePeerRestClient.isConnected( host );
+    }
+
+
+    @Override
+    public String getQuota( final ContainerHost host, final QuotaEnum quota ) throws PeerException
+    {
+        throw new PeerException( "Operation not allowed.");
+//        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+//        return remotePeerRestClient.getQuota( host, quota );
+    }
+
+
+    @Override
+    public void setQuota( final ContainerHost host, final QuotaEnum quota, final String value ) throws PeerException
+    {
+        throw new PeerException( "Operation not allowed.");
+        //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(),
+        // "8181" );
+        //        remotePeerRestClient.setQuota( host, quota, value );
     }
 
 

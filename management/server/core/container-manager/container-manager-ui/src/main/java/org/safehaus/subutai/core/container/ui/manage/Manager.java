@@ -427,7 +427,7 @@ public class Manager extends VerticalLayout
                     resourceHost.getHostname(), new Label(), null, null, null
             }, resourceHost.getHostname() );
 
-            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+            for ( final ContainerHost containerHost : resourceHost.getContainerHosts() )
             {
                 boolean emptyTree = true;
                 Label containerStatus = new Label();
@@ -444,45 +444,36 @@ public class Manager extends VerticalLayout
                     containerStatus.setValue( "RUNNING" );
                     LOG.info( "This is quota manager: " + quotaManager.toString() );
 
-                    //                try
-                    //                {
-                    //                    containerMemory = quotaManager.getQuota( lxcHostname,
-                    // QuotaEnum.MEMORY_LIMIT_IN_BYTES,
-                    //                            agentManager.getAgentByHostname( parentHostname ) );
-                    //                    containerCpu = quotaManager.getQuota( lxcHostname, QuotaEnum.CPUSET_CPUS,
-                    //                            agentManager.getAgentByHostname( parentHostname ) );
-                    //                    containerCpuTextField.setValue( containerCpu );
-                    //
-                    //                    memoryQuotaComponent.setValueForMemoryTextField( containerMemory );
-                    //                    updateQuota.addClickListener( new Button.ClickListener()
-                    //                    {
-                    //                        @Override
-                    //                        public void buttonClick( final Button.ClickEvent clickEvent )
-                    //                        {
-                    //                            try
-                    //                            {
-                    //                                String memoryLimit = memoryQuotaComponent.getMemoryLimitValue();
-                    //                                String cpuLimit = containerCpuTextField.getValue().replaceAll(
-                    // "\n", "" );
-                    //
-                    //                                quotaManager.setQuota( lxcHostname,
-                    // QuotaEnum.MEMORY_LIMIT_IN_BYTES, memoryLimit,
-                    //                                        agentManager.getAgentByHostname( parentHostname ) );
-                    //                                quotaManager.setQuota( lxcHostname, QuotaEnum.CPUSET_CPUS,
-                    // cpuLimit,
-                    //                                        agentManager.getAgentByHostname( parentHostname ) );
-                    //                            }
-                    //                            catch ( QuotaException e )
-                    //                            {
-                    //                                LOGGER.error( "Error executing command lxc-cgroup -n:", e );
-                    //                            }
-                    //                        }
-                    //                    } );
-                    //                }
-                    //                catch ( QuotaException e )
-                    //                {
-                    //                    LOGGER.error( "Error executing command lxc-cgroup -n: ", e );
-                    //                }
+                    try
+                    {
+                        containerMemory = containerHost.getQuota( QuotaEnum.MEMORY_LIMIT_IN_BYTES );
+                        containerCpu = containerHost.getQuota( QuotaEnum.CPUSET_CPUS );
+                        containerCpuTextField.setValue( containerCpu );
+
+                        memoryQuotaComponent.setValueForMemoryTextField( containerMemory );
+                        updateQuota.addClickListener( new Button.ClickListener()
+                        {
+                            @Override
+                            public void buttonClick( final Button.ClickEvent clickEvent )
+                            {
+                                try
+                                {
+                                    String memoryLimit = memoryQuotaComponent.getMemoryLimitValue();
+                                    String cpuLimit = containerCpuTextField.getValue().replaceAll( "\n", "" );
+                                    containerHost.setQuota( QuotaEnum.MEMORY_LIMIT_IN_BYTES, memoryLimit );
+                                    containerHost.setQuota( QuotaEnum.CPUSET_CPUS, cpuLimit );
+                                }
+                                catch ( PeerException pe )
+                                {
+                                    show( pe.toString() );
+                                }
+                            }
+                        } );
+                    }
+                    catch ( PeerException pe )
+                    {
+                        show( pe.toString() );
+                    }
                 }
                 else if ( ContainerState.STOPPED.equals( containerHost.getState() ) )
                 {

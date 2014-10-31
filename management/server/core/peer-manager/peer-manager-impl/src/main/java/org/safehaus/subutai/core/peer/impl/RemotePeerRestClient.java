@@ -16,6 +16,7 @@ import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -267,6 +268,55 @@ public class RemotePeerRestClient implements RemotePeer
         {
             throw new PeerException( response.getEntity().toString() );
         }
+    }
+
+
+    @Override
+    public String getQuota( final ContainerHost host, final QuotaEnum quota ) throws PeerException
+    {
+        throw new PeerException( "Operation not allowed.");
+        //        String path = "peer/container/getquota";
+        //
+        //
+        //        WebClient client = createWebClient();
+        //
+        //        Form form = new Form();
+        //        form.set( "host", JsonUtil.toJson( host ) );
+        //        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+        //                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+        //
+        //        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        //        {
+        //            return response.readEntity( String.class );
+        //        }
+        //        else
+        //        {
+        //            throw new PeerException( response.getEntity().toString() );
+        //        }
+    }
+
+
+    @Override
+    public void setQuota( final ContainerHost host, final QuotaEnum quota, final String value ) throws PeerException
+    {
+        throw new PeerException( "Operation not allowed.");
+//        String path = "peer/container/setquota";
+//
+//
+//        WebClient client = createWebClient();
+//
+//        Form form = new Form();
+//        form.set( "host", JsonUtil.toJson( host ) );
+//        form.set( "quota", quota );
+//        form.set( "value", value );
+//
+//        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+//                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+//
+//        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+//        {
+//            throw new PeerException( response.getEntity().toString() );
+//        }
     }
 
 
