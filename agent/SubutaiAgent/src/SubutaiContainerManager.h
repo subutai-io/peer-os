@@ -40,6 +40,8 @@ struct SubutaiContainer {
     lxc_container* container;
 };
 
+typedef std::vector<SubutaiContainer>::iterator ContainerIterator;
+
 class SubutaiContainerManager {
     public:
         SubutaiContainerManager(string lxc_path);
@@ -51,6 +53,7 @@ class SubutaiContainerManager {
         void findDefinedContainers(string lxc_path);
         bool isContainerRunning(string container_name);
         bool RunProgram(SubutaiContainer* cont, string program, vector<string> params);
+        void CollectInfo();
     private:
         string          _lxc_path;
         lxc_container*  _current_container;

@@ -16,7 +16,7 @@
 
 #include "SubutaiContainerManager.h"
 
-SubutaiContainerManager::SubutaiContainerManager(string lxc_path)
+SubutaiContainerManager::SubutaiContainerManager(string lxc_path) : _lxc_path(lxc_path)
 {
     // Check for running containers in case we just started an app
     // after crash
@@ -107,6 +107,7 @@ bool SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string program,
     char buffer[1000];
     cont->container->attach_run_wait(_current_container, &opts, program.c_str(), _params);
     fflush(stdout);
+    // TODO: Decide where to keep this command output
     string command_output;
     while (1) {
         ssize_t size = read(fd[0], buffer, 1000);
@@ -118,4 +119,14 @@ bool SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string program,
     }
     dup2(_stdout, 1);
     return true;
+}
+
+/*
+ * \details     Collect info from running containers for heartbeat packets
+ * 
+ */
+void SubutaiContainerManager::CollectInfo() {
+    for (ContainerIterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
+         
+    }
 }
