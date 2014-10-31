@@ -15,6 +15,8 @@ import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfigu
 import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 
+import com.google.common.base.Preconditions;
+
 
 public class NodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
 {
@@ -67,20 +69,20 @@ public class NodeOperationHandler extends AbstractOperationHandler<Elasticsearch
 
         try
         {
-            CommandResult result;
+            CommandResult result = null;
             switch ( operationType )
             {
                 case START:
-                    host.execute( new RequestBuilder( Commands.startCommand ) );
+                    result = host.execute( new RequestBuilder( Commands.startCommand ) );
                     break;
                 case STOP:
-                    host.execute( new RequestBuilder( Commands.stopCommand ) );
+                    result = host.execute( new RequestBuilder( Commands.stopCommand ) );
                     break;
                 case STATUS:
                     result = host.execute( new RequestBuilder( Commands.statusCommand ) );
-                    logStatusResults( trackerOperation, result );
                     break;
             }
+            logStatusResults( trackerOperation, result );
         }
         catch ( CommandException e )
         {
@@ -89,17 +91,18 @@ public class NodeOperationHandler extends AbstractOperationHandler<Elasticsearch
     }
 
 
-    private void logStatusResults( TrackerOperation po, CommandResult result )
+    public static void logStatusResults( TrackerOperation po, CommandResult result )
     {
+        Preconditions.checkNotNull( result );
         StringBuilder log = new StringBuilder();
         String status = "UNKNOWN";
         if ( result.getExitCode() == 0 )
         {
-            status = "Cassandra is running";
+            status = result.getStdOut();
         }
         else if ( result.getExitCode() == 768 )
         {
-            status = "Cassandra is not running";
+            status = "elasticsearch is not running";
         }
         else
         {
