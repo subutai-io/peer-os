@@ -832,6 +832,7 @@
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
+      <!-- CASSANDRA -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>cassandra-plugin-api</artifactId>
@@ -855,6 +856,33 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>cassandra-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ELASTICSEARCH -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>elasticsearch-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>elasticsearch-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>elasticsearch-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>elasticsearch-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>elasticsearch-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -952,31 +980,7 @@
          <version>${project.version}</version>
        </dependency>
 
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>elasticsearch-plugin-api</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>elasticsearch-plugin-impl</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>elasticsearch-plugin-cli</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>elasticsearch-plugin-rest</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>elasticsearch-plugin-ui</artifactId>
-         <version>${project.version}</version>
-       </dependency>
+
 
        <dependency>
          <groupId>${project.groupId}</groupId>

@@ -17,17 +17,16 @@ import com.google.common.base.Strings;
 public class InstallOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
 {
 
-    private final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration;
+    private final ElasticsearchClusterConfiguration config;
 
 
-    public InstallOperationHandler( ElasticsearchImpl manager,
-                                    ElasticsearchClusterConfiguration elasticsearchClusterConfiguration )
+    public InstallOperationHandler( ElasticsearchImpl manager, ElasticsearchClusterConfiguration config )
     {
 
-        super( manager, elasticsearchClusterConfiguration.getClusterName() );
-        this.elasticsearchClusterConfiguration = elasticsearchClusterConfiguration;
+        super( manager, config.getClusterName() );
+        this.config = config;
         trackerOperation = manager.getTracker().createTrackerOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-                String.format( "Setting up %s cluster...", elasticsearchClusterConfiguration.getClusterName() ) );
+                String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 
 
@@ -41,7 +40,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<Elasticsea
     @Override
     public void run()
     {
-        if ( Strings.isNullOrEmpty( elasticsearchClusterConfiguration.getClusterName() ) )
+        if ( Strings.isNullOrEmpty( config.getClusterName() ) )
         {
             trackerOperation.addLogFailed( "Malformed configuration" );
             return;
@@ -61,11 +60,11 @@ public class InstallOperationHandler extends AbstractOperationHandler<Elasticsea
     {
         try
         {
-            Environment env = manager.getEnvironmentManager().buildEnvironment(
-                    manager.getDefaultEnvironmentBlueprint( elasticsearchClusterConfiguration ) );
+            Environment env = manager.getEnvironmentManager()
+                                     .buildEnvironment( manager.getDefaultEnvironmentBlueprint( config ) );
 
             ClusterSetupStrategy clusterSetupStrategy =
-                    manager.getClusterSetupStrategy( env, elasticsearchClusterConfiguration, trackerOperation );
+                    manager.getClusterSetupStrategy( env, config, trackerOperation );
             clusterSetupStrategy.setup();
 
             trackerOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );

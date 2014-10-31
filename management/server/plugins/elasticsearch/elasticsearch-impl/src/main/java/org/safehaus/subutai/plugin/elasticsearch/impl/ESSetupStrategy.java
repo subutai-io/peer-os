@@ -4,21 +4,21 @@ package org.safehaus.subutai.plugin.elasticsearch.impl;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
-public class StandaloneSetupStrategy implements ClusterSetupStrategy
+public class ESSetupStrategy implements ClusterSetupStrategy
 {
 
     private final ElasticsearchClusterConfiguration config;
@@ -27,9 +27,9 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy
     private final Environment environment;
 
 
-    public StandaloneSetupStrategy( final Environment environment,
-                                    final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration,
-                                    TrackerOperation po, ElasticsearchImpl elasticsearchManager )
+    public ESSetupStrategy( final Environment environment,
+                            final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration,
+                            TrackerOperation po, ElasticsearchImpl elasticsearchManager )
     {
         Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( elasticsearchClusterConfiguration, "Cluster config is null" );
@@ -47,7 +47,7 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy
     public ElasticsearchClusterConfiguration setup() throws ClusterSetupException
     {
         if ( Strings.isNullOrEmpty( config.getClusterName() ) ||
-                Strings.isNullOrEmpty( ElasticsearchClusterConfiguration.getTemplateName() ) ||
+                Strings.isNullOrEmpty( config.getTemplateName() ) ||
                 config.getNumberOfNodes() <= 0 )
         {
             throw new ClusterSetupException( "Malformed configuration" );
@@ -65,18 +65,18 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy
                     config.getNumberOfNodes(), environment.getContainers().size() ) );
         }
 
-        Set<Agent> elasticsearhcNodes = new HashSet<Agent>();
-        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
+        Set<UUID> esNodes = new HashSet<>();
+        for ( ContainerHost environmentContainer : environment.getContainers() )
         {
-            elasticsearhcNodes.add( environmentContainer.getAgent() );
+            esNodes.add( environmentContainer.getAgent().getUuid() );
         }
-        config.setNodes( elasticsearhcNodes );
+        config.setNodes( esNodes );
 
-        Iterator nodesItr = elasticsearhcNodes.iterator();
-        Set<Agent> masterNodes = new HashSet<Agent>();
-        while ( nodesItr.hasNext() )
+        Iterator iterator = esNodes.iterator();
+        Set<UUID> masterNodes = new HashSet<>();
+        while ( iterator.hasNext() )
         {
-            masterNodes.add( ( Agent ) nodesItr.next() );
+            masterNodes.add( ( UUID ) iterator.next() );
             if ( masterNodes.size() == config.getNumberOfMasterNodes() )
             {
                 break;
@@ -84,31 +84,20 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy
         }
         config.setMasterNodes( masterNodes );
 
-
-        Set<Agent> dataNodes = new HashSet<Agent>();
-        while ( nodesItr.hasNext() )
+        Set<UUID> dataNodes = new HashSet<>();
+        while ( iterator.hasNext() )
         {
-            Agent temp = ( Agent ) nodesItr.next();
-            if ( !masterNodes.contains( temp ) )
+            masterNodes.add( ( UUID ) iterator.next() );
+            if ( dataNodes.size() == config.getNumberOfDataNodes() )
             {
-                dataNodes.add( temp );
+                break;
             }
         }
-        config.setDataNodes( dataNodes );
-
-
-        //check if node agent is connected
-        for ( Agent node : config.getNodes() )
-        {
-            if ( elasticsearchManager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
-            {
-                throw new ClusterSetupException( String.format( "Node %s is not connected", node.getHostname() ) );
-            }
-        }
+        config.setMasterNodes( dataNodes );
 
         try
         {
-            new ClusterConfiguration( elasticsearchManager, po ).configureCluster( config );
+            new ClusterConfiguration( elasticsearchManager, po ).configureCluster( config, environment );
         }
         catch ( ClusterConfigurationException ex )
         {

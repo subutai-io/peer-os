@@ -10,31 +10,44 @@ import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 
 
-public class StartTask implements Runnable
+public class OperationTask implements Runnable
 {
-
-    private final String clusterName, hostname;
+    private final String clusterName;
+    private final UUID agentUUID;
     private final CompleteEvent completeEvent;
     private final Elasticsearch elasticsearch;
     private final Tracker tracker;
+    private OperationType operationType;
 
 
-    public StartTask( Elasticsearch elasticsearch, Tracker tracker, String clusterName, String lxcHostname,
-                      CompleteEvent completeEvent )
+    public OperationTask( Elasticsearch elasticsearch, Tracker tracker, String clusterName, UUID agentUUID,
+                          OperationType operationType, CompleteEvent completeEvent )
     {
         this.elasticsearch = elasticsearch;
         this.tracker = tracker;
         this.clusterName = clusterName;
-        this.hostname = lxcHostname;
+        this.agentUUID = agentUUID;
         this.completeEvent = completeEvent;
+        this.operationType = operationType;
     }
 
 
     @Override
     public void run()
     {
-
-        UUID trackID = elasticsearch.startNode( clusterName, hostname );
+        UUID trackID = null;
+        switch ( operationType )
+        {
+            case START:
+                trackID = elasticsearch.startNode( clusterName, agentUUID );
+                break;
+            case STOP:
+                trackID = elasticsearch.stopNode( clusterName, agentUUID );
+                break;
+            case STATUS:
+                trackID = elasticsearch.checkNode( clusterName, agentUUID );
+                break;
+        }
 
         long start = System.currentTimeMillis();
         while ( !Thread.interrupted() )

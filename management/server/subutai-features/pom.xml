@@ -398,6 +398,8 @@
     </dependency>-->
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+    <!-- CASSANDRA -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>cassandra-plugin-api</artifactId>
@@ -417,6 +419,24 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>cassandra-plugin-ui</artifactId>
+    </dependency>
+
+    <!-- ELASTICSEARCH -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>elasticsearch-plugin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>elasticsearch-plugin-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>elasticsearch-plugin-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>elasticsearch-plugin-ui</artifactId>
     </dependency>
 
     <!--<dependency>
@@ -730,22 +750,7 @@
       <artifactId>pig-plugin-ui</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>elasticsearch-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>elasticsearch-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>elasticsearch-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>elasticsearch-plugin-ui</artifactId>
-    </dependency>
+
 
     <dependency>
       <groupId>${project.groupId}</groupId>
