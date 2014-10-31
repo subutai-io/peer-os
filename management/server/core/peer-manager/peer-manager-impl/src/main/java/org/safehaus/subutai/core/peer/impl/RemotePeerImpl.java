@@ -35,11 +35,14 @@ public class RemotePeerImpl implements RemotePeer
 
     protected PeerInfo peerInfo;
     protected Messenger messenger;
+
     private CommandResponseMessageListener commandResponseMessageListener;
+    private CreateContainerResponseListener createContainerResponseListener;
 
 
     public RemotePeerImpl( final PeerInfo peerInfo, final Messenger messenger,
-                           CommandResponseMessageListener commandResponseMessageListener )
+                           CommandResponseMessageListener commandResponseMessageListener,
+                           CreateContainerResponseListener createContainerResponseListener )
     {
         this.peerInfo = peerInfo;
         this.messenger = messenger;
@@ -96,103 +99,67 @@ public class RemotePeerImpl implements RemotePeer
                                                 final String strategyId, final List<Criteria> criteria )
             throws ContainerCreateException
     {
-
+        //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(),
+        // "8181" );
+        //        return remotePeerRestClient
+        //                .createContainers( creatorPeerId, environmentId, templates, quantity, strategyId, criteria );
         try
         {
-            RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
-            return remotePeerRestClient
-                    .createContainers( creatorPeerId, environmentId, templates, quantity, strategyId, criteria );
+            //send create request
+            CreateContainerRequest request =
+                    new CreateContainerRequest( creatorPeerId, environmentId, templates, quantity, strategyId,
+                            criteria );
+            Message createContainerMessage = messenger.createMessage( request );
+            messenger.sendMessage( this, createContainerMessage, RecipientType.CONTAINER_CREATE_REQUEST.name(),
+                    Constants.CREATE_CONTAINER_REQUEST_TIMEOUT );
+
+            //wait for response
+            return createContainerResponseListener.waitContainers( request.getRequestId() );
         }
-        catch ( ContainerCreateException cce )
+        catch ( MessageException e )
         {
-            throw cce;
-        }
-        catch ( Exception e )
-        {
-            throw new ContainerCreateException( e.toString() );
+            LOG.error( "Error in createContainers", e );
+            throw new ContainerCreateException( e.getMessage() );
         }
     }
 
 
     @Override
-    public void startContainer( final ContainerHost containerHost ) throws PeerException
+    public boolean startContainer( final ContainerHost containerHost ) throws PeerException
     {
-        try
-        {
-            RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
-            remotePeerRestClient.startContainer( containerHost );
-        }
-        catch ( PeerException pe )
-        {
-            throw pe;
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( e.toString() );
-        }
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.startContainer( containerHost );
     }
 
 
     @Override
-    public void stopContainer( final ContainerHost containerHost ) throws PeerException
+    public boolean stopContainer( final ContainerHost containerHost ) throws PeerException
     {
-        try
-        {
-            RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
-            remotePeerRestClient.stopContainer( containerHost );
-        }
-        catch ( PeerException pe )
-        {
-            throw pe;
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( e.toString() );
-        }
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.stopContainer( containerHost );
     }
 
 
     @Override
     public void destroyContainer( final ContainerHost containerHost ) throws PeerException
     {
-        try
-        {
-            RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
-            remotePeerRestClient.destroyContainer( containerHost );
-        }
-        catch ( PeerException pe )
-        {
-            throw pe;
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( e.toString() );
-        }
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+        remotePeerRestClient.destroyContainer( containerHost );
     }
 
 
     @Override
     public boolean isConnected( final Host host ) throws PeerException
     {
-        try
-        {
-            RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
-            return remotePeerRestClient.isConnected( host );
-        }
-        catch ( PeerException pe )
-        {
-            throw pe;
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( e.toString() );
-        }
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.isConnected( host );
     }
 
 
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
+
         return execute( requestBuilder, host, null );
     }
 
@@ -260,7 +227,8 @@ public class RemotePeerImpl implements RemotePeer
         try
         {
             Message message = messenger.createMessage( new CommandRequest( requestBuilder, ( ContainerHost ) host ) );
-            messenger.sendMessage( this, message, CommandRecipientType.COMMAND_REQUEST.name(), 10 );
+            messenger.sendMessage( this, message, RecipientType.COMMAND_REQUEST.name(),
+                    Constants.COMMAND_REQUEST_MESSAGE_TIMEOUT );
         }
         catch ( MessageException e )
         {
