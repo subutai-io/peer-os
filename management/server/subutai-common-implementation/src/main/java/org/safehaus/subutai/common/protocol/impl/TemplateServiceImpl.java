@@ -7,6 +7,7 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.Query;
 
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.TemplateService;
@@ -157,6 +158,56 @@ public class TemplateServiceImpl implements TemplateService
             if ( entityManager != null )
             {
                 entityManager.close();
+            }
+        }
+    }
+
+
+    @Override
+    public List<Template> getChildTemplates( String parentTemplateName, String lxcArch )
+    {
+        EntityManager em = null;
+        try
+        {
+            Template template = this.getTemplateByName( parentTemplateName, lxcArch );
+            return template.getChildren();
+        }
+        catch ( Exception ex )
+        {
+            throw new RuntimeException( ex );
+        }
+        finally
+        {
+            if ( em != null )
+            {
+                em.close();
+            }
+        }
+    }
+
+
+    @Override
+    public Template getTemplateByName( String templateName, String lxcArch )
+    {
+        EntityManager em = null;
+        try
+        {
+            em = entityManagerFactory.createEntityManager();
+            em.getTransaction().begin();
+            Query query = em.createNamedQuery( Template.QUERY_GET_TEMPLATE_BY_NAME_ARCH );
+            query.setParameter( "templateName", templateName );
+            query.setParameter( "lxcArch", lxcArch );
+            return ( Template ) query.getSingleResult();
+        }
+        catch ( Exception ex )
+        {
+            throw new RuntimeException( ex );
+        }
+        finally
+        {
+            if ( em != null )
+            {
+                em.close();
             }
         }
     }

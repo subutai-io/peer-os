@@ -25,7 +25,9 @@ import com.google.gson.annotations.Expose;
  */
 @Entity( name = "Template" )
 @NamedQueries( {
-        @NamedQuery( name = "Template.getAll", query = "SELECT t FROM Template t" )
+        @NamedQuery( name = "Template.getAll", query = "SELECT t FROM Template t" ),
+        @NamedQuery( name = "Tempalte.getTemplateByNameArch",
+                query = "SELECT t FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = :lxcArch" )
 } )
 @XmlRootElement( name = "" )
 public class Template
@@ -35,6 +37,7 @@ public class Template
     public static final String ARCH_I386 = "i386";
 
     public static final String QUERY_GET_ALL = "Template.getAll";
+    public static final String QUERY_GET_TEMPLATE_BY_NAME_ARCH = "Template.getTemplateByNameArch";
 
     //name of template
     @Expose

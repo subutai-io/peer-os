@@ -18,4 +18,9 @@ public interface TemplateService
     public List<Template> getTemplates();
 
     public void deleteTemplate( long id );
+
+    public List<Template> getChildTemplates( String parentTemplateName, String lxcArch );
+
+
+    public Template getTemplateByName( String templateName, String lxcArch );
 }
