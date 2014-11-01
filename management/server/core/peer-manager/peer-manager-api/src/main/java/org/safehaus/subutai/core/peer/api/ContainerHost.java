@@ -121,8 +121,10 @@ public class ContainerHost extends SubutaiHost
         peer.setQuota( this, quota, value );
     }
 
-    public Template getTemplate() throws PeerException {
-        Peer peer = getPeer( this.getPeerId() );
-        return peer.getTemplate(this);
+
+    public Template getTemplate() throws PeerException
+    {
+        Peer peer = getPeer();
+        return peer.getTemplate( this );
     }
 }
