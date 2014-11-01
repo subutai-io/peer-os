@@ -43,20 +43,21 @@ typedef std::vector<SubutaiContainer>::iterator ContainerIterator;
 
 class SubutaiContainerManager {
     public:
-        SubutaiContainerManager(string lxc_path, SubutaiLogger* logger);
+        SubutaiContainerManager(string , SubutaiLogger*);
         ~SubutaiContainerManager();
         void init();
-        SubutaiContainer findContainer(string container_name);
+        SubutaiContainer findContainerByName(string );
+        SubutaiContainer findContainerByUuid(string );
         void findAllContainers();
         void findActiveContainers();
         void findDefinedContainers();
-        bool isContainerRunning(string container_name);
-        string RunProgram(SubutaiContainer* cont, string program, vector<string> params);
+        bool isContainerRunning(string );
+        string RunProgram(SubutaiContainer*,string , vector<string> );
         void CollectInfo();
 
-        void UpdateNetworkingInfo(SubutaiContainer* cont, string data);
-        void UpdateUsersList(SubutaiContainer* cont);
-        void registerAllContainers(SubutaiConnection* connection);
+        void UpdateNetworkingInfo(SubutaiContainer*,string );
+        void UpdateUsersList(SubutaiContainer* );
+        void registerAllContainers(SubutaiConnection* );
 
     private:
         string                          _lxc_path;

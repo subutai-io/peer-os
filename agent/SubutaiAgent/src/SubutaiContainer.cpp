@@ -14,11 +14,11 @@
  *    @copyright 2014 Safehaus.org
  */
 /**
- *  @brief     SubutaiEnvironment.h
- *  @class     SubutaiEnvironment.h
- *  @details   SubutaiEnvironment Class is designed for getting and setting environment variables and special informations.
- *  		   This class's instance can get get useful Agent's specific Environment informations
- *  		   such us IPs, UUID, hostname, macID, parentHostname, etc..
+ *  @brief     SubutaiContainer.cpp
+ *  @class     SubutaiContainer.cpp
+ *  @details   SubutaiContainer Class is designed for getting and setting container variables and special informations.
+ *  		   This class's instance can get get useful container specific informations
+ *  		   such as IPs, UUID, hostname, macID, parentHostname, etc..
  *  @author    Mikhail Savochkin
  *  @author    Ozlem Ceren Sahin
  *  @version   1.1.0

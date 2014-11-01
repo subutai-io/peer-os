@@ -148,6 +148,7 @@ int main(int argc,char *argv[],char *envp[])
     SubutaiEnvironment environment(&logMain);
     string input = "";
     string sendout;
+    SubutaiContainerManager containerManager("/var/lib/", &logMain);
 
     if (!thread.getUserID().checkRootUser())
     {
@@ -249,6 +250,9 @@ int main(int argc,char *argv[],char *envp[])
             environment.getAgentEnvironmentIdValue(),environment.getAgentIpValue());
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Registration Message:", sendout));
     connection->sendMessage(sendout);
+
+    containerManager.registerAllContainers(connection);
+
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Shared Memory MessageQueue is initializing.."));
     message_queue messageQueue
         (open_or_create,        //only create

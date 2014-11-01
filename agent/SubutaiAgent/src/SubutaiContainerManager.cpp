@@ -13,7 +13,15 @@
  *
  *    @copyright 2014 Safehaus.org
  */
-
+/**
+ *  @brief     SubutaiContainerManager.cpp
+ *  @class     SubutaiContainerManager.cpp
+ *  @details   Manages containers on current host, uses LXC API.
+ *  @author    Mikhail Savochkin
+ *  @author    Ozlem Ceren Sahin
+ *  @version   1.1.0
+ *  @date      Oct 31, 2014
+ */
 #include "SubutaiContainerManager.h"
 #include "SubutaiContainer.h"
 
@@ -76,7 +84,7 @@ void SubutaiContainerManager::findAllContainers()
 
 }
 
-SubutaiContainer SubutaiContainerManager::findContainer(string container_name) {
+SubutaiContainer SubutaiContainerManager::findContainerByName(string container_name) {
     for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
         if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
             return (*it);
@@ -84,6 +92,13 @@ SubutaiContainer SubutaiContainerManager::findContainer(string container_name) {
     }
 }
 
+SubutaiContainer SubutaiContainerManager::findContainerByUuid(string uuid) {
+    for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
+        if ((*it).getContainerUuidValue().compare(uuid) == 0) {
+            return (*it);
+        }
+    }
+}
 
 void SubutaiContainerManager::registerAllContainers(SubutaiConnection* connection)
 {
@@ -95,7 +110,7 @@ void SubutaiContainerManager::registerAllContainers(SubutaiConnection* connectio
 /*
  * \details     Runs lxc's attach_run_wait function to specified container
  */
-
+/*
 string SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string program, vector<string> params) {
     char* _params[params.size() + 2];
     _params[0] = const_cast<char*>(program.c_str());
@@ -127,7 +142,7 @@ string SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string progra
 
     return command_output;
 }
-
+*/
 /*
  * \details     Collect info from running containers for heartbeat packets
  * 
