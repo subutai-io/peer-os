@@ -313,4 +313,39 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
+
+    //
+    //    @Override
+    //    public Response getQuota( @FormParam( "host" ) final String host, @FormParam( "host" ) final String quota )
+    //    {
+    //        try
+    //        {
+    //            LocalPeer localPeer = peerManager.getLocalPeer();
+    //            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+    //            String result = localPeer.getQuota( containerHost, QuotaEnum.valueOf( quota ) );
+    //            return Response.ok( result.toString() ).build();
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+    //        }
+    //    }
+    //
+    //
+    //    @Override
+    //    public Response setQuota( @FormParam( "host" ) final String host, @FormParam( "host" ) final String quota,
+    //                              @FormParam( "value" ) final String value )
+    //    {
+    //        try
+    //        {
+    //            LocalPeer localPeer = peerManager.getLocalPeer();
+    //            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+    //            localPeer.setQuota( containerHost, QuotaEnum.valueOf( quota ), value );
+    //            return Response.ok().build();
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+    //        }
+    //    }
 }

@@ -27,6 +27,9 @@ import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -57,10 +60,12 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     private PeerDAO peerDAO;
     private ManagementHost managementHost;
     private CommandRunner commandRunner;
+    private QuotaManager quotaManager;
 
 
     public LocalPeerImpl( PeerManager peerManager, ContainerManager containerManager, TemplateRegistry templateRegistry,
-                          PeerDAO peerDao, CommunicationManager communicationManager, CommandRunner commandRunner )
+                          PeerDAO peerDao, CommunicationManager communicationManager, CommandRunner commandRunner,
+                          QuotaManager quotaManager )
     {
 
         this.peerManager = peerManager;
@@ -69,6 +74,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
         this.peerDAO = peerDao;
         this.communicationManager = communicationManager;
         this.commandRunner = commandRunner;
+        this.quotaManager = quotaManager;
     }
 
 
@@ -359,6 +365,34 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
         else
         {
             return checkHeartbeat( result.getLastHeartbeat() );
+        }
+    }
+
+
+    @Override
+    public String getQuota( ContainerHost host, final QuotaEnum quota ) throws PeerException
+    {
+        try
+        {
+            return quotaManager.getQuota( host.getHostname(), quota, host.getParentAgent() );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e.toString() );
+        }
+    }
+
+
+    @Override
+    public void setQuota( ContainerHost host, final QuotaEnum quota, final String value ) throws PeerException
+    {
+        try
+        {
+            quotaManager.setQuota( host.getHostname(), quota, value, host.getParentAgent() );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e.toString() );
         }
     }
 

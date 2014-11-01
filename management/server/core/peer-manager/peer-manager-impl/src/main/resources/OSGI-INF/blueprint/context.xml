@@ -26,6 +26,8 @@
 
   <reference id="strategyManager" interface="org.safehaus.subutai.core.strategy.api.StrategyManager" />
 
+  <reference id="quotaManager" interface="org.safehaus.subutai.core.lxc.quota.api.QuotaManager" />
+
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
     <property name="agentManager" ref="agentManager" />
@@ -34,6 +36,7 @@
     <property name="templateRegistry" ref="templateRegistry" />
     <property name="communicationManager" ref="communicationManager" />
     <property name="strategyManager" ref="strategyManager" />
+    <property name="quotaManager" ref="quotaManager" />
 
     <argument ref="dataSource" />
     <argument ref="messenger" />

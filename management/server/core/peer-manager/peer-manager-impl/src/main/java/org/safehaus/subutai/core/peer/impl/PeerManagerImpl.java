@@ -15,12 +15,16 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.container.api.ContainerManager;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.message.Common;
+import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
+import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
@@ -45,6 +49,7 @@ public class PeerManagerImpl implements PeerManager
     private PeerDAO peerDAO;
     private ContainerManager containerManager;
     private CommandRunner commandRunner;
+    private QuotaManager quotaManager;
     private TemplateRegistry templateRegistry;
     private DataSource dataSource;
     private CommunicationManager communicationManager;
@@ -89,7 +94,7 @@ public class PeerManagerImpl implements PeerManager
             peerInfo = result.get( 0 );
         }
         localPeer = new LocalPeerImpl( this, containerManager, templateRegistry, peerDAO, communicationManager,
-                commandRunner );
+                commandRunner, quotaManager );
         localPeer.init();
 
         //subscribe to command request messages from remote peer
@@ -144,6 +149,12 @@ public class PeerManagerImpl implements PeerManager
     public void setContainerManager( final ContainerManager containerManager )
     {
         this.containerManager = containerManager;
+    }
+
+
+    public void setQuotaManager( final QuotaManager quotaManager )
+    {
+        this.quotaManager = quotaManager;
     }
 
 

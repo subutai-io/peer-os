@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.container.api.ContainerState;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 
 
 /**
@@ -90,5 +91,19 @@ public class ContainerHost extends SubutaiHost
     {
         lastHeartbeat = System.currentTimeMillis();
         setState( ContainerState.RUNNING );
+    }
+
+
+    public String getQuota( final QuotaEnum quota ) throws PeerException
+    {
+        Peer peer = getPeer( this.getPeerId() );
+        return peer.getQuota( this, quota );
+    }
+
+
+    public void setQuota( final QuotaEnum quota, final String value ) throws PeerException
+    {
+        Peer peer = getPeer( this.getPeerId() );
+        peer.setQuota( this, quota, value );
     }
 }
