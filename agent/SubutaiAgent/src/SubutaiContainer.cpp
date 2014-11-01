@@ -13,15 +13,27 @@
  *
  *    @copyright 2014 Safehaus.org
  */
+/**
+ *  @brief     SubutaiEnvironment.h
+ *  @class     SubutaiEnvironment.h
+ *  @details   SubutaiEnvironment Class is designed for getting and setting environment variables and special informations.
+ *  		   This class's instance can get get useful Agent's specific Environment informations
+ *  		   such us IPs, UUID, hostname, macID, parentHostname, etc..
+ *  @author    Mikhail Savochkin
+ *  @author    Ozlem Ceren Sahin
+ *  @version   1.1.0
+ *  @date      Oct 31, 2014
+ */
 #include "SubutaiContainer.h"
 #include <lxc/lxccontainer.h>
+#include "SubutaiConnection.h"
 /**
  *  \details   Default constructor of SubutaiEnvironment class.
  */
 SubutaiContainer::SubutaiContainer(SubutaiLogger* logger, lxc_container* cont)
 {
-    this->container = cont;
-    this->environmentLogger = logger;
+	this->container = cont;
+    this->containerLogger = logger;
 }
 
 /**
@@ -86,8 +98,8 @@ bool SubutaiContainer::getContainerUuid()
 {
     try
     {
-        vector<string> args = NULL;
-        this->uuid = RunProgram("cat /etc/subutai-agent/uuid.txt", args);
+        vector<string> args;
+        this-> uuid = RunProgram("/bin/cat /etc/subutai-agent/uuid.txt", args);
         if(this->uuid.empty())		//if uuid is null or not reading successfully
         {
             boost::uuids::random_generator gen;
@@ -96,8 +108,8 @@ bool SubutaiContainer::getContainerUuid()
             const std::string tmp = boost::lexical_cast<std::string>(u);
             this->uuid = tmp;
 
-            this-> uuid = RunProgram("echo " + this->uuid + " /etc/subutai-agent/uuid.txt", args);
-            environmentLogger->writeLog(1,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent UUID: ",this->uuid));
+            this-> uuid = RunProgram("/bin/echo " + this->uuid + " /etc/subutai-agent/uuid.txt", args);
+            containerLogger->writeLog(1,containerLogger->setLogData("<SubutaiAgent>","Subutai Agent UUID: ",this->uuid));
             return false;
         }
         return true;
@@ -116,15 +128,14 @@ bool SubutaiContainer::getContainerMacAddress()
 {
     try
     {
-        ifstream file("/sys/class/net/eth0/address");	//opening macaddress
-        getline(file,this->macAddress);
-        file.close();
+        vector<string> args;
+        this-> macAddress = RunProgram("/bin/cat /sys/class/net/eth0/address", args);
         if(this->macAddress.empty())		//if mac is null or not reading successfully
         {
-            environmentLogger->writeLog(3,environmentLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read !!"));
+        	containerLogger->writeLog(3,containerLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read !!"));
             return false;
         }
-        environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent MacID:",this->macAddress));
+        containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","Subutai Agent MacID:",this->macAddress));
         return true;
     }
     catch(const std::exception& error)
@@ -141,9 +152,8 @@ bool SubutaiContainer::getContainerHostname()
 {
     try
     {
-        ifstream file("/etc/hostname");	//opening hostname
-        getline(file,this->hostname);
-        file.close();
+    	vector<string> args;
+    	this-> hostname = RunProgram("/bin/cat /etc/hostname", args);
         if(this->hostname.empty())		//if hostname is null or not reading successfully
         {
             return false;
@@ -164,12 +174,17 @@ bool SubutaiContainer::getContainerParentHostname()
 {
     try
     {
-        if (ifstream("/etc/subutai/lxc-config")) //file exist
+    	vector<string> args;
+    	string config = RunProgram("/bin/cat /etc/subutai/lxc-config", args);
+        if (config.empty()) //file exist
         {
+        	ofstream file("/tmp/subutai/config.txt");
+        	file << config;
+        	file.close();
             boost::property_tree::ptree pt;
-            boost::property_tree::ini_parser::read_ini("/etc/subutai/lxc-config", pt);
+            boost::property_tree::ini_parser::read_ini("/tmp/subutai/config.txt", pt);
             parentHostname =  pt.get<std::string>("Subutai-Agent.subutai_parent_hostname");
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","parentHostname: ",parentHostname));
+            containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","parentHostname: ",parentHostname));
         }
 
         if(!parentHostname.empty())
@@ -178,7 +193,7 @@ bool SubutaiContainer::getContainerParentHostname()
         }
         else
         {
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","parentHostname does not exist!"));
+        	containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","parentHostname does not exist!"));
             return false;
         }
     }
@@ -197,8 +212,16 @@ bool SubutaiContainer::getContainerIpAddress()
 {
     try
     {
+
         ipAddress.clear();
-        FILE * fp = popen("ifconfig", "r");
+
+    	vector<string> args ;
+    	string config = RunProgram("/bin/cat /etc/subutai/lxc-config", args);
+    	ofstream file("/tmp/subutai/ipaddress.txt");
+    	file << config;
+    	file.close();
+
+        FILE * fp = fopen("/tmp/subutai/ipaddress.txt", "r");
         if (fp)
         {
             char *p=NULL, *e; size_t n;
@@ -211,7 +234,6 @@ bool SubutaiContainer::getContainerIpAddress()
                     {
                         *e='\0';
                         ipAddress.push_back(p);
-                        //printf("%s\n", p);
                     }
                 }
             }
@@ -220,7 +242,7 @@ bool SubutaiContainer::getContainerIpAddress()
 
         for(unsigned int i=0; i < ipAddress.size() ; i++)
         {
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent IpAddress:",ipAddress[i]));
+        	containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","Subutai Agent IpAddress:",ipAddress[i]));
         }
         return true;
     }
@@ -228,7 +250,7 @@ bool SubutaiContainer::getContainerIpAddress()
     {
         cout << error.what()<< endl;
     }
-    environmentLogger->writeLog(3,environmentLogger->setLogData("<SubutaiAgent>","IpAddress cannot be read !!"));
+    containerLogger->writeLog(3,containerLogger->setLogData("<SubutaiAgent>","IpAddress cannot be read !!"));
     return false;
 }
 
@@ -246,6 +268,14 @@ string SubutaiContainer::getContainerUuidValue()
 string SubutaiContainer::getContainerHostnameValue()
 {
     return hostname;
+}
+
+/**
+ *  \details   getting lxc container value.
+ */
+lxc_container* SubutaiContainer::getLxcContainerValue()
+{
+	return container;
 }
 
 /**
@@ -272,5 +302,21 @@ vector<string> SubutaiContainer::getContainerIpValue()
     return ipAddress;
 }
 
+void SubutaiContainer::getContainerAllFields()
+{
+	getContainerUuid();
+	getContainerMacAddress();
+	getContainerHostname();
+	getContainerParentHostname();
+	getContainerIpAddress();
+}
 
+void SubutaiContainer::registerContainer(SubutaiConnection* connection)
+{
+	SubutaiResponsePack response;
 
+	string sendout = response.createRegistrationMessage(this-> uuid,this->macAddress,this->hostname,this->parentHostname,NULL,this->ipAddress);
+	containerLogger->writeLog(7,containerLogger->setLogData("<SubutaiAgent>","Registration Message:",sendout));
+
+	connection->sendMessage(sendout);
+}

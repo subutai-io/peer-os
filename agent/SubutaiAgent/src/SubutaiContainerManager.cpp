@@ -15,13 +15,14 @@
  */
 
 #include "SubutaiContainerManager.h"
+#include "SubutaiContainer.h"
 
 
 SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger* logger) : _lxc_path(lxc_path), _logger(logger)
 {
     // Check for running containers in case we just started an app
     // after crash
-    findAllContainers();
+    findActiveContainers();
 }
 
 SubutaiContainerManager::~SubutaiContainerManager() 
@@ -34,7 +35,7 @@ void SubutaiContainerManager::init() {
 bool SubutaiContainerManager::isContainerRunning(string container_name) 
 {
     for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
-        if ((*it).hostname.compare(container_name) == 0) {
+        if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
             return true;
         }
     }
@@ -47,11 +48,8 @@ void SubutaiContainerManager::findDefinedContainers()
 	lxc_container** cont;
 	int num = list_defined_containers(_lxc_path.c_str(), &names, &cont);
 	    for (int i = 0; i < num; i++) {
-	        SubutaiContainer c;
-	        c.uuid = "";
-	        c.hostname = names[i];
-	        c.container = cont[i];
-	        _definedContainers.push_back(c);
+	    	SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
+	    	_definedContainers.push_back(*c);
 	    }
 }
 void SubutaiContainerManager::findActiveContainers()
@@ -60,39 +58,44 @@ void SubutaiContainerManager::findActiveContainers()
 	lxc_container** cont;
 	int num = list_active_containers(_lxc_path.c_str(), &names, &cont);
 	    for (int i = 0; i < num; i++) {
-	        SubutaiContainer c;
-	        c.uuid = "";
-	        c.hostname = names[i];
-	        c.container = cont[i];
-	        _activeContainers.push_back(c);
+	        SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
+	        c->getContainerAllFields();
+	        _activeContainers.push_back(*c);
 	    }
 }
+
 void SubutaiContainerManager::findAllContainers()
 {
 	char** names;
 	lxc_container** cont;
 	int num = list_all_containers(_lxc_path.c_str(), &names, &cont);
 	    for (int i = 0; i < num; i++) {
-	        SubutaiContainer c;
-	        c.uuid = "";
-	        c.hostname = names[i];
-	        c.container = cont[i];
-	        _allContainers.push_back(c);
+	    	SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
+	    	_allContainers.push_back(*c);
 	    }
 
 }
 
 SubutaiContainer SubutaiContainerManager::findContainer(string container_name) {
     for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
-        if ((*it).hostname.compare(container_name) == 0) {
+        if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
             return (*it);
         }
     }
 }
 
+
+void SubutaiContainerManager::registerAllContainers(SubutaiConnection* connection)
+{
+	for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
+	        (*it).registerContainer(connection);
+	}
+}
+
 /*
  * \details     Runs lxc's attach_run_wait function to specified container
  */
+
 string SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string program, vector<string> params) {
     char* _params[params.size() + 2];
     _params[0] = const_cast<char*>(program.c_str());
@@ -108,7 +111,7 @@ string SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string progra
     int _stdout = dup(1);
     dup2(fd[1], 1);
     char buffer[1000];
-    int exit_code = cont->container->attach_run_wait(_current_container, &opts, program.c_str(), _params);
+    int exit_code = cont->getLxcContainerValue()->attach_run_wait(_current_container, &opts, program.c_str(), _params);
     fflush(stdout);
     string command_output = "";
     // TODO: Implement checking of buffer size here
@@ -128,19 +131,20 @@ string SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string progra
 /*
  * \details     Collect info from running containers for heartbeat packets
  * 
- */
+ *//*
 void SubutaiContainerManager::CollectInfo() {
     vector<string> params;
     params.push_back("-a");
     for (ContainerIterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
         UpdateNetworkingInfo(&(*it), RunProgram(&(*it), "/bin/ifconfig", params));
     }
-}
+}*/
 
 /*
  * \details     Parses output of ifconfig and updates Container
  *              We can move this to some another class where we will collect all usefull common methods
  */
+/*
 void SubutaiContainerManager::UpdateNetworkingInfo(SubutaiContainer* cont, string data) {
     // Clear previously stored data
     cont->ip.clear();
@@ -208,3 +212,4 @@ void SubutaiContainerManager::UpdateUsersList(SubutaiContainer* cont) {
         }
     }
 }
+*/
