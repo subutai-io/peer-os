@@ -479,7 +479,7 @@ public class MonitorImplTest
 
 
     @Test
-    public void testGetContainerMetricsWithExceptionw() throws Exception
+    public void testGetContainerMetricsWithException2() throws Exception
     {
         CommandException exception = mock( CommandException.class );
         doThrow( exception ).when( resourceHost ).execute( any( RequestBuilder.class ) );
