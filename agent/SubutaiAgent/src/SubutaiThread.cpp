@@ -713,7 +713,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
  *  		   if the execution successfully done, it returns true.
  *  		   Otherwise it returns false.
  */
-int SubutaiThread::threadFunction(message_queue* messageQueue,SubutaiCommand *command,char* argv[])
+int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *command, char* argv[])
 {
     signal(SIGCHLD, SIG_IGN);		//when the child process done it will be raped by kernel. We do not allowed zombie processes.
     pid = fork();						//creating a child process

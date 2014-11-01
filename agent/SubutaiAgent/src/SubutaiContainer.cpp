@@ -334,9 +334,7 @@ void SubutaiContainer::getContainerAllFields()
 void SubutaiContainer::registerContainer(SubutaiConnection* connection)
 {
 	SubutaiResponsePack response;
-
 	string sendout = response.createRegistrationMessage(this-> uuid,this->macAddress,this->hostname,this->parentHostname,NULL,this->ipAddress);
 	containerLogger->writeLog(7,containerLogger->setLogData("<SubutaiAgent>","Registration Message:",sendout));
-
 	connection->sendMessage(sendout);
 }
