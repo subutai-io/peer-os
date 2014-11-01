@@ -9,6 +9,7 @@ import javax.naming.NamingException;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
@@ -86,7 +87,18 @@ public class MonitorForm extends CustomComponent
                 }
                 else
                 {
-                    addOutput( environment.toString() );
+                    try
+                    {
+                        Set<ContainerHostMetric> metrics = monitor.getContainerMetrics( environment );
+                        for ( ContainerHostMetric metric : metrics )
+                        {
+                            addOutput( metric.toString() );
+                        }
+                    }
+                    catch ( MonitorException e )
+                    {
+                        addOutput( e.getMessage() );
+                    }
                 }
             }
         } );
@@ -116,7 +128,7 @@ public class MonitorForm extends CustomComponent
                 }
                 catch ( MonitorException e )
                 {
-                    e.printStackTrace();
+                    addOutput( e.getMessage() );
                 }
             }
         } );
