@@ -3,9 +3,7 @@ package org.safehaus.subutai.core.peer.impl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.sql.DataSource;
@@ -20,7 +18,6 @@ import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -50,7 +47,6 @@ public class PeerManagerImpl implements PeerManager
     private CommandRunner commandRunner;
     private TemplateRegistry templateRegistry;
     private DataSource dataSource;
-    private Set<PeerContainer> containers = new HashSet<>();
     private CommunicationManager communicationManager;
     private LocalPeer localPeer;
     private StrategyManager strategyManager;
@@ -217,44 +213,6 @@ public class PeerManagerImpl implements PeerManager
     public PeerInfo getPeerInfo( UUID uuid )
     {
         return peerDAO.getInfo( SOURCE_REMOTE_PEER, uuid.toString(), PeerInfo.class );
-    }
-
-
-    @Override
-    public boolean startContainer( final PeerContainer container )
-    {
-        Agent parentAgent = agentManager.getAgentByUUID( container.getParentHostId() );
-        if ( parentAgent == null )
-        {
-            return false;
-        }
-        return containerManager.startLxcOnHost( parentAgent, container.getHostname() );
-    }
-
-
-    @Override
-    public boolean stopContainer( final PeerContainer container )
-    {
-        Agent parentAgent = agentManager.getAgentByUUID( container.getParentHostId() );
-        if ( parentAgent == null )
-        {
-            return false;
-        }
-        return containerManager.stopLxcOnHost( parentAgent, container.getHostname() );
-    }
-
-
-    @Override
-    public boolean isContainerConnected( final PeerContainer container )
-    {
-        return agentManager.getAgentByUUID( container.getAgentId() ) != null;
-    }
-
-
-    @Override
-    public Set<PeerContainer> getContainers()
-    {
-        return containers;
     }
 
 
