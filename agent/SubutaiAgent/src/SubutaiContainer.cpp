@@ -378,5 +378,11 @@ void SubutaiContainer::registerContainer(SubutaiConnection* connection)
 // We need to check if CWD is exist because in LXC API - if cwd does not
 // exist CWD will become root directory
 bool SubutaiContainer::checkCWD(string cwd) {
-    
+    vector<string> params;
+    params.push_back(cwd);
+    ExecutionResult result = RunProgram("/bin/cd", params);    
+    if (result.exit_code == 0) 
+        return true;
+    else
+        return false;
 }
