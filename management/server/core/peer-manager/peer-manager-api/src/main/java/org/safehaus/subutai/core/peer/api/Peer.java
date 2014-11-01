@@ -60,4 +60,6 @@ public interface Peer
     public void setQuota( ContainerHost host, QuotaEnum quota, String value ) throws PeerException;
 
     public Template getTemplate( ContainerHost containerHost ) throws PeerException;
+
+    public boolean isOnline() throws PeerException;
 }

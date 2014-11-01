@@ -105,7 +105,6 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     @Override
     public UUID getId()
     {
-
         return peerManager.getLocalPeerInfo().getId();
     }
 
@@ -593,6 +592,13 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     public Template getTemplate( final ContainerHost containerHost )
     {
         return templateRegistry.getTemplate( containerHost.getTemplateName() );
+    }
+
+
+    @Override
+    public boolean isOnline() throws PeerException
+    {
+        return true;
     }
 }
 
