@@ -405,7 +405,7 @@ int main(int argc,char *argv[],char *envp[])
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command timeout:", toString(command.getTimeout())));
                     // Check if this uuid belongs this FAI or one of child containers
                     bool isLocal = true;
-                    SubutaiContainer* target_container = cman->getContainerByUuid(command.getUuid());
+                    SubutaiContainer* target_container = cman.findContainerById(command.getUuid());
                     if (target_container) {
                         isLocal = false;
                     }    
@@ -435,12 +435,12 @@ int main(int argc,char *argv[],char *envp[])
                     else if (command.getType()=="PS_REQUEST")
                     {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","PS execution operation is starting.."));
-                        SubutaiThread* mypointer = new SubutaiThread;
-                        mypointer->getLogger().setLogLevel(logMain.getLogLevel());
+                        SubutaiThread* subprocess = new SubutaiThread;
+                        subprocess->getLogger().setLogLevel(logMain.getLogLevel());
                         command.setProgram("for i in `ps aux | grep '[s]h -c' | awk -F \" \" '{print $2}'`; do ps aux | grep `pgrep -P $i` | sed '/grep/d' ; done 2> /dev/null");
                         command.setWorkingDirectory("/");
-                        mypointer->threadFunction(&messageQueue,&command,argv);
-                        delete mypointer;
+                        subprocess->threadFunction(&messageQueue,&command,argv);
+                        delete subprocess;
                     }
                     else if (command.getType()=="HEARTBEAT_REQUEST")
                     {
@@ -450,20 +450,20 @@ int main(int argc,char *argv[],char *envp[])
                          * Refresh new agent ip address set for each heartbeat message
                          */
                         if (isLocal) {
-                        environment.getAgentIpAddress();
-                        response.setIps(environment.getAgentIpValue());
-                        response.setHostname(environment.getAgentHostnameValue());
-                        response.setParentHostname(environment.getAgentParentHostnameValue());
-                        response.setMacAddress(environment.getAgentMacAddressValue());
-                        string resp = response.createHeartBeatMessage(environment.getAgentUuidValue(),
-                                command.getRequestSequenceNumber(), environment.getAgentEnvironmentIdValue(),
-                                environment.getAgentMacAddressValue(),environment.getAgentParentHostnameValue(),
-                                environment.getAgentParentHostnameValue(),
-                                command.getSource(),command.getTaskUuid());
-                        connection->sendMessage(resp);
+                            environment.getAgentIpAddress();
+                            response.setIps(environment.getAgentIpValue());
+                            response.setHostname(environment.getAgentHostnameValue());
+                            response.setParentHostname(environment.getAgentParentHostnameValue());
+                            response.setMacAddress(environment.getAgentMacAddressValue());
+                            string resp = response.createHeartBeatMessage(environment.getAgentUuidValue(),
+                                    command.getRequestSequenceNumber(), environment.getAgentEnvironmentIdValue(),
+                                    environment.getAgentMacAddressValue(),environment.getAgentParentHostnameValue(),
+                                    environment.getAgentParentHostnameValue(),
+                                    command.getSource(),command.getTaskUuid());
+                            connection->sendMessage(resp);
+                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","HeartBeat Response:", resp));
                         } else {
                         }
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","HeartBeat Response:", resp));
                     }
                     else if (command.getType() == "TERMINATE_REQUEST")
                     {
@@ -577,12 +577,16 @@ int main(int argc,char *argv[],char *envp[])
                         if (input != "\n" && command.deserialize(input))
                         {
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Execute operation is starting.."));
-                            SubutaiThread* mypointer = new SubutaiThread;
-                            mypointer->getLogger().setLogLevel(logMain.getLogLevel());
+                            SubutaiThread* subprocess = new SubutaiThread;
+                            subprocess->getLogger().setLogLevel(logMain.getLogLevel());
                             command.setUuid(environment.getAgentUuidValue()); /*command uuid should be set to agents uuid */
-                            pidList.push_back(mypointer->threadFunction(&messageQueue, &command, argv));
+                            SubutaiContainer* target_container = cman.findContainerById(command.getUuid());
+                            if (target_container)
+                                pidList.push_back(subprocess->threadFunction(&messageQueue, &command, argv, target_container));
+                            else
+                                pidList.push_back(subprocess->threadFunction(&messageQueue, &command, argv));
                             currentProcess++;
-                            delete mypointer;
+                            delete subprocess;
                         }
                         else
                         {
