@@ -34,7 +34,7 @@
 #include "SubutaiResponsePack.h"
 #include "SubutaiStreamReader.h"
 #include "SubutaiLogger.h"
-#include "SubutaiContainerManager.h"
+#include "SubutaiContainer.h"
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
@@ -49,7 +49,7 @@ class SubutaiThread
 public:
 	SubutaiThread();
 	virtual ~SubutaiThread();
-	int threadFunction(message_queue*,SubutaiCommand*,char*[]);
+	int threadFunction(message_queue*, SubutaiCommand*, char*[], SubutaiContainer* cont = NULL);
 	bool checkCWD(SubutaiCommand*);
 	bool checkUID(SubutaiCommand*);
 	static string getProcessPid(const char*);
@@ -76,27 +76,28 @@ public:
 	void setoutBuff(string);
 	void seterrBuff(string);
 	void setLogger(SubutaiLogger);
-	int optionReadSend(message_queue*,SubutaiCommand*,int,int*);
-	void checkAndWrite(message_queue*,SubutaiCommand*);
-	void checkAndSend(message_queue*,SubutaiCommand*);
-	void lastCheckAndSend(message_queue*,SubutaiCommand*);
-	bool checkExecutionTimeout(unsigned int*,bool*,unsigned int*,unsigned int*);
+	int optionReadSend(message_queue*, SubutaiCommand*, int, int*);
+	void checkAndWrite(message_queue*, SubutaiCommand*);
+	void checkAndSend(message_queue*, SubutaiCommand*);
+	void lastCheckAndSend(message_queue*, SubutaiCommand*);
+	bool checkExecutionTimeout(unsigned int*, bool*, unsigned int*, unsigned int*);
 	static string toString(int);
 private:
-	SubutaiUserID uid;
-	SubutaiLogger logger;
-	SubutaiResponsePack response;
-	SubutaiStreamReader errorStream;
-	SubutaiStreamReader outputStream;
-	string argument,exec,sendout,environment;
-	string outBuff, errBuff;	//general buffers for error and output
-	pid_t pid;
-	uid_t euid, ruid;
-	int responsecount;
-	int processpid;
-	bool ACTFLAG;	    //flag for acrivity check for stderr and stdout
-	bool CWDERR;	    //CWD error flag
-	bool UIDERR;		//UID error flag
-	int EXITSTATUS;    //Execution Error Detection Flag
+	SubutaiUserID           uid;
+	SubutaiLogger           logger;
+	SubutaiResponsePack     response;
+	SubutaiStreamReader     errorStream;
+	SubutaiStreamReader     outputStream;
+	string                  argument, exec, sendout, environment;
+	string                  outBuff, errBuff;       //general buffers for error and output
+	pid_t                   pid;
+	uid_t                   euid, ruid;
+	int                     responsecount;
+	int                     processpid;
+	bool                    ACTFLAG;	        //flag for acrivity check for stderr and stdout
+	bool                    CWDERR;	                //CWD error flag
+	bool                    UIDERR;		        //UID error flag
+	int                     EXITSTATUS;             //Execution Error Detection Flag
+        bool                    _isContainer;           // Command need to be executed on container
 };
 #endif /* SUBUTAITHREAD_H_ */

@@ -32,6 +32,9 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger*
     // after crash
     vector<SubutaiContainer> tmp_container = findAllContainers();
     getContainerStates(tmp_container);
+
+    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Initializing"));
+
 }
 
 SubutaiContainerManager::~SubutaiContainerManager() 
@@ -86,6 +89,7 @@ vector<SubutaiContainer> SubutaiContainerManager::findDefinedContainers()
 	    	containers.push_back(*c);
 	    }
 	    return containers;
+
 }
 
 /*
@@ -104,6 +108,7 @@ vector<SubutaiContainer> SubutaiContainerManager::findActiveContainers()
 	        containers.push_back(*c);
 	    }
 	    return containers;
+
 }
 
 /*
@@ -122,6 +127,7 @@ vector<SubutaiContainer> SubutaiContainerManager::findAllContainers()
 	    	containers.push_back(*c);
 	    }
 	    return containers;
+
 }
 
 
@@ -158,9 +164,9 @@ SubutaiContainer* SubutaiContainerManager::findContainerById(string container_id
  */
 void SubutaiContainerManager::registerAllContainers(SubutaiConnection* connection)
 {
-	for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
-	        (*it).registerContainer(connection);
-	}
+    for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
+        (*it).registerContainer(connection);
+    }
 }
 
 /*
@@ -173,8 +179,8 @@ string exec(char* cmd, char* type) {
     char buffer[128];
     string result = "";
     while(!feof(pipe)) {
-    	if(fgets(buffer, 128, pipe) != NULL)
-    		result += buffer;
+        if(fgets(buffer, 128, pipe) != NULL)
+            result += buffer;
     }
     pclose(pipe);
     return result;
@@ -185,15 +191,15 @@ string exec(char* cmd, char* type) {
  *
  */
 vector<string> splitContainers(string list, char* delimeter) {
-	vector<string> tokens;
-	size_t pos = 0;
-	std::string token;
-	while ((pos = list.find(delimeter)) != std::string::npos) {
-	    token = list.substr(0, pos);
-	    tokens.push_back(token);
-	    list.erase(0, pos + 1);
-	}
-	return tokens;
+    vector<string> tokens;
+    size_t pos = 0;
+    std::string token;
+    while ((pos = list.find(delimeter)) != std::string::npos) {
+        token = list.substr(0, pos);
+        tokens.push_back(token);
+        list.erase(0, pos + 1);
+    }
+    return tokens;
 }
 
 /*
@@ -203,9 +209,9 @@ vector<string> splitContainers(string list, char* delimeter) {
  */
 void SubutaiContainerManager::getContainerStates(vector<SubutaiContainer> _allContainers)
 {
-	vector<string> active_containers = splitContainers(exec("lxc-ls --active", "r"), "\n");
-	vector<string> stopped_containers = splitContainers(exec("lxc-ls --stopped", "r"), "\n");
-	vector<string> frozen_containers = splitContainers(exec("lxc-ls --frozen", "r"), "\n");
+    vector<string> active_containers = splitContainers(exec("lxc-ls --active", "r"), "\n");
+    vector<string> stopped_containers = splitContainers(exec("lxc-ls --stopped", "r"), "\n");
+    vector<string> frozen_containers = splitContainers(exec("lxc-ls --frozen", "r"), "\n");
 
  	for (vector<SubutaiContainer>::iterator it = _allContainers.begin(); it != _allContainers.end(); it++) {
  		bool containerRegisteredToList = false;
@@ -236,6 +242,7 @@ void SubutaiContainerManager::getContainerStates(vector<SubutaiContainer> _allCo
 			}
 		}
 	}
+
 }
 
 
@@ -271,120 +278,120 @@ void SubutaiContainerManager::write()
  * \details     Runs lxc's attach_run_wait function to specified container
  */
 /*
-string SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string program, vector<string> params) {
-    char* _params[params.size() + 2];
-    _params[0] = const_cast<char*>(program.c_str());
-    vector<string>::iterator it;
-    int i = 1;
-    for (it = params.begin(); it != params.end(); it++, i++) {
-        _params[i] = const_cast<char*>(it->c_str());
-    }    
-    _params[i + 1] = NULL;
-    lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT;
-    int fd[2];
-    pipe(fd);
-    int _stdout = dup(1);
-    dup2(fd[1], 1);
-    char buffer[1000];
-    int exit_code = cont->getLxcContainerValue()->attach_run_wait(_current_container, &opts, program.c_str(), _params);
-    fflush(stdout);
-    string command_output = "";
-    // TODO: Implement checking of buffer size here
-    while (1) {
-        ssize_t size = read(fd[0], buffer, 1000);
-        command_output += buffer;
-        if (size < 1000) {
-            buffer[size] = '\0';
-            command_output += buffer;
-        }
-    }
-    dup2(_stdout, 1);
+   string SubutaiContainerManager::RunProgram(SubutaiContainer* cont, string program, vector<string> params) {
+   char* _params[params.size() + 2];
+   _params[0] = const_cast<char*>(program.c_str());
+   vector<string>::iterator it;
+   int i = 1;
+   for (it = params.begin(); it != params.end(); it++, i++) {
+   _params[i] = const_cast<char*>(it->c_str());
+   }    
+   _params[i + 1] = NULL;
+   lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT;
+   int fd[2];
+   pipe(fd);
+   int _stdout = dup(1);
+   dup2(fd[1], 1);
+   char buffer[1000];
+   int exit_code = cont->getLxcContainerValue()->attach_run_wait(_current_container, &opts, program.c_str(), _params);
+   fflush(stdout);
+   string command_output = "";
+// TODO: Implement checking of buffer size here
+while (1) {
+ssize_t size = read(fd[0], buffer, 1000);
+command_output += buffer;
+if (size < 1000) {
+buffer[size] = '\0';
+command_output += buffer;
+}
+}
+dup2(_stdout, 1);
 
-    return command_output;
+return command_output;
 }
 */
 /*
  * \details     Collect info from running containers for heartbeat packets
  * 
  *//*
-void SubutaiContainerManager::CollectInfo() {
-    vector<string> params;
-    params.push_back("-a");
-    for (ContainerIterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
-        UpdateNetworkingInfo(&(*it), RunProgram(&(*it), "/bin/ifconfig", params));
-    }
-}*/
+      void SubutaiContainerManager::CollectInfo() {
+      vector<string> params;
+      params.push_back("-a");
+      for (ContainerIterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
+      UpdateNetworkingInfo(&(*it), RunProgram(&(*it), "/bin/ifconfig", params));
+      }
+      }*/
 
 /*
  * \details     Parses output of ifconfig and updates Container
  *              We can move this to some another class where we will collect all usefull common methods
  */
 /*
-void SubutaiContainerManager::UpdateNetworkingInfo(SubutaiContainer* cont, string data) {
-    // Clear previously stored data
-    cont->ip.clear();
-    cont->mac.clear();
-    size_t n = 0;
-    size_t p = 0;
-    vector<string> res;
-    bool nextIsMac = false;
-    bool nextIsIp = false;
-    // Tokenize the data by spaces and extract mac and ip
-    while ((n = data.find_first_of(" ", p)) != string::npos) {
-        if (n - p != 0) {
-            if (nextIsMac) {
-                cont->mac.push_back(data.substr(p, n - p));
-                nextIsMac = false;
-            } else if (nextIsIp) {
-                // On a some systems ifconfig may differ from others by adding
-                // a space after "inet addr:"
-                string bad_part = "addr:";
-                string ip = data.substr(p, n - p);
-                if (ip.substr(0, bad_part.length()).compare(bad_part) == 0) {
-                    ip = data.substr(bad_part.length(), ip.length());
-                } 
-                cont->ip.push_back(ip);
-                nextIsIp = false;
-            }
-            if (data.substr(p, n - p).compare("HWaddr") == 0) {
-                nextIsMac = true;
-            } else if (data.substr(p, n - p).compare("inet") == 0) {
-                nextIsIp = true;
-            }
-        }
-        p = n + 1;
-    }
+   void SubutaiContainerManager::UpdateNetworkingInfo(SubutaiContainer* cont, string data) {
+// Clear previously stored data
+cont->ip.clear();
+cont->mac.clear();
+size_t n = 0;
+size_t p = 0;
+vector<string> res;
+bool nextIsMac = false;
+bool nextIsIp = false;
+// Tokenize the data by spaces and extract mac and ip
+while ((n = data.find_first_of(" ", p)) != string::npos) {
+if (n - p != 0) {
+if (nextIsMac) {
+cont->mac.push_back(data.substr(p, n - p));
+nextIsMac = false;
+} else if (nextIsIp) {
+// On a some systems ifconfig may differ from others by adding
+// a space after "inet addr:"
+string bad_part = "addr:";
+string ip = data.substr(p, n - p);
+if (ip.substr(0, bad_part.length()).compare(bad_part) == 0) {
+ip = data.substr(bad_part.length(), ip.length());
+} 
+cont->ip.push_back(ip);
+nextIsIp = false;
+}
+if (data.substr(p, n - p).compare("HWaddr") == 0) {
+nextIsMac = true;
+} else if (data.substr(p, n - p).compare("inet") == 0) {
+nextIsIp = true;
+}
+}
+p = n + 1;
+}
 }
 
 void SubutaiContainerManager::UpdateUsersList(SubutaiContainer* cont) {
-    cont->users.clear();
-    vector<string> params;
-    params.push_back("/etc/passwd");
-    string passwd = RunProgram(cont, "/bin/cat", params);
-    size_t n = 0;
-    size_t p = 0;
-    stringstream ss(passwd);
-    string line;
-    while (getline(ss, line, '\n')) {
-        int c = 0;
-        int uid;
-        string uname;
-        while ((n = line.find_first_of(":", p)) != string::npos) {
-            c++;
-            if (n - p != 0) {
-                if (c == 1) {
-                    // This is a username
-                    uname = line.substr(p, n - p);
-                } else if (c == 3) {
-                    // This is a uid
-                    stringstream conv(line.substr(p, n - p));
-                    if (!(conv >> uid)) {
-                        uid = -1; // We failed to convert string to int
-                    }
-                }
-            }
-            cont->users.insert(make_pair(uid, uname));
-        }
-    }
+cont->users.clear();
+vector<string> params;
+params.push_back("/etc/passwd");
+string passwd = RunProgram(cont, "/bin/cat", params);
+size_t n = 0;
+size_t p = 0;
+stringstream ss(passwd);
+string line;
+while (getline(ss, line, '\n')) {
+int c = 0;
+int uid;
+string uname;
+while ((n = line.find_first_of(":", p)) != string::npos) {
+c++;
+if (n - p != 0) {
+if (c == 1) {
+// This is a username
+uname = line.substr(p, n - p);
+} else if (c == 3) {
+// This is a uid
+stringstream conv(line.substr(p, n - p));
+if (!(conv >> uid)) {
+uid = -1; // We failed to convert string to int
+}
+}
+}
+cont->users.insert(make_pair(uid, uname));
+}
+}
 }
 */

@@ -50,6 +50,12 @@ using namespace std;
 using std::stringstream;
 using std::string;
 
+// Execution Result contains exit code of a functions, stdout and/or stderr
+struct ExecutionResult {
+    string out;
+    string err;
+    string exit_code;
+};
 
 enum containerStatus { RUNNING, STOPPED, FROZEN };
 
@@ -81,9 +87,12 @@ public:
 	void setContainerHostname(string);
 	void setContainerStatus(containerStatus);
 	void getContainerAllFields();
-	string RunProgram(string , vector<string> );
+	string RunProgram(string , vector<string>);
+	ExecutionResult RunProgram(string , vector<string>, bool return_result);
 	void registerContainer(SubutaiConnection* );
 	void write();
+    bool checkCWD(string cwd);
+
 private:
 	containerStatus status;
 	lxc_container* container;
