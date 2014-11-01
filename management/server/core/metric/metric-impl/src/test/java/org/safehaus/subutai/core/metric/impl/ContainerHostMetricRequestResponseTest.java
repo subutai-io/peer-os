@@ -32,7 +32,7 @@ public class ContainerHostMetricRequestResponseTest
     @Test
     public void testResponse() throws Exception
     {
-        Set<ContainerHostMetric> metrics = Sets.newHashSet();
+        Set<ContainerHostMetricImpl> metrics = Sets.newHashSet();
         UUID requestId = UUID.randomUUID();
 
         ContainerHostMetricResponse response = new ContainerHostMetricResponse( requestId, metrics );

@@ -4,8 +4,6 @@ package org.safehaus.subutai.core.metric.impl;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
-
 
 /**
  * Response to ContainerHostMetricRequest
@@ -13,10 +11,10 @@ import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 public class ContainerHostMetricResponse
 {
     private UUID requestId;
-    private Set<ContainerHostMetric> metrics;
+    private Set<ContainerHostMetricImpl> metrics;
 
 
-    public ContainerHostMetricResponse( final UUID requestId, final Set<ContainerHostMetric> metrics )
+    public ContainerHostMetricResponse( final UUID requestId, final Set<ContainerHostMetricImpl> metrics )
     {
         this.requestId = requestId;
         this.metrics = metrics;
@@ -29,7 +27,7 @@ public class ContainerHostMetricResponse
     }
 
 
-    public Set<ContainerHostMetric> getMetrics()
+    public Set<ContainerHostMetricImpl> getMetrics()
     {
         return metrics;
     }

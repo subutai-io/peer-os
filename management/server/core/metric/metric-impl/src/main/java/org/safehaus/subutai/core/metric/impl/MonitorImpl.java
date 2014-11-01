@@ -74,6 +74,7 @@ public class MonitorImpl implements Monitor
     }
 
 
+    //TODO get metrics from each peer and container separately
     @Override
     public Set<ContainerHostMetric> getContainerMetrics( final Environment environment ) throws MonitorException
     {
@@ -124,10 +125,10 @@ public class MonitorImpl implements Monitor
     }
 
 
-    protected Set<ContainerHostMetric> getLocalContainerHostMetrics( UUID environmentId )
+    protected Set<ContainerHostMetricImpl> getLocalContainerHostMetrics( UUID environmentId )
     {
 
-        Set<ContainerHostMetric> metrics = Sets.newHashSet();
+        Set<ContainerHostMetricImpl> metrics = Sets.newHashSet();
         try
         {
             //obtain environment containers
@@ -158,7 +159,7 @@ public class MonitorImpl implements Monitor
     }
 
 
-    protected void getContainerMetrics( final UUID environmentId, final Set<ContainerHostMetric> metrics,
+    protected void getContainerMetrics( final UUID environmentId, final Set<ContainerHostMetricImpl> metrics,
                                         final ResourceHost resourceHost, final ContainerHost localContainer )
     {
         try
@@ -185,6 +186,7 @@ public class MonitorImpl implements Monitor
     }
 
 
+    //TODO get metrics from each host separately
     @Override
     public Set<ResourceHostMetric> getResourceHostMetrics() throws MonitorException
     {

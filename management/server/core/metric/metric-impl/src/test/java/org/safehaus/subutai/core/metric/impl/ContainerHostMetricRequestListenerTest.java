@@ -60,7 +60,7 @@ public class ContainerHostMetricRequestListenerTest
         ContainerHostMetricRequest request = mock( ContainerHostMetricRequest.class );
         when( request.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
         when( message.getPayload( ContainerHostMetricRequest.class ) ).thenReturn( request );
-        ContainerHostMetric metric = mock( ContainerHostMetric.class );
+        ContainerHostMetricImpl metric = mock( ContainerHostMetricImpl.class );
         when( monitor.getLocalContainerHostMetrics( ENVIRONMENT_ID ) ).thenReturn( Sets.newHashSet( metric ) );
 
         listener.onMessage( message );
@@ -79,7 +79,7 @@ public class ContainerHostMetricRequestListenerTest
         verify( exception ).printStackTrace( any( PrintStream.class ) );
 
         when( monitor.getLocalContainerHostMetrics( ENVIRONMENT_ID ) )
-                .thenReturn( Collections.<ContainerHostMetric>emptySet() );
+                .thenReturn( Collections.<ContainerHostMetricImpl>emptySet() );
 
         reset( request );
 

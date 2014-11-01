@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.common.cache.ExpiringCache;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageListener;
-import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +20,7 @@ public class ContainerHostMetricResponseListener extends MessageListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( ContainerHostMetricResponseListener.class.getName() );
     protected Map<UUID, Semaphore> semaphoreMap = new ConcurrentHashMap<>();
-    protected ExpiringCache<UUID, Set<ContainerHostMetric>> containers = new ExpiringCache<>();
+    protected ExpiringCache<UUID, Set<ContainerHostMetricImpl>> containers = new ExpiringCache<>();
 
 
     protected ContainerHostMetricResponseListener()
@@ -30,7 +29,7 @@ public class ContainerHostMetricResponseListener extends MessageListener
     }
 
 
-    public Set<ContainerHostMetric> waitMetrics( UUID requestId )
+    public Set<ContainerHostMetricImpl> waitMetrics( UUID requestId )
     {
         //put semaphore to map so that response can release it
         semaphoreMap.put( requestId, new Semaphore( 0 ) );
@@ -47,9 +46,9 @@ public class ContainerHostMetricResponseListener extends MessageListener
         //remove semaphore from map
         semaphoreMap.remove( requestId );
         //obtain containers
-        Set<ContainerHostMetric> metrics = containers.remove( requestId );
+        Set<ContainerHostMetricImpl> metrics = containers.remove( requestId );
         //return
-        return metrics == null ? Collections.<ContainerHostMetric>emptySet() : metrics;
+        return metrics == null ? Collections.<ContainerHostMetricImpl>emptySet() : metrics;
     }
 
 
