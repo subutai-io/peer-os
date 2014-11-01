@@ -587,5 +587,12 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
         managementHost = null;
         peerDAO.deleteInfo( SOURCE_MANAGEMENT, id.toString() );
     }
+
+
+    @Override
+    public Template getTemplate( final ContainerHost containerHost )
+    {
+        return templateRegistry.getTemplate( containerHost.getTemplateName() );
+    }
 }
 

@@ -70,7 +70,14 @@ public class RestServiceImpl implements RestService
         if ( config != null )
         {
             PeerInfo peerInfo = GSON.fromJson( config, PeerInfo.class );
-            peerManager.register( peerInfo );
+            try
+            {
+                peerManager.register( peerInfo );
+            }
+            catch ( PeerException e )
+            {
+                return null;
+            }
             return peerInfo;
         }
         else
@@ -113,8 +120,15 @@ public class RestServiceImpl implements RestService
     public Response processRegisterRequest( String peer )
     {
         PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
-        peerManager.register( p );
-        return Response.ok( GSON.toJson( p ) ).build();
+        try
+        {
+            peerManager.register( p );
+            return Response.ok( GSON.toJson( p ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).entity( e.toString() ).build();
+        }
     }
 
 
@@ -122,14 +136,21 @@ public class RestServiceImpl implements RestService
     public Response unregisterPeer( String peerId )
     {
         UUID id = GSON.fromJson( peerId, UUID.class );
-        boolean result = peerManager.unregister( id.toString() );
-        if ( result )
+        try
         {
-            return Response.ok( "Successfully unregistered peer: " + peerId ).build();
+            boolean result = peerManager.unregister( id.toString() );
+            if ( result )
+            {
+                return Response.ok( "Successfully unregistered peer: " + peerId ).build();
+            }
+            else
+            {
+                return Response.status( Response.Status.NOT_FOUND ).build();
+            }
         }
-        else
+        catch ( PeerException pe )
         {
-            return Response.status( Response.Status.NOT_FOUND ).build();
+            return Response.status( Response.Status.NOT_FOUND ).entity( pe.toString() ).build();
         }
     }
 
@@ -199,7 +220,8 @@ public class RestServiceImpl implements RestService
             Set<ContainerHost> result = localPeer
                     .createContainers( UUID.fromString( ownerPeerId ), UUID.fromString( environmentId ),
                             ( List<Template> ) JsonUtil.fromJson( templates, new TypeToken<List<Template>>()
-                            {}.getType() ), quantity, strategyId, criteriaList );
+                            {
+                            }.getType() ), quantity, strategyId, criteriaList );
             return Response.ok( JsonUtil.toJson( result ) ).build();
             //            return Response.ok().entity( result ).build();
         }
@@ -313,6 +335,24 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
+
+
+    @Override
+    public Response getTemplate( final String host )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+            Template result = localPeer.getTemplate( containerHost );
+            return Response.ok( result.toString() ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
 
     //
     //    @Override
