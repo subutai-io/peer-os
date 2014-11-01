@@ -65,17 +65,10 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getId()
+    public String getId()
     {
-        try
-        {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            return Response.ok( localPeer.getId().toString() ).build();
-        }
-        catch ( Exception e )
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        return localPeer.getId().toString();
     }
 
 
