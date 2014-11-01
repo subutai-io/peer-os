@@ -1,19 +1,15 @@
 package org.safehaus.subutai.plugin.hadoop.impl.common;
 
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcPlacementStrategy;
-import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
+//import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
+//import org.safehaus.subutai.core.container.api.lxcmanager.LxcPlacementStrategy;
+//import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 
 
-public class CustomPlacementStrategy extends LxcPlacementStrategy
+public class CustomPlacementStrategy /*extends LxcPlacementStrategy*/
 {
 
-    public static final String MASTER_NODE_TYPE = "master";
+    /*public static final String MASTER_NODE_TYPE = "master";
     public static final String SLAVE_NODE_TYPE = "slave";
     private final Map<String, Integer> nodesCount;
     private float hddPerNodeMb;
@@ -32,7 +28,7 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy
     }
 
 
-    /*public static Map<String, Set<Agent>> getNodes( LxcManager lxcManager, int masterNodes, int slaveNodes )
+    *//*public static Map<String, Set<Agent>> getNodes( LxcManager lxcManager, int masterNodes, int slaveNodes )
             throws LxcCreateException
     {
 
@@ -66,7 +62,7 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy
             }
         }
         return res;
-    }*/
+    }*//*
 
 
     @Override
@@ -95,9 +91,9 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy
                 continue;
             }
 
-			/*int unusedCpu = 100 - m.getCpuLoadPercent();
+			*//*int unusedCpu = 100 - m.getCpuLoadPercent();
             n = Math.round(unusedCpu - cpuReservedPercentage / cpuPerNodePercentage);
-			if ((min = Math.min(n, min)) <= 0) continue;*/
+			if ((min = Math.min(n, min)) <= 0) continue;*//*
 
             slots.put( e.getKey(), min );
         }
@@ -202,5 +198,5 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy
     private int GB2MB( float gb )
     {
         return Math.round( gb * 1024 );
-    }
+    }*/
 }

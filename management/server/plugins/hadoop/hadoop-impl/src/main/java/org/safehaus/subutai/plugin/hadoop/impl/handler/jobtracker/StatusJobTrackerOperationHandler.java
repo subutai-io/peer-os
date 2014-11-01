@@ -1,11 +1,7 @@
 package org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker;
 
 
-import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
@@ -24,7 +20,7 @@ public class StatusJobTrackerOperationHandler extends AbstractOperationHandler<H
     @Override
     public void run()
     {
-        HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
+        /*HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
 
         if ( hadoopClusterConfig == null )
         {
@@ -82,6 +78,6 @@ public class StatusJobTrackerOperationHandler extends AbstractOperationHandler<H
         else
         {
             trackerOperation.addLogDone( String.format( "JobTracker of %s is %s", node.getHostname(), nodeState ) );
-        }
+        }*/
     }
 }

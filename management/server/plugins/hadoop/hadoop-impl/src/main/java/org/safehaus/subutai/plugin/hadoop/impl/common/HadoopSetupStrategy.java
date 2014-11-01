@@ -9,13 +9,13 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
@@ -104,7 +104,8 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
         }
         catch ( EnvironmentBuildException e )
         {
-            destroyLXC( po, "Destroying lxc containers after cluster installation failure.\n" + e.getMessage() );
+            //            destroyLXC( po, "Destroying lxc containers after cluster installation failure.\n" + e
+            // .getMessage() );
         }
 
         return hadoopClusterConfig;
@@ -114,7 +115,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     private void installHadoopCluster() throws ClusterSetupException
     {
 
-        po.addLog( "Hadoop installation started" );
+       /* po.addLog( "Hadoop installation started" );
         hadoopManager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
                 hadoopClusterConfig );
         po.addLog( "Cluster info saved to DB" );
@@ -134,11 +135,11 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
             {
                 po.addLogFailed( String.format( "%s failed, %s", command.getDescription(), command.getAllErrors() ) );
             }
-        }
+        }*/
     }
 
 
-    private void destroyLXC( TrackerOperation po, String log )
+    /*private void destroyLXC( TrackerOperation po, String log )
     {
         //destroy all lxcs also
         po.addLog( "Destroying lxc containers" );
@@ -155,21 +156,29 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
             po.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
         }
         po.addLogFailed( log );
-    }
+    }*/
 
 
     private void setMasterNodes() throws ClusterSetupException
     {
         Set<Agent> masterNodes = new HashSet<>();
 
-        for ( EnvironmentContainer environmentContainer : this.environment.getContainers() )
+        for ( ContainerHost environmentContainer : this.environment.getContainers() )
         {
             if ( NodeType.MASTER_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
-                if ( environmentContainer.getTemplate().getProducts()
-                                         .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
+                try
                 {
-                    masterNodes.add( environmentContainer.getAgent() );
+                    Template template = environmentContainer.getTemplate();
+                    if ( template.getProducts()
+                                 .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
+                    {
+                        masterNodes.add( environmentContainer.getAgent() );
+                    }
+                }
+                catch ( PeerException e )
+                {
+                    throw new ClusterSetupException( String.format( "Could not get template %s", e.getMessage() ) );
                 }
             }
         }
@@ -191,14 +200,22 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     {
         Set<Agent> slaveNodes = new HashSet<>();
 
-        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
+        for ( ContainerHost environmentContainer : environment.getContainers() )
         {
             if ( NodeType.SLAVE_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
-                if ( environmentContainer.getTemplate().getProducts()
-                                         .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
+                try
                 {
-                    slaveNodes.add( environmentContainer.getAgent() );
+                    Template template = environmentContainer.getTemplate();
+                    if ( template.getProducts()
+                                 .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
+                    {
+                        slaveNodes.add( environmentContainer.getAgent() );
+                    }
+                }
+                catch ( PeerException e )
+                {
+                    throw new ClusterSetupException( String.format( "Can not get template %s", e.getMessage() ) );
                 }
             }
         }

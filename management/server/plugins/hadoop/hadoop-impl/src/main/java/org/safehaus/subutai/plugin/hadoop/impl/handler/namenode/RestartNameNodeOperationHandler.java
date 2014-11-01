@@ -1,13 +1,7 @@
 package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
 
 
-import java.util.regex.Pattern;
-
-import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
@@ -26,7 +20,7 @@ public class RestartNameNodeOperationHandler extends AbstractOperationHandler<Ha
     @Override
     public void run()
     {
-        HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
+        /*HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
 
         if ( hadoopClusterConfig == null )
         {
@@ -91,6 +85,6 @@ public class RestartNameNodeOperationHandler extends AbstractOperationHandler<Ha
         {
             trackerOperation.addLogFailed( String.format( "Failed to restart NameNode %s. %s", node.getHostname(),
                     startCommand.getAllErrors() ) );
-        }
+        }*/
     }
 }

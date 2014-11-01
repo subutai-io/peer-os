@@ -1,11 +1,7 @@
 package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
 
 
-import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
@@ -28,7 +24,7 @@ public class StartDataNodeOperationHandler extends AbstractOperationHandler<Hado
     @Override
     public void run()
     {
-        HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
+        /*HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
 
         if ( hadoopClusterConfig == null )
         {
@@ -90,6 +86,6 @@ public class StartDataNodeOperationHandler extends AbstractOperationHandler<Hado
         {
             trackerOperation.addLogFailed( String.format( "Failed to start Datanode %s. %s", node.getHostname(),
                     startCommand.getAllErrors() ) );
-        }
+        }*/
     }
 }

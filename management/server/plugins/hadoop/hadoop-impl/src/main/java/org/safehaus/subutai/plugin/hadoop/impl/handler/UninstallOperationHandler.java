@@ -2,11 +2,8 @@ package org.safehaus.subutai.plugin.hadoop.impl.handler;
 
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
-
-import com.google.common.collect.Sets;
 
 
 public class UninstallOperationHandler extends AbstractOperationHandler<HadoopImpl>
@@ -23,7 +20,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<HadoopIm
     @Override
     public void run()
     {
-        HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
+        /*HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
 
         if ( hadoopClusterConfig == null )
         {
@@ -46,6 +43,6 @@ public class UninstallOperationHandler extends AbstractOperationHandler<HadoopIm
         trackerOperation.addLog( "Updating db..." );
 
         manager.getPluginDAO().deleteInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName() );
-        trackerOperation.addLogDone( "Information updated in database" );
+        trackerOperation.addLogDone( "Information updated in database" );*/
     }
 }

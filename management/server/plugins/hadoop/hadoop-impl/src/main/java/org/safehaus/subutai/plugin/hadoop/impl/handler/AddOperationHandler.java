@@ -1,17 +1,9 @@
 package org.safehaus.subutai.plugin.hadoop.impl.handler;
 
 
-import java.util.Set;
-
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
-import org.safehaus.subutai.plugin.hadoop.impl.common.AddNodeOperation;
-import org.safehaus.subutai.plugin.hadoop.impl.common.HadoopSetupStrategy;
 
 
 public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl>
@@ -34,7 +26,7 @@ public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl>
     @Override
     public void run()
     {
-        HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
+       /* HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
 
         if ( hadoopClusterConfig == null )
         {
@@ -96,6 +88,6 @@ public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl>
         catch ( LxcCreateException e )
         {
             trackerOperation.addLogFailed( e.getMessage() );
-        }
+        }*/
     }
 }

@@ -419,7 +419,7 @@
       <artifactId>cassandra-plugin-ui</artifactId>
     </dependency>
 
-    <!--<dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hadoop-plugin-api</artifactId>
     </dependency>
@@ -427,6 +427,7 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>hadoop-plugin-impl</artifactId>
     </dependency>
+    <!--
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hadoop-plugin-cli</artifactId>
@@ -434,7 +435,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hadoop-plugin-rest</artifactId>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hadoop-plugin-ui</artifactId>
@@ -444,7 +445,7 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>oozie-plugin-api</artifactId>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>oozie-plugin-impl</artifactId>
     </dependency>
@@ -455,11 +456,13 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>oozie-plugin-rest</artifactId>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>oozie-plugin-ui</artifactId>
     </dependency>
+
+    <!--
 
     <dependency>
       <groupId>${project.groupId}</groupId>

@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
 
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -27,7 +26,7 @@ public class UnblockDataNodeOperationHandler extends AbstractOperationHandler<Ha
     @Override
     public void run()
     {
-        HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
+        /*HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
 
         if ( hadoopClusterConfig == null )
         {
@@ -63,7 +62,7 @@ public class UnblockDataNodeOperationHandler extends AbstractOperationHandler<Ha
         hadoopClusterConfig.getBlockedAgents().remove( node );
         manager.getPluginDAO()
                .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(), hadoopClusterConfig );
-        trackerOperation.addLogDone( "Cluster info saved to DB" );
+        trackerOperation.addLogDone( "Cluster info saved to DB" );*/
     }
 
 

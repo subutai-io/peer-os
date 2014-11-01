@@ -16,15 +16,12 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.network.api.NetworkManager;
@@ -72,10 +69,9 @@ public class HadoopImpl implements Hadoop
 {
     public static final int INITIAL_CAPACITY = 2;
     private static final Logger LOG = LoggerFactory.getLogger( HadoopImpl.class.getName() );
-    private CommandRunner commandRunner;
+
     private AgentManager agentManager;
     private Tracker tracker;
-    private ContainerManager containerManager;
     private NetworkManager networkManager;
     private ExecutorService executor;
     private EnvironmentManager environmentManager;
@@ -108,7 +104,7 @@ public class HadoopImpl implements Hadoop
         {
             LOG.error( e.getMessage(), e );
         }
-        this.commands = new Commands( commandRunner );
+        //        this.commands = new Commands( commandRunner );
 
         executor = Executors.newCachedThreadPool();
     }
@@ -120,21 +116,9 @@ public class HadoopImpl implements Hadoop
     }
 
 
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
     public Tracker getTracker()
     {
         return tracker;
-    }
-
-
-    public ContainerManager getContainerManager()
-    {
-        return containerManager;
     }
 
 
@@ -168,12 +152,6 @@ public class HadoopImpl implements Hadoop
     }
 
 
-    public void setCommandRunner( final CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
-    }
-
-
     public void setAgentManager( final AgentManager agentManager )
     {
         this.agentManager = agentManager;
@@ -183,12 +161,6 @@ public class HadoopImpl implements Hadoop
     public void setTracker( final Tracker tracker )
     {
         this.tracker = tracker;
-    }
-
-
-    public void setContainerManager( final ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
     }
 
 
@@ -632,11 +604,9 @@ public class HadoopImpl implements Hadoop
 
 
     @Override
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( final HadoopClusterConfig config )
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final HadoopClusterConfig config )
             throws ClusterSetupException
     {
-
-        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint
@@ -666,11 +636,11 @@ public class HadoopImpl implements Hadoop
 
         environmentBlueprint.setNodeGroups( nodeGroups );
 
-        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
-        environmentBuildTask.setPhysicalNodes( convertAgent2Hostname() );
+        //        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
+        //        environmentBuildTask.setPhysicalNodes( convertAgent2Hostname() );
 
 
-        return environmentBuildTask;
+        return environmentBlueprint;
     }
 
 

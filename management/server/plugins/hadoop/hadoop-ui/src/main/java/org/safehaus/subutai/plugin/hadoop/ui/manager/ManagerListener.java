@@ -35,9 +35,7 @@ import org.safehaus.subutai.plugin.hadoop.ui.manager.components.StopTask;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.QuestionDialog;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.event.Action;
 import com.vaadin.event.ItemClickEvent;
@@ -77,10 +75,10 @@ public class ManagerListener
                     Agent lxcAgent = hadoopManager.getAgentManager().getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null )
                     {
-                        TerminalWindow terminal =
+                        /*TerminalWindow terminal =
                                 new TerminalWindow( Sets.newHashSet( lxcAgent ), hadoopManager.getExecutorService(),
                                         hadoopManager.getCommandRunner(), hadoopManager.getAgentManager() );
-                        hadoopManager.getContentRoot().getUI().addWindow( terminal.getWindow() );
+                        hadoopManager.getContentRoot().getUI().addWindow( terminal.getWindow() );*/
                     }
                     else
                     {

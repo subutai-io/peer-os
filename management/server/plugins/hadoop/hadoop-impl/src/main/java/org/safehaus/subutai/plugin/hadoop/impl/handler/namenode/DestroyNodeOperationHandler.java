@@ -2,12 +2,10 @@ package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
 
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
+
+//import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 
 
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
@@ -29,7 +27,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Hadoop
     @Override
     public void run()
     {
-        HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
+        /*HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
         Agent node = manager.getAgentManager().getAgentByHostname( lxcHostName );
 
         if ( hadoopClusterConfig == null )
@@ -115,5 +113,6 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Hadoop
         {
             po.addLogFailed( String.format( "Task's operation %s timeout", command.getDescription() ) );
         }
+    }*/
     }
 }
