@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
 public class ContainerHostMetricResponseListener extends MessageListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( ContainerHostMetricResponseListener.class.getName() );
-    private Map<UUID, Semaphore> semaphoreMap = new ConcurrentHashMap<>();
-    private ExpiringCache<UUID, Set<ContainerHostMetric>> containers = new ExpiringCache<>();
+    protected Map<UUID, Semaphore> semaphoreMap = new ConcurrentHashMap<>();
+    protected ExpiringCache<UUID, Set<ContainerHostMetric>> containers = new ExpiringCache<>();
 
 
     protected ContainerHostMetricResponseListener()
@@ -32,13 +32,12 @@ public class ContainerHostMetricResponseListener extends MessageListener
 
     public Set<ContainerHostMetric> waitMetrics( UUID requestId )
     {
-        Semaphore completionSemaphore = new Semaphore( 0 );
         //put semaphore to map so that response can release it
-        semaphoreMap.put( requestId, completionSemaphore );
+        semaphoreMap.put( requestId, new Semaphore( 0 ) );
         //wait for metrics
         try
         {
-            completionSemaphore.tryAcquire( Constants.METRIC_REQUEST_TIMEOUT * 2 + 5, TimeUnit.SECONDS );
+            semaphoreMap.get( requestId ).tryAcquire( Constants.METRIC_REQUEST_TIMEOUT * 2 + 5, TimeUnit.SECONDS );
         }
         catch ( InterruptedException e )
         {
