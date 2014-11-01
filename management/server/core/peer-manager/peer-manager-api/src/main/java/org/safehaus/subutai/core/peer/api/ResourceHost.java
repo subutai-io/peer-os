@@ -265,22 +265,10 @@ public class ResourceHost extends SubutaiHost
     }
 
 
-    public Set<ContainerHost> getContainersHosts()
-    {
-        return containersHosts;
-    }
-
-
-    public void setContainersHosts( final Set<ContainerHost> containersHosts )
-    {
-        this.containersHosts = containersHosts;
-    }
-
-
     public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId )
     {
         Set<ContainerHost> result = new HashSet<>();
-        for ( ContainerHost containerHost : getContainersHosts() )
+        for ( ContainerHost containerHost : getContainerHosts() )
         {
             if ( containerHost.getEnvironmentId() == null )
             {

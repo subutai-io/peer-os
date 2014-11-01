@@ -96,14 +96,14 @@ public class ContainerHost extends SubutaiHost
 
     public String getQuota( final QuotaEnum quota ) throws PeerException
     {
-        Peer peer = getPeer( this.getPeerId() );
+        Peer peer = getPeer();
         return peer.getQuota( this, quota );
     }
 
 
     public void setQuota( final QuotaEnum quota, final String value ) throws PeerException
     {
-        Peer peer = getPeer( this.getPeerId() );
+        Peer peer = getPeer();
         peer.setQuota( this, quota, value );
     }
 }
