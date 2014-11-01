@@ -393,8 +393,9 @@ public class MonitorImplTest
         ContainerHostMetricResponseListener listener = mock( ContainerHostMetricResponseListener.class );
         monitor.containerHostMetricResponseListener = listener;
         when( containerHost.getPeer() ).thenReturn( remotePeer );
-        ContainerHostMetric expected = mock( ContainerHostMetric.class );
-        when( listener.waitMetrics( any( UUID.class ) ) ).thenReturn( Sets.newHashSet( expected ) );
+        ContainerHostMetricImpl expected = mock( ContainerHostMetricImpl.class );
+        when( listener.waitMetrics( any( UUID.class ) ) ).thenReturn(
+                Sets.<ContainerHostMetricImpl>newHashSet( expected ) );
 
 
         Set<ContainerHostMetric> metrics = monitor.getContainerMetrics( environment );
@@ -454,7 +455,7 @@ public class MonitorImplTest
         when( commandResult.getStdOut() ).thenReturn( METRIC_JSON );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
 
-        Set<ContainerHostMetric> metrics = Sets.newHashSet();
+        Set<ContainerHostMetricImpl> metrics = Sets.newHashSet();
         monitor.getContainerMetrics( ENVIRONMENT_ID, metrics, resourceHost, containerHost );
 
         ContainerHostMetric metric = metrics.iterator().next();

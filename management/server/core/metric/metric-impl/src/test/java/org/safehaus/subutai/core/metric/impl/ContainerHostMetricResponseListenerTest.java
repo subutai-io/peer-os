@@ -38,7 +38,7 @@ public class ContainerHostMetricResponseListenerTest
     @Spy
     Map<UUID, Semaphore> semaphoreMap = new ConcurrentHashMap();
     @Mock
-    ExpiringCache<UUID, Set<ContainerHostMetric>> containers;
+    ExpiringCache<UUID, Set<ContainerHostMetricImpl>> containers;
 
 
     @Before

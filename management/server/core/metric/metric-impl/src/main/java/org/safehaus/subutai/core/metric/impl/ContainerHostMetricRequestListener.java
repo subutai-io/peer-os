@@ -39,7 +39,7 @@ public class ContainerHostMetricRequestListener extends MessageListener
         ContainerHostMetricRequest request = message.getPayload( ContainerHostMetricRequest.class );
 
 
-        Set<ContainerHostMetric> metrics = monitor.getLocalContainerHostMetrics( request.getEnvironmentId() );
+        Set<ContainerHostMetricImpl> metrics = monitor.getLocalContainerHostMetrics( request.getEnvironmentId() );
 
         if ( !metrics.isEmpty() )
         {
