@@ -62,7 +62,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public boolean isOnline() throws PeerException
     {
-        if ( getRemoteId() == peerInfo.getId() )
+        if ( peerInfo.getId().equals( getRemoteId() ) )
         {
             return true;
         }

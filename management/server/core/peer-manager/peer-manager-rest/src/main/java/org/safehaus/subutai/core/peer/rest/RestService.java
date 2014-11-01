@@ -39,9 +39,9 @@ public interface RestService
     public String getPeerJsonFormat();
 
     @GET
-    @Path( "id" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response getId();
+    @Path("id")
+    @Produces("text/plain")
+    public String getId();
 
 
     @POST

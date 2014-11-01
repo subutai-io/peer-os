@@ -213,19 +213,24 @@ public class RemotePeerRestClient
     public UUID getId() throws PeerException
     {
         String path = "peer/id";
-
-        WebClient client = createWebClient();
-
-        Response response =
-                client.path( path ).type( MediaType.APPLICATION_JSON_TYPE ).accept( MediaType.APPLICATION_JSON ).get();
-
-        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        try
         {
-            return JsonUtil.fromJson( response.getEntity().toString(), UUID.class );
+            WebClient client = createWebClient();
+
+            Response response = client.path( path ).accept( MediaType.TEXT_PLAIN ).get();
+
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+                return UUID.fromString( response.readEntity( String.class ) );
+            }
+            else
+            {
+                throw new PeerException( "Could not retrieve remote peer ID." );
+            }
         }
-        else
+        catch ( Exception ce )
         {
-            throw new PeerException( "Could not retrieve remote peer ID.", response.getEntity().toString() );
+            throw new PeerException( "Could not retrieve remote peer ID.", ce.toString() );
         }
     }
 }
