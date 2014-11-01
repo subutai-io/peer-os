@@ -405,7 +405,11 @@ int main(int argc,char *argv[],char *envp[])
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command runAs:", command.getRunAs()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command timeout:", toString(command.getTimeout())));
                     // Check if this uuid belongs this FAI or one of child containers
-                     
+                    bool isLocal = true;
+                    SubutaiContainer* target_container = cman->getContainerByUuid(command.getUuid());
+                    if (target_container) {
+                        isLocal = false;
+                    }    
                     if (command.getWatchArguments().size()!=0)
                     {
                         for (unsigned int i=0; i<command.getWatchArguments().size(); i++)
@@ -415,15 +419,19 @@ int main(int argc,char *argv[],char *envp[])
                     if (command.getType()=="REGISTRATION_REQUEST_DONE") //type is registration done
                     {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Registration is done.."));
-                        //agent is registered to server now
+                        // agent is registered to server now
                     }
                     else if (command.getType()=="EXECUTE_REQUEST")	//execution request will be executed in other process.
                     {
-                        fstream file;	//opening uuid.txt
-                        file.open("/etc/subutai-agent/commandQueue.txt",fstream::in | fstream::out | fstream::app);
-                        file << input;
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Received Message to internal currentProcess!"));
-                        file.close();
+                        if (isLocal) {
+                            fstream file;	//opening uuid.txt
+                            file.open("/etc/subutai-agent/commandQueue.txt",fstream::in | fstream::out | fstream::app);
+                            file << input;
+                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Received Message to internal currentProcess!"));
+                            file.close();
+                        } else {
+                            // Need to put a command to queue on container
+                        }
                     }
                     else if (command.getType()=="PS_REQUEST")
                     {
@@ -442,6 +450,7 @@ int main(int argc,char *argv[],char *envp[])
                         /*
                          * Refresh new agent ip address set for each heartbeat message
                          */
+                        if (isLocal) {
                         environment.getAgentIpAddress();
                         response.setIps(environment.getAgentIpValue());
                         response.setHostname(environment.getAgentHostnameValue());
@@ -453,9 +462,11 @@ int main(int argc,char *argv[],char *envp[])
                                 environment.getAgentParentHostnameValue(),
                                 command.getSource(),command.getTaskUuid());
                         connection->sendMessage(resp);
+                        } else {
+                        }
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","HeartBeat Response:", resp));
                     }
-                    else if (command.getType()=="TERMINATE_REQUEST")
+                    else if (command.getType() == "TERMINATE_REQUEST")
                     {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",toString(command.getPid())));
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID.."));
@@ -474,12 +485,12 @@ int main(int argc,char *argv[],char *envp[])
                                 string resp = response.createFailTerminateMessage(environment.getAgentUuidValue(),
                                         command.getRequestSequenceNumber(),command.getSource(),command.getTaskUuid());
                                 connection->sendMessage(resp);
-                                logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate Fail Response! Received PID:",toString(command.getPid())));
+                                logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", toString(command.getPid())));
                             }
                         }
                         else
                         {
-                            logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","Irrelevant Terminate Request"));
+                            logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Irrelevant Terminate Request"));
                         }
                     }
                     else if (command.getType()=="INOTIFY_CREATE_REQUEST")
@@ -551,7 +562,7 @@ int main(int argc,char *argv[],char *envp[])
                 if (currentProcess < ncores)
                 {
                     ifstream file2("/etc/subutai-agent/commandQueue.txt");
-                    if (file2.peek()!=ifstream::traits_type::eof())
+                    if (file2.peek() != ifstream::traits_type::eof())
                     {
                         ofstream file3("/etc/subutai-agent/commandQueue2.txt");
                         input = "";
@@ -562,7 +573,7 @@ int main(int argc,char *argv[],char *envp[])
                             file3 << str2 << endl;
                         }
                         file3.close();
-                        rename("/etc/subutai-agent/commandQueue2.txt","/etc/subutai-agent/commandQueue.txt");
+                        rename("/etc/subutai-agent/commandQueue2.txt", "/etc/subutai-agent/commandQueue.txt");
                         logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","Message Fetched from internal queue!"));
                         if (input != "\n" && command.deserialize(input))
                         {
