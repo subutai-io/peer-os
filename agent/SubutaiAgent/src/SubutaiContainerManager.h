@@ -48,6 +48,7 @@ class SubutaiContainerManager {
         void init();
         SubutaiContainer* findContainerByName(string );
         SubutaiContainer* findContainerByUuid(string );
+        void getContainerStates();
         void findAllContainers();
         void findActiveContainers();
         void findDefinedContainers();

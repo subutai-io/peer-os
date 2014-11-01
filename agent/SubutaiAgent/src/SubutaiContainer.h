@@ -50,6 +50,9 @@ using namespace std;
 using std::stringstream;
 using std::string;
 
+
+typedef enum containerStatus { RUNNING, STOPPED, FROZEN };
+
 class SubutaiContainer
 {
 public:
@@ -70,11 +73,14 @@ public:
 	string getContainerConnectionOptionsValue();
 	lxc_container* getLxcContainerValue();
 	vector<string> getContainerIpValue();
+	containerStatus getContainerStatus();
+	void setContainerStatus(containerStatus);
 	void getContainerAllFields();
 	string RunProgram(string , vector<string> );
 	void registerContainer(SubutaiConnection* );
 
 private:
+	containerStatus status;
 	lxc_container* container;
 	string uuid;
 	string macAddress;
