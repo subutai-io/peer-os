@@ -74,6 +74,7 @@ public class MonitorImpl implements Monitor
     }
 
 
+    //TODO get metrics from each peer and container separately
     @Override
     public Set<ContainerHostMetric> getContainerMetrics( final Environment environment ) throws MonitorException
     {
@@ -185,6 +186,7 @@ public class MonitorImpl implements Monitor
     }
 
 
+    //TODO get metrics from each host separately
     @Override
     public Set<ResourceHostMetric> getResourceHostMetrics() throws MonitorException
     {
