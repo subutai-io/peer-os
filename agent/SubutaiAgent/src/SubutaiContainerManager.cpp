@@ -84,7 +84,7 @@ void SubutaiContainerManager::findAllContainers()
 
 }
 
-SubutaiContainer SubutaiContainerManager::findContainerByName(string container_name) {
+SubutaiContainer* SubutaiContainerManager::findContainerByName(string container_name) {
 
     for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
         if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
@@ -94,7 +94,7 @@ SubutaiContainer SubutaiContainerManager::findContainerByName(string container_n
     return NULL;
 }
 
-SubutaiContainer SubutaiContainerManager::findContainerByUuid(string container_uuid) {
+SubutaiContainer* SubutaiContainerManager::findContainerByUuid(string container_uuid) {
     for (ContainerIterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
         if ((*it).getContainerUuidValue() == container_uuid) {
             return &(*it);
@@ -103,13 +103,6 @@ SubutaiContainer SubutaiContainerManager::findContainerByUuid(string container_u
     return NULL;
 }
 
-SubutaiContainer SubutaiContainerManager::findContainerByUuid(string uuid) {
-    for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
-        if ((*it).getContainerUuidValue().compare(uuid) == 0) {
-            return (*it);
-        }
-    }
-}
 
 void SubutaiContainerManager::registerAllContainers(SubutaiConnection* connection)
 {
