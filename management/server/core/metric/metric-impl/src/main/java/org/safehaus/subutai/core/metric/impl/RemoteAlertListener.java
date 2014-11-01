@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
  */
 public class RemoteAlertListener extends MessageListener
 {
-    public static final String ALERT_RECIPIENT = "alert";
     protected static Logger LOG = LoggerFactory.getLogger( RemoteAlertListener.class.getName() );
 
     protected MonitorImpl monitor;
@@ -22,7 +21,7 @@ public class RemoteAlertListener extends MessageListener
 
     protected RemoteAlertListener( MonitorImpl monitor )
     {
-        super( ALERT_RECIPIENT );
+        super( RecipientType.ALERT_RECIPIENT.name() );
         this.monitor = monitor;
     }
 
