@@ -2,23 +2,21 @@ package org.safehaus.subutai.core.peer.impl;
 
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -30,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -157,21 +154,10 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public boolean register( final PeerInfo peerInfo )
+    public boolean register( final PeerInfo peerInfo ) throws PeerException
     {
-        Agent management = agentManager.getAgentByHostname( "management" );
-        String cmd = String.format( "sed '/^path_map.*$/ s/$/ ; %s %s/' apt-cacher.conf > apt-cacher.conf"
-                        + ".new && mv apt-cacher.conf.new apt-cacher.conf && /etc/init.d/apt-cacher reload",
-                peerInfo.getId().toString(),
-                ( "http://" + peerInfo.getIp() + "/ksks" ).replace( ".", "\\." ).replace( "/", "\\/" ) );
-
-        LOG.info( cmd );
-        RequestBuilder rb = new RequestBuilder( cmd );
-        rb.withCwd( "/etc/apt-cacher/" );
-        Command command = commandRunner.createCommand( rb, Sets.newHashSet( management ) );
-        commandRunner.runCommand( command );
-        boolean r = command.hasSucceeded();
-        LOG.info( "Apt-cacher mapping result: " + r );
+        ManagementHost managementHost = getLocalPeer().getManagementHost();
+        managementHost.addAptSource( peerInfo.getId().toString(), peerInfo.getIp() );
         return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId().toString(), peerInfo );
     }
 
@@ -212,8 +198,11 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public boolean unregister( final String uuid )
+    public boolean unregister( final String uuid ) throws PeerException
     {
+        ManagementHost managementHost = getLocalPeer().getManagementHost();
+        PeerInfo p = getPeerInfo( UUID.fromString( uuid ) );
+        managementHost.removeAptSource( p.getId().toString(), p.getIp() );
         return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, uuid );
     }
 

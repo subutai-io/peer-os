@@ -64,9 +64,15 @@ public interface RestService
     public Response stopContainer( @FormParam("host") String host );
 
     @POST
-    @Path( "container/isconnected" )
+    @Path("container/isconnected")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response isContainerConnected( @FormParam("host") String host );
+
+
+    @POST
+    @Path( "template/get" )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response isContainerConnected( @FormParam( "host" ) String host );
+    public Response getTemplate( @FormParam( "host" ) String host );
 
     @POST
     @Path("execute")
