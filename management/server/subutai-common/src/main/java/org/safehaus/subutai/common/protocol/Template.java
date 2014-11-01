@@ -9,10 +9,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -140,13 +144,16 @@ public class Template
     //contents of packages manifest file
     private String packagesManifest;
 
-    @ManyToOne
+    @ManyToOne( fetch = FetchType.LAZY, optional = true )
+    @JoinColumns( {
+            @JoinColumn( name = "parentTemplate" ), @JoinColumn( name = "parentLxcArch" )
+    } )
     private Template parentTemplate;
 
 
     //children of template, this property is calculated upon need and is null by default (see REST API for calculation)
     @Expose
-    @OneToMany( mappedBy = "parentTemplate" )
+    @OneToMany( mappedBy = "parentTemplate", fetch = FetchType.EAGER, cascade = { CascadeType.ALL } )
     private List<Template> children;
 
     //subutai products present only in this template excluding all subutai products present in the whole ancestry
@@ -241,17 +248,24 @@ public class Template
         {
             this.children = new ArrayList<>();
         }
-        for ( Template child : children )
-        {
-            child.setParentTemplate( this );
-        }
+        //        for ( Template child : children )
+        //        {
+        //            child.setParentTemplate( this );
+        //        }
         this.children.addAll( children );
     }
 
 
     public List<Template> getChildren()
     {
-        return Collections.unmodifiableList( children );
+        if ( children != null )
+        {
+            return Collections.unmodifiableList( children );
+        }
+        else
+        {
+            return Collections.emptyList();
+        }
     }
 
 

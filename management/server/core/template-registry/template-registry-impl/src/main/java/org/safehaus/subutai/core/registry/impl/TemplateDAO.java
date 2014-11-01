@@ -44,6 +44,7 @@ public class TemplateDAO implements TemplateService
     @Override
     public Template saveTemplate( Template template )
     {
+        Template savedTemplate = null;
         if ( template.getTemplateName() == null || "".equals( template.getTemplateName() ) )
         {
             throw new RuntimeException( "Template Name is required" );
@@ -54,12 +55,13 @@ public class TemplateDAO implements TemplateService
         {
             entityManager = entityManagerFactory.createEntityManager();
             entityManager.getTransaction().begin();
-            entityManager.persist( template );
+            savedTemplate = entityManager.merge( template );
             entityManager.flush();
             entityManager.getTransaction().commit();
         }
         catch ( Exception ex )
         {
+            LOGGER.warn( "Exception thrown in saveTemplate: ", ex );
             if ( entityManager != null )
             {
                 if ( entityManager.getTransaction().isActive() )
@@ -75,7 +77,7 @@ public class TemplateDAO implements TemplateService
                 entityManager.close();
             }
         }
-        return template;
+        return savedTemplate;
     }
 
 

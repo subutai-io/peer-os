@@ -18,9 +18,9 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class TemplateDAOTest
@@ -63,7 +63,7 @@ public class TemplateDAOTest
         Template template = TestUtils.getParentTemplate();
         templateDAO.saveTemplate( template );
         Template savedTemplate = templateDAO.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
-        assertEquals( template.getMd5sum(), savedTemplate.getMd5sum() );
+        assertEquals( template, savedTemplate );
     }
 
 
@@ -130,17 +130,28 @@ public class TemplateDAOTest
         Template parentTemplate = TestUtils.getParentTemplate();
         Template childTemplate = TestUtils.getChildTemplate();
 
-        childTemplate.setParentTemplate( parentTemplate );
+        //        childTemplate.setParentTemplate( parentTemplate );
+        parentTemplate.addChildren( Arrays.asList( childTemplate ) );
 
-        parentTemplate.addChildren( new ArrayList<>( Arrays.asList( childTemplate ) ) );
+        //        EntityManager em = emf.createEntityManager();
+
+        //        em.getTransaction().begin();
+        //        em.persist( childTemplate );
+        //        em.merge( parentTemplate );
 
         templateDAO.saveTemplate( parentTemplate );
-        templateDAO.saveTemplate( childTemplate );
+        //        em.getTransaction().commit();
+        //        parentTemplate.addChildren( Arrays.asList( childTemplate ) );
+
+        //        templateDAO.saveTemplate( parentTemplate );
+        //        templateDAO.saveTemplate( childTemplate );
+
+        //        templateDAO.saveTemplate( parentTemplate, Arrays.asList( childTemplate ) );
 
         List<Template> childTemplates =
                 templateDAO.getChildTemplates( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() );
 
-        assertFalse( childTemplates.contains( childTemplate ) );
+        assertTrue( childTemplates.contains( childTemplate ) );
     }
 
 
