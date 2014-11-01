@@ -64,15 +64,19 @@ string SubutaiContainer::RunProgram(string program, vector<string> params) {
     for (it = params.begin(); it != params.end(); it++, i++) {
         _params[i] = const_cast<char*>(it->c_str());
     }
-    _params[i + 1] = NULL;
+    _params[i] = NULL;
     lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT;
     int fd[2];
-    pipe(fd);
     int _stdout = dup(1);
+    pipe(fd);
     dup2(fd[1], 1);
     char buffer[1000];
-    this->container->attach_run_wait(this->container, &opts, program.c_str(), _params);
+    // TODO: if exit code not equals one - we got stderr
+    int exit_code = this->container->attach_run_wait(this->container, &opts, program.c_str(), _params);
     fflush(stdout);
+    close(fd[1]);
+    dup2(_stdout, 1);
+    close(_stdout);
     // TODO: Decide where to keep this command output
     string command_output;
     while (1) {
@@ -81,9 +85,11 @@ string SubutaiContainer::RunProgram(string program, vector<string> params) {
         if (size < 1000) {
             buffer[size] = '\0';
             command_output += buffer;
+            break;
+        } else {
+            command_output += buffer;
         }
     }
-    dup2(_stdout, 1);
 
     return command_output;
 }
@@ -98,8 +104,9 @@ bool SubutaiContainer::getContainerUuid()
     try
     {
         vector<string> args;
-        this-> uuid = RunProgram("/bin/cat /etc/subutai-agent/uuid.txt", args);
-        if(this->uuid.empty())		//if uuid is null or not reading successfully
+        args.push_back("/etc/subutai-agent/uuid.txt");
+        this-> uuid = RunProgram("/bin/cat", args);
+        if (this->uuid.empty())		//if uuid is null or not reading successfully
         {
             boost::uuids::random_generator gen;
             boost::uuids::uuid u = gen();
