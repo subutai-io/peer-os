@@ -181,15 +181,15 @@ public abstract class BaseManager implements BaseManagerInterface
     }
 
 
-    protected void populateTable( final Table table, List<Agent> agents )
+    protected void populateTable( final Table table, List<ContainerHost> containerHosts )
     {
 
         table.removeAllItems();
 
         // Add UI components into relevant fields according to its role in cluster
-        for ( final Agent agent : agents )
+        for ( final ContainerHost containerHost : containerHosts )
         {
-            addRowComponents( table, agent );
+            addRowComponents( table, containerHost );
         }
     }
 

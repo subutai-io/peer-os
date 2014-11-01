@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 import com.google.common.base.Preconditions;
 
@@ -22,11 +23,11 @@ public class HadoopClusterConfig implements ConfigBase
     public static final int NAME_NODE_PORT = 8020, JOB_TRACKER_PORT = 9000;
 
     private String clusterName, domainName;
-    private UUID nameNode, jobTracker, secondaryNameNode;
-    private List<UUID> masterNodes;
-    private List<UUID> dataNodes, taskTrackers;
+    private ContainerHost nameNode, jobTracker, secondaryNameNode;
+    private List<ContainerHost> masterNodes;
+    private List<ContainerHost> dataNodes, taskTrackers;
     private Integer replicationFactor = 1, countOfSlaveNodes = 1;
-    private Set<UUID> blockedAgents;
+    private Set<ContainerHost> blockedAgents;
     private UUID environmentId;
 
 
@@ -63,9 +64,9 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public List<UUID> getAllNodes()
+    public List<ContainerHost> getAllNodes()
     {
-        Set<UUID> allAgents = new HashSet<>();
+        Set<ContainerHost> allAgents = new HashSet<>();
         if ( dataNodes != null )
         {
             allAgents.addAll( dataNodes );
@@ -92,20 +93,20 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public Set<UUID> getAllMasterNodes(){
+    public Set<ContainerHost> getAllMasterNodes(){
         Preconditions.checkNotNull( nameNode, "NameNode is null");
         Preconditions.checkNotNull( jobTracker, "JobTracker is null");
         Preconditions.checkNotNull( secondaryNameNode, "SecondaryNameNode is null");
-        Set<UUID> allMastersNodes = new HashSet<>();
+        Set<ContainerHost> allMastersNodes = new HashSet<>();
         allMastersNodes.add( nameNode );
         allMastersNodes.add( jobTracker );
         allMastersNodes.add( secondaryNameNode );
         return allMastersNodes;
     }
 
-    public List<UUID> getAllSlaveNodes()
+    public List<ContainerHost> getAllSlaveNodes()
     {
-        Set<UUID> allAgents = new HashSet<>();
+        Set<ContainerHost> allAgents = new HashSet<>();
         if ( dataNodes != null )
         {
             allAgents.addAll( dataNodes );
@@ -119,7 +120,7 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public void removeNode( UUID agent )
+    public void removeNode( ContainerHost agent )
     {
         if ( dataNodes.contains( agent ) )
         {
@@ -194,19 +195,19 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public Set<UUID> getBlockedAgents()
+    public Set<ContainerHost> getBlockedAgents()
     {
         return blockedAgents;
     }
 
 
-    public void setBlockedAgents( HashSet<UUID> blockedAgents )
+    public void setBlockedAgents( HashSet<ContainerHost> blockedAgents )
     {
         this.blockedAgents = blockedAgents;
     }
 
 
-    public boolean isMasterNode( UUID agent )
+    public boolean isMasterNode( ContainerHost agent )
     {
         if ( agent.equals( getNameNode() ) || agent.equals( getJobTracker() ) || agent
                 .equals( getSecondaryNameNode() ) )
@@ -220,43 +221,43 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public UUID getNameNode()
+    public ContainerHost getNameNode()
     {
         return nameNode;
     }
 
 
-    public void setNameNode( UUID nameNode )
+    public void setNameNode( ContainerHost nameNode )
     {
         this.nameNode = nameNode;
     }
 
 
-    public UUID getJobTracker()
+    public ContainerHost getJobTracker()
     {
         return jobTracker;
     }
 
 
-    public void setJobTracker( UUID jobTracker )
+    public void setJobTracker( ContainerHost jobTracker )
     {
         this.jobTracker = jobTracker;
     }
 
 
-    public UUID getSecondaryNameNode()
+    public ContainerHost getSecondaryNameNode()
     {
         return secondaryNameNode;
     }
 
 
-    public void setSecondaryNameNode( UUID secondaryNameNode )
+    public void setSecondaryNameNode( ContainerHost secondaryNameNode )
     {
         this.secondaryNameNode = secondaryNameNode;
     }
 
 
-    public boolean isDataNode( UUID agent )
+    public boolean isDataNode( ContainerHost agent )
     {
         if ( getDataNodes().contains( agent ) )
         {
@@ -269,19 +270,19 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public List<UUID> getDataNodes()
+    public List<ContainerHost> getDataNodes()
     {
         return dataNodes;
     }
 
 
-    public void setDataNodes( List<UUID> dataNodes )
+    public void setDataNodes( List<ContainerHost> dataNodes )
     {
         this.dataNodes = dataNodes;
     }
 
 
-    public boolean isTaskTracker( UUID agent )
+    public boolean isTaskTracker( ContainerHost agent )
     {
         if ( getTaskTrackers().contains( agent ) )
         {
@@ -294,19 +295,19 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public List<UUID> getTaskTrackers()
+    public List<ContainerHost> getTaskTrackers()
     {
         return taskTrackers;
     }
 
 
-    public void setTaskTrackers( List<UUID> taskTrackers )
+    public void setTaskTrackers( List<ContainerHost> taskTrackers )
     {
         this.taskTrackers = taskTrackers;
     }
 
 
-    public boolean isNameNode( UUID agent )
+    public boolean isNameNode( ContainerHost agent )
     {
         if ( getNameNode().equals( agent ) )
         {
@@ -319,7 +320,7 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public boolean isJobTracker( UUID agent )
+    public boolean isJobTracker( ContainerHost agent )
     {
         if ( getJobTracker().equals( agent ) )
         {
@@ -332,7 +333,7 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public boolean isSecondaryNameNode( UUID agent )
+    public boolean isSecondaryNameNode( ContainerHost agent )
     {
         if ( getSecondaryNameNode().equals( agent ) )
         {

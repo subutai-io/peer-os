@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
@@ -30,7 +31,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
 
     private Environment environment;
     private HadoopImpl hadoopManager;
-    private TrackerOperation po;
+    private TrackerOperation trackerOperation;
     private HadoopClusterConfig hadoopClusterConfig;
 
 
@@ -41,7 +42,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
         Preconditions.checkNotNull( hadoopManager, "Hadoop manager is null" );
 
         this.hadoopManager = hadoopManager;
-        this.po = po;
+        this.trackerOperation = po;
         this.hadoopClusterConfig = hadoopClusterConfig;
     }
 
@@ -55,7 +56,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
         Preconditions.checkNotNull( hadoopManager, "Hadoop manager is null" );
 
         this.hadoopManager = hadoopManager;
-        this.po = po;
+        this.trackerOperation = po;
         this.hadoopClusterConfig = hadoopClusterConfig;
         this.environment = environment;
     }
@@ -80,7 +81,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     {
         try
         {
-            po.addLog( String.format( "Creating %d servers...", hadoopClusterConfig.getCountOfSlaveNodes()
+            trackerOperation.addLog( String.format( "Creating %d servers...", hadoopClusterConfig.getCountOfSlaveNodes()
                     + HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY ) );
 
             if ( this.environment == null )
@@ -91,26 +92,35 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
 
             setMasterNodes();
             setSlaveNodes();
-            po.addLog( "Lxc containers created successfully" );
+            trackerOperation.addLog( "Lxc containers created successfully" );
 
-            //continue installation here
-            installHadoopCluster( environment );
-
-            po.addLogDone(
-                    String.format( "Cluster '%s' \nInstallation finished", hadoopClusterConfig.getClusterName() ) );
+            try
+            {
+                new ClusterConfiguration( trackerOperation, hadoopManager ).configureCluster( hadoopClusterConfig, environment );
+            }
+            catch ( ClusterConfigurationException e )
+            {
+                throw new ClusterSetupException( e.getMessage() );
+            }
         }
         catch ( EnvironmentBuildException e )
         {
-            try
-            {
-                hadoopManager.getEnvironmentManager().destroyEnvironment( environment.getId() );
-            }
-            catch ( EnvironmentDestroyException destroyException )
-            {
-                po.addLogFailed( String.format( "Failed to destroy environment %s. \n%s ", environment, destroyException ) );
-                destroyException.printStackTrace();
-            }
+            e.printStackTrace();
         }
+        //        return hadoopClusterConfig;
+//        catch ( EnvironmentBuildException e )
+//        {
+//            try
+//            {
+//                hadoopManager.getEnvironmentManager().destroyEnvironment( environment.getId() );
+//            }
+//            catch ( EnvironmentDestroyException destroyException )
+//            {
+//                trackerOperation.addLogFailed(
+//                        String.format( "Failed to destroy environment %s. \n%s ", environment, destroyException ) );
+//                destroyException.printStackTrace();
+//            }
+//        }
 
         return hadoopClusterConfig;
     }
@@ -119,61 +129,62 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     private void installHadoopCluster( Environment environment ) throws ClusterSetupException
     {
 
-        po.addLog( "Hadoop installation started" );
+        trackerOperation.addLog( "Hadoop installation started" );
         hadoopManager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
                 hadoopClusterConfig );
-        po.addLog( "Cluster info saved to DB" );
+        hadoopClusterConfig.setEnvironmentId( environment.getId() );
+        trackerOperation.addLog( "Cluster info saved to DB" );
 
 //        InstallHadoopOperation installOperation =
 //                new InstallHadoopOperation( hadoopManager.getCommands(), hadoopClusterConfig );
 //        for ( Command command : installOperation.getCommandList() )
 //        {
-//            po.addLog( ( String.format( "%s started...", command.getDescription() ) ) );
+//            trackerOperation.addLog( ( String.format( "%s started...", command.getDescription() ) ) );
 //            hadoopManager.getCommandRunner().runCommand( command );
 //
 //            if ( command.hasSucceeded() )
 //            {
-//                po.addLog( String.format( "%s succeeded", command.getDescription() ) );
+//                trackerOperation.addLog( String.format( "%s succeeded", command.getDescription() ) );
 //            }
 //            else
 //            {
-//                po.addLogFailed( String.format( "%s failed, %s", command.getDescription(), command.getAllErrors() ) );
+//                trackerOperation.addLogFailed( String.format( "%s failed, %s", command.getDescription(), command.getAllErrors() ) );
 //            }
 //        }
     }
 
 
-    //    private void destroyLXC( TrackerOperation po, String log )
+    //    private void destroyLXC( TrackerOperation trackerOperation, String log )
     //    {
     //        //destroy all lxcs also
-    //        po.addLog( "Destroying lxc containers" );
+    //        trackerOperation.addLog( "Destroying lxc containers" );
     //        try
     //        {
     //            for ( Agent agent : hadoopClusterConfig.getAllNodes() )
     //            {
     //                hadoopManager.getContainerManager().cloneDestroy( agent.getParentHostName(), agent.getHostname() );
     //            }
-    //            po.addLog( "Lxc containers successfully destroyed" );
+    //            trackerOperation.addLog( "Lxc containers successfully destroyed" );
     //        }
     //        catch ( LxcDestroyException ex )
     //        {
-    //            po.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
+    //            trackerOperation.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
     //        }
-    //        po.addLogFailed( log );
+    //        trackerOperation.addLogFailed( log );
     //    }
 
 
     private void setMasterNodes() throws ClusterSetupException
     {
-        Set<UUID> masterNodes = new HashSet<>();
+        Set<ContainerHost> masterNodes = new HashSet<>();
         int masterCount = 0;
         for ( ContainerHost containerHost : this.environment.getContainers() )
         {
-            masterCount++;
             if ( masterCount < HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY  )
             {
-                masterNodes.add( containerHost.getAgent().getUuid() );
+                masterNodes.add( containerHost );
             }
+            masterCount++;
         }
 
         if ( masterNodes.size() != HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY )
@@ -181,7 +192,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
             throw new ClusterSetupException( String.format( "Hadoop master nodes must be %d in count",
                     HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY ) );
         }
-        Iterator<UUID> masterIterator = masterNodes.iterator();
+        Iterator<ContainerHost> masterIterator = masterNodes.iterator();
         hadoopClusterConfig.setNameNode( masterIterator.next() );
         hadoopClusterConfig.setSecondaryNameNode( masterIterator.next() );
         hadoopClusterConfig.setJobTracker( masterIterator.next() );
@@ -190,12 +201,12 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
 
     private void setSlaveNodes() throws ClusterSetupException
     {
-        Set<UUID> slaveNodes = new HashSet<>();
+        Set<ContainerHost> slaveNodes = new HashSet<>();
         for ( ContainerHost containerHost : environment.getContainers() )
         {
             if ( ! hadoopClusterConfig.getAllMasterNodes().contains( containerHost.getAgent().getUuid() ) )
             {
-                slaveNodes.add( containerHost.getAgent().getUuid() );
+                slaveNodes.add( containerHost );
             }
         }
         if ( slaveNodes.isEmpty() )

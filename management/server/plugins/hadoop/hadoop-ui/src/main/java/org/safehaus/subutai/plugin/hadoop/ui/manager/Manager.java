@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.hadoop.ui.manager;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -11,6 +12,7 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -34,10 +36,11 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
 
 
-public class Manager extends BaseManager
+public class Manager
 {
 
     protected final static String START_NAMENODE_BUTTON_CAPTION = "Start Namenode";
@@ -65,6 +68,26 @@ public class Manager extends BaseManager
     private ManagerListener managerListener;
     private final EnvironmentManager environmentManager;
 
+    public final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
+    public final static String START_ALL_BUTTON_CAPTION = "Start All";
+    public final static String STOP_ALL_BUTTON_CAPTION = "Stop All";
+    public final static String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    public final static String ADD_NODE_BUTTON_CAPTION = "Add Node";
+    public final static String CHECK_BUTTON_CAPTION = "Check";
+    public final static String START_BUTTON_CAPTION = "Start";
+    public final static String STOP_BUTTON_CAPTION = "Stop";
+    public final static String DESTROY_BUTTON_CAPTION = "Destroy";
+    public final static String HOST_COLUMN_CAPTION = "Host";
+    public final static String IP_COLUMN_CAPTION = "IP List";
+    public final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
+    public final static String STATUS_COLUMN_CAPTION = "Status";
+    public final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
+    public final static String START_STOP_BUTTON_DEFAULT_CAPTION = "Start/Stop";
+
+    protected GridLayout contentRoot;
+    protected ProgressBar progressBar;
+    protected int processCount = 0;
+
 
     public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
@@ -75,6 +98,18 @@ public class Manager extends BaseManager
         this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         managerListener = new ManagerListener( this );
+
+        contentRoot = new GridLayout();
+        contentRoot.setSpacing( true );
+        contentRoot.setMargin( true );
+        contentRoot.setSizeFull();
+        contentRoot.setRows( 40 );
+        contentRoot.setColumns( 1 );
+
+        progressBar = new ProgressBar();
+        progressBar.setId( "indicator" );
+        progressBar.setIndeterminate( true );
+        progressBar.setVisible( false );
 
         //tables go here
         masterNodesTable = createTableTemplate( "Master Nodes" );
@@ -176,6 +211,95 @@ public class Manager extends BaseManager
         checkAllButton.click();
     }
 
+    public HorizontalLayout getStatusLayout( final Item row )
+    {
+        if ( row == null )
+        {
+            return null;
+        }
+        return ( HorizontalLayout ) row.getItemProperty( STATUS_COLUMN_CAPTION ).getValue();
+    }
+
+
+    public Button getDestroyButton( final HorizontalLayout availableOperationsLayout )
+    {
+        if ( availableOperationsLayout == null )
+        {
+            return null;
+        }
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( DESTROY_BUTTON_CAPTION ) )
+                {
+                    return ( Button ) component;
+                }
+            }
+            return null;
+        }
+    }
+
+    public Button getCheckButton( final HorizontalLayout availableOperationsLayout )
+    {
+        if ( availableOperationsLayout == null )
+        {
+            return null;
+        }
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( CHECK_BUTTON_CAPTION ) )
+                {
+                    return ( Button ) component;
+                }
+            }
+            return null;
+        }
+    }
+
+    public synchronized void enableProgressBar()
+    {
+        incrementProcessCount();
+        progressBar.setVisible( true );
+    }
+
+
+    public synchronized void disableProgressBar()
+    {
+        if ( processCount > 0 )
+        {
+            decrementProcessCount();
+        }
+        if ( processCount == 0 )
+        {
+            progressBar.setVisible( false );
+        }
+    }
+
+    public synchronized void incrementProcessCount()
+    {
+        processCount++;
+    }
+
+    public synchronized void decrementProcessCount()
+    {
+        processCount--;
+    }
+
+
+
+    public synchronized int getProcessCount()
+    {
+        return processCount;
+    }
+
+
+    public ProgressBar getProgressBar()
+    {
+        return progressBar;
+    }
 
 
     public Table createTableTemplate( String caption )
@@ -197,7 +321,7 @@ public class Manager extends BaseManager
         table.setSelectable( false );
         table.setImmediate( true );
 
-        table.addItemClickListener( managerListener.getTableClickListener( table ) );
+//        table.addItemClickListener( managerListener.getTableClickListener( table ) );
 
         return table;
     }
@@ -207,14 +331,10 @@ public class Manager extends BaseManager
     {
         if ( hadoopCluster != null )
         {
-            //            refreshClustersInfo();
-//            populateTable( masterNodesTable, getMasterNodeList( hadoopCluster ) );
-//            populateTable( slaveNodesTable, hadoopCluster.getDataNodes() );
-
             Environment environment = environmentManager.getEnvironmentByUUID( hadoopCluster.getEnvironmentId() );
 
-            populateTable( masterNodesTable, getMasters( environment, hadoopCluster ) );
-            populateTable( masterNodesTable, getSlaves( environment, hadoopCluster ) );
+            populateTable( masterNodesTable, getMasters( environment.getContainers(), hadoopCluster ) );
+            populateTable( masterNodesTable, getSlaves( environment.getContainers(), hadoopCluster ) );
 
 
             replicationFactor.setValue( hadoopCluster.getReplicationFactor().toString() );
@@ -231,24 +351,56 @@ public class Manager extends BaseManager
         }
     }
 
+    protected void populateTable( final Table table, Set<ContainerHost> containerHosts )
+    {
 
-    public List<Agent> getMasters( Environment environment, HadoopClusterConfig config ){
-        List<Agent> agents = null;
-        for ( ContainerHost containerHost : environment.getContainerHosts() ) {
-            if ( config.getAllMasterNodes().contains( containerHost.getAgent().getUuid() ) )
-            agents.add( containerHost.getAgent() );
+        table.removeAllItems();
+
+        // Add UI components into relevant fields according to its role in cluster
+        for ( final ContainerHost containerHost : containerHosts )
+        {
+            addRowComponents( table, containerHost );
         }
-        return agents;
     }
 
-    private List<Agent> getSlaves( Environment environment, HadoopClusterConfig config ){
-        List<Agent> agents = null;
-        for ( ContainerHost containerHost : environment.getContainerHosts() ) {
-            if ( config.getAllSlaveNodes().contains( containerHost.getAgent().getUuid() ) )
-                agents.add( containerHost.getAgent() );
+
+    public Set<ContainerHost> getMasters( Set<ContainerHost> containerHosts, HadoopClusterConfig config ){
+        Set<ContainerHost> list = new HashSet<>();
+        for ( ContainerHost containerHost : containerHosts ) {
+            System.out.println( containerHost.getCreatorPeerId() );
+            if ( config.getAllMasterNodes().contains( containerHost.getAgent().getUuid() ) ){
+                    list.add( containerHost );
+            }
         }
-        return agents;
+        return list;
     }
+
+
+    private Set<ContainerHost> getSlaves( Set<ContainerHost> containerHosts, HadoopClusterConfig config ){
+        Set<ContainerHost> list = new HashSet<>();
+        for ( ContainerHost containerHost : containerHosts ) {
+            System.out.println( containerHost.getCreatorPeerId() );
+            if ( config.getAllSlaveNodes().contains( containerHost.getAgent().getUuid() ) ){
+                list.add( containerHost );
+            }
+        }
+        return list;
+    }
+
+
+
+//    protected void populateTable( final Table table, List<ContainerHost> containerHosts )
+//    {
+//
+//        table.removeAllItems();
+//
+//        // Add UI components into relevant fields according to its role in cluster
+//        for ( final ContainerHost containerHost : containerHosts )
+//        {
+//            addRowComponents( table, containerHost );
+//        }
+//    }
+
 
     private void startAllNodes( Table table )
     {
@@ -266,6 +418,15 @@ public class Manager extends BaseManager
                 }
             }
         }
+    }
+
+    public HorizontalLayout getAvailableOperationsLayout( Item row )
+    {
+        if ( row == null )
+        {
+            return null;
+        }
+        return ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
     }
 
 
@@ -286,6 +447,68 @@ public class Manager extends BaseManager
             }
         }
     }
+
+
+    public Button getStartButton( final HorizontalLayout availableOperationsLayout )
+    {
+        if ( availableOperationsLayout == null )
+        {
+            return null;
+        }
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().contains( START_BUTTON_CAPTION ) )
+                {
+                    return ( Button ) component;
+                }
+            }
+            return null;
+        }
+    }
+
+
+    public Button getStopButton( final HorizontalLayout availableOperationsLayout )
+    {
+        if ( availableOperationsLayout == null )
+        {
+            return null;
+        }
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().contains( STOP_BUTTON_CAPTION ) )
+                {
+                    return ( Button ) component;
+                }
+            }
+            return null;
+        }
+    }
+
+
+    public Button getStartStopButton( final HorizontalLayout availableOperationsLayout )
+    {
+        if ( availableOperationsLayout == null )
+        {
+            return null;
+        }
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().contains( START_BUTTON_CAPTION ) || component.getCaption().contains(
+                        STOP_BUTTON_CAPTION ) || component.getCaption().equals( START_STOP_BUTTON_DEFAULT_CAPTION ) )
+                {
+                    return ( Button ) component;
+                }
+            }
+            return null;
+        }
+    }
+
 
 
     protected Button getExcludeIncludeButton( final HorizontalLayout availableOperationsLayout )
@@ -432,9 +655,9 @@ public class Manager extends BaseManager
     }
 
 
-    public List<UUID> getMasterNodeList( final HadoopClusterConfig hadoopCluster )
+    public List<ContainerHost> getMasterNodeList( final HadoopClusterConfig hadoopCluster )
     {
-        List<UUID> masterNodeList = new ArrayList<>();
+        List<ContainerHost> masterNodeList = new ArrayList<>();
         masterNodeList.add( hadoopCluster.getNameNode() );
         masterNodeList.add( hadoopCluster.getJobTracker() );
         masterNodeList.add( hadoopCluster.getSecondaryNameNode() );
@@ -526,15 +749,20 @@ public class Manager extends BaseManager
     }
 
 
-    @Override
+
     public void refreshClustersInfo()
     {
         managerListener.refreshClusterList();
     }
 
 
+//    @Override
+//    public void addRowComponents( final Table table, final Agent agent )
+//    {
+//
+//    }
 
-    public void addRowComponents( Table table, final Agent agent )
+    public void addRowComponents( Table table, final ContainerHost containerHost )
     {
 
         final HadoopClusterConfig cluster = hadoop.getCluster( hadoopCluster.getClusterName() );
@@ -551,15 +779,15 @@ public class Manager extends BaseManager
 
         // Buttons to be added to availableOperations
         final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
-        checkButton.setId( agent.getListIP().get( 0 ) + "-hadoopCheck" );
+        checkButton.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hadoopCheck" );
         final Button destroyButton = new Button( DESTROY_BUTTON_CAPTION );
-        destroyButton.setId( agent.getListIP().get( 0 ) + "-hadoopDestroy" );
+        destroyButton.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hadoopDestroy" );
         final Button startStopButton = new Button( START_STOP_BUTTON_DEFAULT_CAPTION );
-        startStopButton.setId( agent.getListIP().get( 0 ) + "-hadoopStartStop" );
+        startStopButton.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hadoopStartStop" );
         final Button excludeIncludeNodeButton = new Button( EXCLUDE_INCLUDE_BUTTON_DEFAULT_CAPTION );
-        excludeIncludeNodeButton.setId( agent.getListIP().get( 0 ) + "-hadoopExcludeInclude" );
+        excludeIncludeNodeButton.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hadoopExcludeInclude" );
         final Button urlButton = new Button( URL_BUTTON_CAPTION );
-        urlButton.setId( agent.getHostname() + "-hadoopUrl" );
+        urlButton.setId( containerHost.getHostname() + "-hadoopUrl" );
 
         checkButton.addStyleName( "default" );
         startStopButton.addStyleName( "default" );
@@ -571,11 +799,11 @@ public class Manager extends BaseManager
 
         // Labels to be added to statusGroup
         final Label statusDatanode = new Label( "" );
-        statusDatanode.setId( agent.getListIP().get( 0 ) + "-hadoopStatusDataNode" );
+        statusDatanode.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hadoopStatusDataNode" );
         final Label statusTaskTracker = new Label( "" );
-        statusTaskTracker.setId( agent.getListIP().get( 0 ) + "-hadoopStatusTaskTracker" );
+        statusTaskTracker.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hadoopStatusTaskTracker" );
         final Label statusDecommission = new Label( "" );
-        statusDecommission.setId( agent.getListIP().get( 0 ) + "-hadoopStatusDecommission" );
+        statusDecommission.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hadoopStatusDecommission" );
 
         statusDatanode.addStyleName( "default" );
         statusTaskTracker.addStyleName( "default" );
@@ -583,23 +811,23 @@ public class Manager extends BaseManager
         // Labels to be added to statusGroup
 
 
-        if ( cluster.isMasterNode( agent.getUuid() ) )
+        if ( cluster.isMasterNode( containerHost ) )
         {
-            if ( cluster.isNameNode( agent.getUuid() ) )
+            if ( cluster.isNameNode( containerHost ) )
             {
                 availableOperations.addComponent( checkButton );
                 availableOperations.addComponent( startStopButton );
                 availableOperations.addComponent( urlButton );
                 statusGroup.addComponent( statusDatanode );
             }
-            else if ( cluster.isJobTracker( agent.getUuid() ) )
+            else if ( cluster.isJobTracker( containerHost ) )
             {
                 availableOperations.addComponent( checkButton );
                 availableOperations.addComponent( startStopButton );
                 availableOperations.addComponent( urlButton );
                 statusGroup.addComponent( statusTaskTracker );
             }
-            else if ( cluster.isSecondaryNameNode( agent.getUuid() ) )
+            else if ( cluster.isSecondaryNameNode( containerHost ) )
             {
                 availableOperations.addComponent( checkButton );
                 availableOperations.addComponent( urlButton );
@@ -616,37 +844,37 @@ public class Manager extends BaseManager
             statusGroup.addComponent( statusDecommission );
         }
         table.addItem( new Object[] {
-                agent.getHostname(), agent.getListIP().toString(), getNodeRoles( cluster, agent ).toString(),
+                containerHost.getHostname(), containerHost.getAgent().getListIP().toString(), getNodeRoles( cluster, containerHost ).toString(),
                 statusGroup, availableOperations
         }, null );
 
 
-        Item row = getAgentRow( table, agent );
+        Item row = getAgentRow( table, containerHost.getAgent() );
 
         // Add listeners according to node type
 
         // If master node
-        if ( cluster.isMasterNode( agent.getUuid() ) )
+        if ( cluster.isMasterNode( containerHost ) )
         {
 
             // If Namenode
-            if ( cluster.isNameNode( agent.getUuid() ) )
+            if ( cluster.isNameNode( containerHost ) )
             {
-                urlButton.addClickListener( managerListener.nameNodeURLButtonListener( agent ) );
+                urlButton.addClickListener( managerListener.nameNodeURLButtonListener( containerHost.getAgent() ) );
                 checkButton.addClickListener( managerListener.nameNodeCheckButtonListener( row ) );
                 startStopButton.addClickListener( managerListener.nameNodeStartStopButtonListener( row ) );
             }
             // If Jobtracker
-            else if ( cluster.isJobTracker( agent.getUuid() ) )
+            else if ( cluster.isJobTracker( containerHost ) )
             {
-                urlButton.addClickListener( jobTrackerURLButtonListener( agent ) );
+                urlButton.addClickListener( jobTrackerURLButtonListener( containerHost.getAgent() ) );
                 checkButton.addClickListener( managerListener.jobTrackerCheckButtonListener( row ) );
                 startStopButton.addClickListener( managerListener.jobTrackerStartStopButtonListener( row ) );
             }
             // If SecondaryNameNode
-            else if ( cluster.isSecondaryNameNode( agent.getUuid() ) )
+            else if ( cluster.isSecondaryNameNode( containerHost ) )
             {
-                urlButton.addClickListener( managerListener.secondaryNameNodeURLButtonListener( agent ) );
+                urlButton.addClickListener( managerListener.secondaryNameNodeURLButtonListener( containerHost.getAgent() ) );
                 checkButton.addClickListener( managerListener.secondaryNameNodeCheckButtonListener( row ) );
             }
         }
@@ -654,7 +882,7 @@ public class Manager extends BaseManager
         else
         {
 
-            checkButton.addClickListener( managerListener.slaveNodeCheckButtonListener( row ) );
+//            checkButton.addClickListener( managerListener.slaveNodeCheckButtonListener( row ) );
             excludeIncludeNodeButton.addClickListener( managerListener.slaveNodeExcludeIncludeButtonListener( row ) );
             destroyButton.addClickListener( managerListener.slaveNodeDestroyButtonListener( row ) );
         }
@@ -662,27 +890,64 @@ public class Manager extends BaseManager
 
 
 
-    private List<NodeType> getNodeRoles( HadoopClusterConfig clusterConfig, final Agent agent )
+    public Item getAgentRow( final Table table, final Agent agent )
+    {
+
+        int rowId = getAgentRowId( table, agent );
+        Item row = null;
+        if ( rowId >= 0 )
+        {
+            row = table.getItem( rowId );
+        }
+        if ( row == null )
+        {
+            Notification.show( "Agent rowId should have been found inside " + table.getCaption()
+                    + " but could not find! " );
+        }
+        return row;
+    }
+
+
+    protected int getAgentRowId( final Table table, final Agent agent )
+    {
+        if ( table != null && agent != null )
+        {
+            for ( Object o : table.getItemIds() )
+            {
+                int rowId = ( Integer ) o;
+                Item row = table.getItem( rowId );
+                String hostName = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
+                if ( hostName.equals( agent.getHostname() ) )
+                {
+                    return rowId;
+                }
+            }
+        }
+        return -1;
+    }
+
+
+    private List<NodeType> getNodeRoles( HadoopClusterConfig clusterConfig, final ContainerHost containerHost )
     {
         List<NodeType> nodeRoles = new ArrayList<>();
 
-        if ( clusterConfig.isNameNode( agent.getUuid() ) )
+        if ( clusterConfig.isNameNode( containerHost ) )
         {
             nodeRoles.add( NodeType.NAMENODE );
         }
-        if ( clusterConfig.isSecondaryNameNode( agent.getUuid() ) )
+        if ( clusterConfig.isSecondaryNameNode( containerHost ) )
         {
             nodeRoles.add( NodeType.SECONDARY_NAMENODE );
         }
-        if ( clusterConfig.isJobTracker( agent.getUuid() ) )
+        if ( clusterConfig.isJobTracker( containerHost ) )
         {
             nodeRoles.add( NodeType.JOBTRACKER );
         }
-        if ( clusterConfig.isDataNode( agent.getUuid() ) )
+        if ( clusterConfig.isDataNode( containerHost ) )
         {
             nodeRoles.add( NodeType.DATANODE );
         }
-        if ( clusterConfig.isTaskTracker( agent.getUuid() ) )
+        if ( clusterConfig.isTaskTracker( containerHost ) )
         {
             nodeRoles.add( NodeType.TASKTRACKER );
         }

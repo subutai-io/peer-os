@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 
 public class HadoopImpl implements Hadoop
@@ -605,7 +606,6 @@ public class HadoopImpl implements Hadoop
             throws ClusterSetupException
     {
 
-
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint
                 .setName( String.format( "%s-%s", HadoopClusterConfig.PRODUCT_KEY, UUIDUtil.generateTimeBasedUUID() ) );
@@ -614,27 +614,33 @@ public class HadoopImpl implements Hadoop
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
         Set<NodeGroup> nodeGroups = new HashSet<>( INITIAL_CAPACITY );
 
-        //hadoop master nodes
-        NodeGroup mastersGroup = new NodeGroup();
-        mastersGroup.setName( NodeType.MASTER_NODE.name() );
-        mastersGroup.setNumberOfNodes( HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY );
-        mastersGroup.setTemplateName( config.getTemplateName() );
-        mastersGroup.setPlacementStrategy( PlacementStrategy.MORE_RAM );
-        //        mastersGroup.setPhysicalNodes( convertAgent2Hostname() );
-        nodeGroups.add( mastersGroup );
+        NodeGroup nodeGroup = new NodeGroup();
+        nodeGroup.setTemplateName( config.getTemplateName() );
+        nodeGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        nodeGroup.setNumberOfNodes( HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY + config.getCountOfSlaveNodes() );
 
-        //hadoop slave nodes
-        NodeGroup slavesGroup = new NodeGroup();
-        slavesGroup.setName( NodeType.SLAVE_NODE.name() );
-        slavesGroup.setNumberOfNodes( config.getCountOfSlaveNodes() );
-        slavesGroup.setTemplateName( config.getTemplateName() );
-        slavesGroup.setPlacementStrategy( PlacementStrategy.MORE_HDD );
-        //        slavesGroup.setPhysicalNodes( convertAgent2Hostname() );
-        nodeGroups.add( slavesGroup );
-
-        environmentBlueprint.setNodeGroups( nodeGroups );
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
 
 
+//        //hadoop master nodes
+//        NodeGroup mastersGroup = new NodeGroup();
+//        mastersGroup.setName( NodeType.MASTER_NODE.name() );
+//        mastersGroup.setNumberOfNodes( HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY );
+//        mastersGroup.setTemplateName( config.getTemplateName() );
+//        mastersGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+//        //        mastersGroup.setPhysicalNodes( convertAgent2Hostname() );
+//        nodeGroups.add( mastersGroup );
+//
+//        //hadoop slave nodes
+//        NodeGroup slavesGroup = new NodeGroup();
+//        slavesGroup.setName( NodeType.SLAVE_NODE.name() );
+//        slavesGroup.setNumberOfNodes( config.getCountOfSlaveNodes() );
+//        slavesGroup.setTemplateName( config.getTemplateName() );
+//        slavesGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN);
+//        //        slavesGroup.setPhysicalNodes( convertAgent2Hostname() );
+//        nodeGroups.add( slavesGroup );
+//
+//        environmentBlueprint.setNodeGroups( nodeGroups );
 
         return environmentBlueprint;
     }
