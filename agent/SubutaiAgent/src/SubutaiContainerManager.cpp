@@ -85,11 +85,22 @@ void SubutaiContainerManager::findAllContainers()
 }
 
 SubutaiContainer SubutaiContainerManager::findContainerByName(string container_name) {
+
     for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
         if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
-            return (*it);
+            return &(*it);
         }
     }
+    return NULL;
+}
+
+SubutaiContainer SubutaiContainerManager::findContainerByUuid(string container_uuid) {
+    for (ContainerIterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
+        if ((*it).getContainerUuidValue() == container_uuid) {
+            return &(*it);
+        }
+    }
+    return NULL;
 }
 
 SubutaiContainer SubutaiContainerManager::findContainerByUuid(string uuid) {

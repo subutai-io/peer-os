@@ -25,7 +25,6 @@
  *  @date      Oct 31, 2014
  */
 #include "SubutaiContainer.h"
-#include <lxc/lxccontainer.h>
 #include "SubutaiConnection.h"
 /**
  *  \details   Default constructor of SubutaiEnvironment class.

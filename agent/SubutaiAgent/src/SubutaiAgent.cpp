@@ -89,7 +89,7 @@ void threadSend(message_queue *mq,SubutaiConnection *connection,SubutaiLogger* l
  *  \details   This method checks the Default HeartBeat execution timeout value.
  *  		   if execution timeout is occured it returns true. Otherwise it returns false.
  */
-bool checkExecutionTimeout(unsigned int* startsec,bool* overflag,unsigned int* exectimeout,unsigned int* count)
+bool checkExecutionTimeout(unsigned int* startsec, bool* overflag, unsigned int* exectimeout, unsigned int* count)
 {
     if (*exectimeout != 0)
     {
@@ -404,6 +404,8 @@ int main(int argc,char *argv[],char *envp[])
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command Program:", command.getProgram()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command runAs:", command.getRunAs()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command timeout:", toString(command.getTimeout())));
+                    // Check if this uuid belongs this FAI or one of child containers
+                     
                     if (command.getWatchArguments().size()!=0)
                     {
                         for (unsigned int i=0; i<command.getWatchArguments().size(); i++)
