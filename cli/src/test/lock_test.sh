@@ -6,7 +6,6 @@ subutai_lib_base=/usr/share/subutai-cli/subutai/lib
 subutai_conf_base=/etc/subutai
 . $subutai_lib_base/funcs
 
-
 test_system_lock()
 {
   lock_subutai_system > /dev/null 2>&1
@@ -19,6 +18,11 @@ test_system_lock()
   if [ "`is_system_locked`" != "true" ]
   then
     assertEquals "is_system_locked function false but system is locked!" 0 1
+  fi
+  (lxc-ls | grep master) > /dev/null 2>&1
+  if [ $? != 0 ]
+  then
+  subutai master_import
   fi
   subutai clone master test > /dev/null 2>&1
   returnCode=$?
@@ -151,31 +155,31 @@ test_read_lock()
     assertEquals "Test Container is locked by read but clone is able to work!" 1 $returnCode
   fi
   rm /lxc-data/tmpdir/test*
-  subutai export test #> /dev/null 2>&1
+  subutai export test > /dev/null 2>&1
   returnCode=$?
   if [ $returnCode == 0 ]
   then
     assertEquals "Test Container is locked by read but export is able to work!" 1 $returnCode
   fi
-  subutai register test #> /dev/null 2>&1
+  subutai register test > /dev/null 2>&1
   returnCode=$?
   if [ $returnCode == 0 ]
   then
     assertEquals "Test Container is locked by read but register is able to work!" 1 $returnCode
   fi
-  subutai destroy test #> /dev/null 2>&1
+  subutai destroy test > /dev/null 2>&1
   returnCode=$?
   if [ $returnCode == 0 ]
   then
     assertEquals "Test Container is locked by read but destroy is able to work!" 1 $returnCode
   fi
-  subutai demote test #> /dev/null 2>&1
+  subutai demote test > /dev/null 2>&1
   returnCode=$?
   if [ $returnCode == 0 ]
   then
     assertEquals "Test Container is locked by read but demote is able to work!" 1 $returnCode
   fi
-  subutai promote test #> /dev/null 2>&1
+  subutai promote test > /dev/null 2>&1
   returnCode=$?
   if [ $returnCode == 0 ]
   then
