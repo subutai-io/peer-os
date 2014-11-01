@@ -130,14 +130,12 @@ public class StormImpl extends StormBase
 
 
     @Override
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( StormConfig config )
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( StormConfig config )
     {
 
-        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
-
-        EnvironmentBlueprint eb = new EnvironmentBlueprint();
-        eb.setName( StormConfig.PRODUCT_NAME + UUIDUtil.generateTimeBasedUUID() );
-        eb.setNodeGroups( new HashSet<NodeGroup>() );
+        EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
+        environmentBlueprint.setName( StormConfig.PRODUCT_NAME + UUIDUtil.generateTimeBasedUUID() );
+        environmentBlueprint.setNodeGroups( new HashSet<NodeGroup>() );
 
         // no need to create new container for nimbus node if external Zookeeper
         // instance is used as nimbus node
@@ -148,7 +146,7 @@ public class StormImpl extends StormBase
             nimbus.setNumberOfNodes( 1 );
             nimbus.setTemplateName( StormConfig.TEMPLATE_NAME_NIMBUS );
             nimbus.setPlacementStrategy( PlacementStrategy.MORE_RAM );
-            eb.getNodeGroups().add( nimbus );
+            environmentBlueprint.getNodeGroups().add( nimbus );
         }
 
         NodeGroup workers = new NodeGroup();
@@ -156,11 +154,10 @@ public class StormImpl extends StormBase
         workers.setNumberOfNodes( config.getSupervisorsCount() );
         workers.setTemplateName( StormConfig.TEMPLATE_NAME_WORKER );
         workers.setPlacementStrategy( PlacementStrategy.MORE_RAM );
-        eb.getNodeGroups().add( workers );
+        environmentBlueprint.getNodeGroups().add( workers );
 
-        environmentBuildTask.setEnvironmentBlueprint( eb );
 
-        return environmentBuildTask;
+        return environmentBlueprint;
     }
 
 

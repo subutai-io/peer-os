@@ -4,7 +4,10 @@ package org.safehaus.subutai.core.peer.api;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.container.api.ContainerState;
+
+import sun.security.util.DerValue;
 
 
 /**
@@ -17,6 +20,8 @@ public class ContainerHost extends SubutaiHost
     private String templateName;
     private String templateArch;
     private ContainerState state = ContainerState.UNKNOWN;
+    private String nodeGroupName;
+    private Template template;
 
 
     public ContainerHost( final Agent agent, UUID peerId, UUID environmentId )
@@ -90,6 +95,18 @@ public class ContainerHost extends SubutaiHost
     {
         lastHeartbeat = System.currentTimeMillis();
         setState( ContainerState.RUNNING );
+    }
+
+
+    public String getNodeGroupName()
+    {
+        return nodeGroupName;
+    }
+
+
+    public Template getTemplate()
+    {
+        return template;
     }
 
     //    @Override

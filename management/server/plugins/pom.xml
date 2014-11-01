@@ -23,7 +23,9 @@
     <module>mongodb</module>
     <module>flume</module>
     <module>hive</module>
+    -->
     <module>storm</module>
+    <!--
     <module>presto</module>
     <module>spark</module>
     <module>shark</module>
@@ -37,7 +39,7 @@
     <module>hipi</module>
     <module>nutch</module>
     <module>jetty</module>-->
-    <!--<module>plugin-common</module>-->
+    <module>plugin-common</module>
   </modules>
 
 </project>

@@ -2,20 +2,23 @@ package org.safehaus.subutai.plugin.storm.impl;
 
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
@@ -54,7 +57,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         }
 
         // check installed packages
-        for ( EnvironmentContainer n : environment.getContainers() )
+        for ( ContainerHost n : environment.getContainers() )
         {
             if ( !n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
             {
@@ -103,21 +106,21 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         else
         // find out nimbus node in environment
         {
-            for ( EnvironmentContainer n : environment.getContainers() )
+            for ( ContainerHost n : environment.getContainers() )
             {
                 if ( n.getNodeGroupName().equals( StormService.NIMBUS.toString() ) )
                 {
-                    config.setNimbus( n.getAgent() );
+                    config.setNimbus( n.getId() );
                 }
             }
         }
 
         // collect worker nodes in environment
-        for ( EnvironmentContainer n : environment.getContainers() )
+        for ( ContainerHost n : environment.getContainers() )
         {
             if ( n.getNodeGroupName().equals( StormService.SUPERVISOR.toString() ) )
             {
-                config.getSupervisors().add( n.getAgent() );
+                config.getSupervisors().add( n.getId() );
             }
         }
         if ( config.getNimbus() == null )
@@ -131,15 +134,16 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
                             config.getSupervisorsCount() ) );
         }
 
-        // check if nodes are connected
-        String nimbusHostname = config.getNimbus().getHostname();
-        if ( manager.agentManager.getAgentByHostname( nimbusHostname ) == null )
+        ContainerHost containerHost = environment.getContainerHostByUUID( config.getNimbus() );
+
+        if ( !containerHost.isConnected() )
         {
             throw new ClusterSetupException( "Nimbus node is not connected" );
         }
-        for ( Agent a : config.getSupervisors() )
+        for ( UUID supervisorUuids : config.getSupervisors() )
         {
-            if ( manager.agentManager.getAgentByHostname( a.getHostname() ) == null )
+            if ( ! manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
+                    .getContainerHostByUUID( supervisorUuids ).isConnected() )
             {
                 throw new ClusterSetupException( "Not all worker nodes are connected" );
             }
@@ -165,19 +169,31 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         Map<String, String> paramValues = new LinkedHashMap<>();
         paramValues.put( "storm.zookeeper.servers", zk_servers );
         paramValues.put( "storm.local.dir", "/var/lib/storm" );
-        paramValues.put( "nimbus.host", config.getNimbus().getListIP().get( 0 ) );
+        ContainerHost nimbusHost = environment.getContainerHostByUUID( config.getNimbus() );
+        paramValues.put( "nimbus.host", nimbusHost.getAgent().getListIP().get( 0 ) );
 
-        Set<Agent> allNodes = new HashSet<>( config.getSupervisors() );
+        Set<UUID> allNodes = new HashSet<>( config.getSupervisors() );
         allNodes.add( config.getNimbus() );
 
         for ( Map.Entry<String, String> e : paramValues.entrySet() )
         {
             String s = Commands.configure( "add", "storm.xml", e.getKey(), e.getValue() );
-            Command cmd = manager.getCommandRunner().createCommand( new RequestBuilder( s ), allNodes );
-            manager.getCommandRunner().runCommand( cmd );
-            if ( !cmd.hasSucceeded() )
-            {
-                throw new ClusterSetupException( "Failed to configure: " + cmd.getAllErrors() );
+
+            Iterator<UUID> iterator = allNodes.iterator();
+
+            while( iterator.hasNext() ) {
+                ContainerHost stormNode = environment.getContainerHostByUUID( iterator.next() );
+                try
+                {
+                    CommandResult commandResult = stormNode.execute( new RequestBuilder( s ).withTimeout( 60 ) );
+                    po.addLog( String.format( "Storm %s %s configured on %s", nimbusHost.getNodeGroupName(),
+                            commandResult.hasSucceeded() ? "" : "not", stormNode.getHostname() ) );
+                }
+                catch ( CommandException exception )
+                {
+                    po.addLogFailed("Failed to configure " + stormNode + ": " + exception );
+                    exception.printStackTrace();
+                }
             }
         }
     }
@@ -206,7 +222,8 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         }
         else if ( config.getNimbus() != null )
         {
-            return config.getNimbus().getListIP().get( 0 );
+            ContainerHost nimbusHost = environment.getContainerHostByUUID( config.getNimbus() );
+            return nimbusHost.getAgent().getListIP().get( 0 );
         }
 
         return null;

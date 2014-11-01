@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
@@ -32,7 +32,7 @@ public interface Storm extends ApiBase<StormConfig>
 
     public UUID destroyNode( String clusterName, String hostname );
 
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( StormConfig config );
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( StormConfig config );
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, StormConfig config,
                                                          TrackerOperation po );

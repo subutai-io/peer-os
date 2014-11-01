@@ -7,9 +7,6 @@ import java.util.concurrent.Executors;
 
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDao;
@@ -23,11 +20,8 @@ public abstract class StormBase implements Storm
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( StormImpl.class.getName() );
-    protected CommandRunner commandRunner;
-    protected AgentManager agentManager;
     protected Tracker tracker;
     protected Zookeeper zookeeperManager;
-    protected ContainerManager containerManager;
     protected EnvironmentManager environmentManager;
 
     protected PluginDao pluginDao;
@@ -56,30 +50,6 @@ public abstract class StormBase implements Storm
     }
 
 
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
-    public void setCommandRunner( CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
-    }
-
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }
-
-
     public Tracker getTracker()
     {
         return tracker;
@@ -101,18 +71,6 @@ public abstract class StormBase implements Storm
     public void setZookeeperManager( Zookeeper zookeeperManager )
     {
         this.zookeeperManager = zookeeperManager;
-    }
-
-
-    public ContainerManager getContainerManager()
-    {
-        return containerManager;
-    }
-
-
-    public void setContainerManager( ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
     }
 
 
