@@ -2,8 +2,10 @@ package org.safehaus.subutai.plugin.common.ui;
 
 
 import java.util.List;
+import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.BaseManagerInterface;
 
 import com.vaadin.data.Item;

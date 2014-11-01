@@ -10,14 +10,12 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
+import com.google.common.base.Preconditions;
 
-/**
- * Created by daralbaev on 02.04.14.
- */
+
 public class HadoopClusterConfig implements ConfigBase
 {
     public static final String PRODUCT_KEY = "Hadoop";
-
     public static final int DEFAULT_HADOOP_MASTER_NODES_QUANTITY = 3;
     public static final String PRODUCT_NAME = PRODUCT_KEY.toLowerCase();
     private String templateName = PRODUCT_NAME;
@@ -25,6 +23,7 @@ public class HadoopClusterConfig implements ConfigBase
 
     private String clusterName, domainName;
     private UUID nameNode, jobTracker, secondaryNameNode;
+    private List<UUID> masterNodes;
     private List<UUID> dataNodes, taskTrackers;
     private Integer replicationFactor = 1, countOfSlaveNodes = 1;
     private Set<UUID> blockedAgents;
@@ -92,6 +91,17 @@ public class HadoopClusterConfig implements ConfigBase
         return new ArrayList<>( allAgents );
     }
 
+
+    public Set<UUID> getAllMasterNodes(){
+        Preconditions.checkNotNull( nameNode, "NameNode is null");
+        Preconditions.checkNotNull( jobTracker, "JobTracker is null");
+        Preconditions.checkNotNull( secondaryNameNode, "SecondaryNameNode is null");
+        Set<UUID> allMastersNodes = new HashSet<>();
+        allMastersNodes.add( nameNode );
+        allMastersNodes.add( jobTracker );
+        allMastersNodes.add( secondaryNameNode );
+        return allMastersNodes;
+    }
 
     public List<UUID> getAllSlaveNodes()
     {

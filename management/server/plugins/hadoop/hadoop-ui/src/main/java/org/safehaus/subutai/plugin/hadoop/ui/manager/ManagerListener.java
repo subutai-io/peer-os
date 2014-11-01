@@ -65,30 +65,31 @@ public class ManagerListener
 
     protected ItemClickEvent.ItemClickListener getTableClickListener( final Table table )
     {
-        return new ItemClickEvent.ItemClickListener()
-        {
-            @Override
-            public void itemClick( ItemClickEvent event )
-            {
-                if ( event.isDoubleClick() )
-                {
-                    String lxcHostname =
-                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = hadoopManager.getAgentManager().getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
-                    {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), hadoopManager.getExecutorService(),
-                                        hadoopManager.getCommandRunner(), hadoopManager.getAgentManager() );
-                        hadoopManager.getContentRoot().getUI().addWindow( terminal.getWindow() );
-                    }
-                    else
-                    {
-                        hadoopManager.show( "Agent of " + lxcHostname + " is not connected" );
-                    }
-                }
-            }
-        };
+//        return new ItemClickEvent.ItemClickListener()
+//        {
+//            @Override
+//            public void itemClick( ItemClickEvent event )
+//            {
+//                if ( event.isDoubleClick() )
+//                {
+//                    String lxcHostname =
+//                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
+//                    Agent lxcAgent = hadoopManager.getAgentManager().getAgentByHostname( lxcHostname );
+//                    if ( lxcAgent != null )
+//                    {
+//                        TerminalWindow terminal =
+//                                new TerminalWindow( Sets.newHashSet( lxcAgent ), hadoopManager.getExecutorService(),
+//                                        hadoopManager.getCommandRunner(), hadoopManager.getAgentManager() );
+//                        hadoopManager.getContentRoot().getUI().addWindow( terminal.getWindow() );
+//                    }
+//                    else
+//                    {
+//                        hadoopManager.show( "Agent of " + lxcHostname + " is not connected" );
+//                    }
+//                }
+//            }
+//        };
+        return  null;
     }
 
 
@@ -717,7 +718,7 @@ public class ManagerListener
                 excludeIncludeNodeButton.setEnabled( false );
                 destroyButton.setEnabled( false );
                 if ( hadoopManager.getHadoop().getCluster( hadoopManager.getHadoopCluster().getClusterName() )
-                                  .isDataNode( agent ) )
+                                  .isDataNode( agent.getUuid() ) )
                 {
                     hadoopManager.enableProgressBar();
                     hadoopManager.getExecutorService().execute(
@@ -757,7 +758,7 @@ public class ManagerListener
                             }, null, agent ) );
                 }
                 if ( hadoopManager.getHadoop().getCluster( hadoopManager.getHadoopCluster().getClusterName() )
-                                  .isTaskTracker( agent ) )
+                                  .isTaskTracker( agent.getUuid() ) )
                 {
                     hadoopManager.enableProgressBar();
                     hadoopManager.getExecutorService().execute(

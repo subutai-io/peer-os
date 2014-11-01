@@ -4,19 +4,15 @@ package org.safehaus.subutai.plugin.hadoop.impl.common;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -82,7 +78,6 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     @Override
     public HadoopClusterConfig setup() throws ClusterSetupException
     {
-
         try
         {
             po.addLog( String.format( "Creating %d servers...", hadoopClusterConfig.getCountOfSlaveNodes()
@@ -129,22 +124,22 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
                 hadoopClusterConfig );
         po.addLog( "Cluster info saved to DB" );
 
-        InstallHadoopOperation installOperation =
-                new InstallHadoopOperation( hadoopManager.getCommands(), hadoopClusterConfig );
-        for ( Command command : installOperation.getCommandList() )
-        {
-            po.addLog( ( String.format( "%s started...", command.getDescription() ) ) );
-            hadoopManager.getCommandRunner().runCommand( command );
-
-            if ( command.hasSucceeded() )
-            {
-                po.addLog( String.format( "%s succeeded", command.getDescription() ) );
-            }
-            else
-            {
-                po.addLogFailed( String.format( "%s failed, %s", command.getDescription(), command.getAllErrors() ) );
-            }
-        }
+//        InstallHadoopOperation installOperation =
+//                new InstallHadoopOperation( hadoopManager.getCommands(), hadoopClusterConfig );
+//        for ( Command command : installOperation.getCommandList() )
+//        {
+//            po.addLog( ( String.format( "%s started...", command.getDescription() ) ) );
+//            hadoopManager.getCommandRunner().runCommand( command );
+//
+//            if ( command.hasSucceeded() )
+//            {
+//                po.addLog( String.format( "%s succeeded", command.getDescription() ) );
+//            }
+//            else
+//            {
+//                po.addLogFailed( String.format( "%s failed, %s", command.getDescription(), command.getAllErrors() ) );
+//            }
+//        }
     }
 
 
@@ -170,17 +165,14 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
 
     private void setMasterNodes() throws ClusterSetupException
     {
-        Set<Agent> masterNodes = new HashSet<>();
-
-        for ( ContainerHost environmentContainer : this.environment.getContainers() )
+        Set<UUID> masterNodes = new HashSet<>();
+        int masterCount = 0;
+        for ( ContainerHost containerHost : this.environment.getContainers() )
         {
-            if ( NodeType.MASTER_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
+            masterCount++;
+            if ( masterCount < HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY  )
             {
-                if ( environmentContainer.getTemplate().getProducts()
-                                         .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
-                {
-                    masterNodes.add( environmentContainer.getAgent() );
-                }
+                masterNodes.add( containerHost.getAgent().getUuid() );
             }
         }
 
@@ -189,8 +181,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
             throw new ClusterSetupException( String.format( "Hadoop master nodes must be %d in count",
                     HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY ) );
         }
-
-        Iterator<Agent> masterIterator = masterNodes.iterator();
+        Iterator<UUID> masterIterator = masterNodes.iterator();
         hadoopClusterConfig.setNameNode( masterIterator.next() );
         hadoopClusterConfig.setSecondaryNameNode( masterIterator.next() );
         hadoopClusterConfig.setJobTracker( masterIterator.next() );
@@ -199,25 +190,18 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
 
     private void setSlaveNodes() throws ClusterSetupException
     {
-        Set<Agent> slaveNodes = new HashSet<>();
-
-        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
+        Set<UUID> slaveNodes = new HashSet<>();
+        for ( ContainerHost containerHost : environment.getContainers() )
         {
-            if ( NodeType.SLAVE_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
+            if ( ! hadoopClusterConfig.getAllMasterNodes().contains( containerHost.getAgent().getUuid() ) )
             {
-                if ( environmentContainer.getTemplate().getProducts()
-                                         .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
-                {
-                    slaveNodes.add( environmentContainer.getAgent() );
-                }
+                slaveNodes.add( containerHost.getAgent().getUuid() );
             }
         }
-
         if ( slaveNodes.isEmpty() )
         {
             throw new ClusterSetupException( "Hadoop slave nodes are empty" );
         }
-
         hadoopClusterConfig.setDataNodes( Lists.newArrayList( slaveNodes ) );
         hadoopClusterConfig.setTaskTrackers( Lists.newArrayList( slaveNodes ) );
     }

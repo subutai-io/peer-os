@@ -3,6 +3,8 @@ package org.safehaus.subutai.plugin.hadoop.ui.manager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
@@ -12,6 +14,10 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.common.ui.BaseManager;
@@ -53,12 +59,11 @@ public class Manager extends BaseManager
     private final Hadoop hadoop;
     private final Tracker tracker;
     private final ExecutorService executorService;
-    private final CommandRunner commandRunner;
-    private final AgentManager agentManager;
     private Button checkAllButton;
     private HadoopClusterConfig hadoopCluster;
     private String decommissionStatus;
     private ManagerListener managerListener;
+    private final EnvironmentManager environmentManager;
 
 
     public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -67,8 +72,7 @@ public class Manager extends BaseManager
         this.executorService = executorService;
         this.tracker = serviceLocator.getService( Tracker.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         managerListener = new ManagerListener( this );
 
@@ -204,8 +208,15 @@ public class Manager extends BaseManager
         if ( hadoopCluster != null )
         {
             //            refreshClustersInfo();
-            populateTable( masterNodesTable, getMasterNodeList( hadoopCluster ) );
-            populateTable( slaveNodesTable, hadoopCluster.getDataNodes() );
+//            populateTable( masterNodesTable, getMasterNodeList( hadoopCluster ) );
+//            populateTable( slaveNodesTable, hadoopCluster.getDataNodes() );
+
+            Environment environment = environmentManager.getEnvironmentByUUID( hadoopCluster.getEnvironmentId() );
+
+            populateTable( masterNodesTable, getMasters( environment, hadoopCluster ) );
+            populateTable( masterNodesTable, getSlaves( environment, hadoopCluster ) );
+
+
             replicationFactor.setValue( hadoopCluster.getReplicationFactor().toString() );
             domainName.setValue( hadoopCluster.getDomainName() );
             slaveNodeCount.setValue( hadoopCluster.getAllSlaveNodes().size() + "" );
@@ -221,7 +232,23 @@ public class Manager extends BaseManager
     }
 
 
+    public List<Agent> getMasters( Environment environment, HadoopClusterConfig config ){
+        List<Agent> agents = null;
+        for ( ContainerHost containerHost : environment.getContainerHosts() ) {
+            if ( config.getAllMasterNodes().contains( containerHost.getAgent().getUuid() ) )
+            agents.add( containerHost.getAgent() );
+        }
+        return agents;
+    }
 
+    private List<Agent> getSlaves( Environment environment, HadoopClusterConfig config ){
+        List<Agent> agents = null;
+        for ( ContainerHost containerHost : environment.getContainerHosts() ) {
+            if ( config.getAllSlaveNodes().contains( containerHost.getAgent().getUuid() ) )
+                agents.add( containerHost.getAgent() );
+        }
+        return agents;
+    }
 
     private void startAllNodes( Table table )
     {
@@ -296,15 +323,12 @@ public class Manager extends BaseManager
         {
             return null;
         }
-
-        List<Agent> hadoopNodeList = hadoopCluster.getAllNodes();
+        Environment environment = environmentManager.getEnvironmentByUUID( hadoopCluster.getEnvironmentId() );
         String lxcHostname = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
 
-        for ( Agent agent : hadoopNodeList )
-        {
-            if ( agent.getHostname().equals( lxcHostname ) )
-            {
-                return agent;
+        for ( ContainerHost containerHost : environment.getContainerHosts() ){
+            if ( containerHost.getHostname().equals( lxcHostname ) ){
+                return containerHost.getAgent();
             }
         }
         return null;
@@ -408,24 +432,13 @@ public class Manager extends BaseManager
     }
 
 
-    public List<Agent> getMasterNodeList( final HadoopClusterConfig hadoopCluster )
+    public List<UUID> getMasterNodeList( final HadoopClusterConfig hadoopCluster )
     {
-        List<Agent> masterNodeList = new ArrayList<>();
+        List<UUID> masterNodeList = new ArrayList<>();
         masterNodeList.add( hadoopCluster.getNameNode() );
         masterNodeList.add( hadoopCluster.getJobTracker() );
         masterNodeList.add( hadoopCluster.getSecondaryNameNode() );
         return masterNodeList;
-    }
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
     }
 
 
@@ -520,7 +533,7 @@ public class Manager extends BaseManager
     }
 
 
-    @Override
+
     public void addRowComponents( Table table, final Agent agent )
     {
 
@@ -570,23 +583,23 @@ public class Manager extends BaseManager
         // Labels to be added to statusGroup
 
 
-        if ( cluster.isMasterNode( agent ) )
+        if ( cluster.isMasterNode( agent.getUuid() ) )
         {
-            if ( cluster.isNameNode( agent ) )
+            if ( cluster.isNameNode( agent.getUuid() ) )
             {
                 availableOperations.addComponent( checkButton );
                 availableOperations.addComponent( startStopButton );
                 availableOperations.addComponent( urlButton );
                 statusGroup.addComponent( statusDatanode );
             }
-            else if ( cluster.isJobTracker( agent ) )
+            else if ( cluster.isJobTracker( agent.getUuid() ) )
             {
                 availableOperations.addComponent( checkButton );
                 availableOperations.addComponent( startStopButton );
                 availableOperations.addComponent( urlButton );
                 statusGroup.addComponent( statusTaskTracker );
             }
-            else if ( cluster.isSecondaryNameNode( agent ) )
+            else if ( cluster.isSecondaryNameNode( agent.getUuid() ) )
             {
                 availableOperations.addComponent( checkButton );
                 availableOperations.addComponent( urlButton );
@@ -613,25 +626,25 @@ public class Manager extends BaseManager
         // Add listeners according to node type
 
         // If master node
-        if ( cluster.isMasterNode( agent ) )
+        if ( cluster.isMasterNode( agent.getUuid() ) )
         {
 
             // If Namenode
-            if ( cluster.isNameNode( agent ) )
+            if ( cluster.isNameNode( agent.getUuid() ) )
             {
                 urlButton.addClickListener( managerListener.nameNodeURLButtonListener( agent ) );
                 checkButton.addClickListener( managerListener.nameNodeCheckButtonListener( row ) );
                 startStopButton.addClickListener( managerListener.nameNodeStartStopButtonListener( row ) );
             }
             // If Jobtracker
-            else if ( cluster.isJobTracker( agent ) )
+            else if ( cluster.isJobTracker( agent.getUuid() ) )
             {
                 urlButton.addClickListener( jobTrackerURLButtonListener( agent ) );
                 checkButton.addClickListener( managerListener.jobTrackerCheckButtonListener( row ) );
                 startStopButton.addClickListener( managerListener.jobTrackerStartStopButtonListener( row ) );
             }
             // If SecondaryNameNode
-            else if ( cluster.isSecondaryNameNode( agent ) )
+            else if ( cluster.isSecondaryNameNode( agent.getUuid() ) )
             {
                 urlButton.addClickListener( managerListener.secondaryNameNodeURLButtonListener( agent ) );
                 checkButton.addClickListener( managerListener.secondaryNameNodeCheckButtonListener( row ) );
@@ -653,23 +666,23 @@ public class Manager extends BaseManager
     {
         List<NodeType> nodeRoles = new ArrayList<>();
 
-        if ( clusterConfig.isNameNode( agent ) )
+        if ( clusterConfig.isNameNode( agent.getUuid() ) )
         {
             nodeRoles.add( NodeType.NAMENODE );
         }
-        if ( clusterConfig.isSecondaryNameNode( agent ) )
+        if ( clusterConfig.isSecondaryNameNode( agent.getUuid() ) )
         {
             nodeRoles.add( NodeType.SECONDARY_NAMENODE );
         }
-        if ( clusterConfig.isJobTracker( agent ) )
+        if ( clusterConfig.isJobTracker( agent.getUuid() ) )
         {
             nodeRoles.add( NodeType.JOBTRACKER );
         }
-        if ( clusterConfig.isDataNode( agent ) )
+        if ( clusterConfig.isDataNode( agent.getUuid() ) )
         {
             nodeRoles.add( NodeType.DATANODE );
         }
-        if ( clusterConfig.isTaskTracker( agent ) )
+        if ( clusterConfig.isTaskTracker( agent.getUuid() ) )
         {
             nodeRoles.add( NodeType.TASKTRACKER );
         }

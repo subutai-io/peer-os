@@ -32,7 +32,7 @@ public class NameNode extends ClusterNode
         this.executorService = executorService;
         this.hadoop = hadoop;
         this.tracker = tracker;
-        setHostname( cluster.getNameNode().getHostname() );
+//        setHostname( cluster.getNameNode().getHostname() );
 
         startButton.addClickListener( new MouseEvents.ClickListener()
         {
@@ -80,36 +80,36 @@ public class NameNode extends ClusterNode
             slaveNode.setLoading( true );
         }
 
-        executorService.execute( new CheckTask( hadoop, tracker, NodeType.NAMENODE, cluster, new CompleteEvent()
-        {
-
-            public void onComplete( NodeState state )
-            {
-                synchronized ( progressButton )
-                {
-                    boolean isRunning = false;
-                    if ( state == NodeState.RUNNING )
-                    {
-                        isRunning = true;
-                    }
-                    else if ( state == NodeState.STOPPED )
-                    {
-                        isRunning = false;
-                    }
-
-                    startButton.setEnabled( !isRunning );
-                    restartButton.setEnabled( isRunning );
-                    stopButton.setEnabled( isRunning );
-
-                    for ( ClusterNode slaveNode : slaveNodes )
-                    {
-                        slaveNode.getStatus( null );
-                    }
-
-                    setLoading( false );
-                }
-            }
-        }, trackID, cluster.getNameNode() ) );
+//        executorService.execute( new CheckTask( hadoop, tracker, NodeType.NAMENODE, cluster, new CompleteEvent()
+//        {
+//
+//            public void onComplete( NodeState state )
+//            {
+//                synchronized ( progressButton )
+//                {
+//                    boolean isRunning = false;
+//                    if ( state == NodeState.RUNNING )
+//                    {
+//                        isRunning = true;
+//                    }
+//                    else if ( state == NodeState.STOPPED )
+//                    {
+//                        isRunning = false;
+//                    }
+//
+//                    startButton.setEnabled( !isRunning );
+//                    restartButton.setEnabled( isRunning );
+//                    stopButton.setEnabled( isRunning );
+//
+//                    for ( ClusterNode slaveNode : slaveNodes )
+//                    {
+//                        slaveNode.getStatus( null );
+//                    }
+//
+//                    setLoading( false );
+//                }
+//            }
+//        }, trackID, cluster.getNameNode() ) );
     }
 
 

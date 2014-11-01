@@ -7,6 +7,8 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
@@ -59,10 +61,11 @@ public class InstallOperationHandler extends AbstractOperationHandler<HadoopImpl
 
     private void setup()
     {
-
         try
         {
-            ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( trackerOperation, config );
+            Environment env = manager.getEnvironmentManager()
+                                     .buildEnvironment( manager.getDefaultEnvironmentBlueprint( config ) );
+            ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( trackerOperation, config, env );
             setupStrategy.setup();
 
             trackerOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
@@ -71,6 +74,10 @@ public class InstallOperationHandler extends AbstractOperationHandler<HadoopImpl
         {
             trackerOperation.addLogFailed(
                     String.format( "Failed to setup Hadoop cluster %s : %s", clusterName, e.getMessage() ) );
+        }
+        catch ( EnvironmentBuildException e )
+        {
+            e.printStackTrace();
         }
     }
 }
