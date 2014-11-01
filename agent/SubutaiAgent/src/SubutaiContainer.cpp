@@ -54,9 +54,16 @@ string SubutaiContainer::toString(int intcont)
     return dummy.str();
 }
 
-
-
 string SubutaiContainer::RunProgram(string program, vector<string> params) {
+    ExecutionResult result = RunProgram(program, params, true);
+    if (result.exit_code == 0) {
+        return result.out;
+    } else {
+        return result.err;
+    }
+}
+
+ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> params, bool return_result) {
     char* _params[params.size() + 2];
     _params[0] = const_cast<char*>(program.c_str());
     vector<string>::iterator it;
@@ -72,7 +79,8 @@ string SubutaiContainer::RunProgram(string program, vector<string> params) {
     dup2(fd[1], 1);
     char buffer[1000];
     // TODO: if exit code not equals one - we got stderr
-    int exit_code = this->container->attach_run_wait(this->container, &opts, program.c_str(), _params);
+    ExecutionResult result;
+    result.exit_code = this->container->attach_run_wait(this->container, &opts, program.c_str(), _params);
     fflush(stdout);
     close(fd[1]);
     dup2(_stdout, 1);
@@ -90,8 +98,13 @@ string SubutaiContainer::RunProgram(string program, vector<string> params) {
             command_output += buffer;
         }
     }
+    if (result.exit_code == 0) {
+        result.out = command_output;
+    } else {
+        result.err = command_output;
+    }
 
-    return command_output;
+    return result;
 }
 
 
@@ -360,4 +373,10 @@ void SubutaiContainer::registerContainer(SubutaiConnection* connection)
 	string sendout = response.createRegistrationMessage(this->id,this->macAddress,this->hostname,this->parentHostname,NULL,this->ipAddress);
 	containerLogger->writeLog(7,containerLogger->setLogData("<SubutaiAgent>","Registration Message:",sendout));
 	connection->sendMessage(sendout);
+}
+
+// We need to check if CWD is exist because in LXC API - if cwd does not
+// exist CWD will become root directory
+bool SubutaiContainer::checkCWD(string cwd) {
+    
 }
