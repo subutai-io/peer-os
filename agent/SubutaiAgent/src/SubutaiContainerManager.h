@@ -47,12 +47,14 @@ class SubutaiContainerManager {
         ~SubutaiContainerManager();
         void init();
         SubutaiContainer* findContainerByName(string );
-        SubutaiContainer* findContainerByUuid(string );
+        SubutaiContainer* findContainerById(string );
         void getContainerStates();
         void findAllContainers();
         void findActiveContainers();
         void findDefinedContainers();
         bool isContainerRunning(string );
+        bool isContainerStopped(string );
+        bool isContainerFrozen(string );
         string RunProgram(SubutaiContainer*,string , vector<string> );
         void CollectInfo();
 

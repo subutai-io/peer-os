@@ -95,27 +95,44 @@ string SubutaiContainer::RunProgram(string program, vector<string> params) {
 }
 
 
+bool SubutaiContainer::isContainerRunning()
+{
+	if(this->status == RUNNING) return true;
+	return false;
+}
+
+bool SubutaiContainer::isContainerStopped()
+{
+	if(this->status == STOPPED) return true;
+	return false;
+}
+
+bool SubutaiContainer::isContainerFrozen()
+{
+	if(this->status == FROZEN) return true;
+	return false;
+}
 /**
  *  \details   UUID of the Subutai Agent is fetched from statically using this function.
  *  		   Example uuid:"ff28d7c7-54b4-4291-b246-faf3dd493544"
  */
-bool SubutaiContainer::getContainerUuid()
+bool SubutaiContainer::getContainerId()
 {
     try
     {
         vector<string> args;
         args.push_back("/etc/subutai-agent/uuid.txt");
-        this-> uuid = RunProgram("/bin/cat", args);
-        if (this->uuid.empty())		//if uuid is null or not reading successfully
+        this-> id = RunProgram("/bin/cat", args);
+        if (this->id.empty())		//if uuid is null or not reading successfully
         {
             boost::uuids::random_generator gen;
             boost::uuids::uuid u = gen();
 
             const std::string tmp = boost::lexical_cast<std::string>(u);
-            this->uuid = tmp;
+            this->id = tmp;
 
-            this-> uuid = RunProgram("/bin/echo " + this->uuid + " /etc/subutai-agent/uuid.txt", args);
-            containerLogger->writeLog(1,containerLogger->setLogData("<SubutaiAgent>","Subutai Agent UUID: ",this->uuid));
+            this-> id = RunProgram("/bin/echo " + this->id + " /etc/subutai-agent/uuid.txt", args);
+            containerLogger->writeLog(1,containerLogger->setLogData("<SubutaiAgent>","Subutai Agent UUID: ",this->id));
             return false;
         }
         return true;
@@ -173,7 +190,13 @@ bool SubutaiContainer::getContainerHostname()
     return false;
 }
 
-
+/**
+ *  \details   Hostname of the KiskisAgent machine is fetched from statically.
+ */
+void SubutaiContainer::setContainerHostname(string hostname)
+{
+    this-> hostname = hostname;
+}
 
 /**
  *  \details   Hostname of the KiskisAgent machine is fetched from statically.
@@ -277,9 +300,9 @@ bool SubutaiContainer::getContainerIpAddress()
 /**
  *  \details   getting Agent uuid value.
  */
-string SubutaiContainer::getContainerUuidValue()
+string SubutaiContainer::getContainerIdValue()
 {
-    return uuid;
+    return id;
 }
 
 /**
@@ -324,7 +347,7 @@ vector<string> SubutaiContainer::getContainerIpValue()
 
 void SubutaiContainer::getContainerAllFields()
 {
-	getContainerUuid();
+	getContainerId();
 	getContainerMacAddress();
 	getContainerHostname();
 	getContainerParentHostname();
