@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.peer.api;
 
 
 /**
- * Created by dilshat on 9/18/14.
+ * Exception thrown by peer methods
  */
 public class PeerException extends Exception
 {

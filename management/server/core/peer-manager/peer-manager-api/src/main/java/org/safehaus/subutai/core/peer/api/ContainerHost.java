@@ -91,10 +91,4 @@ public class ContainerHost extends SubutaiHost
         lastHeartbeat = System.currentTimeMillis();
         setState( ContainerState.RUNNING );
     }
-
-    //    @Override
-    //    public boolean isConnected()
-    //    {
-    //        return ContainerState.RUNNING.equals( state ) && super.isConnected();
-    //    }
 }
