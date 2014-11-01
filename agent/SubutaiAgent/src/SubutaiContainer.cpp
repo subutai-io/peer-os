@@ -26,6 +26,12 @@
  */
 #include "SubutaiContainer.h"
 #include "SubutaiConnection.h"
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <iostream>
+
+using namespace std;
 /**
  *  \details   Default constructor of SubutaiEnvironment class.
  */
@@ -118,6 +124,7 @@ bool SubutaiContainer::isContainerFrozen()
  */
 bool SubutaiContainer::getContainerId()
 {
+	if(this-> status != RUNNING) return false;
     try
     {
         vector<string> args;
@@ -131,7 +138,11 @@ bool SubutaiContainer::getContainerId()
             const std::string tmp = boost::lexical_cast<std::string>(u);
             this->id = tmp;
 
-            this-> id = RunProgram("/bin/echo " + this->id + " /etc/subutai-agent/uuid.txt", args);
+            args.clear();
+            args.push_back(this->id);
+            args.push_back(">");
+            args.push_back("/etc/subutai-agent/uuid.txt");
+            this-> id = RunProgram("/bin/echo", args);
             containerLogger->writeLog(1,containerLogger->setLogData("<SubutaiAgent>","Subutai Agent UUID: ",this->id));
             return false;
         }
@@ -149,10 +160,12 @@ bool SubutaiContainer::getContainerId()
  */
 bool SubutaiContainer::getContainerMacAddress()
 {
+	if(this-> status != RUNNING) return false;
     try
     {
         vector<string> args;
-        this-> macAddress = RunProgram("/bin/cat /sys/class/net/eth0/address", args);
+        args.push_back("/sys/class/net/eth0/address");
+        this-> macAddress = RunProgram("/bin/cat", args);
         if(this->macAddress.empty())		//if mac is null or not reading successfully
         {
         	containerLogger->writeLog(3,containerLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read !!"));
@@ -173,10 +186,12 @@ bool SubutaiContainer::getContainerMacAddress()
  */
 bool SubutaiContainer::getContainerHostname()
 {
+	if(this-> status != RUNNING) return false;
     try
     {
     	vector<string> args;
-    	this-> hostname = RunProgram("/bin/cat /etc/hostname", args);
+    	args.push_back("/etc/hostname");
+    	this-> hostname = RunProgram("/bin/cat", args);
         if(this->hostname.empty())		//if hostname is null or not reading successfully
         {
             return false;
@@ -215,10 +230,12 @@ void SubutaiContainer::setContainerStatus(containerStatus status)
  */
 bool SubutaiContainer::getContainerParentHostname()
 {
+	if(this-> status != RUNNING) return false;
     try
     {
     	vector<string> args;
-    	string config = RunProgram("/bin/cat /etc/subutai/lxc-config", args);
+    	args.push_back("/etc/hostname");
+    	string config = RunProgram("/bin/cat", args);
         if (config.empty()) //file exist
         {
         	ofstream file("/tmp/subutai/config.txt");
@@ -253,13 +270,15 @@ bool SubutaiContainer::getContainerParentHostname()
  */
 bool SubutaiContainer::getContainerIpAddress()
 {
+	if(this-> status != RUNNING) return false;
     try
     {
 
         ipAddress.clear();
 
     	vector<string> args ;
-    	string config = RunProgram("/bin/cat /etc/subutai/lxc-config", args);
+    	string config = RunProgram("ifconfig", args);
+
     	ofstream file("/tmp/subutai/ipaddress.txt");
     	file << config;
     	file.close();
@@ -353,6 +372,12 @@ void SubutaiContainer::getContainerAllFields()
 	getContainerParentHostname();
 	getContainerIpAddress();
 }
+
+void SubutaiContainer::write(){
+   cout << id << "  " << macAddress << "  " << hostname << "  " << parentHostname<< "  " <<  endl;
+
+}
+
 
 void SubutaiContainer::registerContainer(SubutaiConnection* connection)
 {

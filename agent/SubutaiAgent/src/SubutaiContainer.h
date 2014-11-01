@@ -83,7 +83,7 @@ public:
 	void getContainerAllFields();
 	string RunProgram(string , vector<string> );
 	void registerContainer(SubutaiConnection* );
-
+	void write();
 private:
 	containerStatus status;
 	lxc_container* container;

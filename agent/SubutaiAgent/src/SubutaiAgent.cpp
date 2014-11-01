@@ -43,6 +43,11 @@
 #include "SubutaiWatch.h"
 #include "SubutaiEnvironment.h"
 #include "SubutaiContainerManager.h"
+#include <stdio.h>
+#include <pthread.h>
+#include <string.h>
+#include <unistd.h>
+#include <iostream>
 
 /**
  *  \details   This method designed for Typically conversion from integer to string.
@@ -131,6 +136,33 @@ bool checkExecutionTimeout(unsigned int* startsec, bool* overflag, unsigned int*
     return false;	                //no timeout occured
 }
 
+
+static void * updateContainerInfo(void * arg )
+{
+    pthread_detach( pthread_self() ) ;
+
+    SubutaiContainerManager* container_manager = (SubutaiContainerManager*) arg;
+    while( true )
+    {
+        // do background task, i.e.:
+        cout << "hello" << endl;
+        container_manager->updateContainerLists();
+        usleep(3000000) ;
+    }
+}
+
+int updateContainerInfosPeriodically( SubutaiContainerManager* container_manager)
+{
+    pthread_t thread ;
+    pthread_attr_t attr ;
+
+    pthread_attr_init( & attr ) ;
+    pthread_create( & thread, & attr, updateContainerInfo, container_manager ) ;
+
+}
+
+
+
 /**
  *  \details   This function is the main thread of SubutaiAgent.
  *  		   It sends and receives messages from MQTT broker.
@@ -194,6 +226,14 @@ int main(int argc,char *argv[],char *envp[])
      * Starting Container Manager
      */
     SubutaiContainerManager cman("/var/lib/lxc", &logMain);
+    updateContainerInfosPeriodically(&cman);
+    cman.write();
+
+    while(true)
+    {
+    	cout<< "hi" << endl;
+    	usleep(5000000);
+    }
 
     /*
      * Opening MQTT Connection

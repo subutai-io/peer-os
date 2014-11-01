@@ -48,15 +48,17 @@ class SubutaiContainerManager {
         void init();
         SubutaiContainer* findContainerByName(string );
         SubutaiContainer* findContainerById(string );
-        void getContainerStates();
-        void findAllContainers();
-        void findActiveContainers();
-        void findDefinedContainers();
+        void getContainerStates(vector<SubutaiContainer>);
+        vector<SubutaiContainer> findAllContainers();
+        vector<SubutaiContainer> findActiveContainers();
+        vector<SubutaiContainer> findDefinedContainers();
         bool isContainerRunning(string );
         bool isContainerStopped(string );
         bool isContainerFrozen(string );
         string RunProgram(SubutaiContainer*,string , vector<string> );
         void CollectInfo();
+        void updateContainerLists();
+        void write();
 
         void UpdateNetworkingInfo(SubutaiContainer*,string );
         void UpdateUsersList(SubutaiContainer* );
@@ -66,8 +68,8 @@ class SubutaiContainerManager {
         string                          _lxc_path;
         SubutaiLogger*                  _logger;
         lxc_container*                  _current_container;
-        vector<SubutaiContainer>        _allContainers;
-        vector<SubutaiContainer>        _definedContainers;
+        vector<SubutaiContainer>        _frozenContainers;
+        vector<SubutaiContainer>        _stoppedContainers;
         vector<SubutaiContainer>        _activeContainers;
 };
 
