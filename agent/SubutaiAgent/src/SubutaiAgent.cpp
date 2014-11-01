@@ -401,7 +401,7 @@ int main(int argc,char *argv[],char *envp[])
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command runAs:", command.getRunAs()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command timeout:", toString(command.getTimeout())));
                     // Check if this uuid belongs this FAI or one of child containers
-                    
+                     
                     if (command.getWatchArguments().size()!=0)
                     {
                         for (unsigned int i=0; i<command.getWatchArguments().size(); i++)
