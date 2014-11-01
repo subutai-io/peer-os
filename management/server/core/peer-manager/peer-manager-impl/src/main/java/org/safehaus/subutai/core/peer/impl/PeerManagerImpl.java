@@ -22,9 +22,6 @@ import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.message.Common;
-import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
-import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
@@ -32,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 
@@ -202,7 +200,7 @@ public class PeerManagerImpl implements PeerManager
     public List<Peer> getPeers()
     {
         List<PeerInfo> peerInfoList = peerDAO.getInfo( SOURCE_REMOTE_PEER, PeerInfo.class );
-        List<Peer> result = new ArrayList();
+        List<Peer> result = Lists.newArrayList();
         result.add( getLocalPeer() );
         for ( PeerInfo info : peerInfoList )
         {
