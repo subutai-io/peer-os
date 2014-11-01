@@ -719,29 +719,30 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
     pid = fork();		// creating a child process
     if (pid == 0)		// child process is starting
     {
+        int argv0size = strlen(argv[0]);
+        strncpy(argv[0], "subutai-agent-child", argv0size);
+        logger.openLogFile(getpid(),command->getRequestSequenceNumber());
+        string pidparnumstr = toString(getpid());		//geting pid number of the process
+        string processpid = "";	//processpid for execution
+        logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Fork is Starting!!", toString(getpid())));
+        this->getOutputStream().setMode(command->getStandardOutput());
+        this->getOutputStream().setPath(command->getStandardOutputPath());
+        this->getOutputStream().setIdentity("output");
+        this->getErrorStream().setMode(command->getStandardError());
+        this->getErrorStream().setPath(command->getStandardErrPath());
+        this->getErrorStream().setIdentity("error");
+
+        if (this->getOutputStream().openPipe() == false || this->getErrorStream().openPipe() == false)
+        {
+            /* an error occurred pipe of pipeerror or output */
+            logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Error opening pipes!!"));
+        }
+
         if (container) {
             _isContainer = true;
             // Execute function for container only
         } else {
             // Execute function for FAI
-            int argv0size = strlen(argv[0]);
-            strncpy(argv[0], "subutai-agent-child", argv0size);
-            logger.openLogFile(getpid(),command->getRequestSequenceNumber());
-            string pidparnumstr = toString(getpid());		//geting pid number of the process
-            string processpid = "";	//processpid for execution
-            logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Fork is Starting!!", toString(getpid())));
-            this->getOutputStream().setMode(command->getStandardOutput());
-            this->getOutputStream().setPath(command->getStandardOutputPath());
-            this->getOutputStream().setIdentity("output");
-            this->getErrorStream().setMode(command->getStandardError());
-            this->getErrorStream().setPath(command->getStandardErrPath());
-            this->getErrorStream().setIdentity("error");
-
-            if (this->getOutputStream().openPipe() == false || this->getErrorStream().openPipe() == false)
-            {
-                /* an error occurred pipe of pipeerror or output */
-                logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Error opening pipes!!"));
-            }
 
             string executecmd = createExecString(command).c_str();
             string latest = executecmd.substr(executecmd.length()-3);
