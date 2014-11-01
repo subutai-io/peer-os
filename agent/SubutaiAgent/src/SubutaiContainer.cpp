@@ -20,7 +20,7 @@
  */
 SubutaiContainer::SubutaiContainer(SubutaiLogger* logger, lxc_container* cont)
 {
-	this->container = cont;
+    this->container = cont;
     this->environmentLogger = logger;
 }
 
@@ -87,7 +87,7 @@ bool SubutaiContainer::getContainerUuid()
     try
     {
         vector<string> args = NULL;
-        this-> uuid = RunProgram("cat /etc/subutai-agent/uuid.txt", args);
+        this->uuid = RunProgram("cat /etc/subutai-agent/uuid.txt", args);
         if(this->uuid.empty())		//if uuid is null or not reading successfully
         {
             boost::uuids::random_generator gen;
