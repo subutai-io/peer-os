@@ -2,16 +2,11 @@ package org.safehaus.subutai.core.peer.impl;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.exception.CommandException;
@@ -47,7 +42,6 @@ import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.Criteria;
-import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
 import com.google.common.collect.Sets;
 
@@ -58,14 +52,12 @@ import com.google.common.collect.Sets;
 public class LocalPeerImpl implements LocalPeer, ResponseListener
 {
     private static final String SOURCE_MANAGEMENT = "MANAGEMENT_HOST";
-    private static final int MAX_LXC_NAME = 15;
     private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60; // 5 min
     private PeerManager peerManager;
     private ContainerManager containerManager;
     private TemplateRegistry templateRegistry;
     private CommunicationManager communicationManager;
     private PeerDAO peerDAO;
-    private ConcurrentMap<String, AtomicInteger> sequences = new ConcurrentHashMap<>();
     private ManagementHost managementHost;
     private CommandRunner commandRunner;
     private QuotaManager quotaManager;
@@ -224,28 +216,6 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     }
 
 
-    private String nextHostName( String templateName ) throws PeerException
-    {
-        AtomicInteger i = sequences.putIfAbsent( templateName, new AtomicInteger() );
-        if ( i == null )
-        {
-            i = sequences.get( templateName );
-        }
-        while ( true )
-        {
-            String suffix = String.valueOf( i.incrementAndGet() );
-            int prefixLen = MAX_LXC_NAME - suffix.length();
-            String name = ( templateName.length() > prefixLen ? templateName.substring( 0, prefixLen ) : templateName )
-                    + suffix;
-
-            if ( getContainerHostByName( name ) == null )
-            {
-                return name;
-            }
-        }
-    }
-
-
     @Override
     public ContainerHost getContainerHostByName( String hostname ) throws PeerException
     {
@@ -263,21 +233,6 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     public ResourceHost getResourceHostByName( String hostname ) throws PeerException
     {
         return getManagementHost().getResourceHostByName( hostname );
-    }
-
-
-    private Map<Agent, ServerMetric> getResourceHostsMetrics() throws PeerException, CommandException
-    {
-        Map<Agent, ServerMetric> result = new HashMap();
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            ServerMetric metrics = resourceHost.getMetric();
-            if ( metrics != null )
-            {
-                result.put( resourceHost.getAgent(), metrics );
-            }
-        }
-        return result;
     }
 
 
@@ -467,7 +422,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     {
         List<Template> templates = templateRegistry.getAllTemplates();
 
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for ( Template template : templates )
         {
             result.add( template.getTemplateName() );
@@ -530,16 +485,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             {
                 containerHost.updateHeartbeat();
                 peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
-
-                //                containerHost =
-                //                        new ContainerHost( PeerUtils.buildAgent( response ), getId(),
-                // response.getEnvironmentId() );
-                //                containerHost.setParentAgent( resourceHost.getAgent() );
-                //                resourceHost.addContainerHost( containerHost );
             }
-            //            containerHost.updateHeartbeat();
-            //            containerHost.setState( ContainerState.RUNNING );
-            //            peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
         }
     }
 

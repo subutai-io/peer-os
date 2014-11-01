@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Created by timur on 10/22/14.
+ * Remote Peer implementation
  */
 public class RemotePeerImpl implements RemotePeer
 {
@@ -101,10 +101,6 @@ public class RemotePeerImpl implements RemotePeer
                                                 final String strategyId, final List<Criteria> criteria )
             throws ContainerCreateException
     {
-        //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(),
-        // "8181" );
-        //        return remotePeerRestClient
-        //                .createContainers( creatorPeerId, environmentId, templates, quantity, strategyId, criteria );
         try
         {
             //send create request

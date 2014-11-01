@@ -16,7 +16,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "peer", name = "clone")
+@Command( scope = "peer", name = "clone" )
 public class CloneCommand extends OsgiCommandSupport
 {
 
@@ -42,16 +42,16 @@ public class CloneCommand extends OsgiCommandSupport
     }
 
 
-    @Argument(index = 0, name = "envId", multiValued = false, description = "Environment UUID")
+    @Argument( index = 0, name = "envId", multiValued = false, description = "Environment UUID" )
     private String envId;
 
-    @Argument(index = 1, name = "templateName", multiValued = false, description = "Remote template name")
+    @Argument( index = 1, name = "templateName", multiValued = false, description = "Remote template name" )
     private String templateName;
 
-    @Argument(index = 2, name = "quantity", multiValued = false, description = "Number of containers to clone")
+    @Argument( index = 2, name = "quantity", multiValued = false, description = "Number of containers to clone" )
     private int quantity;
 
-    @Argument(index = 3, name = "strategyId", multiValued = false, description = "Container placement strategy")
+    @Argument( index = 3, name = "strategyId", multiValued = false, description = "Container placement strategy" )
     private String strategyId;
 
 
@@ -67,7 +67,8 @@ public class CloneCommand extends OsgiCommandSupport
         List<Template> templates = templateRegistry.getParentTemplates( templateName );
         templates.add( template );
         Set<ContainerHost> containers = localPeer
-                .createContainers( peerManager.getPeerId(), environmentId, templates, quantity, strategyId, null );
+                .createContainers( peerManager.getLocalPeer().getId(), environmentId, templates, quantity, strategyId,
+                        null );
 
         System.out.println(
                 String.format( "Containers successfully created.\nList of new %d containers:\n", containers.size() ) );

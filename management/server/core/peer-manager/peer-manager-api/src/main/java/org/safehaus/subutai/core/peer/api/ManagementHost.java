@@ -1,12 +1,13 @@
 package org.safehaus.subutai.core.peer.api;
 
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+
+import com.google.common.collect.Sets;
 
 
 /**
@@ -15,7 +16,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 public class ManagementHost extends SubutaiHost
 {
     //    private static final String DEFAULT_MANAGEMENT_HOSTNAME = "management";
-    private Set<ResourceHost> resourceHosts = new HashSet();
+    private Set<ResourceHost> resourceHosts = Sets.newHashSet();
 
 
     public ManagementHost( final Agent agent, UUID peerId )

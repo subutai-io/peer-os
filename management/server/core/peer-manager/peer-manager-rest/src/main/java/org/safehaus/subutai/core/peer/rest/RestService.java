@@ -26,6 +26,7 @@ public interface RestService
     @Consumes(MediaType.TEXT_PLAIN)
     public PeerInfo registerPeer( @QueryParam("peer") String peer );
 
+
     @GET
     @Path("containers/format")
     @Produces(MediaType.APPLICATION_JSON)
@@ -36,28 +37,6 @@ public interface RestService
     @Path("json")
     @Produces(MediaType.APPLICATION_JSON)
     public String getPeerJsonFormat();
-
-    @GET
-    @Path("id")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getId();
-
-
-    @POST
-    @Path("message")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response processMessage( @FormParam("peerId") String peerId, @FormParam("recipient") String recipient,
-                                    @FormParam("message") String message );
-
-    @GET
-    @Path("agents")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getConnectedAgents( @QueryParam("envId") String environmentId );
-
-    @POST
-    @Path("invoke")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response invoke( @FormParam("commandType") String commandType, @FormParam("command") String command );
 
 
     @POST
@@ -85,20 +64,9 @@ public interface RestService
     public Response stopContainer( @FormParam("host") String host );
 
     @POST
-    @Path("container/isconnected")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response isContainerConnected( @FormParam("host") String host );
-
-    //    @POST
-    //    @Path( "container/getquota" )
-    //    @Produces( MediaType.APPLICATION_JSON )
-    //    public Response getQuota( @FormParam( "host" ) String host, @FormParam( "host" ) String quota );
-    //
-    //    @POST
-    //    @Path( "container/setquota" )
-    //    @Produces( MediaType.APPLICATION_JSON )
-    //    public Response setQuota( @FormParam( "host" ) String host, @FormParam( "host" ) String quota,
-    //                              @FormParam( "value" ) String value );
+    @Path( "container/isconnected" )
+    @Produces( MediaType.APPLICATION_JSON )
+    public Response isContainerConnected( @FormParam( "host" ) String host );
 
     @POST
     @Path("execute")
