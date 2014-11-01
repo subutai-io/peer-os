@@ -166,6 +166,20 @@ bool SubutaiContainer::getContainerHostname()
     return false;
 }
 
+
+
+/**
+ *  \details   Hostname of the KiskisAgent machine is fetched from statically.
+ */
+containerStatus SubutaiContainer::getContainerStatus()
+{
+    return this->status;
+}
+
+void SubutaiContainer::setContainerStatus(containerStatus status)
+{
+    this->status = status;
+}
 /**
  *  \details   Parent Hostname of the Subutai Agent machine is fetched from c paramonfig file.
  */

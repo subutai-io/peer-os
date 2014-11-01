@@ -30,7 +30,8 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger*
 {
     // Check for running containers in case we just started an app
     // after crash
-    findActiveContainers();
+    findAllContainers();
+    getContainerStates();
 }
 
 SubutaiContainerManager::~SubutaiContainerManager() 
@@ -110,6 +111,61 @@ void SubutaiContainerManager::registerAllContainers(SubutaiConnection* connectio
 	        (*it).registerContainer(connection);
 	}
 }
+
+
+string exec(char* cmd) {
+    FILE* pipe = popen(cmd, "r");
+    if (!pipe) return "ERROR";
+    char buffer[128];
+    string result = "";
+    while(!feof(pipe)) {
+    	if(fgets(buffer, 128, pipe) != NULL)
+    		result += buffer;
+    }
+    pclose(pipe);
+    return result;
+}
+
+vector<string> splitContainers(string list) {
+	vector<string> tokens;
+	size_t pos = 0;
+	std::string token;
+	while ((pos = list.find(" ")) != std::string::npos) {
+	    token = list.substr(0, pos);
+	    tokens.push_back(token);
+	    list.erase(0, pos + 1);
+	}
+	return tokens;
+}
+
+void SubutaiContainerManager::getContainerStates()
+{
+	vector<string> active_containers = splitContainers(exec("lxc-ls --active"));
+	vector<string> stopped_containers = splitContainers(exec("lxc-ls --stopped"));
+	vector<string> frozen_containers = splitContainers(exec("lxc-ls --frozen"));
+
+	for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
+		for (vector<string>::iterator it_status = active_containers.begin(); it_status != active_containers.end(); it_status++) {
+			if((*it).getContainerHostnameValue() == (*it_status))
+				{
+					(*it).setContainerStatus(RUNNING); break;
+				}
+		}
+		for (vector<string>::iterator it_status = stopped_containers.begin(); it_status != stopped_containers.end(); it_status++) {
+			if((*it).getContainerHostnameValue() == (*it_status))
+			{
+				(*it).setContainerStatus(STOPPED); break;
+			}
+		}
+		for (vector<string>::iterator it_status = frozen_containers.begin(); it_status != frozen_containers.end(); it_status++) {
+			if((*it).getContainerHostnameValue() == (*it_status))
+			{
+				(*it).setContainerStatus(FROZEN); break;
+			}
+		}
+	}
+}
+
 
 /*
  * \details     Runs lxc's attach_run_wait function to specified container
