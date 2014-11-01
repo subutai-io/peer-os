@@ -19,12 +19,25 @@ public class ContainerHost extends SubutaiHost
     private String templateName;
     private String templateArch;
     private ContainerState state = ContainerState.UNKNOWN;
+    private String nodeGroupName;
 
 
     public ContainerHost( final Agent agent, UUID peerId, UUID environmentId )
     {
         super( agent, peerId );
         this.environmentId = environmentId;
+    }
+
+
+    public String getNodeGroupName()
+    {
+        return nodeGroupName;
+    }
+
+
+    public void setNodeGroupName( final String nodeGroupName )
+    {
+        this.nodeGroupName = nodeGroupName;
     }
 
 

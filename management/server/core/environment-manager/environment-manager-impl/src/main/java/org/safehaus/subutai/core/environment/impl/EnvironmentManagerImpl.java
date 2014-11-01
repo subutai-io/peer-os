@@ -354,6 +354,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     {
                         for ( ContainerHost container : containers )
                         {
+                            container.setNodeGroupName( ccm.getNodeGroupName() );
                             environment.addContainer( container );
                         }
                     }
