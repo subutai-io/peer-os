@@ -1,6 +1,7 @@
 package org.safehaus.subutai.common.protocol;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -10,6 +11,9 @@ import java.util.UUID;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -24,32 +28,94 @@ import com.google.gson.annotations.Expose;
  * Template represents template entry in registry
  */
 @Entity( name = "Template" )
+@IdClass( Template.TemplateId.class )
 @NamedQueries( {
         @NamedQuery( name = "Template.getAll", query = "SELECT t FROM Template t" ),
-        @NamedQuery( name = "Tempalte.getTemplateByNameArch",
-                query = "SELECT t FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = :lxcArch" )
+        @NamedQuery( name = "Template.getTemplateByNameArch",
+                query = "SELECT t FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = :lxcArch" ),
+        @NamedQuery( name = "Template.removeTemplateByNameArch",
+                query = "DELETE FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = :lxcArch" )
 } )
 @XmlRootElement( name = "" )
 public class Template
 {
+
+    public static class TemplateId implements Serializable
+    {
+        public String getTemplateName()
+        {
+            return templateName;
+        }
+
+
+        public void setTemplateName( final String templateName )
+        {
+            this.templateName = templateName;
+        }
+
+
+        public String getLxcArch()
+        {
+            return lxcArch;
+        }
+
+
+        public void setLxcArch( final String lxcArch )
+        {
+            this.lxcArch = lxcArch;
+        }
+
+
+        private String templateName;
+        private String lxcArch;
+
+
+        @Override
+        public boolean equals( Object object )
+        {
+            if ( object instanceof TemplateId )
+            {
+                TemplateId other = ( TemplateId ) object;
+                return templateName.equals( other.templateName ) && lxcArch.equals( other.lxcArch );
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
+        @Override
+        public int hashCode()
+        {
+            int result = templateName.hashCode();
+            result = 31 * result + lxcArch.hashCode();
+            return result;
+        }
+    }
+
 
     public static final String ARCH_AMD64 = "amd64";
     public static final String ARCH_I386 = "i386";
 
     public static final String QUERY_GET_ALL = "Template.getAll";
     public static final String QUERY_GET_TEMPLATE_BY_NAME_ARCH = "Template.getTemplateByNameArch";
+    public static final String QUERY_REMOVE_TEMPLATE_BY_NAME_ARCH = "Template.removeTemplateByNameArch";
 
     //name of template
     @Expose
+    @Id
     private String templateName;
+
+    //lxc architecture e.g. amd64, i386
+    @Expose
+    @Id
+    private String lxcArch;
 
     //name of parent template
     @Expose
     private String parentTemplateName;
 
-    //lxc architecture e.g. amd64, i386
-    @Expose
-    private String lxcArch;
 
     //lxc container name
     @Expose
@@ -74,9 +140,13 @@ public class Template
     //contents of packages manifest file
     private String packagesManifest;
 
+    @ManyToOne
+    private Template parentTemplate;
+
+
     //children of template, this property is calculated upon need and is null by default (see REST API for calculation)
     @Expose
-    @OneToMany( targetEntity = Template.class )
+    @OneToMany( mappedBy = "parentTemplate" )
     private List<Template> children;
 
     //subutai products present only in this template excluding all subutai products present in the whole ancestry
@@ -171,6 +241,10 @@ public class Template
         {
             this.children = new ArrayList<>();
         }
+        for ( Template child : children )
+        {
+            child.setParentTemplate( this );
+        }
         this.children.addAll( children );
     }
 
@@ -253,30 +327,15 @@ public class Template
     }
 
 
-    @Override
-    public int hashCode()
+    public Template getParentTemplate()
     {
-        int result = templateName.hashCode();
-        result = 31 * result + lxcArch.hashCode();
-        return result;
+        return parentTemplate;
     }
 
 
-    @Override
-    public boolean equals( final Object o )
+    public void setParentTemplate( Template template )
     {
-        if ( this == o )
-        {
-            return true;
-        }
-        if ( o == null || getClass() != o.getClass() )
-        {
-            return false;
-        }
-
-        final Template template = ( Template ) o;
-
-        return lxcArch.equals( template.lxcArch ) && templateName.equals( template.templateName );
+        this.parentTemplate = template;
     }
 
 
@@ -311,6 +370,33 @@ public class Template
         result.setRemote( true );
         result.setPeerId( peerId );
         return result;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        int result = templateName.hashCode();
+        result = 31 * result + lxcArch.hashCode();
+        return result;
+    }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
+
+        final Template template = ( Template ) o;
+
+        return lxcArch.equals( template.getLxcArch() ) && templateName.equals( template.getTemplateName() );
     }
 
 

@@ -1,212 +1,182 @@
 package org.safehaus.subutai.core.registry.impl;
 
 
-import java.io.StringReader;
-import java.lang.reflect.Type;
-import java.sql.Clob;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import javax.sql.DataSource;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 
-import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.common.util.DbUtil;
+import org.safehaus.subutai.common.protocol.api.TemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 
 
 /**
  * Provides Data Access API for templates
  */
-public class TemplateDAO
+public class TemplateDAO implements TemplateService
 {
-    private static final Logger LOG = LoggerFactory.getLogger( TemplateDAO.class.getName() );
+    private static final Logger LOGGER = LoggerFactory.getLogger( TemplateDAO.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    protected DbUtil dbUtil;
 
 
-    public TemplateDAO( final DataSource dataSource ) throws DaoException
+    private EntityManagerFactory entityManagerFactory;
+
+
+    public EntityManagerFactory getEntityManagerFactory()
     {
-        Preconditions.checkNotNull( dataSource, "Data source is null" );
-
-        this.dbUtil = new DbUtil( dataSource );
-        setupDb();
+        return entityManagerFactory;
     }
 
 
-    protected void setupDb() throws DaoException
+    public void setEntityManagerFactory( final EntityManagerFactory entityManagerFactory )
     {
-        String sql = "create table if not exists template_registry_info ( template varchar(100), arch varchar(10), "
-                + "parent varchar(100), info clob, PRIMARY KEY (template, arch) );";
+        this.entityManagerFactory = entityManagerFactory;
+        LOGGER.info( "EntityManagerFactory is assigned" );
+    }
+
+
+    @Override
+    public Template saveTemplate( Template template )
+    {
+        if ( template.getTemplateName() == null || "".equals( template.getTemplateName() ) )
+        {
+            throw new RuntimeException( "Template Name is required" );
+        }
+
+        EntityManager entityManager = null;
         try
         {
-            dbUtil.update( sql );
+            entityManager = entityManagerFactory.createEntityManager();
+            entityManager.getTransaction().begin();
+            entityManager.persist( template );
+            entityManager.flush();
+            entityManager.getTransaction().commit();
         }
-        catch ( SQLException e )
+        catch ( Exception ex )
         {
-            throw new DaoException( e );
-        }
-    }
-
-
-    /**
-     * Returns all registered templates from database
-     *
-     * @return {@code List<Template>}
-     */
-    public List<Template> getAllTemplates() throws DaoException
-    {
-        try
-        {
-            ResultSet rs = dbUtil.select( "select info from template_registry_info" );
-
-            return getTemplatesFromResultSet( rs );
-        }
-        catch ( SQLException | JsonSyntaxException ex )
-        {
-            LOG.error( "Error in getAllTemplates", ex );
-            throw new DaoException( ex );
-        }
-    }
-
-
-    private List<Template> getTemplatesFromResultSet( ResultSet rs ) throws SQLException
-    {
-        List<Template> list = new ArrayList<>();
-
-        while ( rs != null && rs.next() )
-        {
-            Clob infoClob = rs.getClob( "info" );
-            if ( infoClob != null && infoClob.length() > 0 )
+            if ( entityManager != null )
             {
-                String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                Template template = GSON.fromJson( info, Template.class );
-                if ( template != null )
+                if ( entityManager.getTransaction().isActive() )
                 {
-                    list.add( template );
+                    entityManager.getTransaction().rollback();
                 }
             }
         }
-
-        return list;
-    }
-
-
-    /**
-     * Returns child templates of supplied parent
-     *
-     * @param parentTemplateName - name of parent template
-     * @param lxcArch - lxc arch of template
-     *
-     * @return {@code List<Template>}
-     */
-    public List<Template> getChildTemplates( String parentTemplateName, String lxcArch ) throws DaoException
-    {
-        if ( parentTemplateName != null && lxcArch != null )
+        finally
         {
-            try
+            if ( entityManager != null )
             {
-                ResultSet rs = dbUtil.select( "select info from template_registry_info where parent = ? and arch = ?",
-                        parentTemplateName.toLowerCase(), lxcArch.toLowerCase() );
-
-                return getTemplatesFromResultSet( rs );
-            }
-            catch ( SQLException | JsonSyntaxException ex )
-            {
-                LOG.error( "Error in getChildTemplates", ex );
-                throw new DaoException( ex );
+                entityManager.close();
             }
         }
-        return Collections.emptyList();
+        return template;
     }
 
 
-    /**
-     * Returns template by name
-     *
-     * @param templateName - template name
-     * @param lxcArch -- lxc arch of template
-     *
-     * @return {@code Template}
-     */
-    public Template getTemplateByName( String templateName, String lxcArch ) throws DaoException
+    @Override
+    public List<Template> getAllTemplates()
     {
-        if ( templateName != null && lxcArch != null )
-        {
-            try
-            {
-                ResultSet rs = dbUtil.select( "select info from template_registry_info where template = ? and arch = ?",
-                        templateName.toLowerCase(), lxcArch.toLowerCase() );
-                List<Template> list = getTemplatesFromResultSet( rs );
-                if ( !list.isEmpty() )
-                {
-                    return list.iterator().next();
-                }
-            }
-            catch ( SQLException | JsonSyntaxException ex )
-            {
-                LOG.error( "Error in getTemplateByName", ex );
-                throw new DaoException( ex );
-            }
-        }
-        return null;
-    }
+        EntityManager entityManager = null;
 
-
-    /**
-     * Saves template to database
-     *
-     * @param template - template to save
-     */
-    public void saveTemplate( Template template ) throws DaoException
-    {
-        Type templateType = new TypeToken<Template>()
-        {
-
-        }.getType();
         try
         {
-            dbUtil.update( "merge into template_registry_info(template, arch, parent, info) values(?,?,?,?)",
-                    template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase(),
-                    Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null :
-                    template.getParentTemplateName().toLowerCase(),
-                    new StringReader( GSON.toJson( template, templateType ) ) );
+            entityManager = entityManagerFactory.createEntityManager();
+            return entityManager.createNamedQuery( Template.QUERY_GET_ALL, Template.class ).getResultList();
         }
-        catch ( SQLException e )
+        catch ( Exception ex )
         {
-            LOG.error( "Error in saveTemplate", e );
-            throw new DaoException( e );
+            throw new RuntimeException( ex );
+        }
+        //        finally
+        //        {
+        //            if ( entityManager != null )
+        //            {
+        //                entityManager.close();
+        //            }
+        //        }
+    }
+
+
+    @Override
+    public void removeTemplate( Template template )
+    {
+        EntityManager entityManager = null;
+        try
+        {
+            entityManager = entityManagerFactory.createEntityManager();
+            entityManager.getTransaction().begin();
+            Query query = entityManager.createNamedQuery( Template.QUERY_REMOVE_TEMPLATE_BY_NAME_ARCH );
+            query.setParameter( "templateName", template.getTemplateName() );
+            query.setParameter( "lxcArch", template.getLxcArch() );
+            entityManager.flush();
+            entityManager.getTransaction().commit();
+            LOGGER.info( String.format( "Template deleted : %s", template.getTemplateName() ) );
+        }
+        catch ( Exception ex )
+        {
+            LOGGER.error( "Exception deleting template : %s", template.getTemplateName() );
+            throw new RuntimeException( ex );
+        }
+        finally
+        {
+            if ( entityManager != null )
+            {
+                entityManager.close();
+            }
         }
     }
 
 
-    /**
-     * Deletes template from database
-     *
-     * @param template - template to delete
-     */
-    public void removeTemplate( Template template ) throws DaoException
+    @Override
+    public List<Template> getChildTemplates( String parentTemplateName, String lxcArch )
     {
         try
         {
-            dbUtil.update( "delete from template_registry_info where template = ? and arch = ?",
-                    template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase() );
+            Template template = this.getTemplateByName( parentTemplateName, lxcArch );
+            return template.getChildren();
         }
-        catch ( SQLException e )
+        catch ( Exception ex )
         {
-            LOG.error( "Error in removeTemplate", e );
-            throw new DaoException( e );
+            throw new RuntimeException( ex );
+        }
+    }
+
+
+    @Override
+    public Template getTemplateByName( String templateName, String lxcArch )
+    {
+        EntityManager em = null;
+        try
+        {
+            em = entityManagerFactory.createEntityManager();
+            em.getTransaction().begin();
+            Query query = em.createNamedQuery( Template.QUERY_GET_TEMPLATE_BY_NAME_ARCH );
+            query.setParameter( "templateName", templateName );
+            query.setParameter( "lxcArch", lxcArch );
+            em.getTransaction().commit();
+            return ( Template ) query.getSingleResult();
+        }
+        catch ( org.apache.openjpa.persistence.PersistenceException ex )
+        {
+            LOGGER.warn( "Couldn't find template with name: " + templateName + ", lxcArch: " + lxcArch );
+            return null;
+        }
+        catch ( Exception ex )
+        {
+            throw new RuntimeException( ex );
+        }
+        finally
+        {
+            if ( em != null )
+            {
+                em.close();
+            }
         }
     }
 }

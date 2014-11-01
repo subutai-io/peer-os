@@ -13,11 +13,7 @@ public interface TemplateService
 {
     public Template saveTemplate( Template templateClone );
 
-    public Template getTemplate( long id );
-
     public List<Template> getAllTemplates();
-
-    public void removeTemplate( long id );
 
     public void removeTemplate( Template template );
 

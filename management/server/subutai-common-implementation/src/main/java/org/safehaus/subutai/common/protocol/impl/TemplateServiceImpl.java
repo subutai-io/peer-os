@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.Query;
 
 import org.safehaus.subutai.common.protocol.Template;
@@ -21,8 +20,10 @@ import org.slf4j.LoggerFactory;
  */
 public class TemplateServiceImpl implements TemplateService
 {
-    private EntityManagerFactory entityManagerFactory;
+
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateServiceImpl.class.getName() );
+
+    private EntityManagerFactory entityManagerFactory;
 
 
     public EntityManagerFactory getEntityManagerFactory()
@@ -76,42 +77,6 @@ public class TemplateServiceImpl implements TemplateService
 
 
     @Override
-    public Template getTemplate( final long id )
-    {
-        EntityManager entityManager = null;
-        Template Template = null;
-
-        try
-        {
-            entityManager = entityManagerFactory.createEntityManager();
-            entityManager.getTransaction().begin();
-            Template = entityManager.find( Template.class, id );
-            entityManager.getTransaction().commit();
-        }
-        catch ( EntityNotFoundException ex )
-        {
-            LOGGER.error( "Template not found with id: " + String.valueOf( id ), ex );
-        }
-        catch ( Exception ex )
-        {
-            LOGGER.error( "Error in getTemplate method", ex );
-        }
-        finally
-        {
-            if ( entityManager != null )
-            {
-                if ( entityManager.getTransaction().isActive() )
-                {
-                    entityManager.getTransaction().rollback();
-                }
-                entityManager.close();
-            }
-        }
-        return Template;
-    }
-
-
-    @Override
     public List<Template> getAllTemplates()
     {
         EntityManager entityManager = null;
@@ -123,34 +88,6 @@ public class TemplateServiceImpl implements TemplateService
         }
         catch ( Exception ex )
         {
-            throw new RuntimeException( ex );
-        }
-        finally
-        {
-            if ( entityManager != null )
-            {
-                entityManager.close();
-            }
-        }
-    }
-
-
-    @Override
-    public void removeTemplate( final long id )
-    {
-        EntityManager entityManager = null;
-        try
-        {
-            entityManager = entityManagerFactory.createEntityManager();
-            entityManager.getTransaction().begin();
-            Template Template = entityManager.find( Template.class, id );
-            entityManager.remove( Template );
-            entityManager.getTransaction().commit();
-            LOGGER.info( String.format( "Template deleted with id: %d", id ) );
-        }
-        catch ( Exception ex )
-        {
-            LOGGER.error( "Exception deleting template with id: %d", id );
             throw new RuntimeException( ex );
         }
         finally
