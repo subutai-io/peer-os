@@ -53,16 +53,31 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public boolean isOnline() throws PeerException
+    public UUID getId()
     {
-        return false;
+        return peerInfo.getId();
     }
 
 
     @Override
-    public UUID getId()
+    public boolean isOnline() throws PeerException
     {
-        return peerInfo.getId();
+        if ( getRemoteId() == peerInfo.getId() )
+        {
+            return true;
+        }
+        else
+        {
+            throw new PeerException( "Invalid peer ID." );
+        }
+    }
+
+
+    @Override
+    public UUID getRemoteId() throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.getId();
     }
 
 
@@ -76,7 +91,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public UUID getOwnerId()
     {
-        return null;
+        return peerInfo.getOwnerId();
     }
 
 

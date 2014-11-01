@@ -38,6 +38,11 @@ public interface RestService
     @Produces(MediaType.APPLICATION_JSON)
     public String getPeerJsonFormat();
 
+    @GET
+    @Path( "id" )
+    @Produces( MediaType.APPLICATION_JSON )
+    public Response getId();
+
 
     @POST
     @Path("container/create")
@@ -70,9 +75,9 @@ public interface RestService
 
 
     @POST
-    @Path( "template/get" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response getTemplate( @FormParam( "host" ) String host );
+    @Path("template/get")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTemplate( @FormParam("host") String host );
 
     @POST
     @Path("execute")

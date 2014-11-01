@@ -65,6 +65,21 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getId()
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            return Response.ok( localPeer.getId().toString() ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
     public PeerInfo registerPeer( String config )
     {
         if ( config != null )
@@ -345,7 +360,7 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
             Template result = localPeer.getTemplate( containerHost );
-            return Response.ok( result.toString() ).build();
+            return Response.ok( JsonUtil.toJson( result ) ).build();
         }
         catch ( PeerException e )
         {
