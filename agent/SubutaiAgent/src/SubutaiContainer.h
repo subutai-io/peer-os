@@ -51,7 +51,7 @@ using std::stringstream;
 using std::string;
 
 
-typedef enum containerStatus { RUNNING, STOPPED, FROZEN };
+enum containerStatus { RUNNING, STOPPED, FROZEN };
 
 class SubutaiContainer
 {
@@ -59,12 +59,12 @@ public:
 	SubutaiContainer( SubutaiLogger*, lxc_container* cont );
 	virtual ~SubutaiContainer( void );
 	string toString( int );
-	bool getContainerUuid();
+	bool getContainerId();
 	bool getContainerMacAddress();
 	bool getContainerHostname();
 	bool getContainerParentHostname();
 	bool getContainerIpAddress();
-	string getContainerUuidValue();
+	string getContainerIdValue();
 	string getContainerHostnameValue();
 	string getContainerMacAddressValue();
 	string getContainerParentHostnameValue();
@@ -74,6 +74,11 @@ public:
 	lxc_container* getLxcContainerValue();
 	vector<string> getContainerIpValue();
 	containerStatus getContainerStatus();
+	bool isContainerRunning();
+	bool isContainerStopped();
+	bool isContainerFrozen();
+
+	void setContainerHostname(string);
 	void setContainerStatus(containerStatus);
 	void getContainerAllFields();
 	string RunProgram(string , vector<string> );
@@ -82,7 +87,7 @@ public:
 private:
 	containerStatus status;
 	lxc_container* container;
-	string uuid;
+	string id;
 	string macAddress;
 	string hostname;
 	string parentHostname;

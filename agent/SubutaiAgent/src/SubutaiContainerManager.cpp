@@ -45,12 +45,35 @@ bool SubutaiContainerManager::isContainerRunning(string container_name)
 {
     for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
         if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
-            return true;
+            return (*it).isContainerRunning();
         }
     }
     return false;
 }
 
+bool SubutaiContainerManager::isContainerStopped(string container_name)
+{
+    for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
+        if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
+            return (*it).isContainerStopped();
+        }
+    }
+    return false;
+}
+
+bool SubutaiContainerManager::isContainerFrozen(string container_name)
+{
+    for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
+        if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
+            return (*it).isContainerFrozen();
+        }
+    }
+    return false;
+}
+/*
+ * \details find defined containers - returns all defined containers -active stopped running
+ *
+ */
 void SubutaiContainerManager::findDefinedContainers()
 {
 	char** names;
@@ -58,9 +81,15 @@ void SubutaiContainerManager::findDefinedContainers()
 	int num = list_defined_containers(_lxc_path.c_str(), &names, &cont);
 	    for (int i = 0; i < num; i++) {
 	    	SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
+	        c->setContainerHostname(names[i]);
 	    	_definedContainers.push_back(*c);
 	    }
 }
+
+/*
+ * \details find only active containers
+ *			It returns frozen and running containers
+ */
 void SubutaiContainerManager::findActiveContainers()
 {
 	char** names;
@@ -68,11 +97,15 @@ void SubutaiContainerManager::findActiveContainers()
 	int num = list_active_containers(_lxc_path.c_str(), &names, &cont);
 	    for (int i = 0; i < num; i++) {
 	        SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
-	        c->getContainerAllFields();
+	        c->setContainerHostname(names[i]);
 	        _activeContainers.push_back(*c);
 	    }
 }
 
+/*
+ * \details find all containers - returns all defined containers -active stopped running
+ *
+ */
 void SubutaiContainerManager::findAllContainers()
 {
 	char** names;
@@ -80,11 +113,16 @@ void SubutaiContainerManager::findAllContainers()
 	int num = list_all_containers(_lxc_path.c_str(), &names, &cont);
 	    for (int i = 0; i < num; i++) {
 	    	SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
+	    	c->setContainerHostname(names[i]);
 	    	_allContainers.push_back(*c);
 	    }
 
 }
 
+/*
+ * \details find container using hostname/name
+ *
+ */
 SubutaiContainer* SubutaiContainerManager::findContainerByName(string container_name) {
 
     for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
@@ -95,16 +133,23 @@ SubutaiContainer* SubutaiContainerManager::findContainerByName(string container_
     return NULL;
 }
 
-SubutaiContainer* SubutaiContainerManager::findContainerByUuid(string container_uuid) {
+/*
+ * \details find container using id
+ *
+ */
+SubutaiContainer* SubutaiContainerManager::findContainerById(string container_id) {
     for (ContainerIterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
-        if ((*it).getContainerUuidValue() == container_uuid) {
+        if ((*it).getContainerIdValue() == container_id) {
             return &(*it);
         }
     }
     return NULL;
 }
 
-
+/*
+ * \details send registration message from all lxcs
+ *
+ */
 void SubutaiContainerManager::registerAllContainers(SubutaiConnection* connection)
 {
 	for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
@@ -112,9 +157,12 @@ void SubutaiContainerManager::registerAllContainers(SubutaiConnection* connectio
 	}
 }
 
-
-string exec(char* cmd) {
-    FILE* pipe = popen(cmd, "r");
+/*
+ * \details execute a terminal command. type = r, w, rw
+ *
+ */
+string exec(char* cmd, char* type) {
+    FILE* pipe = popen(cmd, type);
     if (!pipe) return "ERROR";
     char buffer[128];
     string result = "";
@@ -126,11 +174,15 @@ string exec(char* cmd) {
     return result;
 }
 
-vector<string> splitContainers(string list) {
+/*
+ * \details split string by delimeter
+ *
+ */
+vector<string> splitContainers(string list, char* delimeter) {
 	vector<string> tokens;
 	size_t pos = 0;
 	std::string token;
-	while ((pos = list.find(" ")) != std::string::npos) {
+	while ((pos = list.find(delimeter)) != std::string::npos) {
 	    token = list.substr(0, pos);
 	    tokens.push_back(token);
 	    list.erase(0, pos + 1);
@@ -138,28 +190,41 @@ vector<string> splitContainers(string list) {
 	return tokens;
 }
 
+/*
+ * \details     get the states of all lxcs by using lxc-ls terminal command..
+ * 				Frozen containers are returned by both --active and --frozen commands !
+ *
+ */
 void SubutaiContainerManager::getContainerStates()
 {
-	vector<string> active_containers = splitContainers(exec("lxc-ls --active"));
-	vector<string> stopped_containers = splitContainers(exec("lxc-ls --stopped"));
-	vector<string> frozen_containers = splitContainers(exec("lxc-ls --frozen"));
+	vector<string> active_containers = splitContainers(exec("lxc-ls --active", "r"), "\n");
+	vector<string> stopped_containers = splitContainers(exec("lxc-ls --stopped", "r"), "\n");
+	vector<string> frozen_containers = splitContainers(exec("lxc-ls --frozen", "r"), "\n");
 
-	for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
+	//int a = active_containers.size(), b = stopped_containers.size(), c = frozen_containers.size();
+	//cout << "size " << a << " " << b << " " << c << endl;
+ 	for (vector<SubutaiContainer>::iterator it = _allContainers.begin(); it != _allContainers.end(); it++) {
 		for (vector<string>::iterator it_status = active_containers.begin(); it_status != active_containers.end(); it_status++) {
+			//cout << (*it).getContainerHostnameValue() << " o " << (*it_status) << endl;
 			if((*it).getContainerHostnameValue() == (*it_status))
 				{
+					//cout << (*it_status) << " running" << endl;
 					(*it).setContainerStatus(RUNNING); break;
 				}
 		}
 		for (vector<string>::iterator it_status = stopped_containers.begin(); it_status != stopped_containers.end(); it_status++) {
+			//cout << (*it).getContainerHostnameValue() << " " << (*it_status) << endl;
 			if((*it).getContainerHostnameValue() == (*it_status))
 			{
+				//cout << (*it_status) << " stopped" << endl;
 				(*it).setContainerStatus(STOPPED); break;
 			}
 		}
 		for (vector<string>::iterator it_status = frozen_containers.begin(); it_status != frozen_containers.end(); it_status++) {
+			//cout << (*it).getContainerHostnameValue() << " " << (*it_status) << endl;
 			if((*it).getContainerHostnameValue() == (*it_status))
 			{
+				//cout << (*it_status) << " frozen" << endl;
 				(*it).setContainerStatus(FROZEN); break;
 			}
 		}
