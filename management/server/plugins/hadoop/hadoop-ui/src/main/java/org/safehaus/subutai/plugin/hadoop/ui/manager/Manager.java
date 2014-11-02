@@ -21,8 +21,6 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerExc
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.api.NodeType;
-import org.safehaus.subutai.plugin.common.ui.BaseManager;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
@@ -38,6 +36,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
+import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 
 
 public class Manager

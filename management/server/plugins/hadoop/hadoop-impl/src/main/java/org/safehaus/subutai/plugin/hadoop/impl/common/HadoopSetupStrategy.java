@@ -15,7 +15,6 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildExcep
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
@@ -62,18 +61,18 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     }
 
 
-    public static PlacementStrategy getNodePlacementStrategyByNodeType( NodeType nodeType )
-    {
-        switch ( nodeType )
-        {
-            case MASTER_NODE:
-                return PlacementStrategy.MORE_RAM;
-            case SLAVE_NODE:
-                return PlacementStrategy.MORE_HDD;
-            default:
-                return PlacementStrategy.ROUND_ROBIN;
-        }
-    }
+//    public static PlacementStrategy getNodePlacementStrategyByNodeType( NodeType nodeType )
+//    {
+//        switch ( nodeType )
+//        {
+//            case MASTER_NODE:
+//                return PlacementStrategy.MORE_RAM;
+//            case SLAVE_NODE:
+//                return PlacementStrategy.MORE_HDD;
+//            default:
+//                return PlacementStrategy.ROUND_ROBIN;
+//        }
+//    }
 
 
     @Override

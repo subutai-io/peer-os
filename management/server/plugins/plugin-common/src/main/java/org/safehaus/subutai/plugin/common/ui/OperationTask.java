@@ -15,8 +15,6 @@ import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.oozie.api.Oozie;
-import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 
 
 public class OperationTask implements Runnable

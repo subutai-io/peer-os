@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 

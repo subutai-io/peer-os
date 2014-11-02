@@ -26,8 +26,6 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDao;
-import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
@@ -36,6 +34,7 @@ import org.safehaus.subutai.plugin.hadoop.impl.handler.AddOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.RemoveNodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.UninstallOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.dao.PluginDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +55,7 @@ public class HadoopImpl implements Hadoop
     private Commands commands;
 
 
-    private PluginDao pluginDAO;
+    private PluginDAO pluginDAO;
     private DataSource dataSource;
 
 
@@ -76,7 +75,7 @@ public class HadoopImpl implements Hadoop
     {
         try
         {
-            this.pluginDAO = new PluginDao( dataSource );
+            this.pluginDAO = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
         {
@@ -122,7 +121,7 @@ public class HadoopImpl implements Hadoop
     }
 
 
-    public PluginDao getPluginDAO()
+    public PluginDAO getPluginDAO()
     {
         return pluginDAO;
     }
