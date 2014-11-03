@@ -70,7 +70,7 @@ class SubutaiContainerManager {
         lxc_container*                  _current_container;
         vector<SubutaiContainer>        _frozenContainers;
         vector<SubutaiContainer>        _stoppedContainers;
-        vector<SubutaiContainer>        _activeContainers;
+        vector<SubutaiContainer>        _running_containers;
 };
 
 #endif
