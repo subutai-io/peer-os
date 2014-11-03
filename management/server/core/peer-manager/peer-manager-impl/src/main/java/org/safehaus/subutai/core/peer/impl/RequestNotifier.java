@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.peer.impl;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
+import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
@@ -37,11 +38,14 @@ public class RequestNotifier implements Runnable
     public void run()
     {
         //notify listener and obtain response
-        MessageResponse messageResponse;
+        MessageResponse messageResponse = null;
         try
         {
             Object response = listener.onRequest( messageRequest.getPayload() );
-            messageResponse = new MessageResponse( messageRequest.getId(), response, null );
+            if ( response != null )
+            {
+                messageResponse = new MessageResponse( messageRequest.getId(), new Payload( response ), null );
+            }
         }
         catch ( Exception e )
         {
@@ -49,17 +53,21 @@ public class RequestNotifier implements Runnable
             messageResponse = new MessageResponse( messageRequest.getId(), null, e.getMessage() );
         }
 
-        //send response back
-        Message responseMessage = messenger.createMessage( messageResponse );
-        Peer sourcePeer = peerManager.getPeer( message.getSourcePeerId() );
-        try
+        //send message if not null
+        if ( messageResponse != null )
         {
-            messenger.sendMessage( sourcePeer, responseMessage, RecipientType.PEER_RESPONSE_LISTENER.name(),
-                    Timeouts.PEER_MESSAGE_TIMEOUT );
-        }
-        catch ( MessageException e )
-        {
-            LOG.error( "Error sending response to peer message", e );
+            //send response back
+            Message responseMessage = messenger.createMessage( messageResponse );
+            Peer sourcePeer = peerManager.getPeer( message.getSourcePeerId() );
+            try
+            {
+                messenger.sendMessage( sourcePeer, responseMessage, RecipientType.PEER_RESPONSE_LISTENER.name(),
+                        Timeouts.PEER_MESSAGE_TIMEOUT );
+            }
+            catch ( MessageException e )
+            {
+                LOG.error( "Error sending response to peer message", e );
+            }
         }
     }
 }

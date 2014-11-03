@@ -3,15 +3,17 @@ package org.safehaus.subutai.core.peer.impl;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.core.peer.api.Payload;
 
-public class MessageRequest<T>
+
+public class MessageRequest
 {
     private UUID id;
-    private T payload;
+    private Payload payload;
     private String recipient;
 
 
-    public MessageRequest( final T payload, final String recipient )
+    public MessageRequest( final Payload payload, final String recipient )
     {
         this.id = UUID.randomUUID();
         this.payload = payload;
@@ -25,7 +27,7 @@ public class MessageRequest<T>
     }
 
 
-    public T getPayload()
+    public Payload getPayload()
     {
         return payload;
     }

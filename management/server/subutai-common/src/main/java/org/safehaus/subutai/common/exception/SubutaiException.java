@@ -10,4 +10,10 @@ public class SubutaiException extends Exception
     {
         super( message );
     }
+
+
+    public SubutaiException( final Throwable cause )
+    {
+        super( cause );
+    }
 }

@@ -4,40 +4,48 @@ package org.safehaus.subutai.core.metric.impl;
 import java.util.Set;
 import java.util.UUID;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
-
-import com.google.common.collect.Sets;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 
+@RunWith( MockitoJUnitRunner.class )
 public class ContainerHostMetricRequestResponseTest
 {
+
+    private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
+    ContainerHostMetricRequest request;
+    ContainerHostMetricResponse response;
+    @Mock
+    Set<ContainerHostMetricImpl> metrics;
+
+
+    @Before
+    public void setUp() throws Exception
+    {
+
+        request = new ContainerHostMetricRequest( ENVIRONMENT_ID );
+
+        response = new ContainerHostMetricResponse( metrics );
+    }
 
 
     @Test
     public void testRequest() throws Exception
     {
-        UUID environmentId = UUID.randomUUID();
 
-        ContainerHostMetricRequest request = new ContainerHostMetricRequest( environmentId );
-
-        assertEquals( environmentId, request.getEnvironmentId() );
-        assertNotNull( request.getId() );
+        assertEquals( ENVIRONMENT_ID, request.getEnvironmentId() );
     }
 
 
     @Test
     public void testResponse() throws Exception
     {
-        Set<ContainerHostMetricImpl> metrics = Sets.newHashSet();
-        UUID requestId = UUID.randomUUID();
-
-        ContainerHostMetricResponse response = new ContainerHostMetricResponse( requestId, metrics );
 
         assertEquals( metrics, response.getMetrics() );
-        assertEquals( requestId, response.getRequestId() );
     }
 }

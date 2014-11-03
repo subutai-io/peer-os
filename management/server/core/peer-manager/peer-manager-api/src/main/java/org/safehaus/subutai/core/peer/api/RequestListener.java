@@ -24,5 +24,5 @@ public abstract class RequestListener
     }
 
 
-    public abstract Object onRequest( Object request ) throws Exception;
+    public abstract Object onRequest( Payload payload ) throws Exception;
 }
