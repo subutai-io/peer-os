@@ -62,7 +62,7 @@ string SubutaiContainer::toString(int intcont)
 
 string SubutaiContainer::RunProgram(string program, vector<string> params) {
     ExecutionResult result = RunProgram(program, params, true);
-    if (result.exit_code == 0) {
+    if (result.exit_code == "0") {
         return result.out;
     } else {
         return result.err;
@@ -104,7 +104,7 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
             command_output += buffer;
         }
     }
-    if (result.exit_code == 0) {
+    if (result.exit_code == "0") {
         result.out = command_output;
     } else {
         result.err = command_output;
@@ -251,11 +251,11 @@ bool SubutaiContainer::getContainerParentHostname()
     	string config = RunProgram("/bin/cat", args);
         if (config.empty()) //file exist
         {
-        	ofstream file("/tmp/subutai/config.txt");
+        	ofstream file("/tmp/config.txt");
         	file << config;
         	file.close();
             boost::property_tree::ptree pt;
-            boost::property_tree::ini_parser::read_ini("/tmp/subutai/config.txt", pt);
+            boost::property_tree::ini_parser::read_ini("/tmp/config.txt", pt);
             parentHostname =  pt.get<std::string>("Subutai-Agent.subutai_parent_hostname");
             containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","parentHostname: ",parentHostname));
         }
@@ -292,11 +292,11 @@ bool SubutaiContainer::getContainerIpAddress()
     	vector<string> args ;
     	string config = RunProgram("ifconfig", args);
 
-    	ofstream file("/tmp/subutai/ipaddress.txt");
+    	ofstream file("/tmp/ipaddress.txt");
     	file << config;
     	file.close();
 
-        FILE * fp = fopen("/tmp/subutai/ipaddress.txt", "r");
+        FILE * fp = fopen("/tmp/ipaddress.txt", "r");
         if (fp)
         {
             char *p=NULL, *e; size_t n;
@@ -405,8 +405,9 @@ void SubutaiContainer::registerContainer(SubutaiConnection* connection)
 bool SubutaiContainer::checkCWD(string cwd) {
     vector<string> params;
     params.push_back(cwd);
-    ExecutionResult result = RunProgram("/bin/cd", params);    
-    if (result.exit_code == 0) 
+    ExecutionResult result;
+    result.exit_code = RunProgram("/bin/cd", params);
+    if (result.exit_code == "0")
         return true;
     else
         return false;
