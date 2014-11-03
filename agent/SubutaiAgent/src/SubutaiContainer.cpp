@@ -62,7 +62,7 @@ string SubutaiContainer::toString(int intcont)
 
 string SubutaiContainer::RunProgram(string program, vector<string> params) {
     ExecutionResult result = RunProgram(program, params, true);
-    if (result.exit_code == "0") {
+    if (result.exit_code == 0) {
         return result.out;
     } else {
         return result.err;
@@ -102,7 +102,7 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
             command_output += buffer;
         }
     }
-    if (result.exit_code == "0") {
+    if (result.exit_code == 0) {
         result.out = command_output;
     } else {
         result.err = command_output;
