@@ -25,6 +25,7 @@ import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.TopologyEnum;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenceException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -32,8 +33,8 @@ import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
 import org.safehaus.subutai.core.environment.impl.builder.TopologyBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
-import org.safehaus.subutai.core.network.api.NetworkManager;
-import org.safehaus.subutai.core.network.api.NetworkManagerException;
+import org.safehaus.subutai.core.security.api.*;
+import org.safehaus.subutai.core.security.api.SecurityManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -65,7 +66,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     //    private ServiceLocator serviceLocator;
     private EnvironmentDAO environmentDAO;
     private TemplateRegistry templateRegistry;
-    private NetworkManager networkManager;
+    private org.safehaus.subutai.core.security.api.SecurityManager securityManager;
     private Tracker tracker;
     private DataSource dataSource;
 
@@ -89,15 +90,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public NetworkManager getNetworkManager()
+    public SecurityManager getSecurityManager()
     {
-        return networkManager;
+        return securityManager;
     }
 
 
-    public void setNetworkManager( final NetworkManager networkManager )
+    public void setSecurityManager( final SecurityManager securityManager )
     {
-        this.networkManager = networkManager;
+        this.securityManager = securityManager;
     }
 
 
@@ -137,7 +138,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         this.environmentDAO = null;
         this.templateRegistry = null;
-        this.networkManager = null;
+        this.securityManager = null;
         this.peerManager = null;
         this.tracker = null;
         this.topologyBuilder = null;
@@ -188,7 +189,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public boolean destroyEnvironment( final UUID uuid )
+    public boolean destroyEnvironment( final UUID uuid ) throws EnvironmentDestroyException
     {
         Environment environment = getEnvironmentByUUID( uuid );
         int count = 0;
@@ -200,20 +201,26 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 ip = container.getPeer().getPeerInfo().getIp();
                 container.dispose();
                 System.out.println( String.format( "Container %s destroyed.", container.getHostname() ) );
+                count++;
             }
             catch ( PeerException e )
             {
                 LOG.error( String.format( "Could not destroy container %s on %s: %s", container.getHostname(), ip,
                         e.toString() ) );
+                throw new EnvironmentDestroyException( e.getMessage() );
             }
         }
 
-        //TODO: fix workaround
-        /*if ( count == environment.getContainers().size() )
+
+        if ( count == environment.getContainers().size() )
         {
-            return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
-        }*/
-        return environmentDAO.deleteInfo( ENVIRONMENT, uuid.toString() );
+            return environmentDAO.deleteInfo( ENVIRONMENT, uuid.toString() );
+        }
+        else
+        {
+            throw new EnvironmentDestroyException( String.format( "Only %d out of %d containers destroyed.", count,
+                    environment.getContainers().size() ) );
+        }
     }
 
 
@@ -392,9 +399,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 {
                     try
                     {
-                        networkManager.configSshOnAgents( environment.getContainers() );
+                        securityManager.configSshOnAgents( environment.getContainers() );
                     }
-                    catch ( NetworkManagerException e )
+                    catch ( SecurityManagerException e )
                     {
                         throw new EnvironmentBuildException( e.getMessage() );
                     }
@@ -403,9 +410,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 {
                     try
                     {
-                        networkManager.configHostsOnAgents( environment.getContainers(), blueprint.getDomainName() );
+                        securityManager.configHostsOnAgents( environment.getContainers(), blueprint.getDomainName() );
                     }
-                    catch ( NetworkManagerException e )
+                    catch ( SecurityManagerException e )
                     {
                         throw new EnvironmentBuildException( e.getMessage() );
                     }
