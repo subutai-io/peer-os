@@ -37,4 +37,8 @@ public interface PeerManager
     public LocalPeer getLocalPeer();
 
     PeerGroup getPeerGroup( UUID peerGroupId );
+
+    public void addRequestListener( RequestListener listener );
+
+    public void removeRequestListener( RequestListener listener );
 }

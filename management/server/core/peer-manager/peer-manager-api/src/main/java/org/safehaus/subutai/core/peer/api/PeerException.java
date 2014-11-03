@@ -9,6 +9,12 @@ public class PeerException extends Exception
     private String description = "";
 
 
+    public PeerException( final Throwable cause )
+    {
+        super( cause );
+    }
+
+
     public PeerException( final String message )
     {
         super( message );

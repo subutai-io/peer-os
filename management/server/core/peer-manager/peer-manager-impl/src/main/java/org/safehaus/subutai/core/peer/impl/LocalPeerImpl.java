@@ -37,12 +37,15 @@ import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 
@@ -61,11 +64,12 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     private ManagementHost managementHost;
     private CommandRunner commandRunner;
     private QuotaManager quotaManager;
+    private Set<RequestListener> requestListeners;
 
 
     public LocalPeerImpl( PeerManager peerManager, ContainerManager containerManager, TemplateRegistry templateRegistry,
                           PeerDAO peerDao, CommunicationManager communicationManager, CommandRunner commandRunner,
-                          QuotaManager quotaManager )
+                          QuotaManager quotaManager, Set<RequestListener> requestListeners )
     {
 
         this.peerManager = peerManager;
@@ -75,6 +79,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
         this.communicationManager = communicationManager;
         this.commandRunner = commandRunner;
         this.quotaManager = quotaManager;
+        this.requestListeners = requestListeners;
     }
 
 
@@ -599,6 +604,37 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     public boolean isOnline() throws PeerException
     {
         return true;
+    }
+
+
+    @Override
+    public <T, V> V sendRequest( final T payload, final String recipient, final int timeout,
+                                 final Class<V> responseType ) throws PeerException
+    {
+        Preconditions.checkNotNull( payload, "Invalid payload" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
+        Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
+        Preconditions.checkNotNull( responseType, "Invalid response type" );
+
+
+        for ( RequestListener requestListener : requestListeners )
+        {
+            if ( recipient.equalsIgnoreCase( requestListener.getRecipient() ) )
+            {
+                try
+                {
+                    Object response = requestListener.onRequest( payload );
+
+                    return responseType.cast( response );
+                }
+                catch ( Exception e )
+                {
+                    throw new PeerException( e );
+                }
+            }
+        }
+
+        return null;
     }
 }
 
