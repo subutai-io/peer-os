@@ -54,9 +54,9 @@ public abstract class SubutaiHost implements Host
     }
 
 
-    public Peer getPeer( UUID peerId ) throws PeerException
+    public Peer getPeer() throws PeerException
     {
-        Peer result = null;
+        Peer result;
         try
         {
             PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
@@ -88,7 +88,7 @@ public abstract class SubutaiHost implements Host
     {
         try
         {
-            Peer peer = getPeer( this.getPeerId() );
+            Peer peer = getPeer();
             return peer.execute( requestBuilder, this, callback );
         }
         catch ( PeerException e )
@@ -111,34 +111,12 @@ public abstract class SubutaiHost implements Host
     {
         try
         {
-            Peer peer = getPeer( this.getPeerId() );
+            Peer peer = getPeer();
             peer.executeAsync( requestBuilder, this, callback );
         }
         catch ( PeerException e )
         {
             throw new CommandException( e.toString() );
-        }
-    }
-
-
-    public String echo( String text ) throws CommandException
-    {
-        RequestBuilder requestBuilder = new RequestBuilder( "echo " + text );
-        CommandResult result = execute( requestBuilder );
-        if ( result.hasSucceeded() )
-        {
-            return result.getStdOut();
-        }
-        else
-        {
-            if ( result.hasTimedOut() )
-            {
-                throw new CommandException( "Command timed out" );
-            }
-            else
-            {
-                throw new CommandException( "Echo execution error: " + result.getStdErr() );
-            }
         }
     }
 
@@ -191,7 +169,7 @@ public abstract class SubutaiHost implements Host
     {
         try
         {
-            Peer peer = getPeer( this.getPeerId() );
+            Peer peer = getPeer();
             return peer.isConnected( this );
         }
         catch ( PeerException e )
@@ -199,7 +177,6 @@ public abstract class SubutaiHost implements Host
 
             return false;
         }
-        //return ( System.currentTimeMillis() - lastHeartbeat ) < INACTIVE_TIME;
     }
 
 

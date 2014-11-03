@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.peer.api;
 
 
 /**
- * Created by talas on 9/24/14.
+ * Registration status of peer
  */
 public enum PeerStatus
 {

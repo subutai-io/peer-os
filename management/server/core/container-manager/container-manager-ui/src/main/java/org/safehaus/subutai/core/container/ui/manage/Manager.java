@@ -1,41 +1,29 @@
 package org.safehaus.subutai.core.container.ui.manage;
 
 
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
+import com.vaadin.event.Action;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.*;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.container.ui.common.Buttons;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.PeerException;
-import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.ResourceHost;
+import org.safehaus.subutai.core.peer.api.*;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.event.Action;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.TreeTable;
-import com.vaadin.ui.VerticalLayout;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @SuppressWarnings( "serial" )
@@ -227,8 +215,8 @@ public class Manager extends VerticalLayout
         TreeTable table = new TreeTable( caption );
         table.addContainerProperty( HOST_NAME, String.class, null );
         table.addContainerProperty( LXC_STATUS, Label.class, null );
-        table.addContainerProperty( LXC_MEMORY, QuotaMemoryComponent.class, null );
-        table.addContainerProperty( LXC_CPU_LIST, TextField.class, null );
+        //table.addContainerProperty( LXC_MEMORY, QuotaMemoryComponent.class, null );
+        //table.addContainerProperty( LXC_CPU_LIST, TextField.class, null );
         table.addContainerProperty( LXC_UPDATE, Button.class, null );
 
         table.setWidth( 100, Unit.PERCENTAGE );
@@ -419,12 +407,15 @@ public class Manager extends VerticalLayout
 
     private void populateTable( Set<ResourceHost> resourceHosts )
     {
+        final Button btnApplySettings = new Button();
+        btnApplySettings.addStyleName("default");
+
         lxcTable.removeAllItems();
 
         for ( ResourceHost resourceHost : resourceHosts )
         {
             final Object parentId = lxcTable.addItem( new Object[] {
-                    resourceHost.getHostname(), new Label(), null, null, null
+                    resourceHost.getHostname(), new Label(), /*null, null,*/ null
             }, resourceHost.getHostname() );
 
             for ( final ContainerHost containerHost : resourceHost.getContainerHosts() )
@@ -435,6 +426,7 @@ public class Manager extends VerticalLayout
                 updateQuota.addStyleName( "default" );
                 String containerMemory;
                 final QuotaMemoryComponent memoryQuotaComponent = new QuotaMemoryComponent();
+                final QuotaComponents modifyQuota = new QuotaComponents();
 
                 String containerCpu = "Cpu Shares";
                 final TextField containerCpuTextField = new TextField();
@@ -450,16 +442,43 @@ public class Manager extends VerticalLayout
                         containerCpu = containerHost.getQuota( QuotaEnum.CPUSET_CPUS );
                         containerCpuTextField.setValue( containerCpu );
 
+                        modifyQuota.setValueFormemoryTextField2(containerMemory);
+                        modifyQuota.setValueForCoresUsedTextField(containerCpu);
+
                         memoryQuotaComponent.setValueForMemoryTextField( containerMemory );
                         updateQuota.addClickListener( new Button.ClickListener()
                         {
                             @Override
                             public void buttonClick( final Button.ClickEvent clickEvent )
                             {
+                                Window subWindowModifyLXC = new Window("Modify LXC container");
+                                AbsoluteLayout mainLayout = new AbsoluteLayout();
+                                subWindowModifyLXC.setModal(true);
+                                subWindowModifyLXC.center();
+                                subWindowModifyLXC.setHeight("600px");
+                                subWindowModifyLXC.setWidth("550px");
+
+                                mainLayout.addComponent(modifyQuota, "top:0.0px;right:0.0px;left:0.0px;");
+
+                                btnApplySettings.addStyleName("default");
+                                btnApplySettings.setCaption("Apply");
+                                btnApplySettings.setImmediate(true);
+                                btnApplySettings.setWidth("-1px");
+                                btnApplySettings.setHeight("-1px");
+                                mainLayout.addComponent(btnApplySettings, "top:500.0px;left:450.0px;");
+
+                                subWindowModifyLXC.setContent(mainLayout);
+
+                                UI.getCurrent().addWindow(subWindowModifyLXC);
+                            }
+                        } );
+                        btnApplySettings.addClickListener(new Button.ClickListener() {
+                            @Override
+                            public void buttonClick(final Button.ClickEvent clickEvent) {
                                 try
                                 {
-                                    String memoryLimit = memoryQuotaComponent.getMemoryLimitValue();
-                                    String cpuLimit = containerCpuTextField.getValue().replaceAll( "\n", "" );
+                                    String memoryLimit = modifyQuota.getMemoryLimitValue();
+                                    String cpuLimit = modifyQuota.getValueFromCpuCoresUsed();
                                     containerHost.setQuota( QuotaEnum.MEMORY_LIMIT_IN_BYTES, memoryLimit );
                                     containerHost.setQuota( QuotaEnum.CPUSET_CPUS, cpuLimit );
                                 }
@@ -467,8 +486,10 @@ public class Manager extends VerticalLayout
                                 {
                                     show( pe.toString() );
                                 }
+                                Notification.show("Settings applied");
                             }
-                        } );
+                        });
+
                     }
                     catch ( PeerException pe )
                     {
@@ -480,7 +501,7 @@ public class Manager extends VerticalLayout
                     containerStatus.setValue( "STOPPED" );
                 }
                 Object childId = lxcTable.addItem( new Object[] {
-                        lxcHostname, containerStatus, memoryQuotaComponent, containerCpuTextField, updateQuota
+                        lxcHostname, containerStatus, /*memoryQuotaComponent, containerCpuTextField,*/ updateQuota
                 }, lxcHostname );
 
                 lxcTable.setParent( childId, parentId );

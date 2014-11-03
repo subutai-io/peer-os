@@ -36,6 +36,7 @@ import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -191,18 +192,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Environment environment = getEnvironmentByUUID( uuid );
         int count = 0;
-        /*for ( EnvironmentContainer container : environment.getContainers() )
+        for ( ContainerHost container : environment.getContainers() )
         {
-            DestroyContainersMessage dcm =
-                    new DestroyContainersMessage( PeerCommandType.DESTROY, environment.getUuid(), container.getPeerId(),
-                            container.getAgentId() );
-            dcm.setHostname( container.getHostname() );
-            peerCommandDispatcher.invoke( dcm, 1000 * 60 );
-            if ( dcm.isSuccess() )
+            String ip = null;
+            try
             {
-                count++;
+                ip = container.getPeer().getPeerInfo().getIp();
+                container.dispose();
+                System.out.println( String.format( "Container %s destroyed.", container.getHostname() ) );
             }
-        }*/
+            catch ( PeerException e )
+            {
+                LOG.error( String.format( "Could not destroy container %s on %s: %s", container.getHostname(), ip,
+                        e.toString() ) );
+            }
+        }
 
         //TODO: fix workaround
         /*if ( count == environment.getContainers().size() )
@@ -354,6 +358,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     {
                         for ( ContainerHost container : containers )
                         {
+                            container.setNodeGroupName( ccm.getNodeGroupName() );
                             environment.addContainer( container );
                         }
                     }
