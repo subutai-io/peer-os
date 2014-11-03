@@ -1,11 +1,12 @@
 package org.safehaus.subutai.plugin.pig.impl.handler;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.SetupType;
 import org.safehaus.subutai.plugin.pig.impl.PigImpl;
@@ -33,7 +34,7 @@ public class DestroyClusterOperationHandler extends AbstractOperationHandler<Pig
             return;
         }
 
-        for ( Agent node : config.getNodes() )
+        for ( UUID agentUUID : config.getNodes() )
         {
             if ( manager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
             {

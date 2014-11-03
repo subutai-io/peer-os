@@ -12,25 +12,23 @@ import javax.sql.DataSource;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
-import org.safehaus.subutai.plugin.solr.impl.handler.AddNodeOperationHandler;
-import org.safehaus.subutai.plugin.solr.impl.handler.CheckNodeOperationHandler;
-import org.safehaus.subutai.plugin.solr.impl.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.plugin.solr.impl.handler.InstallOperationHandler;
-import org.safehaus.subutai.plugin.solr.impl.handler.StartNodeOperationHandler;
-import org.safehaus.subutai.plugin.solr.impl.handler.StopNodeOperationHandler;
+import org.safehaus.subutai.plugin.solr.impl.handler.NodeOperationHandler;
+import org.safehaus.subutai.plugin.solr.impl.handler.OperationType;
 import org.safehaus.subutai.plugin.solr.impl.handler.UninstallOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,12 +42,8 @@ public class SolrImpl implements Solr
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( SolrImpl.class.getName() );
-    protected Commands commands;
-    protected AgentManager agentManager;
-    private CommandRunner commandRunner;
     private Tracker tracker;
     private EnvironmentManager environmentManager;
-    private ContainerManager containerManager;
     private ExecutorService executor;
     private PluginDao pluginDAO;
     private DataSource dataSource;
@@ -77,7 +71,6 @@ public class SolrImpl implements Solr
         {
             LOG.error( e.getMessage(), e );
         }
-        this.commands = new Commands( commandRunner );
 
         executor = Executors.newCachedThreadPool();
     }
@@ -86,18 +79,6 @@ public class SolrImpl implements Solr
     public void destroy()
     {
         executor.shutdown();
-    }
-
-
-    public ContainerManager getContainerManager()
-    {
-        return containerManager;
-    }
-
-
-    public void setContainerManager( final ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
     }
 
 
@@ -111,37 +92,6 @@ public class SolrImpl implements Solr
     {
         this.environmentManager = environmentManager;
     }
-
-
-    public Commands getCommands()
-    {
-        return commands;
-    }
-
-
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
-    public void setCommandRunner( final CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
-    }
-
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public void setAgentManager( final AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }
-
 
     public Tracker getTracker()
     {
@@ -178,7 +128,6 @@ public class SolrImpl implements Solr
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
 
-
         AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
 
         executor.execute( operationHandler );
@@ -209,13 +158,13 @@ public class SolrImpl implements Solr
     }
 
 
-    public UUID startNode( final String clusterName, final String lxcHostName )
+    public UUID startNode( final String clusterName, final ContainerHost containerHost )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostName ), "Lxc hostname is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHost.getHostname() ), "Lxc hostname is null or empty" );
 
 
-        AbstractOperationHandler operationHandler = new StartNodeOperationHandler( this, clusterName, lxcHostName );
+        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, clusterName, containerHost.getAgent().getUuid(), OperationType.START );
 
         executor.execute( operationHandler );
 
@@ -223,13 +172,13 @@ public class SolrImpl implements Solr
     }
 
 
-    public UUID stopNode( final String clusterName, final String lxcHostName )
+    public UUID stopNode( final String clusterName, final ContainerHost containerHost )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostName ), "Lxc hostname is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHost.getHostname() ), "Lxc hostname is null or empty" );
 
 
-        AbstractOperationHandler operationHandler = new StopNodeOperationHandler( this, clusterName, lxcHostName );
+        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, clusterName, containerHost.getAgent().getUuid(), OperationType.STOP );
 
         executor.execute( operationHandler );
 
@@ -237,13 +186,13 @@ public class SolrImpl implements Solr
     }
 
 
-    public UUID checkNode( final String clusterName, final String lxcHostName )
+    public UUID checkNode( final String clusterName, final ContainerHost containerHost )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostName ), "Lxc hostname is null or empty" );
+        //Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostName ), "Lxc hostname is null or empty" );
 
 
-        AbstractOperationHandler operationHandler = new CheckNodeOperationHandler( this, clusterName, lxcHostName );
+        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, clusterName, containerHost.getAgent().getUuid(), OperationType.STATUS );
 
         executor.execute( operationHandler );
 
@@ -253,28 +202,15 @@ public class SolrImpl implements Solr
 
     public UUID addNode( final String clusterName )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-
-
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName );
-
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
+       //TODO
+        return null;
     }
 
 
-    public UUID destroyNode( final String clusterName, final String lxcHostName )
+    public UUID destroyNode( final String clusterName, final ContainerHost containerHost )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostName ), "Lxc hostname is null or empty" );
-
-
-        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostName );
-
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
+        //TODO
+        return null;
     }
 
 
@@ -282,38 +218,37 @@ public class SolrImpl implements Solr
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final SolrClusterConfig config,
                                                          final TrackerOperation po )
     {
-        Preconditions.checkNotNull( environment, "Environment is null" );
+        /*Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( config, "Solr cluster config is null" );
-        Preconditions.checkNotNull( po, "Product operation is null" );
+        Preconditions.checkNotNull( po, "Product operation is null" );*/
 
         return new SolrSetupStrategy( this, po, config, environment );
     }
 
 
     @Override
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( SolrClusterConfig config )
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( SolrClusterConfig config )
     {
-        Preconditions.checkNotNull( config, "Solr cluster config is null" );
-
-        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
-
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint
                 .setName( String.format( "%s-%s", SolrClusterConfig.PRODUCT_KEY, UUIDUtil.generateTimeBasedUUID() ) );
 
+        environmentBlueprint.setLinkHosts( true );
+        environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
+        environmentBlueprint.setExchangeSshKeys( true );
+
         //1 node group
-        NodeGroup solrGroup = new NodeGroup();
-        solrGroup.setName( "DEFAULT" );
-        solrGroup.setNumberOfNodes( config.getNumberOfNodes() );
-        solrGroup.setTemplateName( config.getTemplateName() );
-        solrGroup.setPlacementStrategy( SolrSetupStrategy.getPlacementStrategy() );
+        NodeGroup nodeGroup = new NodeGroup();
+        nodeGroup.setTemplateName( config.getTemplateName() );
+        nodeGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        nodeGroup.setNumberOfNodes( config.getNumberOfNodes() );
 
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
 
-        environmentBlueprint.setNodeGroups( Sets.newHashSet( solrGroup ) );
-
-        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
-
-
-        return environmentBuildTask;
+        return environmentBlueprint;
+    }
+    public UUID configureEnvironmentCluster( final SolrClusterConfig config )
+    {
+        return null;
     }
 }

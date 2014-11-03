@@ -4,6 +4,7 @@ package org.safehaus.subutai.plugin.solr.impl;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -13,7 +14,7 @@ import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 
 import com.google.common.base.Preconditions;
@@ -78,33 +79,13 @@ public class SolrSetupStrategy implements ClusterSetupStrategy
                     environment.getContainers().size(), config.getNumberOfNodes() ) );
         }
 
-        Set<EnvironmentContainer> solrEnvironmentContainers = new HashSet<>();
-        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
+        Set<UUID> solrNodes = new HashSet<>();
+        for ( ContainerHost environmentContainer : environment.getContainers() )
         {
-            if ( environmentContainer.getTemplate().getProducts()
-                                     .contains( Common.PACKAGE_PREFIX + SolrClusterConfig.PRODUCT_NAME ) )
-            {
-                solrEnvironmentContainers.add( environmentContainer );
-            }
+            solrNodes.add( environmentContainer.getAgent().getUuid() );
         }
 
-        if ( solrEnvironmentContainers.size() < config.getNumberOfNodes() )
-        {
-            throw new ClusterSetupException(
-                    String.format( "Number of nodes with Solr installed is %d, but %d is required",
-                            solrEnvironmentContainers
-
-                                    .size(), config.getNumberOfNodes() ) );
-        }
-
-        Set<Agent> solrAgents = new HashSet<>();
-        Iterator<EnvironmentContainer> it = solrEnvironmentContainers.iterator();
-        for ( int i = 0; i < config.getNumberOfNodes(); i++ )
-        {
-            solrAgents.add( it.next().getAgent() );
-        }
-
-        config.setNodes( solrAgents );
+        config.setNodes( solrNodes );
 
         po.addLog( "Saving cluster information to database..." );
 

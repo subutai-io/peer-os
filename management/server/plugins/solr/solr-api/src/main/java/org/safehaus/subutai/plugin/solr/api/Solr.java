@@ -10,9 +10,10 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
 /**
@@ -21,18 +22,20 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 public interface Solr extends ApiBase<SolrClusterConfig>
 {
 
-    public UUID startNode( String clusterName, String lxcHostname );
+    public UUID startNode( String clusterName, ContainerHost containerHost );
 
-    public UUID stopNode( String clusterName, String lxcHostname );
+    public UUID stopNode( String clusterName, ContainerHost containerHost );
 
-    public UUID checkNode( String clusterName, String lxcHostname );
+    public UUID checkNode( String clusterName, ContainerHost containerHost );
 
     public UUID addNode( String clusterName );
 
-    public UUID destroyNode( String clusterName, String lxcHostname );
+    public UUID destroyNode( String clusterName, ContainerHost containerHost );
 
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final SolrClusterConfig config,
                                                          final TrackerOperation po );
 
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( SolrClusterConfig config );
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( SolrClusterConfig config );
+
+    UUID configureEnvironmentCluster( SolrClusterConfig config );
 }

@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.solr.impl.handler;
 
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 
@@ -29,16 +29,17 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SolrImpl
             return;
         }
 
-        trackerOperation.addLog( "Destroying lxc containers..." );
 
         try
         {
-            manager.getContainerManager().clonesDestroy( solrClusterConfig.getNodes() );
-            trackerOperation.addLog( "Lxc containers successfully destroyed" );
+            trackerOperation.addLog( "Destroying environment..." );
+            manager.getEnvironmentManager().destroyEnvironment( solrClusterConfig.getEnvironmentId() );
+            manager.getPluginDAO().deleteInfo( solrClusterConfig.PRODUCT_KEY, solrClusterConfig.getClusterName() );
+            trackerOperation.addLogDone( "Cluster destroyed" );
         }
-        catch ( LxcDestroyException ex )
+        catch ( EnvironmentDestroyException e )
         {
-            trackerOperation.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
+            trackerOperation.addLog( String.format( "%s, skipping...", e.getMessage() ) );
         }
 
         trackerOperation.addLog( "Updating db..." );

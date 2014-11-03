@@ -11,7 +11,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
 
-public class CommandsTest
+/*public class CommandsTest
 {
 
     private static Commands commands;
@@ -52,4 +52,4 @@ public class CommandsTest
         assertNotNull( command );
         assertEquals( Commands.STATUS, command.getDescription() );
     }
-}
+}*/

@@ -1,7 +1,7 @@
 package org.safehaus.subutai.plugin.solr.impl.handler;
 
 
-import org.junit.Ignore;
+/*import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.OperationState;
@@ -53,4 +53,4 @@ public class UninstallOperationHandlerTest
         // installation" ) );
         assertEquals( operationHandler.getTrackerOperation().getState(), OperationState.FAILED );
     }
-}
+}*/

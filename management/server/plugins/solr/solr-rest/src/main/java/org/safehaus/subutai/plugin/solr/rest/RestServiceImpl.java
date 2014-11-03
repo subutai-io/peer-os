@@ -80,33 +80,37 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response startNode( final String clusterName, final String lxcHostname )
+    public Response startNode( final String clusterName, final String agentUUID )
     {
-        String operationId = wrapUUID( solrManager.startNode( clusterName, lxcHostname ) );
-        return Response.status( Response.Status.OK ).entity( operationId ).build();
+        /*String operationId = wrapUUID( solrManager.startNode( clusterName, UUID.fromString( agentUUID ) ) );
+        return Response.status( Response.Status.OK ).entity( operationId ).build();*/
+        return null;
     }
 
 
     @Override
-    public Response stopNode( final String clusterName, final String lxcHostname )
+    public Response stopNode( final String clusterName, final String agentUUID )
     {
-        String operationId = wrapUUID( solrManager.stopNode( clusterName, lxcHostname ) );
-        return Response.status( Response.Status.OK ).entity( operationId ).build();
+        /*String operationId = wrapUUID( solrManager.stopNode( clusterName,UUID.fromString( agentUUID )  ));
+        return Response.status( Response.Status.OK ).entity( operationId ).build();*/
+        return null;
     }
 
 
     @Override
-    public Response destroyNode( final String clusterName, final String lxcHostname )
+    public Response destroyNode( final String clusterName, final String agentUUID)
     {
-        String operationId = wrapUUID( solrManager.destroyNode( clusterName, lxcHostname ) );
-        return Response.status( Response.Status.OK ).entity( operationId ).build();
+        /*String operationId = wrapUUID( solrManager.destroyNode( clusterName, UUID.fromString( agentUUID ) ) );
+        return Response.status( Response.Status.OK ).entity( operationId ).build();*/
+        return null;
     }
 
 
     @Override
-    public Response checkNode( final String clusterName, final String lxcHostname )
+    public Response checkNode( final String clusterName, final String agentUUID )
     {
-        String operationId = wrapUUID( solrManager.checkNode( clusterName, lxcHostname ) );
-        return Response.status( Response.Status.OK ).entity( operationId ).build();
+        /*String operationId = wrapUUID( solrManager.checkNode( clusterName, UUID.fromString( agentUUID ) ) );
+        return Response.status( Response.Status.OK ).entity( operationId ).build();*/
+        return null;
     }
 }

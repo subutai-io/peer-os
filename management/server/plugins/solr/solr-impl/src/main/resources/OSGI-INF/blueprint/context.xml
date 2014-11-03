@@ -7,16 +7,14 @@
     <property name="password" value="" />
   </bean>
 
-  <reference id="tracker" availability="mandatory"
-             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
-  <reference id="environmentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
+  <reference id="tracker" interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+  <reference id="environmentManager" interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
   <bean id="solr-impl" scope="singleton" class="org.safehaus.subutai.plugin.solr.impl.SolrImpl"
         init-method="init" destroy-method="destroy">
+    <argument ref="dataSource" />
     <property name="tracker" ref="tracker" />
     <property name="environmentManager" ref="environmentManager" />
-    <argument ref="dataSource" />
   </bean>
 
   <service ref="solr-impl" interface="org.safehaus.subutai.plugin.solr.api.Solr" />

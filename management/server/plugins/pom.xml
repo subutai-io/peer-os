@@ -24,12 +24,12 @@
     <module>flume</module>
     <module>hive</module>
     <module>storm</module>
+    <module>pig</module>
     <module>presto</module>
     <module>spark</module>
     <module>shark</module>
     <module>sqoop</module>
     <module>lucene</module>
-    <module>pig</module>
     <module>elasticsearch</module>
     <module>hbase</module>
     <module>mahout</module>
