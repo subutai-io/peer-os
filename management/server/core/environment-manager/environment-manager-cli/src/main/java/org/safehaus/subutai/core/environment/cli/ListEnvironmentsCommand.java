@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerException;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
@@ -13,8 +16,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Created by bahadyr on 6/21/14.
  */
-@Command( scope = "environment", name = "ls", description = "Command to list environments",
-        detailedDescription = "Command to list environments" )
+@Command(scope = "environment", name = "ls", description = "Command to list environments",
+        detailedDescription = "Command to list environments")
 public class ListEnvironmentsCommand extends OsgiCommandSupport
 {
 
@@ -34,7 +37,7 @@ public class ListEnvironmentsCommand extends OsgiCommandSupport
 
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
     {
         List<Environment> environments = environmentManager.getEnvironments();
         if ( environments != null )
@@ -44,6 +47,25 @@ public class ListEnvironmentsCommand extends OsgiCommandSupport
                 for ( Environment environment : environments )
                 {
                     System.out.println( environment.getName() );
+                    for ( ContainerHost containerHost : environment.getContainers() )
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append( containerHost.getHostname() );
+                        Peer peer = null;
+                        try
+                        {
+                            peer = containerHost.getPeer();
+                            sb.append( " " + peer.getPeerInfo().getIp() );
+                            sb.append( " " + containerHost.getTemplate().getTemplateName() );
+                            sb.append( " " + ( containerHost.isConnected() ? "CONNECTED" : "DISCONNECTED" ) );
+                        }
+                        catch ( PeerException e )
+                        {
+                            sb.append( e.toString() );
+                        }
+
+                        System.out.println( String.format( "\t%s", sb.toString() ) );
+                    }
                 }
             }
             else
