@@ -33,7 +33,7 @@ public interface EnvironmentManager
 
     Environment getEnvironment( String environmentName );
 
-    boolean destroyEnvironment( UUID environmentId ) throws EnvironmentManagerException;
+    boolean destroyEnvironment( UUID environmentId ) throws EnvironmentDestroyException;
 
     boolean saveBlueprint( String blueprint );
 

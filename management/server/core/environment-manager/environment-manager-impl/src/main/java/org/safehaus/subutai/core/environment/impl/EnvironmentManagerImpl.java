@@ -25,6 +25,7 @@ import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.TopologyEnum;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenceException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -188,7 +189,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public boolean destroyEnvironment( final UUID uuid )
+    public boolean destroyEnvironment( final UUID uuid ) throws EnvironmentDestroyException
     {
         Environment environment = getEnvironmentByUUID( uuid );
         int count = 0;
@@ -200,20 +201,26 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 ip = container.getPeer().getPeerInfo().getIp();
                 container.dispose();
                 System.out.println( String.format( "Container %s destroyed.", container.getHostname() ) );
+                count++;
             }
             catch ( PeerException e )
             {
                 LOG.error( String.format( "Could not destroy container %s on %s: %s", container.getHostname(), ip,
                         e.toString() ) );
+                throw new EnvironmentDestroyException( e.getMessage() );
             }
         }
 
-        //TODO: fix workaround
-        /*if ( count == environment.getContainers().size() )
+
+        if ( count == environment.getContainers().size() )
         {
-            return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
-        }*/
-        return environmentDAO.deleteInfo( ENVIRONMENT, uuid.toString() );
+            return environmentDAO.deleteInfo( ENVIRONMENT, uuid.toString() );
+        }
+        else
+        {
+            throw new EnvironmentDestroyException( String.format( "Only %d out of %d containers destroyed.", count,
+                    environment.getContainers().size() ) );
+        }
     }
 
 
