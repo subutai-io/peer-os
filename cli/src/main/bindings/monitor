@@ -5,7 +5,12 @@ function monitor_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Monitor containers.
   echo
-  echo "        "subutai \[-qh\] monitor \[-p\] \[container_name\]
+  echo "        "subutai \[-qh\] monitor \[-p\|container_name\] \[-c\|-u metric_type\|-q metric_type\]
+  echo "          "parameters:
+  echo "                    "p -- physical machine
+  echo "                    "c -- create rrd for container
+  echo "                    "u -- update rrd for container for given metric
+  echo "                    "q -- query rrd for container for given metric
   echo
   echo -----------------------------------------------------------------------
 }
@@ -13,12 +18,38 @@ function monitor_usage {
 
 function monitor {
   local is_physical="false"
+  local is_create="false"
+  local is_update="false"
+  local is_query="false"
   shift_amount=0;
-  while getopts ":p" opt; do
+  while getopts ":pcu:q:" opt; do
     case $opt in
       p)
         is_physical="true"
         ;;
+      c)
+        is_create="true"
+        if [[ "true" == "$is_update" || "true" == "$is_query" ]]; then
+          msg_error "Cannot use the -c, -u, and -q options together." >&2
+          exit 1
+        fi
+        ;;
+      u)
+	metric_type="$OPTARG"
+        is_update="true"
+	if [[ "true" == "$is_create" || "true" == "$is_query" ]]; then
+          msg_error "Cannot use the -c, -u, and -q options together." >&2
+          exit 1
+        fi
+        ;;
+      q)
+        metric_type="$OPTARG"
+        is_query="true"
+        if [[ "true" == "$is_update" || "true" == "$is_create" ]]; then
+          msg_error "Cannot use the -c, -u, and -q options together." >&2
+          exit 1
+        fi
+	;;
       \?)
         msg_error "Unrecognized option -$OPTARG"
         exit 1
@@ -30,13 +61,19 @@ function monitor {
   while [ -n "`echo $1 | grep -`" ]; do
     shift
   done
-
+  
   if [ "x$is_physical" == "xtrue" ]; then
-    initialize_physical_machine_metrics
+    hostname=`hostname`
+  else
+    hostname=$1
+  fi
+  
+  if [ "x$hostname" == "x`hostname`" ]; then
+    get_physical_machine_metrics
   else
     lxc=$1
     lxc_assert "$lxc" > /dev/null
-    initialize_container_metrics $lxc
+    get_container_metrics $lxc
   fi
 
   # Result
@@ -45,7 +82,7 @@ function monitor {
 }
 
 
-function initialize_physical_machine_metrics {
+function get_physical_machine_metrics {
   host=`hostname`
   # Metrics
   totalRam=$(get_physical_total_ram)
@@ -59,7 +96,7 @@ function initialize_physical_machine_metrics {
 }
 
 
-function initialize_container_metrics {
+function get_container_metrics {
   host=$1
   # Metrics
   totalRam=$(get_total_ram $lxc)

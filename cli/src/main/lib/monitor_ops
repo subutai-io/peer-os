@@ -4,6 +4,10 @@
 # Set of functions for monitoring functionality
 # ==========================================================================
 
+update_sequence="10"
+metric_list=("ram" "cpu" )
+
+
 function get_total_ram {
   local lxc="$1"
   lxc_assert $lxc > /dev/null
@@ -104,3 +108,113 @@ function get_physical_used_disk {
 function get_physical_total_disk {
   echo "550000"
 }
+
+function contains() {
+    local n=$#
+    local value=${!n}
+    for ((i=1;i < $#;i++)) {
+        if [ "${!i}" == "${value}" ]; then
+            echo "y"
+            return 0
+        fi
+    }
+    echo "n"
+    return 1
+}
+
+function create_rrd {
+  hostname=$1
+  metric_type=$2
+
+  lxc_assert "$hostname"
+  assert_metric "$metric_type"
+
+  mkdir -p $SUBUTAI_RRD_DIRECTORY > /dev/null 2>&1
+  #TODO define datasets properly for each metric type
+  ram_dataset_name=$(get_dataset_name $metric_type)
+  pushd $SUBUTAI_RRD_DIRECTORY > /dev/null
+  rrdtool create $(get_database_file $hostname $metric_type) \
+  --step $update_sequence \
+  DS:$ram_dataset_name:GAUGE:"$(($update_sequence * 2 - 1))":0:10000000000 \
+  RRA:LAST:0.5:1:1500
+  popd > /dev/null
+}
+
+
+function populate_rrd {
+  hostname=$1
+  metric_type=$2
+
+  assert_hostname $hostname
+  assert_metric $metric_type
+
+  database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
+
+  tag=$(get_metric_tag $metric_type)
+  dataset_name=$(get_dataset_name $metric_type)
+  update_sequence="10"
+  metric_value=$(subutai monitor $hostname | awk -F"$tag" '{print $2}' | awk -F"," '{print $1}' | awk -F"\"" '{print $3}')
+  msg_info "$metric_value is stored at `date +%s`"
+  rrdtool update  $database_file --template $dataset_name N:$metric_value
+}
+
+
+function query_rrd {
+  hostname=$1
+  metric_type=$2
+
+  assert_hostname "$hostname"
+  assert_metric "$metric_type"
+
+  database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
+
+  TIME=$(date +%s)
+
+  # Show last $ entries
+  start_time=$(($update_sequence * 50))
+  rrdtool fetch $database_file LAST -e $TIME -s e-"$start_time"sec
+}
+
+
+function assert_metric {
+  if [ -z $metric_type ]; then
+    echo "Please provide metric type to store.Aborting!"
+    exit 1
+  fi
+
+  if [ $(contains "${metric_list[@]}" "$metric_type") != "y" ]; then
+    echo "$metric_type is not supported. Please provide one of the followings:"
+    echo ${metric_list[@]}
+    exit 1
+  fi
+}
+
+function get_dataset_name {
+  metric_type=$1
+
+  assert_metric $metric_type
+  #TODO define datasets for each passed metric_type
+  echo "$metric_type"_used
+}
+
+
+function get_metric_tag {
+  metric_type=$1
+
+  assert_metric $metric_type
+  #TODO define tags for each passed metric_type
+  echo "usedRam"
+}
+
+
+function get_database_file {
+  local hostname=$1
+  local metric_type=$2
+
+  lxc_assert $hostname
+  assert_metric $metric_type
+
+  echo ""$metric_type"_"$hostname".rrd"
+}
+
+
