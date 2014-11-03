@@ -612,10 +612,25 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     public <T, V> V sendRequest( final T request, final String recipient, final int timeout,
                                  final Class<V> responseType ) throws PeerException
     {
+        Preconditions.checkNotNull( responseType, "Invalid response type" );
+
+        return sendRequestInternal( request, recipient, timeout, responseType );
+    }
+
+
+    @Override
+    public <T> void sendRequest( final T request, final String recipient, final int timeout ) throws PeerException
+    {
+        sendRequestInternal( request, recipient, timeout, null );
+    }
+
+
+    private <T, V> V sendRequestInternal( final T request, final String recipient, final int timeout,
+                                          final Class<V> responseType ) throws PeerException
+    {
         Preconditions.checkNotNull( request, "Invalid request" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
         Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
-        Preconditions.checkNotNull( responseType, "Invalid response type" );
 
 
         for ( RequestListener requestListener : requestListeners )
@@ -626,7 +641,10 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                 {
                     Object response = requestListener.onRequest( new Payload( request ) );
 
-                    return responseType.cast( response );
+                    if ( response != null && responseType != null )
+                    {
+                        return responseType.cast( response );
+                    }
                 }
                 catch ( Exception e )
                 {

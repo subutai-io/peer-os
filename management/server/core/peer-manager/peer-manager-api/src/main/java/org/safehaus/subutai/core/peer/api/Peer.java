@@ -64,4 +64,6 @@ public interface Peer
     public boolean isOnline() throws PeerException;
 
     public <T, V> V sendRequest( T request, String recipient, int timeout, Class<V> responseType ) throws PeerException;
+
+    public <T> void sendRequest( T request, String recipient, int timeout ) throws PeerException;
 }

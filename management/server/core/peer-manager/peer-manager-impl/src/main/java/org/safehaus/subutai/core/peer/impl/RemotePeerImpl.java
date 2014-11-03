@@ -291,23 +291,10 @@ public class RemotePeerImpl implements RemotePeer
     public <T, V> V sendRequest( final T request, String recipient, final int timeout, Class<V> responseType )
             throws PeerException
     {
-        Preconditions.checkNotNull( request, "Invalid request" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
-        Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
         Preconditions.checkNotNull( responseType, "Invalid response type" );
 
-        MessageRequest messageRequest = new MessageRequest( new Payload( request ), recipient );
-        Message message = messenger.createMessage( messageRequest );
-
-        try
-        {
-            messenger.sendMessage( this, message, RecipientType.PEER_REQUEST_LISTENER.name(),
-                    Timeouts.PEER_MESSAGE_TIMEOUT );
-        }
-        catch ( MessageException e )
-        {
-            throw new PeerException( e );
-        }
+        //send request
+        MessageRequest messageRequest = sendRequestInternal( request, recipient, timeout );
 
         //wait for response here
         MessageResponse messageResponse = messageResponseListener.waitResponse( messageRequest.getId(), timeout );
@@ -325,5 +312,36 @@ public class RemotePeerImpl implements RemotePeer
         }
 
         return null;
+    }
+
+
+    @Override
+    public <T> void sendRequest( final T request, final String recipient, final int timeout ) throws PeerException
+    {
+        sendRequestInternal( request, recipient, timeout );
+    }
+
+
+    private <T> MessageRequest sendRequestInternal( final T request, final String recipient, final int timeout )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( request, "Invalid request" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
+        Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
+
+        MessageRequest messageRequest = new MessageRequest( new Payload( request ), recipient );
+        Message message = messenger.createMessage( messageRequest );
+
+        try
+        {
+            messenger.sendMessage( this, message, RecipientType.PEER_REQUEST_LISTENER.name(),
+                    Timeouts.PEER_MESSAGE_TIMEOUT );
+        }
+        catch ( MessageException e )
+        {
+            throw new PeerException( e );
+        }
+
+        return messageRequest;
     }
 }
