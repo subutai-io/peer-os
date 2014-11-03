@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.security.api;
+package org.safehaus.subutai.core.network.api;
 
 
 import java.util.Set;
