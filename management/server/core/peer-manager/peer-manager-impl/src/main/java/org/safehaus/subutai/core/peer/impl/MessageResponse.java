@@ -3,15 +3,17 @@ package org.safehaus.subutai.core.peer.impl;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.core.peer.api.Payload;
+
 
 public class MessageResponse
 {
     private UUID requestId;
-    private Object payload;
+    private Payload payload;
     private String exception;
 
 
-    public MessageResponse( final UUID requestId, final Object payload, final String exception )
+    public MessageResponse( final UUID requestId, final Payload payload, final String exception )
     {
         this.requestId = requestId;
         this.payload = payload;
@@ -25,7 +27,7 @@ public class MessageResponse
     }
 
 
-    public Object getPayload()
+    public Payload getPayload()
     {
         return payload;
     }

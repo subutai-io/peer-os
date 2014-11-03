@@ -40,6 +40,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
+import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -55,6 +56,7 @@ import org.safehaus.subutai.core.strategy.api.StrategyManager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
 
 
@@ -77,7 +79,11 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private ConcurrentMap<String, AtomicInteger> sequences;
-
+    /**
+     * cache of currently connected agents with expiry ttl. Agents will expire unless they send heartbeat message
+     * regularly
+     */
+    private Cache<UUID, Agent> agents;
     private Set<RequestListener> requestListeners;
 
 
@@ -747,13 +753,28 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public <T, V> V sendRequest( final T payload, final String recipient, final int timeout,
+    public <T, V> V sendRequest( final T request, final String recipient, final int timeout,
                                  final Class<V> responseType ) throws PeerException
     {
-        Preconditions.checkNotNull( payload, "Invalid payload" );
+        Preconditions.checkNotNull( responseType, "Invalid response type" );
+
+        return sendRequestInternal( request, recipient, timeout, responseType );
+    }
+
+
+    @Override
+    public <T> void sendRequest( final T request, final String recipient, final int timeout ) throws PeerException
+    {
+        sendRequestInternal( request, recipient, timeout, null );
+    }
+
+
+    private <T, V> V sendRequestInternal( final T request, final String recipient, final int timeout,
+                                          final Class<V> responseType ) throws PeerException
+    {
+        Preconditions.checkNotNull( request, "Invalid request" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
         Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
-        Preconditions.checkNotNull( responseType, "Invalid response type" );
 
 
         for ( RequestListener requestListener : requestListeners )
@@ -762,9 +783,12 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             {
                 try
                 {
-                    Object response = requestListener.onRequest( payload );
+                    Object response = requestListener.onRequest( new Payload( request ) );
 
-                    return responseType.cast( response );
+                    if ( response != null && responseType != null )
+                    {
+                        return responseType.cast( response );
+                    }
                 }
                 catch ( Exception e )
                 {

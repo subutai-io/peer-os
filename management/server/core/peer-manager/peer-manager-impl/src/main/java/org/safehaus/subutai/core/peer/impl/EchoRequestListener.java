@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 
 
@@ -16,8 +17,8 @@ public class EchoRequestListener extends RequestListener
 
 
     @Override
-    public Object onRequest( final Object request ) throws Exception
+    public Object onRequest( final Payload payload ) throws Exception
     {
-        return request;
+        return payload.getMessage( String.class );
     }
 }
