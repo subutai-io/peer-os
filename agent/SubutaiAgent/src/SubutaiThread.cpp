@@ -790,7 +790,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                 //executing the process on background
                 system(createExecString(command).c_str());
             } else {
-
+                container->RunCommand(command);
             }
             //parent returns with success if the daemon successfully send to process to background
             string message = this->getResponse().createExitMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(),

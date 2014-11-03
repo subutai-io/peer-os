@@ -401,7 +401,7 @@ int main(int argc,char *argv[],char *envp[])
                     }    
                     if (command.getWatchArguments().size()!=0)
                     {
-                        for (unsigned int i=0; i<command.getWatchArguments().size(); i++)
+                        for (unsigned int i = 0; i < command.getWatchArguments().size(); i++)
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Command WatchArgs:", command.getWatchArguments()[i]));
                     }
 
