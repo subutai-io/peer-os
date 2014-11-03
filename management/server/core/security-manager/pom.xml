@@ -9,13 +9,13 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>network-manager-parent</artifactId>
-  <name>Subutai Network Manager Parent</name>
-  <description>Subutai Network Manager Parent</description>
+  <artifactId>security-manager-parent</artifactId>
+  <name>Subutai Security Manager Parent</name>
+  <description>Subutai Security Manager Parent</description>
   <packaging>pom</packaging>
 
   <modules>
-    <module>network-manager-api</module>
-    <module>network-manager-impl</module>
+    <module>security-manager-api</module>
+    <module>security-manager-impl</module>
   </modules>
 </project>

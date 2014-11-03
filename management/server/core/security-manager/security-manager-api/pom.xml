@@ -4,14 +4,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>network-manager-parent</artifactId>
+    <artifactId>security-manager-parent</artifactId>
     <groupId>org.safehaus.subutai</groupId>
     <version>2.0.0</version>
   </parent>
 
-  <artifactId>network-manager-api</artifactId>
-  <name>Subutai Network Manager Api</name>
-  <description>Network Manager Api</description>
+  <artifactId>security-manager-api</artifactId>
+  <name>Subutai Security Manager Api</name>
+  <description>Security Manager Api</description>
 
   <packaging>bundle</packaging>
 
@@ -37,7 +37,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.network.api</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.security.api</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
