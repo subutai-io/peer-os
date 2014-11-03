@@ -1,7 +1,6 @@
 package org.safehaus.subutai.common.protocol;
 
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -11,12 +10,9 @@ import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -32,7 +28,6 @@ import com.google.gson.annotations.Expose;
  * Template represents template entry in registry
  */
 @Entity( name = "Template" )
-@IdClass( Template.TemplateId.class )
 @NamedQueries( {
         @NamedQuery( name = "Template.getAll", query = "SELECT t FROM Template t" ),
         @NamedQuery( name = "Template.getTemplateByNameArch",
@@ -44,61 +39,6 @@ import com.google.gson.annotations.Expose;
 public class Template
 {
 
-    public static class TemplateId implements Serializable
-    {
-        public String getTemplateName()
-        {
-            return templateName;
-        }
-
-
-        public void setTemplateName( final String templateName )
-        {
-            this.templateName = templateName;
-        }
-
-
-        public String getLxcArch()
-        {
-            return lxcArch;
-        }
-
-
-        public void setLxcArch( final String lxcArch )
-        {
-            this.lxcArch = lxcArch;
-        }
-
-
-        private String templateName;
-        private String lxcArch;
-
-
-        @Override
-        public boolean equals( Object object )
-        {
-            if ( object instanceof TemplateId )
-            {
-                TemplateId other = ( TemplateId ) object;
-                return templateName.equals( other.templateName ) && lxcArch.equals( other.lxcArch );
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-
-        @Override
-        public int hashCode()
-        {
-            int result = templateName.hashCode();
-            result = 31 * result + lxcArch.hashCode();
-            return result;
-        }
-    }
-
-
     public static final String ARCH_AMD64 = "amd64";
     public static final String ARCH_I386 = "i386";
 
@@ -106,15 +46,8 @@ public class Template
     public static final String QUERY_GET_TEMPLATE_BY_NAME_ARCH = "Template.getTemplateByNameArch";
     public static final String QUERY_REMOVE_TEMPLATE_BY_NAME_ARCH = "Template.removeTemplateByNameArch";
 
-    //name of template
-    @Expose
-    @Id
-    private String templateName;
-
-    //lxc architecture e.g. amd64, i386
-    @Expose
-    @Id
-    private String lxcArch;
+    @EmbeddedId
+    TemplatePK pk;
 
     //name of parent template
     @Expose
@@ -145,15 +78,15 @@ public class Template
     private String packagesManifest;
 
     @ManyToOne( fetch = FetchType.LAZY, optional = true )
-    @JoinColumns( {
-            @JoinColumn( name = "parentTemplate" ), @JoinColumn( name = "parentLxcArch" )
-    } )
+    //    @JoinColumns( {
+    //            @JoinColumn( name = "parentTemplate" ), @JoinColumn( name = "parentLxcArch" )
+    //    } )
     private Template parentTemplate;
 
 
     //children of template, this property is calculated upon need and is null by default (see REST API for calculation)
     @Expose
-    @OneToMany( mappedBy = "parentTemplate", fetch = FetchType.EAGER, cascade = { CascadeType.ALL } )
+    @OneToMany( mappedBy = "parentTemplate", fetch = FetchType.LAZY, cascade = { CascadeType.ALL } )
     private List<Template> children;
 
     //subutai products present only in this template excluding all subutai products present in the whole ancestry
@@ -199,18 +132,17 @@ public class Template
         Preconditions.checkArgument( !Strings.isNullOrEmpty( packagesManifest ), "Missing packages manifest" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( md5sum ), "Missing md5sum" );
 
-        this.lxcArch = lxcArch;
+        this.pk = new TemplatePK( lxcUtsname, lxcArch );
         this.lxcUtsname = lxcUtsname;
         this.subutaiConfigPath = subutaiConfigPath;
         this.subutaiParent = subutaiParent;
         this.subutaiGitBranch = subutaiGitBranch;
         this.subutaiGitUuid = subutaiGitUuid;
         this.packagesManifest = packagesManifest;
-        this.templateName = lxcUtsname;
         this.parentTemplateName = subutaiParent;
         this.md5sum = md5sum;
 
-        if ( templateName.equalsIgnoreCase( parentTemplateName ) )
+        if ( pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
         {
             parentTemplateName = null;
         }
@@ -289,7 +221,7 @@ public class Template
 
     public String getLxcArch()
     {
-        return lxcArch;
+        return pk.getLxcArch();
     }
 
 
@@ -331,7 +263,7 @@ public class Template
 
     public String getTemplateName()
     {
-        return templateName;
+        return pk.getTemplateName();
     }
 
 
@@ -379,7 +311,8 @@ public class Template
 
     public Template getRemoteClone( UUID peerId )
     {
-        Template result = new Template( this.lxcArch, this.lxcUtsname, this.subutaiConfigPath, this.subutaiParent,
+        Template result =
+                new Template( this.pk.getLxcArch(), this.lxcUtsname, this.subutaiConfigPath, this.subutaiParent,
                 this.subutaiGitBranch, this.subutaiGitUuid, this.packagesManifest, this.md5sum );
         result.setRemote( true );
         result.setPeerId( peerId );
@@ -390,9 +323,7 @@ public class Template
     @Override
     public int hashCode()
     {
-        int result = templateName.hashCode();
-        result = 31 * result + lxcArch.hashCode();
-        return result;
+        return pk.hashCode();
     }
 
 
@@ -410,7 +341,7 @@ public class Template
 
         final Template template = ( Template ) o;
 
-        return lxcArch.equals( template.getLxcArch() ) && templateName.equals( template.getTemplateName() );
+        return pk.equals( template.pk );
     }
 
 
@@ -418,9 +349,9 @@ public class Template
     public String toString()
     {
         return "Template{" +
-                "templateName='" + templateName + '\'' +
+                "templateName='" + pk.getTemplateName() + '\'' +
                 ", parentTemplateName='" + parentTemplateName + '\'' +
-                ", lxcArch='" + lxcArch + '\'' +
+                ", lxcArch='" + pk.getLxcArch() + '\'' +
                 ", lxcUtsname='" + lxcUtsname + '\'' +
                 ", subutaiConfigPath='" + subutaiConfigPath + '\'' +
                 ", subutaiParent='" + subutaiParent + '\'' +

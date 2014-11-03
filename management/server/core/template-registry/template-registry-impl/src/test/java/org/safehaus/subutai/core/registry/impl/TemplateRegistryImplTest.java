@@ -1,14 +1,8 @@
 package org.safehaus.subutai.core.registry.impl;
 
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.util.List;
 import java.util.Set;
-
-import javax.sql.DataSource;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -27,7 +21,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -47,9 +40,10 @@ public class TemplateRegistryImplTest
 
     static class TemplateRegistryImplExt extends TemplateRegistryImpl
     {
-        TemplateRegistryImplExt( final DataSource dataSource ) throws DaoException
+
+
+        public TemplateRegistryImplExt() throws DaoException
         {
-            super( dataSource );
         }
 
 
@@ -63,29 +57,9 @@ public class TemplateRegistryImplTest
     @Before
     public void setUp() throws Exception
     {
-        Connection connection = mock( Connection.class );
-        DataSource dataSource = mock( DataSource.class );
-        PreparedStatement preparedStatement = mock( PreparedStatement.class );
-        ResultSet resultSet = mock( ResultSet.class );
-        when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
-        when( dataSource.getConnection() ).thenReturn( connection );
-        when( preparedStatement.executeQuery() ).thenReturn( resultSet );
-        ResultSetMetaData metadata = mock( ResultSetMetaData.class );
-        when( metadata.getColumnCount() ).thenReturn( 1 );
-        when( metadata.getColumnName( 1 ) ).thenReturn( "info" );
-        when( metadata.getColumnType( 1 ) ).thenReturn( java.sql.Types.CLOB );
-        when( resultSet.getMetaData() ).thenReturn( metadata );
-        when( resultSet.next() ).thenReturn( true ).thenReturn( false );
-        templateRegistry = new TemplateRegistryImplExt( dataSource );
+        templateRegistry = new TemplateRegistryImplExt();
         templateDAO = mock( TemplateDAO.class );
         templateRegistry.setTemplateDao( templateDAO );
-    }
-
-
-    @Test(expected = NullPointerException.class)
-    public void constructorShouldFailOnNullDataSource() throws Exception
-    {
-        new TemplateRegistryImpl( null );
     }
 
 

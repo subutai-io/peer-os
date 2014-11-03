@@ -19,11 +19,8 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.sql.DataSource;
-
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.common.protocol.api.TemplateService;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.registry.api.RegistryException;
@@ -48,12 +45,12 @@ public class TemplateRegistryImpl implements TemplateRegistry
     private static final String LXC_ARCH_IS_NULL_MSG = "Lxc Arch is null or empty";
     private static final String TEMPLATE_NOT_FOUND_MSG = "Template %s not found";
 
-    protected TemplateService templateDAO;
+    protected TemplateDAO templateDAO;
 
 
-    public TemplateRegistryImpl( final DataSource dataSource ) throws DaoException
+    public TemplateRegistryImpl() throws DaoException
     {
-        Preconditions.checkNotNull( dataSource, "Data source is null" );
+        //        Preconditions.checkNotNull( dataSource, "Data source is null" );
         //        templateDAO = new TemplateDAO( dataSource );
     }
 

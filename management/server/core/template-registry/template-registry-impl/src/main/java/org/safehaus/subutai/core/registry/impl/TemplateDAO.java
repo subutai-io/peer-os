@@ -7,8 +7,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.common.protocol.api.TemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +19,7 @@ import com.google.gson.GsonBuilder;
 /**
  * Provides Data Access API for templates
  */
-public class TemplateDAO implements TemplateService
+public class TemplateDAO// implements TemplateService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateDAO.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -41,8 +41,8 @@ public class TemplateDAO implements TemplateService
     }
 
 
-    @Override
-    public Template saveTemplate( Template template )
+    //    @Override
+    public Template saveTemplate( Template template ) throws DaoException
     {
         Template savedTemplate = null;
         if ( template.getTemplateName() == null || "".equals( template.getTemplateName() ) )
@@ -55,8 +55,8 @@ public class TemplateDAO implements TemplateService
         {
             entityManager = entityManagerFactory.createEntityManager();
             entityManager.getTransaction().begin();
-            savedTemplate = entityManager.merge( template );
-            entityManager.flush();
+            entityManager.merge( template );
+            //            entityManager.flush();
             entityManager.getTransaction().commit();
         }
         catch ( Exception ex )
@@ -69,6 +69,7 @@ public class TemplateDAO implements TemplateService
                     entityManager.getTransaction().rollback();
                 }
             }
+            throw new DaoException( ex );
         }
         finally
         {
@@ -81,7 +82,7 @@ public class TemplateDAO implements TemplateService
     }
 
 
-    @Override
+    //    @Override
     public List<Template> getAllTemplates()
     {
         EntityManager entityManager = null;
@@ -95,18 +96,11 @@ public class TemplateDAO implements TemplateService
         {
             throw new RuntimeException( ex );
         }
-        //        finally
-        //        {
-        //            if ( entityManager != null )
-        //            {
-        //                entityManager.close();
-        //            }
-        //        }
     }
 
 
-    @Override
-    public void removeTemplate( Template template )
+    //    @Override
+    public void removeTemplate( Template template ) throws DaoException
     {
         EntityManager entityManager = null;
         try
@@ -116,14 +110,14 @@ public class TemplateDAO implements TemplateService
             Query query = entityManager.createNamedQuery( Template.QUERY_REMOVE_TEMPLATE_BY_NAME_ARCH );
             query.setParameter( "templateName", template.getTemplateName() );
             query.setParameter( "lxcArch", template.getLxcArch() );
-            entityManager.flush();
+            //            entityManager.flush();
             entityManager.getTransaction().commit();
             LOGGER.info( String.format( "Template deleted : %s", template.getTemplateName() ) );
         }
         catch ( Exception ex )
         {
             LOGGER.error( "Exception deleting template : %s", template.getTemplateName() );
-            throw new RuntimeException( ex );
+            throw new DaoException( ex );
         }
         finally
         {
@@ -135,8 +129,8 @@ public class TemplateDAO implements TemplateService
     }
 
 
-    @Override
-    public List<Template> getChildTemplates( String parentTemplateName, String lxcArch )
+    //    @Override
+    public List<Template> getChildTemplates( String parentTemplateName, String lxcArch ) throws DaoException
     {
         try
         {
@@ -145,24 +139,27 @@ public class TemplateDAO implements TemplateService
         }
         catch ( Exception ex )
         {
-            throw new RuntimeException( ex );
+            throw new DaoException( ex );
         }
     }
 
 
-    @Override
-    public Template getTemplateByName( String templateName, String lxcArch )
+    //    @Override
+    public Template getTemplateByName( String templateName, String lxcArch ) throws DaoException
     {
         EntityManager em = null;
         try
         {
+            Template template = null;
             em = entityManagerFactory.createEntityManager();
             em.getTransaction().begin();
             Query query = em.createNamedQuery( Template.QUERY_GET_TEMPLATE_BY_NAME_ARCH );
             query.setParameter( "templateName", templateName );
             query.setParameter( "lxcArch", lxcArch );
+            template = ( Template ) query.getSingleResult();
+
             em.getTransaction().commit();
-            return ( Template ) query.getSingleResult();
+            return template;
         }
         catch ( org.apache.openjpa.persistence.PersistenceException ex )
         {
@@ -171,7 +168,7 @@ public class TemplateDAO implements TemplateService
         }
         catch ( Exception ex )
         {
-            throw new RuntimeException( ex );
+            throw new DaoException( ex );
         }
         finally
         {
