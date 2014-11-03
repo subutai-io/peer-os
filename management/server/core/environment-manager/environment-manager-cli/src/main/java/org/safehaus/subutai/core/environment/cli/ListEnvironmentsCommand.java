@@ -46,7 +46,7 @@ public class ListEnvironmentsCommand extends OsgiCommandSupport
             {
                 for ( Environment environment : environments )
                 {
-                    System.out.println( environment.getName() );
+                    System.out.println( String.format( "%s %s", environment.getName(), environment.getId() ) );
                     for ( ContainerHost containerHost : environment.getContainers() )
                     {
                         StringBuilder sb = new StringBuilder();

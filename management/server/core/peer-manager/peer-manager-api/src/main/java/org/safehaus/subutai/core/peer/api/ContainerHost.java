@@ -127,4 +127,11 @@ public class ContainerHost extends SubutaiHost
         Peer peer = getPeer();
         return peer.getTemplate( this );
     }
+
+
+    public void dispose() throws PeerException
+    {
+        Peer peer = getPeer();
+        peer.destroyContainer( this );
+    }
 }
