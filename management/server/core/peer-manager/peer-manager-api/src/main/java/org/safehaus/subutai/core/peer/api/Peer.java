@@ -62,4 +62,6 @@ public interface Peer
     public Template getTemplate( ContainerHost containerHost ) throws PeerException;
 
     public boolean isOnline() throws PeerException;
+
+    public <T, V> V sendRequest( T payload, String recipient, int timeout, Class<V> responseType ) throws PeerException;
 }

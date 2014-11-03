@@ -28,7 +28,7 @@ public class CommandResponseMessageListener extends MessageListener
     {
         if ( callback != null )
         {
-            callbacks.put( commandId, callback, timeout * 1000 + Constants.COMMAND_REQUEST_MESSAGE_TIMEOUT * 2 * 1000,
+            callbacks.put( commandId, callback, timeout * 1000 + Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT * 2 * 1000,
                     new EntryExpiryCallback<CommandCallback>()
                     {
                         @Override
