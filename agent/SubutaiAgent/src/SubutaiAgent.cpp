@@ -43,6 +43,7 @@
 #include "SubutaiWatch.h"
 #include "SubutaiEnvironment.h"
 #include "SubutaiContainerManager.h"
+#include "SubutaiTimer.h"
 #include <stdio.h>
 #include <pthread.h>
 #include <string.h>
@@ -94,6 +95,7 @@ void threadSend(message_queue *mq,SubutaiConnection *connection,SubutaiLogger* l
  *  \details   This method checks the Default HeartBeat execution timeout value.
  *  		   if execution timeout is occured it returns true. Otherwise it returns false.
  */
+/*
 bool checkExecutionTimeout(unsigned int* startsec, bool* overflag, unsigned int* exectimeout, unsigned int* count)
 {
     if (*exectimeout != 0)
@@ -145,8 +147,9 @@ static void * updateContainerInfo(void * arg )
     while( true )
     {
         // do background task, i.e.:
+        cout << "updating container" << endl;
         container_manager->updateContainerLists();
-        usleep(3000000) ;
+        usleep(40000000) ;
     }
 }
 
@@ -159,7 +162,7 @@ int updateContainerInfosPeriodically( SubutaiContainerManager* container_manager
     pthread_create( & thread, & attr, updateContainerInfo, container_manager ) ;
 
 }
-
+*/
 
 
 /**
@@ -225,7 +228,7 @@ int main(int argc,char *argv[],char *envp[])
      * Starting Container Manager
      */
     SubutaiContainerManager cman("/var/lib/lxc", &logMain);
-    updateContainerInfosPeriodically(&cman);
+    //updateContainerInfosPeriodically(&cman);
     cman.write();
 
     /*
@@ -326,68 +329,21 @@ int main(int argc,char *argv[],char *envp[])
     SubutaiWatch Watcher(connection, &response, &logMain);
     Watcher.initialize(20000);
     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "The Watcher is initializing.."));
+
+    /*
+    * initializing timer for periodical operations
+    */
+
+    SubutaiTimer timer(logMain, &environment, &cman, connection);
+    logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Timer is initializing.."));
+
     while(true)
     {
         try
         {
-            if (checkExecutionTimeout(&startsec,&overflag,&exectimeout,&count)) //checking Default Timeout
-            {
-                //timeout occured!!
-                response.clear();
-                /*
-                 * Refresh new agent ip address set for each heartbeat message
-                 */
-                environment.getAgentIpAddress();
-                response.setIps(environment.getAgentIpValue());
-                response.setHostname(environment.getAgentHostnameValue());
-                response.setMacAddress(environment.getAgentMacAddressValue());
-                string resp = response.createHeartBeatMessage(environment.getAgentUuidValue(),
-                        command.getRequestSequenceNumber(),
-                        environment.getAgentEnvironmentIdValue(),
-                        environment.getAgentMacAddressValue(),
-                        environment.getAgentHostnameValue(),
-                        environment.getAgentParentHostnameValue(),
-                        command.getSource(),
-                        command.getTaskUuid());
-                connection->sendMessage(resp);
+        	timer.sendHeartBeat(command);
+        	timer.sendCommandQueueInfo(command);
 
-                logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat Response:", resp));
-                start =         boost::posix_time::second_clock::local_time();	//Reset Default Timeout value
-                startsec =      start.time_of_day().seconds();
-                overflag =      false;
-                exectimeout =   175;
-                count =         1;
-            }
-            if (checkExecutionTimeout(&startsecQueue,&overflagQueue,&queuetimeout,&countQueue))
-            {   //checking IN_QUEUE Default Timeout
-                //timeout occured!!
-                response.clear();
-                ifstream queueFile("/etc/subutai-agent/commandQueue.txt");
-                string queueElement;
-                if (queueFile.peek() != ifstream::traits_type::eof())
-                {
-                    while(getline(queueFile, queueElement))
-                    {
-                        if (command.deserialize(queueElement))
-                        {
-                            string resp = response.createInQueueMessage(environment.getAgentUuidValue(), command.getTaskUuid());
-                            connection->sendMessage(resp);
-                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "IN_QUEUE Response:", resp));
-                        }
-                        else
-                        {
-                            cout << "error!!" <<endl;
-                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Fetched Element:",queueElement));
-                        }
-                    }
-                }
-                queueFile.close();
-                startQueue =            boost::posix_time::second_clock::local_time();	//Reset Default Timeout values
-                startsecQueue  =        startQueue.time_of_day().seconds();
-                overflagQueue =         false;
-                queuetimeout =          30;
-                countQueue =            1;
-            }
             command.clear();
             for (list<int>::iterator iter = pidList.begin(); iter != pidList.end();iter++)
             {
@@ -398,7 +354,8 @@ int main(int argc,char *argv[],char *envp[])
                     if (result != 0)
                     {
                         iter = pidList.erase(iter);
-                        currentProcess--;
+                        currentProcess--;       string resp = response.createInQueueMessage(environment.getAgentUuidValue(), command.getTaskUuid());
+
                     }
                 }
             }

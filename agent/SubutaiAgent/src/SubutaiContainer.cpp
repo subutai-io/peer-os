@@ -278,11 +278,12 @@ bool SubutaiContainer::getContainerParentHostname()
         string config = RunProgram("/bin/cat", args);
         if (config.empty()) //file exist
         {
-            ofstream file("/tmp/subutai/config.txt");
-            file << config;
-            file.close();
+        	ofstream file("/tmp/config.txt");
+        	file << config;
+        	file.close();
+
             boost::property_tree::ptree pt;
-            boost::property_tree::ini_parser::read_ini("/tmp/subutai/config.txt", pt);
+            boost::property_tree::ini_parser::read_ini("/tmp/config.txt", pt);
             parentHostname =  pt.get<std::string>("Subutai-Agent.subutai_parent_hostname");
             containerLogger->writeLog(6, containerLogger->setLogData("<SubutaiAgent>","parentHostname: ",parentHostname));
         }

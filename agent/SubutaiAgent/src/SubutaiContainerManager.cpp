@@ -251,12 +251,13 @@ void SubutaiContainerManager::getContainerStates(vector<SubutaiContainer> _allCo
  */
 void SubutaiContainerManager::updateContainerLists()
 {
-    vector<SubutaiContainer> tmp_container = findAllContainers();
-    getContainerStates(tmp_container);
-    /*
-       for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++)
-       (*it).getContainerAllFields();
-       */
+	  vector<SubutaiContainer> tmp_container = findAllContainers();
+	  getContainerStates(tmp_container);
+
+	  for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++)
+	  {
+		  (*it).getContainerAllFields();
+	  }
 }
 
 
