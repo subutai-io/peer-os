@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.peer.impl;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
+import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
@@ -41,7 +42,7 @@ public class RequestNotifier implements Runnable
         try
         {
             Object response = listener.onRequest( messageRequest.getPayload() );
-            messageResponse = new MessageResponse( messageRequest.getId(), response, null );
+            messageResponse = new MessageResponse( messageRequest.getId(), new Payload( response), null );
         }
         catch ( Exception e )
         {

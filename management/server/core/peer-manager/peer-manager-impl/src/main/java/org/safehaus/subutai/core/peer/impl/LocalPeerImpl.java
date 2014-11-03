@@ -34,6 +34,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
+import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -608,10 +609,10 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public <T, V> V sendRequest( final T payload, final String recipient, final int timeout,
+    public <T, V> V sendRequest( final T request, final String recipient, final int timeout,
                                  final Class<V> responseType ) throws PeerException
     {
-        Preconditions.checkNotNull( payload, "Invalid payload" );
+        Preconditions.checkNotNull( request, "Invalid request" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
         Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
         Preconditions.checkNotNull( responseType, "Invalid response type" );
@@ -623,7 +624,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             {
                 try
                 {
-                    Object response = requestListener.onRequest( payload );
+                    Object response = requestListener.onRequest( new Payload( request ) );
 
                     return responseType.cast( response );
                 }
