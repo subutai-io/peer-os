@@ -51,9 +51,10 @@ public:
 	virtual ~SubutaiThread();
 	int threadFunction(message_queue*, SubutaiCommand*, char*[], SubutaiContainer* cont = NULL);
 	bool checkCWD(SubutaiCommand*, SubutaiContainer* cont = NULL);
-	bool checkUID(SubutaiCommand*);
+	bool checkUID(SubutaiCommand*, SubutaiContainer* cont = NULL);
 	static string getProcessPid(const char*);
 	string createExecString(SubutaiCommand*);
+        bool ExecuteCommand(SubutaiCommand*, SubutaiContainer* cont);
 	SubutaiUserID& getUserID();
 	SubutaiResponsePack& getResponse();
 	SubutaiLogger& getLogger();

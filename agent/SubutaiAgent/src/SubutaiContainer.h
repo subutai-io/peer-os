@@ -46,6 +46,7 @@
 #include "SubutaiLogger.h"
 #include "SubutaiConnection.h"
 #include "SubutaiResponsePack.h"
+#include "SubutaiCommand.h"
 using namespace std;
 using std::stringstream;
 using std::string;
@@ -91,7 +92,7 @@ public:
 	void setContainerStatus(containerStatus);
 	void getContainerAllFields();
 	string RunProgram(string , vector<string>);
-	ExecutionResult RunProgram(string , vector<string>, bool return_result);
+	ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT);
 	void registerContainer(SubutaiConnection* );
 	void write();
     bool checkCWD(string cwd);

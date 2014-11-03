@@ -61,7 +61,7 @@ string SubutaiContainer::toString(int intcont)
 }
 
 string SubutaiContainer::RunProgram(string program, vector<string> params) {
-    ExecutionResult result = RunProgram(program, params, true);
+    ExecutionResult result = RunProgram(program, params, true, LXC_ATTACH_OPTIONS_DEFAULT);
     if (result.exit_code == 0) {
         return result.out;
     } else {
@@ -69,7 +69,7 @@ string SubutaiContainer::RunProgram(string program, vector<string> params) {
     }
 }
 
-ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> params, bool return_result) {
+ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> params, bool return_result, lxc_attach_options_t opts) {
     char* _params[params.size() + 2];
     _params[0] = const_cast<char*>(program.c_str());
     vector<string>::iterator it;
@@ -78,7 +78,6 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
         _params[i] = const_cast<char*>(it->c_str());
     }
     _params[i] = NULL;
-    lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT;
     int fd[2];
     int _stdout = dup(1);
     pipe(fd);
@@ -93,7 +92,6 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     string command_output;
     while (1) {
         ssize_t size = read(fd[0], buffer, 1000);
-        command_output += buffer;
         if (size < 1000) {
             buffer[size] = '\0';
             command_output += buffer;
@@ -205,7 +203,7 @@ bool SubutaiContainer::getContainerMacAddress()
     {
         vector<string> args;
         args.push_back("/sys/class/net/eth0/address");
-        this-> macAddress = RunProgram("/bin/cat", args);
+        this->macAddress = RunProgram("/bin/cat", args);
         if(this->macAddress.empty())		//if mac is null or not reading successfully
         {
             containerLogger->writeLog(3,containerLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read !!"));
@@ -231,11 +229,13 @@ bool SubutaiContainer::getContainerHostname()
     {
         vector<string> args;
         args.push_back("/etc/hostname");
-        this-> hostname = RunProgram("/bin/cat", args);
+        this->hostname = RunProgram("/bin/cat", args);
         if(this->hostname.empty())		//if hostname is null or not reading successfully
         {
+            containerLogger->writeLog(7, containerLogger->setLogData("<SubutaiAgent>","Failed to get container hostname (getContainerHostname)"));
             return false;
         }
+        containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","Retrieved container hostname:", this->hostname));
         return true;
     }
     catch(const std::exception& error)
@@ -270,7 +270,7 @@ void SubutaiContainer::setContainerStatus(containerStatus status)
  */
 bool SubutaiContainer::getContainerParentHostname()
 {
-    if(this-> status != RUNNING) return false;
+    if(this->status != RUNNING) return false;
     try
     {
         vector<string> args;
@@ -294,7 +294,7 @@ bool SubutaiContainer::getContainerParentHostname()
         }
         else
         {
-            containerLogger->writeLog(6, containerLogger->setLogData("<SubutaiAgent>","parentHostname does not exist!"));
+            containerLogger->writeLog(6, containerLogger->setLogData("<SubutaiAgent>", "parentHostname does not exist!"));
             return false;
         }
     }
@@ -311,50 +311,25 @@ bool SubutaiContainer::getContainerParentHostname()
  */
 bool SubutaiContainer::getContainerIpAddress()
 {
-    if(this-> status != RUNNING) return false;
-    try
-    {
-        ipAddress.clear();
-
-        vector<string> args ;
-        string config = RunProgram("ifconfig", args);
-
-    	ofstream file("/tmp/ipaddress.txt");
-    	file << config;
-    	file.close();
-
-
-        FILE * fp = fopen("/tmp/ipaddress.txt", "r");
-        if (fp)
-        {
-            char *p=NULL, *e; size_t n;
-            while ((getline(&p, &n, fp) > 0) && p)
-            {
-                if ((p = strstr(p, "inet addr:")))
-                {
-                    p+=10;
-                    if ((e = strchr(p, ' ')))
-                    {
-                        *e='\0';
-                        ipAddress.push_back(p);
-                    }
-                }
-            }
+    if (this->status != RUNNING) return false;
+    ipAddress.clear();
+    char** interfaces = this->container->get_interfaces(this->container);
+    int i = 0;
+    while (interfaces[i]) {
+        char** ips = this->container->get_ips(this->container, interfaces[i], "inet", 0);
+        int j = 0;
+        while (ips[j]) {
+            ipAddress.push_back(ips[j]);
+            j++;
         }
-        pclose(fp);
-
-        for(unsigned int i=0; i < ipAddress.size() ; i++)
-        {
-            containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","Subutai Agent IpAddress:",ipAddress[i]));
-        }
+        i++;
+    }
+    delete [] interfaces;
+    if (ipAddress.size() > 0) {
         return true;
+    } else {
+        return false;
     }
-    catch(const std::exception& error)
-    {
-        cout << error.what()<< endl;
-    }
-    containerLogger->writeLog(3,containerLogger->setLogData("<SubutaiAgent>","IpAddress cannot be read !!"));
-    return false;
 }
 
 /**
@@ -423,8 +398,9 @@ void SubutaiContainer::write(){
 void SubutaiContainer::registerContainer(SubutaiConnection* connection)
 {
     SubutaiResponsePack response;
-    string sendout = response.createRegistrationMessage(this->id,this->macAddress,this->hostname,this->parentHostname,NULL,this->ipAddress);
-    containerLogger->writeLog(7,containerLogger->setLogData("<SubutaiAgent>","Registration Message:",sendout));
+    getContainerAllFields();
+    string sendout = response.createRegistrationMessage(this->id, this->macAddress, this->hostname, this->parentHostname, "", this->ipAddress);
+    containerLogger->writeLog(7, containerLogger->setLogData("<SubutaiAgent>","Registration Message:", sendout));
     connection->sendMessage(sendout);
 }
 
@@ -433,8 +409,7 @@ void SubutaiContainer::registerContainer(SubutaiConnection* connection)
 bool SubutaiContainer::checkCWD(string cwd) {
     vector<string> params;
     params.push_back(cwd);
-
-    ExecutionResult result = RunProgram("/bin/cd", params, true);    
+    ExecutionResult result = RunProgram("/bin/cd", params, true, LXC_ATTACH_OPTIONS_DEFAULT);    
     if (result.exit_code == 0) 
         return true;
     else

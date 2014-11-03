@@ -61,21 +61,25 @@ bool SubutaiThread::checkCWD(SubutaiCommand *command, SubutaiContainer* cont)
  *  \details   This method checks and add user Directory in the command
  *  		   If given CWD does not exist on system, it returns false otherwise it returns true.
  */
-bool SubutaiThread::checkUID(SubutaiCommand *command)
+bool SubutaiThread::checkUID(SubutaiCommand *command, SubutaiContainer* container)
 {
-    if (uid.getIDs(ruid, euid, command->getRunAs()))
-    {	
-        //checking user id is on system ?
-        logger.writeLog(4, logger.setLogData("<SubutaiThread::checkUID> " "User id successfully found on system..", "pid", toString(getpid()), "RunAs", command->getRunAs()));
-        uid.doSetuid(this->euid);
-        return true;
-    }
-    else
-    {
-        logger.writeLog(3, logger.setLogData("<SubutaiThread::checkUID> " "User id could not found on system..", "pid", toString(getpid()), "RunAs", command->getRunAs()));
-        logger.writeLog(3, logger.setLogData("<SubutaiThread::checkUID> " "Thread will be closed..", "pid", toString(getpid()), "RunAs", command->getRunAs()));
-        uid.undoSetuid(ruid);
-        return false;
+    if (container) {
+        return container->checkUser(command->getRunAs());
+    } else {
+        if (uid.getIDs(ruid, euid, command->getRunAs()))
+        {	
+            //checking user id is on system ?
+            logger.writeLog(4, logger.setLogData("<SubutaiThread::checkUID> " "User id successfully found on system..", "pid", toString(getpid()), "RunAs", command->getRunAs()));
+            uid.doSetuid(this->euid);
+            return true;
+        }
+        else
+        {
+            logger.writeLog(3, logger.setLogData("<SubutaiThread::checkUID> " "User id could not found on system..", "pid", toString(getpid()), "RunAs", command->getRunAs()));
+            logger.writeLog(3, logger.setLogData("<SubutaiThread::checkUID> " "Thread will be closed..", "pid", toString(getpid()), "RunAs", command->getRunAs()));
+            uid.undoSetuid(ruid);
+            return false;
+        }
     }
 }
 
@@ -118,6 +122,13 @@ string SubutaiThread::createExecString(SubutaiCommand *command)
     }
     logger.writeLog(6, logger.setLogData("<SubutaiThread::createExecString>""CreateExecString Method finished....", "pid", toString(getpid())));
     return exec;
+}
+
+/*
+ *
+ */
+bool SubutaiThread::ExecuteCommand(SubutaiCommand* command, SubutaiContainer* container) {
+
 }
 
 /**
@@ -742,150 +753,124 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
             logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Error opening pipes!!"));
         }
 
-        if (container) {
-            _isContainer = true;
-            logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Command is for container"));
-            // Execute function for container only
-            string executecmd = createExecString(command).c_str();
-            string latest = executecmd.substr(executecmd.length()-3);
-            if (latest.find("&") != std::string::npos)
+
+        string executecmd = createExecString(command).c_str();
+        string latest = executecmd.substr(executecmd.length()-3);
+        if (latest.find("&") != std::string::npos)
+        {
+            logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Process will be executed as a Daemon process!!"));
+            int myval = daemon(0, 0);
+            if (!checkCWD(command, container)) //if the CWD does not exist
             {
-                logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Process will be executed as a Daemon process!!"));
-                int myval = daemon(0, 0);
-                if (!checkCWD(command)) //if the CWD does not exist
-                {
-                    string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
-                            "Working Directory Does Not Exist on System","",command->getSource(),command->getTaskUuid());
-                    while (!messageQueue->try_send(message.data(), message.size(), 0));
-                    myval = 1 ;
-                    message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                            this->getResponsecount(),command->getSource(),command->getTaskUuid(),myval);
-                    while (!messageQueue->try_send(message.data(), message.size(), 0));
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
-                    exit(1);
-                    //problem about absolute path
-                }
-                //if (!_container.checkCWD(command.))
+                string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
+                        "Working Directory Does Not Exist on System","",command->getSource(),command->getTaskUuid());
+                while (!messageQueue->try_send(message.data(), message.size(), 0));
+                myval = 1 ;
+                message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+                        this->getResponsecount(),command->getSource(),command->getTaskUuid(),myval);
+                while (!messageQueue->try_send(message.data(), message.size(), 0));
+                logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
+                exit(1);
+                //problem about absolute path
+            }
+            if (!checkUID(command, container)) //if the User does not exist
+            {
+                string message = this->getResponse().createResponseMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(), 1,
+                        "User Does Not Exist on System", "", command->getSource(), command->getTaskUuid());
+                while (!messageQueue->try_send(message.data(), message.size(), 0));
+                myval = 1 ;
+                message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+                        this->getResponsecount(),command->getSource(),command->getTaskUuid(),myval);
+                while (!messageQueue->try_send(message.data(), message.size(), 0));
+                logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "User id not found on system..","RunAs:",command->getRunAs()));
+                exit(1);
+            }
+            logger.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getProgram()));
+            if (!container) {
+                //executing the process on background
+                system(createExecString(command).c_str());
             } else {
 
             }
+            //parent returns with success if the daemon successfully send to process to background
+            string message = this->getResponse().createExitMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(),
+                    this->getResponsecount(), command->getSource(), command->getTaskUuid(), myval);
+            while (!messageQueue->try_send(message.data(), message.size(), 0));
 
-        } else {
-            // Execute function for FAI
-
-            string executecmd = createExecString(command).c_str();
-            string latest = executecmd.substr(executecmd.length()-3);
-            if (latest.find("&") != std::string::npos)
-            {
-                logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Process will be executed as a Daemon process!!"));
-                int myval = daemon(0, 0);
-                if (!checkCWD(command)) //if the CWD does not exist
+            exit(1);
+        }
+        else
+        {   // not daemon
+            logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Process will not be executed as a Daemon process!!"));
+            int ret[2];
+            int val = 0; //for system return value
+            pipe(ret);
+            signal(SIGCHLD, SIG_DFL);
+            int newpid = fork();
+            if (newpid == 0)
+            {	// Child execute the command
+                string pidchldnumstr = toString(getpid());
+                logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Child Process is starting for pipes","Parentpid",pidparnumstr,"pid",pidchldnumstr));
+                this->getOutputStream().preparePipe();
+                this->getErrorStream().preparePipe();
+                this->getErrorStream().closePipe(0);
+                this->getOutputStream().closePipe(0);
+                if (!checkCWD(command, container))
                 {
-                    string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
-                            "Working Directory Does Not Exist on System","",command->getSource(),command->getTaskUuid());
-                    while (!messageQueue->try_send(message.data(), message.size(), 0));
-                    myval = 1 ;
-                    message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                            this->getResponsecount(),command->getSource(),command->getTaskUuid(),myval);
-                    while (!messageQueue->try_send(message.data(), message.size(), 0));
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
+                    logger.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
+                    kill(getpid(), SIGKILL);		//killing child
                     exit(1);
                     //problem about absolute path
                 }
-                if (!checkUID(command)) //if the User does not exist
+                if (!checkUID(command, container))
                 {
-                    string message = this->getResponse().createResponseMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(), 1,
-                            "User Does Not Exist on System", "", command->getSource(), command->getTaskUuid());
-                    while (!messageQueue->try_send(message.data(), message.size(), 0));
-                    myval = 1 ;
-                    message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                            this->getResponsecount(),command->getSource(),command->getTaskUuid(),myval);
-                    while (!messageQueue->try_send(message.data(), message.size(), 0));
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "User id not found on system..","RunAs:",command->getRunAs()));
+                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "USer id not found on system..","RunAs:",command->getRunAs()));
+                    kill(getpid(), SIGKILL);		//killing child
                     exit(1);
+                    //problem about UID
                 }
-                logger.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getProgram()));
-                //executing the process on background
-                system(createExecString(command).c_str());
-                //parent returns with success if the daemon successfully send to process to background
-                string message = this->getResponse().createExitMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(),
-                        this->getResponsecount(), command->getSource(), command->getTaskUuid(), myval);
-                while (!messageQueue->try_send(message.data(), message.size(), 0));
 
-                exit(1);
-            }
-            else
-            {   // not daemon
-                logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Process will not be executed as a Daemon process!!"));
-                int ret[2];
-                int val = 0; //for system return value
-                pipe(ret);
-                signal(SIGCHLD, SIG_DFL);
-                int newpid = fork();
-                if (newpid == 0)
-                {	// Child execute the command
-                    string pidchldnumstr = toString(getpid());
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Child Process is starting for pipes","Parentpid",pidparnumstr,"pid",pidchldnumstr));
-
-                    this->getOutputStream().preparePipe();
-                    this->getErrorStream().preparePipe();
-
-                    this->getErrorStream().closePipe(0);
-                    this->getOutputStream().closePipe(0);
-
-                    if (!checkCWD(command))
-                    {
-                        logger.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
-                        kill(getpid(), SIGKILL);		//killing child
-                        exit(1);
-                        //problem about absolute path
-                    }
-                    if (!checkUID(command))
-                    {
-                        logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "USer id not found on system..","RunAs:",command->getRunAs()));
-                        kill(getpid(), SIGKILL);		//killing child
-                        exit(1);
-                        //problem about UID
-                    }
-
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is starting!!", "pid", pidchldnumstr));
-                    val = system(createExecString(command).c_str());	//execution of command is starting now..
-
+                logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is starting!!", "pid", pidchldnumstr));
+                if (!container) {
+                    // Execute command
+                    val = system(createExecString(command).c_str());
                     close(ret[0]);
                     write(ret[1], &val, sizeof(val));
                     close(ret[1]);
+                } else {
 
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is done!!","pid",pidchldnumstr));
-                    exit(EXIT_SUCCESS);
                 }
-                else if (newpid == -1)
+
+                logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is done!!","pid",pidchldnumstr));
+                exit(EXIT_SUCCESS);
+            }
+            else if (newpid == -1)
+            {
+                cout << "ERROR!!" << endl;
+                return false;
+            }
+            else
+            {
+                //Parent read the result and send back
+                try
                 {
-                    cout << "ERROR!!" << endl;
-                    return false;
+                    signal(SIGCHLD, SIG_IGN);
+                    this->getErrorStream().closePipe(1);
+                    this->getOutputStream().closePipe(1);
+                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend is starting!!","pid",toString(getpid())));
+                    optionReadSend(messageQueue,command,newpid,ret);
+                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend has finished!!","pid",toString(getpid())));
+                    this->getErrorStream().closePipe(0);
+                    this->getOutputStream().closePipe(0);
+                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Thread is Stopping!!","pid",toString(getpid())));
+                    logger.closeLogFile();
+                    kill(getpid(),SIGKILL);		//killing child
+                    return true; //thread successfully done its work.
                 }
-                else
+                catch(const std::exception& error)
                 {
-                    //Parent read the result and send back
-                    try
-                    {
-                        signal(SIGCHLD, SIG_IGN);
-                        this->getErrorStream().closePipe(1);
-                        this->getOutputStream().closePipe(1);
-                        logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend is starting!!","pid",toString(getpid())));
-                        optionReadSend(messageQueue,command,newpid,ret);
-                        logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend has finished!!","pid",toString(getpid())));
-                        this->getErrorStream().closePipe(0);
-                        this->getOutputStream().closePipe(0);
-                        logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Thread is Stopping!!","pid",toString(getpid())));
-                        logger.closeLogFile();
-                        kill(getpid(),SIGKILL);		//killing child
-                        return true; //thread successfully done its work.
-                    }
-                    catch(const std::exception& error)
-                    {
-                        logger.writeLog(3, logger.setLogData("<SubutaiThread::threadFunction> " "Problem TF:",error.what()));
-                        cout<<error.what()<<endl;
-                    }
+                    logger.writeLog(3, logger.setLogData("<SubutaiThread::threadFunction> " "Problem TF:",error.what()));
+                    cout<<error.what()<<endl;
                 }
             }
         }

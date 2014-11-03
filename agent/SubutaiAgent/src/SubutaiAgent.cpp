@@ -231,7 +231,6 @@ int main(int argc,char *argv[],char *envp[])
     //updateContainerInfosPeriodically(&cman);
     cman.write();
 
-
     /*
      * Opening MQTT Connection
      */
