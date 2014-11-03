@@ -33,8 +33,8 @@ import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
 import org.safehaus.subutai.core.environment.impl.builder.TopologyBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
-import org.safehaus.subutai.core.network.api.NetworkManager;
-import org.safehaus.subutai.core.network.api.NetworkManagerException;
+import org.safehaus.subutai.core.security.api.*;
+import org.safehaus.subutai.core.security.api.SecurityManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -66,7 +66,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     //    private ServiceLocator serviceLocator;
     private EnvironmentDAO environmentDAO;
     private TemplateRegistry templateRegistry;
-    private NetworkManager networkManager;
+    private org.safehaus.subutai.core.security.api.SecurityManager securityManager;
     private Tracker tracker;
     private DataSource dataSource;
 
@@ -90,15 +90,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public NetworkManager getNetworkManager()
+    public SecurityManager getSecurityManager()
     {
-        return networkManager;
+        return securityManager;
     }
 
 
-    public void setNetworkManager( final NetworkManager networkManager )
+    public void setSecurityManager( final SecurityManager securityManager )
     {
-        this.networkManager = networkManager;
+        this.securityManager = securityManager;
     }
 
 
@@ -138,7 +138,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         this.environmentDAO = null;
         this.templateRegistry = null;
-        this.networkManager = null;
+        this.securityManager = null;
         this.peerManager = null;
         this.tracker = null;
         this.topologyBuilder = null;
@@ -399,9 +399,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 {
                     try
                     {
-                        networkManager.configSshOnAgents( environment.getContainers() );
+                        securityManager.configSshOnAgents( environment.getContainers() );
                     }
-                    catch ( NetworkManagerException e )
+                    catch ( SecurityManagerException e )
                     {
                         throw new EnvironmentBuildException( e.getMessage() );
                     }
@@ -410,9 +410,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 {
                     try
                     {
-                        networkManager.configHostsOnAgents( environment.getContainers(), blueprint.getDomainName() );
+                        securityManager.configHostsOnAgents( environment.getContainers(), blueprint.getDomainName() );
                     }
-                    catch ( NetworkManagerException e )
+                    catch ( SecurityManagerException e )
                     {
                         throw new EnvironmentBuildException( e.getMessage() );
                     }

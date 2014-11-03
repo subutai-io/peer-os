@@ -29,6 +29,7 @@
     <module>git-manager</module>
     <module>lxc-quota-manager</module>
     <module>monitoring</module>
+    <module>network-manager</module>
     <module>security-manager</module>
     <module>peer-manager</module>
     <module>strategy-manager</module>

@@ -1,22 +1,22 @@
-package org.safehaus.subutai.core.network.impl;
+package org.safehaus.subutai.core.security.impl;
 
 
 import java.util.Set;
 
-import org.safehaus.subutai.core.network.api.NetworkManager;
-import org.safehaus.subutai.core.network.api.NetworkManagerException;
+import org.safehaus.subutai.core.security.api.SecurityManager;
+import org.safehaus.subutai.core.security.api.SecurityManagerException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
 /**
  * Implementation of Network Manager
  */
-public class NetworkManagerImpl implements NetworkManager
+public class SecurityManagerImpl implements SecurityManager
 {
 
 
     @Override
-    public boolean configSshOnAgents( Set<ContainerHost> containerHosts ) throws NetworkManagerException
+    public boolean configSshOnAgents( Set<ContainerHost> containerHosts ) throws SecurityManagerException
     {
         try
         {
@@ -24,14 +24,14 @@ public class NetworkManagerImpl implements NetworkManager
         }
         catch ( SSHManagerException e )
         {
-            throw new NetworkManagerException( e.getMessage() );
+            throw new SecurityManagerException( e.getMessage() );
         }
     }
 
 
     @Override
     public boolean configSshOnAgents( Set<ContainerHost> containerHosts, ContainerHost containerHost )
-            throws NetworkManagerException
+            throws SecurityManagerException
     {
         try
         {
@@ -39,14 +39,14 @@ public class NetworkManagerImpl implements NetworkManager
         }
         catch ( SSHManagerException e )
         {
-            throw new NetworkManagerException( e.getMessage() );
+            throw new SecurityManagerException( e.getMessage() );
         }
     }
 
 
     @Override
     public boolean configHostsOnAgents( Set<ContainerHost> containerHosts, String domainName )
-            throws NetworkManagerException
+            throws SecurityManagerException
     {
         try
         {
@@ -54,7 +54,7 @@ public class NetworkManagerImpl implements NetworkManager
         }
         catch ( HostManagerException e )
         {
-            throw new NetworkManagerException( e.getMessage() );
+            throw new SecurityManagerException( e.getMessage() );
         }
     }
 }
