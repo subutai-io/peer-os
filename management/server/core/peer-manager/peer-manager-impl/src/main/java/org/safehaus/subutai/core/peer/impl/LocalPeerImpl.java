@@ -54,6 +54,7 @@ import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 
+import com.google.common.cache.Cache;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -78,6 +79,11 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private ConcurrentMap<String, AtomicInteger> sequences;
+    /**
+     * cache of currently connected agents with expiry ttl. Agents will expire unless they send heartbeat message
+     * regularly
+     */
+    private Cache<UUID, Agent> agents;
     private Set<RequestListener> requestListeners;
 
 
@@ -769,6 +775,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
         Preconditions.checkNotNull( request, "Invalid request" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
         Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
+        Preconditions.checkNotNull( responseType, "Invalid response type" );
 
 
         for ( RequestListener requestListener : requestListeners )
