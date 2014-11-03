@@ -54,7 +54,7 @@ using std::string;
 struct ExecutionResult {
     string out;
     string err;
-    string exit_code;
+    int exit_code;
 };
 
 enum containerStatus { RUNNING, STOPPED, FROZEN };
@@ -84,6 +84,7 @@ public:
 	bool isContainerStopped();
 	bool isContainerFrozen();
 
+        void UpdateUsersList();
 	void setContainerHostname(string);
 	void setContainerStatus(containerStatus);
 	void getContainerAllFields();
@@ -100,6 +101,7 @@ private:
 	string macAddress;
 	string hostname;
 	string parentHostname;
+        map<int, string> _users;        // List of users available in system
 	vector<string> ipAddress;
 	SubutaiLogger*	containerLogger;
 };
