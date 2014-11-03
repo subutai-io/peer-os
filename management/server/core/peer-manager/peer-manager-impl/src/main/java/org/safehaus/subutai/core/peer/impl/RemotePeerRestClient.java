@@ -201,7 +201,7 @@ public class RemotePeerRestClient
 
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
-            return JsonUtil.fromJson( response.getEntity().toString(), Template.class );
+            return JsonUtil.fromJson( response.readEntity( String.class ), Template.class );
         }
         else
         {
