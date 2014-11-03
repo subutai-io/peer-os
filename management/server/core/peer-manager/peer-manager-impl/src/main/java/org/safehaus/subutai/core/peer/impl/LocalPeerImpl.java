@@ -2,11 +2,16 @@ package org.safehaus.subutai.core.peer.impl;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.exception.CommandException;
@@ -19,6 +24,7 @@ import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
@@ -43,7 +49,11 @@ import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.core.strategy.api.ServerMetric;
+import org.safehaus.subutai.core.strategy.api.StrategyException;
+import org.safehaus.subutai.core.strategy.api.StrategyManager;
 
+import com.google.common.cache.Cache;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -56,6 +66,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 {
     private static final String SOURCE_MANAGEMENT = "MANAGEMENT_HOST";
     private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60; // 5 min
+    private static final int MAX_LXC_NAME = 15;
     private PeerManager peerManager;
     private ContainerManager containerManager;
     private TemplateRegistry templateRegistry;
@@ -63,15 +74,27 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     private PeerDAO peerDAO;
     private ManagementHost managementHost;
     private CommandRunner commandRunner;
+    private AgentManager agentManager;
+    private StrategyManager strategyManager;
     private QuotaManager quotaManager;
+    private ConcurrentMap<String, AtomicInteger> sequences;
+    /**
+     * cache of currently connected agents with expiry ttl. Agents will expire unless they send heartbeat message
+     * regularly
+     */
+    private Cache<UUID, Agent> agents;
     private Set<RequestListener> requestListeners;
 
 
+    public LocalPeerImpl( PeerManager peerManager, AgentManager agentManager, ContainerManager containerManager,
+                          TemplateRegistry templateRegistry, PeerDAO peerDao, CommunicationManager communicationManager,
+                          CommandRunner commandRunner, QuotaManager quotaManager, StrategyManager strategyManager )
     public LocalPeerImpl( PeerManager peerManager, ContainerManager containerManager, TemplateRegistry templateRegistry,
                           PeerDAO peerDao, CommunicationManager communicationManager, CommandRunner commandRunner,
                           QuotaManager quotaManager, Set<RequestListener> requestListeners )
     {
-
+        this.agentManager = agentManager;
+        this.strategyManager = strategyManager;
         this.peerManager = peerManager;
         this.containerManager = containerManager;
         this.templateRegistry = templateRegistry;
@@ -97,6 +120,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             }
         }
         communicationManager.addListener( this );
+        sequences = new ConcurrentHashMap<>();
     }
 
 
@@ -170,6 +194,56 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     }
 
 
+    public ContainerHost createContainer( final ResourceHost resourceHost, final UUID creatorPeerId,
+                                          final UUID environmentId, final List<Template> templates,
+                                          final String containerName ) throws PeerException
+    {
+        return resourceHost.createContainer( creatorPeerId, environmentId, templates, containerName );
+    }
+
+
+    //    @Override
+    //    public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
+    //                                                final List<Template> templates, final int quantity,
+    //                                                final String strategyId, final List<Criteria> criteria )
+    //            throws ContainerCreateException
+    //    {
+    //        Set<ContainerHost> result = new HashSet<>();
+    //        try
+    //        {
+    //            for ( Template t : templates )
+    //            {
+    //                if ( t.isRemote() )
+    //                {
+    //                    tryToRegister( t );
+    //                }
+    //            }
+    //            String templateName = templates.get( templates.size() - 1 ).getTemplateName();
+    //            Set<Agent> agents = containerManager.clone( environmentId, templateName, quantity, strategyId,
+    // criteria );
+    //
+    //
+    //            for ( Agent agent : agents )
+    //            {
+    //                ResourceHost resourceHost = getResourceHostByName( agent.getParentHostName() );
+    //                ContainerHost containerHost = new ContainerHost( agent, getId(), environmentId );
+    //                containerHost.setParentAgent( resourceHost.getAgent() );
+    //                containerHost.setCreatorPeerId( creatorPeerId );
+    //                containerHost.setTemplateName( templateName );
+    //                containerHost.updateHeartbeat();
+    //                resourceHost.addContainerHost( containerHost );
+    //                result.add( containerHost );
+    //                peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
+    //            }
+    //        }
+    //        catch ( PeerException | RegistryException e )
+    //        {
+    //            throw new ContainerCreateException( e.toString() );
+    //        }
+    //        return result;
+    //    }
+
+
     @Override
     public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
                                                 final List<Template> templates, final int quantity,
@@ -187,25 +261,96 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                 }
             }
             String templateName = templates.get( templates.size() - 1 ).getTemplateName();
-            Set<Agent> agents = containerManager.clone( environmentId, templateName, quantity, strategyId, criteria );
 
 
-            for ( Agent agent : agents )
+            Map<Agent, ServerMetric> serverMetricMap = new HashMap<>();
+            for ( ResourceHost resourceHost : getResourceHosts() )
             {
-                ResourceHost resourceHost = getResourceHostByName( agent.getParentHostName() );
-                ContainerHost containerHost = new ContainerHost( agent, getId(), environmentId );
-                containerHost.setParentAgent( resourceHost.getAgent() );
-                containerHost.setCreatorPeerId( creatorPeerId );
-                containerHost.setTemplateName( templateName );
-                containerHost.updateHeartbeat();
-                resourceHost.addContainerHost( containerHost );
-                result.add( containerHost );
-                peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
+                if ( resourceHost.isConnected() )
+                {
+                    serverMetricMap.put( resourceHost.getAgent(), resourceHost.getMetric() );
+                }
+            }
+            Map<Agent, Integer> slots = null;
+            try
+            {
+                slots = strategyManager.getPlacementDistribution( serverMetricMap, quantity, strategyId, criteria );
+            }
+            catch ( StrategyException e )
+            {
+                throw new ContainerCreateException( e.getMessage() );
+            }
+
+            Set<String> existingContainerNames = getContainerNames();
+
+            // clone specified number of instances and store their names
+            Map<Agent, Set<String>> cloneNames = new HashMap<>();
+
+            for ( Map.Entry<Agent, Integer> e : slots.entrySet() )
+            {
+                Set<String> hostCloneNames = new HashSet<>();
+                for ( int i = 0; i < e.getValue(); i++ )
+                {
+                    String newContainerName = nextHostName( templateName, existingContainerNames );
+                    hostCloneNames.add( newContainerName );
+                }
+                cloneNames.put( e.getKey(), hostCloneNames );
+            }
+
+            for ( final Map.Entry<Agent, Set<String>> e : cloneNames.entrySet() )
+            {
+
+                Agent a = e.getKey();
+                Set<String> clones = e.getValue();
+                ResourceHost resourceHost = getResourceHostByName( a.getHostname() );
+                for ( String cloneName : clones )
+                {
+                    ContainerHost containerHost =
+                            createContainer( resourceHost, creatorPeerId, environmentId, templates, cloneName );
+                    resourceHost.addContainerHost( containerHost );
+                    result.add( containerHost );
+                    peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
+                }
             }
         }
         catch ( PeerException | RegistryException e )
         {
             throw new ContainerCreateException( e.toString() );
+        }
+        return result;
+    }
+
+
+    private String nextHostName( String templateName, Set<String> existingNames )
+    {
+        AtomicInteger i = sequences.putIfAbsent( templateName, new AtomicInteger() );
+        if ( i == null )
+        {
+            i = sequences.get( templateName );
+        }
+        while ( true )
+        {
+            String suffix = String.valueOf( i.incrementAndGet() );
+            int prefixLen = MAX_LXC_NAME - suffix.length();
+            String name = ( templateName.length() > prefixLen ? templateName.substring( 0, prefixLen ) : templateName )
+                    + suffix;
+            if ( !existingNames.contains( name ) )
+            {
+                return name;
+            }
+        }
+    }
+
+
+    private Set<String> getContainerNames() throws PeerException
+    {
+        Set<String> result = new HashSet<>();
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+            {
+                result.add( containerHost.getHostname() );
+            }
         }
         return result;
     }
@@ -635,6 +780,13 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
         }
 
         return null;
+    }
+
+
+    @Override
+    public Agent waitForAgent( final String containerName, final int timeout )
+    {
+        return agentManager.waitForRegistration( containerName, timeout );
     }
 }
 

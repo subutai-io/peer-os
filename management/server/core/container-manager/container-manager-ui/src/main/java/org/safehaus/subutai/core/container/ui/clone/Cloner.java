@@ -319,7 +319,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                     {
                         metricMap.put( rh.getAgent(), rh.getMetric() );
                     }
-                    catch ( CommandException e )
+                    catch ( PeerException e )
                     {
                         show( e.toString() );
                     }

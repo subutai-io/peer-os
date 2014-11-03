@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.peer.api;
 
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.naming.NamingException;
@@ -11,6 +12,7 @@ import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.NullAgent;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.ServiceLocator;
 
 import com.google.common.base.Preconditions;
@@ -184,4 +186,7 @@ public abstract class SubutaiHost implements Host
     {
         return lastHeartbeat;
     }
+
+
+
 }
