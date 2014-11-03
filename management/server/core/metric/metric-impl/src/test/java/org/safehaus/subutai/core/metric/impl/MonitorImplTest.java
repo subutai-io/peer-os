@@ -20,6 +20,7 @@ import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.Messenger;
@@ -44,6 +45,7 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -375,6 +377,35 @@ public class MonitorImplTest
 
 
     @Test
+    public void testGetContainerHostMetrics2() throws Exception
+    {
+
+        when( containerHost.getPeer() ).thenReturn( remotePeer );
+        ContainerHostMetricResponse response = mock( ContainerHostMetricResponse.class );
+        when( remotePeer.sendRequest( anyObject(), anyString(), anyInt(), eq( ContainerHostMetricResponse.class ) ) )
+                .thenReturn( response );
+        ContainerHostMetricImpl metric = JsonUtil.fromJson( METRIC_JSON, ContainerHostMetricImpl.class );
+        when( response.getMetrics() ).thenReturn( Sets.newHashSet( metric ) );
+
+        Set<ContainerHostMetric> metrics = monitor.getContainerMetrics( environment );
+
+        ContainerHostMetric metric2 = metrics.iterator().next();
+        assertEquals( HOST, metric2.getHost() );
+        assertEquals( METRIC_VALUE, metric2.getTotalRam() );
+
+
+        PeerException exception = mock( PeerException.class );
+        doThrow( exception ).when( remotePeer )
+                            .sendRequest( anyObject(), anyString(), anyInt(), eq( ContainerHostMetricResponse.class ) );
+
+
+        monitor.getContainerMetrics( environment );
+
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
+    }
+
+
+    @Test
     public void testGetContainerHostMetricsWithException() throws Exception
     {
         PeerException exception = mock( PeerException.class );
@@ -406,6 +437,24 @@ public class MonitorImplTest
     {
         PeerException exception = mock( PeerException.class );
         doThrow( exception ).when( localPeer ).getContainerHostsByEnvironmentId( ENVIRONMENT_ID );
+
+
+        monitor.getLocalContainerHostMetrics( ENVIRONMENT_ID );
+
+
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
+    }
+
+
+    @Test
+    public void testGetLocalContainerHostMetricsWithException2() throws Exception
+    {
+        when( localPeer.getContainerHostsByEnvironmentId( ENVIRONMENT_ID ) )
+                .thenReturn( Sets.newHashSet( containerHost ) );
+        when( containerHost.getParentHostname() ).thenReturn( RESOURCE_HOST );
+
+        PeerException exception = mock( PeerException.class );
+        doThrow( exception ).when( localPeer ).getResourceHostByName( RESOURCE_HOST );
 
 
         monitor.getLocalContainerHostMetrics( ENVIRONMENT_ID );
@@ -455,6 +504,55 @@ public class MonitorImplTest
 
 
         monitor.getContainerMetrics( ENVIRONMENT_ID, resourceHost, containerHost, null );
+
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
+    }
+
+
+    @Test
+    public void testGetResourceMetrics() throws Exception
+    {
+        CommandResult commandResult = mock( CommandResult.class );
+        when( commandResult.hasSucceeded() ).thenReturn( true );
+        when( commandResult.getStdOut() ).thenReturn( METRIC_JSON );
+        when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
+        Set<ResourceHostMetric> metrics = Sets.newHashSet();
+
+        monitor.getResourceMetrics( resourceHost, metrics );
+
+
+        ResourceHostMetric metric = metrics.iterator().next();
+        assertEquals( LOCAL_PEER_ID, metric.getPeerId() );
+        assertEquals( HOST, metric.getHost() );
+        assertEquals( METRIC_VALUE, metric.getTotalRam() );
+    }
+
+
+    @Test
+    public void testGetResourceMetricsCommandFailed() throws Exception
+    {
+        CommandResult commandResult = mock( CommandResult.class );
+        when( commandResult.hasSucceeded() ).thenReturn( false );
+        Set<ResourceHostMetric> metrics = Sets.newHashSet();
+        when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
+
+
+        monitor.getResourceMetrics( resourceHost, metrics );
+
+
+        verify( resourceHost ).getHostname();
+    }
+
+
+    @Test
+    public void testGetResourceMetricsCommandException() throws Exception
+    {
+        Set<ResourceHostMetric> metrics = Sets.newHashSet();
+        CommandException exception = mock( CommandException.class );
+        doThrow( exception ).when( resourceHost ).execute( any( RequestBuilder.class ) );
+
+        monitor.getResourceMetrics( resourceHost, metrics );
+
 
         verify( exception ).printStackTrace( any( PrintStream.class ) );
     }

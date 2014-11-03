@@ -137,7 +137,7 @@ public class MonitorImpl implements Monitor
         }
         catch ( PeerException e )
         {
-            LOG.warn( String.format( "Error obtaining metrics from peer %s", peer.getName() ) );
+            LOG.warn( String.format( "Error obtaining metrics from peer %s", peer.getName() ), e );
         }
         return metrics;
     }
