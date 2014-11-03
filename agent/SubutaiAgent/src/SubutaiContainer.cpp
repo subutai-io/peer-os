@@ -84,14 +84,12 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     pipe(fd);
     dup2(fd[1], 1);
     char buffer[1000];
-    // TODO: if exit code not equals one - we got stderr
     ExecutionResult result;
     result.exit_code = this->container->attach_run_wait(this->container, &opts, program.c_str(), _params);
     fflush(stdout);
     close(fd[1]);
     dup2(_stdout, 1);
     close(_stdout);
-    // TODO: Decide where to keep this command output
     string command_output;
     while (1) {
         ssize_t size = read(fd[0], buffer, 1000);
@@ -109,26 +107,25 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     } else {
         result.err = command_output;
     }
-
     return result;
 }
 
 
 bool SubutaiContainer::isContainerRunning()
 {
-    if(this->status == RUNNING) return true;
+    if (this->status == RUNNING) return true;
     return false;
 }
 
 bool SubutaiContainer::isContainerStopped()
 {
-    if(this->status == STOPPED) return true;
+    if (this->status == STOPPED) return true;
     return false;
 }
 
 bool SubutaiContainer::isContainerFrozen()
 {
-    if(this->status == FROZEN) return true;
+    if (this->status == FROZEN) return true;
     return false;
 }
 
@@ -179,10 +176,8 @@ bool SubutaiContainer::getContainerId()
         {
             boost::uuids::random_generator gen;
             boost::uuids::uuid u = gen();
-
             const std::string tmp = boost::lexical_cast<std::string>(u);
             this->id = tmp;
-
             args.clear();
             args.push_back(this->id);
             args.push_back(">");
@@ -205,7 +200,7 @@ bool SubutaiContainer::getContainerId()
  */
 bool SubutaiContainer::getContainerMacAddress()
 {
-    if(this-> status != RUNNING) return false;
+    if(this->status != RUNNING) return false;
     try
     {
         vector<string> args;
@@ -289,16 +284,16 @@ bool SubutaiContainer::getContainerParentHostname()
             boost::property_tree::ptree pt;
             boost::property_tree::ini_parser::read_ini("/tmp/subutai/config.txt", pt);
             parentHostname =  pt.get<std::string>("Subutai-Agent.subutai_parent_hostname");
-            containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","parentHostname: ",parentHostname));
+            containerLogger->writeLog(6, containerLogger->setLogData("<SubutaiAgent>","parentHostname: ",parentHostname));
         }
 
-        if(!parentHostname.empty())
+        if (!parentHostname.empty())
         {
             return true;
         }
         else
         {
-            containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","parentHostname does not exist!"));
+            containerLogger->writeLog(6, containerLogger->setLogData("<SubutaiAgent>","parentHostname does not exist!"));
             return false;
         }
     }
@@ -318,7 +313,6 @@ bool SubutaiContainer::getContainerIpAddress()
     if(this-> status != RUNNING) return false;
     try
     {
-
         ipAddress.clear();
 
         vector<string> args ;
@@ -454,7 +448,7 @@ bool SubutaiContainer::checkUser(string username) {
         UpdateUsersList();
     }
     for (user_it it = _users.begin(); it != _users.end(); it++) {
-        if ((*it)->second.compare(username) == 0) {
+        if ((*it).second.compare(username) == 0) {
             return true;
         }
     } 
@@ -465,13 +459,13 @@ bool SubutaiContainer::checkUser(string username) {
  * /details     Runs through the list of userid:username pairs
  *              and returns user id if username was found
  */
-int SubutaiContainer::getRunAsUserId(stirng username) {
+int SubutaiContainer::getRunAsUserId(string username) {
     if (_users.empty()) {
         UpdateUsersList();
     }
     for (user_it it = _users.begin(); it != _users.end(); it++) {
-        if ((*it)->second.compare(username) == 0) {
-            return (*it)->first;
+        if ((*it).second.compare(username) == 0) {
+            return (*it).first;
         }
     } 
     return -1;
