@@ -1,12 +1,16 @@
 package org.safehaus.subutai.plugin.hadoop.impl.common;
 
 
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+
+
 public class Commands
 {
-
-
-    public static final String clearMasterCommand = ". /etc/profile && " + "hadoop-master-slave.sh masters clear";
-    public static final String clearSlavesCommand = ". /etc/profile && " + "hadoop-master-slave.sh slaves clear";
+    HadoopClusterConfig config;
+    public Commands( HadoopClusterConfig config ){
+        this.config = config;
+    }
 
 
     //    public Command getInstallCommand( HadoopClusterConfig hadoopClusterConfig )
@@ -24,43 +28,34 @@ public class Commands
     //                        .withTimeout( 180 ), Sets.newHashSet( agent ) );
     //    }
 
+    public String getStatusNameNodeCommand(){
+        return "service hadoop-dfs status";
+    }
 
-//    public Command getClearMastersCommand( HadoopClusterConfig hadoopClusterConfig )
-//    {
-//
-//        return ( "Clear master nodes for NameNode",
-//        new RequestBuilder( ". /etc/profile && " + "hadoop-master-slave.sh masters clear" ),
-//                Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
-//    }
-//
-//
-//    public Command getClearSlavesCommand( HadoopClusterConfig hadoopClusterConfig )
-//    {
-//        UUID nameNode = hadoopClusterConfig.getNameNode();
-//        ContainerHost containerHost = environment.getContainerHostByUUID( nameNode );
-//        if ( containerHost != null ) {
-//            containerHost.execute( )
-//            return commandRunner.createCommand( "Clear slave nodes for NameNode and JobTracker",
-//                    new RequestBuilder( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear" ),
-//                    Sets.newHashSet( nameNode, hadoopClusterConfig.getJobTracker() ) );
-//        }
-//        return null;
-//
-//    }
-//
-//
-//    public Command getSetMastersCommand( HadoopClusterConfig hadoopClusterConfig )
-//    {
-//        return commandRunner.createCommand( "Set masters for nodes",
-//                new RequestBuilder( ". /etc/profile && " + "hadoop-configure.sh" ).withCmdArgs( Lists.newArrayList(
-//                        String.format( "%s:%d", hadoopClusterConfig.getNameNode().getHostname(),
-//                                HadoopClusterConfig.NAME_NODE_PORT ),
-//                        String.format( "%s:%d", hadoopClusterConfig.getJobTracker().getHostname(),
-//                                HadoopClusterConfig.JOB_TRACKER_PORT ),
-//                        String.format( "%d", hadoopClusterConfig.getReplicationFactor() ) ) ),
-//                Sets.newHashSet( hadoopClusterConfig.getAllNodes() ) );
-//    }
-//
+    public String getStatusDataNodeCommand(){
+        return "service hadoop-dfs status";
+    }
+    public String getClearMastersCommand( HadoopClusterConfig hadoopClusterConfig )
+    {
+        return ". /etc/profile && " + "hadoop-master-slave.sh masters clear" + config.getNameNode().getHostname();
+    }
+
+
+    public String getClearSlavesCommand( HadoopClusterConfig hadoopClusterConfig, ContainerHost containerHost )
+    {
+        return ". /etc/profile && " + "hadoop-master-slave.sh slaves clear" + containerHost.getHostname();
+
+    }
+
+
+    public String getSetMastersCommand( HadoopClusterConfig hadoopClusterConfig )
+    {
+        return ". /etc/profile && " + "hadoop-configure.sh " + config.getNameNode().getHostname() + ":" + HadoopClusterConfig.NAME_NODE_PORT
+                                                             + config.getJobTracker().getHostname() + ":" + HadoopClusterConfig.JOB_TRACKER_PORT
+                                                             + config.getReplicationFactor();
+    }
+
+
 //
 //    public Command getSetMastersCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent )
 //    {
@@ -74,30 +69,18 @@ public class Commands
 //                Sets.newHashSet( agent ) );
 //    }
 //
-//
-//    public Command getAddSecondaryNamenodeCommand( HadoopClusterConfig hadoopClusterConfig )
-//    {
-//        return commandRunner.createCommand( "Set Secondary NameNode master for NameNode", new RequestBuilder(
-//                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh masters %s",
-//                                hadoopClusterConfig.getSecondaryNameNode().getHostname() ) ),
-//                Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
-//    }
-//
-//
-//    public Command getSetDataNodeCommand( HadoopClusterConfig hadoopClusterConfig )
-//    {
-//
-//        StringBuilder cmd = new StringBuilder();
-//        for ( Agent agent : hadoopClusterConfig.getDataNodes() )
-//        {
-//            cmd.append(
-//                    String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ", agent.getHostname() ) );
-//        }
-//
-//        return commandRunner.createCommand( "Set DataNodes for NameNode", new RequestBuilder( cmd.toString() ),
-//                Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
-//    }
-//
+
+    public String getAddSecondaryNamenodeCommand( HadoopClusterConfig hadoopClusterConfig )
+    {
+        return ". /etc/profile && " + "hadoop-master-slave.sh masters %s " + hadoopClusterConfig.getNameNode().getHostname();
+    }
+
+
+    public String getSetDataNodeCommand( HadoopClusterConfig hadoopClusterConfig, ContainerHost containerHost )
+    {
+        return ". /etc/profile && " + "hadoop-master-slave.sh masters %s " + containerHost.getHostname();
+    }
+
 //
 //    public Command getSetDataNodeCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent )
 //    {

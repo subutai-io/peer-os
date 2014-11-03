@@ -74,6 +74,8 @@ public class ManagerListener
 //                {
 //                    String lxcHostname =
 //                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
+//                    Environ
+//
 //                    Agent lxcAgent = hadoopManager.getAgentManager().getAgentByHostname( lxcHostname );
 //                    if ( lxcAgent != null )
 //                    {
@@ -89,7 +91,7 @@ public class ManagerListener
 //                }
 //            }
 //        };
-        return  null;
+        return null;
     }
 
 
@@ -884,7 +886,6 @@ public class ManagerListener
                         hadoopManager.getHadoopCluster(),
                         new org.safehaus.subutai.plugin.hadoop.ui.manager.components.CompleteEvent()
                         {
-
                             public void onComplete( String operationLog )
                             {
                                 hadoopManager.setDecommissionStatus( operationLog );

@@ -16,19 +16,21 @@ public class ClusterConfiguration
 
     private static final Logger LOG = Logger.getLogger( ClusterConfiguration.class.getName() );
     private TrackerOperation po;
-    private HadoopImpl hadoopManagaer;
+    private HadoopImpl hadoopManager;
 
 
-    public ClusterConfiguration( final TrackerOperation operation, final HadoopImpl cassandraManager )
+
+    public ClusterConfiguration( final TrackerOperation operation, final HadoopImpl cassandraManager)
     {
         this.po = operation;
-        this.hadoopManagaer = cassandraManager;
+        this.hadoopManager = cassandraManager;
     }
 
 
     public void configureCluster( HadoopClusterConfig config, Environment environment )
             throws ClusterConfigurationException
     {
+        Commands commands = new Commands( config );
         po.addLog( String.format( "Configuring cluster: %s", config.getClusterName() ) );
 
         for ( ContainerHost containerHost : environment.getContainers() )
@@ -37,7 +39,7 @@ public class ClusterConfiguration
         }
 
         config.setEnvironmentId( environment.getId() );
-        hadoopManagaer.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        hadoopManager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
         po.addLogDone( "Hadoop cluster data saved into database" );
     }
 }

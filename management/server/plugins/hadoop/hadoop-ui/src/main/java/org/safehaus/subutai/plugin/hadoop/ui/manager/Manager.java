@@ -5,19 +5,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -282,11 +277,11 @@ public class Manager
         processCount++;
     }
 
+
     public synchronized void decrementProcessCount()
     {
         processCount--;
     }
-
 
 
     public synchronized int getProcessCount()
@@ -333,7 +328,7 @@ public class Manager
             Environment environment = environmentManager.getEnvironmentByUUID( hadoopCluster.getEnvironmentId() );
 
             populateTable( masterNodesTable, getMasters( environment.getContainers(), hadoopCluster ) );
-            populateTable( masterNodesTable, getSlaves( environment.getContainers(), hadoopCluster ) );
+            populateTable( slaveNodesTable, getSlaves( environment.getContainers(), hadoopCluster ) );
 
 
             replicationFactor.setValue( hadoopCluster.getReplicationFactor().toString() );
@@ -352,9 +347,7 @@ public class Manager
 
     protected void populateTable( final Table table, Set<ContainerHost> containerHosts )
     {
-
         table.removeAllItems();
-
         // Add UI components into relevant fields according to its role in cluster
         for ( final ContainerHost containerHost : containerHosts )
         {
@@ -366,8 +359,7 @@ public class Manager
     public Set<ContainerHost> getMasters( Set<ContainerHost> containerHosts, HadoopClusterConfig config ){
         Set<ContainerHost> list = new HashSet<>();
         for ( ContainerHost containerHost : containerHosts ) {
-            System.out.println( containerHost.getCreatorPeerId() );
-            if ( config.getAllMasterNodes().contains( containerHost.getAgent().getUuid() ) ){
+            if ( config.getAllMasterNodesAgents().contains( containerHost.getAgent().getUuid() ) ){
                     list.add( containerHost );
             }
         }
@@ -378,8 +370,7 @@ public class Manager
     private Set<ContainerHost> getSlaves( Set<ContainerHost> containerHosts, HadoopClusterConfig config ){
         Set<ContainerHost> list = new HashSet<>();
         for ( ContainerHost containerHost : containerHosts ) {
-            System.out.println( containerHost.getCreatorPeerId() );
-            if ( config.getAllSlaveNodes().contains( containerHost.getAgent().getUuid() ) ){
+            if ( config.getAllSlaveNodesAgents().contains( containerHost.getAgent().getUuid() ) ){
                 list.add( containerHost );
             }
         }
@@ -843,7 +834,7 @@ public class Manager
             statusGroup.addComponent( statusDecommission );
         }
         table.addItem( new Object[] {
-                containerHost.getHostname(), containerHost.getAgent().getListIP().toString(), getNodeRoles( cluster, containerHost ).toString(),
+                containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ), getNodeRoles( cluster, containerHost ).toString(),
                 statusGroup, availableOperations
         }, null );
 
@@ -855,7 +846,6 @@ public class Manager
         // If master node
         if ( cluster.isMasterNode( containerHost ) )
         {
-
             // If Namenode
             if ( cluster.isNameNode( containerHost ) )
             {

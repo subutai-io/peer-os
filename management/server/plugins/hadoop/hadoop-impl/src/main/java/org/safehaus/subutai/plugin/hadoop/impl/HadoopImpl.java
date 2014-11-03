@@ -35,6 +35,7 @@ import org.safehaus.subutai.plugin.hadoop.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.RemoveNodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.UninstallOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.dao.PluginDAO;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StatusDataNodeOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -323,16 +324,16 @@ public class HadoopImpl implements Hadoop
     @Override
     public UUID statusDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent )
     {
-//        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
-//        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
-//                "Cluster name is null or empty" );
-//        Preconditions.checkArgument( !Strings.isNullOrEmpty( agent.getHostname() ), "Lxc hostname is null or empty" );
-//
-//        AbstractOperationHandler operationHandler =
-//                new StatusDataNodeOperationHandler( this, hadoopClusterConfig.getClusterName(), agent.getHostname() );
-//        executor.execute( operationHandler );
-//        return operationHandler.getTrackerId();
-        return  null;
+        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
+                "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( agent.getHostname() ), "Lxc hostname is null or empty" );
+
+        AbstractOperationHandler operationHandler =
+                new StatusDataNodeOperationHandler( this, hadoopClusterConfig.getClusterName(), agent );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+//        return  null;
     }
 
 

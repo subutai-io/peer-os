@@ -104,6 +104,14 @@ public class HadoopClusterConfig implements ConfigBase
         return allMastersNodes;
     }
 
+    public Set<UUID> getAllMasterNodesAgents(){
+        Set<UUID> allAgents = new HashSet<>();
+        for( ContainerHost containerHost : getAllMasterNodes() ){
+            allAgents.add( containerHost.getAgent().getUuid() );
+        }
+        return  allAgents;
+    }
+
     public List<ContainerHost> getAllSlaveNodes()
     {
         Set<ContainerHost> allAgents = new HashSet<>();
@@ -117,6 +125,32 @@ public class HadoopClusterConfig implements ConfigBase
         }
 
         return new ArrayList<>( allAgents );
+    }
+
+    public Set<UUID> getAllSlaveNodesAgents(){
+        Set<UUID> allAgents = new HashSet<>();
+        for( ContainerHost containerHost : getAllSlaveNodes() ){
+            allAgents.add( containerHost.getAgent().getUuid() );
+        }
+        return  allAgents;
+    }
+
+
+    public Set<UUID> getAllTaskTrackerNodeAgents(){
+        Set<UUID> allAgents = new HashSet<>();
+        for( ContainerHost containerHost : getTaskTrackers() ){
+            allAgents.add( containerHost.getAgent().getUuid() );
+        }
+        return  allAgents;
+    }
+
+
+    public Set<UUID> getAllDataNodeAgent(){
+        Set<UUID> allAgents = new HashSet<>();
+        for( ContainerHost containerHost : getDataNodes() ){
+            allAgents.add( containerHost.getAgent().getUuid() );
+        }
+        return  allAgents;
     }
 
 
@@ -207,17 +241,11 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public boolean isMasterNode( ContainerHost agent )
+    public boolean isMasterNode( ContainerHost containerHost )
     {
-        if ( agent.equals( getNameNode() ) || agent.equals( getJobTracker() ) || agent
-                .equals( getSecondaryNameNode() ) )
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return containerHost.getAgent().getUuid().equals( getNameNode().getAgent().getUuid() ) ||
+                containerHost.getAgent().getUuid().equals( getJobTracker().getAgent().getUuid() ) ||
+                containerHost.getAgent().getUuid().equals( getSecondaryNameNode().getAgent().getUuid() );
     }
 
 
@@ -257,16 +285,9 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public boolean isDataNode( ContainerHost agent )
+    public boolean isDataNode( ContainerHost containerHost )
     {
-        if ( getDataNodes().contains( agent ) )
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return getAllDataNodeAgent().contains( containerHost.getAgent().getUuid() );
     }
 
 
@@ -282,16 +303,9 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public boolean isTaskTracker( ContainerHost agent )
+    public boolean isTaskTracker( ContainerHost containerHost )
     {
-        if ( getTaskTrackers().contains( agent ) )
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return getAllTaskTrackerNodeAgents().contains( containerHost.getAgent().getUuid() );
     }
 
 
@@ -307,42 +321,21 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public boolean isNameNode( ContainerHost agent )
+    public boolean isNameNode( ContainerHost containerHost )
     {
-        if ( getNameNode().equals( agent ) )
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return getNameNode().getAgent().getUuid().equals( containerHost.getAgent().getUuid() );
     }
 
 
-    public boolean isJobTracker( ContainerHost agent )
+    public boolean isJobTracker( ContainerHost containerHost )
     {
-        if ( getJobTracker().equals( agent ) )
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return getJobTracker().getAgent().getUuid().equals( containerHost.getAgent().getUuid() );
     }
 
 
-    public boolean isSecondaryNameNode( ContainerHost agent )
+    public boolean isSecondaryNameNode( ContainerHost containerHost )
     {
-        if ( getSecondaryNameNode().equals( agent ) )
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return getSecondaryNameNode().getAgent().getUuid().equals( containerHost.getAgent().getUuid() );
     }
 
 

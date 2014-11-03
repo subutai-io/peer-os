@@ -182,8 +182,8 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
             if ( masterCount < HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY  )
             {
                 masterNodes.add( containerHost );
+                masterCount++;
             }
-            masterCount++;
         }
 
         if ( masterNodes.size() != HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY )
@@ -203,7 +203,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
         Set<ContainerHost> slaveNodes = new HashSet<>();
         for ( ContainerHost containerHost : environment.getContainers() )
         {
-            if ( ! hadoopClusterConfig.getAllMasterNodes().contains( containerHost.getAgent().getUuid() ) )
+            if ( ! hadoopClusterConfig.getAllMasterNodes().contains( containerHost ) )
             {
                 slaveNodes.add( containerHost );
             }
