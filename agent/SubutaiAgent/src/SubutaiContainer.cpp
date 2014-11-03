@@ -107,7 +107,6 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     return result;
 }
 
-
 bool SubutaiContainer::isContainerRunning()
 {
     if (this->status == RUNNING) return true;

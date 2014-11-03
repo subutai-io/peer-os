@@ -128,7 +128,7 @@ string SubutaiThread::createExecString(SubutaiCommand *command)
  *
  */
 bool SubutaiThread::ExecuteCommand(SubutaiCommand* command, SubutaiContainer* container) {
-
+    container->RunCommand(command);
 }
 
 /**
@@ -294,9 +294,8 @@ void SubutaiThread::checkAndSend(message_queue* messageQueue,SubutaiCommand* com
              * send main buffers without block output
              */
             this->getoutBuff().clear();
-
-            string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                    this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+            string message = this->getResponse().createResponseMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(),
+                    this->getResponsecount(), this->geterrBuff(), this->getoutBuff(), command->getSource(), command->getTaskUuid());
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndSend2> " "Message was created for sending to the shared memory","Message:",message));
             while (!messageQueue->try_send(message.data(), message.size(), 0));
             this->getResponsecount() = this->getResponsecount()+1;
@@ -349,7 +348,7 @@ void SubutaiThread::checkAndWrite(message_queue *messageQueue,SubutaiCommand* co
     unsigned int errBuffsize = this->geterrBuff().size();					//real error buffer size
     this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite3> ","errBuffSize:",toString(errBuffsize)));
 
-    if (errBuffsize > 0 )	//if there is an error in the pipe, it will be set.
+    if (errBuffsize > 0)	//if there is an error in the pipe, it will be set.
         this->setEXITSTATUS(1);
 
     if ( outBuffsize >= MaxBuffSize || errBuffsize >= MaxBuffSize )
@@ -358,14 +357,11 @@ void SubutaiThread::checkAndWrite(message_queue *messageQueue,SubutaiCommand* co
         {
             string divisionOut = this->getoutBuff().substr(MaxBuffSize,(outBuffsize-MaxBuffSize));	//cut the excess string from output buffer
             this->getoutBuff() = this->getoutBuff().substr(0,MaxBuffSize);
-
             string divisionErr = this->geterrBuff().substr(MaxBuffSize,(errBuffsize-MaxBuffSize));	//cut the excess string from buffer
             this->geterrBuff() = this->geterrBuff().substr(0,MaxBuffSize);
             this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> checkAndSend method is calling..."));
-
             checkAndSend(messageQueue,command);
             this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> checkAndSend method finished"));
-
             this->getoutBuff().clear();
             this->geterrBuff().clear();
             this->setoutBuff(divisionOut);
@@ -379,10 +375,8 @@ void SubutaiThread::checkAndWrite(message_queue *messageQueue,SubutaiCommand* co
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ", "CuttedDataSize:", toString(outBuffsize)));
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ", "Excess_Data:", divisionOut));
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ", "CuttedData:", this->getoutBuff()));
-
             checkAndSend(messageQueue,command);
             this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> checkAndSend method finished"));
-
             this->getoutBuff().clear();
             this->geterrBuff().clear();
             this->setoutBuff(divisionOut);
@@ -392,10 +386,8 @@ void SubutaiThread::checkAndWrite(message_queue *messageQueue,SubutaiCommand* co
             string divisionErr = this->geterrBuff().substr(MaxBuffSize,(errBuffsize-MaxBuffSize));	//cut the excess string from buffer
             this->geterrBuff() = this->geterrBuff().substr(0,MaxBuffSize);
             this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> checkAndSend method is calling..."));
-
             checkAndSend(messageQueue,command);
             this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> checkAndSend method finished..."));
-
             this->getoutBuff().clear();
             this->geterrBuff().clear();
             this->seterrBuff(divisionErr);
