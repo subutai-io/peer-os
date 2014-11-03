@@ -21,7 +21,6 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
-import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import static org.mockito.Mockito.mock;
@@ -43,7 +42,7 @@ public class EnvironmentManagerImplTest
     @Mock
     EnvironmentDAO environmentDao;
     @Mock
-    NetworkManager networkManager;
+    SecurityManager securityManager;
     @Mock
     TemplateRegistry registry;
     @Mock
