@@ -91,7 +91,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
         }
         catch ( DaoException e )
         {
-            LOG.error( "Error in sendRequest", e );
+            LOG.error( "Error in sendMessage", e );
             throw new MessageException( e );
         }
     }
