@@ -94,7 +94,7 @@ public class PeerManagerImpl implements PeerManager
             peerInfo = result.get( 0 );
         }
         localPeer = new LocalPeerImpl( this, agentManager, containerManager, templateRegistry, peerDAO,
-                communicationManager, commandRunner, quotaManager, strategyManager );
+                communicationManager, commandRunner, quotaManager, strategyManager, requestListeners );
         localPeer.init();
 
         //subscribe to command request messages from remote peer
