@@ -50,6 +50,8 @@ using namespace std;
 using std::stringstream;
 using std::string;
 
+typedef map<int, string>::iterator user_it;
+
 // Execution Result contains exit code of a functions, stdout and/or stderr
 struct ExecutionResult {
     string out;
@@ -93,6 +95,8 @@ public:
 	void registerContainer(SubutaiConnection* );
 	void write();
     bool checkCWD(string cwd);
+    bool checkUser(string username);
+    int getRunAsUserId(string username);
 
 private:
 	containerStatus status;

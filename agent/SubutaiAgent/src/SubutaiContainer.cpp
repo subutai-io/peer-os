@@ -443,3 +443,36 @@ bool SubutaiContainer::checkCWD(string cwd) {
     else
         return false;
 }
+
+/*
+ * /details     Runs throught the list of userid:username pairs
+ *              and check user existence
+ */
+
+bool SubutaiContainer::checkUser(string username) {
+    if (_users.empty()) {
+        UpdateUsersList();
+    }
+    for (user_it it = _users.begin(); it != _users.end(); it++) {
+        if ((*it)->second.compare(username) == 0) {
+            return true;
+        }
+    } 
+    return false;
+}
+
+/*
+ * /details     Runs through the list of userid:username pairs
+ *              and returns user id if username was found
+ */
+int SubutaiContainer::getRunAsUserId(stirng username) {
+    if (_users.empty()) {
+        UpdateUsersList();
+    }
+    for (user_it it = _users.begin(); it != _users.end(); it++) {
+        if ((*it)->second.compare(username) == 0) {
+            return (*it)->first;
+        }
+    } 
+    return -1;
+}
