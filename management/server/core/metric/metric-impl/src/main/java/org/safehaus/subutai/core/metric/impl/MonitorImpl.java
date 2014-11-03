@@ -17,8 +17,6 @@ import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.messenger.api.Message;
-import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MetricListener;
@@ -55,7 +53,6 @@ public class MonitorImpl implements Monitor
 
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
-    protected Messenger messenger;
 
 
     public MonitorImpl( final DataSource dataSource, PeerManager peerManager, Messenger messenger ) throws DaoException
@@ -66,8 +63,7 @@ public class MonitorImpl implements Monitor
 
         this.monitorDao = new MonitorDao( dataSource );
         this.peerManager = peerManager;
-        this.messenger = messenger;
-        this.messenger.addMessageListener( new RemoteAlertListener( this ) );
+        peerManager.addRequestListener( new RemoteAlertListener( this ) );
         peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
     }
 
@@ -341,12 +337,11 @@ public class MonitorImpl implements Monitor
             //send metric to owner peer
             else
             {
-                Message message = messenger.createMessage( containerHostMetric );
-                messenger.sendMessage( ownerPeer, message, RecipientType.ALERT_RECIPIENT.name(),
+                ownerPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
                         Constants.ALERT_TIMEOUT );
             }
         }
-        catch ( PeerException | MessageException | RuntimeException e )
+        catch ( PeerException | JsonSyntaxException e )
         {
             LOG.error( "Error in alertThresholdExcess", e );
             throw new MonitorException( e );
