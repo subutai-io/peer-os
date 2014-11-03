@@ -41,7 +41,7 @@ public class CreateContainerResponseListener extends MessageListener
         try
         {
             completionSemaphore.tryAcquire(
-                    Constants.CREATE_CONTAINER_REQUEST_TIMEOUT + Constants.CREATE_CONTAINER_RESPONSE_TIMEOUT + 5,
+                    Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT + Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT + 5,
                     TimeUnit.SECONDS );
         }
         catch ( InterruptedException e )

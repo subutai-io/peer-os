@@ -12,6 +12,12 @@ public class PeerException extends SubutaiException
     private String description = "";
 
 
+    public PeerException( final Throwable cause )
+    {
+        super( cause );
+    }
+
+
     public PeerException( final String message )
     {
         super( message );

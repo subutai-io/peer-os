@@ -51,7 +51,7 @@ public class CreateContainerRequestListener extends MessageListener
             Peer sourcePeer = peerManager.getPeer( message.getSourcePeerId() );
 
             messenger.sendMessage( sourcePeer, response, RecipientType.CONTAINER_CREATE_RESPONSE.name(),
-                    Constants.CREATE_CONTAINER_RESPONSE_TIMEOUT );
+                    Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT );
         }
         catch ( MessageException | ContainerCreateException e )
         {

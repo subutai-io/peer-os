@@ -26,6 +26,9 @@ import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 
 /**
  * Remote Peer implementation
@@ -39,16 +42,19 @@ public class RemotePeerImpl implements RemotePeer
 
     private CommandResponseMessageListener commandResponseMessageListener;
     private CreateContainerResponseListener createContainerResponseListener;
+    private MessageResponseListener messageResponseListener;
 
 
     public RemotePeerImpl( final PeerInfo peerInfo, final Messenger messenger,
                            CommandResponseMessageListener commandResponseMessageListener,
-                           CreateContainerResponseListener createContainerResponseListener )
+                           CreateContainerResponseListener createContainerResponseListener,
+                           MessageResponseListener messageResponseListener )
     {
         this.peerInfo = peerInfo;
         this.messenger = messenger;
         this.commandResponseMessageListener = commandResponseMessageListener;
         this.createContainerResponseListener = createContainerResponseListener;
+        this.messageResponseListener = messageResponseListener;
     }
 
 
@@ -124,7 +130,7 @@ public class RemotePeerImpl implements RemotePeer
                             criteria );
             Message createContainerMessage = messenger.createMessage( request );
             messenger.sendMessage( this, createContainerMessage, RecipientType.CONTAINER_CREATE_REQUEST.name(),
-                    Constants.CREATE_CONTAINER_REQUEST_TIMEOUT );
+                    Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT );
 
             //wait for response
             return createContainerResponseListener.waitContainers( request.getRequestId() );
@@ -263,7 +269,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             Message message = messenger.createMessage( request );
             messenger.sendMessage( this, message, RecipientType.COMMAND_REQUEST.name(),
-                    Constants.COMMAND_REQUEST_MESSAGE_TIMEOUT );
+                    Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT );
         }
         catch ( MessageException e )
         {
@@ -277,5 +283,46 @@ public class RemotePeerImpl implements RemotePeer
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
         return remotePeerRestClient.getTemplate( containerHost );
+    }
+
+
+    @Override
+    public <T, V> V sendRequest( final T payload, String recipient, final int timeout, Class<V> responseType )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( payload, "Invalid payload" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
+        Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
+        Preconditions.checkNotNull( responseType, "Invalid response type" );
+
+        MessageRequest messageRequest = new MessageRequest<>( payload, recipient );
+        Message message = messenger.createMessage( messageRequest );
+
+        try
+        {
+            messenger.sendMessage( this, message, RecipientType.PEER_REQUEST_LISTENER.name(),
+                    Timeouts.PEER_MESSAGE_TIMEOUT );
+        }
+        catch ( MessageException e )
+        {
+            throw new PeerException( e );
+        }
+
+        //wait for response here
+        MessageResponse messageResponse = messageResponseListener.waitResponse( messageRequest.getId(), timeout );
+
+        if ( messageResponse != null )
+        {
+            if ( messageResponse.getException() != null )
+            {
+                throw new PeerException( messageResponse.getException() );
+            }
+            else if ( messageResponse.getPayload() != null )
+            {
+                return responseType.cast( messageResponse.getPayload() );
+            }
+        }
+
+        return null;
     }
 }

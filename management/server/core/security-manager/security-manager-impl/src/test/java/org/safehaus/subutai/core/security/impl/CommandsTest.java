@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.network.impl;
+package org.safehaus.subutai.core.security.impl;
 
 
 import org.junit.Before;

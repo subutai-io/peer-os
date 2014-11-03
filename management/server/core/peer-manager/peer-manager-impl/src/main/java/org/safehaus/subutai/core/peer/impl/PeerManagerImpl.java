@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.peer.impl;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.sql.DataSource;
@@ -20,6 +21,7 @@ import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -54,6 +57,8 @@ public class PeerManagerImpl implements PeerManager
     private Messenger messenger;
     private CommandResponseMessageListener commandResponseMessageListener;
     private CreateContainerResponseListener createContainerResponseListener;
+    private Set<RequestListener> requestListeners = Sets.newHashSet();
+    private MessageResponseListener messageResponseListener;
 
 
     public PeerManagerImpl( final DataSource dataSource, final Messenger messenger )
@@ -102,6 +107,13 @@ public class PeerManagerImpl implements PeerManager
         //subscribe to create containers responses from remote peer
         createContainerResponseListener = new CreateContainerResponseListener();
         messenger.addMessageListener( createContainerResponseListener );
+        //subscribe to peer message requests
+        messenger.addMessageListener( new MessageRequestListener( this, messenger, requestListeners ) );
+        //subscribe to peer message responses
+        messageResponseListener = new MessageResponseListener();
+        messenger.addMessageListener( messageResponseListener );
+        //add echo listener
+        addRequestListener( new EchoRequestListener() );
     }
 
 
@@ -267,7 +279,7 @@ public class PeerManagerImpl implements PeerManager
         if ( peerInfo != null )
         {
             return new RemotePeerImpl( peerInfo, messenger, commandResponseMessageListener,
-                    createContainerResponseListener );
+                    createContainerResponseListener, messageResponseListener );
         }
         return null;
     }
@@ -284,5 +296,25 @@ public class PeerManagerImpl implements PeerManager
     public PeerInfo getLocalPeerInfo()
     {
         return peerInfo;
+    }
+
+
+    @Override
+    public void addRequestListener( RequestListener listener )
+    {
+        if ( listener != null )
+        {
+            requestListeners.add( listener );
+        }
+    }
+
+
+    @Override
+    public void removeRequestListener( RequestListener listener )
+    {
+        if ( listener != null )
+        {
+            requestListeners.add( listener );
+        }
     }
 }
