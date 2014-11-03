@@ -145,7 +145,6 @@ static void * updateContainerInfo(void * arg )
     while( true )
     {
         // do background task, i.e.:
-        cout << "hello" << endl;
         container_manager->updateContainerLists();
         usleep(3000000) ;
     }
@@ -228,12 +227,6 @@ int main(int argc,char *argv[],char *envp[])
     SubutaiContainerManager cman("/var/lib/lxc", &logMain);
     updateContainerInfosPeriodically(&cman);
     cman.write();
-
-    while(true)
-    {
-    	cout<< "hi" << endl;
-    	usleep(5000000);
-    }
 
     /*
      * Opening MQTT Connection

@@ -32,9 +32,7 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger*
     // after crash
     vector<SubutaiContainer> tmp_container = findAllContainers();
     getContainerStates(tmp_container);
-
     _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Initializing"));
-
 }
 
 SubutaiContainerManager::~SubutaiContainerManager() 
@@ -79,16 +77,16 @@ bool SubutaiContainerManager::isContainerFrozen(string container_name)
  */
 vector<SubutaiContainer> SubutaiContainerManager::findDefinedContainers()
 {
-	vector<SubutaiContainer> containers;
-	char** names;
-	lxc_container** cont;
-	int num = list_defined_containers(_lxc_path.c_str(), &names, &cont);
-	    for (int i = 0; i < num; i++) {
-	    	SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
-	        c->setContainerHostname(names[i]);
-	    	containers.push_back(*c);
-	    }
-	    return containers;
+    vector<SubutaiContainer> containers;
+    char** names;
+    lxc_container** cont;
+    int num = list_defined_containers(_lxc_path.c_str(), &names, &cont);
+    for (int i = 0; i < num; i++) {
+        SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
+        c->setContainerHostname(names[i]);
+        containers.push_back(*c);
+    }
+    return containers;
 
 }
 
@@ -98,16 +96,16 @@ vector<SubutaiContainer> SubutaiContainerManager::findDefinedContainers()
  */
 vector<SubutaiContainer> SubutaiContainerManager::findActiveContainers()
 {
-	vector<SubutaiContainer> containers;
-	char** names;
-	lxc_container** cont;
-	int num = list_active_containers(_lxc_path.c_str(), &names, &cont);
-	    for (int i = 0; i < num; i++) {
-	        SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
-	        c->setContainerHostname(names[i]);
-	        containers.push_back(*c);
-	    }
-	    return containers;
+    vector<SubutaiContainer> containers;
+    char** names;
+    lxc_container** cont;
+    int num = list_active_containers(_lxc_path.c_str(), &names, &cont);
+    for (int i = 0; i < num; i++) {
+        SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
+        c->setContainerHostname(names[i]);
+        containers.push_back(*c);
+    }
+    return containers;
 
 }
 
@@ -117,16 +115,16 @@ vector<SubutaiContainer> SubutaiContainerManager::findActiveContainers()
  */
 vector<SubutaiContainer> SubutaiContainerManager::findAllContainers()
 {
-	vector<SubutaiContainer> containers;
-	char** names;
-	lxc_container** cont;
-	int num = list_all_containers(_lxc_path.c_str(), &names, &cont);
-	    for (int i = 0; i < num; i++) {
-	    	SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
-	    	c->setContainerHostname(names[i]);
-	    	containers.push_back(*c);
-	    }
-	    return containers;
+    vector<SubutaiContainer> containers;
+    char** names;
+    lxc_container** cont;
+    int num = list_all_containers(_lxc_path.c_str(), &names, &cont);
+    for (int i = 0; i < num; i++) {
+        SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
+        c->setContainerHostname(names[i]);
+        containers.push_back(*c);
+    }
+    return containers;
 
 }
 
@@ -164,7 +162,8 @@ SubutaiContainer* SubutaiContainerManager::findContainerById(string container_id
  */
 void SubutaiContainerManager::registerAllContainers(SubutaiConnection* connection)
 {
-    for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
+    // TODO: Do we need to register all containers? Maybe active only?
+    for (ContainerIterator it = _activeContainers.begin(); it != _activeContainers.end(); it++) {
         (*it).registerContainer(connection);
     }
 }
@@ -213,35 +212,36 @@ void SubutaiContainerManager::getContainerStates(vector<SubutaiContainer> _allCo
     vector<string> stopped_containers = splitContainers(exec("lxc-ls --stopped", "r"), "\n");
     vector<string> frozen_containers = splitContainers(exec("lxc-ls --frozen", "r"), "\n");
 
- 	for (vector<SubutaiContainer>::iterator it = _allContainers.begin(); it != _allContainers.end(); it++) {
- 		bool containerRegisteredToList = false;
-		for (vector<string>::iterator it_status = frozen_containers.begin(); it_status != frozen_containers.end(); it_status++) {
-			if((*it).getContainerHostnameValue() == (*it_status))
-			{
-				(*it).setContainerStatus(FROZEN);
-				_frozenContainers.push_back((*it));
-				containerRegisteredToList = true; break;
-			}
-		}
-		if(containerRegisteredToList) continue;
-		for (vector<string>::iterator it_status = active_containers.begin(); it_status != active_containers.end(); it_status++) {
-			if((*it).getContainerHostnameValue() == (*it_status))
-			{
-				(*it).setContainerStatus(RUNNING);
-				_activeContainers.push_back((*it));
-				containerRegisteredToList = true; break;
-			}
-		}
-		if(containerRegisteredToList) continue;
-		for (vector<string>::iterator it_status = stopped_containers.begin(); it_status != stopped_containers.end(); it_status++) {
-			if((*it).getContainerHostnameValue() == (*it_status))
-			{
-				(*it).setContainerStatus(STOPPED);
-				_stoppedContainers.push_back((*it));
-				break;
-			}
-		}
-	}
+    for (vector<SubutaiContainer>::iterator it = _allContainers.begin(); it != _allContainers.end(); it++) {
+        bool containerRegisteredToList = false;
+        for (vector<string>::iterator it_status = frozen_containers.begin(); it_status != frozen_containers.end(); it_status++) {
+            if((*it).getContainerHostnameValue() == (*it_status))
+            {
+                (*it).setContainerStatus(FROZEN);
+                _frozenContainers.push_back((*it));
+                containerRegisteredToList = true; break;
+            }
+        }
+        if(containerRegisteredToList) continue;
+        for (vector<string>::iterator it_status = active_containers.begin(); it_status != active_containers.end(); it_status++) {
+            if((*it).getContainerHostnameValue() == (*it_status))
+            {
+                cout << "Active container" << endl;
+                (*it).setContainerStatus(RUNNING);
+                _activeContainers.push_back((*it));
+                containerRegisteredToList = true; break;
+            }
+        }
+        if(containerRegisteredToList) continue;
+        for (vector<string>::iterator it_status = stopped_containers.begin(); it_status != stopped_containers.end(); it_status++) {
+            if((*it).getContainerHostnameValue() == (*it_status))
+            {
+                (*it).setContainerStatus(STOPPED);
+                _stoppedContainers.push_back((*it));
+                break;
+            }
+        }
+    }
 
 }
 
@@ -251,26 +251,26 @@ void SubutaiContainerManager::getContainerStates(vector<SubutaiContainer> _allCo
  */
 void SubutaiContainerManager::updateContainerLists()
 {
-	  vector<SubutaiContainer> tmp_container = findAllContainers();
-	  getContainerStates(tmp_container);
-	  /*
-	  for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++)
-		  (*it).getContainerAllFields();
-*/
+    vector<SubutaiContainer> tmp_container = findAllContainers();
+    getContainerStates(tmp_container);
+    /*
+       for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++)
+       (*it).getContainerAllFields();
+       */
 }
 
 
 void SubutaiContainerManager::write()
 {
-	cout << "active: \n";
-	for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++)
-		(*it).write();
-	cout << "stopped: \n";
-	for (vector<SubutaiContainer>::iterator it = _stoppedContainers.begin(); it != _stoppedContainers.end(); it++)
-			(*it).write();
-	cout << "frozen: \n";
-	for (vector<SubutaiContainer>::iterator it = _frozenContainers.begin(); it != _frozenContainers.end(); it++)
-			(*it).write();
+    cout << "active: \n";
+    for (vector<SubutaiContainer>::iterator it = _activeContainers.begin(); it != _activeContainers.end(); it++)
+        (*it).write();
+    cout << "stopped: \n";
+    for (vector<SubutaiContainer>::iterator it = _stoppedContainers.begin(); it != _stoppedContainers.end(); it++)
+        (*it).write();
+    cout << "frozen: \n";
+    for (vector<SubutaiContainer>::iterator it = _frozenContainers.begin(); it != _frozenContainers.end(); it++)
+        (*it).write();
 }
 
 
