@@ -22,8 +22,6 @@ import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.messenger.api.Message;
-import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MetricListener;
 import org.safehaus.subutai.core.metric.api.MonitorException;
@@ -92,8 +90,7 @@ public class MonitorImplTest
     LocalPeer localPeer;
     @Mock
     RemotePeer remotePeer;
-    @Mock
-    Messenger messenger;
+
     @Mock
     ContainerHost containerHost;
     @Mock
@@ -102,10 +99,10 @@ public class MonitorImplTest
 
     static class MonitorImplExt extends MonitorImpl
     {
-        public MonitorImplExt( final DataSource dataSource, final PeerManager peerManager, final Messenger messenger )
+        public MonitorImplExt( final DataSource dataSource, final PeerManager peerManager )
                 throws DaoException
         {
-            super( dataSource, peerManager, messenger );
+            super( dataSource, peerManager );
         }
 
 
@@ -126,7 +123,7 @@ public class MonitorImplTest
         PreparedStatement preparedStatement = mock( PreparedStatement.class );
         when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
         when( dataSource.getConnection() ).thenReturn( connection );
-        monitor = new MonitorImplExt( dataSource, peerManager, messenger );
+        monitor = new MonitorImplExt( dataSource, peerManager );
         monitor.setMonitorDao( monitorDao );
 
         containerHostMetric = mock( ContainerHostMetric.class );
@@ -151,21 +148,21 @@ public class MonitorImplTest
     @Test(expected = NullPointerException.class)
     public void testConstructorShouldFailOnNullDataSource() throws Exception
     {
-        new MonitorImpl( null, peerManager, messenger );
+        new MonitorImpl( null, peerManager );
     }
 
 
     @Test(expected = NullPointerException.class)
     public void testConstructorShouldFailOnNullPeerManager() throws Exception
     {
-        new MonitorImpl( dataSource, null, messenger );
+        new MonitorImpl( dataSource, null );
     }
 
 
     @Test(expected = NullPointerException.class)
     public void testConstructorShouldFailOnNullMessenger() throws Exception
     {
-        new MonitorImpl( dataSource, peerManager, null );
+        new MonitorImpl( dataSource, peerManager );
     }
 
 
@@ -259,15 +256,11 @@ public class MonitorImplTest
         Peer ownerPeer = mock( Peer.class );
         when( peerManager.getPeer( REMOTE_PEER_ID ) ).thenReturn( ownerPeer );
         when( ownerPeer.isLocal() ).thenReturn( false );
-        Message message = mock( Message.class );
-        when( messenger.createMessage( any() ) ).thenReturn( message );
-
 
         monitor.alertThresholdExcess( METRIC_JSON );
 
 
-        verify( messenger ).createMessage( isA( ContainerHostMetric.class ) );
-        verify( messenger ).sendMessage( eq( ownerPeer ), isA( Message.class ), anyString(), anyInt() );
+        verify( ownerPeer ).sendRequest( isA( ContainerHostMetric.class ), anyString(), anyInt() );
     }
 
 
