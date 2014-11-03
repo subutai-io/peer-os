@@ -112,6 +112,8 @@ public class PeerManagerImpl implements PeerManager
         //subscribe to peer message responses
         messageResponseListener = new MessageResponseListener();
         messenger.addMessageListener( messageResponseListener );
+        //add echo listener
+        addRequestListener( new EchoRequestListener() );
     }
 
 
