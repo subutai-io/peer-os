@@ -155,10 +155,17 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
                         for ( ContainerHost ch : rh.getContainerHosts() )
                         {
                             Item containerHostItem = container.addItem( ch.getId() );
-                            container.setChildrenAllowed( ch.getId(), false );
-                            tree.setItemCaption( ch.getId(), ch.getHostname() );
-                            containerHostItem.getItemProperty( "value" ).setValue( ch );
-                            container.setParent( ch.getId(), rh.getId() );
+                            if ( containerHostItem != null )
+                            {
+                                container.setChildrenAllowed( ch.getId(), false );
+                                tree.setItemCaption( ch.getId(), ch.getHostname() );
+                                containerHostItem.getItemProperty( "value" ).setValue( ch );
+                                container.setParent( ch.getId(), rh.getId() );
+                            }
+                            else
+                            {
+                                LOG.error( "Error in ContainerTree" );
+                            }
                         }
                     }
                     else

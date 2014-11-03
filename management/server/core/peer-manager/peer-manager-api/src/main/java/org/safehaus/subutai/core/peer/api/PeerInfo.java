@@ -5,7 +5,7 @@ import java.util.UUID;
 
 
 /**
- * Created by bahadyr on 9/6/14.
+ * Holds info about peer
  */
 public class PeerInfo
 {
@@ -16,6 +16,8 @@ public class PeerInfo
     private String name;
     private UUID id;
     private UUID ownerId;
+    //TODO implement setting of port
+    private int port = 8181;
 
 
     public UUID getId()
@@ -75,5 +77,11 @@ public class PeerInfo
     public void setStatus( final PeerStatus status )
     {
         this.status = status;
+    }
+
+
+    public int getPort()
+    {
+        return port;
     }
 }

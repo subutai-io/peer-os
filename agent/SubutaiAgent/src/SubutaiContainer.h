@@ -50,11 +50,13 @@ using namespace std;
 using std::stringstream;
 using std::string;
 
+typedef map<int, string>::iterator user_it;
+
 // Execution Result contains exit code of a functions, stdout and/or stderr
 struct ExecutionResult {
     string out;
     string err;
-    string exit_code;
+    int exit_code;
 };
 
 enum containerStatus { RUNNING, STOPPED, FROZEN };
@@ -84,6 +86,7 @@ public:
 	bool isContainerStopped();
 	bool isContainerFrozen();
 
+        void UpdateUsersList();
 	void setContainerHostname(string);
 	void setContainerStatus(containerStatus);
 	void getContainerAllFields();
@@ -92,6 +95,8 @@ public:
 	void registerContainer(SubutaiConnection* );
 	void write();
     bool checkCWD(string cwd);
+    bool checkUser(string username);
+    int getRunAsUserId(string username);
 
 private:
 	containerStatus status;
@@ -100,6 +105,7 @@ private:
 	string macAddress;
 	string hostname;
 	string parentHostname;
+        map<int, string> _users;        // List of users available in system
 	vector<string> ipAddress;
 	SubutaiLogger*	containerLogger;
 };

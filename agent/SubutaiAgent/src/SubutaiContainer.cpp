@@ -37,7 +37,7 @@ using namespace std;
  */
 SubutaiContainer::SubutaiContainer(SubutaiLogger* logger, lxc_container* cont)
 {
-	this->container = cont;
+    this->container = cont;
     this->containerLogger = logger;
 }
 
@@ -84,14 +84,12 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     pipe(fd);
     dup2(fd[1], 1);
     char buffer[1000];
-    // TODO: if exit code not equals one - we got stderr
     ExecutionResult result;
     result.exit_code = this->container->attach_run_wait(this->container, &opts, program.c_str(), _params);
     fflush(stdout);
     close(fd[1]);
     dup2(_stdout, 1);
     close(_stdout);
-    // TODO: Decide where to keep this command output
     string command_output;
     while (1) {
         ssize_t size = read(fd[0], buffer, 1000);
@@ -109,27 +107,58 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     } else {
         result.err = command_output;
     }
-
     return result;
 }
 
 
 bool SubutaiContainer::isContainerRunning()
 {
-	if(this->status == RUNNING) return true;
-	return false;
+    if (this->status == RUNNING) return true;
+    return false;
 }
 
 bool SubutaiContainer::isContainerStopped()
 {
-	if(this->status == STOPPED) return true;
-	return false;
+    if (this->status == STOPPED) return true;
+    return false;
 }
 
 bool SubutaiContainer::isContainerFrozen()
 {
-	if(this->status == FROZEN) return true;
-	return false;
+    if (this->status == FROZEN) return true;
+    return false;
+}
+
+void SubutaiContainer::UpdateUsersList() { 
+    this->_users.clear();
+    vector<string> params;
+    params.push_back("/etc/passwd");
+    string passwd = RunProgram("/bin/cat", params);
+    size_t n = 0;
+    size_t p = 0;
+    stringstream ss(passwd);
+    string line;
+    while (getline(ss, line, '\n')) {
+        int c = 0;
+        int uid;
+        string uname;
+        while ((n = line.find_first_of(":", p)) != string::npos) {
+            c++;
+            if (n - p != 0) {
+                if (c == 1) {
+                    // This is a username
+                    uname = line.substr(p, n - p);
+                } else if (c == 3) {
+                    // This is a uid
+                    stringstream conv(line.substr(p, n - p));
+                    if (!(conv >> uid)) {
+                        uid = -1; // We failed to convert string to int
+                    }
+                }
+            }
+            this->_users.insert(make_pair(uid, uname));
+        }
+    }
 }
 /**
  *  \details   UUID of the Subutai Agent is fetched from statically using this function.
@@ -137,7 +166,7 @@ bool SubutaiContainer::isContainerFrozen()
  */
 bool SubutaiContainer::getContainerId()
 {
-	if(this-> status != RUNNING) return false;
+    if(this-> status != RUNNING) return false;
     try
     {
         vector<string> args;
@@ -147,10 +176,8 @@ bool SubutaiContainer::getContainerId()
         {
             boost::uuids::random_generator gen;
             boost::uuids::uuid u = gen();
-
             const std::string tmp = boost::lexical_cast<std::string>(u);
             this->id = tmp;
-
             args.clear();
             args.push_back(this->id);
             args.push_back(">");
@@ -173,7 +200,7 @@ bool SubutaiContainer::getContainerId()
  */
 bool SubutaiContainer::getContainerMacAddress()
 {
-	if(this-> status != RUNNING) return false;
+    if(this->status != RUNNING) return false;
     try
     {
         vector<string> args;
@@ -181,7 +208,7 @@ bool SubutaiContainer::getContainerMacAddress()
         this-> macAddress = RunProgram("/bin/cat", args);
         if(this->macAddress.empty())		//if mac is null or not reading successfully
         {
-        	containerLogger->writeLog(3,containerLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read !!"));
+            containerLogger->writeLog(3,containerLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read !!"));
             return false;
         }
         containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","Subutai Agent MacID:",this->macAddress));
@@ -199,12 +226,12 @@ bool SubutaiContainer::getContainerMacAddress()
  */
 bool SubutaiContainer::getContainerHostname()
 {
-	if(this-> status != RUNNING) return false;
+    if(this-> status != RUNNING) return false;
     try
     {
-    	vector<string> args;
-    	args.push_back("/etc/hostname");
-    	this-> hostname = RunProgram("/bin/cat", args);
+        vector<string> args;
+        args.push_back("/etc/hostname");
+        this-> hostname = RunProgram("/bin/cat", args);
         if(this->hostname.empty())		//if hostname is null or not reading successfully
         {
             return false;
@@ -243,30 +270,31 @@ void SubutaiContainer::setContainerStatus(containerStatus status)
  */
 bool SubutaiContainer::getContainerParentHostname()
 {
-	if(this-> status != RUNNING) return false;
+    if(this-> status != RUNNING) return false;
     try
     {
-    	vector<string> args;
-    	args.push_back("/etc/hostname");
-    	string config = RunProgram("/bin/cat", args);
+        vector<string> args;
+        args.push_back("/etc/hostname");
+        string config = RunProgram("/bin/cat", args);
         if (config.empty()) //file exist
         {
         	ofstream file("/tmp/config.txt");
         	file << config;
         	file.close();
+
             boost::property_tree::ptree pt;
             boost::property_tree::ini_parser::read_ini("/tmp/config.txt", pt);
             parentHostname =  pt.get<std::string>("Subutai-Agent.subutai_parent_hostname");
-            containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","parentHostname: ",parentHostname));
+            containerLogger->writeLog(6, containerLogger->setLogData("<SubutaiAgent>","parentHostname: ",parentHostname));
         }
 
-        if(!parentHostname.empty())
+        if (!parentHostname.empty())
         {
             return true;
         }
         else
         {
-        	containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","parentHostname does not exist!"));
+            containerLogger->writeLog(6, containerLogger->setLogData("<SubutaiAgent>","parentHostname does not exist!"));
             return false;
         }
     }
@@ -283,18 +311,18 @@ bool SubutaiContainer::getContainerParentHostname()
  */
 bool SubutaiContainer::getContainerIpAddress()
 {
-	if(this-> status != RUNNING) return false;
+    if(this-> status != RUNNING) return false;
     try
     {
-
         ipAddress.clear();
 
-    	vector<string> args ;
-    	string config = RunProgram("ifconfig", args);
+        vector<string> args ;
+        string config = RunProgram("ifconfig", args);
 
     	ofstream file("/tmp/ipaddress.txt");
     	file << config;
     	file.close();
+
 
         FILE * fp = fopen("/tmp/ipaddress.txt", "r");
         if (fp)
@@ -317,7 +345,7 @@ bool SubutaiContainer::getContainerIpAddress()
 
         for(unsigned int i=0; i < ipAddress.size() ; i++)
         {
-        	containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","Subutai Agent IpAddress:",ipAddress[i]));
+            containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","Subutai Agent IpAddress:",ipAddress[i]));
         }
         return true;
     }
@@ -350,7 +378,7 @@ string SubutaiContainer::getContainerHostnameValue()
  */
 lxc_container* SubutaiContainer::getLxcContainerValue()
 {
-	return container;
+    return container;
 }
 
 /**
@@ -379,25 +407,25 @@ vector<string> SubutaiContainer::getContainerIpValue()
 
 void SubutaiContainer::getContainerAllFields()
 {
-	getContainerId();
-	getContainerMacAddress();
-	getContainerHostname();
-	getContainerParentHostname();
-	getContainerIpAddress();
+    getContainerId();
+    getContainerMacAddress();
+    getContainerHostname();
+    getContainerParentHostname();
+    getContainerIpAddress();
 }
 
 void SubutaiContainer::write(){
-   cout << id << "  " << macAddress << "  " << hostname << "  " << parentHostname<< "  " <<  endl;
+    cout << id << "  " << macAddress << "  " << hostname << "  " << parentHostname<< "  " <<  endl;
 
 }
 
 
 void SubutaiContainer::registerContainer(SubutaiConnection* connection)
 {
-	SubutaiResponsePack response;
-	string sendout = response.createRegistrationMessage(this->id,this->macAddress,this->hostname,this->parentHostname,NULL,this->ipAddress);
-	containerLogger->writeLog(7,containerLogger->setLogData("<SubutaiAgent>","Registration Message:",sendout));
-	connection->sendMessage(sendout);
+    SubutaiResponsePack response;
+    string sendout = response.createRegistrationMessage(this->id,this->macAddress,this->hostname,this->parentHostname,NULL,this->ipAddress);
+    containerLogger->writeLog(7,containerLogger->setLogData("<SubutaiAgent>","Registration Message:",sendout));
+    connection->sendMessage(sendout);
 }
 
 // We need to check if CWD is exist because in LXC API - if cwd does not
@@ -405,10 +433,43 @@ void SubutaiContainer::registerContainer(SubutaiConnection* connection)
 bool SubutaiContainer::checkCWD(string cwd) {
     vector<string> params;
     params.push_back(cwd);
-    ExecutionResult result;
-    result.exit_code = RunProgram("/bin/cd", params);
-    if (result.exit_code == "0")
+
+    ExecutionResult result = RunProgram("/bin/cd", params, true);    
+    if (result.exit_code == 0) 
         return true;
     else
         return false;
+}
+
+/*
+ * /details     Runs throught the list of userid:username pairs
+ *              and check user existence
+ */
+
+bool SubutaiContainer::checkUser(string username) {
+    if (_users.empty()) {
+        UpdateUsersList();
+    }
+    for (user_it it = _users.begin(); it != _users.end(); it++) {
+        if ((*it).second.compare(username) == 0) {
+            return true;
+        }
+    } 
+    return false;
+}
+
+/*
+ * /details     Runs through the list of userid:username pairs
+ *              and returns user id if username was found
+ */
+int SubutaiContainer::getRunAsUserId(string username) {
+    if (_users.empty()) {
+        UpdateUsersList();
+    }
+    for (user_it it = _users.begin(); it != _users.end(); it++) {
+        if ((*it).second.compare(username) == 0) {
+            return (*it).first;
+        }
+    } 
+    return -1;
 }

@@ -26,6 +26,7 @@ public interface RestService
     @Consumes(MediaType.TEXT_PLAIN)
     public PeerInfo registerPeer( @QueryParam("peer") String peer );
 
+
     @GET
     @Path("containers/format")
     @Produces(MediaType.APPLICATION_JSON)
@@ -39,25 +40,8 @@ public interface RestService
 
     @GET
     @Path("id")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces("text/plain")
     public String getId();
-
-
-    @POST
-    @Path("message")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response processMessage( @FormParam("peerId") String peerId, @FormParam("recipient") String recipient,
-                                    @FormParam("message") String message );
-
-    @GET
-    @Path("agents")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getConnectedAgents( @QueryParam("envId") String environmentId );
-
-    @POST
-    @Path("invoke")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response invoke( @FormParam("commandType") String commandType, @FormParam("command") String command );
 
 
     @POST
@@ -89,16 +73,11 @@ public interface RestService
     @Produces(MediaType.APPLICATION_JSON)
     public Response isContainerConnected( @FormParam("host") String host );
 
-    //    @POST
-    //    @Path( "container/getquota" )
-    //    @Produces( MediaType.APPLICATION_JSON )
-    //    public Response getQuota( @FormParam( "host" ) String host, @FormParam( "host" ) String quota );
-    //
-    //    @POST
-    //    @Path( "container/setquota" )
-    //    @Produces( MediaType.APPLICATION_JSON )
-    //    public Response setQuota( @FormParam( "host" ) String host, @FormParam( "host" ) String quota,
-    //                              @FormParam( "value" ) String value );
+
+    @POST
+    @Path("template/get")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTemplate( @FormParam("host") String host );
 
     @POST
     @Path("execute")

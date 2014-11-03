@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
-import java.util.Date;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.RequestBuilder;
@@ -12,7 +11,6 @@ public class CommandRequest
 {
     private RequestBuilder requestBuilder;
     private ContainerHost host;
-    private Date createDate;
     private UUID requestId;
 
 
@@ -20,7 +18,6 @@ public class CommandRequest
     {
         this.requestBuilder = requestBuilder;
         this.host = host;
-        this.createDate = new Date();
         this.requestId = UUID.randomUUID();
     }
 
@@ -40,11 +37,5 @@ public class CommandRequest
     public ContainerHost getHost()
     {
         return host;
-    }
-
-
-    public Date getCreateDate()
-    {
-        return createDate;
     }
 }

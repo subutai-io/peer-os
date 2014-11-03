@@ -39,17 +39,21 @@ SubutaiThread::~SubutaiThread()
  *  \details   This method checks CurrentWorking Directory in the command
  *  		   If given CWD does not exist on system, it returns false otherwise it returns true.
  */
-bool SubutaiThread::checkCWD(SubutaiCommand *command)
+bool SubutaiThread::checkCWD(SubutaiCommand *command, SubutaiContainer* cont)
 {
-    if ((chdir(command->getWorkingDirectory().c_str())) < 0)
-    {		
-        //changing working directory first
-        logger.writeLog(3, logger.setLogData("<SubutaiThread::checkCWD> " " Changing working Directory failed..", "pid", toString(getpid()), "CWD", command->getWorkingDirectory()));
-        return false;
-    }
-    else
-    {
-        return true;
+    if (cont) {
+        return cont->checkCWD(command->getWorkingDirectory());
+    } else {
+        if ((chdir(command->getWorkingDirectory().c_str())) < 0)
+        {		
+            //changing working directory first
+            logger.writeLog(3, logger.setLogData("<SubutaiThread::checkCWD> " " Changing working Directory failed..", "pid", toString(getpid()), "CWD", command->getWorkingDirectory()));
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 }
 
@@ -722,8 +726,8 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
         int argv0size = strlen(argv[0]);
         strncpy(argv[0], "subutai-agent-child", argv0size);
         logger.openLogFile(getpid(),command->getRequestSequenceNumber());
-        string pidparnumstr = toString(getpid());		//geting pid number of the process
-        string processpid = "";	//processpid for execution
+        string pidparnumstr = toString(getpid());       //geting pid number of the process
+        string processpid = "";	                        //processpid for execution
         logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Fork is Starting!!", toString(getpid())));
         this->getOutputStream().setMode(command->getStandardOutput());
         this->getOutputStream().setPath(command->getStandardOutputPath());
@@ -740,7 +744,32 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
 
         if (container) {
             _isContainer = true;
+            logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Command is for container"));
             // Execute function for container only
+            string executecmd = createExecString(command).c_str();
+            string latest = executecmd.substr(executecmd.length()-3);
+            if (latest.find("&") != std::string::npos)
+            {
+                logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Process will be executed as a Daemon process!!"));
+                int myval = daemon(0, 0);
+                if (!checkCWD(command)) //if the CWD does not exist
+                {
+                    string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
+                            "Working Directory Does Not Exist on System","",command->getSource(),command->getTaskUuid());
+                    while (!messageQueue->try_send(message.data(), message.size(), 0));
+                    myval = 1 ;
+                    message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+                            this->getResponsecount(),command->getSource(),command->getTaskUuid(),myval);
+                    while (!messageQueue->try_send(message.data(), message.size(), 0));
+                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
+                    exit(1);
+                    //problem about absolute path
+                }
+                //if (!_container.checkCWD(command.))
+            } else {
+
+            }
+
         } else {
             // Execute function for FAI
 
@@ -786,7 +815,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                 exit(1);
             }
             else
-            {
+            {   // not daemon
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Process will not be executed as a Daemon process!!"));
                 int ret[2];
                 int val = 0; //for system return value
