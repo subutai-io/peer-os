@@ -22,7 +22,6 @@ import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.messenger.api.Message;
-import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MetricListener;
@@ -344,17 +343,6 @@ public class MonitorImplTest
 
 
     @Test(expected = MonitorException.class)
-    public void testGetResourceHostMetricsWithMonitorException() throws Exception
-    {
-        CommandResult commandResult = mock( CommandResult.class );
-        when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
-        when( commandResult.hasSucceeded() ).thenReturn( false );
-
-        monitor.getResourceHostMetrics();
-    }
-
-
-    @Test(expected = MonitorException.class)
     public void testGetResourceHostMetricsWithMonitorException2() throws Exception
     {
         when( localPeer.getResourceHosts() ).thenThrow( new PeerException( "" ) );
@@ -387,34 +375,14 @@ public class MonitorImplTest
 
 
     @Test
-    public void testGetContainerHostMetricsRemote() throws Exception
-    {
-
-        ContainerHostMetricResponseListener listener = mock( ContainerHostMetricResponseListener.class );
-        monitor.containerHostMetricResponseListener = listener;
-        when( containerHost.getPeer() ).thenReturn( remotePeer );
-        ContainerHostMetricImpl expected = mock( ContainerHostMetricImpl.class );
-        when( listener.waitMetrics( any( UUID.class ) ) ).thenReturn(
-                Sets.<ContainerHostMetricImpl>newHashSet( expected ) );
-
-
-        Set<ContainerHostMetric> metrics = monitor.getContainerMetrics( environment );
-
-        ContainerHostMetric metric = metrics.iterator().next();
-        assertEquals( expected, metric );
-    }
-
-
-    @Test(expected = MonitorException.class)
     public void testGetContainerHostMetricsWithException() throws Exception
     {
-        when( containerHost.getPeer() ).thenReturn( remotePeer );
-        doThrow( new MessageException( "" ) ).when( messenger )
-                                             .sendMessage( any( Peer.class ), any( Message.class ), anyString(),
-                                                     anyInt() );
-
+        PeerException exception = mock( PeerException.class );
+        doThrow( exception ).when( containerHost ).getPeer();
 
         monitor.getContainerMetrics( environment );
+
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 
 
@@ -456,7 +424,7 @@ public class MonitorImplTest
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
 
         Set<ContainerHostMetricImpl> metrics = Sets.newHashSet();
-        monitor.getContainerMetrics( ENVIRONMENT_ID, metrics, resourceHost, containerHost );
+        monitor.getContainerMetrics( ENVIRONMENT_ID, resourceHost, containerHost, metrics );
 
         ContainerHostMetric metric = metrics.iterator().next();
         assertEquals( ENVIRONMENT_ID, metric.getEnvironmentId() );
@@ -473,7 +441,7 @@ public class MonitorImplTest
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
 
 
-        monitor.getContainerMetrics( ENVIRONMENT_ID, null, resourceHost, containerHost );
+        monitor.getContainerMetrics( ENVIRONMENT_ID, resourceHost, containerHost, null );
 
         verify( commandResult ).getStdErr();
     }
@@ -486,7 +454,7 @@ public class MonitorImplTest
         doThrow( exception ).when( resourceHost ).execute( any( RequestBuilder.class ) );
 
 
-        monitor.getContainerMetrics( ENVIRONMENT_ID, null, resourceHost, containerHost );
+        monitor.getContainerMetrics( ENVIRONMENT_ID, resourceHost, containerHost, null );
 
         verify( exception ).printStackTrace( any( PrintStream.class ) );
     }

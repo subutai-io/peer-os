@@ -10,24 +10,16 @@ import java.util.UUID;
 public class ContainerHostMetricRequest
 {
     private UUID environmentId;
-    private UUID id;
 
 
     public ContainerHostMetricRequest( final UUID environmentId )
     {
         this.environmentId = environmentId;
-        this.id = UUID.randomUUID();
     }
 
 
     public UUID getEnvironmentId()
     {
         return environmentId;
-    }
-
-
-    public UUID getId()
-    {
-        return id;
     }
 }
