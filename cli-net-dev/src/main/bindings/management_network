@@ -4,19 +4,30 @@
 function management_network_usage {
 echo -------------------------------------------------------------------------------
 echo Usage:   Establish a tunnnel to a subutai peer whose address information provided
-echo "        "subutai \[-qh\] management_network -c TUNNELPORTNAME TUNNELIPADDRESS TUNNELTYPE OFfPORTNUMBER
+echo "        "subutai \[-qh\] management_network -c TUNNELPORTNAME TUNNELIPADDRESS TUNNELTYPE
+echo "        "Example Create Operation
+echo "        "subutai management_network -c tunnel1 172.16.1.134 vxlan
 echo
 echo Usage:   List tunnnels on subutai management host
 echo "        "subutai \[-qh\] management_network -l
 echo
 echo Usage:   Remove selected tunnnel from subutai management host
 echo "        "subutai \[-qh\] management_network -r TUNNELPORTNAME
-echo
+echo "        "Example Remove Operation
+echo "        "subutai management_network -r tunnel1
+echo 
 echo Usage:   Add a simple Open flow block rule to a bridge		
-echo "        "subutai \[-qh\] management_network -b BRIDGENAME PRIORITY PACKAGETYPE ACTION 
+echo "        "subutai \[-qh\] management_network -b BRIDGENAME PRIORITY PACKAGETYPE ACTION NWSRC NWDST INPORT  
+echo "        "Example Parameters:
+echo "        "BRIDGENAME = {br-int , br-tun} etc..
+echo "        "PRIORITY = {1-32768} between..
+echo "        "PACKAGETYPE = {normal, arp, ip, icmp, tcp, udp} etc..
+echo "        "NWSRC=10.10.10.0/24, NWDST=10.10.10.0/24
+echo "        "INPORT=1
+echo "        "ACTION = {normal, drop ,flood} etc..
 echo
 echo Usage:   Add a simple open Flow forward rule to a bridge
-echo "        "subutai \[-qh\] management_network -f BRIDGENAME PRIORITY INPORT OUTPORT NWDST ACTION
+echo "        "subutai \[-qh\] management_network -f BRIDGENAME PRIORITY INPORT OUTPORT NWSRC NWDST ACTION
 echo
 echo Usage:   Show flow table and Port informations in a brdige                
 echo "        "subutai \[-qh\] management_network -s BRIDGENAME
@@ -27,7 +38,7 @@ echo ---------------------------------------------------------------------------
 }
 
 function management_network {
-:
+
   local tunnelPortName
   local tunnelIpAddress
   local tunnelType
@@ -40,6 +51,7 @@ function management_network {
   local inport
   local outport
   local nwdst
+  local nwsrc
   local matchCase
   
   local createTunnel="false"
@@ -91,13 +103,10 @@ function management_network {
   done
   
   if [ "true" == "$createTunnel" ]; then  
-     net_assert_name $1
-
      tunnelPortName="$1"
      tunnelIpAddress="$2"
      tunnelType="$3"
-     ofPortNumber="$4"
-     extra="$5"
+     extra="$4"
 
      if [ -z "$tunnelPortName" ]; then
         msg_error "TunnelPortName Parameter not provided. Aborting ..."
@@ -114,27 +123,19 @@ function management_network {
         show_usage "`management_network_usage`"
      fi
 
-     if [ -z "$ofPortNumber" ]; then
-        msg_error "ofPortNumber Parameter not provided. Aborting ..."
-        show_usage "`management_network_usage`"
-     fi
-
      if [ "$extra" ]; then
         msg_error "extra Parameter provided. Aborting ..."
         show_usage "`management_network_usage`"
      fi
+     
+     net_check_tunnelPortName $tunnelPortName
+     net_check_ip_validation $tunnelIpAddress
+     net_check_tunnel_type $tunnelType
   
-     case "$tunnelType" in "vxlan"|"gre")
-         ovs-vsctl --may-exist add-port br-tun $tunnelPortName
-         ovs-vsctl set Interface $tunnelPortName type=$tunnelType options:key=flow \
-         options:remote_ip=$tunnelIpAddress ofport_request=$ofPortNumber
-         echo "A port of $tunnelPortName is opened type=$tunnelType and IP=$tunnelIpAddress and ofportNumber=$ofPortNumber in br-tun bridge."
-         ;;
-     *)
-        echo "TunnelType must be [vxlan] or [gre]. Aborting ..."
-        exit 1
-        ;;
-     esac
+     ovs-vsctl --may-exist add-port br-tun $tunnelPortName
+     ovs-vsctl set Interface $tunnelPortName type=$tunnelType options:key=flow \
+     options:remote_ip=$tunnelIpAddress
+     echo "A port of $tunnelPortName is opened type=$tunnelType and IP=$tunnelIpAddress in br-tun bridge."
    fi
    
    if [ "true" == "$listTunnel" ]; then
@@ -158,9 +159,11 @@ function management_network {
       if [ "$extra" ]; then
          msg_error "extra Parameter provided. Aborting ..."
          show_usage "`management_network_usage`"
-      fi   
+      fi  
+      net_check_tunnelPortName_exist $tunnelPortName
+ 
       ovs-vsctl del-port $tunnelPortName
-      echo "$tunnelPortName is deleted from br-tun"
+      echo "$tunnelPortName is deleted from br-tun."
    fi
 
    if [ "true" == "$addBlockFlow" ]; then
@@ -168,7 +171,9 @@ function management_network {
       priority="$2"
       packageType="$3"
       action="$4"
-      extra="$5"
+      nwsrc="$5"
+      nwdst="$6"
+      inport=$7
 
       if [ -z "$bridgeName" ]; then
          msg_error "brdigeName Parameter not provided. Aborting ..."
@@ -184,18 +189,37 @@ function management_network {
          msg_error "packagetype Parameter not provided. Aborting ..."
          show_usage "`management_network_usage`"
       fi
-
+      
       if [ -z "$action" ]; then
          msg_error "action Parameter not provided. Aborting ..."
          show_usage "`management_network_usage`"
       fi
 
-      if [ "$extra" ]; then
-         msg_error "extra Parameter provided. Aborting ..."
-         show_usage "`management_network_usage`"
+      net_check_bridgeName $bridgeName 
+      net_check_priority $priority
+      net_check_action $action
+      
+      if [ "$packageType" == "normal" ]; then
+         ovs-ofctl add-flow $bridgeName "priority=$priority actions=$action"  
+      else
+         #optional Parameter check
+         if [ -z "$nwsrc" ]; then
+            msg_error "nwsrc Parameter not provided. Aborting ..."
+            show_usage "`management_network_usage`"
+         fi
+
+         if [ -z "$nwdst" ]; then
+            msg_error "nwdst Parameter not provided. Aborting ..."
+            show_usage "`management_network_usage`"
+         fi
+
+         if [ -z "$inport" ]; then
+            msg_error "inport Parameter not provided. Aborting ..."
+            show_usage "`management_network_usage`"
+         fi
+
+         ovs-ofctl add-flow $bridgeName "priority=$priority,$packageType, in_port=$inport,nw_src=$nwsrc,nw_dst=$nwdst actions=$action"
       fi
-        
-      ovs-ofctl add-flow $bridgeName "priority=$priority, $packageType, actions=$action"
       echo "One Blocking Flow rule is added to $bridgeName"	 
    fi
        
@@ -204,9 +228,10 @@ function management_network {
       priority="$2"
       inport="$3"
       outport="$4"
-      nwdst="$5"
-      action="$6"
-      extra="$7"
+      nwsrc="$5"
+      nwdst="$6"
+      action="$7"
+      extra="$8"
 
       if [ -z "$bridgeName" ]; then
          msg_error "brdigeName Parameter not provided. Aborting ..."
@@ -220,6 +245,11 @@ function management_network {
 
       if [ -z "$inport" ]; then
          msg_error "inport Parameter not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      if [ -z "$nwsrc" ]; then
+         msg_error "nwsrc Parameter not provided. Aborting ..."
          show_usage "`management_network_usage`"
       fi
 
@@ -242,9 +272,14 @@ function management_network {
          msg_error "extra Parameter provided. Aborting ..."
          show_usage "`management_network_usage`"
       fi
+      
+      net_check_bridgeName $bridgeName
+      net_check_priority $priority
+      net_check_action $action
+      
          
-	ovs-ofctl add-flow $bridgeName "priority=$priority, ip, in_port=$inport, nw_dst=$nwdst actions=$action:$outport"
-	echo "One Forwarding flow rule is added to $bridgeName"
+      ovs-ofctl add-flow $bridgeName "priority=$priority, ip, in_port=$inport, nw_src=$nwsrc , nw_dst=$nwdst actions=$action:$outport"
+      echo "One Forwarding flow rule is added to $bridgeName"
    fi
 
    if [ "true" == "$showFlow" ]; then
@@ -301,5 +336,10 @@ function management_network {
 }
 
 function management_network_description {
-  echo "Establish a tunnel between subutai peers"
+  echo "Create Tunnel between subutai peers"
+  echo "List Opened Tunnels in subutai Host"
+  echo "Remove a tunnel from subutai Host"
+  echo "Add Block/Forwarding Flow rules "
+  echo "Show Bridge Flow Rules"
+  echo "Delete Bridge Flow Rules" 
 }
