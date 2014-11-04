@@ -13,6 +13,7 @@ import org.safehaus.subutai.common.protocol.api.TemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -29,14 +30,9 @@ public class TemplateDAO implements TemplateService
     private EntityManagerFactory entityManagerFactory;
 
 
-    public EntityManagerFactory getEntityManagerFactory()
-    {
-        return entityManagerFactory;
-    }
-
-
     public void setEntityManagerFactory( final EntityManagerFactory entityManagerFactory )
     {
+        Preconditions.checkNotNull( entityManagerFactory, "EntityManagerFactory cannot be null value" );
         this.entityManagerFactory = entityManagerFactory;
         LOGGER.info( "EntityManagerFactory is assigned" );
     }
