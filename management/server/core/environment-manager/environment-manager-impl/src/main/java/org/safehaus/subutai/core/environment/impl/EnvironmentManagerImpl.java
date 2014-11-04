@@ -66,7 +66,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     //    private ServiceLocator serviceLocator;
     private EnvironmentDAO environmentDAO;
     private TemplateRegistry templateRegistry;
-    private org.safehaus.subutai.core.security.api.SecurityManager securityManager;
+    private SecurityManager securityManager;
     private Tracker tracker;
     private DataSource dataSource;
 
@@ -118,12 +118,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         try
         {
-            //            this.serviceLocator = new ServiceLocator();
-            //            this.peerManager = serviceLocator.getService( PeerManager.class );
-            //            this.tracker = serviceLocator.getService( Tracker.class );
-            //            this.templateRegistry = serviceLocator.getService( TemplateRegistry.class );
-            //            this.networkManager = serviceLocator.getService( NetworkManager.class );
-
             this.topologyBuilder = new TopologyBuilder( this );
             this.environmentDAO = new EnvironmentDAO( dataSource );
         }
