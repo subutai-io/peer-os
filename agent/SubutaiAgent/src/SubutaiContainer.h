@@ -96,6 +96,7 @@ class SubutaiContainer
         bool checkCWD(string cwd);
         bool checkUser(string username);
         int getRunAsUserId(string username);
+        void PutToFile(string filename, string text);
         string findFullProgramPath(string program_name);
     protected:
         vector<string> ExplodeCommandArguments(SubutaiCommand* command);

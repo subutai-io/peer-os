@@ -58,7 +58,7 @@ public:
 	bool getAgentMacAddress();
 	bool getAgentHostname();
 	bool getAgentParentHostname();
-	bool isAgentLxc();
+	//bool isAgentLxc();
 	bool getAgentIpAddress();
 	bool getAgentEnvironmentId();
 	string getAgentUuidValue();
@@ -82,7 +82,7 @@ private:
 	string hostname;
 	string parentHostname;
 	string environmentId;
-	int islxc;
+	//int islxc;
 	vector<string> ipAddress;
 	SubutaiLogger*	environmentLogger;
 };

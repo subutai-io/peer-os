@@ -119,8 +119,8 @@ void SubutaiTimer::sendHeartBeat()
     response->setMacAddress(environment->getAgentMacAddressValue());
     response->setContainerSet(containerManager->getAllContainers());
     string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue(),  environment->getAgentMacAddressValue());
-    connection->sendMessage(resp);
-    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat Response:", resp));
+    connection->sendMessage(resp, "HEARTBEAT_TOPIC");
+    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat:", resp));
 }
 
 bool SubutaiTimer::checkHeartBeatTimer(SubutaiCommand command)
@@ -161,7 +161,7 @@ bool SubutaiTimer::checkCommandQueueInfoTimer(SubutaiCommand command)
 
                      "commandId":"c6cd5988-ceac-11e3-82b2-ebd389e743a3"
                      */
-                    string resp = response->createInQueueMessage(environment->getAgentUuidValue(), command.getTaskUuid());
+                    string resp = response->createInQueueMessage(environment->getAgentUuidValue(), command.getCommandId());
                     connection->sendMessage(resp);
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "IN_QUEUE Response:", resp));
                 }

@@ -218,9 +218,10 @@ int main(int argc,char *argv[],char *envp[])
     environment.getAgentSettings();
     environment.getAgentUuid();
     environment.getAgentMacAddress();
-    environment.isAgentLxc();
+    //environment.isAgentLxc();
     environment.getAgentIpAddress();
-    environment.getAgentParentHostname();
+    //environment.getAgentParentHostname();
+    environment.getAgentHostname();
     environment.getAgentEnvironmentId();
     clientAddress = environment.getAgentUuidValue();
 
@@ -228,7 +229,6 @@ int main(int argc,char *argv[],char *envp[])
      * Starting Container Manager
      */
     SubutaiContainerManager cman("/var/lib/lxc", &logMain);
-    //updateContainerInfosPeriodically(&cman);
 
     /*
      * Opening MQTT Connection
@@ -273,8 +273,9 @@ int main(int argc,char *argv[],char *envp[])
     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Registration Message is sending to MQTT Broker.."));
 
     /*
-     * sending registration message
+     * sending registration message : For the new subutai agent arch. heartbeat will be used for registration.
      */
+/*
     sendout = response.createRegistrationMessage(
             environment.getAgentUuidValue(), environment.getAgentMacAddressValue(),
             environment.getAgentHostnameValue(),environment.getAgentParentHostnameValue(),
@@ -283,6 +284,7 @@ int main(int argc,char *argv[],char *envp[])
     connection->sendMessage(sendout);
 
     cman.registerAllContainers(connection);
+*/
 
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Shared Memory MessageQueue is initializing.."));
     message_queue messageQueue
@@ -333,13 +335,16 @@ int main(int argc,char *argv[],char *envp[])
     SubutaiTimer timer(logMain, &environment, &cman, connection);
     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Timer is initializing.."));
 
+    // Send initial heratbeat for registration of resource host and container nodes attached to this host.
     timer.sendHeartBeat();
     while(true)
     {
         try
         {
-            timer.checkHeartBeatTimer(command);
-            timer.checkCommandQueueInfoTimer(command);
+        	//In 30 second periods send heartbeat and in_queue responses.
+        	timer.checkHeartBeatTimer(command);
+        	timer.checkCommandQueueInfoTimer(command);
+
 
             command.clear();
             for (list<int>::iterator iter = pidList.begin(); iter != pidList.end();iter++) {
@@ -348,7 +353,7 @@ int main(int argc,char *argv[],char *envp[])
                     pid_t result = waitpid(*iter, &status,WNOHANG);
                     if (result != 0) {
                         iter = pidList.erase(iter);
-                        currentProcess--;       string resp = response.createInQueueMessage(environment.getAgentUuidValue(), command.getTaskUuid());
+                        currentProcess--;       string resp = response.createInQueueMessage(environment.getAgentUuidValue(), command.getCommandId());
 
                     }
                 }
@@ -373,7 +378,7 @@ int main(int argc,char *argv[],char *envp[])
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command source:", command.getSource()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command type:", command.getType()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command uuid:", command.getUuid()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command TaskUuid:", command.getTaskUuid()));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command TaskUuid:", command.getCommandId()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command RequestSequenceNumber:",
                                 toString(command.getRequestSequenceNumber())));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command workingDirectory:", command.getWorkingDirectory()));
@@ -381,7 +386,7 @@ int main(int argc,char *argv[],char *envp[])
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command stdOutPath:", command.getStandardOutputPath()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command StdErr:", command.getStandardError()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command stdErrPath:", command.getStandardErrPath()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command Program:", command.getProgram()));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command Command:", command.getCommand()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command runAs:", command.getRunAs()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command timeout:", toString(command.getTimeout())));
                     // Check if this uuid belongs this FAI or one of child containers
@@ -396,33 +401,40 @@ int main(int argc,char *argv[],char *envp[])
                         }
                     }
 
-                    if (command.getType() == "REGISTRATION_REQUEST_DONE") { //type is registration done
-                        // TODO: Determine whether it was a container or agent
+                    /*
+                    if (command.getType() == "REGISTRATION_REQUEST_DONE") //type is registration done
+                    {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Registration is done.."));
-                    } else if (command.getType() == "EXECUTE_REQUEST") {	//execution request will be executed in other process.
-                        fstream file;	//opening uuid.txt
-                        file.open("/etc/subutai-agent/commandQueue.txt", fstream::in | fstream::out | fstream::app);
-                        file << input;
+                        // agent is registered to server now
+                    }
+                    else*/
+                    if (command.getType() == "EXECUTE_REQUEST")	//execution request will be executed in other process.
+                    {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Received Message to internal currentProcess!"));
-                        file.close();
-                    } else if (command.getType() == "PS_REQUEST") {
-                        if (isLocal) {
-                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "PS execution operation is starting.."));
-                            SubutaiThread* subprocess = new SubutaiThread;
-                            subprocess->getLogger().setLogLevel(logMain.getLogLevel());
-                            command.setProgram("for i in `ps aux | grep '[s]h -c' | awk -F \" \" '{print $2}'`; do ps aux | grep `pgrep -P $i` | sed '/grep/d' ; done 2> /dev/null");
-                            command.setWorkingDirectory("/");
-                            subprocess->threadFunction(&messageQueue, &command, argv);
-                            delete subprocess;
-                        } else {
-
-                        }
+                            fstream file;	//opening commandQueue.txt
+                            file.open("/etc/subutai-agent/commandQueue.txt",fstream::in | fstream::out | fstream::app);
+                            file << input;
+                            file.close();
                     } else if (command.getType()=="HEARTBEAT_REQUEST") {
+                    }
+                    else if (command.getType()=="PS_REQUEST")
+                    {
+                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","PS execution operation is starting.."));
+                        SubutaiThread* subprocess = new SubutaiThread;
+                        subprocess->getLogger().setLogLevel(logMain.getLogLevel());
+                        command.setCommand("for i in `ps aux | grep '[s]h -c' | awk -F \" \" '{print $2}'`; do ps aux | grep `pgrep -P $i` | sed '/grep/d' ; done 2> /dev/null");
+                        command.setWorkingDirectory("/");
+                        subprocess->threadFunction(&messageQueue,&command,argv);
+                        delete subprocess;
+                    }
+                    /*
+                    else if (command.getType()=="HEARTBEAT_REQUEST")
+                    {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Heartbeat message has been taken.."));
                         response.clear();
                         /*
                          * Refresh new agent ip address set for each heartbeat message
-                         */
+                         *//*
                         if (isLocal) {
                             environment.getAgentIpAddress();
                             response.setIps(environment.getAgentIpValue());
@@ -437,19 +449,25 @@ int main(int argc,char *argv[],char *envp[])
                             timer.sendHeartBeat();
                             // It is container
                         }
+<<<<<<< HEAD
                     } else if (command.getType() == "TERMINATE_REQUEST") {
+=======
+                    }
+                    */
+                    else if (command.getType() == "TERMINATE_REQUEST")
+                    {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",toString(command.getPid())));
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID.."));
                         if (command.getPid() > 0) {
                             int retstatus = kill(command.getPid(), SIGKILL);
                             if (retstatus == 0) { //termination is successfully done
                                 string resp = response.createTerminateMessage(environment.getAgentUuidValue(),
-                                        command.getRequestSequenceNumber(),command.getSource(),command.getTaskUuid());
+                                        command.getRequestSequenceNumber(),command.getSource(),command.getCommandId());
                                 connection->sendMessage(resp);
                                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
                             } else if (retstatus == -1) { //termination is failed
                                 string resp = response.createFailTerminateMessage(environment.getAgentUuidValue(),
-                                        command.getRequestSequenceNumber(),command.getSource(),command.getTaskUuid());
+                                        command.getRequestSequenceNumber(),command.getSource(),command.getCommandId());
                                 connection->sendMessage(resp);
                                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", toString(command.getPid())));
                             }
@@ -493,17 +511,17 @@ int main(int argc,char *argv[],char *envp[])
                     if (input.size() >= 10000) {
                         connection->sendMessage(response.createResponseMessage(environment.getAgentUuidValue(),9999999,
                                     command.getRequestSequenceNumber(),1,
-                                    "Command Size is greater than Maximum Size !! ","",command.getSource(),command.getTaskUuid()));
+                                    "Command Size is greater than Maximum Size !! ","",command.getSource(),command.getCommandId()));
                         connection->sendMessage(response.createExitMessage(environment.getAgentUuidValue(),9999999,
                                     command.getRequestSequenceNumber(),2,
-                                    command.getSource(),command.getTaskUuid(),1));
+                                    command.getSource(),command.getCommandId(),1));
                     } else {
                         connection->sendMessage(response.createResponseMessage(environment.getAgentUuidValue(),9999999,
                                     command.getRequestSequenceNumber(),1,
-                                    "Command is not a valid Json string !!","",command.getSource(),command.getTaskUuid()));
+                                    "Command is not a valid Json string !!","",command.getSource(),command.getCommandId()));
                         connection->sendMessage(response.createExitMessage(environment.getAgentUuidValue(),9999999,
                                     command.getRequestSequenceNumber(),2,
-                                    command.getSource(),command.getTaskUuid(),1));
+                                    command.getSource(),command.getCommandId(),1));
                     }
                 }
             } else {
@@ -526,11 +544,7 @@ int main(int argc,char *argv[],char *envp[])
                             subprocess->getLogger().setLogLevel(logMain.getLogLevel());
                             command.setUuid(environment.getAgentUuidValue()); /*command uuid should be set to agents uuid */
                             SubutaiContainer* target_container = cman.findContainerById(command.getUuid());
-                            if (target_container) {
-                                pidList.push_back(subprocess->threadFunction(&messageQueue, &command, argv, target_container));
-                            } else {
-                                pidList.push_back(subprocess->threadFunction(&messageQueue, &command, argv));
-                            }
+                            pidList.push_back(subprocess->threadFunction(&messageQueue, &command, argv, target_container));
                             currentProcess++;
                             delete subprocess;
                         } else {

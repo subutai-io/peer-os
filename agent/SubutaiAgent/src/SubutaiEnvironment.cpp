@@ -225,6 +225,7 @@ bool SubutaiEnvironment::getAgentEnvironmentId()
 /**
  *  \details   Checking the machine is lxc or not
  */
+/*
 bool SubutaiEnvironment::isAgentLxc()
 {
     try
@@ -269,7 +270,7 @@ bool SubutaiEnvironment::isAgentLxc()
         cout << error.what()<< endl;
     }
     return false;
-}
+}*/
 
 /**
  *  \details   IpAddress of the KiskisAgent machine is fetched from statically.

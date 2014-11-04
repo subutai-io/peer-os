@@ -47,7 +47,7 @@ public:
 	vector<string>& getWatchArguments();
 	string& getUuid();
 	string& getWorkingDirectory();
-	string& getProgram();
+	string& getCommand();
 	string& getRunAs();
 	string& getStandardError();
 	string& getStandardOutput();
@@ -57,7 +57,7 @@ public:
 	int getPid();
 	string& getHostname();
 	string& getMacAddress();
-	string& getTaskUuid();
+	string& getCommandId();
 	vector<string>& getIps();
 	int getTimeout();
 	int getRequestSequenceNumber();
@@ -65,7 +65,7 @@ public:
 	void setSource(const string&);
 	void setHostname(const string&);
 	void setMacAddress(const string&);
-	void setTaskUuid(const string&);
+	void setCommandId(const string&);
 	void setIps(vector<string>);
 	void setTimeout(int);
 	void setPid(int);
@@ -73,7 +73,7 @@ public:
 	void setArguments(vector<string>);
 	void setUuid(const string&);
 	void setWorkingDirectory(const string&);
-	void setProgram(const string&);
+	void setCommand(const string&);
 	void setRequestSequenceNumber(int);
 	void setRunAs(const string&);
 	void setStandardError(const string&);

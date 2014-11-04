@@ -164,23 +164,24 @@ void SubutaiContainer::UpdateUsersList()
  */
 bool SubutaiContainer::getContainerId()
 {
-    if (this->status != RUNNING) return false;
     try
     {
-        vector<string> args;
-        args.push_back("/etc/subutai-agent/uuid.txt");
-        this->id = RunProgram("/bin/cat", args);
-        if (this->id.empty()) {		//if uuid is null or not reading successfully
+    	string uuidFile = "/var/lib/lxc/" + this->hostname + "/rootfs/etc/subutai-agent/uuid.txt";
+    	ifstream file(uuidFile.c_str());	//opening uuid.txt
+    	getline(file,this->id);
+    	file.close();
+
+        if (this->id.empty())		//if uuid is null or not reading successfully
+        {
             boost::uuids::random_generator gen;
             boost::uuids::uuid u = gen();
             const std::string tmp = boost::lexical_cast<std::string>(u);
             this->id = tmp;
-            args.clear();
-            args.push_back(this->id);
-            args.push_back(">");
-            args.push_back("/etc/subutai-agent/uuid.txt");
-            this->id = RunProgram("/bin/echo", args);
-            containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiAgent>", "Container UUID: ", this->id));
+            ofstream file(uuidFile.c_str());
+            file << this->id;
+            file.close();
+
+            containerLogger->writeLog(1,containerLogger->setLogData("<SubutaiAgent>","Subutai Agent UUID: ",this->id));
             return false;
         }
         return true;
@@ -217,16 +218,23 @@ bool SubutaiContainer::getContainerMacAddress()
  */
 bool SubutaiContainer::getContainerHostname()
 {
-    if (this->status != RUNNING) return false;
-    try {
+    if(this-> status != RUNNING || !this->hostname.empty()) return false;
+    try
+    {
         vector<string> args;
         args.push_back("/etc/hostname");
         this->hostname = RunProgram("/bin/cat", args);
+
         if(this->hostname.empty())		//if hostname is null or not reading successfully
         {
             containerLogger->writeLog(7, containerLogger->setLogData("<SubutaiAgent>","Failed to get container hostname (getContainerHostname)"));
             return false;
         }
+        else
+        {
+            if(this->hostname[this->hostname.size()-1] == '\n') this->hostname[this->hostname.size()-1] = '\0';
+        }
+
         containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","Retrieved container hostname:", this->hostname));
         return true;
     } catch(const std::exception& error) {
@@ -367,15 +375,16 @@ vector<string> SubutaiContainer::getContainerIpValue()
 
 void SubutaiContainer::getContainerAllFields()
 {
+    getContainerHostname();
     getContainerId();
     getContainerMacAddress();
-    getContainerHostname();
     getContainerParentHostname();
     getContainerIpAddress();
 }
 
 ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command) 
 {
+    cout << "RUN COMMAND REQUEST!!!!!!!!!!!" << endl;
     lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT;
     if (command->getWorkingDirectory() != "" && checkCWD(command->getWorkingDirectory())) {
         opts.initial_cwd = const_cast<char*>(command->getWorkingDirectory().c_str());
@@ -463,6 +472,16 @@ int SubutaiContainer::getRunAsUserId(string username)
     return -1;
 }
 
+void SubutaiContainer::PutToFile(string filename, string text) {
+    vector<string> args;
+    args.push_back("-c");
+    args.push_back("'/bin/echo");
+    args.push_back(text);
+    args.push_back(">");
+    args.push_back(filename);
+    RunProgram("/bin/bash", args);
+}
+
 string SubutaiContainer::findFullProgramPath(string program_name) 
 {
     vector<string> args;
@@ -476,14 +495,14 @@ vector<string> SubutaiContainer::ExplodeCommandArguments(SubutaiCommand* command
     vector<string> result;
     size_t p = 0;
     size_t n = 0;
-    while ((n = command->getProgram().find_first_of(" ", p)) != string::npos) {
+    while ((n = command->getCommand().find_first_of(" ", p)) != string::npos) {
         if (n - p != 0) {
-            result.push_back(command->getProgram().substr(p, n - p));
+            result.push_back(command->getCommand().substr(p, n - p));
         }
         p = n + 1;
     } 
-    if (p < command->getProgram().size()) {
-        result.push_back(command->getProgram().substr(p));
+    if (p < command->getCommand().size()) {
+        result.push_back(command->getCommand().substr(p));
     }
     return result;
 }

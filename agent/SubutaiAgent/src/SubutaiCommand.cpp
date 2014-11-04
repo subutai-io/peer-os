@@ -21,7 +21,7 @@ SubutaiCommand::SubutaiCommand()
 {			//Setting default values..
     // TODO Auto-generated constructor stub
     this->setType("");
-    this->setProgram("");
+    this->setCommand("");
     this->setWorkingDirectory("");
     this->setUuid("");
     this->setPid(-1);
@@ -34,7 +34,7 @@ SubutaiCommand::SubutaiCommand()
     this->setTimeout(30);
     this->getArguments().clear();
     this->getEnvironment().clear();
-    this->setTaskUuid("");
+    this->setCommandId("");
     this->setMacAddress("");
     this->setHostname("");
     this->getIps().clear();
@@ -55,7 +55,7 @@ SubutaiCommand::~SubutaiCommand()
 void SubutaiCommand::clear()
 {		//clear the all variables..
     this->setType("");
-    this->setProgram("");
+    this->setCommand("");
     this->setWorkingDirectory("");
     this->setUuid("");
     this->setPid(-1);
@@ -68,7 +68,7 @@ void SubutaiCommand::clear()
     this->setTimeout(30);
     this->getArguments().clear();
     this->getEnvironment().clear();
-    this->setTaskUuid("");
+    this->setCommandId("");
     this->setMacAddress("");
     this->setHostname("");
     this->getIps().clear();
@@ -102,97 +102,97 @@ bool SubutaiCommand::deserialize(string& input)
             return false; //error in parsing Json
         }
 
-        if(!root["command"]["type"].isNull())
+        if(!root["request"]["type"].isNull())
         {
-            this->setType(root["command"]["type"].asString());
+            this->setType(root["request"]["type"].asString());
         }
-        if(!root["command"]["stdOut"].isNull())
+        if(!root["request"]["stdOut"].isNull())
         {
-            this->setStandardOutput(root["command"]["stdOut"].asString());		//initialize standardOutput parameter if it is not null
+            this->setStandardOutput(root["request"]["stdOut"].asString());		//initialize standardOutput parameter if it is not null
         }
-        if(!root["command"]["stdOutPath"].isNull())
+        if(!root["request"]["stdOutPath"].isNull())
         {
-            this->setStandardOutPath(root["command"]["stdOutPath"].asString());		//initialize standardOutpath parameter if it is not null
+            this->setStandardOutPath(root["request"]["stdOutPath"].asString());		//initialize standardOutpath parameter if it is not null
         }
-        if(!root["command"]["stdErr"].isNull())
+        if(!root["request"]["stdErr"].isNull())
         {
-            this->setStandardError(root["command"]["stdErr"].asString());		//initialize standardError parameter if it is not null
+            this->setStandardError(root["request"]["stdErr"].asString());		//initialize standardError parameter if it is not null
         }
-        if(!root["command"]["stdErrPath"].isNull())
+        if(!root["request"]["stdErrPath"].isNull())
         {
-            this->setStandardErrPath(root["command"]["stdErrPath"].asString());		//initialize standardError parameter if it is not null
+            this->setStandardErrPath(root["request"]["stdErrPath"].asString());		//initialize standardError parameter if it is not null
         }
-        if(!root["command"]["uuid"].isNull())
+        if(!root["request"]["uuid"].isNull())
         {
-            this->setUuid(root["command"]["uuid"].asString());				//initialize UUID parameter if it is not null
+            this->setUuid(root["request"]["uuid"].asString());				//initialize UUID parameter if it is not null
         }
-        if(!root["command"]["pid"].isNull())
+        if(!root["request"]["pid"].isNull())
         {
-            this->setPid(root["command"]["pid"].asInt());					//initialize pid parameter if it is not null
+            this->setPid(root["request"]["pid"].asInt());					//initialize pid parameter if it is not null
         }
-        if(!root["command"]["workingDirectory"].isNull())
+        if(!root["request"]["workingDirectory"].isNull())
         {
-            this->setWorkingDirectory(root["command"]["workingDirectory"].asString());		//initialize workingDirectory parameter if it is not null
+            this->setWorkingDirectory(root["request"]["workingDirectory"].asString());		//initialize workingDirectory parameter if it is not null
         }
-        if(!root["command"]["requestSequenceNumber"].isNull())
+        if(!root["request"]["requestSequenceNumber"].isNull())
         {
-            this->setRequestSequenceNumber(root["command"]["requestSequenceNumber"].asInt()); //initialize requestSequenceNumber parameter if it is not null
+            this->setRequestSequenceNumber(root["request"]["requestSequenceNumber"].asInt()); //initialize requestSequenceNumber parameter if it is not null
         }
-        if(!root["command"]["program"].isNull())
+        if(!root["request"]["command"].isNull())
         {
-            this->setProgram(root["command"]["program"].asString());		//initialize program parameter if it is not null
+            this->setCommand(root["request"]["command"].asString());		//initialize program parameter if it is not null
         }
-        if(!root["command"]["runAs"].isNull())
+        if(!root["request"]["runAs"].isNull())
         {
-            setRunAs(root["command"]["runAs"].asString());		//initialize runAs parameter if it is not null
+            setRunAs(root["request"]["runAs"].asString());		//initialize runAs parameter if it is not null
         }
-        if(!root["command"]["timeout"].isNull())
+        if(!root["request"]["timeout"].isNull())
         {
-            this->setTimeout(root["command"]["timeout"].asInt());		//initialize runAs parameter if it is not null
+            this->setTimeout(root["request"]["timeout"].asInt());		//initialize runAs parameter if it is not null
         }
-        Json::Value::Members members = root["command"]["environment"].getMemberNames();		//get environment members
+        Json::Value::Members members = root["request"]["environment"].getMemberNames();		//get environment members
 
         for(unsigned int index=0; index < members.size(); index++)	//set Env path pairs
         {
             dummy.first = members[index].c_str();
-            dummy.second = root["command"]["environment"][members[index].c_str()].asString();
+            dummy.second = root["request"]["environment"][members[index].c_str()].asString();
             this->environment.push_back(dummy);
         }
 
         string arg;
-        for(unsigned int index=0; index < root["command"]["args"].size(); index++)	//set arguments
+        for(unsigned int index=0; index < root["request"]["args"].size(); index++)	//set arguments
         {
-            arg =  root["command"]["args"][index].asString();
+            arg =  root["request"]["args"][index].asString();
             this->getArguments().push_back(arg);
         }
-        if(!root["command"]["taskUuid"].isNull())
+        if(!root["request"]["commandId"].isNull())
         {
-            setTaskUuid(root["command"]["taskUuid"].asString());		//initialize taskUuid parameter if it is not null
+            setCommandId(root["request"]["commandId"].asString());		//initialize taskUuid parameter if it is not null
         }
-        if(!root["command"]["hostname"].isNull())
+        if(!root["request"]["hostname"].isNull())
         {
-            setHostname(root["command"]["hostname"].asString());		//initialize hostname parameter if it is not null
+            setHostname(root["request"]["hostname"].asString());		//initialize hostname parameter if it is not null
         }
-        if(!root["command"]["macAddress"].isNull())
+        if(!root["request"]["macAddress"].isNull())
         {
-            setMacAddress(root["command"]["macAddress"].asString());		//initialize macAddress parameter if it is not null
+            setMacAddress(root["request"]["macAddress"].asString());		//initialize macAddress parameter if it is not null
         }
         arg.clear();
-        for(unsigned int index=0; index < root["command"]["ips"].size(); index++)	//set ips
+        for(unsigned int index=0; index < root["request"]["ips"].size(); index++)	//set ips
         {
-            arg =  root["command"]["ips"][index].asString();
+            arg =  root["request"]["ips"][index].asString();
             this->getIps().push_back(arg);
         }
-        if(!root["command"]["source"].isNull())
+        if(!root["request"]["source"].isNull())
         {
-            setSource(root["command"]["source"].asString());		//initialize hostname parameter if it is not null
+            setSource(root["request"]["source"].asString());		//initialize hostname parameter if it is not null
         }
         string arg1;
         arg1.clear();
         watchArgs.clear();
-        for(unsigned int index=0; index < root["command"]["confPoints"].size(); index++)	//set arguments
+        for(unsigned int index=0; index < root["request"]["confPoints"].size(); index++)	//set arguments
         {
-            arg1 =  root["command"]["confPoints"][index].asString();
+            arg1 =  root["request"]["confPoints"][index].asString();
             this->getWatchArguments().push_back(arg1);
         }
 
@@ -307,8 +307,8 @@ void SubutaiCommand::setWorkingDirectory(const string& workingdirectory)
 /**
  *  \details   getting "program" private variable of SubutaiCommand instance.
  */
-string& SubutaiCommand::getProgram()
-{					//getting Program path
+string& SubutaiCommand::getCommand()
+{					//getting Command path
     return this->program;
 }
 
@@ -317,9 +317,9 @@ string& SubutaiCommand::getProgram()
  *  		   This variable is an absolute program path.
  *  		   For instance: "/bin/ls" or "/usr/bin/tail"
  */
-void SubutaiCommand::setProgram(const string& myprogram)
-{	//setting Program path
-    this->program = myprogram;
+void SubutaiCommand::setCommand(const string& mycommand)
+{	//setting Command path
+    this->program = mycommand;
 }
 
 /**
@@ -497,7 +497,7 @@ void SubutaiCommand::setMacAddress(const string& macAddress)
 /**
  *  \details   getting "taskUuid" private variable of SubutaiCommand instance.
  */
-string& SubutaiCommand::getTaskUuid()
+string& SubutaiCommand::getCommandId()
 {
     return this->taskUuid;
 }
@@ -506,7 +506,7 @@ string& SubutaiCommand::getTaskUuid()
  *  \details   setting "taskUuid" private variable of SubutaiCommand instance.
  *  		   This holds the task uuid of the command
  */
-void SubutaiCommand::setTaskUuid(const string& taskuuid)
+void SubutaiCommand::setCommandId(const string& taskuuid)
 {
     this->taskUuid = taskuuid;
 }
