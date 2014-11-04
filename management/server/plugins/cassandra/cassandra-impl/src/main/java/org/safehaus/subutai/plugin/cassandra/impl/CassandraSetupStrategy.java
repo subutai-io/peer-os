@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
 import com.google.common.base.Preconditions;
@@ -64,17 +64,17 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy
         }
 
         Set<UUID> cassNodes = new HashSet<>();
-        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
+        for ( ContainerHost environmentContainer : environment.getContainers() )
         {
             cassNodes.add( environmentContainer.getAgent().getUuid() );
         }
         config.setNodes( cassNodes );
 
-        Iterator nodesItr = cassNodes.iterator();
+        Iterator iterator = cassNodes.iterator();
         Set<UUID> seedNodes = new HashSet<>();
-        while ( nodesItr.hasNext() )
+        while ( iterator.hasNext() )
         {
-            seedNodes.add( ( UUID ) nodesItr.next() );
+            seedNodes.add( ( UUID ) iterator.next() );
             if ( seedNodes.size() == config.getNumberOfSeeds() )
             {
                 break;
@@ -85,7 +85,7 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy
 
         try
         {
-            new ClusterConfiguration( trackerOperation, cassandraManager ).configureCluster( config );
+            new ClusterConfiguration( trackerOperation, cassandraManager ).configureCluster( config, environment );
         }
         catch ( ClusterConfigurationException e )
         {

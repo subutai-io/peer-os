@@ -6,7 +6,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 
 import com.google.common.base.Strings;
@@ -40,7 +39,7 @@ public class TerminalForm extends CustomComponent implements Disposable
     private ExecutorService executor;
 
 
-    public TerminalForm( final CommandDispatcher commandDispatcher, final EnvironmentManager environmentManager )
+    public TerminalForm( final EnvironmentManager environmentManager )
     {
         setSizeFull();
 
@@ -107,7 +106,7 @@ public class TerminalForm extends CustomComponent implements Disposable
             }
         } );
 
-        sendBtn.addClickListener( new SendButtonListener( commandDispatcher, this, executor ) );
+        sendBtn.addClickListener( new SendButtonListener( this, executor ) );
 
         clearBtn.addClickListener( new Button.ClickListener()
         {

@@ -115,7 +115,7 @@ public class NodeGroup2PeerWizard extends Window
         peersTable.setSizeFull();
 
 
-        List<Peer> peers = managerUI.getPeerManager().peers();
+        List<Peer> peers = managerUI.getPeerManager().getPeers();
         if ( !peers.isEmpty() )
         {
             for ( Peer peer : peers )
@@ -181,7 +181,7 @@ public class NodeGroup2PeerWizard extends Window
             nodeGroupMap.put( itemId, ng );
             //            }
         }
-        Button nextButton = new Button( "Build" );
+        Button nextButton = new Button( "Save build task" );
         nextButton.addClickListener( new Button.ClickListener()
         {
             @Override

@@ -51,6 +51,8 @@ public class Manager
     protected static final String STOP_ALL_BUTTON_CAPTION = "Stop All";
     protected static final String STOP_BUTTON_CAPTION = "Stop";
     protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    protected static final String DESTROY_BUTTON_CAPTION = "Destroy";
+    protected static final String ADD_NODE_BUTTON_CAPTION = "Add Node";
     protected static final String HOST_COLUMN_CAPTION = "Host";
     protected static final String IP_COLUMN_CAPTION = "IP List";
     protected static final String NODE_ROLE_COLUMN_CAPTION = "Node Role";
@@ -58,7 +60,7 @@ public class Manager
     protected static final String BUTTON_STYLE_NAME = "default";
     private static final String MESSAGE = "No cluster is installed !";
     private static final Pattern ELASTICSEARCH_PATTERN = Pattern.compile( ".*(elasticsearch.+?g).*" );
-    final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn;
+    final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn, addNodeBtn;
     private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final Table nodesTable;
     private final ExecutorService executorService;
@@ -162,7 +164,16 @@ public class Manager
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
 
-        addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn );
+
+        /**  Add Node button  */
+        addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
+        addNodeBtn.setId( "ZookeeperMngAddNode" );
+        addClickListenerToAddNodeButton();
+        controlsContent.addComponent( addNodeBtn );
+        controlsContent.setComponentAlignment( addNodeBtn, Alignment.MIDDLE_CENTER );
+
+        addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn,
+                addNodeBtn );
 
         PROGRESS_ICON.setVisible( false );
         PROGRESS_ICON.setId( "indicator" );
@@ -172,10 +183,53 @@ public class Manager
     }
 
 
+    private void addClickListenerToAddNodeButton()
+    {
+        addNodeBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent event )
+            {
+                if ( config != null )
+                {
+
+                    ConfirmationDialog alert = new ConfirmationDialog(
+                            String.format( "Do you want to add node to the %s cluster?", config.getClusterName() ),
+                            "Yes", "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
+                        @Override
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
+                            UUID trackID = elasticsearch.addNode( config.getClusterName(), null );
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                    ElasticsearchClusterConfiguration.PRODUCT_KEY );
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
+                                @Override
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
+                                    refreshClustersInfo();
+                                }
+                            } );
+                            contentRoot.getUI().addWindow( window.getWindow() );
+                        }
+                    } );
+                    contentRoot.getUI().addWindow( alert.getAlert() );
+                }
+                else
+                {
+                    show( "Please, select cluster" );
+                }
+            }
+        } );
+    }
+
+
     /**
      * Parses output of 'service cassandra status' command
      */
-    public static String parseServiceResult( String result )
+    private static String parseServiceResult( String result )
     {
         StringBuilder parsedResult = new StringBuilder();
         Matcher tracersMatcher = ELASTICSEARCH_PATTERN.matcher( result );
@@ -188,7 +242,7 @@ public class Manager
     }
 
 
-    public void addClickListener( Button button )
+    private void addClickListener( Button button )
     {
         if ( button.getCaption().equals( REFRESH_CLUSTERS_CAPTION ) )
         {
@@ -260,7 +314,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToDestroyClusterButton()
+    private void addClickListenerToDestroyClusterButton()
     {
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -328,7 +382,7 @@ public class Manager
     }
 
 
-    public void stopAllNodes()
+    private void stopAllNodes()
     {
         for ( Agent agent : config.getNodes() )
         {
@@ -399,7 +453,6 @@ public class Manager
         final Table table = new Table( caption );
         table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
-        table.addContainerProperty( NODE_ROLE_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( STATUS_COLUMN_CAPTION, Label.class, null );
         table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
 
@@ -548,8 +601,10 @@ public class Manager
             startButton.setId( agent.getListIP().get( 0 ) + "-elasticsearchStart" );
             final Button stopButton = new Button( STOP_BUTTON_CAPTION );
             stopButton.setId( agent.getListIP().get( 0 ) + "-elasticsearchStop" );
+            final Button destroyButton = new Button( DESTROY_BUTTON_CAPTION );
 
-            addStyleNameToButtons( checkButton, startButton, stopButton );
+
+            addStyleNameToButtons( checkButton, startButton, stopButton, destroyButton );
             enableButtons( startButton, stopButton );
             PROGRESS_ICON.setVisible( false );
             PROGRESS_ICON.setId( "indicator" );
@@ -558,16 +613,16 @@ public class Manager
             availableOperations.setSpacing( true );
             availableOperations.addStyleName( "default" );
 
-            addGivenComponents( availableOperations, checkButton, startButton, stopButton );
+            addGivenComponents( availableOperations, checkButton, startButton, stopButton, destroyButton );
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), checkIfMaster( agent ), resultHolder,
-                    availableOperations
+                    agent.getHostname(), agent.getListIP().get( 0 ), resultHolder, availableOperations
             }, null );
 
-            addCheckButtonClickListener( agent, resultHolder, checkButton, startButton, stopButton );
-            addStartButtonClickListener( agent, checkButton, startButton, stopButton );
-            addStopButtonClickListener( agent, checkButton, startButton, stopButton );
+            addCheckButtonClickListener( agent, resultHolder, checkButton, startButton, stopButton, destroyButton );
+            addStartButtonClickListener( agent, checkButton, startButton, stopButton, destroyButton );
+            addStopButtonClickListener( agent, checkButton, startButton, stopButton, destroyButton );
+            addDestroyButtonClickListener( agent, checkButton, startButton, stopButton, destroyButton );
         }
     }
 
@@ -582,6 +637,41 @@ public class Manager
             }
         }
         return null;
+    }
+
+
+    private void addDestroyButtonClickListener( final Agent agent, final Button... buttons )
+    {
+        getButton( DESTROY_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent event )
+            {
+                ConfirmationDialog alert = new ConfirmationDialog(
+                        String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
+                alert.getOk().addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( Button.ClickEvent clickEvent )
+                    {
+                        UUID trackID = elasticsearch.destroyNode( config.getClusterName(), agent.getHostname() );
+                        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                ElasticsearchClusterConfiguration.PRODUCT_KEY );
+                        window.getWindow().addCloseListener( new Window.CloseListener()
+                        {
+                            @Override
+                            public void windowClose( Window.CloseEvent closeEvent )
+                            {
+                                refreshClustersInfo();
+                            }
+                        } );
+                        contentRoot.getUI().addWindow( window.getWindow() );
+                    }
+                } );
+
+                contentRoot.getUI().addWindow( alert.getAlert() );
+            }
+        } );
     }
 
 
@@ -671,6 +761,7 @@ public class Manager
                                             }
                                             PROGRESS_ICON.setVisible( false );
                                             getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
                                         }
                                     }
                                 } ) );
@@ -703,21 +794,6 @@ public class Manager
         {
             b.setEnabled( true );
         }
-    }
-
-
-    /**
-     * @param agent agent
-     *
-     * @return Yes if give agent is among seeds, otherwise returns No
-     */
-    public String checkIfMaster( Agent agent )
-    {
-        if ( config.getMasterNodes().contains( agent ) )
-        {
-            return "Master";
-        }
-        return "Data";
     }
 
 

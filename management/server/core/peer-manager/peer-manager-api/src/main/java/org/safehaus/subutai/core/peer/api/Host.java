@@ -32,16 +32,13 @@ public interface Host extends Serializable
 
     public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException;
 
-    public CommandResult execute( RequestBuilder requestBuilder, CommandCallback commandCallback )
-            throws CommandException;
+    public CommandResult execute( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
 
-    public void executeAsync( RequestBuilder requestBuilder, CommandCallback commandCallback ) throws CommandException;
+    public void executeAsync( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
 
     public void executeAsync( RequestBuilder requestBuilder ) throws CommandException;
 
-    public boolean isConnected( Host host );
+    public boolean isConnected();
 
-    public Peer getPeer( UUID peerId ) throws PeerException;
-
-    //    public void updateHeartbeat();
+    public long getLastHeartbeat();
 }

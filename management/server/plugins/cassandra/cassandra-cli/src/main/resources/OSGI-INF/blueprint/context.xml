@@ -55,7 +55,6 @@
     <command name="cassandra/describe-cluster">
       <action class="org.safehaus.subutai.plugin.cassandra.cli.DescribeClusterCommand">
         <property name="cassandraManager" ref="cassandraManager" />
-        <property name="agentManager" ref="agentManager" />
       </action>
     </command>
 

@@ -1,19 +1,18 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
-import java.util.List;
+import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +33,7 @@ public class RemotePeerRestClient
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
-    private static final long RECEIVE_TIMEOUT = 1000 * 60 * 5;
+    private static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 5;
     private static final long CONNECTION_TIMEOUT = 1000 * 60 * 1;
     private final long receiveTimeout;
     private final long connectionTimeout;
@@ -42,61 +41,29 @@ public class RemotePeerRestClient
     private String baseUrl = "http://%s:%s/cxf";
 
 
-    public RemotePeerRestClient()
+    public RemotePeerRestClient( String ip, String port )
     {
-        this.receiveTimeout = RECEIVE_TIMEOUT;
+        this.receiveTimeout = DEFAULT_RECEIVE_TIMEOUT;
         this.connectionTimeout = CONNECTION_TIMEOUT;
-    }
-
-
-    public RemotePeerRestClient( long timeout )
-    {
-        this.connectionTimeout = CONNECTION_TIMEOUT;
-        this.receiveTimeout = timeout;
-    }
-
-
-    public String getBaseUrl()
-    {
-        return baseUrl;
-    }
-
-
-    public void setBaseUrl( final String baseUrl )
-    {
-        this.baseUrl = baseUrl;
-    }
-
-
-    public String callRemoteRest()
-    {
-        WebClient client = WebClient.create( baseUrl );
-        String response = client.path( "peer/id" ).accept( MediaType.APPLICATION_JSON ).get( String.class );
-        return response;
-    }
-
-
-    public Set<ContainerHost> createRemoteContainers( String ip, String port, UUID ownerPeerId, UUID environmentId,
-                                                      List<Template> templates, int quantity, String strategyId,
-                                                      List<Criteria> criteria ) throws ContainerCreateException
-    {
-        String path = "peer/container/create";
 
         baseUrl = String.format( baseUrl, ip, port );
         LOG.info( baseUrl );
+    }
 
+
+    public RemotePeerRestClient( long timeout, String ip, String port )
+    {
+        this.connectionTimeout = CONNECTION_TIMEOUT;
+        this.receiveTimeout = timeout;
+
+        baseUrl = String.format( baseUrl, ip, port );
+        LOG.info( baseUrl );
+    }
+
+
+    protected WebClient createWebClient()
+    {
         WebClient client = WebClient.create( baseUrl );
-
-        Form form = new Form();
-        form.set( "ownerPeerId", ownerPeerId.toString() );
-        form.set( "environmentId", environmentId.toString() );
-        form.set( "templates", JsonUtil.toJson( templates ) );
-        form.set( "quantity", quantity );
-        form.set( "strategyId", strategyId );
-        // TODO: implement criteria transfer
-        form.set( "criteria", "" );
-
-
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
@@ -104,81 +71,166 @@ public class RemotePeerRestClient
         httpClientPolicy.setReceiveTimeout( receiveTimeout );
 
         httpConduit.setClient( httpClientPolicy );
+        return client;
+    }
 
+
+    public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId ) throws PeerException
+    {
+
+        String path = "peer/environment/containers";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "environmentId", environmentId.toString() );
         Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
-                                  .accept( MediaType.APPLICATION_JSON ).form( form );
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
 
         String jsonObject = response.readEntity( String.class );
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
-            Set<ContainerHost> result = JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHostImpl>>()
+            return JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHost>>()
             {
             }.getType() );
-            return result;
         }
 
         if ( response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() )
         {
-            throw new ContainerCreateException( response.getEntity().toString() );
+            throw new PeerException( response.getEntity().toString() );
         }
         else
         {
-            return null;
+            return Collections.emptySet();
         }
     }
 
 
-    public void invoke( String ip, String port, PeerCommandMessage peerCommandMessage )
+    public void stopContainer( final ContainerHost containerHost ) throws PeerException
     {
-        String path = "peer/invoke";
+        String path = "peer/container/stop";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "host", JsonUtil.toJson( containerHost ) );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        {
+            throw new PeerException( response.getEntity().toString() );
+        }
+    }
+
+
+    public void startContainer( final ContainerHost containerHost ) throws PeerException
+    {
+        String path = "peer/container/start";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "host", JsonUtil.toJson( containerHost ) );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        {
+            throw new PeerException( response.getEntity().toString() );
+        }
+    }
+
+
+    public void destroyContainer( final ContainerHost containerHost ) throws PeerException
+    {
+        String path = "peer/container/destroy";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "host", JsonUtil.toJson( containerHost ) );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        {
+            throw new PeerException( response.getEntity().toString() );
+        }
+    }
+
+
+    public boolean isConnected( final Host host ) throws PeerException
+    {
+
+        if ( !( host instanceof ContainerHost ) )
+        {
+            throw new PeerException( "Operation not allowed." );
+        }
+        String path = "peer/container/isconnected";
+
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "host", JsonUtil.toJson( host ) );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), Boolean.class );
+        }
+        else
+        {
+            throw new PeerException( response.getEntity().toString() );
+        }
+    }
+
+
+    public Template getTemplate( final String templateName ) throws PeerException
+    {
+        String path = "peer/template/get";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "templateName", templateName );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), Template.class );
+        }
+        else
+        {
+            throw new PeerException( "Could not retrieve remote template.", response.getEntity().toString() );
+        }
+    }
+
+
+    public UUID getId() throws PeerException
+    {
+        String path = "peer/id";
         try
         {
-            baseUrl = String.format( baseUrl, ip, port );
-            LOG.info( baseUrl );
+            WebClient client = createWebClient();
 
-            WebClient client = WebClient.create( baseUrl );
-
-            Form form = new Form();
-            form.set( "commandType", peerCommandMessage.getType().toString() );
-            form.set( "command", peerCommandMessage.toJson() );
-
-
-            HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
-
-            HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-            httpClientPolicy.setConnectionTimeout( connectionTimeout );
-            httpClientPolicy.setReceiveTimeout( receiveTimeout );
-
-            httpConduit.setClient( httpClientPolicy );
-
-            Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
-                                      .accept( MediaType.APPLICATION_JSON ).form( form );
-
-            String jsonObject = response.readEntity( String.class );
-            PeerCommandMessage result = JsonUtil.fromJson( jsonObject, peerCommandMessage.getClass() );
+            Response response = client.path( path ).accept( MediaType.TEXT_PLAIN ).get();
 
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
-                peerCommandMessage.setResult( result.getResult() );
-                //                peerCommandMessage.setSuccess( result.isSuccess() );
-                LOG.debug( String.format( "Remote command result: %s", result.toString() ) );
-                //                return ccm;
+                return UUID.fromString( response.readEntity( String.class ) );
             }
             else
             {
-                //                peerCommandMessage.setSuccess( false );
-                peerCommandMessage.setExceptionMessage( result.getExceptionMessage() );
-                //                return ccm;
+                throw new PeerException( "Could not retrieve remote peer ID." );
             }
         }
-        catch ( Exception e )
+        catch ( Exception ce )
         {
-            LOG.error( e.getMessage() );
-            //            peerCommandMessage.setSuccess( false );
-            peerCommandMessage.setExceptionMessage( e.toString() );
-            //            throw new RuntimeException( "Error while invoking REST Client" );
+            throw new PeerException( "Could not retrieve remote peer ID.", ce.toString() );
         }
-
-        //return null;
     }
 }

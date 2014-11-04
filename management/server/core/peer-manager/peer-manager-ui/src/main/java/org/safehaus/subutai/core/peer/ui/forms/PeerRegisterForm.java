@@ -6,7 +6,8 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerStatus;
 import org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule;
 import org.slf4j.Logger;
@@ -186,14 +187,14 @@ public class PeerRegisterForm extends CustomComponent
 
     private void populateData()
     {
-        List<Peer> peers = module.getPeerManager().peers();
+        List<PeerInfo> peers = module.getPeerManager().peers();
         peersTable.removeAllItems();
         peersTable.addContainerProperty( "Name", String.class, null );
         peersTable.addContainerProperty( "IP", String.class, null );
         peersTable.addContainerProperty( "Status", PeerStatus.class, null );
         peersTable.addContainerProperty( "ActionsAdvanced", PeerManageActionsComponent.class, null );
 
-        for ( final Peer peer : peers )
+        for ( final PeerInfo peer : peers )
         {
             if ( peer == null || peer.getStatus() == null )
             {
@@ -204,13 +205,13 @@ public class PeerRegisterForm extends CustomComponent
 
                     {
                         @Override
-                        public void OnPositiveButtonTrigger( final Peer peer )
+                        public void OnPositiveButtonTrigger( final PeerInfo peer )
                         {
                             switch ( peer.getStatus() )
                             {
                                 case REQUESTED:
                                     peer.setStatus( PeerStatus.APPROVED );
-                                    Peer selfPeer = getPeerJsonRepresentation( "127.0.0.1", "8181" );
+                                    PeerInfo selfPeer = getPeerJsonRepresentation( "127.0.0.1", "8181" );
                                     selfPeer.setStatus( PeerStatus.APPROVED );
                                     updatePeerOnAnother( selfPeer, peer.getIp(), "8181" );
                                     break;
@@ -230,28 +231,36 @@ public class PeerRegisterForm extends CustomComponent
 
 
                         @Override
-                        public void OnNegativeButtonTrigger( final Peer peer )
+                        public void OnNegativeButtonTrigger( final PeerInfo peer )
                         {
-                            Peer selfPeer = getPeerJsonRepresentation( "127.0.0.1", "8181" );
-                            switch ( peer.getStatus() )
+                            PeerInfo selfPeer = getPeerJsonRepresentation( "127.0.0.1", "8181" );
+                            try
                             {
-                                case REJECTED:
-                                case APPROVED:
-                                case BLOCKED:
-                                case BLOCKED_PEER:
-                                case REQUEST_SENT:
-                                    module.getPeerManager().unregister( peer.getId().toString() );
-                                    peersTable.removeItem( peer.getId() );
-                                    unregisterPeerFromAnother( selfPeer, peer.getIp(), "8181" );
-                                    break;
-                                case REQUESTED:
-                                    peer.setStatus( PeerStatus.REJECTED );
-                                    module.getPeerManager().update( peer );
-                                    Property property = peersTable.getItem( peer.getId() ).getItemProperty( "Status" );
-                                    property.setValue( peer.getStatus() );
-                                    selfPeer.setStatus( PeerStatus.BLOCKED_PEER );
-                                    updatePeerOnAnother( selfPeer, peer.getIp(), "8181" );
-                                    break;
+                                switch ( peer.getStatus() )
+                                {
+                                    case REJECTED:
+                                    case APPROVED:
+                                    case BLOCKED:
+                                    case BLOCKED_PEER:
+                                    case REQUEST_SENT:
+                                        module.getPeerManager().unregister( peer.getId().toString() );
+                                        peersTable.removeItem( peer.getId() );
+                                        unregisterPeerFromAnother( selfPeer, peer.getIp(), "8181" );
+                                        break;
+                                    case REQUESTED:
+                                        peer.setStatus( PeerStatus.REJECTED );
+                                        module.getPeerManager().update( peer );
+                                        Property property =
+                                                peersTable.getItem( peer.getId() ).getItemProperty( "Status" );
+                                        property.setValue( peer.getStatus() );
+                                        selfPeer.setStatus( PeerStatus.BLOCKED_PEER );
+                                        updatePeerOnAnother( selfPeer, peer.getIp(), "8181" );
+                                        break;
+                                }
+                            }
+                            catch ( PeerException pe )
+                            {
+                                show( pe.toString() );
                             }
                         }
                     };
@@ -262,7 +271,7 @@ public class PeerRegisterForm extends CustomComponent
     }
 
 
-    private Peer getPeerJsonRepresentation( String ip, String servicePort )
+    private PeerInfo getPeerJsonRepresentation( String ip, String servicePort )
     {
         String baseUrl = String.format( "http://%s:%s/cxf", ip, servicePort );
         try
@@ -272,7 +281,7 @@ public class PeerRegisterForm extends CustomComponent
             {
                 String peerJson = client.path( "peer/json" ).accept( MediaType.APPLICATION_JSON ).get( String.class );
                 LOG.warn( peerJson );
-                return GSON.fromJson( peerJson, Peer.class );
+                return GSON.fromJson( peerJson, PeerInfo.class );
             }
             else
             {
@@ -288,7 +297,7 @@ public class PeerRegisterForm extends CustomComponent
     }
 
 
-    private void registerPeerToAnother( Peer peer, String ip, String servicePort )
+    private void registerPeerToAnother( PeerInfo peer, String ip, String servicePort )
     {
         String baseUrl = String.format( "http://%s:%s/cxf", ip, servicePort );
         WebClient client = WebClient.create( baseUrl );
@@ -307,7 +316,7 @@ public class PeerRegisterForm extends CustomComponent
     }
 
 
-    private void unregisterPeerFromAnother( Peer peer, String ip, String servicePort )
+    private void unregisterPeerFromAnother( PeerInfo peer, String ip, String servicePort )
     {
         String baseUrl = String.format( "http://%s:%s/cxf", ip, servicePort );
         WebClient client = WebClient.create( baseUrl );
@@ -326,7 +335,7 @@ public class PeerRegisterForm extends CustomComponent
     }
 
 
-    private void updatePeerOnAnother( Peer peer, String ip, String servicePort )
+    private void updatePeerOnAnother( PeerInfo peer, String ip, String servicePort )
     {
         String baseUrl = String.format( "http://%s:%s/cxf", ip, servicePort );
         WebClient client = WebClient.create( baseUrl );
@@ -367,19 +376,31 @@ public class PeerRegisterForm extends CustomComponent
                         String ip = ipTextField.getValue();
                         LOG.warn( ip );
 
-                        Peer remotePeer = getPeerJsonRepresentation( ip, servicePort );
+                        PeerInfo remotePeer = getPeerJsonRepresentation( ip, servicePort );
                         remotePeer.setStatus( PeerStatus.REQUEST_SENT );
-                        module.getPeerManager().register( remotePeer );
+                        try
+                        {
+                            module.getPeerManager().register( remotePeer );
+                            PeerInfo selfPeer = getPeerJsonRepresentation( "127.0.0.1", servicePort );
+                            selfPeer.setStatus( PeerStatus.REQUESTED );
 
-                        Peer selfPeer = getPeerJsonRepresentation( "127.0.0.1", "8181" );
-                        selfPeer.setStatus( PeerStatus.REQUESTED );
-
-                        registerPeerToAnother( selfPeer, ip, servicePort );
+                            registerPeerToAnother( selfPeer, ip, servicePort );
+                        }
+                        catch ( PeerException e )
+                        {
+                            show( e.toString() );
+                        }
                     }
                 } );
             }
         } );
 
         return registerRequestButton;
+    }
+
+
+    private void show( String msg )
+    {
+        Notification.show( msg );
     }
 }
