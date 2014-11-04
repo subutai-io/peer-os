@@ -49,9 +49,9 @@ public class ElasticsearchImpl implements Elasticsearch
     private static final Logger LOG = LoggerFactory.getLogger( ElasticsearchImpl.class.getName() );
     DataSource dataSource;
     private Tracker tracker;
-//    private LxcManager lxcManager;
+    //    private LxcManager lxcManager;
     private ExecutorService executor;
-//    private NetworkManager networkManager;
+    //    private NetworkManager networkManager;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private PluginDao pluginDAO;
@@ -261,7 +261,7 @@ public class ElasticsearchImpl implements Elasticsearch
     @Override
     public UUID addNode( final String clusterName, final String lxcHostname )
     {
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
+        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }

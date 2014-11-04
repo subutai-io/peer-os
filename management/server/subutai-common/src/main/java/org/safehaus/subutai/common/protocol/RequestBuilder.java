@@ -72,6 +72,8 @@ public class RequestBuilder
     // Config points for inotify
     private String[] confPoints;
 
+    private UUID commandId;
+
 
     /**
      * Constructor
@@ -83,6 +85,8 @@ public class RequestBuilder
         Preconditions.checkArgument( !Strings.isNullOrEmpty( command ), "Command is null or empty" );
 
         this.command = command;
+
+        commandId = UUID.randomUUID();
     }
 
 
@@ -94,6 +98,12 @@ public class RequestBuilder
     public Integer getTimeout()
     {
         return timeout;
+    }
+
+
+    public UUID getCommandId()
+    {
+        return commandId;
     }
 
 
@@ -284,6 +294,12 @@ public class RequestBuilder
         return new Request( SOURCE, type, agentUUID, taskUUID, REQUEST_SEQUENCE_NUMBER, cwd, command, outputRedirection,
                 errRedirection, stdOutPath, stdErrPath, runAs, cmdArgs, envVars, pid, timeout )
                 .setConfPoints( confPoints );
+    }
+
+
+    public Request build( UUID agentUUID )
+    {
+        return build( agentUUID, commandId );
     }
 
 

@@ -15,7 +15,8 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>accumulo</module>
+    <module>cassandra</module>
+    <!--<module>accumulo</module>
     <module>hadoop</module>
     <module>solr</module>
     <module>zookeeper</module>
@@ -32,12 +33,11 @@
     <module>elasticsearch</module>
     <module>hbase</module>
     <module>mahout</module>
-    <module>cassandra</module>
     <module>oozie</module>
     <module>hipi</module>
     <module>nutch</module>
-    <module>plugin-common</module>
-    <module>jetty</module>
+    <module>jetty</module>-->
+    <!--<module>plugin-common</module>-->
   </modules>
 
 </project>

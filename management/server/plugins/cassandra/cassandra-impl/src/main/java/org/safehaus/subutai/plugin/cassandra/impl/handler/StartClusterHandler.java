@@ -1,19 +1,28 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
-import java.util.Set;
-
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+//import org.safehaus.subutai.common.protocol.Agent;
 
 
 public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl>
 {
 
+    private static final Logger LOG = LoggerFactory.getLogger( StartClusterHandler.class.getName() );
     private String clusterName;
+    String startCommand = ". /etc/profile && $CASSANDRA_HOME/bin/cassandra";
+    String serviceStartCommand = "service cassandra start";
+    String serviceStatusCommand = "service cassandra status";
 
 
     public StartClusterHandler( final CassandraImpl manager, final String clusterName )
@@ -36,17 +45,26 @@ public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl>
             return;
         }
 
-        Set<Agent> agentSet = manager.getAgentManager().returnAgentsByGivenUUIDSet( config.getNodes() );
-        Command startServiceCommand = manager.getCommands().getStartCommand( agentSet );
-        manager.getCommandRunner().runCommand( startServiceCommand );
+        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+        for ( ContainerHost host : environment.getContainers() )
+        {
+            try
+            {
+                CommandResult result = host.execute( new RequestBuilder( startCommand ) );
+                if ( result.hasSucceeded() )
+                {
+                    trackerOperation.addLogDone( "Start succeeded" );
+                }
+                else
+                {
+                    trackerOperation.addLogFailed( String.format( "Start failed, %s", result.getStdErr() ) );
+                }
+            }
+            catch ( CommandException e )
+            {
 
-        if ( startServiceCommand.hasSucceeded() )
-        {
-            trackerOperation.addLogDone( "Start succeeded" );
-        }
-        else
-        {
-            trackerOperation.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
+                LOG.error( e.getMessage(), e );
+            }
         }
     }
 }

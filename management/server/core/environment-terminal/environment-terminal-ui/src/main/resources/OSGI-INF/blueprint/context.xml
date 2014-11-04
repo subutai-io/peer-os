@@ -6,14 +6,10 @@
   <reference id="environmentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
-  <reference id="commandDispatcher" availability="mandatory"
-             interface="org.safehaus.subutai.core.dispatcher.api.CommandDispatcher" />
-
   <bean id="module" scope="singleton"
         class="org.safehaus.subutai.core.environment.terminal.ui.EnvironmentTerminalPortalModule"
         init-method="init" destroy-method="destroy">
-    <property name="environmentManager" ref="environmentManager" />
-    <property name="commandDispatcher" ref="commandDispatcher" />
+    <argument ref="environmentManager" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />

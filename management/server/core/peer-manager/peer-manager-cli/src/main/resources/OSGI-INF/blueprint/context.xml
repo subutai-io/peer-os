@@ -37,7 +37,7 @@
       <action class="org.safehaus.subutai.core.peer.cli.ImportTemplateCommand">
         <property name="peerManager" ref="peerManager" />
         <property name="templateRegistry" ref="templateRegistry" />
-        <property name="peerCommandDispatcher" ref="peerCommandDispatcher" />
+        <!--<property name="peerCommandDispatcher" ref="peerCommandDispatcher" />-->
       </action>
     </command>
   </command-bundle>
@@ -46,6 +46,7 @@
     <command name="peer/clone">
       <action class="org.safehaus.subutai.core.peer.cli.CloneCommand">
         <property name="peerManager" ref="peerManager" />
+        <property name="templateRegistry" ref="templateRegistry" />
       </action>
     </command>
   </command-bundle>
@@ -54,6 +55,40 @@
     <command name="peer/remote-clone">
       <action class="org.safehaus.subutai.core.peer.cli.RemoteCloneCommand">
         <property name="peerManager" ref="peerManager" />
+        <property name="templateRegistry" ref="templateRegistry" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/hosts">
+      <action class="org.safehaus.subutai.core.peer.cli.HostsCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/stop-container">
+      <action class="org.safehaus.subutai.core.peer.cli.StopLxcCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/start-container">
+      <action class="org.safehaus.subutai.core.peer.cli.StartLxcCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/clean">
+      <action class="org.safehaus.subutai.core.peer.cli.CleanCommand">
+        <property name="peerManager" ref="peerManager" />
       </action>
     </command>
   </command-bundle>
@@ -61,7 +96,7 @@
   <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
-  <reference id="peerCommandDispatcher" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher" />
+  <!--<reference id="peerCommandDispatcher" availability="mandatory"
+             interface="org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher" />-->
 
 </blueprint>

@@ -35,11 +35,11 @@ public class ListCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        List<Peer> list = peerManager.peers();
+        List<Peer> list = peerManager.getPeers();
         System.out.println( "Found " + list.size() + " registered peers" );
         for ( Peer peer : list )
         {
-            System.out.println( peer.getId() + " " + peer.getIp() + " " + peer.getName() );
+            System.out.println( peer.getId() + " " + peer.getPeerInfo().getIp() + " " + peer.getName() );
         }
         return null;
     }

@@ -324,21 +324,7 @@ public class Manager
                         }
                         else
                         {
-                            progressIcon.setVisible( true );
-                            disableOREnableAllButtonsOnTable( nodesTable, false );
-                            executor.execute( new StartAllTask( spark, tracker, config.getClusterName(),
-                                    config.getMasterNode().getHostname(), new CompleteEvent()
-                            {
-                                @Override
-                                public void onComplete( String result )
-                                {
-                                    synchronized ( progressIcon )
-                                    {
-                                        disableOREnableAllButtonsOnTable( nodesTable, true );
-                                        checkAllNodesStatus();
-                                    }
-                                }
-                            } ) );
+                            startAllNodes();
                         }
                     }
                 } );
@@ -355,22 +341,7 @@ public class Manager
                         }
                         else
                         {
-
-                            progressIcon.setVisible( true );
-                            disableOREnableAllButtonsOnTable( nodesTable, false );
-                            executor.execute( new StopAllTask( spark, tracker, config.getClusterName(),
-                                    config.getMasterNode().getHostname(), new CompleteEvent()
-                            {
-                                @Override
-                                public void onComplete( String result )
-                                {
-                                    synchronized ( progressIcon )
-                                    {
-                                        disableOREnableAllButtonsOnTable( nodesTable, true );
-                                        checkAllNodesStatus();
-                                    }
-                                }
-                            } ) );
+                            stopAllNodes();
                         }
                     }
                 } );
@@ -522,7 +493,7 @@ public class Manager
     }
 
 
-    protected Button getCheckButton( final HorizontalLayout availableOperationsLayout )
+    protected Button getButton( final HorizontalLayout availableOperationsLayout, String buttonCaption )
     {
         if ( availableOperationsLayout == null )
         {
@@ -532,12 +503,58 @@ public class Manager
         {
             for ( Component component : availableOperationsLayout )
             {
-                if ( component.getCaption().equals( CHECK_BUTTON_CAPTION ) )
+                if ( component.getCaption().equals( buttonCaption ) )
                 {
                     return ( Button ) component;
                 }
             }
             return null;
+        }
+    }
+
+
+    private void startAllNodes()
+    {
+        if ( nodesTable != null )
+        {
+            for ( Object o : nodesTable.getItemIds() )
+            {
+                int rowId = ( Integer ) o;
+                Item row = nodesTable.getItem( rowId );
+                HorizontalLayout availableOperationsLayout =
+                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                if ( availableOperationsLayout != null )
+                {
+                    Button checkBtn = getButton( availableOperationsLayout, START_BUTTON_CAPTION );
+                    if ( checkBtn != null )
+                    {
+                        checkBtn.click();
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void stopAllNodes()
+    {
+        if ( nodesTable != null )
+        {
+            for ( Object o : nodesTable.getItemIds() )
+            {
+                int rowId = ( Integer ) o;
+                Item row = nodesTable.getItem( rowId );
+                HorizontalLayout availableOperationsLayout =
+                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                if ( availableOperationsLayout != null )
+                {
+                    Button checkBtn = getButton( availableOperationsLayout, STOP_BUTTON_CAPTION );
+                    if ( checkBtn != null )
+                    {
+                        checkBtn.click();
+                    }
+                }
+            }
         }
     }
 
@@ -554,7 +571,7 @@ public class Manager
                         ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
                 if ( availableOperationsLayout != null )
                 {
-                    Button checkBtn = getCheckButton( availableOperationsLayout );
+                    Button checkBtn = getButton( availableOperationsLayout, CHECK_BUTTON_CAPTION );
                     if ( checkBtn != null )
                     {
                         checkBtn.click();
@@ -624,8 +641,8 @@ public class Manager
 
 
             addClickListenerToSlaveCheckButton( agent, resultHolder, startBtn, stopBtn, checkBtn, destroyBtn );
-            addClickListenerToStartButton( agent, startBtn, stopBtn, checkBtn, destroyBtn );
-            addClickListenerToStopButton( agent, startBtn, stopBtn, checkBtn, destroyBtn );
+            addClickListenerToStartButton( agent, false, startBtn, stopBtn, checkBtn, destroyBtn );
+            addClickListenerToStopButton( agent, false, startBtn, stopBtn, checkBtn, destroyBtn );
             addClickListenerToDestroyButton( agent, destroyBtn );
         }
 
@@ -657,8 +674,8 @@ public class Manager
         }, null );
 
         addClickListenerToMasterCheckButton( master, resultHolder, checkBtn, startBtn, stopBtn );
-        addClickListenerToStartButton( master, checkBtn, startBtn, stopBtn );
-        addClickListenerToStopButton( master, checkBtn, startBtn, stopBtn );
+        addClickListenerToStartButton( master, true, checkBtn, startBtn, stopBtn );
+        addClickListenerToStopButton( master, true, checkBtn, startBtn, stopBtn );
     }
 
 
@@ -756,7 +773,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToStartButton( final Agent agent, final Button... buttons )
+    public void addClickListenerToStartButton( final Agent agent, final boolean isMaster, final Button... buttons )
     {
         getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -765,7 +782,7 @@ public class Manager
             {
                 progressIcon.setVisible( true );
                 disableButtons( buttons );
-                executor.execute( new StartTask( spark, tracker, config.getClusterName(), agent.getHostname(), true,
+                executor.execute( new StartTask( spark, tracker, config.getClusterName(), agent.getHostname(), isMaster,
                         new CompleteEvent()
                         {
                             @Override
@@ -818,7 +835,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToStopButton( final Agent agent, final Button... buttons )
+    public void addClickListenerToStopButton( final Agent agent, final boolean isMaster, final Button... buttons )
     {
         getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -827,7 +844,7 @@ public class Manager
             {
                 progressIcon.setVisible( true );
                 disableButtons( buttons );
-                executor.execute( new StopTask( spark, tracker, config.getClusterName(), agent.getHostname(), true,
+                executor.execute( new StopTask( spark, tracker, config.getClusterName(), agent.getHostname(), isMaster,
                         new CompleteEvent()
                         {
                             @Override

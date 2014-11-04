@@ -13,7 +13,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 
 
 public interface RestService
@@ -24,7 +24,7 @@ public interface RestService
     @Path("peer")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.TEXT_PLAIN)
-    public Peer registerPeer( @QueryParam("peer") String peer );
+    public PeerInfo registerPeer( @QueryParam("peer") String peer );
 
     //    @POST
     //    @Path("containers")
@@ -70,11 +70,41 @@ public interface RestService
     @POST
     @Path("container/create")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createContainers( @FormParam( "ownerPeerId" ) String ownerPeerId,
+    public Response createContainers( @FormParam("ownerPeerId") String ownerPeerId,
                                       @FormParam("environmentId") String environmentId,
-                                      @FormParam("templateName") String templateName,
-                                      @FormParam("quantity") int quantity, @FormParam("strategyId") String strategyId,
+                                      @FormParam("templates") String templates, @FormParam("quantity") int quantity,
+                                      @FormParam("strategyId") String strategyId,
                                       @FormParam("criteria") String criteria );
+
+    @POST
+    @Path( "container/destroy" )
+    @Produces( MediaType.APPLICATION_JSON )
+    public Response destroyContainer( @FormParam( "host" ) String host );
+
+    @POST
+    @Path( "container/start" )
+    @Produces( MediaType.APPLICATION_JSON )
+    public Response startContainer( @FormParam( "host" ) String host );
+
+    @POST
+    @Path( "container/stop" )
+    @Produces( MediaType.APPLICATION_JSON )
+    public Response stopContainer( @FormParam( "host" ) String host );
+
+    @POST
+    @Path( "container/isconnected" )
+    @Produces( MediaType.APPLICATION_JSON )
+    public Response isContainerConnected( @FormParam( "host" ) String host );
+
+    @POST
+    @Path("execute")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response execute( @FormParam("requestBuilder") String requestBuilder, @FormParam("host") String host );
+
+    @POST
+    @Path("environment/containers")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response environmentContainers( @FormParam("environmentId") String envId );
 
     @GET
     @Path("ping")

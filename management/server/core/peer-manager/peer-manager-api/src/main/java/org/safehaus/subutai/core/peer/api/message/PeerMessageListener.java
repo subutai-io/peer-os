@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.peer.api.message;
 
 
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 
 
 /**
@@ -15,7 +15,7 @@ public interface PeerMessageListener
      *
      * @param message message sent by remote counterpart
      */
-    public String onMessage( Peer peer, String message ) throws PeerMessageException;
+    public String onMessage( PeerInfo peerInfo, String message ) throws PeerMessageException;
 
     /**
      * This is a copy of recipient name returned by PeerMessageListener implementations

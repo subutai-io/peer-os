@@ -12,6 +12,10 @@ function ovs_configure_lxc {
     exit 1
   fi
 
+  if [ "x$OVS_DISABLED" == "xtrue" ]; then
+    return
+  fi
+
   config="/var/lib/lxc/$lxc/config"
 
   # Remove configuration entries for network.(type,flags,link,veth.pair,script.up)
@@ -49,6 +53,10 @@ function ovs_revert_configuration {
     msg_error "No value provided for container's name. Aborting ..."
     unlock_container_read $lxc
     show_usage "$usage"
+  fi
+
+  if [ "x$OVS_DISABLED" == "xtrue" ]; then
+    return
   fi
 
   config="/var/lib/lxc/$lxc/config"

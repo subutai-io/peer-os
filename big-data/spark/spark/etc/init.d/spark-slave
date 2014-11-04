@@ -12,6 +12,8 @@ sbin=/opt/$sparkVer/sbin
 DESC="Spark Worker"
 CMD_PATT="spark"
 . /lib/lsb/init-functions
+. /etc/profile
+. $SPARK_HOME/conf/spark-env.sh
 
 export SPARK_PID_DIR=$PIDDIR
 
@@ -28,7 +30,8 @@ is_slave_running()
 
 case "$1" in
 start)
-	$sbin/start-slave.sh ;;
+	$sbin/start-slave.sh 1 spark://$SPARK_MASTER_IP:7077
+        ;;
 stop)
 	is_slave_running
 	stat=$?

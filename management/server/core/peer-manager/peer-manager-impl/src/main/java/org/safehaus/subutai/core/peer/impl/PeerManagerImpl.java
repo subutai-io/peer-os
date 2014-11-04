@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -20,7 +21,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -28,15 +28,11 @@ import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.ContainerState;
 import org.safehaus.subutai.common.protocol.DestroyContainersMessage;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
-import org.safehaus.subutai.common.protocol.NullAgent;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
-import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
@@ -45,17 +41,14 @@ import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
-import org.safehaus.subutai.core.peer.api.PeerInterface;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
@@ -76,11 +69,12 @@ import com.google.gson.reflect.TypeToken;
 /**
  * PeerManager implementation
  */
-public class PeerManagerImpl implements PeerManager, ResponseListener
+public class PeerManagerImpl implements PeerManager
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class.getName() );
-    private static final String SOURCE = "PEER_MANAGER";
+    private static final String SOURCE_REMOTE_PEER = "PEER_REMOTE";
+    private static final String SOURCE_LOCAL_PEER = "PEER_LOCAL";
     private static final String PEER_GROUP = "PEER_GROUP";
     private final Queue<PeerMessageListener> peerMessageListeners = new ConcurrentLinkedQueue<>();
     private AgentManager agentManager;
@@ -91,15 +85,18 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
     private DataSource dataSource;
     private Set<PeerContainer> containers = new HashSet<>();
     private CommunicationManager communicationManager;
-    private ManagementHost managementHost;
     private LocalPeer localPeer;
     private StrategyManager strategyManager;
+    private PeerInfo peerInfo;
+    private Messenger messenger;
+    private CommandResponseMessageListener commandResponseMessageListener;
 
 
-    public PeerManagerImpl( final DataSource dataSource )
+    public PeerManagerImpl( final DataSource dataSource, final Messenger messenger )
     {
         Preconditions.checkNotNull( dataSource, "Data source is null" );
         this.dataSource = dataSource;
+        this.messenger = messenger;
     }
 
 
@@ -113,14 +110,35 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
         {
             LOG.error( e.getMessage(), e );
         }
-        communicationManager.addListener( this );
-        localPeer = new LocalPeerImpl( this, containerManager );
+
+        List<PeerInfo> result = peerDAO.getInfo( SOURCE_LOCAL_PEER, PeerInfo.class );
+        if ( result.isEmpty() )
+        {
+            peerInfo = new PeerInfo();
+            peerInfo.setId( generatePeerId() );
+            peerInfo.setName( "Local Subutai server" );
+            peerInfo.setOwnerId( UUID.randomUUID() );
+            peerDAO.saveInfo( SOURCE_LOCAL_PEER, peerInfo.getId().toString(), peerInfo );
+        }
+        else
+        {
+            peerInfo = result.get( 0 );
+        }
+        localPeer = new LocalPeerImpl( this, containerManager, templateRegistry, peerDAO, communicationManager,
+                commandRunner );
+        localPeer.init();
+
+        //subscribe to command request messages from remote peer
+        messenger.addMessageListener( new CommandRequestMessageListener( localPeer, messenger, this ) );
+        //subscribe to command response messages from remote peer
+        commandResponseMessageListener = new CommandResponseMessageListener();
+        messenger.addMessageListener( commandResponseMessageListener );
     }
 
 
     public void destroy()
     {
-        communicationManager.removeListener( this );
+        localPeer.shutdown();
     }
 
 
@@ -167,13 +185,13 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
 
 
     @Override
-    public boolean register( final Peer peer )
+    public boolean register( final PeerInfo peerInfo )
     {
         Agent management = agentManager.getAgentByHostname( "management" );
         String cmd = String.format( "sed '/^path_map.*$/ s/$/ ; %s %s/' apt-cacher.conf > apt-cacher.conf"
                         + ".new && mv apt-cacher.conf.new apt-cacher.conf && /etc/init.d/apt-cacher reload",
-                peer.getId().toString(),
-                ( "http://" + peer.getIp() + "/ksks" ).replace( ".", "\\." ).replace( "/", "\\/" ) );
+                peerInfo.getId().toString(),
+                ( "http://" + peerInfo.getIp() + "/ksks" ).replace( ".", "\\." ).replace( "/", "\\/" ) );
 
         LOG.info( cmd );
         RequestBuilder rb = new RequestBuilder( cmd );
@@ -182,51 +200,63 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
         commandRunner.runCommand( command );
         boolean r = command.hasSucceeded();
         LOG.info( "Apt-cacher mapping result: " + r );
-        return peerDAO.saveInfo( SOURCE, peer.getId().toString(), peer );
+        return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId().toString(), peerInfo );
     }
 
 
     @Override
-    public boolean update( final Peer peer )
+    public boolean update( final PeerInfo peerInfo )
     {
-        return peerDAO.saveInfo( SOURCE, peer.getId().toString(), peer );
+        return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId().toString(), peerInfo );
     }
 
 
     @Override
-    public UUID getSiteId()
+    public UUID getPeerId()
     {
-        return UUIDUtil.generateMACBasedUUID();
+        return peerInfo.getId();
+    }
+
+
+    private UUID generatePeerId()
+    {
+        return UUID.randomUUID();
     }
 
 
     @Override
-    public List<Peer> peers()
+    public List<PeerInfo> peers()
     {
-        return peerDAO.getInfo( SOURCE, Peer.class );
+        return peerDAO.getInfo( SOURCE_REMOTE_PEER, PeerInfo.class );
+    }
+
+
+    @Override
+    public List<Peer> getPeers()
+    {
+        List<PeerInfo> peerInfoList = peerDAO.getInfo( SOURCE_REMOTE_PEER, PeerInfo.class );
+        List<Peer> result = new ArrayList();
+        result.add( getLocalPeer() );
+        for ( PeerInfo info : peerInfoList )
+        {
+            result.add( getPeer( info.getId() ) );
+        }
+
+        return result;
     }
 
 
     @Override
     public boolean unregister( final String uuid )
     {
-        return peerDAO.deleteInfo( SOURCE, uuid );
+        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, uuid );
     }
 
 
     @Override
-    public Peer getPeerByUUID( UUID uuid )
+    public PeerInfo getPeerInfo( UUID uuid )
     {
-        //        if ( getSiteId().compareTo( uuid ) == 0 )
-        //        {
-        //            Peer peer = new Peer();
-        //            peer.setId( uuid );
-        //            peer.setIp( getLocalIp() );
-        //            peer.setName( "Me" );
-        //            return peer;
-        //        }
-
-        return peerDAO.getInfo( SOURCE, uuid.toString(), Peer.class );
+        return peerDAO.getInfo( SOURCE_REMOTE_PEER, uuid.toString(), PeerInfo.class );
     }
 
 
@@ -262,9 +292,10 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
 
 
     @Override
-    public String sendPeerMessage( final Peer peer, String recipient, final String message ) throws PeerMessageException
+    public String sendPeerMessage( final PeerInfo peerInfo, String recipient, final String message )
+            throws PeerMessageException
     {
-        if ( peer == null )
+        if ( peerInfo == null )
         {
             throw new PeerMessageException( "Peer is null" );
         }
@@ -279,16 +310,16 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
 
         try
         {
-            if ( isPeerReachable( peer ) )
+            if ( isPeerReachable( peerInfo ) )
             {
 
                 Map<String, String> params = new HashMap<>();
                 params.put( Common.RECIPIENT_PARAM_NAME, recipient );
-                params.put( Common.PEER_ID_PARAM_NAME, getSiteId().toString() );
+                params.put( Common.PEER_ID_PARAM_NAME, getPeerId().toString() );
                 params.put( Common.MESSAGE_PARAM_NAME, message );
                 try
                 {
-                    return RestUtil.post( String.format( Common.MESSAGE_REQUEST_URL, peer.getIp() ), params );
+                    return RestUtil.post( String.format( Common.MESSAGE_REQUEST_URL, peerInfo.getIp() ), params );
                 }
                 catch ( HTTPException e )
                 {
@@ -330,12 +361,12 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
         try
         {
             UUID peerUUID = UUID.fromString( peerId );
-            Peer senderPeer = getPeerByUUID( peerUUID );
-            if ( senderPeer != null )
+            PeerInfo senderPeerInfo = getPeerInfo( peerUUID );
+            if ( senderPeerInfo != null )
             {
                 try
                 {
-                    if ( isPeerReachable( senderPeer ) )
+                    if ( isPeerReachable( senderPeerInfo ) )
                     {
                         for ( PeerMessageListener listener : peerMessageListeners )
                         {
@@ -343,7 +374,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                             {
                                 try
                                 {
-                                    return listener.onMessage( senderPeer, message );
+                                    return listener.onMessage( senderPeerInfo, message );
                                 }
                                 catch ( Exception e )
                                 {
@@ -358,7 +389,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                     }
                     else
                     {
-                        String err = String.format( "Peer is not reachable %s", senderPeer );
+                        String err = String.format( "Peer is not reachable %s", senderPeerInfo );
                         LOG.error( "Error in processPeerMessage", err );
                         throw new PeerMessageException( err );
                     }
@@ -385,22 +416,22 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
 
 
     @Override
-    public boolean isPeerReachable( final Peer peer ) throws PeerException
+    public boolean isPeerReachable( final PeerInfo peerInfo ) throws PeerException
     {
-        if ( peer == null )
+        if ( peerInfo == null )
         {
             throw new PeerException( "Peer is null" );
         }
-        if ( getPeerByUUID( peer.getId() ) != null )
+        if ( getPeerInfo( peerInfo.getId() ) != null )
         {
 
-            if ( peer.getId().compareTo( getSiteId() ) == 0 )
+            if ( peerInfo.getId().compareTo( getPeerId() ) == 0 )
             {
                 return true;
             }
             try
             {
-                RestUtil.get( String.format( Common.PING_URL, peer.getIp() ), null );
+                RestUtil.get( String.format( Common.PING_URL, peerInfo.getIp() ), null );
                 return true;
             }
             catch ( HTTPException e )
@@ -432,15 +463,15 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
 
 
     @Override
-    public Set<Agent> getConnectedAgents( final Peer peer, final String environmentId ) throws PeerException
+    public Set<Agent> getConnectedAgents( final PeerInfo peerInfo, final String environmentId ) throws PeerException
     {
-        if ( isPeerReachable( peer ) )
+        if ( isPeerReachable( peerInfo ) )
         {
             try
             {
                 Map<String, String> params = new HashMap<>();
                 params.put( Common.ENV_ID_PARAM_NAME, environmentId );
-                String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
+                String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peerInfo.getIp() ), params );
                 return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>()
                 {}.getType() );
             }
@@ -452,7 +483,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
         }
         else
         {
-            String err = String.format( "Peer is not reachable %s", peer );
+            String err = String.format( "Peer is not reachable %s", peerInfo );
             LOG.error( "Error in getConnectedAgents", err );
             throw new PeerException( err );
         }
@@ -474,7 +505,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
 
     protected boolean isRemotePeer( final UUID peerId )
     {
-        return getSiteId().equals( peerId );
+        return getPeerId().equals( peerId );
     }
 
 
@@ -542,7 +573,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
     public void invoke( PeerCommandMessage peerCommandMessage )
     {
 
-        if ( !getSiteId().equals( peerCommandMessage.getPeerId() ) )
+        if ( !getPeerId().equals( peerCommandMessage.getPeerId() ) )
         {
             LOG.warn( String.format( "Orphan command message: %s", peerCommandMessage ) );
             return;
@@ -579,7 +610,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                 }
                 break;
             case GET_PEER_ID:
-                UUID peerId = getSiteId();
+                UUID peerId = getPeerId();
                 peerCommandMessage.setResult( peerId );
                 break;
             case GET_CONNECTED_CONTAINERS:
@@ -593,7 +624,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                 {
                     PeerContainer pc = new PeerContainer();
                     pc.setAgentId( agent.getUuid() );
-                    pc.setPeerId( agent.getSiteId() );
+                    pc.setPeerId( getPeerId() );
                     pc.setState( ContainerState.STARTED );
                     containers.add( pc );
                 }
@@ -744,48 +775,37 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
 
 
     @Override
-    public PeerInterface getPeer( final UUID peerId )
+    public Peer getPeer( final UUID peerId )
     {
-        Peer peer = findPeerById( peerId );
-
-        if ( peer != null )
+        if ( peerInfo.getId().equals( peerId ) )
         {
+            return localPeer;
+        }
 
-            if ( peer.getId().equals( getSiteId() ) )
-            {
-                return localPeer;
-            }
-            else
-            {
-                return new RemotePeerImpl( peer );
-            }
+        PeerInfo peerInfo = getPeerInfo( peerId );
+
+        if ( peerInfo != null )
+        {
+            return new RemotePeerImpl( peerInfo, messenger, commandResponseMessageListener );
         }
         return null;
     }
 
-
-    private Peer findPeerById( final UUID peerId )
-    {
-        Peer result = null;
-        Iterator<Peer> iterator = peers().iterator();
-        while ( result == null && iterator.hasNext() )
-        {
-
-            Peer peer = iterator.next();
-            if ( peer.getId().equals( peerId ) )
-            {
-                result = peer;
-            }
-        }
-        return result;
-    }
-
-
-    @Override
-    public boolean isConnected( final Host host )
-    {
-        return false;
-    }
+    //
+    //    private PeerInfo findPeerInfo( final UUID peerId )
+    //    {
+    //        PeerInfo result = null;
+    //        Iterator<PeerInfo> iterator = peers().iterator();
+    //        while ( result == null && iterator.hasNext() )
+    //        {
+    //            PeerInfo peerInfo = iterator.next();
+    //            if ( peerInfo.getId().equals( peerId ) )
+    //            {
+    //                result = peerInfo;
+    //            }
+    //        }
+    //        return result;
+    //    }
 
 
     private void executeCommand( final ExecuteCommandMessage ecm )
@@ -939,75 +959,15 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
 
 
     @Override
-    public void onResponse( final Response response )
-    {
-        if ( response == null || response.getType() == null )
-        {
-            return;
-        }
-
-        if ( response.getType().equals( ResponseType.REGISTRATION_REQUEST ) || response.getType().equals(
-                ResponseType.HEARTBEAT_RESPONSE ) )
-        {
-            if ( response.getHostname().equals( "management" ) )
-            {
-                if ( managementHost == null )
-                {
-                    managementHost = new ManagementHostImpl( PeerUtils.buildAgent( response ) );
-                    managementHost.setParentAgent( NullAgent.getInstance() );
-                }
-                managementHost.updateHeartbeat();
-                return;
-            }
-
-            if ( managementHost == null )
-            {
-                return;
-            }
-
-            if ( response.getHostname().startsWith( "py" ) )
-            {
-                ResourceHost host = managementHost.getResourceHostByName( response.getHostname() );
-                if ( host == null )
-                {
-                    host = new ResourceHostImpl( PeerUtils.buildAgent( response ) );
-                    host.setParentAgent( managementHost.getAgent() );
-                    managementHost.addResourceHost( host );
-                }
-                host.updateHeartbeat();
-                return;
-            }
-
-            ResourceHost resourceHost = managementHost.getResourceHostByName( response.getParentHostName() );
-            if ( resourceHost == null )
-            {
-                return;
-            }
-
-            ContainerHost containerHost = resourceHost.getContainerHostByName( response.getHostname() );
-
-            if ( containerHost == null )
-            {
-                containerHost = new ContainerHostImpl( PeerUtils.buildAgent( response ) );
-                containerHost.setParentAgent( resourceHost.getAgent() );
-                resourceHost.addContainerHost( containerHost );
-            }
-
-            containerHost.updateHeartbeat();
-        }
-    }
-
-
-    @Override
-    public ManagementHost getManagementHost()
-    {
-        return this.managementHost;
-    }
-
-
-    @Override
     public LocalPeer getLocalPeer()
     {
         return localPeer;
+    }
+
+
+    @Override
+    public PeerInfo getLocalPeerInfo()
+    {
+        return peerInfo;
     }
 }

@@ -5,10 +5,8 @@ import java.util.Set;
 
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 import com.google.common.base.Preconditions;
@@ -17,10 +15,9 @@ import com.google.common.base.Preconditions;
 /**
  * ResourceHostMetricsCommand
  */
-@Command( scope = "monitor", name = "resource-host-metrics", description = "Lists resource host metrics" )
+@Command( scope = "metric", name = "resource-host-metrics", description = "Lists resource host metrics" )
 public class ResourceHostMetricsCommand extends OsgiCommandSupport
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ResourceHostMetricsCommand.class.getName() );
 
     private final Monitor monitor;
 

@@ -1,24 +1,21 @@
 package org.safehaus.subutai.core.environment.terminal.ui;
 
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.enums.ResponseType;
-import org.safehaus.subutai.common.protocol.Container;
+import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandCallback;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.common.util.StringUtil;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
-import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
-import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.Host;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,22 +32,19 @@ public class SendButtonListener implements Button.ClickListener
 
     private final TerminalForm form;
     private final ExecutorService executor;
-    private final CommandDispatcher commandDispatcher;
 
 
-    public SendButtonListener( final CommandDispatcher commandDispatcher, final TerminalForm form,
-                               ExecutorService executor )
+    public SendButtonListener( final TerminalForm form, ExecutorService executor )
     {
         this.form = form;
         this.executor = executor;
-        this.commandDispatcher = commandDispatcher;
     }
 
 
     @Override
     public void buttonClick( Button.ClickEvent event )
     {
-        Set<EnvironmentContainer> containers = form.environmentTree.getSelectedContainers();
+        Set<ContainerHost> containers = form.environmentTree.getSelectedContainers();
         if ( CollectionUtil.isCollectionEmpty( containers ) )
         {
             form.show( "Please, select container(s)" );
@@ -66,7 +60,7 @@ public class SendButtonListener implements Button.ClickListener
     }
 
 
-    private void executeCommand( Set<EnvironmentContainer> containers )
+    private void executeCommand( Set<ContainerHost> containers )
     {
 
         RequestBuilder requestBuilder = new RequestBuilder( form.programTxtFld.getValue() );
@@ -84,10 +78,10 @@ public class SendButtonListener implements Button.ClickListener
 
             form.indicator.setVisible( true );
 
-            Set<Container> containerSet = new HashSet<>();
-            containerSet.addAll( containers );
-            Command command = commandDispatcher.createContainerCommand( requestBuilder, containerSet );
-            executor.execute( new ExecuteCommandTask( form, command ) );
+            for ( ContainerHost host : containers )
+            {
+                executor.execute( new ExecuteCommandTask( form, host, requestBuilder ) );
+            }
         }
     }
 
@@ -114,13 +108,15 @@ public class SendButtonListener implements Button.ClickListener
     {
 
         private final TerminalForm form;
-        private final Command command;
+        private Host host;
+        private RequestBuilder requestBuilder;
 
 
-        private ExecuteCommandTask( TerminalForm form, Command command )
+        private ExecuteCommandTask( TerminalForm form, Host host, RequestBuilder requestBuilder )
         {
             this.form = form;
-            this.command = command;
+            this.host = host;
+            this.requestBuilder = requestBuilder;
             form.taskCount.incrementAndGet();
         }
 
@@ -130,12 +126,10 @@ public class SendButtonListener implements Button.ClickListener
 
             try
             {
-
-                command.execute( new CommandCallback()
+                host.execute( requestBuilder, new CommandCallback()
                 {
-
                     @Override
-                    public void onResponse( Response response, AgentResult agentResult, Command command )
+                    public void onResponse( final Response response, final CommandResult commandResult )
                     {
                         displayResponse( response );
                     }

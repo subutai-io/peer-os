@@ -25,7 +25,7 @@ public class Metric
         this.value = value;
         this.units = units;
         this.host = host;
-        this.timestamp = timestamp;
+        this.timestamp = ( Date ) timestamp.clone();
     }
 
 

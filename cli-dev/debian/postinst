@@ -27,8 +27,6 @@ case "$1" in
     configure)
 	# Add symlinks of subutai-cli-dev bindings under subutai bindings directory
 	ln -sf /usr/share/subutai-cli-dev/bindings/* /etc/subutai/bindings/
-    # invoke _subutai-dev function with complete command
-    echo "complete -F _subutai-dev subutai" >> /etc/bash_completion.d/subutai-cli.bash_completion
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
@@ -36,8 +34,6 @@ case "$1" in
 
     *)
         echo "postinst called with unknown argument \`$1'" >&2
-        # call subutai bash completion script
-        . /etc/bash_completion.d/subutai-cli-dev.bash_completion
         exit 1
     ;;
 esac

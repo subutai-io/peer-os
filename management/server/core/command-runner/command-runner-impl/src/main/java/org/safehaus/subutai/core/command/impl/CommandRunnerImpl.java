@@ -8,7 +8,9 @@ package org.safehaus.subutai.core.command.impl;
 
 import java.util.Set;
 
+import org.safehaus.subutai.common.exception.RunCommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CommandStatus;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
@@ -21,7 +23,6 @@ import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.core.command.api.command.CommandExecutor;
 import org.safehaus.subutai.core.command.api.command.CommandExecutorExpiryCallback;
-import org.safehaus.subutai.common.protocol.CommandStatus;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 
 import com.google.common.base.Preconditions;
@@ -114,7 +115,7 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
 
         //put command to cache
         boolean queued = commandExecutors
-                .put( commandImpl.getCommandUUID(), commandExecutor, inactiveCommandDropTimeout * 1000 + 2000,
+                .put( commandImpl.getCommandUUID(), commandExecutor, inactiveCommandDropTimeout * 1000,
                         new CommandExecutorExpiryCallback() );
 
         if ( queued )
@@ -136,7 +137,7 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
         }
         else
         {
-            throw new RuntimeException( "Could not queue command for processing" );
+            throw new RunCommandException( "Could not queue command for processing" );
         }
     }
 

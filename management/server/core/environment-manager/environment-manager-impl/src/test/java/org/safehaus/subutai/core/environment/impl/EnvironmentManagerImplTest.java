@@ -19,13 +19,9 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
-import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
-import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import static org.mockito.Mockito.mock;
@@ -36,29 +32,20 @@ import static org.mockito.Mockito.when;
  * Created by bahadyr on 9/25/14.
  */
 @Ignore
-@RunWith(MockitoJUnitRunner.class)
+@RunWith( MockitoJUnitRunner.class )
 public class EnvironmentManagerImplTest
 {
 
     private static final String HOSTNAME = "hostname";
     private static final String NAME = "name";
     EnvironmentManagerImpl manager;
-    @Mock
-    ContainerManager containerManager;
-    @Mock
-    AgentManager agentManager;
-    @Mock
-    EnvironmentBuilder environmentBuilder;
+
     @Mock
     EnvironmentDAO environmentDao;
     @Mock
     NetworkManager networkManager;
     @Mock
-    PeerCommandDispatcher pcd;
-    @Mock
     TemplateRegistry registry;
-    @Mock
-    PeerCommandDispatcher peerCommandDispatcher;
     @Mock
     EnvironmentBlueprint environmentBlueprint;
     @Mock
@@ -68,16 +55,8 @@ public class EnvironmentManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-
         manager = new EnvironmentManagerImpl( dataSource );
-        manager.setAgentManager( agentManager );
-        manager.setContainerManager( containerManager );
-        manager.setEnvironmentBuilder( environmentBuilder );
         manager.setEnvironmentDAO( environmentDao );
-        manager.setNetworkManager( networkManager );
-        manager.setPeerCommandDispatcher( pcd );
-        manager.setTemplateRegistry( registry );
-        manager.setPeerCommandDispatcher( peerCommandDispatcher );
     }
 
 

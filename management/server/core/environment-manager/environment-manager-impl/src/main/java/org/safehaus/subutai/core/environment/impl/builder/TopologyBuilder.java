@@ -167,4 +167,32 @@ public class TopologyBuilder
         int rand = random.nextInt( max + 1 );
         return rand;
     }
+
+
+    public EnvironmentBuildProcess createEnvironmentBuildProcessB2P( final UUID blueprintId, final UUID peerId )
+            throws EnvironmentBuildException
+    {
+        EnvironmentBuildProcess process = new EnvironmentBuildProcess( blueprintId );
+        try
+        {
+            EnvironmentBlueprint blueprint = environmentManager.getEnvironmentBlueprint( blueprintId );
+            Set<NodeGroup> groupSet = blueprint.getNodeGroups();
+            for ( NodeGroup nodeGroup : groupSet )
+            {
+                String key = peerId.toString() + "-" + nodeGroup.getTemplateName();
+                CloneContainersMessage ccm = new CloneContainersMessage( peerId );
+                ccm.setEnvId( process.getId() );
+                ccm.setTemplate( nodeGroup.getTemplateName() );
+                ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
+                ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );
+                process.putCloneContainerMessage( key, ccm );
+            }
+
+            return process;
+        }
+        catch ( EnvironmentManagerException e )
+        {
+            throw new EnvironmentBuildException( e.getMessage() );
+        }
+    }
 }

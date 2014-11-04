@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
 
 public class ElasticsearchClusterConfiguration implements ConfigBase
@@ -26,7 +27,6 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
     private Set<Agent> nodes = new HashSet<>();
     private Set<Agent> masterNodes = new HashSet<>();
     private Set<Agent> dataNodes = new HashSet<>();
-
 
 
     public static String getTemplateName()
@@ -155,5 +155,11 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
     public void setDataNodes( Set<Agent> nodes )
     {
         this.dataNodes = nodes;
+    }
+
+
+    public static PlacementStrategy getNodePlacementStrategy()
+    {
+        return PlacementStrategy.ROUND_ROBIN;
     }
 }

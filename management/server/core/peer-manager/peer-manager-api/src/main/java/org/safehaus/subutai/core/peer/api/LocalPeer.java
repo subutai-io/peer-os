@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * Local peer interface
  */
-public interface LocalPeer extends PeerInterface
+public interface LocalPeer extends Peer
 {
     public ResourceHost getResourceHostByName( String hostname ) throws PeerException;
 
@@ -16,4 +16,10 @@ public interface LocalPeer extends PeerInterface
     public ManagementHost getManagementHost() throws PeerException;
 
     public Set<ResourceHost> getResourceHosts() throws PeerException;
+
+    void init();
+
+    void shutdown();
+
+    public void clean();
 }

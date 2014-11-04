@@ -428,7 +428,6 @@ public class Manager
     {
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
-
             @Override
             public void buttonClick( Button.ClickEvent event )
             {
@@ -472,7 +471,6 @@ public class Manager
     {
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
-
             @Override
             public void buttonClick( Button.ClickEvent event )
             {
@@ -502,6 +500,7 @@ public class Manager
                                 contentRoot.getUI().addWindow( window.getWindow() );
                             }
                         } );
+                        contentRoot.getUI().addWindow( alert.getAlert() );
                     }
                     else if ( config.getSetupType() == SetupType.OVER_HADOOP
                             || config.getSetupType() == SetupType.WITH_HADOOP )

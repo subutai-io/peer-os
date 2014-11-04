@@ -115,7 +115,7 @@ public class Node2PeerWizard extends Window
         peersTable.setSizeFull();
 
 
-        List<Peer> peers = managerUI.getPeerManager().peers();
+        List<Peer> peers = managerUI.getPeerManager().getPeers();
         if ( !peers.isEmpty() )
         {
             for ( Peer peer : peers )

@@ -59,4 +59,9 @@ public interface Monitor
      * @param alertMetric - body of alert in JSON
      */
     public void alertThresholdExcess( String alertMetric ) throws MonitorException;
+
+
+    public void addMetricListener( MetricListener listener );
+
+    public void removeMetricListener( MetricListener listener );
 }

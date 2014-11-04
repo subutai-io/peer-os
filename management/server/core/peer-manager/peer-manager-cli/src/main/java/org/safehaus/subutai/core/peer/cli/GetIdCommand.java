@@ -34,7 +34,7 @@ public class GetIdCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        UUID id = peerManager.getSiteId();
+        UUID id = peerManager.getPeerId();
         System.out.println( "SUBUTAI ID: " + id );
         return null;
     }

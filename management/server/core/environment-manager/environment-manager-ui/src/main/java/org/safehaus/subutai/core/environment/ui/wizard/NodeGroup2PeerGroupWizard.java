@@ -12,8 +12,8 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
-import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
+import org.safehaus.subutai.core.peer.api.PeerInfo;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
@@ -104,7 +104,7 @@ public class NodeGroup2PeerGroupWizard extends Window
         for ( NodeGroup ng : blueprint.getNodeGroups() )
         {
             ComboBox comboBox = new ComboBox();
-            BeanItemContainer<Peer> bic = new BeanItemContainer<>( Peer.class );
+            BeanItemContainer<PeerInfo> bic = new BeanItemContainer<>( PeerInfo.class );
             bic.addAll( selectedPeers() );
             comboBox.setContainerDataSource( bic );
             comboBox.setNullSelectionAllowed( false );
@@ -149,13 +149,13 @@ public class NodeGroup2PeerGroupWizard extends Window
     }
 
 
-    private Set<Peer> selectedPeers()
+    private Set<PeerInfo> selectedPeers()
     {
-        Set<Peer> peerSet = new HashSet<>();
+        Set<PeerInfo> peerSet = new HashSet<>();
         PeerGroup peerGroup = getSelectedPeerGroup();
         for ( UUID uuid : peerGroup.getPeerIds() )
         {
-            Peer peer = module.getPeerManager().getPeerByUUID( uuid );
+            PeerInfo peer = module.getPeerManager().getPeerInfo( uuid );
             peerSet.add( peer );
         }
 

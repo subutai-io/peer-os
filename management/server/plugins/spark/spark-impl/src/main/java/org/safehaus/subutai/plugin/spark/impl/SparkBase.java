@@ -22,18 +22,16 @@ public abstract class SparkBase
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( SparkBase.class.getName() );
+    public PluginDao pluginDAO;
+    public DataSource dataSource;
     CommandRunner commandRunner;
     AgentManager agentManager;
     Tracker tracker;
     EnvironmentManager environmentManager;
     Hadoop hadoopManager;
     ContainerManager containerManager;
-
     ExecutorService executor;
     Commands commands;
-
-    public PluginDao pluginDAO;
-    public DataSource dataSource;
 
 
     public void init()
@@ -112,12 +110,6 @@ public abstract class SparkBase
     }
 
 
-    public void setExecutor( final ExecutorService executor )
-    {
-        this.executor = executor;
-    }
-
-
     public Hadoop getHadoopManager()
     {
         return hadoopManager;
@@ -145,6 +137,12 @@ public abstract class SparkBase
     public ExecutorService getExecutor()
     {
         return executor;
+    }
+
+
+    public void setExecutor( final ExecutorService executor )
+    {
+        this.executor = executor;
     }
 
 

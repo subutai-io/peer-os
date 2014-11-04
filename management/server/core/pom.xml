@@ -18,7 +18,6 @@
   <modules>
     <module>agent-manager</module>
     <module>apt-repository-manager</module>
-    <module>command-dispatcher</module>
     <module>command-runner</module>
     <module>communication-manager</module>
     <module>config-point-tracker</module>
@@ -26,20 +25,18 @@
     <module>container-manager</module>
     <module>environment-manager</module>
     <module>environment-terminal</module>
-    <!--<module>db-manager</module>-->
     <module>file-tracker</module>
     <module>git-manager</module>
-    <module>lxc-manager</module>
     <module>lxc-quota-manager</module>
     <module>monitoring</module>
     <module>network-manager</module>
     <module>peer-manager</module>
-    <module>peer-command-dispatcher</module>
     <module>strategy-manager</module>
     <module>template-manager</module>
     <module>template-registry</module>
     <module>tracker</module>
     <module>metric</module>
+    <module>messenger</module>
   </modules>
 
 </project>
