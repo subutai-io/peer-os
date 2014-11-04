@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.container.api.ContainerCreateException;
 
 
 /**
@@ -34,7 +33,7 @@ public interface LocalPeer extends Peer
     public void clean();
 
     public ContainerHost createContainer( String hostName, String templateName, String cloneName, UUID envId )
-            throws ContainerCreateException;
+            throws PeerException;
 
     Agent waitForAgent( String containerName, int timeout );
 }

@@ -16,7 +16,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
@@ -257,6 +256,12 @@ public class ResourceHost extends SubutaiHost
     }
 
 
+    public boolean destroyContainerHost( final ContainerHost containerHost ) throws ResourceHostException
+    {
+        return run( Command.DESTROY, containerHost.getHostname() );
+    }
+
+
     public ContainerHost getContainerHostByName( final String hostname )
     {
         ContainerHost result = null;
@@ -449,6 +454,7 @@ public class ResourceHost extends SubutaiHost
     {
         LIST_TEMPLATES( "subutai list -t %s" ),
         CLONE( "subutai clone %s %s -e %s &" ),
+        DESTROY( "subutai destroy %s" ),
         IMPORT( "subutai import %s" ),
         ADD_SOURCE( "echo \"deb http://gw.intra.lan:9999/%1$s trusty main\" > /etc/apt/sources.list.d/%1$s.list " ),
         REMOVE_SOURCE( "rm /etc/apt/sources.list.d/%1$s.list " ),
