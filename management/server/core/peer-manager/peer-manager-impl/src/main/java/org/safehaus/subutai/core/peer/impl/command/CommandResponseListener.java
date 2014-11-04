@@ -11,10 +11,14 @@ import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.RecipientType;
 import org.safehaus.subutai.core.peer.impl.Timeouts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class CommandResponseListener extends RequestListener
 {
+    private static final Logger LOG = LoggerFactory.getLogger( CommandResponseListener.class.getName() );
+
 
     private ExpiringCache<UUID, CommandCallback> callbacks;
 
@@ -51,13 +55,20 @@ public class CommandResponseListener extends RequestListener
     {
         final CommandResponse commandResponse = payload.getMessage( CommandResponse.class );
 
-        CommandCallback callback = callbacks.get( commandResponse.getRequestId() );
-
-        if ( callback != null )
+        if ( commandResponse != null )
         {
-            callback.onResponse( commandResponse.getResponse(), commandResponse.getCommandResult() );
-        }
 
+            CommandCallback callback = callbacks.get( commandResponse.getRequestId() );
+
+            if ( callback != null )
+            {
+                callback.onResponse( commandResponse.getResponse(), commandResponse.getCommandResult() );
+            }
+        }
+        else
+        {
+            LOG.warn( "Null response" );
+        }
         return null;
     }
 }
