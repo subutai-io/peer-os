@@ -52,6 +52,10 @@ class SubutaiContainerManager {
         vector<SubutaiContainer> findAllContainers();
         vector<SubutaiContainer> findActiveContainers();
         vector<SubutaiContainer> findDefinedContainers();
+        vector<SubutaiContainer> getAllContainers();
+        vector<SubutaiContainer> getRunningContainers();
+        vector<SubutaiContainer> getStoppedContainers();
+        vector<SubutaiContainer> getFrozenContainers();
         bool isContainerRunning(string );
         bool isContainerStopped(string );
         bool isContainerFrozen(string );
@@ -70,7 +74,7 @@ class SubutaiContainerManager {
         lxc_container*                  _current_container;
         vector<SubutaiContainer>        _frozenContainers;
         vector<SubutaiContainer>        _stoppedContainers;
-        vector<SubutaiContainer>        _running_containers;
+        vector<SubutaiContainer>        _runningContainers;
 };
 
 #endif

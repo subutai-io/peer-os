@@ -101,21 +101,59 @@ string SubutaiResponsePack::createInQueueMessage(string uuid,string taskuuid)	//
 
 /**
  *  \details   This method creates HeartBeat message.
+ *  {
+   "response":
+
+    {
+
+        "type":"HEARTBEAT_RESPONSE",
+
+        "id":"56b0ac88-5140-4a32-8691-916d75d62f1c",
+
+        "hostname":"resource_host",
+
+        "ips":["10.10.10.13","172.16.11.89","127.0.0.1"],
+
+        "macAddress":"08:00:27:f2:9b:aa",
+
+        "containers":[
+
+            {
+                "hostname" : "container1",
+
+                "id":"56b0ac88-5140-4a32-8691-916d75d62f1c",
+
+                "ips":["10.10.10.12","127.0.0.1"],
+
+                "status":"RUNNING"
+
+            },
+
+            {
+                "hostname" : "container1",
+
+                "id":"56b0ac88-5140-4a32-8691-916d75d62f1c",
+
+                "ips":["10.10.10.14","127.0.0.1"],
+
+                "status":"FROZEN"
+
+            }
+        ]
+    }
+
+}
  */
-string SubutaiResponsePack::createHeartBeatMessage(string uuid,int requestSeqNum,string environmentID,string macaddress,
-		string hostname,string parenthostname,string source,string taskuuid)	//Creating HeartBeat Message
+string SubutaiResponsePack::createHeartBeatMessage(string uuid,	string hostname,string macaddress)	//Creating HeartBeat Message
 {
+	clear();
 	this->setType("HEARTBEAT_RESPONSE");
-	this->setSource(source);
-	this->setTaskUuid(taskuuid);
-	this->setMacAddress(macaddress);
-	this->setHostname(hostname);
-	this->setParentHostname(parenthostname);
-	this->setEnvironmentId(environmentID);
 	this->setUuid(uuid);
-	this->setRequestSequenceNumber(requestSeqNum);
-	this->setResponseSequenceNumber(1);
+	this->setHostname(hostname);
+	this->setMacAddress(macaddress);
 	this->serialize(sendout);
+
+	cout << "Message is : " << sendout << endl;
 	return sendout;
 }
 

@@ -74,6 +74,9 @@ void SubutaiResponse::clear()
  *  		   This is one of the most frequently used function is the class.
  *  		   It also check the existing variable(NULL or not) when serializing the instance.
  *  		   It returns given reference output strings.
+ *
+ *
+ *
  */
 void SubutaiResponse::serialize(string& output)
 {
@@ -99,7 +102,7 @@ void SubutaiResponse::serialize(string& output)
 	}
 	if(!(this->getUuid().empty()))
 	{
-		root["response"]["uuid"] = this->getUuid();
+		root["response"]["id"] = this->getUuid();
 	}
 	if(this->getPid() >= 0)
 	{
@@ -107,11 +110,11 @@ void SubutaiResponse::serialize(string& output)
 	}
 	if(this->getRequestSequenceNumber() >= 0)											//check the requestSequenceNumber is assigned or not
 	{
-		root["response"]["requestSequenceNumber"] = this->getRequestSequenceNumber();
+		root["response"]["requestNumber"] = this->getRequestSequenceNumber();
 	}
 	if(this->getResponseSequenceNumber() >= 0)										//check the responseSequenceNumber is assigned or not
 	{
-		root["response"]["responseSequenceNumber"] = this->getResponseSequenceNumber();
+		root["response"]["responseNumber"] = this->getResponseSequenceNumber();
 	}
 	for(unsigned int index=0; index < this->getIps().size(); index++)
 	{	//automatically check the size of the ips list
@@ -119,7 +122,7 @@ void SubutaiResponse::serialize(string& output)
 	}
 	if(!(this->getTaskUuid().empty()))											//check the taskuuid is assigned or not
 	{
-		root["response"]["taskUuid"] = this->getTaskUuid();
+		root["response"]["commandId"] = this->getTaskUuid();
 	}
 	if(!(this->getHostname().empty()))											//check the hostname is assigned or not
 	{
@@ -152,6 +155,17 @@ void SubutaiResponse::serialize(string& output)
 	if(!(this->getEnvironmentId().empty()))
 	{
 		root["response"]["environmentId"] = this->getEnvironmentId();
+	}
+	for(unsigned int index=0; index < this->containers.size(); index++)
+	{
+		root["response"]["containers"][index]["hostname"]	=	this->containers[index].getContainerHostnameValue();
+		root["response"]["containers"][index]["id"]			=	this->containers[index].getContainerIdValue();
+		root["response"]["containers"][index]["status"]		=	this->containers[index].getContainerStatus();
+		vector<string> ipValues	=	this->containers[index].getContainerIpValue();
+		for(unsigned int i=0; i < ipValues.size(); i++)
+		{
+			root["response"]["containers"][index]["ips"][i]=ipValues[i];
+		}
 	}
 	for(unsigned int index=0; index < this->getConfPoints().size(); index++)
 	{
@@ -216,6 +230,16 @@ void SubutaiResponse::serializeDone(string& output)
 	}
 	output = writer.write(root);	//Json Response Done string is created
 }
+
+/**
+ *   \details Add a new container set for response.
+ */
+void SubutaiResponse::setContainerSet(vector<SubutaiContainer> contSet)
+{
+	this->containers.clear();
+	this->containers = contSet;
+}
+
 
 /**
  *  \details   getting "pid" private variable of SubutaiResponse instance

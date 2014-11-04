@@ -540,6 +540,14 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
                 {
                     /*
                      * sending I'm alive message with no output and errror buffers
+                     *
+                     *         	"type":"EXECUTE_RESPONSE",
+
+        						"id":"56b0ac88-5140-4a32-8691-916d75d62f1c"
+
+        						"commandId":"c6cd5988-ceac-11e3-82b2-ebd389e743a3",
+
+        						"pid":32247
                      */
                     this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "(HEARTBEAT TIMEOUT)Sending I'm alive Message!!"));
                     string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
