@@ -133,21 +133,23 @@ function contains() {
 
 function create_rrd {
   local hostname=$1
-  local metric_type=$2
 
   if [ `hostname` != $hostname ]; then
     lxc_assert "$hostname"
   fi
-  assert_metric "$metric_type"
 
   mkdir -p $SUBUTAI_RRD_DIRECTORY > /dev/null 2>&1
-  #TODO define datasets properly for each metric type
-  local dataset_name=$(get_dataset_name $metric_type)
-  local update_sequence=$(get_update_sequence)
-  pushd $SUBUTAI_RRD_DIRECTORY > /dev/null
-  rrdtool create "$(get_database_file $hostname $metric_type)" --step $update_sequence DS:"$dataset_name":GAUGE:$(($update_sequence * 2 - 1)):0:U RRA:LAST:0.5:1:1500
-  popd > /dev/null
-  start_update_rrd "$hostname" "$metric_type" > /dev/null
+  for metric_type in "${metric_list[@]}"
+  do
+    assert_metric "$metric_type"
+    msg_info "$metric_type rrd is created for $hostname"
+    local dataset_name=$(get_dataset_name $metric_type)
+    local update_sequence=$(get_update_sequence)
+    pushd $SUBUTAI_RRD_DIRECTORY > /dev/null
+    rrdtool create "$(get_database_file $hostname $metric_type)" --step $update_sequence DS:"$dataset_name":GAUGE:$(($update_sequence * 2 - 1)):0:U RRA:LAST:0.5:1:1500
+    popd > /dev/null
+    start_update_rrd "$hostname" "$metric_type" > /dev/null
+  done
 }
 
 
@@ -224,13 +226,13 @@ function query_rrd {
 
 function assert_metric {
   if [ -z $metric_type ]; then
-    echo "Please provide metric type to store.Aborting!"
+    msg_error "Metric type is empty.Aborting!"
     exit 1
   fi
 
   if [ $(contains "${metric_list[@]}" "$metric_type") != "y" ]; then
-    echo "$metric_type is not supported. Please provide one of the followings:"
-    echo ${metric_list[@]}
+    msg_error "    - $metric_type is not supported metric type. Please provide one of the followings:"
+    echo "      ${metric_list[@]}"
     exit 1
   fi
 }

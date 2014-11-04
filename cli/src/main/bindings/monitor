@@ -5,10 +5,10 @@ function monitor_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Monitor containers.
   echo
-  echo "        "subutai \[-qh\] monitor \[-c metric_type\|-s metric_type\|-e metric_type\|-q metric_type\] \[hostname\]
+  echo "        "subutai \[-qh\] monitor \[-c\|-s metric_type\|-e metric_type\|-q metric_type\] \[hostname\]
   echo "          "parameters:
   echo "                    "p -- physical machine
-  echo "                    "c -- create rrd for container
+  echo "                    "c -- create monitoring infrastructure for container
   echo "                    "s -- starts monitoring of container for given metric
   echo "                    "e -- ends monitoring of container for given metric
   echo "                    "q -- query rrd for container for given metric
@@ -26,10 +26,9 @@ function monitor {
   local is_query="false"
   shift_amount=0;
 
-  while getopts ":c:s:e:u:q:" opt; do
+  while getopts ":cs:e:u:q:" opt; do
     case $opt in
       c)
-        metric_type="$OPTARG"
         is_create="true"
         if [[ "true" == "$is_start" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" ]]; then
           msg_error "Cannot use the -c, -s, -e, -u, and -q options together." >&2
@@ -111,7 +110,7 @@ function monitor {
   fi
  
   if [ $is_create == "true" ]; then
-    create_rrd "$hostname" "$metric_type"
+    create_rrd "$hostname"
   elif [ $is_update == "true"  ]; then
     update_rrd "$hostname" "$metric_type"
   elif [ $is_start == "true"  ]; then
