@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -39,7 +40,7 @@ public class TemplateDAOTest
     public void setUp() throws Exception
     {
         emf = Persistence.createEntityManagerFactory( "default" );
-
+        EntityManager em = emf.createEntityManager();
         templateDAO = new TemplateDAO();
         templateDAO.setEntityManagerFactory( emf );
     }
@@ -98,25 +99,18 @@ public class TemplateDAOTest
         templateDAO.saveTemplate( template );
 
         Template savedTemplate = templateDAO.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
-
         LOGGER.warn( template.toString() );
         LOGGER.warn( savedTemplate.toString() );
-
         LOGGER.warn( "\n\n\n\nGetting all templates from DB" );
         for ( Template template1 : templateDAO.getAllTemplates() )
         {
             LOGGER.warn( template1.getTemplateName() );
         }
-
         assertEquals( template, savedTemplate );
-
         templateDAO.removeTemplate( template );
-
         savedTemplate = templateDAO.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
-
         LOGGER.warn( "\n\n\n\nGetting template from database" );
         LOGGER.warn( savedTemplate.toString() );
-
         assertNotNull( savedTemplate );
     }
 
@@ -127,28 +121,10 @@ public class TemplateDAOTest
     {
         Template parentTemplate = TestUtils.getParentTemplate();
         Template childTemplate = TestUtils.getChildTemplate();
-
-        //        childTemplate.setParentTemplate( parentTemplate );
         parentTemplate.addChildren( Arrays.asList( childTemplate ) );
-
-        //        EntityManager em = emf.createEntityManager();
-
-        //        em.getTransaction().begin();
-        //        em.persist( childTemplate );
-        //        em.merge( parentTemplate );
-
         templateDAO.saveTemplate( parentTemplate );
-        //        em.getTransaction().commit();
-        //        parentTemplate.addChildren( Arrays.asList( childTemplate ) );
-
-        //        templateDAO.saveTemplate( parentTemplate );
-        //        templateDAO.saveTemplate( childTemplate );
-
-        //        templateDAO.saveTemplate( parentTemplate, Arrays.asList( childTemplate ) );
-
         List<Template> childTemplates =
                 templateDAO.getChildTemplates( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() );
-
         assertTrue( childTemplates.contains( childTemplate ) );
     }
 

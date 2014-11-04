@@ -28,13 +28,14 @@ import com.google.gson.annotations.Expose;
  * Template represents template entry in registry
  */
 @Entity( name = "Template" )
-@NamedQueries( {
+@NamedQueries(value = {
         @NamedQuery( name = "Template.getAll", query = "SELECT t FROM Template t" ),
         @NamedQuery( name = "Template.getTemplateByNameArch",
-                query = "SELECT t FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = :lxcArch" ),
+                query = "SELECT t FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = " +
+                        ":lxcArch" ),
         @NamedQuery( name = "Template.removeTemplateByNameArch",
-                query = "DELETE FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = :lxcArch" )
-} )
+                query = "DELETE FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = :lxcArch" )
+})
 @XmlRootElement( name = "" )
 public class Template
 {
