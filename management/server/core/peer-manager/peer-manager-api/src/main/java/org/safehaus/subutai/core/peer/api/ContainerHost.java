@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 
 
@@ -125,7 +124,7 @@ public class ContainerHost extends SubutaiHost
     public Template getTemplate() throws PeerException
     {
         Peer peer = getPeer();
-        return peer.getTemplate( this );
+        return peer.getTemplate( getTemplateName() );
     }
 
 

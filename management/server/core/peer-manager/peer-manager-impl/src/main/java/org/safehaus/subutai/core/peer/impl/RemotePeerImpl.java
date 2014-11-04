@@ -12,7 +12,6 @@ import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.CommandStatus;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
@@ -129,7 +128,7 @@ public class RemotePeerImpl implements RemotePeer
     public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
                                                 final List<Template> templates, final int quantity,
                                                 final String strategyId, final List<Criteria> criteria )
-            throws ContainerCreateException
+            throws PeerException
     {
         try
         {
@@ -147,13 +146,13 @@ public class RemotePeerImpl implements RemotePeer
             }
             else
             {
-                throw new ContainerCreateException( "Received null response" );
+                throw new PeerException( "Received null response" );
             }
         }
         catch ( PeerException e )
         {
             LOG.error( "Error in createContainers", e );
-            throw new ContainerCreateException( e.getMessage() );
+            throw new PeerException( e.getMessage() );
         }
     }
 
@@ -291,10 +290,10 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Template getTemplate( final ContainerHost containerHost ) throws PeerException
+    public Template getTemplate( final String templateName ) throws PeerException
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
-        return remotePeerRestClient.getTemplate( containerHost );
+        return remotePeerRestClient.getTemplate( templateName );
     }
 
 
