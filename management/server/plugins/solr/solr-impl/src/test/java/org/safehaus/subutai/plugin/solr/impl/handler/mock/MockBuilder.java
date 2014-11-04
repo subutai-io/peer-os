@@ -1,15 +1,6 @@
 package org.safehaus.subutai.plugin.solr.impl.handler.mock;
 
 
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.plugin.common.mock.CommandMock;
-import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
-import org.safehaus.subutai.plugin.solr.impl.Commands;
-import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
-import org.safehaus.subutai.plugin.solr.impl.handler.InstallOperationHandler;
-import org.safehaus.subutai.plugin.solr.impl.handler.NodeOperationHandler;
-import org.safehaus.subutai.plugin.solr.impl.handler.UninstallOperationHandler;
-
 ;
 
 

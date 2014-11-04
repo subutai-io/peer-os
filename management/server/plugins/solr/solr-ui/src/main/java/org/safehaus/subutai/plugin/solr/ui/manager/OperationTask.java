@@ -16,7 +16,7 @@ import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 
 
-public class StartTask implements Runnable
+public class OperationTask implements Runnable
 {
 
     private final String clusterName;
@@ -24,14 +24,17 @@ public class StartTask implements Runnable
     private final CompleteEvent completeEvent;
     private final Solr solr;
     private final Tracker tracker;
+    private final OperationType operationType;
 
 
-    public StartTask( Solr solr, Tracker tracker, String clusterName, ContainerHost containerHost, CompleteEvent completeEvent )
+    public OperationTask( Solr solr, Tracker tracker, String clusterName, ContainerHost containerHost,
+                          OperationType operationType, CompleteEvent completeEvent )
     {
         this.solr = solr;
         this.tracker = tracker;
         this.clusterName = clusterName;
         this.containerHost = containerHost;
+        this.operationType = operationType;
         this.completeEvent = completeEvent;
     }
 
@@ -39,7 +42,19 @@ public class StartTask implements Runnable
     public void run()
     {
 
-        UUID trackID = solr.startNode( clusterName, containerHost );
+        UUID trackID = null;
+        switch ( operationType )
+        {
+            case START:
+                trackID = solr.startNode( clusterName, containerHost );
+                break;
+            case STOP:
+                trackID = solr.stopNode( clusterName, containerHost );
+                break;
+            case STATUS:
+                trackID = solr.checkNode( clusterName, containerHost );
+                break;
+        }
 
         long start = System.currentTimeMillis();
 

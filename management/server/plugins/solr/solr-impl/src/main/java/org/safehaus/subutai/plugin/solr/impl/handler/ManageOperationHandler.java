@@ -19,7 +19,7 @@ import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import com.google.common.base.Preconditions;
 
 
-public class NodeOperationHandler extends AbstractOperationHandler<SolrImpl>
+public class ManageOperationHandler extends AbstractOperationHandler<SolrImpl>
 {
 
     private String clusterName;
@@ -27,8 +27,8 @@ public class NodeOperationHandler extends AbstractOperationHandler<SolrImpl>
     private OperationType operationType;
 
 
-    public NodeOperationHandler( final SolrImpl manager, final String clusterName, final UUID agentUUID,
-                                 OperationType operationType )
+    public ManageOperationHandler( final SolrImpl manager, final String clusterName, final UUID agentUUID,
+                                   OperationType operationType )
     {
         super( manager, clusterName );
         this.agentUUID = agentUUID;

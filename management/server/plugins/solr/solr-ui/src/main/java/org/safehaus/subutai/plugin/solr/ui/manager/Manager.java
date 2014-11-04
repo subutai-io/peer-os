@@ -14,8 +14,6 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -27,7 +25,6 @@ import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -291,7 +288,7 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new CheckTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost,
+                        new OperationTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost, OperationType.STATUS,
                                 new CompleteEvent()
                                 {
                                     public void onComplete( String result )
@@ -342,7 +339,7 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StopTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost,
+                        new OperationTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost, OperationType.STOP,
                                 new CompleteEvent()
                                 {
                                     @Override
@@ -370,7 +367,7 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StartTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost,
+                        new OperationTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost,OperationType.START,
                                 new CompleteEvent()
                                 {
                                     @Override
