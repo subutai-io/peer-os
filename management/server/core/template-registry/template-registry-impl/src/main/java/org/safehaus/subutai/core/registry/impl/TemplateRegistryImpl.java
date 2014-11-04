@@ -57,8 +57,6 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
     public TemplateRegistryImpl() throws DaoException
     {
-        //        Preconditions.checkNotNull( dataSource, "Data source is null" );
-        //        templateDAO = new TemplateDAO( dataSource );
     }
 
 

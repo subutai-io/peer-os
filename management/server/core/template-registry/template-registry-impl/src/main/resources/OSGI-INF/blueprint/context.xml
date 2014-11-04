@@ -11,7 +11,6 @@
 
   <bean id="templateRegistry" scope="singleton" activation="eager"
         class="org.safehaus.subutai.core.registry.impl.TemplateRegistryImpl">
-    <argument ref="dataSource" />
     <property name="templateDAO" ref="templateDAO" />
   </bean>
 
