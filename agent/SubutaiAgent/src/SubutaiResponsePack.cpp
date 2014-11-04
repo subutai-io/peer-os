@@ -38,7 +38,7 @@ string SubutaiResponsePack::createResponseMessage(string uuid,int pid,int reques
 {
 	clear();
 	this->setType("EXECUTE_RESPONSE");			//creating Response chunk message
-	this->setTaskUuid(taskuuid);
+	this->setCommandId(taskuuid);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(responseSeqNum);
@@ -57,7 +57,7 @@ string SubutaiResponsePack::createExitMessage(string uuid,int pid,int requestSeq
 {
 	clear();
 	this->setType("EXECUTE_RESPONSE_DONE");
-	this->setTaskUuid(taskuuid);
+	this->setCommandId(taskuuid);
 	this->setUuid(uuid);
 	this->setPid(pid);
 	this->setRequestSequenceNumber(requestSeqNum);
@@ -79,7 +79,6 @@ string SubutaiResponsePack::createRegistrationMessage(string uuid, string macadd
 	this->setHostname(hostname);
 	this->setParentHostname(parenthostname);
 	this->setUuid(uuid);
-	this->setEnvironmentId(environmentID);
 	this->serialize(sendout);
 	return sendout;
 }
@@ -91,7 +90,7 @@ string SubutaiResponsePack::createInQueueMessage(string uuid,string taskuuid)	//
 {
 	clear();
 	this->setType("IN_QUEUE");
-	this->setTaskUuid(taskuuid);
+	this->setCommandId(taskuuid);
 	this->setUuid(uuid);
 	this->serialize(sendout);
 	return sendout;
@@ -165,7 +164,7 @@ string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(1);
-	this->setTaskUuid(taskuuid);
+	this->setCommandId(taskuuid);
 	this->serialize(sendout);
 	return sendout;
 }
@@ -181,7 +180,7 @@ string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSe
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(1);
-	this->setTaskUuid(taskuuid);
+	this->setCommandId(taskuuid);
 	this->serialize(sendout);
 	return sendout;
 }
@@ -194,7 +193,7 @@ string SubutaiResponsePack::createTimeoutMessage(string uuid,int pid,int request
 {
 	clear();
 	this->setType("EXECUTE_TIMEOUT");
-	this->setTaskUuid(taskuuid);
+	this->setCommandId(taskuuid);
 	this->setPid(pid);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);

@@ -183,8 +183,7 @@ int main(int argc,char *argv[],char *envp[])
     string input = "";
     string sendout;
 
-    if (!thread.getUserID().checkRootUser())
-    {
+    if (!thread.getUserID().checkRootUser()) {
         //user is not root SubutaiAgent Will be closed
         cout << "Main Process User is not root.. Subutai Agent is going to be closed.." << endl;
         close(STDIN_FILENO);
@@ -193,8 +192,7 @@ int main(int argc,char *argv[],char *envp[])
         return 100;
     }
 
-    if (!logMain.openLogFileWithName("subutai-agent.log"))
-    {
+    if (!logMain.openLogFileWithName("subutai-agent.log")) {
         cout << "/var/log/subutai-agent/ folder does not exist.. Subutai Agent is going to be closed.."<<endl;
         FILE* dumplog = fopen("/etc/subutai-agent_dump.log","a+");
         string log = "<DEBUG> /var/log/subutai-agent/ folder does not exist.. "
@@ -218,9 +216,7 @@ int main(int argc,char *argv[],char *envp[])
     environment.getAgentSettings();
     environment.getAgentUuid();
     environment.getAgentMacAddress();
-    //environment.isAgentLxc();
     environment.getAgentIpAddress();
-    //environment.getAgentParentHostname();
     environment.getAgentHostname();
     environment.getAgentEnvironmentId();
     clientAddress = environment.getAgentUuidValue();
@@ -341,11 +337,9 @@ int main(int argc,char *argv[],char *envp[])
     {
         try
         {
-        	//In 30 second periods send heartbeat and in_queue responses.
-        	timer.checkHeartBeatTimer(command);
-        	timer.checkCommandQueueInfoTimer(command);
-
-
+            //In 30 second periods send heartbeat and in_queue responses.
+            timer.checkHeartBeatTimer(command);
+            timer.checkCommandQueueInfoTimer(command);
             command.clear();
             for (list<int>::iterator iter = pidList.begin(); iter != pidList.end();iter++) {
                 if (pidList.begin() != pidList.end()) {
@@ -403,13 +397,6 @@ int main(int argc,char *argv[],char *envp[])
                         }
                     }
 
-                    /*
-                    if (command.getType() == "REGISTRATION_REQUEST_DONE") //type is registration done
-                    {
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Registration is done.."));
-                        // agent is registered to server now
-                    }
-                    else*/
                     if (command.getType() == "EXECUTE_REQUEST")	//execution request will be executed in other process.
                     {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Received Message to internal currentProcess!"));
@@ -417,10 +404,7 @@ int main(int argc,char *argv[],char *envp[])
                             file.open("/etc/subutai-agent/commandQueue.txt",fstream::in | fstream::out | fstream::app);
                             file << input;
                             file.close();
-                    } else if (command.getType()=="HEARTBEAT_REQUEST") {
-                    }
-                    else if (command.getType()=="PS_REQUEST")
-                    {
+                    } else if (command.getType()=="PS_REQUEST") {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","PS execution operation is starting.."));
                         SubutaiThread* subprocess = new SubutaiThread;
                         subprocess->getLogger().setLogLevel(logMain.getLogLevel());
@@ -428,36 +412,7 @@ int main(int argc,char *argv[],char *envp[])
                         command.setWorkingDirectory("/");
                         subprocess->threadFunction(&messageQueue,&command,argv);
                         delete subprocess;
-                    }
-                    /*
-                    else if (command.getType()=="HEARTBEAT_REQUEST")
-                    {
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Heartbeat message has been taken.."));
-                        response.clear();
-                        /*
-                         * Refresh new agent ip address set for each heartbeat message
-                         *//*
-                        if (isLocal) {
-                            environment.getAgentIpAddress();
-                            response.setIps(environment.getAgentIpValue());
-                            response.setHostname(environment.getAgentHostnameValue());
-                            response.setParentHostname(environment.getAgentParentHostnameValue());
-                            response.setMacAddress(environment.getAgentMacAddressValue());
-                            string resp = response.createHeartBeatMessage(environment.getAgentUuidValue(),
-                                    environment.getAgentParentHostnameValue(), environment.getAgentMacAddressValue());
-                            connection->sendMessage(resp);
-                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","HeartBeat Response:", resp));
-                        } else {
-                            timer.sendHeartBeat();
-                            // It is container
-                        }
-<<<<<<< HEAD
                     } else if (command.getType() == "TERMINATE_REQUEST") {
-=======
-                    }
-                    */
-                    else if (command.getType() == "TERMINATE_REQUEST")
-                    {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",toString(command.getPid())));
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID.."));
                         if (command.getPid() > 0) {
@@ -506,21 +461,21 @@ int main(int argc,char *argv[],char *envp[])
                         sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(),response.getConfPoints());
                         connection->sendMessage(sendout);
                         Watcher.stats();
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ",sendout));
+                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));
                     }
                 } else {
-                    logMain.writeLog(3, logMain.setLogData("<SubutaiAgent>","Failed at parsing Json String: ",input));
+                    logMain.writeLog(3, logMain.setLogData("<SubutaiAgent>","Failed to parsing JSON String: ", input));
                     if (input.size() >= 10000) {
-                        connection->sendMessage(response.createResponseMessage(environment.getAgentUuidValue(),9999999,
-                                    command.getRequestSequenceNumber(),1,
-                                    "Request Size is greater than Maximum Size !! ","",command.getCommandId()));
-                        connection->sendMessage(response.createExitMessage(environment.getAgentUuidValue(),9999999,
-                                    command.getRequestSequenceNumber(),2,
-                                    command.getCommandId(),1));
+                        connection->sendMessage(response.createResponseMessage(environment.getAgentUuidValue(), 9999999,
+                                    command.getRequestSequenceNumber(), 1,
+                                    "Request Size is greater than Maximum Size", "", command.getCommandId()));
+                        connection->sendMessage(response.createExitMessage(environment.getAgentUuidValue(), 9999999,
+                                    command.getRequestSequenceNumber(), 2,
+                                    command.getCommandId(), 1));
                     } else {
                         connection->sendMessage(response.createResponseMessage(environment.getAgentUuidValue(),9999999,
                                     command.getRequestSequenceNumber(),1,
-                                    "Request is not a valid Json string !!","",command.getCommandId()));
+                                    "Request is not a valid JSON string","",command.getCommandId()));
                         connection->sendMessage(response.createExitMessage(environment.getAgentUuidValue(),9999999,
                                     command.getRequestSequenceNumber(),2,
                                     command.getCommandId(),1));

@@ -29,8 +29,7 @@ SubutaiResponse::SubutaiResponse()
     setStandardError("");
     setStandardOutput("");
     setExitCode(-1);
-    setSource("");
-    setTaskUuid("");
+    setCommandId("");
     setMacAddress("");
     setHostname("");
     setParentHostname("");
@@ -57,8 +56,7 @@ void SubutaiResponse::clear()
     setResponseSequenceNumber(-1);
     setStandardError("");
     setStandardOutput("");
-    setSource("");
-    setTaskUuid("");
+    setCommandId("");
     setMacAddress("");
     setHostname("");
     setParentHostname("");
@@ -120,9 +118,9 @@ void SubutaiResponse::serialize(string& output)
     {	//automatically check the size of the ips list
         root["response"]["ips"][index]=this->getIps()[index];
     }
-    if(!(this->getTaskUuid().empty()))											//check the taskuuid is assigned or not
+    if(!(this->getCommandId().empty()))											//check the taskuuid is assigned or not
     {
-        root["response"]["commandId"] = this->getTaskUuid();
+        root["response"]["commandId"] = this->getCommandId();
     }
     if(!(this->getHostname().empty()))											//check the hostname is assigned or not
     {
@@ -136,10 +134,6 @@ void SubutaiResponse::serialize(string& output)
     {
         root["response"]["macAddress"] = this->getMacAddress();
     }
-    if(!(this->getSource().empty()))
-    {
-        root["response"]["source"] = this->getSource();
-    }
     if(!(this->getconfigPoint().empty()))
     {
         root["response"]["configPoint"] = this->getconfigPoint();
@@ -151,10 +145,6 @@ void SubutaiResponse::serialize(string& output)
     if(!(this->getChangeType().empty()))
     {
         root["response"]["changeType"] = this->getChangeType();
-    }
-    if(!(this->getEnvironmentId().empty()))
-    {
-        root["response"]["environmentId"] = this->getEnvironmentId();
     }
     for(unsigned int index = 0; index < this->containers.size(); index++) {
         root["response"]["containers"][index]["hostname"]	= this->containers[index].getContainerHostnameValue();
@@ -195,7 +185,7 @@ void SubutaiResponse::serializeDone(string& output)
     }
     if(!(this->getUuid().empty()))
     {
-        root["response"]["uuid"] = this->getUuid();
+        root["response"]["id"] = this->getUuid();
     }
     if(this->getRequestSequenceNumber() >= 0)											//check the requestSequenceNumber is assigned or not
     {
@@ -213,13 +203,9 @@ void SubutaiResponse::serializeDone(string& output)
     {
         root["response"]["exitCode"] = this->getExitCode();
     }
-    if(!(this->getTaskUuid().empty()))											//check the taskuuid is assigned or not
+    if(!(this->getCommandId().empty()))											//check the taskuuid is assigned or not
     {
-        root["response"]["taskUuid"] = this->getTaskUuid();
-    }
-    if(!(this->getSource().empty()))											//check the macAddress is assigned or not
-    {
-        root["response"]["source"] = this->getSource();
+        root["response"]["commandId"] = this->getCommandId();
     }
     output = writer.write(root);	//Json Response Done string is created
 }
@@ -387,14 +373,6 @@ string& SubutaiResponse::getHostname()
 }
 
 /**
- *  \details   getting "environmentId" private variable of SubutaiResponse instance.
- */
-string& SubutaiResponse::getEnvironmentId()
-{
-    return this->environmentId;
-}
-
-/**
  *  \details   setting "hostname" private variable of SubutaiResponse instance.
  *  		   This holds the hostname of the agent machine
  */
@@ -421,28 +399,20 @@ void SubutaiResponse::setMacAddress(const string& macAddress)
 }
 
 /**
- *  \details   setting "environmentId" private variable of SubutaiResponse instance.
- */
-void SubutaiResponse::setEnvironmentId(const string& envID)
-{
-    this->environmentId = envID;
-}
-
-/**
  *  \details   getting "taskUuid" private variable of SubutaiResponse instance.
  */
-string& SubutaiResponse::getTaskUuid()
+string& SubutaiResponse::getCommandId()
 {
-    return this->taskUuid;
+    return this->commandId;
 }
 
 /**
  *  \details   setting "taskUuid" private variable of SubutaiResponse instance.
  *  		   This holds the task uuid of the command
  */
-void SubutaiResponse::setTaskUuid(const string& taskuuid)
+void SubutaiResponse::setCommandId(const string& commandid)
 {
-    this->taskUuid = taskuuid;
+    this->commandId = commandid;
 }
 
 /**
@@ -465,23 +435,6 @@ vector<string>& SubutaiResponse::getIps()
 {					//getting ips vector
 
     return this->ips;
-}
-
-/**
- *  \details   getting "source" private variable of SubutaiResponse instance.
- */
-string& SubutaiResponse::getSource()
-{
-    return this->source;
-}
-
-/**
- *  \details   setting "source" private variable of SubutaiResponse instance.
- *  		   This holds the task source information of the response
- */
-void SubutaiResponse::setSource(const string& source)
-{
-    this->source = source;
 }
 
 /**
