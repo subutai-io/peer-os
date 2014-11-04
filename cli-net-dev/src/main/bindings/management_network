@@ -17,23 +17,38 @@ echo "        "Example Remove Operation
 echo "        "subutai management_network -r tunnel1
 echo 
 echo Usage:   Add a simple Open flow block rule to a bridge		
-echo "        "subutai \[-qh\] management_network -b BRIDGENAME PRIORITY PACKAGETYPE ACTION NWSRC NWDST INPORT  
+echo "        "subutai \[-qh\] management_network -b BRIDGENAME PRIORITY PACKAGETYPE ACTION {NWSRC NWDST INPORT}  
 echo "        "Example Parameters:
 echo "        "BRIDGENAME = {br-int , br-tun} etc..
 echo "        "PRIORITY = {1-32768} between..
 echo "        "PACKAGETYPE = {normal, arp, ip, icmp, tcp, udp} etc..
-echo "        "NWSRC=10.10.10.0/24, NWDST=10.10.10.0/24
-echo "        "INPORT=1
+echo "        "NWSRC=10.10.10.0/24, NWDST=10.10.10.0/24 {optional}
+echo "        "INPORT=1 {optional}
 echo "        "ACTION = {normal, drop ,flood} etc..
+echo "        "subutai management_network -b br-tun 1 normal normal
 echo
 echo Usage:   Add a simple open Flow forward rule to a bridge
 echo "        "subutai \[-qh\] management_network -f BRIDGENAME PRIORITY INPORT OUTPORT NWSRC NWDST ACTION
-echo
-echo Usage:   Show flow table and Port informations in a brdige                
+echo "        "Example Parameters:
+echo "        "BRIDGENAME = {br-int , br-tun} etc..
+echo "        "PRIORITY = {1-32768} between..
+echo "        "INPORT=1
+echo "        "OUTPORT=2
+echo "        "NWSRC=10.10.10.0/24, NWDST=10.10.10.0/24
+echo "        "ACTION = {normal, drop ,flood} etc..
+echo "        "subutai management_network -f br-tun 500 2 5 10.10.10.0/24 10.10.10.5 output
+echo 
+echo Usage:   Show flow table informations in a brdige                
 echo "        "subutai \[-qh\] management_network -s BRIDGENAME
+echo "        "subutai management_network -s br-tun
+echo
+echo Usage:   Show ports informations in a brdige                
+echo "        "subutai \[-qh\] management_network -p BRIDGENAME
+echo "        "subutai management_network -p br-tun
 echo
 echo Usage:   Delete a Open flow rule from a bridge                 
 echo "        "subutai \[-qh\] management_network -d BRIDGENAME MATCHCASE
+echo "        "subutai management_network -d br-tun dl_type=0x806
 echo -------------------------------------------------------------------------------
 }
 
@@ -61,9 +76,10 @@ function management_network {
   local addForwardFlow="false"
   local deleteFlow="false"
   local showFlow="false"
+  local showPort="false"
 
   shift_amount=0;
-  while getopts ":clrbfsd:" opt; do
+  while getopts ":clrbfspd:" opt; do
      case $opt in
        c)
 	 createTunnel="true"	
@@ -90,6 +106,10 @@ function management_network {
          ;;
        d)
          deleteFlow="true"
+         shift
+         ;;
+       p)
+         showPort="true"
          shift
          ;;
 
@@ -290,24 +310,44 @@ function management_network {
          msg_error "brdigeName Parameter not provided. Aborting ..."
          show_usage "`management_network_usage`"
       fi
-    
+      
       if [ "$extra" ]; then
          msg_error "extra Parameter provided. Aborting ..."
          show_usage "`management_network_usage`"
       fi
       
+      net_check_bridgeName $bridgeName
+
       echo "****************************"
       echo "Flow Table informations of $bridgeName"
       echo "****************************"
       ovs-ofctl dump-flows $bridgeName
       echo "****************************"
 
+   fi
+
+   if [ "true" == "$showPort" ]; then
+      bridgeName="$1"
+      extra="$2"
+
+      if [ -z "$bridgeName" ]; then
+         msg_error "brdigeName Parameter not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      if [ "$extra" ]; then
+         msg_error "extra Parameter provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      net_check_bridgeName $bridgeName
+
       echo "----------------------------"
       echo "Port informations of $bridgeName"
       echo "----------------------------"
-      ovs-ofctl show $bridgeName 
+      ovs-ofctl show $bridgeName
       echo "----------------------------"
-   fi
+   fi 
 
    if [ "true" == "$deleteFlow" ]; then
       bridgeName="$1"
@@ -323,7 +363,9 @@ function management_network {
          msg_error "matchCase Parameter not provided. Aborting ..."
          show_usage "`management_network_usage`"
       fi
-
+      
+      net_check_bridgeName $bridgeName
+      
       if [ "$extra" ]; then
          msg_error "extra Parameter provided. Aborting ..."
          show_usage "`management_network_usage`"
@@ -341,5 +383,6 @@ function management_network_description {
   echo "Remove a tunnel from subutai Host"
   echo "Add Block/Forwarding Flow rules "
   echo "Show Bridge Flow Rules"
+  echo "Show Bridge Port informations"
   echo "Delete Bridge Flow Rules" 
 }
