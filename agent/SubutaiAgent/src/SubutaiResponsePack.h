@@ -37,7 +37,7 @@ public:
 	string createTerminateMessage(string,int,string,string);
 	string createFailTerminateMessage(string,int,string,string);
 	string createInQueueMessage(string,string);
-	string createHeartBeatMessage(string,int,string,string,string,string,string,string);
+	string createHeartBeatMessage(string,string,string);
 	string createTimeoutMessage(string,int,int,int,string,string,string,string);
 	string createInotifyMessage(string,string,string,string);
 	string createInotifyShowMessage(string,vector<string>);

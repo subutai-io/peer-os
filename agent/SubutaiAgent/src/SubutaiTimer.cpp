@@ -106,37 +106,36 @@ bool SubutaiTimer::checkExecutionTimeout(unsigned int* startsec,bool* overflag,u
 }
 
 
-bool SubutaiTimer::sendHeartBeat(SubutaiCommand command)
+void SubutaiTimer::sendHeartBeat()
+{
+	response->clear();
+
+		    /*
+		    * Refresh new agent ip address set for each heartbeat message
+		    */
+		     environment->getAgentIpAddress();
+		     containerManager->updateContainerLists();
+
+		     response->setIps(environment->getAgentIpValue());
+		     response->setHostname(environment->getAgentHostnameValue());
+		     response->setMacAddress(environment->getAgentMacAddressValue());
+		     response->setContainerSet(containerManager->getAllContainers());
+		     string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue(),  environment->getAgentMacAddressValue());
+		    connection->sendMessage(resp);
+
+		    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat Response:", resp));
+}
+
+bool SubutaiTimer::checkHeartBeatTimer(SubutaiCommand command)
 {
 	if (checkExecutionTimeout(&startsec,&overflag,&exectimeout,&count)) //checking Default Timeout
 	{
-	    //timeout occured!!
-		response->clear();
+		sendHeartBeat();
 
-	    /*
-	    * Refresh new agent ip address set for each heartbeat message
-	    */
-	     environment->getAgentIpAddress();
-	     containerManager->updateContainerLists();
-
-	     response->setIps(environment->getAgentIpValue());
-	     response->setHostname(environment->getAgentHostnameValue());
-	     response->setMacAddress(environment->getAgentMacAddressValue());
-	     string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(),
-	    		 command.getRequestSequenceNumber(),
-	             environment->getAgentEnvironmentIdValue(),
-	             environment->getAgentMacAddressValue(),
-	             environment->getAgentHostnameValue(),
-	             environment->getAgentParentHostnameValue(),
-	             command.getSource(),
-	             command.getTaskUuid());
-	    connection->sendMessage(resp);
-
-	    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat Response:", resp));
 	    start =         boost::posix_time::second_clock::local_time();	//Reset Default Timeout value
 	    startsec =      start.time_of_day().seconds();
 	    overflag =      false;
-	    exectimeout =   175;
+	    exectimeout =   30;
 	    count =         1;
 
 	    return true;
@@ -144,7 +143,7 @@ bool SubutaiTimer::sendHeartBeat(SubutaiCommand command)
 	return false;
 }
 
-bool SubutaiTimer::sendCommandQueueInfo(SubutaiCommand command)
+bool SubutaiTimer::checkCommandQueueInfoTimer(SubutaiCommand command)
 {
 	 if (checkExecutionTimeout(&startsecQueue,&overflagQueue,&queuetimeout,&countQueue))
 	 {   //checking IN_QUEUE Default Timeout
@@ -158,6 +157,13 @@ bool SubutaiTimer::sendCommandQueueInfo(SubutaiCommand command)
 	         {
 	    		 if (command.deserialize(queueElement))
 	             {
+	    			 /*
+	    			  *         "type":"IN_QUEUE",
+
+        						"id":"56b0ac88-5140-4a32-8691-916d75d62f1c"
+
+        						"commandId":"c6cd5988-ceac-11e3-82b2-ebd389e743a3"
+	    			  */
 	    			 string resp = response->createInQueueMessage(environment->getAgentUuidValue(), command.getTaskUuid());
 	                 connection->sendMessage(resp);
 	                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "IN_QUEUE Response:", resp));

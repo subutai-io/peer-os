@@ -30,6 +30,7 @@
 #include <jsoncpp/json.h>
 #include <string>
 #include <fstream>
+#include "SubutaiContainer.h"
 using namespace std;
 using std::stringstream;
 using std::string;
@@ -58,6 +59,7 @@ public:
 	string& getDateTime();
 	string& getChangeType();
 	vector<string>& getConfPoints();
+	void setContainerSet(vector<SubutaiContainer>);
 	void setSource(const string&);
 	void setHostname(const string&);
 	void setParentHostname(const string&);
@@ -100,5 +102,6 @@ private:
 	string			dateTime;
 	string			changeType;
 	vector<string>  confPoints;
+	vector<SubutaiContainer>  containers;
 };
 #endif /* SUBUTAIRESPONSE_H_ */

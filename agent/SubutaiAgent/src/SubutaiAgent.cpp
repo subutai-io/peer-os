@@ -229,7 +229,7 @@ int main(int argc,char *argv[],char *envp[])
      */
     SubutaiContainerManager cman("/var/lib/lxc", &logMain);
     //updateContainerInfosPeriodically(&cman);
-    cman.write();
+
 
     /*
      * Opening MQTT Connection
@@ -286,7 +286,7 @@ int main(int argc,char *argv[],char *envp[])
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Registration Message:", sendout));
     connection->sendMessage(sendout);
 
-    cman.registerAllContainers(connection);
+    //cman.registerAllContainers(connection);
 
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Shared Memory MessageQueue is initializing.."));
     message_queue messageQueue
@@ -303,9 +303,10 @@ int main(int argc,char *argv[],char *envp[])
 
     /*
      * initializing timer settings
-     */
+     *//*
     boost::posix_time::ptime start =            boost::posix_time::second_clock::local_time();
     boost::posix_time::ptime startQueue =       boost::posix_time::second_clock::local_time();
+
     unsigned int exectimeout =                  175;    //180 seconds for HeartBeat Default Timeout
     unsigned int queuetimeout =                 30;     //30 seconds for In Queue Default Timeout
     unsigned int startsec  =                    start.time_of_day().seconds();
@@ -314,6 +315,7 @@ int main(int argc,char *argv[],char *envp[])
     bool overflagQueue =                        false;
     unsigned int count =                        1;
     unsigned int countQueue =                   1;
+    */
     list<int> pidList;
     int ncores =                                -1;
     ncores =                                    sysconf(_SC_NPROCESSORS_CONF);
@@ -337,12 +339,13 @@ int main(int argc,char *argv[],char *envp[])
     SubutaiTimer timer(logMain, &environment, &cman, connection);
     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Timer is initializing.."));
 
+    timer.sendHeartBeat();
     while(true)
     {
         try
         {
-        	timer.sendHeartBeat(command);
-        	timer.sendCommandQueueInfo(command);
+        	timer.checkHeartBeatTimer(command);
+        	timer.checkCommandQueueInfoTimer(command);
 
             command.clear();
             for (list<int>::iterator iter = pidList.begin(); iter != pidList.end();iter++)
@@ -446,10 +449,7 @@ int main(int argc,char *argv[],char *envp[])
                             response.setParentHostname(environment.getAgentParentHostnameValue());
                             response.setMacAddress(environment.getAgentMacAddressValue());
                             string resp = response.createHeartBeatMessage(environment.getAgentUuidValue(),
-                                    command.getRequestSequenceNumber(), environment.getAgentEnvironmentIdValue(),
-                                    environment.getAgentMacAddressValue(),environment.getAgentParentHostnameValue(),
-                                    environment.getAgentParentHostnameValue(),
-                                    command.getSource(),command.getTaskUuid());
+                                    environment.getAgentParentHostnameValue(), environment.getAgentMacAddressValue());
                             connection->sendMessage(resp);
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","HeartBeat Response:", resp));
                         } else {

@@ -61,8 +61,9 @@ public:
 	SubutaiTimer(SubutaiLogger, SubutaiEnvironment*, SubutaiContainerManager*, SubutaiConnection*);
 	virtual ~SubutaiTimer( void );
 	bool checkExecutionTimeout(unsigned int* ,bool* ,unsigned int* ,unsigned int*);
-	bool sendHeartBeat(SubutaiCommand);
-	bool sendCommandQueueInfo(SubutaiCommand);
+	void sendHeartBeat();
+	bool checkHeartBeatTimer(SubutaiCommand);
+	bool checkCommandQueueInfoTimer(SubutaiCommand);
 
 private:
 	SubutaiEnvironment* environment;

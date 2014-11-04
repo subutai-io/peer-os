@@ -25,7 +25,6 @@
  *  @date      Oct 31, 2014
  */
 #include "SubutaiContainer.h"
-#include "SubutaiConnection.h"
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -256,9 +255,11 @@ void SubutaiContainer::setContainerHostname(string hostname)
 /**
  *  \details   Hostname of the KiskisAgent machine is fetched from statically.
  */
-containerStatus SubutaiContainer::getContainerStatus()
+string SubutaiContainer::getContainerStatus()
 {
-    return this->status;
+    if(this->status == RUNNING) return "RUNNING";
+    if(this->status == STOPPED) return "STOPPED";
+    if(this->status == FROZEN)  return "FROZEN";
 }
 
 void SubutaiContainer::setContainerStatus(containerStatus status)
@@ -390,11 +391,11 @@ void SubutaiContainer::getContainerAllFields()
 }
 
 void SubutaiContainer::write(){
-    cout << id << "  " << macAddress << "  " << hostname << "  " << parentHostname<< "  " <<  endl;
+    cout << " start" <<  id << "  " << macAddress << "  " << hostname << "  " << parentHostname<< " stop" <<  endl;
 
 }
 
-
+/*
 void SubutaiContainer::registerContainer(SubutaiConnection* connection)
 {
     SubutaiResponsePack response;
@@ -402,7 +403,7 @@ void SubutaiContainer::registerContainer(SubutaiConnection* connection)
     string sendout = response.createRegistrationMessage(this->id, this->macAddress, this->hostname, this->parentHostname, "", this->ipAddress);
     containerLogger->writeLog(7, containerLogger->setLogData("<SubutaiAgent>","Registration Message:", sendout));
     connection->sendMessage(sendout);
-}
+}*/
 
 // We need to check if CWD is exist because in LXC API - if cwd does not
 // exist CWD will become root directory

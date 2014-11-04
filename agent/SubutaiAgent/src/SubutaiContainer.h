@@ -45,7 +45,6 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include "SubutaiLogger.h"
 #include "SubutaiConnection.h"
-#include "SubutaiResponsePack.h"
 #include "SubutaiCommand.h"
 using namespace std;
 using std::stringstream;
@@ -82,18 +81,17 @@ public:
 	string getContainerConnectionOptionsValue();
 	lxc_container* getLxcContainerValue();
 	vector<string> getContainerIpValue();
-	containerStatus getContainerStatus();
+	string getContainerStatus();
 	bool isContainerRunning();
 	bool isContainerStopped();
 	bool isContainerFrozen();
 
-        void UpdateUsersList();
+    void UpdateUsersList();
 	void setContainerHostname(string);
 	void setContainerStatus(containerStatus);
 	void getContainerAllFields();
 	string RunProgram(string , vector<string>);
 	ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT);
-	void registerContainer(SubutaiConnection* );
 	void write();
     bool checkCWD(string cwd);
     bool checkUser(string username);
@@ -106,7 +104,7 @@ private:
 	string macAddress;
 	string hostname;
 	string parentHostname;
-        map<int, string> _users;        // List of users available in system
+    map<int, string> _users;        // List of users available in system
 	vector<string> ipAddress;
 	SubutaiLogger*	containerLogger;
 };
