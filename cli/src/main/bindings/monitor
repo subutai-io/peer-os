@@ -5,11 +5,12 @@ function monitor_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Monitor containers.
   echo
-  echo "        "subutai \[-qh\] monitor \[-p\|container_name\] \[-c\|-u metric_type\|-q metric_type\]
+  echo "        "subutai \[-qh\] monitor \[-c metric_type\|-s metric_type\|-e metric_type\|-q metric_type\] \[hostname\]
   echo "          "parameters:
   echo "                    "p -- physical machine
   echo "                    "c -- create rrd for container
-  echo "                    "u -- update rrd for container for given metric
+  echo "                    "s -- starts monitoring of container for given metric
+  echo "                    "e -- ends monitoring of container for given metric
   echo "                    "q -- query rrd for container for given metric
   echo
   echo -----------------------------------------------------------------------
@@ -20,33 +21,51 @@ function monitor {
   local is_physical="false"
   local is_create="false"
   local is_update="false"
+  local is_start="false"
+  local is_end="false"
   local is_query="false"
   shift_amount=0;
-  while getopts ":pcu:q:" opt; do
+
+  while getopts ":c:s:e:u:q:" opt; do
     case $opt in
-      p)
-        is_physical="true"
-        ;;
       c)
+        metric_type="$OPTARG"
         is_create="true"
-        if [[ "true" == "$is_update" || "true" == "$is_query" ]]; then
-          msg_error "Cannot use the -c, -u, and -q options together." >&2
+        if [[ "true" == "$is_start" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" ]]; then
+          msg_error "Cannot use the -c, -s, -e, -u, and -q options together." >&2
+          exit 1
+        fi
+	;;
+	u)
+        metric_type="$OPTARG"
+        is_update="true"
+        if [[ "true" == "$is_create" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_start" ]]; then
+          msg_error "Cannot use the -c, -s, -e, -u, and -q options together." >&2
           exit 1
         fi
         ;;
-      u)
+
+      s)
 	metric_type="$OPTARG"
-        is_update="true"
-	if [[ "true" == "$is_create" || "true" == "$is_query" ]]; then
-          msg_error "Cannot use the -c, -u, and -q options together." >&2
+        is_start="true"
+	if [[ "true" == "$is_create" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" ]]; then
+          msg_error "Cannot use the -c, -s, -e, -u, and -q options together." >&2
+          exit 1
+        fi
+        ;;
+      e)
+        metric_type="$OPTARG"
+        is_end="true"
+        if [[ "true" == "$is_create" || "true" == "$is_query" || "true" == "$is_start" || "true" == "$is_update" ]]; then
+          msg_error "Cannot use the -c, -s, -e, -u, and -q options together." >&2
           exit 1
         fi
         ;;
       q)
         metric_type="$OPTARG"
         is_query="true"
-        if [[ "true" == "$is_update" || "true" == "$is_create" ]]; then
-          msg_error "Cannot use the -c, -u, and -q options together." >&2
+        if [[ "true" == "$is_start" || "true" == "$is_create" || "true" == "$is_end" || "true" == "$is_update" ]]; then
+          msg_error "Cannot use the -c, -s, -e, -u, and -q options together." >&2
           exit 1
         fi
 	;;
@@ -54,31 +73,63 @@ function monitor {
         msg_error "Unrecognized option -$OPTARG"
         exit 1
         ;;
+      :)
+        msg_error "Option -$OPTARG requires an argument." >&2
+        exit 1
     esac
     shift_amount=$(($shift_amount + 1))
   done
-
-  while [ -n "`echo $1 | grep -`" ]; do
-    shift
-  done
-  
-  if [ "x$is_physical" == "xtrue" ]; then
-    hostname=`hostname`
-  else
-    hostname=$1
-  fi
-  
-  if [ "x$hostname" == "x`hostname`" ]; then
-    get_physical_machine_metrics
-  else
-    lxc=$1
-    lxc_assert "$lxc" > /dev/null
-    get_container_metrics $lxc
+#  while [ -n "`echo $1 | grep -`" ]; do
+#    shift
+#  done
+  shift $((OPTIND-1))
+  if [ "x$1" == "x`hostname`" ]; then
+    is_physical="true"
   fi
 
-  # Result
-  printf '{"host":"%s", "totalRam":"%s", "availableRam":"%s", "usedRam":"%s", "cpuLoad5":"%s", "availableDisk":"%s", "usedDisk":"%s", "totalDisk":"%s"}\n' "$host" "$totalRam" "$availableRam" "$usedRam" "$cpuLoad5" "$availableDisk" "$usedDisk" "$totalDisk"
+  if [ "x$1" == "x" ]; then
+    msg_error "Host is not provided. Aborting!"
+    show_usage "`monitor_usage`"
+  fi
 
+  hostname=$1
+
+  #TEST_MODE="true" 
+  if [ "$TEST_MODE" == "true" ]; then
+    echo ---- TEST_MODE DUMP ----
+    echo -e "operand count\t= $#"
+    echo -e "operands\t= $@"
+    echo -e "hostname\t= $hostname"
+    echo -e "is_physical\t= $is_physical"
+    echo -e "is_create\t= $is_create"
+    echo -e "is_update\t= $is_update"
+    echo -e "is_start\t= $is_start"
+    echo -e "is_end\t= $is_end"
+    echo -e "is_query\t= $is_query"
+    echo -e "metric_type\t= $metric_type"
+    echo
+  fi
+ 
+  if [ $is_create == "true" ]; then
+    create_rrd "$hostname" "$metric_type"
+  elif [ $is_update == "true"  ]; then
+    update_rrd "$hostname" "$metric_type"
+  elif [ $is_start == "true"  ]; then
+    start_update_rrd "$hostname" "$metric_type"
+  elif [ $is_end == "true"  ]; then
+    stop_update_rrd "$hostname" "$metric_type"
+  elif [ $is_query == "true" ]; then
+    query_rrd "$hostname" "$metric_type"
+  else
+    if [ "x$hostname" == "x`hostname`" ]; then
+      get_physical_machine_metrics
+    else
+      lxc=$1
+      lxc_assert "$lxc" > /dev/null
+      get_container_metrics $lxc
+    fi
+    print_results
+  fi
 }
 
 
@@ -88,11 +139,10 @@ function get_physical_machine_metrics {
   totalRam=$(get_physical_total_ram)
   availableRam=$(get_physical_available_ram)
   usedRam=$(get_physical_used_ram)
-  cpuLoad5=$(get_physical_cpu_load_seconds 5)
+  usedCpu=$(get_physical_used_cpu)
   availableDisk=$(get_physical_available_disk)
   usedDisk=$(get_physical_used_disk)
   totalDisk=$(get_physical_total_disk)
-
 }
 
 
@@ -102,11 +152,16 @@ function get_container_metrics {
   totalRam=$(get_total_ram $lxc)
   availableRam=$(get_available_ram $lxc)
   usedRam=$(get_used_ram $lxc)
-  cpuLoad5=$(get_cpu_load_seconds $lxc 5)
+  usedCpu=$(get_used_cpu $lxc)
   availableDisk=$(get_available_disk $lxc)
   usedDisk=$(get_used_disk $lxc)
   totalDisk=$(get_total_disk $lxc)
+}
 
+
+function print_results {
+  # Result
+  printf '{"host":"%s", "totalRam":"%s", "availableRam":"%s", "usedRam":"%s", "usedCpu":"%s", "availableDisk":"%s", "usedDisk":"%s", "totalDisk":"%s"}\n' "$host" "$totalRam" "$availableRam" "$usedRam" "$usedCpu" "$availableDisk" "$usedDisk" "$totalDisk"
 }
 
 
