@@ -135,7 +135,9 @@ function create_rrd {
   local hostname=$1
   local metric_type=$2
 
-  lxc_assert "$hostname"
+  if [ `hostname` != $hostname ]; then
+    lxc_assert "$hostname"
+  fi
   assert_metric "$metric_type"
 
   mkdir -p $SUBUTAI_RRD_DIRECTORY > /dev/null 2>&1
@@ -153,7 +155,9 @@ function update_rrd {
   local hostname=$1
   local metric_type=$2
 
-  lxc_assert "$hostname"
+  if [ `hostname` != $hostname ]; then
+    lxc_assert "$hostname"
+  fi
   assert_metric "$metric_type" 
 
   local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
@@ -171,7 +175,9 @@ function start_update_rrd {
   local hostname=$1
   local metric_type=$2
 
-  lxc_assert "$hostname"
+  if [ `hostname` != $hostname ]; then
+    lxc_assert "$hostname"
+  fi
   assert_metric "$metric_type"
   stop_update_rrd "$hostname" "$metric_type" > /dev/null
   #write out current crontab
@@ -181,12 +187,6 @@ function start_update_rrd {
   #install new cron file
   crontab mycron
   rm mycron
-#  crontab -l | { cat; */$(get_cron_interval_in_minutes) * * * * subutai monitor -u $metric_type $hostname; } | crontab -
-#  while true
-#  do
-#    update_rrd $hostname $metric_type > /dev/null 2>&1
-#    sleep $(get_update_sequence)
-#  done
 }
 
 
@@ -194,7 +194,9 @@ function stop_update_rrd {
   local hostname=$1
   local metric_type=$2
 
-  lxc_assert "$hostname"
+  if [ `hostname` != $hostname ]; then
+    lxc_assert "$hostname"
+  fi
   assert_metric "$metric_type"
 
   crontab -l | sed "/subutai monitor -u $metric_type $hostname/d" | crontab -
@@ -204,8 +206,10 @@ function stop_update_rrd {
 function query_rrd {
   local hostname=$1
   local metric_type=$2
-
-  lxc_assert "$hostname"
+  
+  if [ `hostname` != $hostname ]; then
+    lxc_assert "$hostname"
+  fi
   assert_metric "$metric_type"
 
   local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
@@ -214,7 +218,7 @@ function query_rrd {
   local update_sequence=$(get_update_sequence)
   # Show last X entries
   local start_time=$(($update_sequence * 50))
-  rrdtool fetch $database_file LAST -e $TIME -s e-"$start_time"sec
+  rrdtool fetch "$database_file" LAST -e $TIME -s e-"$start_time"sec
 }
 
 
@@ -255,7 +259,9 @@ function get_database_file {
   local hostname=$1
   local metric_type=$2
 
-  lxc_assert "$hostname" > /dev/null
+  if [ `hostname` != $hostname ]; then
+    lxc_assert "$hostname" > /dev/null
+  fi
   assert_metric "$metric_type" > /dev/null
 
   echo ""$metric_type"_"$hostname".rrd"
