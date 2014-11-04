@@ -38,11 +38,9 @@ public class Commands
         return "service hadoop-dfs status";
     }
 
-
     public String getStartNameNodeCommand(){
         return "service hadoop-dfs start";
     }
-
 
     public String getStopNameNodeCommand(){
         return "service hadoop-dfs stop";
@@ -53,12 +51,11 @@ public class Commands
     }
 
     public String getStopJobTrackerCommand(){
-        return "service hadoop-mapred start";
+        return "service hadoop-mapred stop";
     }
 
-
     public String getStatusJobTrackerCommand(){
-        return "service hadoop-mapred start";
+        return "service hadoop-mapred status";
     }
 
     public String getStatusDataNodeCommand()
@@ -69,7 +66,6 @@ public class Commands
     public String getConfigureJobTrackerCommand(){
         return ". /etc/profile && " + "hadoop-master-slave.sh slaves " + config.getJobTracker().getHostname();
     }
-
 
     public String getConfigureSecondaryNameNodeCommand(){
         return ". /etc/profile && " + "hadoop-master-slave.sh masters " + config.getNameNode().getHostname();
@@ -244,16 +240,23 @@ public class Commands
     }
 
 
-    public String getStartTaskTrackerCommand( Agent agent )
+    public String getStopDataNodeCommand()
+    {
+        return ". /etc/profile && " + "hadoop-daemons.sh stop datanode";
+    }
+
+
+    public String getStartTaskTrackerCommand()
     {
         return ". /etc/profile && " + "hadoop-daemons.sh start tasktracker";
     }
 
 
-    public String getStopTaskTrackerCommand( Agent agent )
+    public String getStopTaskTrackerCommand()
     {
         return ". /etc/profile && " + "hadoop-daemons.sh stop tasktracker";
     }
+
 
 
     //

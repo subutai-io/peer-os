@@ -1,94 +1,94 @@
-//package org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker;
-//
-//
-//import org.safehaus.subutai.common.enums.NodeState;
-//import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-//import org.safehaus.subutai.common.protocol.Agent;
-//import org.safehaus.subutai.core.command.api.command.AgentResult;
-//import org.safehaus.subutai.core.command.api.command.Command;
-//import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-//import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
-//
-//
-//public class StartTaskTrackerOperationHandler extends AbstractOperationHandler<HadoopImpl>
-//{
-//
-//    private String lxcHostName;
-//
-//
-//    public StartTaskTrackerOperationHandler( HadoopImpl manager, String clusterName, String lxcHostname )
-//    {
-//        super( manager, clusterName );
-//        this.lxcHostName = lxcHostname;
-//        trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
-//                String.format( "Starting TaskTracker in %s", clusterName ) );
-//    }
-//
-//
-//    @Override
-//    public void run()
-//    {
-//        HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
-//
-//        if ( hadoopClusterConfig == null )
-//        {
-//            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
-//            return;
-//        }
-//
-//        Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostName );
-//        if ( !hadoopClusterConfig.getTaskTrackers().contains( agent ) )
-//        {
-//            trackerOperation.addLogFailed( String.format( "TaskTracker on %s does not exist", clusterName ) );
-//            return;
-//        }
-//
-//        Agent node = manager.getAgentManager().getAgentByHostname( lxcHostName );
-//        if ( node == null )
-//        {
-//            trackerOperation.addLogFailed( "TaskTracker is not connected" );
-//            return;
-//        }
-//
-//        Command startCommand = manager.getCommands().getStartTaskTrackerCommand( node );
-//        manager.getCommandRunner().runCommand( startCommand );
-//        Command statusCommand = manager.getCommands().getJobTrackerCommand( node, "status" );
-//        manager.getCommandRunner().runCommand( statusCommand );
-//
-//        AgentResult result = statusCommand.getResults().get( node.getUuid() );
-//
-//        NodeState nodeState = NodeState.UNKNOWN;
-//        if ( statusCommand.hasCompleted() )
-//        {
-//            if ( result.getStdOut() != null && result.getStdOut().contains( "TaskTracker" ) )
-//            {
-//                String[] array = result.getStdOut().split( "\n" );
-//
-//                for ( String status : array )
-//                {
-//                    if ( status.contains( "TaskTracker" ) )
-//                    {
-//                        String temp = status.replaceAll( "TaskTracker is ", "" );
-//                        if ( temp.toLowerCase().contains( "not" ) )
-//                        {
-//                            nodeState = NodeState.STOPPED;
-//                        }
-//                        else
-//                        {
-//                            nodeState = NodeState.RUNNING;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//        if ( NodeState.UNKNOWN.equals( nodeState ) )
-//        {
-//            trackerOperation.addLogFailed( String.format( "Failed to check status of %s", node.getHostname() ) );
-//        }
-//        else
-//        {
-//            trackerOperation.addLogDone( String.format( "TaskTracker of %s is %s", node.getHostname(), nodeState ) );
-//        }
-//    }
-//}
+package org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker;
+
+
+import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
+import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
+
+import java.util.Iterator;
+
+
+public class StartTaskTrackerOperationHandler extends AbstractOperationHandler<HadoopImpl>
+{
+
+    private String lxcHostName;
+
+
+    public StartTaskTrackerOperationHandler( HadoopImpl manager, String clusterName, String lxcHostname )
+    {
+        super( manager, clusterName );
+        this.lxcHostName = lxcHostname;
+        trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
+                String.format( "Starting TaskTracker in %s", clusterName ) );
+    }
+
+
+    @Override
+    public void run()
+    {
+        HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
+        Commands commands = new Commands( hadoopClusterConfig );
+
+        if ( hadoopClusterConfig == null )
+        {
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            return;
+        }
+
+        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
+        Iterator iterator = environment.getContainers().iterator();
+
+        ContainerHost host = null;
+        while ( iterator.hasNext() )
+        {
+            host = ( ContainerHost ) iterator.next();
+            if ( host.getAgent().getUuid().equals( hadoopClusterConfig.getNameNode().getAgent().getUuid() ) )
+            {
+                break;
+            }
+        }
+
+        if ( host == null )
+        {
+            trackerOperation.addLogFailed( String.format( "No Container with ID %s", host.getId() ) );
+            return;
+        }
+
+        try
+        {
+            CommandResult result = host.execute( new RequestBuilder( commands.getStartTaskTrackerCommand() ) );
+            logStatusResults( trackerOperation, result );
+        }
+        catch ( CommandException e )
+        {
+            trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
+        }
+    }
+
+    private void logStatusResults( TrackerOperation po, CommandResult result )
+    {
+        if ( result.getStdOut() != null && result.getStdOut().contains( "TaskTracker" ) )
+        {
+            String[] array = result.getStdOut().split( "\n" );
+
+            for ( String status : array )
+            {
+                if ( status.contains( "TaskTracker" ) )
+                {
+                    trackerOperation.addLogDone( status );
+                }
+            }
+        }
+    }
+}

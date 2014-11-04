@@ -4,6 +4,7 @@ package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
 import java.util.Iterator;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -82,6 +83,8 @@ public class StatusDataNodeOperationHandler extends AbstractOperationHandler<Had
 
     private void logStatusResults( TrackerOperation po, CommandResult result )
     {
+        NodeState nodeState = NodeState.UNKNOWN;
+
         if ( result.getStdOut() != null && result.getStdOut().contains( "DataNode" ) )
         {
             String[] array = result.getStdOut().split( "\n" );
@@ -90,9 +93,27 @@ public class StatusDataNodeOperationHandler extends AbstractOperationHandler<Had
             {
                 if ( status.contains( "DataNode" ) )
                 {
-                    trackerOperation.addLogDone( status );
+                    String temp = status.replaceAll( "DataNode is ", "" );
+                    if ( temp.toLowerCase().contains( "not" ) )
+                    {
+                        nodeState = NodeState.STOPPED;
+                    }
+                    else
+                    {
+                        nodeState = NodeState.RUNNING;
+                    }
                 }
             }
+        }
+
+
+        if ( NodeState.UNKNOWN.equals( nodeState ) )
+        {
+            trackerOperation.addLogFailed( String.format( "Failed to check status" ) );
+        }
+        else
+        {
+            trackerOperation.addLogDone( String.format( "DataNode is %s", nodeState ) );
         }
     }
 

@@ -330,7 +330,6 @@ public class Manager
             populateTable( masterNodesTable, getMasters( environment.getContainers(), hadoopCluster ) );
             populateTable( slaveNodesTable, getSlaves( environment.getContainers(), hadoopCluster ) );
 
-
             replicationFactor.setValue( hadoopCluster.getReplicationFactor().toString() );
             domainName.setValue( hadoopCluster.getDomainName() );
             slaveNodeCount.setValue( hadoopCluster.getAllSlaveNodes().size() + "" );
@@ -870,8 +869,7 @@ public class Manager
         // If slave node
         else
         {
-
-//            checkButton.addClickListener( managerListener.slaveNodeCheckButtonListener( row ) );
+            checkButton.addClickListener( managerListener.slaveNodeCheckButtonListener( row ) );
             excludeIncludeNodeButton.addClickListener( managerListener.slaveNodeExcludeIncludeButtonListener( row ) );
             destroyButton.addClickListener( managerListener.slaveNodeDestroyButtonListener( row ) );
         }

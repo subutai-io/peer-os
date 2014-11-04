@@ -1,96 +1,94 @@
-//package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
-//
-//
-//import java.util.regex.Pattern;
-//
-//import org.safehaus.subutai.common.enums.NodeState;
-//import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-//import org.safehaus.subutai.common.protocol.Agent;
-//import org.safehaus.subutai.core.command.api.command.AgentResult;
-//import org.safehaus.subutai.core.command.api.command.Command;
-//import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-//import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
-//
-//
-//public class RestartNameNodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
-//{
-//
-//    public RestartNameNodeOperationHandler( HadoopImpl manager, String clusterName )
-//    {
-//        super( manager, clusterName );
-//        trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
-//                String.format( "Restarting NameNode in %s", clusterName ) );
-//    }
-//
-//
-//    @Override
-//    public void run()
-//    {
-//        HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
-//
-//        if ( hadoopClusterConfig == null )
-//        {
-//            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
-//            return;
-//        }
-//
-//        if ( hadoopClusterConfig.getNameNode() == null )
-//        {
-//            trackerOperation.addLogFailed( String.format( "NameNode on %s does not exist", clusterName ) );
-//            return;
-//        }
-////
-//        Agent node = manager.getAgentManager().getAgentByHostname( hadoopClusterConfig.getNameNode().getHostname() );
-//        if ( node == null )
-//        {
-//            trackerOperation.addLogFailed( "NameNode is not connected" );
-//            return;
-//        }
-//
-//        Command stopCommand = manager.getCommands().getNameNodeCommand( node, "stop" );
-//        manager.getCommandRunner().runCommand( stopCommand );
-//        Command startCommand = manager.getCommands().getNameNodeCommand( node, "start" );
-//        manager.getCommandRunner().runCommand( startCommand );
-//        Command statusCommand = manager.getCommands().getNameNodeCommand( node, "status" );
-//        manager.getCommandRunner().runCommand( statusCommand );
-//
-//        AgentResult result = statusCommand.getResults().get( node.getUuid() );
-//        NodeState nodeState = NodeState.UNKNOWN;
-//
-//        if ( result != null )
-//        {
-//            if ( result.getStdOut().contains( "NameNode" ) )
-//            {
-//                String[] array = result.getStdOut().split( "\n" );
-//
-//                for ( String status : array )
-//                {
-//                    if ( status.contains( "NameNode" ) )
-//                    {
-//                        String temp = status.replaceAll(
-//                                Pattern.quote( "!(SecondaryNameNode is not running on this " + "machine)" ), "" ).
-//                                                    replaceAll( "NameNode is ", "" );
-//                        if ( temp.toLowerCase().contains( "not" ) )
-//                        {
-//                            nodeState = NodeState.STOPPED;
-//                        }
-//                        else
-//                        {
-//                            nodeState = NodeState.RUNNING;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//        if ( NodeState.RUNNING.equals( nodeState ) )
-//        {
-//            trackerOperation.addLogDone( String.format( "NameNode on %s restarted", node.getHostname() ) );
-//        }
-//        else
-//        {
-//            trackerOperation.addLogFailed( String.format( "Failed to restart NameNode %s. %s", node.getHostname(),
-//                    startCommand.getAllErrors() ) );
-//        }
-//    }
-//}
+package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
+
+
+import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
+import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
+
+import java.util.Iterator;
+
+
+public class RestartNameNodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
+{
+
+    public RestartNameNodeOperationHandler( HadoopImpl manager, String clusterName )
+    {
+        super( manager, clusterName );
+        trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
+                String.format( "Restarting NameNode in %s", clusterName ) );
+    }
+
+
+    @Override
+    public void run()
+    {
+        HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
+        Commands commands = new Commands( hadoopClusterConfig );
+
+        if ( hadoopClusterConfig == null )
+        {
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            return;
+        }
+
+        if ( hadoopClusterConfig.getNameNode() == null )
+        {
+            trackerOperation.addLogFailed( String.format( "NameNode on %s does not exist", clusterName ) );
+            return;
+        }
+
+        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
+        Iterator iterator = environment.getContainers().iterator();
+
+        ContainerHost host = null;
+        while ( iterator.hasNext() )
+        {
+            host = ( ContainerHost ) iterator.next();
+            if ( host.getAgent().getUuid().equals( hadoopClusterConfig.getNameNode().getAgent().getUuid() ) )
+            {
+                break;
+            }
+        }
+
+        if ( host == null )
+        {
+            trackerOperation.addLogFailed( String.format( "No Container with ID %s", host.getId() ) );
+            return;
+        }
+
+        try
+        {
+            CommandResult result;
+            host.execute( new RequestBuilder( commands.getStopNameNodeCommand() ) );
+            result = host.execute( new RequestBuilder( commands.getStartNameNodeCommand() ) );
+            logStatusResults(trackerOperation, result);
+        }
+        catch ( CommandException e )
+        {
+            trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
+        }
+    }
+
+    private void logStatusResults( TrackerOperation po, CommandResult result )
+    {
+        if ( result.getStdOut() != null && result.getStdOut().contains( "NameNode" ) )
+        {
+            String[] array = result.getStdOut().split( "\n" );
+
+            for ( String status : array )
+            {
+                if ( status.contains( "NameNode" ) )
+                {
+                    trackerOperation.addLogDone( status );
+                }
+            }
+        }
+    }
+}

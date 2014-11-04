@@ -80,8 +80,9 @@ public class StatusNameNodeOperationHandler extends AbstractOperationHandler<Had
         }
     }
 
-    private void logStatusResults( TrackerOperation po, CommandResult result )
+    private void logStatusResults( TrackerOperation trackerOperation, CommandResult result )
     {
+        NodeState nodeState = NodeState.UNKNOWN;
         if ( result.getStdOut() != null && result.getStdOut().contains( "NameNode" ) )
         {
             String[] array = result.getStdOut().split( "\n" );
@@ -90,9 +91,28 @@ public class StatusNameNodeOperationHandler extends AbstractOperationHandler<Had
             {
                 if ( status.contains( "NameNode" ) )
                 {
-                    trackerOperation.addLogDone( status );
+                    String temp = status.replaceAll(
+                            Pattern.quote( "!(SecondaryNameNode is not running on this " + "machine)" ), "" ).
+                            replaceAll( "NameNode is ", "" );
+                    if ( temp.toLowerCase().contains( "not" ) )
+                    {
+                        nodeState = NodeState.STOPPED;
+                    }
+                    else
+                    {
+                        nodeState = NodeState.RUNNING;
+                    }
                 }
             }
+        }
+        if ( NodeState.UNKNOWN.equals( nodeState ) )
+        {
+            trackerOperation.addLogFailed( String.format( "Failed to check status of node") );
+        }
+        else
+        {
+            trackerOperation
+                    .addLogDone( String.format( "NameNode is %s", nodeState ) );
         }
     }
 }

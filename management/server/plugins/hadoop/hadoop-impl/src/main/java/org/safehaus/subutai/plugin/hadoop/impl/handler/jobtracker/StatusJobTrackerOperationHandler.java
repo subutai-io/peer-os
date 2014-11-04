@@ -49,7 +49,7 @@ public class StatusJobTrackerOperationHandler extends AbstractOperationHandler<H
         while ( iterator.hasNext() )
         {
             host = ( ContainerHost ) iterator.next();
-            if ( host.getAgent().getUuid().equals( hadoopClusterConfig.getNameNode().getAgent().getUuid() ) )
+            if ( host.getAgent().getUuid().equals( hadoopClusterConfig.getJobTracker().getAgent().getUuid() ) )
             {
                 break;
             }
@@ -74,17 +74,37 @@ public class StatusJobTrackerOperationHandler extends AbstractOperationHandler<H
 
     private void logStatusResults( TrackerOperation po, CommandResult result )
     {
-        if ( result.getStdOut() != null && result.getStdOut().contains( "NameNode" ) )
+        NodeState nodeState = NodeState.UNKNOWN;
+
+        if ( result.getStdOut() != null && result.getStdOut().contains( "JobTracker" ) )
         {
             String[] array = result.getStdOut().split( "\n" );
 
             for ( String status : array )
             {
-                if ( status.contains( "NameNode" ) )
+                if ( status.contains( "JobTracker" ) )
                 {
-                    trackerOperation.addLogDone( status );
+                    String temp = status.replaceAll( "JobTracker is ", "" );
+                    if ( temp.toLowerCase().contains( "not" ) )
+                    {
+                        nodeState = NodeState.STOPPED;
+                    }
+                    else
+                    {
+                        nodeState = NodeState.RUNNING;
+                    }
                 }
             }
+        }
+
+
+        if ( NodeState.UNKNOWN.equals( nodeState ) )
+        {
+            trackerOperation.addLogFailed( String.format( "Failed to check status of" ) );
+        }
+        else
+        {
+            trackerOperation.addLogDone( String.format( "JobTracker is %s", nodeState ) );
         }
     }
 }
