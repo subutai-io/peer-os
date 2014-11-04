@@ -12,12 +12,10 @@
   <artifactId>script-manager</artifactId>
   <name>Subutai Script Manager Parent</name>
   <description>Subutai Script Manager Parent</description>
+
   <modules>
-    <module>script-manager-api</module>
-    <module>script-manager-impl</module>
     <module>script-manager-rest</module>
   </modules>
   <packaging>pom</packaging>
-
 
 </project>
