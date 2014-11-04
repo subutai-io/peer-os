@@ -29,14 +29,11 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
-import org.safehaus.subutai.core.container.api.ContainerCreateException;
-import org.safehaus.subutai.core.container.api.ContainerDestroyException;
-import org.safehaus.subutai.core.container.api.ContainerManager;
-import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.ContainerState;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
@@ -46,6 +43,7 @@ import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
+import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -56,6 +54,7 @@ import org.safehaus.subutai.core.strategy.api.StrategyManager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 
@@ -68,7 +67,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60; // 5 min
     private static final int MAX_LXC_NAME = 15;
     private PeerManager peerManager;
-    private ContainerManager containerManager;
+    //    private ContainerManager containerManager;
     private TemplateRegistry templateRegistry;
     private CommunicationManager communicationManager;
     private PeerDAO peerDAO;
@@ -82,16 +81,16 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     private Set<RequestListener> requestListeners;
 
 
-    public LocalPeerImpl( PeerManager peerManager, AgentManager agentManager, ContainerManager containerManager,
-                          TemplateRegistry templateRegistry, PeerDAO peerDao, CommunicationManager communicationManager,
-                          CommandRunner commandRunner, QuotaManager quotaManager, StrategyManager strategyManager,
+    public LocalPeerImpl( PeerManager peerManager, AgentManager agentManager, TemplateRegistry templateRegistry,
+                          PeerDAO peerDao, CommunicationManager communicationManager, CommandRunner commandRunner,
+                          QuotaManager quotaManager, StrategyManager strategyManager,
                           Set<RequestListener> requestListeners )
 
     {
         this.agentManager = agentManager;
         this.strategyManager = strategyManager;
         this.peerManager = peerManager;
-        this.containerManager = containerManager;
+        //        this.containerManager = containerManager;
         this.templateRegistry = templateRegistry;
         this.peerDAO = peerDao;
         this.communicationManager = communicationManager;
@@ -156,36 +155,15 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
     @Override
     public ContainerHost createContainer( final String hostName, final String templateName, final String cloneName,
-                                          final UUID envId ) throws ContainerCreateException
+                                          final UUID envId ) throws PeerException
     {
-        try
-        {
-            Set<Agent> agents = containerManager
-                    .clone( envId, getResourceHostByName( hostName ).getAgent(), templateName,
-                            Sets.newHashSet( cloneName ) );
+        ResourceHost resourceHost = getResourceHostByName( hostName );
+        ContainerHost containerHost = resourceHost
+                .createContainer( getId(), envId, Lists.newArrayList( getTemplate( templateName ) ), cloneName );
 
-            if ( agents.size() == 1 )
-            {
-                Agent agent = agents.iterator().next();
-                ResourceHost resourceHost = getResourceHostByName( agent.getParentHostName() );
-                ContainerHost containerHost = new ContainerHost( agent, getId(), envId );
-                containerHost.setParentAgent( resourceHost.getAgent() );
-                containerHost.setCreatorPeerId( getId() );
-                containerHost.setTemplateName( templateName );
-                containerHost.updateHeartbeat();
-                resourceHost.addContainerHost( containerHost );
-                peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
-                return containerHost;
-            }
-            else
-            {
-                throw new ContainerCreateException( "There are more than one created containers." );
-            }
-        }
-        catch ( PeerException e )
-        {
-            throw new ContainerCreateException( e.toString() );
-        }
+        resourceHost.addContainerHost( containerHost );
+        peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
+        return containerHost;
     }
 
 
@@ -243,7 +221,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
                                                 final List<Template> templates, final int quantity,
                                                 final String strategyId, final List<Criteria> criteria )
-            throws ContainerCreateException
+            throws PeerException
     {
         Set<ContainerHost> result = new HashSet<>();
         try
@@ -273,7 +251,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             }
             catch ( StrategyException e )
             {
-                throw new ContainerCreateException( e.getMessage() );
+                throw new PeerException( e.getMessage() );
             }
 
             Set<String> existingContainerNames = getContainerNames();
@@ -308,9 +286,9 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                 }
             }
         }
-        catch ( PeerException | RegistryException e )
+        catch ( RegistryException e )
         {
-            throw new ContainerCreateException( e.toString() );
+            throw new PeerException( e.toString() );
         }
         return result;
     }
@@ -477,12 +455,14 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
         try
         {
-            containerManager.destroy( containerHost.getAgent().getParentHostName(), containerHost.getHostname() );
+            //            containerManager.destroy( containerHost.getAgent().getParentHostName(),
+            // containerHost.getHostname() );
             ResourceHost resourceHost = getResourceHostByName( containerHost.getAgent().getParentHostName() );
+            resourceHost.destroyContainerHost( containerHost );
             resourceHost.removeContainerHost( result );
             peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
         }
-        catch ( ContainerDestroyException e )
+        catch ( ResourceHostException e )
         {
             throw new PeerException( e.toString() );
         }
@@ -734,9 +714,9 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public Template getTemplate( final ContainerHost containerHost )
+    public Template getTemplate( final String templateName )
     {
-        return templateRegistry.getTemplate( containerHost.getTemplateName() );
+        return templateRegistry.getTemplate( templateName );
     }
 
 

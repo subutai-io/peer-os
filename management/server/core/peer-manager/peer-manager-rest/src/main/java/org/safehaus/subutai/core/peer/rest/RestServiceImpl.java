@@ -19,7 +19,6 @@ import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -233,7 +232,7 @@ public class RestServiceImpl implements RestService
             return Response.ok( JsonUtil.toJson( result ) ).build();
             //            return Response.ok().entity( result ).build();
         }
-        catch ( ContainerCreateException e )
+        catch ( PeerException e )
         {
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
@@ -346,13 +345,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getTemplate( final String host )
+    public Response getTemplate( final String templateName )
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
-            Template result = localPeer.getTemplate( containerHost );
+            Template result = localPeer.getTemplate( templateName );
             return Response.ok( JsonUtil.toJson( result ) ).build();
         }
         catch ( PeerException e )

@@ -77,7 +77,7 @@ public interface RestService
     @POST
     @Path("template/get")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTemplate( @FormParam("host") String host );
+    public Response getTemplate( @FormParam("templateName") String templateName );
 
     @POST
     @Path("execute")
