@@ -539,7 +539,7 @@ public class Manager
         Environment environment = environmentManager.getEnvironmentByUUID( hadoopCluster.getEnvironmentId() );
         String lxcHostname = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
 
-        for ( ContainerHost containerHost : environment.getContainerHosts() ){
+        for ( ContainerHost containerHost : environment.getContainers() ){
             if ( containerHost.getHostname().equals( lxcHostname ) ){
                 return containerHost.getAgent();
             }

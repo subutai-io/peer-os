@@ -35,6 +35,7 @@ import org.safehaus.subutai.plugin.hadoop.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.RemoveNodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.UninstallOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.dao.PluginDAO;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StartNameNodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StatusDataNodeOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,7 +182,6 @@ public class HadoopImpl implements Hadoop
     public UUID uninstallCluster( final String clusterName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-
         AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
@@ -214,16 +214,13 @@ public class HadoopImpl implements Hadoop
     @Override
     public UUID startNameNode( HadoopClusterConfig hadoopClusterConfig )
     {
-//        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
-//        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
-//                "Cluster name is null or empty" );
-//
-//
-//        AbstractOperationHandler operationHandler =
-//                new StartNameNodeOperationHandler( this, hadoopClusterConfig.getClusterName() );
-//        executor.execute( operationHandler );
-//        return operationHandler.getTrackerId();
-        return null;
+        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
+                "Cluster name is null or empty" );
+        AbstractOperationHandler operationHandler =
+                new StartNameNodeOperationHandler( this, hadoopClusterConfig.getClusterName() );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 

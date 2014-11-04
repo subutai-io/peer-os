@@ -55,21 +55,25 @@ public class ClusterConfiguration
 
 
         // Configure DataNodes
-        for ( ContainerHost containerHost : config.getAllSlaveNodes() ){
+        for ( ContainerHost containerHost : config.getDataNodes() ){
             config.getNameNode().execute(
                     new RequestBuilder( commands.getConfigureDataNodesCommand( containerHost.getHostname() ) ) );
         }
 
         // Configure TaskTrackers
-        for ( ContainerHost containerHost : config.getAllSlaveNodes() ){
-            config.getJobTracker().execute( new RequestBuilder( commands.getConfigureTaskTrackersCcommand( containerHost.getHostname() ) ) );
+        for ( ContainerHost containerHost : config.getTaskTrackers() ){
+            config.getJobTracker().execute(
+                    new RequestBuilder( commands.getConfigureTaskTrackersCcommand( containerHost.getHostname() ) ) );
         }
 
+        // Format NameNode
+        config.getNameNode().execute( new RequestBuilder( commands.getFormatNameNodeCommand() ) );
 
-//        for ( ContainerHost containerHost : environment.getContainers() )
-//        {
-//            po.addLog( "Configuring node: " + containerHost.getId() );
-//        }
+
+        // Start Hadoop cluster
+        config.getNameNode().execute( new RequestBuilder( commands.getStartNameNodeCommand() ) );
+        config.getJobTracker().execute( new RequestBuilder( commands.getStartJobTrackerCommand() ) );
+
 
         po.addLog( "Configuration is finished !" );
 

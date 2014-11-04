@@ -127,6 +127,7 @@ public class HadoopClusterConfig implements ConfigBase
         return new ArrayList<>( allAgents );
     }
 
+
     public Set<UUID> getAllSlaveNodesAgents(){
         Set<UUID> allAgents = new HashSet<>();
         for( ContainerHost containerHost : getAllSlaveNodes() ){

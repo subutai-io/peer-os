@@ -39,32 +39,41 @@ public class Commands
     }
 
 
+    public String getStartNameNodeCommand(){
+        return "service hadoop-dfs start";
+    }
+
+
+    public String getStartJobTrackerCommand(){
+        return "service hadoop-mapred start";
+    }
+
     public String getStatusDataNodeCommand()
     {
         return "service hadoop-dfs status";
     }
 
     public String getConfigureJobTrackerCommand(){
-        return "hadoop-master-slave.sh slaves " + config.getJobTracker().getHostname();
+        return ". /etc/profile && " + "hadoop-master-slave.sh slaves " + config.getJobTracker().getHostname();
     }
 
 
     public String getConfigureSecondaryNameNodeCommand(){
-        return "hadoop-master-slave.sh masters " + config.getNameNode().getHostname();
+        return ". /etc/profile && " + "hadoop-master-slave.sh masters " + config.getNameNode().getHostname();
     }
 
     public String getConfigureDataNodesCommand( String hostname ){
-        return "hadoop-master-slave.sh slaves " + hostname;
+        return ". /etc/profile && " + "hadoop-master-slave.sh slaves " + hostname;
     }
 
     public String getConfigureTaskTrackersCcommand( String hostname ){
-        return "hadoop-master-slave.sh slaves " + hostname;
+        return ". /etc/profile && " + "hadoop-master-slave.sh slaves " + hostname;
     }
 
 
     public String getClearMastersCommand()
     {
-        return ". /etc/profile && " + "hadoop-master-slave.sh masters clear" + config.getNameNode().getHostname();
+        return ". /etc/profile && " + "hadoop-master-slave.sh masters clear";
     }
 
 
@@ -76,9 +85,10 @@ public class Commands
 
     public String getSetMastersCommand()
     {
-        return ". /etc/profile && " + "hadoop-configure.sh " + config.getNameNode().getHostname() + ":"
-                + HadoopClusterConfig.NAME_NODE_PORT + config.getJobTracker().getHostname() + ":"
-                + HadoopClusterConfig.JOB_TRACKER_PORT + config.getReplicationFactor();
+        return ". /etc/profile && " + "hadoop-configure.sh " +
+                config.getNameNode().getHostname() + ":" + HadoopClusterConfig.NAME_NODE_PORT + " " +
+                config.getJobTracker().getHostname() + ":" + HadoopClusterConfig.JOB_TRACKER_PORT + " " +
+                config.getReplicationFactor();
     }
 
 
@@ -197,7 +207,7 @@ public class Commands
     //
 
 
-    public String getFormatNameNodeCommand( HadoopClusterConfig hadoopClusterConfig )
+    public String getFormatNameNodeCommand()
     {
         return ". /etc/profile && " + "hadoop namenode -format";
     }

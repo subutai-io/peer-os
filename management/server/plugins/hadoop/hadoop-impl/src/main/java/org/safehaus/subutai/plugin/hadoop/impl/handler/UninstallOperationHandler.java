@@ -26,9 +26,9 @@ public class UninstallOperationHandler extends AbstractOperationHandler<HadoopIm
     @Override
     public void run()
     {
-        HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
+        HadoopClusterConfig config = manager.getCluster( clusterName );
 
-        if ( hadoopClusterConfig == null )
+        if ( config == null )
         {
             trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
@@ -37,8 +37,8 @@ public class UninstallOperationHandler extends AbstractOperationHandler<HadoopIm
         try
         {
             trackerOperation.addLog( "Destroying environment..." );
-            manager.getEnvironmentManager().destroyEnvironment( hadoopClusterConfig.getEnvironmentId() );
-            manager.getPluginDAO().deleteInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName() );
+            manager.getEnvironmentManager().destroyEnvironment( config.getEnvironmentId() );
+            manager.getPluginDAO().deleteInfo( HadoopClusterConfig.PRODUCT_KEY, config.getClusterName() );
             trackerOperation.addLogDone( "Cluster destroyed" );
         }
         catch ( EnvironmentDestroyException e )

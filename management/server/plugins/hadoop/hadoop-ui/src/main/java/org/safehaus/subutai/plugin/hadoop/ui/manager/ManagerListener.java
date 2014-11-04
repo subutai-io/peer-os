@@ -162,7 +162,6 @@ public class ManagerListener
 
     protected Button.ClickListener destroyClusterButtonListener()
     {
-
         return new Button.ClickListener()
         {
             @Override
