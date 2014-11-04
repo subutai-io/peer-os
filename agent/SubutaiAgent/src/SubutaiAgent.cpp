@@ -62,8 +62,8 @@ string toString(int intcont)
 
 /**
  *  \details   threadSend function sends string messages in the Shared Memory buffer to MQTT Broker.
- *  		   This is a thread with working concurrently with main thread.
- *  		   It is main purpose that checking the Shared Memory Buffer in Blocking mode and sending them to Broker
+ *  	       This is a thread with working concurrently with main thread.
+ *  	       It is main purpose that checking the Shared Memory Buffer in Blocking mode and sending them to Broker
  */
 void threadSend(message_queue *mq,SubutaiConnection *connection,SubutaiLogger* logMain)
 {
@@ -96,70 +96,70 @@ void threadSend(message_queue *mq,SubutaiConnection *connection,SubutaiLogger* l
  *  		   if execution timeout is occured it returns true. Otherwise it returns false.
  */
 /*
-bool checkExecutionTimeout(unsigned int* startsec, bool* overflag, unsigned int* exectimeout, unsigned int* count)
-{
-    if (*exectimeout != 0)
-    {
-        boost::posix_time::ptime current = boost::posix_time::second_clock::local_time();
-        unsigned int currentsec  =  current.time_of_day().seconds();
+   bool checkExecutionTimeout(unsigned int* startsec, bool* overflag, unsigned int* exectimeout, unsigned int* count)
+   {
+   if (*exectimeout != 0)
+   {
+   boost::posix_time::ptime current = boost::posix_time::second_clock::local_time();
+   unsigned int currentsec  =  current.time_of_day().seconds();
 
-        if ((currentsec > *startsec) && *overflag==false)
-        {
-            if (currentsec != 59)
-            {
-                *count = *count + (currentsec - *startsec);
-                *startsec = currentsec;
-            }
-            else
-            {
-                *count = *count + (currentsec - *startsec);
-                *overflag = true;
-                *startsec = 1;
-            }
-        }
-        if (currentsec == 59)
-        {
-            *overflag = true;
-            *startsec = 1;
-        }
-        else
-        {
-            *overflag = false;
-        }
-        if (*count >= *exectimeout)     //timeout
-        {
-            return true;	        //timeout occured now
-        }
-        else
-        {
-            return false;               //no timeout occured
-        }
-    }
-    return false;	                //no timeout occured
+   if ((currentsec > *startsec) && *overflag==false)
+   {
+   if (currentsec != 59)
+   {
+ *count = *count + (currentsec - *startsec);
+ *startsec = currentsec;
+ }
+ else
+ {
+ *count = *count + (currentsec - *startsec);
+ *overflag = true;
+ *startsec = 1;
+ }
+ }
+ if (currentsec == 59)
+ {
+ *overflag = true;
+ *startsec = 1;
+ }
+ else
+ {
+ *overflag = false;
+ }
+ if (*count >= *exectimeout)     //timeout
+ {
+ return true;	        //timeout occured now
+ }
+ else
+ {
+ return false;               //no timeout occured
+ }
+ }
+ return false;	                //no timeout occured
+ }
+
+
+ static void * updateContainerInfo(void * arg )
+ {
+ pthread_detach( pthread_self() ) ;
+
+ SubutaiContainerManager* container_manager = (SubutaiContainerManager*) arg;
+ while( true )
+ {
+// do background task, i.e.:
+cout << "updating container" << endl;
+container_manager->updateContainerLists();
+usleep(40000000) ;
 }
-
-
-static void * updateContainerInfo(void * arg )
-{
-    pthread_detach( pthread_self() ) ;
-
-    SubutaiContainerManager* container_manager = (SubutaiContainerManager*) arg;
-    while( true )
-    {
-        // do background task, i.e.:
-        cout << "updating container" << endl;
-        container_manager->updateContainerLists();
-        usleep(40000000) ;
-    }
 }
 
 int updateContainerInfosPeriodically( SubutaiContainerManager* container_manager)
 {
-    pthread_t thread ;
-    pthread_attr_t attr ;
+pthread_t thread ;
+pthread_attr_t attr ;
 
-    pthread_attr_init( & attr ) ;
-    pthread_create( & thread, & attr, updateContainerInfo, container_manager ) ;
+pthread_attr_init( & attr ) ;
+pthread_create( & thread, & attr, updateContainerInfo, container_manager ) ;
 
 }
 */
@@ -172,8 +172,8 @@ int updateContainerInfosPeriodically( SubutaiContainerManager* container_manager
  */
 int main(int argc,char *argv[],char *envp[])
 {
-    string serverAddress = "SERVICE_TOPIC";             //Default SERVICE TOPIC
-    string broadcastAddress = "BROADCAST_TOPIC";	//Default BROADCAST TOPIC
+    string serverAddress        = "SERVICE_TOPIC";              // Default SERVICE TOPIC
+    string broadcastAddress     = "BROADCAST_TOPIC";	        // Default BROADCAST TOPIC
     string clientAddress;
     SubutaiThread thread;
     SubutaiLogger logMain;
@@ -230,36 +230,33 @@ int main(int argc,char *argv[],char *envp[])
     SubutaiContainerManager cman("/var/lib/lxc", &logMain);
     //updateContainerInfosPeriodically(&cman);
 
-
     /*
      * Opening MQTT Connection
      */
-
     class SubutaiConnection *connection;
     int rc;
     mosqpp::lib_init();
-    connection = new SubutaiConnection(clientAddress.c_str(),
+    connection = new SubutaiConnection(
+            clientAddress.c_str(),
             clientAddress.c_str(),
             serverAddress.c_str(),
             broadcastAddress.c_str(),
-            environment.getAgentConnectionUrlValue().c_str(),atoi(environment.getAgentConnectionPortValue().c_str()));
+            environment.getAgentConnectionUrlValue().c_str(),
+            atoi(environment.getAgentConnectionPortValue().c_str()));
 
     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Trying to open Connection with MQTT Broker: ",
                 environment.getAgentConnectionUrlValue(), " Port: ", environment.getAgentConnectionPortValue()));
 
     int reconnectDelay = atoi(environment.getAgentConnectionOptionsValue().c_str()) - 4;
 
-    if (reconnectDelay <= 0)
-    {
+    if (reconnectDelay <= 0) {
         logMain.writeLog(3, logMain.setLogData("<SubutaiAgent>", "Reconnect Delay cannot be under 0 !!",
                     " Using default timeout(10).", toString(reconnectDelay)));
         reconnectDelay = 10;
     }
 
-    while (true)
-    {
-        if (!connection->openSession())
-        {
+    while (true) {
+        if (!connection->openSession()) {
             sleep(reconnectDelay);
             logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Trying connect to MQTT Broker..:", 
                         environment.getAgentConnectionUrlValue()));
@@ -278,7 +275,6 @@ int main(int argc,char *argv[],char *envp[])
     /*
      * sending registration message
      */
-
     sendout = response.createRegistrationMessage(
             environment.getAgentUuidValue(), environment.getAgentMacAddressValue(),
             environment.getAgentHostnameValue(),environment.getAgentParentHostnameValue(),
@@ -286,7 +282,7 @@ int main(int argc,char *argv[],char *envp[])
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Registration Message:", sendout));
     connection->sendMessage(sendout);
 
-    //cman.registerAllContainers(connection);
+    cman.registerAllContainers(connection);
 
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Shared Memory MessageQueue is initializing.."));
     message_queue messageQueue
@@ -304,18 +300,18 @@ int main(int argc,char *argv[],char *envp[])
     /*
      * initializing timer settings
      *//*
-    boost::posix_time::ptime start =            boost::posix_time::second_clock::local_time();
-    boost::posix_time::ptime startQueue =       boost::posix_time::second_clock::local_time();
+          boost::posix_time::ptime start =            boost::posix_time::second_clock::local_time();
+          boost::posix_time::ptime startQueue =       boost::posix_time::second_clock::local_time();
 
-    unsigned int exectimeout =                  175;    //180 seconds for HeartBeat Default Timeout
-    unsigned int queuetimeout =                 30;     //30 seconds for In Queue Default Timeout
-    unsigned int startsec  =                    start.time_of_day().seconds();
-    unsigned int startsecQueue  =               start.time_of_day().seconds();
-    bool overflag =                             false;
-    bool overflagQueue =                        false;
-    unsigned int count =                        1;
-    unsigned int countQueue =                   1;
-    */
+          unsigned int exectimeout =                  175;    //180 seconds for HeartBeat Default Timeout
+          unsigned int queuetimeout =                 30;     //30 seconds for In Queue Default Timeout
+          unsigned int startsec  =                    start.time_of_day().seconds();
+          unsigned int startsecQueue  =               start.time_of_day().seconds();
+          bool overflag =                             false;
+          bool overflagQueue =                        false;
+          unsigned int count =                        1;
+          unsigned int countQueue =                   1;
+          */
     list<int> pidList;
     int ncores =                                -1;
     ncores =                                    sysconf(_SC_NPROCESSORS_CONF);
@@ -327,15 +323,13 @@ int main(int argc,char *argv[],char *envp[])
     /*
      * initializing inotify handler
      */
-
     SubutaiWatch Watcher(connection, &response, &logMain);
     Watcher.initialize(20000);
     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "The Watcher is initializing.."));
 
     /*
-    * initializing timer for periodical operations
-    */
-
+     * initializing timer for periodical operations
+     */
     SubutaiTimer timer(logMain, &environment, &cman, connection);
     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Timer is initializing.."));
 
@@ -344,18 +338,15 @@ int main(int argc,char *argv[],char *envp[])
     {
         try
         {
-        	timer.checkHeartBeatTimer(command);
-        	timer.checkCommandQueueInfoTimer(command);
+            timer.checkHeartBeatTimer(command);
+            timer.checkCommandQueueInfoTimer(command);
 
             command.clear();
-            for (list<int>::iterator iter = pidList.begin(); iter != pidList.end();iter++)
-            {
-                if (pidList.begin() != pidList.end())
-                {
+            for (list<int>::iterator iter = pidList.begin(); iter != pidList.end();iter++) {
+                if (pidList.begin() != pidList.end()) {
                     int status;
                     pid_t result = waitpid(*iter, &status,WNOHANG);
-                    if (result != 0)
-                    {
+                    if (result != 0) {
                         iter = pidList.erase(iter);
                         currentProcess--;       string resp = response.createInQueueMessage(environment.getAgentUuidValue(), command.getTaskUuid());
 
@@ -366,20 +357,17 @@ int main(int argc,char *argv[],char *envp[])
             Watcher.checkNotification(); //checking the watch event status
 
             rc = connection->loop(1); // checking the status of the new message
-            if (rc)
-            {
+            if (rc) {
                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","RC:",toString(rc)));
                 connection->reconnect();
             }
-            if (connection->checkMessageStatus()) //checking new message arrived ?
-            {
+            if (connection->checkMessageStatus()) { //checking new message arrived ? 
                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","total running process:",toString(currentProcess)));
                 connection->resetMessageStatus(); //reseting message status
                 input = connection->getMessage(); //fetching message..
                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Fetched Message:",input));
 
-                if (command.deserialize(input))	 //deserialize the message
-                {
+                if (command.deserialize(input))	{  //deserialize the message
                     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","New Message is received"));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","New Message:", input));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command source:", command.getSource()));
@@ -402,41 +390,34 @@ int main(int argc,char *argv[],char *envp[])
                     if (target_container) {
                         isLocal = false;
                     }    
-                    if (command.getWatchArguments().size()!=0)
-                    {
-                        for (unsigned int i = 0; i < command.getWatchArguments().size(); i++)
+                    if (command.getWatchArguments().size() != 0 ) {
+                        for (unsigned int i = 0; i < command.getWatchArguments().size(); i++) {
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Command WatchArgs:", command.getWatchArguments()[i]));
-                    }
-
-                    if (command.getType() == "REGISTRATION_REQUEST_DONE") //type is registration done
-                    {
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Registration is done.."));
-                        // agent is registered to server now
-                    }
-                    else if (command.getType() == "EXECUTE_REQUEST")	//execution request will be executed in other process.
-                    {
-                        if (isLocal) {
-                            fstream file;	//opening uuid.txt
-                            file.open("/etc/subutai-agent/commandQueue.txt",fstream::in | fstream::out | fstream::app);
-                            file << input;
-                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Received Message to internal currentProcess!"));
-                            file.close();
-                        } else {
-                            // Need to put a command to queue on container
                         }
                     }
-                    else if (command.getType()=="PS_REQUEST")
-                    {
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "PS execution operation is starting.."));
-                        SubutaiThread* subprocess = new SubutaiThread;
-                        subprocess->getLogger().setLogLevel(logMain.getLogLevel());
-                        command.setProgram("for i in `ps aux | grep '[s]h -c' | awk -F \" \" '{print $2}'`; do ps aux | grep `pgrep -P $i` | sed '/grep/d' ; done 2> /dev/null");
-                        command.setWorkingDirectory("/");
-                        subprocess->threadFunction(&messageQueue, &command, argv);
-                        delete subprocess;
-                    }
-                    else if (command.getType()=="HEARTBEAT_REQUEST")
-                    {
+
+                    if (command.getType() == "REGISTRATION_REQUEST_DONE") { //type is registration done
+                        // TODO: Determine whether it was a container or agent
+                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Registration is done.."));
+                    } else if (command.getType() == "EXECUTE_REQUEST") {	//execution request will be executed in other process.
+                        fstream file;	//opening uuid.txt
+                        file.open("/etc/subutai-agent/commandQueue.txt", fstream::in | fstream::out | fstream::app);
+                        file << input;
+                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Received Message to internal currentProcess!"));
+                        file.close();
+                    } else if (command.getType() == "PS_REQUEST") {
+                        if (isLocal) {
+                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "PS execution operation is starting.."));
+                            SubutaiThread* subprocess = new SubutaiThread;
+                            subprocess->getLogger().setLogLevel(logMain.getLogLevel());
+                            command.setProgram("for i in `ps aux | grep '[s]h -c' | awk -F \" \" '{print $2}'`; do ps aux | grep `pgrep -P $i` | sed '/grep/d' ; done 2> /dev/null");
+                            command.setWorkingDirectory("/");
+                            subprocess->threadFunction(&messageQueue, &command, argv);
+                            delete subprocess;
+                        } else {
+
+                        }
+                    } else if (command.getType()=="HEARTBEAT_REQUEST") {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Heartbeat message has been taken.."));
                         response.clear();
                         /*
@@ -453,56 +434,43 @@ int main(int argc,char *argv[],char *envp[])
                             connection->sendMessage(resp);
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","HeartBeat Response:", resp));
                         } else {
+                            timer.sendHeartBeat();
                             // It is container
                         }
-                    }
-                    else if (command.getType() == "TERMINATE_REQUEST")
-                    {
+                    } else if (command.getType() == "TERMINATE_REQUEST") {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",toString(command.getPid())));
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID.."));
-                        if (command.getPid() > 0)
-                        {
-                            int retstatus = kill(command.getPid(),SIGKILL);
-                            if (retstatus == 0) //termination is successfully done
-                            {
+                        if (command.getPid() > 0) {
+                            int retstatus = kill(command.getPid(), SIGKILL);
+                            if (retstatus == 0) { //termination is successfully done
                                 string resp = response.createTerminateMessage(environment.getAgentUuidValue(),
                                         command.getRequestSequenceNumber(),command.getSource(),command.getTaskUuid());
                                 connection->sendMessage(resp);
                                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
-                            }
-                            else if (retstatus == -1) //termination is failed
-                            {
+                            } else if (retstatus == -1) { //termination is failed
                                 string resp = response.createFailTerminateMessage(environment.getAgentUuidValue(),
                                         command.getRequestSequenceNumber(),command.getSource(),command.getTaskUuid());
                                 connection->sendMessage(resp);
                                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", toString(command.getPid())));
                             }
-                        }
-                        else
-                        {
+                        } else {
                             logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Irrelevant Terminate Request"));
                         }
-                    }
-                    else if (command.getType()=="INOTIFY_CREATE_REQUEST")
-                    {
+                    } else if (command.getType() == "INOTIFY_CREATE_REQUEST") {
                         logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","executing INOTIFY_REQUEST.."));
-                        for (unsigned int i=0; i<command.getWatchArguments().size();i++)
-                        {
+                        for (unsigned int i=0; i<command.getWatchArguments().size();i++) {
                             Watcher.addWatcher(command.getWatchArguments()[i]);
                             logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","adding Watcher: ",
                                         command.getWatchArguments()[i]));
                         }
                         Watcher.stats();
-                        sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(),response.getConfPoints());
+                        sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(), response.getConfPoints());
                         connection->sendMessage(sendout);
                         Watcher.stats();
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ",sendout));
-                    }
-                    else if (command.getType()=="INOTIFY_REMOVE_REQUEST")
-                    {
+                    } else if (command.getType()=="INOTIFY_REMOVE_REQUEST") {
                         logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "executing INOTIFY_CANCEL_REQUEST.."));
-                        for (unsigned int i = 0; i < command.getWatchArguments().size(); i++)
-                        {
+                        for (unsigned int i = 0; i < command.getWatchArguments().size(); i++) {
                             Watcher.eraseWatcher(command.getWatchArguments()[i]);
                             logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Erasing Watcher: ",
                                         command.getWatchArguments()[i]));
@@ -512,9 +480,7 @@ int main(int argc,char *argv[],char *envp[])
                         connection->sendMessage(sendout);
                         Watcher.stats();
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));
-                    }
-                    else if (command.getType()=="INOTIFY_LIST_REQUEST")
-                    {
+                    } else if (command.getType()=="INOTIFY_LIST_REQUEST") {
                         logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "executing INOTIFY_SHOW_REQUEST.."));
                         Watcher.stats();
                         sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(),response.getConfPoints());
@@ -522,22 +488,16 @@ int main(int argc,char *argv[],char *envp[])
                         Watcher.stats();
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ",sendout));
                     }
-                }
-                else
-                {
+                } else {
                     logMain.writeLog(3, logMain.setLogData("<SubutaiAgent>","Failed at parsing Json String: ",input));
-
-                    if (input.size() >= 10000)
-                    {
+                    if (input.size() >= 10000) {
                         connection->sendMessage(response.createResponseMessage(environment.getAgentUuidValue(),9999999,
                                     command.getRequestSequenceNumber(),1,
                                     "Command Size is greater than Maximum Size !! ","",command.getSource(),command.getTaskUuid()));
                         connection->sendMessage(response.createExitMessage(environment.getAgentUuidValue(),9999999,
                                     command.getRequestSequenceNumber(),2,
                                     command.getSource(),command.getTaskUuid(),1));
-                    }
-                    else
-                    {
+                    } else {
                         connection->sendMessage(response.createResponseMessage(environment.getAgentUuidValue(),9999999,
                                     command.getRequestSequenceNumber(),1,
                                     "Command is not a valid Json string !!","",command.getSource(),command.getTaskUuid()));
@@ -546,41 +506,34 @@ int main(int argc,char *argv[],char *envp[])
                                     command.getSource(),command.getTaskUuid(),1));
                     }
                 }
-            }
-            else
-            {
-                if (currentProcess < ncores)
-                {
+            } else {
+                if (currentProcess < ncores) {
                     ifstream file2("/etc/subutai-agent/commandQueue.txt");
-                    if (file2.peek() != ifstream::traits_type::eof())
-                    {
+                    if (file2.peek() != ifstream::traits_type::eof()) {
                         ofstream file3("/etc/subutai-agent/commandQueue2.txt");
                         input = "";
                         getline(file2, str2);
                         input = str2;
-                        while(getline(file2, str2))
-                        {
+                        while(getline(file2, str2)) {
                             file3 << str2 << endl;
                         }
                         file3.close();
                         rename("/etc/subutai-agent/commandQueue2.txt", "/etc/subutai-agent/commandQueue.txt");
                         logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","Message Fetched from internal queue!"));
-                        if (input != "\n" && command.deserialize(input))
-                        {
+                        if (input != "\n" && command.deserialize(input)) {
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Execute operation is starting.."));
                             SubutaiThread* subprocess = new SubutaiThread;
                             subprocess->getLogger().setLogLevel(logMain.getLogLevel());
                             command.setUuid(environment.getAgentUuidValue()); /*command uuid should be set to agents uuid */
                             SubutaiContainer* target_container = cman.findContainerById(command.getUuid());
-                            if (target_container)
+                            if (target_container) {
                                 pidList.push_back(subprocess->threadFunction(&messageQueue, &command, argv, target_container));
-                            else
+                            } else {
                                 pidList.push_back(subprocess->threadFunction(&messageQueue, &command, argv));
+                            }
                             currentProcess++;
                             delete subprocess;
-                        }
-                        else
-                        {
+                        } else {
                             cout << "error!" << endl;
                         }
                     }

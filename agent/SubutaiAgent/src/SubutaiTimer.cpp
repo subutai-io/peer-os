@@ -108,35 +108,32 @@ bool SubutaiTimer::checkExecutionTimeout(unsigned int* startsec,bool* overflag,u
 
 void SubutaiTimer::sendHeartBeat()
 {
-	response->clear();
-
-		    /*
-		    * Refresh new agent ip address set for each heartbeat message
-		    */
-		     environment->getAgentIpAddress();
-		     containerManager->updateContainerLists();
-
-		     response->setIps(environment->getAgentIpValue());
-		     response->setHostname(environment->getAgentHostnameValue());
-		     response->setMacAddress(environment->getAgentMacAddressValue());
-		     response->setContainerSet(containerManager->getAllContainers());
-		     string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue(),  environment->getAgentMacAddressValue());
-		    connection->sendMessage(resp);
-
-		    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat Response:", resp));
+    response->clear();
+    /*
+     * Refresh new agent ip address set for each heartbeat message
+     */
+    environment->getAgentIpAddress();
+    containerManager->updateContainerLists();
+    response->setIps(environment->getAgentIpValue());
+    response->setHostname(environment->getAgentHostnameValue());
+    response->setMacAddress(environment->getAgentMacAddressValue());
+    response->setContainerSet(containerManager->getAllContainers());
+    string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue(),  environment->getAgentMacAddressValue());
+    connection->sendMessage(resp);
+    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat Response:", resp));
 }
 
 bool SubutaiTimer::checkHeartBeatTimer(SubutaiCommand command)
 {
-	if (checkExecutionTimeout(&startsec,&overflag,&exectimeout,&count)) //checking Default Timeout
-	{
-		sendHeartBeat();
+    if (checkExecutionTimeout(&startsec,&overflag,&exectimeout,&count)) //checking Default Timeout
+    {
+        sendHeartBeat();
 
-	    start =         boost::posix_time::second_clock::local_time();	//Reset Default Timeout value
-	    startsec =      start.time_of_day().seconds();
-	    overflag =      false;
-	    exectimeout =   30;
-	    count =         1;
+        start =         boost::posix_time::second_clock::local_time();	//Reset Default Timeout value
+        startsec =      start.time_of_day().seconds();
+        overflag =      false;
+        exectimeout =   30;
+        count =         1;
 
         return true;
     }
@@ -145,42 +142,42 @@ bool SubutaiTimer::checkHeartBeatTimer(SubutaiCommand command)
 
 bool SubutaiTimer::checkCommandQueueInfoTimer(SubutaiCommand command)
 {
-	 if (checkExecutionTimeout(&startsecQueue,&overflagQueue,&queuetimeout,&countQueue))
-	 {   //checking IN_QUEUE Default Timeout
-	     //timeout occured!!
-		 response->clear();
-	     ifstream queueFile("/etc/subutai-agent/commandQueue.txt");
-	     string queueElement;
-	     if (queueFile.peek() != ifstream::traits_type::eof())
-	     {
-	    	 while(getline(queueFile, queueElement))
-	         {
-	    		 if (command.deserialize(queueElement))
-	             {
-	    			 /*
-	    			  *         "type":"IN_QUEUE",
+    if (checkExecutionTimeout(&startsecQueue,&overflagQueue,&queuetimeout,&countQueue))
+    {   //checking IN_QUEUE Default Timeout
+        //timeout occured!!
+        response->clear();
+        ifstream queueFile("/etc/subutai-agent/commandQueue.txt");
+        string queueElement;
+        if (queueFile.peek() != ifstream::traits_type::eof())
+        {
+            while(getline(queueFile, queueElement))
+            {
+                if (command.deserialize(queueElement))
+                {
+                    /*
+                     *         "type":"IN_QUEUE",
 
-        						"id":"56b0ac88-5140-4a32-8691-916d75d62f1c"
+                     "id":"56b0ac88-5140-4a32-8691-916d75d62f1c"
 
-        						"commandId":"c6cd5988-ceac-11e3-82b2-ebd389e743a3"
-	    			  */
-	    			 string resp = response->createInQueueMessage(environment->getAgentUuidValue(), command.getTaskUuid());
-	                 connection->sendMessage(resp);
-	                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "IN_QUEUE Response:", resp));
-	             }
-	             else
-	             {
-	            	 cout << "error!!" <<endl;
-	                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Fetched Element:",queueElement));
-	             }
-	         }
-	     }
-	     queueFile.close();
-	     startQueue =            boost::posix_time::second_clock::local_time();	//Reset Default Timeout values
-	     startsecQueue  =        startQueue.time_of_day().seconds();
-	     overflagQueue =         false;
-	     queuetimeout =          30;
-	     countQueue =            1;
+                     "commandId":"c6cd5988-ceac-11e3-82b2-ebd389e743a3"
+                     */
+                    string resp = response->createInQueueMessage(environment->getAgentUuidValue(), command.getTaskUuid());
+                    connection->sendMessage(resp);
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "IN_QUEUE Response:", resp));
+                }
+                else
+                {
+                    cout << "error!!" <<endl;
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Fetched Element:",queueElement));
+                }
+            }
+        }
+        queueFile.close();
+        startQueue =            boost::posix_time::second_clock::local_time();	//Reset Default Timeout values
+        startsecQueue  =        startQueue.time_of_day().seconds();
+        overflagQueue =         false;
+        queuetimeout =          30;
+        countQueue =            1;
 
 
         return true;

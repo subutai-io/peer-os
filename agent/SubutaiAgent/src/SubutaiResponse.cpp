@@ -100,6 +100,9 @@ void SubutaiResponse::serialize(string& output)
 	{
 		root["response"]["type"] = this->getType();
 	}
+        if (!(this->getType().empty())) {
+            root["response"]["topic"] = this->getTopic();
+        }
 	if(!(this->getUuid().empty()))
 	{
 		root["response"]["id"] = this->getUuid();
@@ -553,6 +556,14 @@ void SubutaiResponse::setConfPoints(vector<string> myvector)
 	{
 		this->confPoints.push_back(myvector[index]);
 	}
+}
+
+void SubutaiResponse::setTopic(const string& topic) {
+    this->topic = topic; 
+}
+
+string& SubutaiResponse::getTopic() {
+    return this->topic;
 }
 
 /**

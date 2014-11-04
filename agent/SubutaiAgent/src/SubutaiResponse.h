@@ -53,6 +53,7 @@ public:
 	string& getMacAddress();
 	string& getEnvironmentId();
 	string& getTaskUuid();
+        string& getTopic();
 	vector<string>& getIps();
 	string& getSource();
 	string& getconfigPoint();
@@ -79,6 +80,7 @@ public:
 	void setDateTime(const string&);
 	void setChangeType(const string&);
 	void setConfPoints(vector<string>);
+        void setTopic(const string&);
 	void serialize(string&);						//Serializing a Chunk Response message to a Json String
 	void serializeDone(string&);					//Serializing a Last Done Response message to a Json string
 	void clear();
@@ -101,6 +103,7 @@ private:
 	string 			configPoint;
 	string			dateTime;
 	string			changeType;
+        string                  topic;
 	vector<string>  confPoints;
 	vector<SubutaiContainer>  containers;
 };

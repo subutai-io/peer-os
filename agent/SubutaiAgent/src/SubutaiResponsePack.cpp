@@ -106,7 +106,7 @@ string SubutaiResponsePack::createInQueueMessage(string uuid,string taskuuid)	//
 
     {
 
-        "type":"HEARTBEAT_RESPONSE",
+        "type":"HEARTBEAT_TOPIC",
 
         "id":"56b0ac88-5140-4a32-8691-916d75d62f1c",
 
@@ -147,7 +147,8 @@ string SubutaiResponsePack::createInQueueMessage(string uuid,string taskuuid)	//
 string SubutaiResponsePack::createHeartBeatMessage(string uuid,	string hostname,string macaddress)	//Creating HeartBeat Message
 {
 	clear();
-	this->setType("HEARTBEAT_RESPONSE");
+	this->setType("HEARTBEAT");
+        this->setTopic("HEARTBEAT_TOPIC");
 	this->setUuid(uuid);
 	this->setHostname(hostname);
 	this->setMacAddress(macaddress);
