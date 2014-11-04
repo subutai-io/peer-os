@@ -90,12 +90,14 @@ public:
 	void setContainerHostname(string);
 	void setContainerStatus(containerStatus);
 	void getContainerAllFields();
+        ExecutionResult RunCommand(SubutaiCommand* command);
 	string RunProgram(string , vector<string>);
 	ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT);
 	void write();
     bool checkCWD(string cwd);
     bool checkUser(string username);
     int getRunAsUserId(string username);
+    string findFullProgramPath(string program_name);
 
 private:
 	containerStatus status;

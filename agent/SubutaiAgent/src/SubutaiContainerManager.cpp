@@ -125,7 +125,6 @@ vector<SubutaiContainer> SubutaiContainerManager::findAllContainers()
         containers.push_back(*c);
     }
     return containers;
-
 }
 
 
@@ -136,6 +135,7 @@ vector<SubutaiContainer> SubutaiContainerManager::findAllContainers()
 SubutaiContainer* SubutaiContainerManager::findContainerByName(string container_name) {
 
     for (vector<SubutaiContainer>::iterator it = _runningContainers.begin(); it != _runningContainers.end(); it++) {
+
         if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
             return &(*it);
         }
@@ -163,6 +163,7 @@ SubutaiContainer* SubutaiContainerManager::findContainerById(string container_id
 void SubutaiContainerManager::registerAllContainers(SubutaiConnection* connection)
 {
 	/*
+
     // TODO: Do we need to register all containers? Maybe active only?
     for (ContainerIterator it = _runningContainers.begin(); it != _runningContainers.end(); it++) {
         (*it).registerContainer(connection);
@@ -248,6 +249,7 @@ void SubutaiContainerManager::getContainerStates(vector<SubutaiContainer> _allCo
 			}
 		}
 	}
+
 }
 
 
@@ -293,7 +295,6 @@ vector<SubutaiContainer> SubutaiContainerManager::getAllContainers()
 
 void SubutaiContainerManager::write()
 {
-
 	cout << "active: \n";
 	for (vector<SubutaiContainer>::iterator it = _runningContainers.begin(); it != _runningContainers.end(); it++)
 		(*it).write();
@@ -303,8 +304,6 @@ void SubutaiContainerManager::write()
 	cout << "frozen: \n";
 	for (vector<SubutaiContainer>::iterator it = _frozenContainers.begin(); it != _frozenContainers.end(); it++)
 			(*it).write();
-
-
 }
 
 

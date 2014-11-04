@@ -57,7 +57,7 @@ string SubutaiLogger::getLocaltime()
 {
     boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
 
-    return toString(now.date().day().as_number()) +"-"+ toString(now.date().month().as_number())+"-" +toString(now.date().year()) +" "+ toString(now.time_of_day().hours())+":"+toString(now.time_of_day().minutes())+":"+toString(now.time_of_day().seconds());
+    return toString(now.date().day().as_number())  + "-" +  toString(now.date().month().as_number()) + "-"  + toString(now.date().year())  + " " +  toString(now.time_of_day().hours()) + ":" + toString(now.time_of_day().minutes()) + ":" + toString(now.time_of_day().seconds());
 }
 
 /**
@@ -80,10 +80,10 @@ bool SubutaiLogger::openLogFile(int pid,int requestSequenceNumber)
 {
     boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
     string logFileName = "/var/log/subutai-agent/"
-        +toString(now.date().year()) + toString(now.date().month().as_number()) + toString(now.date().day().as_number())
-        +"-"+ toString(now.time_of_day().total_milliseconds())
-        +"-"+toString(pid)+"-"+toString(requestSequenceNumber);
-    this->logFile = fopen(logFileName.c_str(),"a+");
+         + toString(now.date().year()) + toString(now.date().month().as_number()) + toString(now.date().day().as_number())
+         + "-" +  toString(now.time_of_day().total_milliseconds())
+         + "-" + toString(pid) + "-" + toString(requestSequenceNumber);
+    this->logFile = fopen(logFileName.c_str(),"a + ");
     if(this->logFile)
     {
         return true;	//file pointer successfully assigned.
@@ -100,7 +100,7 @@ bool SubutaiLogger::openLogFile(int pid,int requestSequenceNumber)
 bool SubutaiLogger::openLogFileWithName(string logfilename)
 {
     logfilename = "/var/log/subutai-agent/" + logfilename;
-    this->logFile = fopen(logfilename.c_str(),"a+");
+    this->logFile = fopen(logfilename.c_str(),"a + ");
     if(this->logFile)
     {
         return true; 	//file pointer successfully assigned.
@@ -136,56 +136,56 @@ void SubutaiLogger::writeLog(int level,string log)
             switch(level)
             {
                 case 7:
-                    log = getLocaltime()+" <DEBUG>"+log + "\n";
+                    log = getLocaltime() + " <DEBUG>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 6:
-                    log =getLocaltime()+" <INFO>"+log + "\n";
+                    log =getLocaltime() + " <INFO>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 5:
-                    log = getLocaltime()+" <NOTICE>"+log + "\n";
+                    log = getLocaltime() + " <NOTICE>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 4:
-                    log =getLocaltime()+" <WARNING>"+log + "\n";
+                    log =getLocaltime() + " <WARNING>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 3:
-                    log = getLocaltime()+" <ERROR>"+log + "\n";
+                    log = getLocaltime() + " <ERROR>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 2:
-                    log = getLocaltime()+" <CRITICAL>"+log + "\n";
+                    log = getLocaltime() + " <CRITICAL>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 1:
-                    log = getLocaltime()+" <ALERT>"+log + "\n";
+                    log = getLocaltime() + " <ALERT>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 0:
-                    log = getLocaltime()+" <EMERGENCY>"+log + "\n";
+                    log = getLocaltime() + " <EMERGENCY>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
@@ -197,49 +197,49 @@ void SubutaiLogger::writeLog(int level,string log)
             switch(level)
             {
                 case 6:
-                    log =getLocaltime()+" <INFO>"+log + "\n";
+                    log =getLocaltime() + " <INFO>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 5:
-                    log = getLocaltime()+" <NOTICE>"+log + "\n";
+                    log = getLocaltime() + " <NOTICE>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 4:
-                    log =getLocaltime()+" <WARNING>"+log + "\n";
+                    log =getLocaltime() + " <WARNING>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 3:
-                    log = getLocaltime()+" <ERROR>"+log + "\n";
+                    log = getLocaltime() + " <ERROR>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 2:
-                    log = getLocaltime()+" <CRITICAL>"+log + "\n";
+                    log = getLocaltime() + " <CRITICAL>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 1:
-                    log = getLocaltime()+" <ALERT>"+log + "\n";
+                    log = getLocaltime() + " <ALERT>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 0:
-                    log = getLocaltime()+" <EMERGENCY>"+log + "\n";
+                    log = getLocaltime() + " <EMERGENCY>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
@@ -251,42 +251,42 @@ void SubutaiLogger::writeLog(int level,string log)
             switch(level)
             {
                 case 5:
-                    log = getLocaltime()+" <NOTICE>"+log + "\n";
+                    log = getLocaltime() + " <NOTICE>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 4:
-                    log =getLocaltime()+" <WARNING>"+log + "\n";
+                    log =getLocaltime() + " <WARNING>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 3:
-                    log = getLocaltime()+" <ERROR>"+log + "\n";
+                    log = getLocaltime() + " <ERROR>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 2:
-                    log = getLocaltime()+" <CRITICAL>"+log + "\n";
+                    log = getLocaltime() + " <CRITICAL>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 1:
-                    log = getLocaltime()+" <ALERT>"+log + "\n";
+                    log = getLocaltime() + " <ALERT>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 0:
-                    log = getLocaltime()+" <EMERGENCY>"+log + "\n";
+                    log = getLocaltime() + " <EMERGENCY>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
@@ -298,35 +298,35 @@ void SubutaiLogger::writeLog(int level,string log)
             switch(level)
             {
                 case 4:
-                    log =getLocaltime()+" <WARNING>"+log + "\n";
+                    log =getLocaltime() + " <WARNING>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 3:
-                    log = getLocaltime()+" <ERROR>"+log + "\n";
+                    log = getLocaltime() + " <ERROR>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 2:
-                    log = getLocaltime()+" <CRITICAL>"+log + "\n";
+                    log = getLocaltime() + " <CRITICAL>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 1:
-                    log = getLocaltime()+" <ALERT>"+log + "\n";
+                    log = getLocaltime() + " <ALERT>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 0:
-                    log = getLocaltime()+" <EMERGENCY>"+log + "\n";
+                    log = getLocaltime() + " <EMERGENCY>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
@@ -338,28 +338,28 @@ void SubutaiLogger::writeLog(int level,string log)
             switch(level)
             {
                 case 3:
-                    log = getLocaltime()+" <ERROR>"+log + "\n";
+                    log = getLocaltime() + " <ERROR>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 2:
-                    log = getLocaltime()+" <CRITICAL>"+log + "\n";
+                    log = getLocaltime() + " <CRITICAL>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 1:
-                    log = getLocaltime()+" <ALERT>"+log + "\n";
+                    log = getLocaltime() + " <ALERT>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 0:
-                    log = getLocaltime()+" <EMERGENCY>"+log + "\n";
+                    log = getLocaltime() + " <EMERGENCY>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
@@ -371,21 +371,21 @@ void SubutaiLogger::writeLog(int level,string log)
             switch(level)
             {
                 case 2:
-                    log = getLocaltime()+" <CRITICAL>"+log + "\n";
+                    log = getLocaltime() + " <CRITICAL>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 1:
-                    log = getLocaltime()+" <ALERT>"+log + "\n";
+                    log = getLocaltime() + " <ALERT>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 0:
-                    log = getLocaltime()+" <EMERGENCY>"+log + "\n";
+                    log = getLocaltime() + " <EMERGENCY>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
@@ -397,14 +397,14 @@ void SubutaiLogger::writeLog(int level,string log)
             switch(level)
             {
                 case 1:
-                    log = getLocaltime()+" <ALERT>"+log + "\n";
+                    log = getLocaltime() + " <ALERT>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
 #endif
                     break;
                 case 0:
-                    log = getLocaltime()+" <EMERGENCY>"+log + "\n";
+                    log = getLocaltime() + " <EMERGENCY>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());
@@ -416,7 +416,7 @@ void SubutaiLogger::writeLog(int level,string log)
             switch(level)
             {
                 case 0:
-                    log = getLocaltime()+" <EMERGENCY>"+log + "\n";
+                    log = getLocaltime() + " <EMERGENCY>" + log + "\n";
                     fputs(log.c_str(), this->logFile);
 #if _DEBUG
                     printf("%s", log.c_str());

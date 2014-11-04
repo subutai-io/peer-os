@@ -34,21 +34,21 @@ using namespace std;
  */
 SubutaiTimer::SubutaiTimer(SubutaiLogger log, SubutaiEnvironment* env, SubutaiContainerManager* cont, SubutaiConnection* conn)
 {
-	start 				=  	boost::posix_time::second_clock::local_time();
-	startQueue			=  	boost::posix_time::second_clock::local_time();
-	exectimeout 		=  	30;
-	queuetimeout 		=  	30;
-	startsec  			=  	start.time_of_day().seconds();
-	startsecQueue		=  	start.time_of_day().seconds();
-	overflag 			=  	false;
-	overflagQueue		=  	false;
-	count 				=  	1;
-	countQueue			=  	1;
-	logMain		 		=	log;
-	response 			= 	new SubutaiResponsePack();
-	connection			= 	conn;
-	environment 		=	env;
-	containerManager 	= 	cont;
+    start 			=  	boost::posix_time::second_clock::local_time();
+    startQueue			=  	boost::posix_time::second_clock::local_time();
+    exectimeout 		=  	30;
+    queuetimeout 		=  	30;
+    startsec  			=  	start.time_of_day().seconds();
+    startsecQueue		=  	start.time_of_day().seconds();
+    overflag 			=  	false;
+    overflagQueue		=  	false;
+    count 			=  	1;
+    countQueue			=  	1;
+    logMain		 	=	log;
+    response 			= 	new SubutaiResponsePack();
+    connection			= 	conn;
+    environment 		=	env;
+    containerManager 	        = 	cont;
 }
 
 /**
@@ -65,44 +65,44 @@ SubutaiTimer::~SubutaiTimer()
  */
 bool SubutaiTimer::checkExecutionTimeout(unsigned int* startsec,bool* overflag,unsigned int* exectimeout,unsigned int* count)
 {
-	if (*exectimeout != 0)
-	{
-		boost::posix_time::ptime current = boost::posix_time::second_clock::local_time();
-		unsigned int currentsec  =  current.time_of_day().seconds();
+    if (*exectimeout != 0)
+    {
+        boost::posix_time::ptime current = boost::posix_time::second_clock::local_time();
+        unsigned int currentsec  =  current.time_of_day().seconds();
 
-		if((currentsec > *startsec) && *overflag==false)
-		{
-			if(currentsec != 59)
-			{
-				*count = *count + (currentsec - *startsec);
-				*startsec = currentsec;
-			}
-			else
-			{
-				*count = *count + (currentsec - *startsec);
-				*overflag = true;
-				*startsec = 1;
-			}
-		}
-		if(currentsec == 59)
-		{
-			*overflag = true;
-			*startsec = 1;
-		}
-		else
-		{
-			*overflag = false;
-		}
-		if(*count >= *exectimeout) //timeout
-		{
-			return true;	//timeout occured now
-		}
-		else
-		{
-			return false; //no timeout occured
-		}
-	}
-	return false;	//no timeout occured
+        if((currentsec > *startsec) && *overflag==false)
+        {
+            if(currentsec != 59)
+            {
+                *count = *count + (currentsec - *startsec);
+                *startsec = currentsec;
+            }
+            else
+            {
+                *count = *count + (currentsec - *startsec);
+                *overflag = true;
+                *startsec = 1;
+            }
+        }
+        if(currentsec == 59)
+        {
+            *overflag = true;
+            *startsec = 1;
+        }
+        else
+        {
+            *overflag = false;
+        }
+        if(*count >= *exectimeout) //timeout
+        {
+            return true;	//timeout occured now
+        }
+        else
+        {
+            return false; //no timeout occured
+        }
+    }
+    return false;	//no timeout occured
 }
 
 
@@ -138,9 +138,9 @@ bool SubutaiTimer::checkHeartBeatTimer(SubutaiCommand command)
 	    exectimeout =   30;
 	    count =         1;
 
-	    return true;
-	}
-	return false;
+        return true;
+    }
+    return false;
 }
 
 bool SubutaiTimer::checkCommandQueueInfoTimer(SubutaiCommand command)
@@ -182,7 +182,8 @@ bool SubutaiTimer::checkCommandQueueInfoTimer(SubutaiCommand command)
 	     queuetimeout =          30;
 	     countQueue =            1;
 
-	     return true;
-	 }
-	 return false;
+
+        return true;
+    }
+    return false;
 }

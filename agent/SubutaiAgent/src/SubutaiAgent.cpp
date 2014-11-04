@@ -404,16 +404,16 @@ int main(int argc,char *argv[],char *envp[])
                     }    
                     if (command.getWatchArguments().size()!=0)
                     {
-                        for (unsigned int i=0; i<command.getWatchArguments().size(); i++)
+                        for (unsigned int i = 0; i < command.getWatchArguments().size(); i++)
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Command WatchArgs:", command.getWatchArguments()[i]));
                     }
 
-                    if (command.getType()=="REGISTRATION_REQUEST_DONE") //type is registration done
+                    if (command.getType() == "REGISTRATION_REQUEST_DONE") //type is registration done
                     {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Registration is done.."));
                         // agent is registered to server now
                     }
-                    else if (command.getType()=="EXECUTE_REQUEST")	//execution request will be executed in other process.
+                    else if (command.getType() == "EXECUTE_REQUEST")	//execution request will be executed in other process.
                     {
                         if (isLocal) {
                             fstream file;	//opening uuid.txt

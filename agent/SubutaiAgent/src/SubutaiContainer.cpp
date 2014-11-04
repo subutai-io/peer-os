@@ -48,7 +48,6 @@ SubutaiContainer::~SubutaiContainer()
     // TODO Auto-generated destructor stub
 }
 
-
 /**
  *  \details   This method designed for Typically conversion from integer to string.
  */
@@ -106,7 +105,6 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     }
     return result;
 }
-
 
 bool SubutaiContainer::isContainerRunning()
 {
@@ -390,6 +388,19 @@ void SubutaiContainer::getContainerAllFields()
     getContainerIpAddress();
 }
 
+ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command) {
+    lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT;
+    if (command->getWorkingDirectory() != "" && checkCWD(command->getWorkingDirectory())) {
+        opts.initial_cwd = const_cast<char*>(command->getWorkingDirectory().c_str());
+    }
+    if (command->getRunAs() != "" && checkUser(command->getRunAs())) {
+        opts.uid = getRunAsUserId(command->getRunAs());
+    }
+    vector<string> args;
+    ExecutionResult res = RunProgram(command->getProgram(), args, true, opts);
+    return res;
+}
+
 void SubutaiContainer::write(){
     cout << " start" <<  id << "  " << macAddress << "  " << hostname << "  " << parentHostname<< " stop" <<  endl;
 
@@ -448,4 +459,11 @@ int SubutaiContainer::getRunAsUserId(string username) {
         }
     } 
     return -1;
+}
+
+string SubutaiContainer::findFullProgramPath(string program_name) {
+    vector<string> args;
+    args.push_back(program_name);
+    string locations = RunProgram("whereis", args);
+    return locations; // TODO: Parse whereis output
 }
