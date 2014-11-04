@@ -44,7 +44,20 @@ public class Commands
     }
 
 
+    public String getStopNameNodeCommand(){
+        return "service hadoop-dfs stop";
+    }
+
     public String getStartJobTrackerCommand(){
+        return "service hadoop-mapred start";
+    }
+
+    public String getStopJobTrackerCommand(){
+        return "service hadoop-mapred start";
+    }
+
+
+    public String getStatusJobTrackerCommand(){
         return "service hadoop-mapred start";
     }
 

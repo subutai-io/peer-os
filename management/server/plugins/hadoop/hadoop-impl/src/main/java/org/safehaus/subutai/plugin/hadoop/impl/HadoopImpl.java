@@ -37,6 +37,7 @@ import org.safehaus.subutai.plugin.hadoop.impl.handler.UninstallOperationHandler
 import org.safehaus.subutai.plugin.hadoop.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StartNameNodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StatusDataNodeOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StopNameNodeOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -227,16 +228,12 @@ public class HadoopImpl implements Hadoop
     @Override
     public UUID stopNameNode( HadoopClusterConfig hadoopClusterConfig )
     {
-//        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
-//        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
-//                "Cluster name is null or empty" );
-//
-//
-//        AbstractOperationHandler operationHandler =
-//                new StopNameNodeOperationHandler( this, hadoopClusterConfig.getClusterName() );
-//        executor.execute( operationHandler );
-//        return operationHandler.getTrackerId();
-        return null;
+        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
+                "Cluster name is null or empty" );        AbstractOperationHandler operationHandler =
+                new StopNameNodeOperationHandler( this, hadoopClusterConfig.getClusterName() );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
