@@ -46,7 +46,8 @@ public class RequestNotifier implements Runnable
             Object response = listener.onRequest( messageRequest.getPayload() );
             if ( response != null )
             {
-                messageResponse = new MessageResponse( messageRequest.getId(), new Payload( response ), null );
+                messageResponse = new MessageResponse( messageRequest.getId(),
+                        new Payload( response, peerManager.getLocalPeer().getId() ), null );
             }
         }
         catch ( Exception e )

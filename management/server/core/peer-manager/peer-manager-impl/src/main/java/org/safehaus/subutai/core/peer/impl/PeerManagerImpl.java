@@ -22,8 +22,8 @@ import org.safehaus.subutai.core.peer.api.PeerGroup;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
-import org.safehaus.subutai.core.peer.impl.command.CommandRequestMessageListener;
-import org.safehaus.subutai.core.peer.impl.command.CommandResponseMessageListener;
+import org.safehaus.subutai.core.peer.impl.command.CommandRequestListener;
+import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequestListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequestListener;
@@ -60,7 +60,7 @@ public class PeerManagerImpl implements PeerManager
     private StrategyManager strategyManager;
     private PeerInfo peerInfo;
     private Messenger messenger;
-    private CommandResponseMessageListener commandResponseMessageListener;
+    private CommandResponseListener commandResponseListener;
     private Set<RequestListener> requestListeners = Sets.newHashSet();
     private MessageResponseListener messageResponseListener;
 
@@ -101,11 +101,11 @@ public class PeerManagerImpl implements PeerManager
                 communicationManager, commandRunner, quotaManager, strategyManager, requestListeners );
         localPeer.init();
 
-        //subscribe to command request messages from remote peer
-        messenger.addMessageListener( new CommandRequestMessageListener( localPeer, messenger, this ) );
-        //subscribe to command response messages from remote peer
-        commandResponseMessageListener = new CommandResponseMessageListener();
-        messenger.addMessageListener( commandResponseMessageListener );
+        //add command request listener
+        addRequestListener( new CommandRequestListener( localPeer, this ) );
+        //add command response listener
+        commandResponseListener = new CommandResponseListener();
+        addRequestListener( commandResponseListener );
         //subscribe to peer message requests
         messenger.addMessageListener( new MessageRequestListener( this, messenger, requestListeners ) );
         //subscribe to peer message responses
@@ -279,7 +279,8 @@ public class PeerManagerImpl implements PeerManager
 
         if ( peerInfo != null )
         {
-            return new RemotePeerImpl( peerInfo, messenger, commandResponseMessageListener, messageResponseListener );
+            return new RemotePeerImpl( localPeer, peerInfo, messenger, commandResponseListener,
+                    messageResponseListener );
         }
         return null;
     }

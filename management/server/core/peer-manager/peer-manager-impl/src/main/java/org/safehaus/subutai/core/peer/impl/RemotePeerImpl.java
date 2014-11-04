@@ -19,13 +19,14 @@ import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.RemotePeer;
 import org.safehaus.subutai.core.peer.impl.command.BlockingCommandCallback;
 import org.safehaus.subutai.core.peer.impl.command.CommandRequest;
-import org.safehaus.subutai.core.peer.impl.command.CommandResponseMessageListener;
+import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequest;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequest;
@@ -46,20 +47,22 @@ public class RemotePeerImpl implements RemotePeer
 {
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerImpl.class.getName() );
 
+    private LocalPeer localPeer;
     protected PeerInfo peerInfo;
     protected Messenger messenger;
 
-    private CommandResponseMessageListener commandResponseMessageListener;
+    private CommandResponseListener commandResponseListener;
     private MessageResponseListener messageResponseListener;
 
 
-    public RemotePeerImpl( final PeerInfo peerInfo, final Messenger messenger,
-                           CommandResponseMessageListener commandResponseMessageListener,
+    public RemotePeerImpl( LocalPeer localPeer, final PeerInfo peerInfo, final Messenger messenger,
+                           CommandResponseListener commandResponseListener,
                            MessageResponseListener messageResponseListener )
     {
+        this.localPeer = localPeer;
         this.peerInfo = peerInfo;
         this.messenger = messenger;
-        this.commandResponseMessageListener = commandResponseMessageListener;
+        this.commandResponseListener = commandResponseListener;
         this.messageResponseListener = messageResponseListener;
     }
 
@@ -273,17 +276,14 @@ public class RemotePeerImpl implements RemotePeer
 
         CommandRequest request = new CommandRequest( requestBuilder, ( ContainerHost ) host );
         //cache callback
-        commandResponseMessageListener
-                .addCallback( request.getRequestId(), callback, requestBuilder.getTimeout(), semaphore );
+        commandResponseListener.addCallback( request.getRequestId(), callback, requestBuilder.getTimeout(), semaphore );
 
-        //send command message to remote peer
+        //send command request to remote peer counterpart
         try
         {
-            Message message = messenger.createMessage( request );
-            messenger.sendMessage( this, message, RecipientType.COMMAND_REQUEST.name(),
-                    Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT );
+            sendRequest( request, RecipientType.COMMAND_REQUEST.name(), Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT );
         }
-        catch ( MessageException e )
+        catch ( PeerException e )
         {
             throw new CommandException( e );
         }
@@ -340,7 +340,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
         Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
 
-        MessageRequest messageRequest = new MessageRequest( new Payload( request ), recipient );
+        MessageRequest messageRequest = new MessageRequest( new Payload( request, localPeer.getId() ), recipient );
         Message message = messenger.createMessage( messageRequest );
 
         try
