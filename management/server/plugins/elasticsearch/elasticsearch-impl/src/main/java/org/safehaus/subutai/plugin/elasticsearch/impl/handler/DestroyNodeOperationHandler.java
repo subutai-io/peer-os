@@ -5,12 +5,9 @@ import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
-
-import com.google.common.collect.Sets;
 
 
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
@@ -61,42 +58,34 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
                     "This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted" );
             return;
         }
-        trackerOperation.addLog( "Uninstalling Mahout..." );
-        Command uninstallCommand = manager.getCommands().getUninstallCommand( Sets.newHashSet( agent ) );
-        manager.getCommandRunner().runCommand( uninstallCommand );
 
-        if ( uninstallCommand.hasCompleted() )
+        trackerOperation.addLog( "Destroying lxc container..." );
+        Agent physicalAgent = manager.getAgentManager().getAgentByHostname( agent.getParentHostName() );
+        if ( physicalAgent == null )
         {
-            AgentResult result = uninstallCommand.getResults().get( agent.getUuid() );
-            if ( result.getExitCode() != null && result.getExitCode() == 0 )
-            {
-                if ( result.getStdOut().contains( "Package subutai-elasticsearch is not installed, so not removed" ) )
-                {
-                    trackerOperation.addLog( String.format( "Elasticsearch is not installed, so not removed on node %s",
+            trackerOperation.addLog(
+                    String.format( "Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
                             agent.getHostname() ) );
-                }
-                else
-                {
-                    trackerOperation
-                            .addLog( String.format( "Elasticsearch is removed from node %s", agent.getHostname() ) );
-                }
-            }
-            else
-            {
-                trackerOperation
-                        .addLog( String.format( "Error %s on node %s", result.getStdErr(), agent.getHostname() ) );
-            }
-
-            elasticsearchClusterConfiguration.getNodes().remove( agent );
-            trackerOperation.addLog( "Updating db..." );
-
-            manager.getPluginDAO().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-                    elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration );
-            trackerOperation.addLogDone( "Cluster info update in DB\nDone" );
         }
         else
         {
-            trackerOperation.addLogFailed( "Uninstallation failed, command timed out" );
+            try
+            {
+                manager.getContainerManager().cloneDestroy( physicalAgent.getHostname(), agent.getHostname() );
+                trackerOperation.addLog( "Lxc container destroyed successfully" );
+                elasticsearchClusterConfiguration.getNodes().remove( agent );
+                trackerOperation.addLog( "Updating db..." );
+
+                manager.getPluginDAO().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+                        elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration );
+                trackerOperation.addLogDone( "Cluster info updated in DB\nDone" );
+            }
+            catch ( LxcDestroyException e )
+            {
+                trackerOperation.addLog(
+                        String.format( "Could not destroy lxc container %s. Use LXC module to cleanup, skipping...",
+                                e.getMessage() ) );
+            }
         }
     }
 }

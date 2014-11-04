@@ -174,18 +174,18 @@ public class AgentManagerImplTest
     }
 
 
-    @Test
-    public void shouldReturnAgentByEnvId()
-    {
-        UUID id = UUIDUtil.generateTimeBasedUUID();
-        ;
-        Response response = MockUtils.getRegistrationRequestFromLxcAgentWithEnvironmentId( id );
-
-        agentManager.onResponse( response );
-
-        assertTrue( !agentManager.getAgentsByEnvironmentId( id ).isEmpty() );
-        assertTrue( id.equals( agentManager.getAgentsByEnvironmentId( id ).iterator().next().getEnvironmentId() ) );
-    }
+//    @Test
+//    public void shouldReturnAgentByEnvId()
+//    {
+//        UUID id = UUIDUtil.generateTimeBasedUUID();
+//        ;
+//        Response response = MockUtils.getRegistrationRequestFromLxcAgentWithEnvironmentId( id );
+//
+//        agentManager.onResponse( response );
+//
+//        assertTrue( !agentManager.getAgentsByEnvironmentId( id ).isEmpty() );
+//        assertTrue( id.equals( agentManager.getAgentsByEnvironmentId( id ).iterator().next().getEnvironmentId() ) );
+//    }
 
 
     @Test

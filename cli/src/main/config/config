@@ -30,6 +30,9 @@ export SUBUTAI_AUTH_KEY=/root/.ssh/id_dsa.pub
 #on the same container/template
 export SUBUTAI_LOCK_PATH=/var/lock/subutai/
 
+# Directory to store round-robin database files for monitoring feature
+export SUBUTAI_RRD_DIRECTORY="/var/lib/subutai/rrd/"
+
 # A colon separated list of non-overlapping configuration paths which
 # need to be tracked in templates for changes via git. By default /etc
 # is versioned on each container. Use the subutai-config-path utility

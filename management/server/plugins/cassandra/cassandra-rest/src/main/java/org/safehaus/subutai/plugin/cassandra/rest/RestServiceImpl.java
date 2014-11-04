@@ -99,27 +99,27 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response addNode( final String clusterName, final String lxcHostname, final String nodeType )
+    public Response addNode( final String clusterName, final String nodeType )
     {
-        UUID uuid = cassandraManager.addNode( clusterName, lxcHostname, nodeType );
+        UUID uuid = cassandraManager.addNode( clusterName, nodeType );
         String operationId = wrapUUID( uuid );
         return Response.status( Response.Status.CREATED ).entity( operationId ).build();
     }
 
 
     @Override
-    public Response destroyNode( final String clusterName, final String lxcHostname, final String nodeType )
+    public Response destroyNode( final String clusterName, final String containerId )
     {
-        UUID uuid = cassandraManager.destroyNode( clusterName, lxcHostname, nodeType );
+        UUID uuid = cassandraManager.destroyNode( clusterName, UUID.fromString( containerId ) );
         String operationId = wrapUUID( uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
 
 
     @Override
-    public Response checkNode( final String clusterName, final String lxcHostname )
+    public Response checkNode( final String clusterName, final String containerId )
     {
-        UUID uuid = cassandraManager.checkNode( clusterName, lxcHostname );
+        UUID uuid = cassandraManager.checkNode( clusterName, UUID.fromString( containerId ) );
         String operationId = wrapUUID( uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }

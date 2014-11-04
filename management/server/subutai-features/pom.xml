@@ -26,6 +26,21 @@
     <!-- core -->
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- queue -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>messenger-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>messenger-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>messenger-rest</artifactId>
+    </dependency>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- agent-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -62,14 +77,14 @@
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- command-dispatcher -->
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>command-dispatcher-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>command-dispatcher-impl</artifactId>
-    </dependency>
+    </dependency>-->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- command-runner -->
     <dependency>
@@ -206,21 +221,6 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- lxc-manager -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>lxc-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>lxc-manager-impl</artifactId>
-    </dependency>
-    <!--<dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>lxc-manager-ui</artifactId>
-    </dependency>
--->
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- lxc-quota-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -247,32 +247,54 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- monitor -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>metric-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>metric-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>metric-cli</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>metric-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>metric-ui</artifactId>
+    </dependency>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- security-manager -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>security-manager-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>security-manager-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- network-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>network-manager-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>network-manager-impl</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- peer-command-dispatcher -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>peer-command-dispatcher-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>peer-command-dispatcher-impl</artifactId>
-    </dependency>
-    <!--
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>peer-command-dispatcher-rest</artifactId>
-    </dependency>
-       -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- peer-manager -->
     <dependency>
@@ -389,14 +411,34 @@
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- plugins -->
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>plugin-common</artifactId>
-    </dependency>
+    </dependency>-->
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- hadoop -->
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>cassandra-plugin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>cassandra-plugin-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>cassandra-plugin-cli</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>cassandra-plugin-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>cassandra-plugin-ui</artifactId>
+    </dependency>
+
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hadoop-plugin-api</artifactId>
     </dependency>
@@ -768,27 +810,6 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-ui</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>hipi-plugin-api</artifactId>
     </dependency>
     <dependency>
@@ -808,7 +829,6 @@
       <artifactId>hipi-plugin-ui</artifactId>
     </dependency>
 
-    <!-- nutch -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>nutch-plugin-api</artifactId>
@@ -830,7 +850,6 @@
       <artifactId>nutch-plugin-ui</artifactId>
     </dependency>
 
-    <!-- jetty -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>jetty-plugin-api</artifactId>
@@ -842,7 +861,8 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>jetty-plugin-ui</artifactId>
-    </dependency>
+    </dependency>-->
+
   </dependencies>
 
   <build>

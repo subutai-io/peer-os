@@ -2,64 +2,26 @@ package org.safehaus.subutai.core.peer.api;
 
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.PeerCommandMessage;
-import org.safehaus.subutai.core.container.api.ContainerCreateException;
-import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
-import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 
-
-/**
- * Created by bahadyr on 8/28/14.
- */
 public interface PeerManager
 {
 
-    boolean register( Peer peer );
+    boolean register( PeerInfo peerInfo ) throws PeerException;
 
-    boolean update( Peer peer );
+    boolean update( PeerInfo peerInfo );
 
-    public UUID getSiteId();
 
-    public List<Peer> peers();
+    @Deprecated
+    public List<PeerInfo> peers();
 
-    boolean unregister( String uuid );
+    public PeerInfo getLocalPeerInfo();
 
-    public Peer getPeerByUUID( UUID uuid );
+    public PeerInfo getPeerInfo( UUID uuid );
 
-    //    public String getRemoteId( String baseUrl );
+    boolean unregister( String uuid ) throws PeerException;
 
-    public void addPeerMessageListener( PeerMessageListener listener );
-
-    public void removePeerMessageListener( PeerMessageListener listener );
-
-    public String sendPeerMessage( Peer peer, String recipient, String message ) throws PeerMessageException;
-
-    public String processPeerMessage( String peerId, String recipient, String message ) throws PeerMessageException;
-
-    public boolean isPeerReachable( Peer peer ) throws PeerException;
-
-    public Set<Agent> getConnectedAgents( String environmentId ) throws PeerException;
-
-    public Set<Agent> getConnectedAgents( Peer peer, String environmentId ) throws PeerException;
-
-    public Set<Agent> createContainers( UUID envId, UUID peerId, String template, int numberOfNodes, String strategy )
-            throws ContainerCreateException;
-
-    public boolean startContainer( PeerContainer container );
-
-    public boolean stopContainer( PeerContainer container );
-
-    public boolean isContainerConnected( PeerContainer container );
-
-    public Set<PeerContainer> getContainers();
-
-    public void addContainer( PeerContainer peerContainer );
-
-    public void invoke( PeerCommandMessage peerCommandMessage );
 
     List<PeerGroup> peersGroups();
 
@@ -67,17 +29,16 @@ public interface PeerManager
 
     boolean savePeerGroup( PeerGroup group );
 
-    public PeerInterface getPeer( UUID peerId );
+    public Peer getPeer( UUID peerId );
 
+    public List<Peer> getPeers();
 
-    //    public Set<ContainerHost> createContainers( UUID envId, String templateName, int quantity, String strategyId,
-    //                                                List<Criteria> criteria ) throws ContainerCreateException;
-
-    public boolean isConnected( Host host );
-
-    public ManagementHost getManagementHost();
 
     public LocalPeer getLocalPeer();
 
     PeerGroup getPeerGroup( UUID peerGroupId );
+
+    public void addRequestListener( RequestListener listener );
+
+    public void removeRequestListener( RequestListener listener );
 }

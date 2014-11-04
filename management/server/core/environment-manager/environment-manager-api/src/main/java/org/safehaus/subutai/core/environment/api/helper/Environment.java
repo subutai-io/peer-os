@@ -6,22 +6,16 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.naming.NamingException;
-
-import org.safehaus.subutai.common.protocol.PeerCommandMessage;
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
 public class Environment
 {
 
-    private final ServiceLocator serviceLocator;
     private UUID id;
     private String name;
-    private Set<EnvironmentContainer> containers;
+    private Set<ContainerHost> containers;
     private EnvironmentStatusEnum status;
     private long creationTimestamp;
 
@@ -31,7 +25,6 @@ public class Environment
         this.name = name;
         this.id = UUIDUtil.generateTimeBasedUUID();
         this.containers = new HashSet<>();
-        this.serviceLocator = new ServiceLocator();
         this.status = EnvironmentStatusEnum.EMPTY;
         this.creationTimestamp = System.currentTimeMillis();
     }
@@ -55,16 +48,22 @@ public class Environment
     }
 
 
-    public void addContainer( EnvironmentContainer container )
+    public void addContainer( ContainerHost container )
     {
         container.setEnvironmentId( id );
         this.containers.add( container );
     }
 
 
-    public Set<EnvironmentContainer> getContainers()
+    public Set<ContainerHost> getContainers()
     {
         return containers;
+    }
+
+
+    public void setContainers( final Set<ContainerHost> containers )
+    {
+        this.containers = containers;
     }
 
 
@@ -72,12 +71,6 @@ public class Environment
     public Set<ContainerHost> getContainerHosts()
     {
         return Collections.EMPTY_SET;
-    }
-
-
-    public void setContainers( final Set<EnvironmentContainer> containers )
-    {
-        this.containers = containers;
     }
 
 
@@ -90,21 +83,5 @@ public class Environment
     public UUID getId()
     {
         return id;
-    }
-
-
-    public void invoke( PeerCommandMessage commandMessage )
-    {
-        try
-        {
-            EnvironmentManager environmentManager = this.serviceLocator.getServiceNoCache( EnvironmentManager.class );
-            environmentManager.invoke( commandMessage );
-        }
-        catch ( NamingException e )
-        {
-            commandMessage.setProccessed( true );
-            commandMessage.setExceptionMessage( e.toString() );
-            //            commandMessage.setSuccess( false );
-        }
     }
 }

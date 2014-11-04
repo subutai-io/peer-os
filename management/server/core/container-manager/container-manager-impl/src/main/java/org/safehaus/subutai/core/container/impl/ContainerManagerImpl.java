@@ -29,7 +29,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -75,7 +74,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
 
     public ContainerManagerImpl( AgentManager agentManager, CommandRunner commandRunner, Monitoring monitoring,
                                  TemplateManager templateManager, TemplateRegistry templateRegistry,
-                                  StrategyManager strategyManager )
+                                 StrategyManager strategyManager )
     {
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
@@ -863,19 +862,5 @@ public class ContainerManagerImpl extends ContainerManagerBase
                 }
             }
         }
-    }
-
-
-    @Override
-    public List<String> getTemplates()
-    {
-        List<Template> templates = templateRegistry.getAllTemplates();
-
-        List<String> result = new ArrayList<String>();
-        for ( Template template : templates )
-        {
-            result.add( template.getTemplateName() );
-        }
-        return result;
     }
 }

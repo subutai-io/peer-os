@@ -1,107 +1,73 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 
 
+import java.util.Set;
+
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
+import org.safehaus.subutai.plugin.elasticsearch.impl.ClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
-
-import com.google.common.collect.Sets;
 
 
 public class AddNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
 {
-    private final String lxcHostname;
+
+    private ClusterConfiguration clusterConfiguration;
 
 
-    public AddNodeOperationHandler( ElasticsearchImpl manager, String clusterName, String lxcHostname )
+    public AddNodeOperationHandler( ElasticsearchImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        this.lxcHostname = lxcHostname;
         trackerOperation = manager.getTracker().createTrackerOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 String.format( "Adding node to %s", clusterName ) );
+        clusterConfiguration = new ClusterConfiguration( manager, trackerOperation );
     }
 
 
     @Override
     public void run()
     {
-        ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = manager.getCluster( clusterName );
-        if ( elasticsearchClusterConfiguration == null )
+        ElasticsearchClusterConfiguration config = manager.getCluster( clusterName );
+        try
         {
-            trackerOperation.addLogFailed(
-                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
-            return;
-        }
+            //create lxc
+            trackerOperation.addLog( "Creating lxc container..." );
 
-        //check if node agent is connected
-        Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( agent == null )
-        {
-            trackerOperation
-                    .addLogFailed( String.format( "Node %s is not connected\nOperation aborted", lxcHostname ) );
-            return;
-        }
+            Set<Agent> agents = manager.getContainerManager()
+                                       .clone( ElasticsearchClusterConfiguration.getTemplateName(), 1, null,
+                                               ElasticsearchClusterConfiguration.getNodePlacementStrategy() );
 
-        if ( elasticsearchClusterConfiguration.getNodes().contains( agent ) )
-        {
-            trackerOperation.addLogFailed(
-                    String.format( "Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName ) );
-            return;
-        }
+            Agent agent = agents.iterator().next();
 
-        trackerOperation.addLog( "Checking prerequisites..." );
+            trackerOperation.addLog( "Lxc container created successfully" );
 
-        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( agent ) );
-        manager.getCommandRunner().runCommand( checkInstalledCommand );
+            config.getNodes().add( agent );
+            config.setNumberOfNodes( config.getNumberOfNodes() + 1 );
 
-        if ( !checkInstalledCommand.hasCompleted() )
-        {
-            trackerOperation
-                    .addLogFailed( "Failed to check presence of installed subutai packages\nInstallation aborted" );
-            return;
-        }
-
-        AgentResult result = checkInstalledCommand.getResults().get( agent.getUuid() );
-
-        if ( result.getStdOut()
-                   .contains( Common.PACKAGE_PREFIX + ElasticsearchClusterConfiguration.PRODUCT_KEY.toLowerCase() ) )
-        {
-            trackerOperation.addLogFailed(
-                    String.format( "Node %s already has Elasticsearch installed\nInstallation aborted", lxcHostname ) );
-            return;
-        }
-
-        elasticsearchClusterConfiguration.getNodes().add( agent );
-        trackerOperation.addLog( "Updating db..." );
-        //save to db
-        if ( manager.getPluginDAO().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-                elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration ) )
-        {
-            trackerOperation.addLog( "Cluster info updated in DB\nInstalling Mahout..." );
-            //install mahout
-
-            Command installCommand = manager.getCommands().getInstallCommand( Sets.newHashSet( agent ) );
-            manager.getCommandRunner().runCommand( installCommand );
-
-            if ( installCommand.hasSucceeded() )
+            //reconfigure cluster
+            try
             {
-                trackerOperation.addLogDone( "Installation succeeded\nDone" );
+                clusterConfiguration.configureCluster( config );
             }
-            else
+            catch ( ClusterConfigurationException e )
             {
-
-                trackerOperation
-                        .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+                trackerOperation.addLogFailed( String.format( "Error reconfiguring cluster, %s", e.getMessage() ) );
+                return;
             }
+
+            //update db
+            trackerOperation.addLog( "Updating cluster information in database..." );
+
+            manager.getPluginDAO()
+                   .saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, config.getClusterName(), config );
+            trackerOperation.addLogDone( "Cluster information updated in database" );
         }
-        else
+        catch ( LxcCreateException ex )
         {
-            trackerOperation
-                    .addLogFailed( "Could not update cluster info in DB! Please see logs\nInstallation aborted" );
+            trackerOperation.addLogFailed( ex.getMessage() );
         }
     }
 }

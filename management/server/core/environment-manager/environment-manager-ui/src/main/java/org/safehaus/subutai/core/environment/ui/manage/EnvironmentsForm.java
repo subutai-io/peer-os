@@ -6,15 +6,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.safehaus.subutai.common.exception.ContainerException;
-import org.safehaus.subutai.common.protocol.Container;
-import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
@@ -117,7 +115,7 @@ public class EnvironmentsForm
                 {
                     try
                     {
-                        managerUI.getEnvironmentManager().destroyEnvironment( environment.getId().toString() );
+                        managerUI.getEnvironmentManager().destroyEnvironment( environment.getId() );
                         environmentsButton.click();
                     }
                     catch ( EnvironmentDestroyException e )
@@ -160,33 +158,51 @@ public class EnvironmentsForm
 
     private Window configWindow( final Environment environment )
     {
-        Window window = createWindow( MANAGE_TITLE );
+        Window window = createWindow( "Configure container network properties" );
         window.setContent( genConfigureContainersTable( environment, environment.getContainers() ) );
         return window;
     }
 
 
-    private VerticalLayout genConfigureContainersTable( Environment environment, Set<EnvironmentContainer> containers )
+    private VerticalLayout genConfigureContainersTable( Environment environment, Set<ContainerHost> containers )
     {
         VerticalLayout vl = new VerticalLayout();
+        CheckBox autoHostname = new CheckBox( "Assign auto Hostname" );
+        vl.addComponent( autoHostname );
+        CheckBox autoIP = new CheckBox( "Assign auto IP" );
+        vl.addComponent( autoIP );
 
         Table containersTable = new Table();
         containersTable.addContainerProperty( NAME, String.class, null );
         containersTable.addContainerProperty( "Peer", String.class, null );
-        containersTable.addContainerProperty( "IP", TextField.class, null );
+        containersTable.addContainerProperty( "Hostname", TextField.class, null );
+//        containersTable.addContainerProperty( "IP 1", TextField.class, null );
+        containersTable.addContainerProperty( "IP 2", TextField.class, null );
         containersTable.setPageLength( 10 );
         containersTable.setSelectable( false );
         containersTable.setEnabled( true );
         containersTable.setImmediate( true );
         containersTable.setSizeFull();
 
-        for ( Container container : containers )
+
+        int ipInt = 10;
+        for ( ContainerHost container : containers )
         {
-            TextField field = new TextField();
-            field.setWidth( "200px" );
-            field.setValue( container.getIps().get( 0 ) );
+
+            TextField fieldHostname = new TextField();
+            fieldHostname.setWidth( "120px" );
+            fieldHostname.setValue( container.getAgent().getHostname() );
+
+            /*TextField fieldIp = new TextField();
+            fieldIp.setWidth( "120px" );
+            fieldIp.setValue( container.getAgent().getListIP().get( 0 ) );*/
+
+            TextField fieldIp2 = new TextField();
+            fieldIp2.setWidth( "120px" );
+            fieldIp2.setValue( "192.168.50." + ipInt++ );
+
             containersTable.addItem( new Object[] {
-                    container.getName(), container.getPeerId().toString(), field
+                    container.getTemplateName(), container.getPeerId().toString(), fieldHostname, /*fieldIp,*/ fieldIp2,
             }, null );
         }
 
@@ -209,7 +225,7 @@ public class EnvironmentsForm
     {
         Window window = new Window();
         window.setCaption( caption );
-        window.setWidth( "800px" );
+        window.setWidth( "900px" );
         window.setHeight( "500px" );
         window.setModal( true );
         window.setClosable( true );
@@ -217,7 +233,7 @@ public class EnvironmentsForm
     }
 
 
-    private VerticalLayout genContainersTable( Environment environment, Set<EnvironmentContainer> containers )
+    private VerticalLayout genContainersTable( Environment environment, Set<ContainerHost> containers )
     {
         VerticalLayout vl = new VerticalLayout();
 
@@ -234,11 +250,11 @@ public class EnvironmentsForm
         containersTable.setImmediate( true );
         containersTable.setSizeFull();
 
-        for ( Container container : containers )
+        for ( ContainerHost container : containers )
         {
 
             containersTable.addItem( new Object[] {
-                    container.getName(), container.getPeerId().toString(), propertiesButton( container ),
+                    container.getTemplateName(), container.getPeerId().toString(), propertiesButton( container ),
                     startButton( environment, container ), stopButton( environment, container ),
                     destroyButton( environment, container )
             }, null );
@@ -250,7 +266,7 @@ public class EnvironmentsForm
     }
 
 
-    private Object propertiesButton( final Container container )
+    private Object propertiesButton( final ContainerHost container )
     {
         Button button = new Button( PROPERTIES );
         button.addClickListener( new Button.ClickListener()
@@ -271,22 +287,19 @@ public class EnvironmentsForm
     }
 
 
-    private Table getContainerDetails( Container container )
+    private Table getContainerDetails( ContainerHost container )
     {
         Table table = new Table();
         table.setSizeFull();
         table.addContainerProperty( "Property", String.class, null );
         table.addContainerProperty( "Value", String.class, null );
         table.addItem( new Object[] { "Peer", container.getPeerId().toString() }, null );
-        table.addItem( new Object[] { "Agent", container.getAgentId().toString() }, null );
-        table.addItem( new Object[] { "IP", container.getIps().toString() }, null );
         table.addItem( new Object[] { "Environment ID", container.getEnvironmentId().toString() }, null );
-        table.addItem( new Object[] { "Description", container.getDescription() }, null );
         return table;
     }
 
 
-    private Object startButton( final Environment environment, final Container container )
+    private Object startButton( final Environment environment, final ContainerHost container )
     {
         Button button = new Button( START );
         button.addClickListener( new Button.ClickListener()
@@ -294,7 +307,7 @@ public class EnvironmentsForm
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                try
+                /*try
                 {
                     DefaultCommandMessage commandMessage = container.start();
                     environment.invoke( commandMessage );
@@ -302,14 +315,14 @@ public class EnvironmentsForm
                 catch ( ContainerException e )
                 {
                     Notification.show( e.getMessage() );
-                }
+                }*/
             }
         } );
         return button;
     }
 
 
-    private Object stopButton( final Environment environment, final Container container )
+    private Object stopButton( final Environment environment, final ContainerHost container )
     {
         Button button = new Button( STOP );
         button.addClickListener( new Button.ClickListener()
@@ -317,7 +330,7 @@ public class EnvironmentsForm
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                try
+                /*try
                 {
 
                     DefaultCommandMessage commandMessage = container.stop();
@@ -326,14 +339,14 @@ public class EnvironmentsForm
                 catch ( ContainerException e )
                 {
                     Notification.show( e.getMessage() );
-                }
+                }*/
             }
         } );
         return button;
     }
 
 
-    private Object destroyButton( Environment environment, final Container container )
+    private Object destroyButton( Environment environment, final ContainerHost container )
     {
         Button button = new Button( DESTROY );
         button.addClickListener( new Button.ClickListener()

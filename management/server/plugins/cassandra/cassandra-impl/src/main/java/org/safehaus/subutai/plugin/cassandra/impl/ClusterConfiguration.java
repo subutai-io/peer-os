@@ -1,16 +1,17 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
 
-import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.AgentUtil;
-import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
 
@@ -22,140 +23,105 @@ public class ClusterConfiguration
     private CassandraImpl cassandraManager;
 
 
-    public ClusterConfiguration( final TrackerOperation trackerOperation, final CassandraImpl cassandraManager )
+    public ClusterConfiguration( final TrackerOperation operation, final CassandraImpl cassandraManager )
     {
-        this.po = trackerOperation;
+        this.po = operation;
         this.cassandraManager = cassandraManager;
     }
 
 
-    public void configureCluster( CassandraClusterConfig config ) throws ClusterConfigurationException
+    public void configureCluster( CassandraClusterConfig config, Environment environment )
+            throws ClusterConfigurationException
     {
 
-        // setting cluster name
-        po.addLog( "Setting cluster name " + config.getClusterName() );
-        Set<Agent> agentSet = cassandraManager.getAgentManager().returnAgentsByGivenUUIDSet( config.getNodes() );
-        Command setClusterNameCommand = cassandraManager.getCommands().getConfigureCommand( agentSet,
-                "cluster_name " + config.getClusterName() );
-        cassandraManager.getCommandRunner().runCommand( setClusterNameCommand );
+        po.addLog( String.format( "Configuring cluster: %s", config.getClusterName() ) );
+        String script = ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s";
+        String permissionParam = "sudo chmod 750 $CASSANDRA_HOME";
+        String clusterNameParam = "cluster_name " + config.getClusterName();
+        String dataDirParam = "data_dir " + config.getDataDirectory();
+        String commitLogDirParam = "commitlog_dir " + config.getCommitLogDirectory();
+        String savedCacheDirParam = "saved_cache_dir " + config.getSavedCachesDirectory();
 
-        if ( setClusterNameCommand.hasSucceeded() )
-        {
-            po.addLog( "Configure cluster name succeeded" );
-        }
-        else
-        {
-            po.addLogFailed( String.format( "Installation failed, %s", setClusterNameCommand.getAllErrors() ) );
-            return;
-        }
 
-        // setting data directory name
-        po.addLog( "Setting data directory: " + config.getDataDirectory() );
-        Command setDataDirCommand =
-                cassandraManager.getCommands().getConfigureCommand( agentSet, "data_dir " + config.getDataDirectory() );
-        cassandraManager.getCommandRunner().runCommand( setDataDirCommand );
-
-        if ( setDataDirCommand.hasSucceeded() )
-        {
-            po.addLog( "Configure data directory succeeded" );
-        }
-        else
-        {
-            po.addLogFailed( String.format( "Installation failed, %s", setDataDirCommand.getAllErrors() ) );
-            return;
-        }
-
-        // setting commit log directory
-        po.addLog( "Setting commit directory: " + config.getCommitLogDirectory() );
-        Command setCommitDirCommand = cassandraManager.getCommands().getConfigureCommand( agentSet,
-                "commitlog_dir " + config.getCommitLogDirectory() );
-        cassandraManager.getCommandRunner().runCommand( setCommitDirCommand );
-
-        if ( setCommitDirCommand.hasSucceeded() )
-        {
-            po.addLog( "Configure commit directory succeeded" );
-        }
-        else
-        {
-            po.addLogFailed( String.format( "Installation failed, %s", setCommitDirCommand.getAllErrors() ) );
-            return;
-        }
-
-        // setting saved cache directory
-        po.addLog( "Setting saved cache directory: " + config.getSavedCachesDirectory() );
-        Command setSavedCacheDirCommand = cassandraManager.getCommands().getConfigureCommand( agentSet,
-                "saved_cache_dir " + config.getSavedCachesDirectory() );
-        cassandraManager.getCommandRunner().runCommand( setSavedCacheDirCommand );
-
-        if ( setSavedCacheDirCommand.hasSucceeded() )
-        {
-            po.addLog( "Configure saved cache directory succeeded" );
-        }
-        else
-        {
-            po.addLogFailed( String.format( "Installation failed, %s", setSavedCacheDirCommand.getAllErrors() ) );
-            return;
-        }
-
-        // setting rpc address
-        po.addLog( "Setting rpc address" );
-        Command setRpcAddressCommand =
-                cassandraManager.getCommands().getConfigureRpcAndListenAddressesCommand( agentSet, "rpc_address" );
-        cassandraManager.getCommandRunner().runCommand( setRpcAddressCommand );
-
-        if ( setRpcAddressCommand.hasSucceeded() )
-        {
-            po.addLog( "Configure rpc address succeeded" );
-        }
-        else
-        {
-            po.addLogFailed( String.format( "Installation failed, %s", setRpcAddressCommand.getAllErrors() ) );
-            return;
-        }
-
-        // setting listen address
-        po.addLog( "Setting listen address" );
-        Command setListenAddressCommand =
-                cassandraManager.getCommands().getConfigureRpcAndListenAddressesCommand( agentSet, "listen_address" );
-        cassandraManager.getCommandRunner().runCommand( setListenAddressCommand );
-
-        if ( setListenAddressCommand.hasSucceeded() )
-        {
-            po.addLog( "Configure listen address succeeded" );
-        }
-        else
-        {
-            po.addLogFailed( String.format( "Installation failed, %s", setListenAddressCommand.getAllErrors() ) );
-            return;
-        }
-
-        // setting seeds
         StringBuilder sb = new StringBuilder();
-        //                        sb.append('"');
-        for ( UUID seedUUID : config.getSeedNodes() )
+        int seedCount = 0;
+        for ( ContainerHost containerHost : environment.getContainers() )
         {
-            Agent seed = cassandraManager.getAgentManager().getAgentByUUID( seedUUID );
-            sb.append( AgentUtil.getAgentIpByMask( seed, Common.IP_MASK ) ).append( "," );
+            seedCount++;
+            sb.append( AgentUtil.getAgentIpByMask( containerHost.getAgent(), Common.IP_MASK ) ).append( "," );
+            if ( seedCount == config.getNumberOfSeeds() )
+            {
+                break;
+            }
         }
         sb.replace( sb.toString().length() - 1, sb.toString().length(), "" );
-        //                        sb.append('"');
-        po.addLog( "Settings seeds " + sb.toString() );
+        String seedsParam = "seeds " + sb.toString();
 
-        Command setSeedsCommand =
-                cassandraManager.getCommands().getConfigureCommand( agentSet, "seeds " + sb.toString() );
-        cassandraManager.getCommandRunner().runCommand( setSeedsCommand );
 
-        if ( setSeedsCommand.hasSucceeded() )
+        for ( ContainerHost containerHost : environment.getContainers() )
         {
-            po.addLog( "Configure seeds succeeded" );
-        }
-        else
-        {
-            po.addLogFailed( String.format( "Installation failed, %s", setSeedsCommand.getAllErrors() ) );
-            return;
+            try
+            {
+                po.addLog( "Configuring node: " + containerHost.getId() );
+
+                // Setting permission
+                CommandResult commandResult = containerHost.execute( new RequestBuilder( permissionParam ) );
+                po.addLog( commandResult.getStdOut() );
+
+                // Setting cluster name
+                commandResult =
+                        containerHost.execute( new RequestBuilder( String.format( script, clusterNameParam ) ) );
+                po.addLog( commandResult.getStdOut() );
+
+                // Create directories
+                commandResult = containerHost
+                        .execute( new RequestBuilder( String.format( "mkdir -p %s", config.getDataDirectory() ) ) );
+                po.addLog( commandResult.getStdOut() );
+                commandResult = containerHost
+                        .execute( new RequestBuilder( String.format( "mkdir -p %s", config.getCommitLogDirectory() ) ) );
+                po.addLog( commandResult.getStdOut() );
+                commandResult = containerHost
+                        .execute( new RequestBuilder( String.format( "mkdir -p %s", config.getSavedCachesDirectory() ) ) );
+                po.addLog( commandResult.getStdOut() );
+
+                // Configure directories
+                commandResult = containerHost.execute( new RequestBuilder( String.format( script, dataDirParam ) ) );
+                po.addLog( commandResult.getStdOut() );
+
+                commandResult =
+                        containerHost.execute( new RequestBuilder( String.format( script, commitLogDirParam ) ) );
+                po.addLog( commandResult.getStdOut() );
+
+                commandResult =
+                        containerHost.execute( new RequestBuilder( String.format( script, savedCacheDirParam ) ) );
+                po.addLog( commandResult.getStdOut() );
+
+                // Set RPC address
+                String rpcAddress =
+                        String.format( ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s %s", "rpc_address",
+                                AgentUtil.getAgentIpByMask( containerHost.getAgent(), Common.IP_MASK ) );
+                commandResult = containerHost.execute( new RequestBuilder( rpcAddress ) );
+                po.addLog( commandResult.getStdOut() );
+
+                // Set listen address
+                String listenAddress = String.format( ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s %s",
+                        "listen_address", AgentUtil.getAgentIpByMask( containerHost.getAgent(), Common.IP_MASK ) );
+                commandResult = containerHost.execute( new RequestBuilder( listenAddress ) );
+                po.addLog( commandResult.getStdOut() );
+
+                // Configure seeds
+                commandResult = containerHost.execute( new RequestBuilder( String.format( script, seedsParam ) ) );
+                po.addLog( commandResult.getStdOut() );
+            }
+            catch ( CommandException e )
+            {
+                po.addLogFailed( String.format( "Installation failed" ) );
+                throw new ClusterConfigurationException( e.getMessage() );
+            }
         }
 
+        config.setEnvironmentId( environment.getId() );
         cassandraManager.getPluginDAO().saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-        po.addLog( "Cassandra cluster data saved into database" );
+        po.addLogDone( "Cassandra cluster data saved into database" );
     }
 }
