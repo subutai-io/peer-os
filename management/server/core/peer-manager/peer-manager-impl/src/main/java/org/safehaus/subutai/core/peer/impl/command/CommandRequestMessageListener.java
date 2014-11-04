@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.impl;
+package org.safehaus.subutai.core.peer.impl.command;
 
 
 import org.safehaus.subutai.common.exception.CommandException;
@@ -12,6 +12,8 @@ import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.impl.RecipientType;
+import org.safehaus.subutai.core.peer.impl.Timeouts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +27,8 @@ public class CommandRequestMessageListener extends MessageListener
     private PeerManager peerManager;
 
 
-    protected CommandRequestMessageListener( final LocalPeer localPeer, final Messenger messenger,
-                                             final PeerManager peerManager )
+    public CommandRequestMessageListener( final LocalPeer localPeer, final Messenger messenger,
+                                          final PeerManager peerManager )
     {
         super( RecipientType.COMMAND_REQUEST.name() );
         this.localPeer = localPeer;

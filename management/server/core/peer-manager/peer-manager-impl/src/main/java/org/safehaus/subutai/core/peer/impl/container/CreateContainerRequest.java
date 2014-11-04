@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.impl;
+package org.safehaus.subutai.core.peer.impl.container;
 
 
 import java.util.List;
@@ -19,7 +19,6 @@ public class CreateContainerRequest
     private final int quantity;
     private final String strategyId;
     private final List<Criteria> criteria;
-    private final UUID requestId;
 
 
     public CreateContainerRequest( final UUID creatorPeerId, final UUID environmentId, final List<Template> templates,
@@ -31,13 +30,6 @@ public class CreateContainerRequest
         this.quantity = quantity;
         this.strategyId = strategyId;
         this.criteria = criteria;
-        this.requestId = UUID.randomUUID();
-    }
-
-
-    public UUID getRequestId()
-    {
-        return requestId;
     }
 
 

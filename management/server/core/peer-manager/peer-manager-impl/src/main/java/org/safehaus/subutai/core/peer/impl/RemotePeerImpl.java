@@ -23,6 +23,14 @@ import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.RemotePeer;
+import org.safehaus.subutai.core.peer.impl.command.BlockingCommandCallback;
+import org.safehaus.subutai.core.peer.impl.command.CommandRequest;
+import org.safehaus.subutai.core.peer.impl.command.CommandResponseMessageListener;
+import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequest;
+import org.safehaus.subutai.core.peer.impl.container.CreateContainerResponse;
+import org.safehaus.subutai.core.peer.impl.request.MessageRequest;
+import org.safehaus.subutai.core.peer.impl.request.MessageResponse;
+import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,19 +50,16 @@ public class RemotePeerImpl implements RemotePeer
     protected Messenger messenger;
 
     private CommandResponseMessageListener commandResponseMessageListener;
-    private CreateContainerResponseListener createContainerResponseListener;
     private MessageResponseListener messageResponseListener;
 
 
     public RemotePeerImpl( final PeerInfo peerInfo, final Messenger messenger,
                            CommandResponseMessageListener commandResponseMessageListener,
-                           CreateContainerResponseListener createContainerResponseListener,
                            MessageResponseListener messageResponseListener )
     {
         this.peerInfo = peerInfo;
         this.messenger = messenger;
         this.commandResponseMessageListener = commandResponseMessageListener;
-        this.createContainerResponseListener = createContainerResponseListener;
         this.messageResponseListener = messageResponseListener;
     }
 
@@ -129,14 +134,20 @@ public class RemotePeerImpl implements RemotePeer
             CreateContainerRequest request =
                     new CreateContainerRequest( creatorPeerId, environmentId, templates, quantity, strategyId,
                             criteria );
-            Message createContainerMessage = messenger.createMessage( request );
-            messenger.sendMessage( this, createContainerMessage, RecipientType.CONTAINER_CREATE_REQUEST.name(),
-                    Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT );
 
-            //wait for response
-            return createContainerResponseListener.waitContainers( request.getRequestId() );
+            CreateContainerResponse response = sendRequest( request, RecipientType.CONTAINER_CREATE_REQUEST.name(),
+                    Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainerResponse.class );
+
+            if ( response != null )
+            {
+                return response.getContainerHosts();
+            }
+            else
+            {
+                throw new ContainerCreateException( "Received null response" );
+            }
         }
-        catch ( MessageException e )
+        catch ( PeerException e )
         {
             LOG.error( "Error in createContainers", e );
             throw new ContainerCreateException( e.getMessage() );

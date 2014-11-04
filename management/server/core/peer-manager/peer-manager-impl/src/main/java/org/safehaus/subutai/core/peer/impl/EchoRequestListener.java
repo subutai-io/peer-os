@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.peer.impl;
 
 import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.RequestListener;
+import org.safehaus.subutai.core.peer.impl.RecipientType;
 
 
 /**

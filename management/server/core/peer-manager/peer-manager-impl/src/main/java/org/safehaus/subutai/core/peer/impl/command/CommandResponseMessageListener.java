@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.impl;
+package org.safehaus.subutai.core.peer.impl.command;
 
 
 import java.util.UUID;
@@ -9,6 +9,8 @@ import org.safehaus.subutai.common.cache.ExpiringCache;
 import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageListener;
+import org.safehaus.subutai.core.peer.impl.RecipientType;
+import org.safehaus.subutai.core.peer.impl.Timeouts;
 
 
 public class CommandResponseMessageListener extends MessageListener

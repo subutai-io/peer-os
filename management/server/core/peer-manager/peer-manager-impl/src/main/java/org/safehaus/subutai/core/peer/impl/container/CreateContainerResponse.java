@@ -1,8 +1,7 @@
-package org.safehaus.subutai.core.peer.impl;
+package org.safehaus.subutai.core.peer.impl.container;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
@@ -13,19 +12,11 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 public class CreateContainerResponse
 {
     private Set<ContainerHost> containerHosts;
-    private UUID requestId;
 
 
-    public CreateContainerResponse( UUID requestId, final Set<ContainerHost> containerHosts )
+    public CreateContainerResponse( final Set<ContainerHost> containerHosts )
     {
-        this.requestId = requestId;
         this.containerHosts = containerHosts;
-    }
-
-
-    public UUID getRequestId()
-    {
-        return requestId;
     }
 
 
