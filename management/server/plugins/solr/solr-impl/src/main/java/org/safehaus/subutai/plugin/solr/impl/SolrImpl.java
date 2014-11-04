@@ -218,9 +218,9 @@ public class SolrImpl implements Solr
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final SolrClusterConfig config,
                                                          final TrackerOperation po )
     {
-        /*Preconditions.checkNotNull( environment, "Environment is null" );
+        Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( config, "Solr cluster config is null" );
-        Preconditions.checkNotNull( po, "Product operation is null" );*/
+        Preconditions.checkNotNull( po, "Product operation is null" );
 
         return new SolrSetupStrategy( this, po, config, environment );
     }

@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -109,7 +108,7 @@ public class SolrClusterConfig implements ConfigBase
     }
 
 
-    public void setEnviromentId( final UUID environmentId )
+    public void setEnvironmentId( final UUID environmentId )
     {
         this.environmentId = environmentId;
     }

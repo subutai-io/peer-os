@@ -89,6 +89,8 @@ public class SolrSetupStrategy implements ClusterSetupStrategy
 
         po.addLog( "Saving cluster information to database..." );
 
+        config.setEnvironmentId( environment.getId() );
+
         manager.getPluginDAO().saveInfo( SolrClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
         po.addLog( "Cluster information saved to database" );
 
