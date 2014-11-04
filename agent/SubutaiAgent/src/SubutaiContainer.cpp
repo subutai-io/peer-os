@@ -161,23 +161,34 @@ void SubutaiContainer::UpdateUsersList() {
  */
 bool SubutaiContainer::getContainerId()
 {
-    if(this-> status != RUNNING) return false;
     try
-    {
+    {/*
         vector<string> args;
         args.push_back("/etc/subutai-agent/uuid.txt");
         this-> id = RunProgram("/bin/cat", args);
+        */
+    	string uuidFile = "/var/lib/lxc/" + this->hostname + "/rootfs/etc/subutai-agent/uuid.txt";
+    	ifstream file(uuidFile.c_str());	//opening uuid.txt
+    	getline(file,this->id);
+    	file.close();
+
         if (this->id.empty())		//if uuid is null or not reading successfully
         {
             boost::uuids::random_generator gen;
             boost::uuids::uuid u = gen();
             const std::string tmp = boost::lexical_cast<std::string>(u);
             this->id = tmp;
+            /*
             args.clear();
             args.push_back(this->id);
             args.push_back(">");
             args.push_back("/etc/subutai-agent/uuid.txt");
             this-> id = RunProgram("/bin/echo", args);
+            */
+            ofstream file(uuidFile.c_str());
+            file << this->id;
+            file.close();
+
             containerLogger->writeLog(1,containerLogger->setLogData("<SubutaiAgent>","Subutai Agent UUID: ",this->id));
             return false;
         }
@@ -221,17 +232,23 @@ bool SubutaiContainer::getContainerMacAddress()
  */
 bool SubutaiContainer::getContainerHostname()
 {
-    if(this-> status != RUNNING) return false;
+    if(this-> status != RUNNING || !this->hostname.empty()) return false;
     try
     {
         vector<string> args;
         args.push_back("/etc/hostname");
         this->hostname = RunProgram("/bin/cat", args);
+
         if(this->hostname.empty())		//if hostname is null or not reading successfully
         {
             containerLogger->writeLog(7, containerLogger->setLogData("<SubutaiAgent>","Failed to get container hostname (getContainerHostname)"));
             return false;
         }
+        else
+        {
+            if(this->hostname[this->hostname.size()-1] == '\n') this->hostname[this->hostname.size()-1] = '\0';
+        }
+
         containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","Retrieved container hostname:", this->hostname));
         return true;
     }
@@ -381,9 +398,9 @@ vector<string> SubutaiContainer::getContainerIpValue()
 
 void SubutaiContainer::getContainerAllFields()
 {
+    getContainerHostname();
     getContainerId();
     getContainerMacAddress();
-    getContainerHostname();
     getContainerParentHostname();
     getContainerIpAddress();
 }

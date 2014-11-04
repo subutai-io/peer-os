@@ -265,6 +265,14 @@ void SubutaiContainerManager::updateContainerLists()
 	  {
 		  (*it).getContainerAllFields();
 	  }
+	  for (vector<SubutaiContainer>::iterator it = _stoppedContainers.begin(); it != _stoppedContainers.end(); it++)
+	  {
+		  (*it).getContainerAllFields();
+	  }
+	  for (vector<SubutaiContainer>::iterator it = _frozenContainers.begin(); it != _frozenContainers.end(); it++)
+	  {
+		  (*it).getContainerAllFields();
+	  }
 }
 
 

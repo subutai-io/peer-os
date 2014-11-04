@@ -218,7 +218,7 @@ int main(int argc,char *argv[],char *envp[])
     environment.getAgentSettings();
     environment.getAgentUuid();
     environment.getAgentMacAddress();
-    environment.isAgentLxc();
+    //environment.isAgentLxc();
     environment.getAgentIpAddress();
     environment.getAgentParentHostname();
     environment.getAgentEnvironmentId();
@@ -228,7 +228,6 @@ int main(int argc,char *argv[],char *envp[])
      * Starting Container Manager
      */
     SubutaiContainerManager cman("/var/lib/lxc", &logMain);
-    //updateContainerInfosPeriodically(&cman);
 
 
     /*
@@ -276,17 +275,16 @@ int main(int argc,char *argv[],char *envp[])
     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Registration Message is sending to MQTT Broker.."));
 
     /*
-     * sending registration message
+     * sending registration message : For the new subutai agent arch. heartbeat will be used for registration.
      */
-
+/*
     sendout = response.createRegistrationMessage(
             environment.getAgentUuidValue(), environment.getAgentMacAddressValue(),
             environment.getAgentHostnameValue(),environment.getAgentParentHostnameValue(),
             environment.getAgentEnvironmentIdValue(),environment.getAgentIpValue());
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Registration Message:", sendout));
     connection->sendMessage(sendout);
-
-    //cman.registerAllContainers(connection);
+*/
 
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Shared Memory MessageQueue is initializing.."));
     message_queue messageQueue
@@ -339,13 +337,16 @@ int main(int argc,char *argv[],char *envp[])
     SubutaiTimer timer(logMain, &environment, &cman, connection);
     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Timer is initializing.."));
 
+    // Send initial heratbeat for registration of resource host and container nodes attached to this host.
     timer.sendHeartBeat();
     while(true)
     {
         try
         {
+        	//In 30 second periods send heartbeat and in_queue responses.
         	timer.checkHeartBeatTimer(command);
         	timer.checkCommandQueueInfoTimer(command);
+
 
             command.clear();
             for (list<int>::iterator iter = pidList.begin(); iter != pidList.end();iter++)
@@ -408,15 +409,17 @@ int main(int argc,char *argv[],char *envp[])
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Command WatchArgs:", command.getWatchArguments()[i]));
                     }
 
+                    /*
                     if (command.getType() == "REGISTRATION_REQUEST_DONE") //type is registration done
                     {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Registration is done.."));
                         // agent is registered to server now
                     }
-                    else if (command.getType() == "EXECUTE_REQUEST")	//execution request will be executed in other process.
+                    else*/
+                    if (command.getType() == "EXECUTE_REQUEST")	//execution request will be executed in other process.
                     {
                         if (isLocal) {
-                            fstream file;	//opening uuid.txt
+                            fstream file;	//opening commandQueue.txt
                             file.open("/etc/subutai-agent/commandQueue.txt",fstream::in | fstream::out | fstream::app);
                             file << input;
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Received Message to internal currentProcess!"));
@@ -435,13 +438,14 @@ int main(int argc,char *argv[],char *envp[])
                         subprocess->threadFunction(&messageQueue,&command,argv);
                         delete subprocess;
                     }
+                    /*
                     else if (command.getType()=="HEARTBEAT_REQUEST")
                     {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Heartbeat message has been taken.."));
                         response.clear();
                         /*
                          * Refresh new agent ip address set for each heartbeat message
-                         */
+                         *//*
                         if (isLocal) {
                             environment.getAgentIpAddress();
                             response.setIps(environment.getAgentIpValue());
@@ -455,6 +459,7 @@ int main(int argc,char *argv[],char *envp[])
                         } else {
                         }
                     }
+                    */
                     else if (command.getType() == "TERMINATE_REQUEST")
                     {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",toString(command.getPid())));
