@@ -188,14 +188,14 @@ public class RemotePeerRestClient
     }
 
 
-    public Template getTemplate( final ContainerHost containerHost ) throws PeerException
+    public Template getTemplate( final String templateName ) throws PeerException
     {
         String path = "peer/template/get";
 
         WebClient client = createWebClient();
 
         Form form = new Form();
-        form.set( "host", JsonUtil.toJson( containerHost ) );
+        form.set( "templateName", templateName );
         Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
                                   .accept( MediaType.APPLICATION_JSON ).post( form );
 

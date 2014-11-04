@@ -3,10 +3,10 @@ package org.safehaus.subutai.core.peer.impl.container;
 
 import java.util.Set;
 
-import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Payload;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.RecipientType;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public class CreateContainerRequestListener extends RequestListener
 
                 return new CreateContainerResponse( containerHosts );
             }
-            catch ( ContainerCreateException e )
+            catch ( PeerException e )
             {
                 LOG.error( "'Error in CreateContainerRequestListener.onMessage", e );
             }
