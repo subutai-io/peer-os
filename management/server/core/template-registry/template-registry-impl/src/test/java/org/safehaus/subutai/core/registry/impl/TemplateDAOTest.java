@@ -1,9 +1,10 @@
 package org.safehaus.subutai.core.registry.impl;
 
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -11,15 +12,16 @@ import javax.persistence.Persistence;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -39,7 +41,7 @@ public class TemplateDAOTest
     @Before
     public void setUp() throws Exception
     {
-        emf = Persistence.createEntityManagerFactory( "default" );
+        emf = Persistence.createEntityManagerFactory( "default", System.getProperties() );
         EntityManager em = emf.createEntityManager();
         templateDAO = new TemplateDAO();
         templateDAO.setEntityManagerFactory( emf );
@@ -64,33 +66,44 @@ public class TemplateDAOTest
     }
 
 
-    @Ignore
     @Test
     public void testGetAllTemplates() throws Exception
     {
-        List<Template> templates = new ArrayList<>();
-        templates.add( TestUtils.getParentTemplate() );
-        templates.add( TestUtils.getChildTemplate() );
+        Map<Pair<String, String>, Template> templates = new HashMap<>();
+
+        Template childTemplate = TestUtils.getChildTemplate();
+        Template parentTemplate = TestUtils.getParentTemplate();
+
+        templates.put( new ImmutablePair<String, String>( childTemplate.getTemplateName(), childTemplate.getLxcArch() ),
+                childTemplate );
+        templates.put( new ImmutablePair<String, String>( parentTemplate.getTemplateName(),
+                parentTemplate.getLxcArch() ), parentTemplate );
+
+        //        templates.add( TestUtils.getChildTemplate() );
+        //        templates.add( TestUtils.getParentTemplate() );
 
         LOGGER.info( "Templates going to be persisted" );
-        for ( Template template : templates )
+        for ( Map.Entry<Pair<String, String>, Template> pairTemplateEntry : templates.entrySet() )
         {
-            templateDAO.saveTemplate( template );
-            LOGGER.warn( template.getTemplateName() );
+            templateDAO.saveTemplate( pairTemplateEntry.getValue() );
+            LOGGER.warn( pairTemplateEntry.getValue().getTemplateName() );
         }
 
+
         LOGGER.info( "Templates persisted in database" );
+        Map<Pair<String, String>, Template> savedTemplatesMap = new HashMap<>();
         List<Template> savedTemplates = templateDAO.getAllTemplates();
         for ( Template savedTemplate : savedTemplates )
         {
+            savedTemplatesMap.put( new ImmutablePair<String, String>( savedTemplate.getTemplateName(),
+                    savedTemplate.getLxcArch() ), savedTemplate );
             LOGGER.warn( savedTemplate.getTemplateName() );
         }
 
-        assertArrayEquals( templates.toArray(), savedTemplates.toArray() );
+        assertArrayEquals( templates.entrySet().toArray(), savedTemplatesMap.entrySet().toArray() );
     }
 
 
-    @Ignore
     @Test
     public void testRemoveTemplate() throws Exception
     {
@@ -115,7 +128,6 @@ public class TemplateDAOTest
     }
 
 
-    @Ignore
     @Test
     public void testGetChildTemplates() throws Exception
     {
@@ -129,13 +141,12 @@ public class TemplateDAOTest
     }
 
 
-    //    @Ignore
     @Test
     public void testGetTemplateByName() throws Exception
     {
         Template template = TestUtils.getParentTemplate();
         templateDAO.saveTemplate( template );
         Template savedTemplate = templateDAO.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
-        assertNotEquals( template, savedTemplate );
+        assertEquals( template, savedTemplate );
     }
 }

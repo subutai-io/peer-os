@@ -14,7 +14,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -28,17 +27,16 @@ import com.google.gson.annotations.Expose;
 /**
  * Template represents template entry in registry
  */
-@Entity( name = "Template" )
+@Entity(name = "Template")
 @IdClass( TemplatePK.class )
 @NamedQueries(value = {
         @NamedQuery( name = "Template.getAll", query = "SELECT t FROM Template t" ),
         @NamedQuery( name = "Template.getTemplateByNameArch",
-                query = "SELECT t FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = " +
-                        ":lxcArch" ),
+                query = "SELECT t FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = " + ":lxcArch" ),
         @NamedQuery( name = "Template.removeTemplateByNameArch",
                 query = "DELETE FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = :lxcArch" )
 })
-@XmlRootElement( name = "" )
+@XmlRootElement(name = "")
 public class Template
 {
 
@@ -83,16 +81,17 @@ public class Template
     //contents of packages manifest file
     private String packagesManifest;
 
-    @ManyToOne( fetch = FetchType.LAZY, optional = true )
+    //    @ManyToOne( optional = true )
     //    @JoinColumns( {
     //            @JoinColumn( name = "parentTemplate" ), @JoinColumn( name = "parentLxcArch" )
     //    } )
-    private Template parentTemplate;
+    //    private Template parentTemplate;
 
 
     //children of template, this property is calculated upon need and is null by default (see REST API for calculation)
     @Expose
-    @OneToMany( mappedBy = "parentTemplate", fetch = FetchType.LAZY, cascade = { CascadeType.ALL } )
+    @OneToMany( fetch = FetchType.EAGER, cascade = { CascadeType.ALL },
+            orphanRemoval = true )
     private List<Template> children;
 
     //subutai products present only in this template excluding all subutai products present in the whole ancestry
@@ -282,16 +281,16 @@ public class Template
     }
 
 
-    public Template getParentTemplate()
-    {
-        return parentTemplate;
-    }
-
-
-    public void setParentTemplate( Template template )
-    {
-        this.parentTemplate = template;
-    }
+    //    public Template getParentTemplate()
+    //    {
+    //        return parentTemplate;
+    //    }
+    //
+    //
+    //    public void setParentTemplate( Template template )
+    //    {
+    //        this.parentTemplate = template;
+    //    }
 
 
     public UUID getPeerId()
@@ -331,7 +330,9 @@ public class Template
     @Override
     public int hashCode()
     {
-        return super.hashCode();
+        int result = templateName.hashCode();
+        result = 31 * result + lxcArch.hashCode();
+        return result;
     }
 
 
@@ -349,7 +350,7 @@ public class Template
 
         final Template template = ( Template ) o;
 
-        return super.equals( template );
+        return lxcArch.equals( template.getLxcArch() ) && templateName.equals( template.getTemplateName() );
     }
 
 

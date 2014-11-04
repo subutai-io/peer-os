@@ -3,6 +3,7 @@ package org.safehaus.subutai.common.protocol.api;
 
 import java.util.List;
 
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
 
 
@@ -11,7 +12,7 @@ import org.safehaus.subutai.common.protocol.Template;
  */
 public interface TemplateService
 {
-    public Template saveTemplate( Template templateClone );
+    public Template saveTemplate( Template templateClone ) throws DaoException;
 
     public List<Template> getAllTemplates();
 
