@@ -61,8 +61,6 @@ public:
 	vector<string>& getIps();
 	int getTimeout();
 	int getRequestSequenceNumber();
-	string& getSource();
-	void setSource(const string&);
 	void setHostname(const string&);
 	void setMacAddress(const string&);
 	void setCommandId(const string&);
@@ -103,7 +101,6 @@ private:
 	string			macAddress;
 	string			hostname;
 	vector<string>  ips;
-	string			source;
 	vector<string>	watchArgs;
 };
 #endif /* SUBUTAICOMMAND_H_ */

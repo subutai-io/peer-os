@@ -375,29 +375,31 @@ int main(int argc,char *argv[],char *envp[])
                 if (command.deserialize(input))	{  //deserialize the message
                     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","New Message is received"));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","New Message:", input));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command source:", command.getSource()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command type:", command.getType()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command uuid:", command.getUuid()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command TaskUuid:", command.getCommandId()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command RequestSequenceNumber:",
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request type:", command.getType()));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request ID:", command.getUuid()));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request CommandID:", command.getCommandId()));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request RequestSequenceNumber:",
                                 toString(command.getRequestSequenceNumber())));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command workingDirectory:", command.getWorkingDirectory()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command StdOut:", command.getStandardOutput()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command stdOutPath:", command.getStandardOutputPath()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command StdErr:", command.getStandardError()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command stdErrPath:", command.getStandardErrPath()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command Command:", command.getCommand()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command runAs:", command.getRunAs()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Command timeout:", toString(command.getTimeout())));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request workingDirectory:", command.getWorkingDirectory()));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request StdOut:", command.getStandardOutput()));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request stdOutPath:", command.getStandardOutputPath()));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request StdErr:", command.getStandardError()));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request stdErrPath:", command.getStandardErrPath()));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request Command:", command.getCommand()));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request runAs:", command.getRunAs()));
+                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request timeout:", toString(command.getTimeout())));
                     // Check if this uuid belongs this FAI or one of child containers
                     bool isLocal = true;
                     SubutaiContainer* target_container = cman.findContainerById(command.getUuid());
                     if (target_container) {
+                        logMain.writeLog(3, logMain.setLogData("<SubutaiAgent>", "Container received a command to execute"));
                         isLocal = false;
-                    }    
+                    } else {
+                        logMain.writeLog(3, logMain.setLogData("<SubutaiAgent>", "FAI received command to execute"));
+                    } 
                     if (command.getWatchArguments().size() != 0 ) {
                         for (unsigned int i = 0; i < command.getWatchArguments().size(); i++) {
-                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Command WatchArgs:", command.getWatchArguments()[i]));
+                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Request WatchArgs:", command.getWatchArguments()[i]));
                         }
                     }
 
@@ -462,12 +464,12 @@ int main(int argc,char *argv[],char *envp[])
                             int retstatus = kill(command.getPid(), SIGKILL);
                             if (retstatus == 0) { //termination is successfully done
                                 string resp = response.createTerminateMessage(environment.getAgentUuidValue(),
-                                        command.getRequestSequenceNumber(),command.getSource(),command.getCommandId());
+                                        command.getRequestSequenceNumber(),command.getCommandId());
                                 connection->sendMessage(resp);
                                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
                             } else if (retstatus == -1) { //termination is failed
                                 string resp = response.createFailTerminateMessage(environment.getAgentUuidValue(),
-                                        command.getRequestSequenceNumber(),command.getSource(),command.getCommandId());
+                                        command.getRequestSequenceNumber(),command.getCommandId());
                                 connection->sendMessage(resp);
                                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", toString(command.getPid())));
                             }
@@ -511,17 +513,17 @@ int main(int argc,char *argv[],char *envp[])
                     if (input.size() >= 10000) {
                         connection->sendMessage(response.createResponseMessage(environment.getAgentUuidValue(),9999999,
                                     command.getRequestSequenceNumber(),1,
-                                    "Command Size is greater than Maximum Size !! ","",command.getSource(),command.getCommandId()));
+                                    "Request Size is greater than Maximum Size !! ","",command.getCommandId()));
                         connection->sendMessage(response.createExitMessage(environment.getAgentUuidValue(),9999999,
                                     command.getRequestSequenceNumber(),2,
-                                    command.getSource(),command.getCommandId(),1));
+                                    command.getCommandId(),1));
                     } else {
                         connection->sendMessage(response.createResponseMessage(environment.getAgentUuidValue(),9999999,
                                     command.getRequestSequenceNumber(),1,
-                                    "Command is not a valid Json string !!","",command.getSource(),command.getCommandId()));
+                                    "Request is not a valid Json string !!","",command.getCommandId()));
                         connection->sendMessage(response.createExitMessage(environment.getAgentUuidValue(),9999999,
                                     command.getRequestSequenceNumber(),2,
-                                    command.getSource(),command.getCommandId(),1));
+                                    command.getCommandId(),1));
                     }
                 }
             } else {

@@ -38,7 +38,6 @@ SubutaiCommand::SubutaiCommand()
     this->setMacAddress("");
     this->setHostname("");
     this->getIps().clear();
-    this->setSource("");
 }
 
 /**
@@ -72,7 +71,6 @@ void SubutaiCommand::clear()
     this->setMacAddress("");
     this->setHostname("");
     this->getIps().clear();
-    this->setSource("");
 }
 
 /**
@@ -122,9 +120,9 @@ bool SubutaiCommand::deserialize(string& input)
         {
             this->setStandardErrPath(root["request"]["stdErrPath"].asString());		//initialize standardError parameter if it is not null
         }
-        if(!root["request"]["uuid"].isNull())
+        if(!root["request"]["id"].isNull())
         {
-            this->setUuid(root["request"]["uuid"].asString());				//initialize UUID parameter if it is not null
+            this->setUuid(root["request"]["id"].asString());				//initialize UUID parameter if it is not null
         }
         if(!root["request"]["pid"].isNull())
         {
@@ -182,10 +180,6 @@ bool SubutaiCommand::deserialize(string& input)
         {
             arg =  root["request"]["ips"][index].asString();
             this->getIps().push_back(arg);
-        }
-        if(!root["request"]["source"].isNull())
-        {
-            setSource(root["request"]["source"].asString());		//initialize hostname parameter if it is not null
         }
         string arg1;
         arg1.clear();
@@ -531,23 +525,6 @@ vector<string>& SubutaiCommand::getIps()
 {					//getting ips vector
 
     return this->ips;
-}
-
-/**
- *  \details   getting "source" private variable of SubutaiCommand instance.
- */
-string& SubutaiCommand::getSource()
-{
-    return this->source;
-}
-
-/**
- *  \details   setting "source" private variable of SubutaiCommand instance.
- *  		   This holds the task source information of the command
- */
-void SubutaiCommand::setSource(const string& source)
-{
-    this->source = source;
 }
 
 /**

@@ -34,11 +34,10 @@ SubutaiResponsePack::~SubutaiResponsePack()
  *  \details   This method creates default chunk message.
  */
 string SubutaiResponsePack::createResponseMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
-		string error,string output,string source,string taskuuid)
+		string error,string output,string taskuuid)
 {
 	clear();
 	this->setType("EXECUTE_RESPONSE");			//creating Response chunk message
-	this->setSource(source);
 	this->setTaskUuid(taskuuid);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
@@ -54,11 +53,10 @@ string SubutaiResponsePack::createResponseMessage(string uuid,int pid,int reques
  *  \details   This method creates Exit done message.
  */
 string SubutaiResponsePack::createExitMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
-		string source, string taskuuid,int exitcode)	//Creating Exit message
+		string taskuuid,int exitcode)	//Creating Exit message
 {
 	clear();
 	this->setType("EXECUTE_RESPONSE_DONE");
-	this->setSource(source);
 	this->setTaskUuid(taskuuid);
 	this->setUuid(uuid);
 	this->setPid(pid);
@@ -159,11 +157,10 @@ string SubutaiResponsePack::createHeartBeatMessage(string uuid,	string hostname,
 /**
  *  \details   This method creates  SuccessTermination message.
  */
-string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string source,string taskuuid)	//Creating Terminate Message
+string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string taskuuid)	//Creating Terminate Message
 {
 	clear();
 	this->setType("TERMINATE_RESPONSE_DONE");
-	this->setSource(source);
 	this->setExitCode(0);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
@@ -176,11 +173,10 @@ string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum
 /**
  *  \details   This method creates Fail Termination message.
  */
-string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,string source,string taskuuid)
+string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,string taskuuid)
 {
 	clear();
 	this->setType("TERMINATE_RESPONSE_FAILED");
-	this->setSource(source);
 	this->setExitCode(1);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
@@ -194,11 +190,10 @@ string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSe
  *  \details   This method creates Timeout message.
  */
 string SubutaiResponsePack::createTimeoutMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
-		string stdOut,string stdErr,string source,string taskuuid)	//Creating Timeout Message
+		string stdOut,string stdErr,string taskuuid)	//Creating Timeout Message
 {
 	clear();
 	this->setType("EXECUTE_TIMEOUT");
-	this->setSource(source);
 	this->setTaskUuid(taskuuid);
 	this->setPid(pid);
 	this->setUuid(uuid);

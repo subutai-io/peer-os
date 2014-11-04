@@ -20,21 +20,21 @@
  */
 SubutaiResponse::SubutaiResponse()
 {
-	// TODO Auto-generated constructor stub
-	setType("");
-	setUuid("");
-	setPid(-1);
-	setRequestSequenceNumber(-1);
-	setResponseSequenceNumber(-1);
-	setStandardError("");
-	setStandardOutput("");
-	setExitCode(-1);
-	setSource("");
-	setTaskUuid("");
-	setMacAddress("");
-	setHostname("");
-	setParentHostname("");
-	getIps().clear();
+    // TODO Auto-generated constructor stub
+    setType("");
+    setUuid("");
+    setPid(-1);
+    setRequestSequenceNumber(-1);
+    setResponseSequenceNumber(-1);
+    setStandardError("");
+    setStandardOutput("");
+    setExitCode(-1);
+    setSource("");
+    setTaskUuid("");
+    setMacAddress("");
+    setHostname("");
+    setParentHostname("");
+    getIps().clear();
 }
 
 /**
@@ -42,7 +42,7 @@ SubutaiResponse::SubutaiResponse()
  */
 SubutaiResponse::~SubutaiResponse()
 {
-	// TODO Auto-generated destructor stub
+    // TODO Auto-generated destructor stub
 }
 
 /**
@@ -50,23 +50,23 @@ SubutaiResponse::~SubutaiResponse()
  */
 void SubutaiResponse::clear()
 {		//clear the all variables..
-	setType("");
-	setUuid("");
-	setPid(-1);
-	setRequestSequenceNumber(-1);
-	setResponseSequenceNumber(-1);
-	setStandardError("");
-	setStandardOutput("");
-	setSource("");
-	setTaskUuid("");
-	setMacAddress("");
-	setHostname("");
-	setParentHostname("");
-	getIps().clear();
-	setUuid("");
-	setconfigPoint("");
-	setDateTime("");
-	setChangeType("");
+    setType("");
+    setUuid("");
+    setPid(-1);
+    setRequestSequenceNumber(-1);
+    setResponseSequenceNumber(-1);
+    setStandardError("");
+    setStandardOutput("");
+    setSource("");
+    setTaskUuid("");
+    setMacAddress("");
+    setHostname("");
+    setParentHostname("");
+    getIps().clear();
+    setUuid("");
+    setconfigPoint("");
+    setDateTime("");
+    setChangeType("");
 }
 
 /**
@@ -80,106 +80,99 @@ void SubutaiResponse::clear()
  */
 void SubutaiResponse::serialize(string& output)
 {
-	Json::Value environment;
-	Json::Value root;
-	Json::FastWriter writer;
-	Json::Features myfeatures;
-	myfeatures.all();
+    Json::Value environment;
+    Json::Value root;
+    Json::FastWriter writer;
+    Json::Features myfeatures;
+    myfeatures.all();
 
-	//mandatory arguments
+    //mandatory arguments
 
-	if(!(this->getStandardOutput().empty()))
-	{
-		root["response"]["stdOut"] = this->getStandardOutput();
-	}
-	if(!(this->getStandardError().empty()))
-	{
-		root["response"]["stdErr"] = this->getStandardError();
-	}
-	if(!(this->getType().empty()))
-	{
-		root["response"]["type"] = this->getType();
-	}
-	if(!(this->getUuid().empty()))
-	{
-		root["response"]["id"] = this->getUuid();
-	}
-	if(this->getPid() >= 0)
-	{
-		root["response"]["pid"] = this->getPid();										//check the pid is assigned or not
-	}
-	if(this->getRequestSequenceNumber() >= 0)											//check the requestSequenceNumber is assigned or not
-	{
-		root["response"]["requestNumber"] = this->getRequestSequenceNumber();
-	}
-	if(this->getResponseSequenceNumber() >= 0)										//check the responseSequenceNumber is assigned or not
-	{
-		root["response"]["responseNumber"] = this->getResponseSequenceNumber();
-	}
-	for(unsigned int index=0; index < this->getIps().size(); index++)
-	{	//automatically check the size of the ips list
-		root["response"]["ips"][index]=this->getIps()[index];
-	}
-	if(!(this->getTaskUuid().empty()))											//check the taskuuid is assigned or not
-	{
-		root["response"]["commandId"] = this->getTaskUuid();
-	}
-	if(!(this->getHostname().empty()))											//check the hostname is assigned or not
-	{
-		root["response"]["hostname"] = this->getHostname();
-	}
-	if(!(this->getParentHostname().empty()))											//check the parenthostname is assigned or not
-	{
-		root["response"]["parentHostName"] = this->getParentHostname();
-	}
-	if(!(this->getMacAddress().empty()))											//check the macAddress is assigned or not
-	{
-		root["response"]["macAddress"] = this->getMacAddress();
-	}
-	if(!(this->getSource().empty()))
-	{
-		root["response"]["source"] = this->getSource();
-	}
-	if(!(this->getconfigPoint().empty()))
-	{
-		root["response"]["configPoint"] = this->getconfigPoint();
-	}
-	if(!(this->getDateTime().empty()))
-	{
-		root["response"]["dateTime"] = this->getDateTime();
-	}
-	if(!(this->getChangeType().empty()))
-	{
-		root["response"]["changeType"] = this->getChangeType();
-	}
-	if(!(this->getEnvironmentId().empty()))
-	{
-		root["response"]["environmentId"] = this->getEnvironmentId();
-	}
-	for(unsigned int index=0; index < this->containers.size(); index++)
-	{
-		root["response"]["containers"][index]["hostname"]	=	this->containers[index].getContainerHostnameValue();
-		root["response"]["containers"][index]["id"]			=	this->containers[index].getContainerIdValue();
-		root["response"]["containers"][index]["status"]		=	this->containers[index].getContainerStatus();
-		vector<string> ipValues	=	this->containers[index].getContainerIpValue();
-		for(unsigned int i=0; i < ipValues.size(); i++)
-		{
-			root["response"]["containers"][index]["ips"][i]=ipValues[i];
-		}
-	}
-	for(unsigned int index=0; index < this->getConfPoints().size(); index++)
-	{
-		if(this->getType() == "INOTIFY_LIST_RESPONSE")
-		{
-			root["response"]["configPoints"][index]=this->getConfPoints()[index];
-		}
-		else if(this->getType() == "INOTIFY_ACTION_RESPONSE")
-		{
-			root["response"]["configPoint"][index]=this->getConfPoints()[index];
-		}
-	}
-
-	output = writer.write(root);
+    if(!(this->getStandardOutput().empty()))
+    {
+        root["response"]["stdOut"] = this->getStandardOutput();
+    }
+    if(!(this->getStandardError().empty()))
+    {
+        root["response"]["stdErr"] = this->getStandardError();
+    }
+    if(!(this->getType().empty()))
+    {
+        root["response"]["type"] = this->getType();
+    }
+    if(!(this->getUuid().empty()))
+    {
+        root["response"]["id"] = this->getUuid();
+    }
+    if(this->getPid() >= 0)
+    {
+        root["response"]["pid"] = this->getPid();										//check the pid is assigned or not
+    }
+    if(this->getRequestSequenceNumber() >= 0)											//check the requestSequenceNumber is assigned or not
+    {
+        root["response"]["requestNumber"] = this->getRequestSequenceNumber();
+    }
+    if(this->getResponseSequenceNumber() >= 0)										//check the responseSequenceNumber is assigned or not
+    {
+        root["response"]["responseNumber"] = this->getResponseSequenceNumber();
+    }
+    for(unsigned int index=0; index < this->getIps().size(); index++)
+    {	//automatically check the size of the ips list
+        root["response"]["ips"][index]=this->getIps()[index];
+    }
+    if(!(this->getTaskUuid().empty()))											//check the taskuuid is assigned or not
+    {
+        root["response"]["commandId"] = this->getTaskUuid();
+    }
+    if(!(this->getHostname().empty()))											//check the hostname is assigned or not
+    {
+        root["response"]["hostname"] = this->getHostname();
+    }
+    if(!(this->getParentHostname().empty()))											//check the parenthostname is assigned or not
+    {
+        root["response"]["parentHostName"] = this->getParentHostname();
+    }
+    if(!(this->getMacAddress().empty()))											//check the macAddress is assigned or not
+    {
+        root["response"]["macAddress"] = this->getMacAddress();
+    }
+    if(!(this->getSource().empty()))
+    {
+        root["response"]["source"] = this->getSource();
+    }
+    if(!(this->getconfigPoint().empty()))
+    {
+        root["response"]["configPoint"] = this->getconfigPoint();
+    }
+    if(!(this->getDateTime().empty()))
+    {
+        root["response"]["dateTime"] = this->getDateTime();
+    }
+    if(!(this->getChangeType().empty()))
+    {
+        root["response"]["changeType"] = this->getChangeType();
+    }
+    if(!(this->getEnvironmentId().empty()))
+    {
+        root["response"]["environmentId"] = this->getEnvironmentId();
+    }
+    for(unsigned int index = 0; index < this->containers.size(); index++) {
+        root["response"]["containers"][index]["hostname"]	= this->containers[index].getContainerHostnameValue();
+        root["response"]["containers"][index]["id"]		= this->containers[index].getContainerIdValue();
+        root["response"]["containers"][index]["status"]		= this->containers[index].getContainerStatus();
+        vector<string> ipValues	=	this->containers[index].getContainerIpValue();
+        for(unsigned int i=0; i < ipValues.size(); i++) {
+            root["response"]["containers"][index]["ips"][i]=ipValues[i];
+        }
+    }
+    for(unsigned int index = 0; index < this->getConfPoints().size(); index++) {
+        if(this->getType() == "INOTIFY_LIST_RESPONSE") {
+            root["response"]["configPoints"][index]=this->getConfPoints()[index];
+        } else if(this->getType() == "INOTIFY_ACTION_RESPONSE") {
+            root["response"]["configPoint"][index]=this->getConfPoints()[index];
+        }
+    }
+    output = writer.write(root);
 }
 
 /**
@@ -190,45 +183,45 @@ void SubutaiResponse::serialize(string& output)
  */
 void SubutaiResponse::serializeDone(string& output)
 {			//Serialize a Done Response  to a Json String
-	Json::Value environment;
-	Json::Value root;
-	Json::FastWriter writer;
-	Json::Features myfeatures;
-	myfeatures.all();
+    Json::Value environment;
+    Json::Value root;
+    Json::FastWriter writer;
+    Json::Features myfeatures;
+    myfeatures.all();
 
-	if(!(this->getType().empty()))
-	{
-		root["response"]["type"] = this->getType();
-	}
-	if(!(this->getUuid().empty()))
-	{
-		root["response"]["uuid"] = this->getUuid();
-	}
-	if(this->getRequestSequenceNumber() >= 0)											//check the requestSequenceNumber is assigned or not
-	{
-		root["response"]["requestSequenceNumber"] = this->getRequestSequenceNumber();
-	}
-	if(this->getResponseSequenceNumber() >= 0)										//check the responseSequenceNumber is assigned or not
-	{
-		root["response"]["responseSequenceNumber"] = this->getResponseSequenceNumber();
-	}
-	if(this->getPid() >= 0)
-	{
-		root["response"]["pid"] = this->getPid();										//check the pid is assigned or not
-	}
-	if(this->getExitCode() >= 0)
-	{
-		root["response"]["exitCode"] = this->getExitCode();
-	}
-	if(!(this->getTaskUuid().empty()))											//check the taskuuid is assigned or not
-	{
-		root["response"]["taskUuid"] = this->getTaskUuid();
-	}
-	if(!(this->getSource().empty()))											//check the macAddress is assigned or not
-	{
-		root["response"]["source"] = this->getSource();
-	}
-	output = writer.write(root);	//Json Response Done string is created
+    if(!(this->getType().empty()))
+    {
+        root["response"]["type"] = this->getType();
+    }
+    if(!(this->getUuid().empty()))
+    {
+        root["response"]["uuid"] = this->getUuid();
+    }
+    if(this->getRequestSequenceNumber() >= 0)											//check the requestSequenceNumber is assigned or not
+    {
+        root["response"]["requestSequenceNumber"] = this->getRequestSequenceNumber();
+    }
+    if(this->getResponseSequenceNumber() >= 0)										//check the responseSequenceNumber is assigned or not
+    {
+        root["response"]["responseSequenceNumber"] = this->getResponseSequenceNumber();
+    }
+    if(this->getPid() >= 0)
+    {
+        root["response"]["pid"] = this->getPid();										//check the pid is assigned or not
+    }
+    if(this->getExitCode() >= 0)
+    {
+        root["response"]["exitCode"] = this->getExitCode();
+    }
+    if(!(this->getTaskUuid().empty()))											//check the taskuuid is assigned or not
+    {
+        root["response"]["taskUuid"] = this->getTaskUuid();
+    }
+    if(!(this->getSource().empty()))											//check the macAddress is assigned or not
+    {
+        root["response"]["source"] = this->getSource();
+    }
+    output = writer.write(root);	//Json Response Done string is created
 }
 
 /**
@@ -236,8 +229,8 @@ void SubutaiResponse::serializeDone(string& output)
  */
 void SubutaiResponse::setContainerSet(vector<SubutaiContainer> contSet)
 {
-	this->containers.clear();
-	this->containers = contSet;
+    this->containers.clear();
+    this->containers = contSet;
 }
 
 
@@ -246,7 +239,7 @@ void SubutaiResponse::setContainerSet(vector<SubutaiContainer> contSet)
  */
 int SubutaiResponse::getPid()
 {						//getting pid
-	return this->pid;
+    return this->pid;
 }
 
 /**
@@ -254,7 +247,7 @@ int SubutaiResponse::getPid()
  */
 void SubutaiResponse::setPid(int pid)
 {			//setting pid
-	this->pid=pid;
+    this->pid=pid;
 }
 
 /**
@@ -262,7 +255,7 @@ void SubutaiResponse::setPid(int pid)
  */
 int SubutaiResponse::getExitCode()
 {					//getting ExitCode
-	return this->exitCode;
+    return this->exitCode;
 }
 
 /**
@@ -270,7 +263,7 @@ int SubutaiResponse::getExitCode()
  */
 void SubutaiResponse::setExitCode(int exitcode)
 {			//setting ExitCode
-	this->exitCode = exitcode;
+    this->exitCode = exitcode;
 }
 
 /**
@@ -278,7 +271,7 @@ void SubutaiResponse::setExitCode(int exitcode)
  */
 string& SubutaiResponse::getType()
 {								//getting Type
-	return this->type;
+    return this->type;
 }
 
 /**
@@ -286,7 +279,7 @@ string& SubutaiResponse::getType()
  */
 void SubutaiResponse::setType(const string& type)
 {				//setting Type
-	this->type = type;
+    this->type = type;
 }
 
 /**
@@ -294,7 +287,7 @@ void SubutaiResponse::setType(const string& type)
  */
 string& SubutaiResponse::getUuid()
 {								//getting uuid
-	return this->uuid;
+    return this->uuid;
 }
 
 /**
@@ -302,7 +295,7 @@ string& SubutaiResponse::getUuid()
  */
 void SubutaiResponse::setUuid(const string& uuid)
 {				//setting uuid
-	this->uuid = uuid;
+    this->uuid = uuid;
 }
 
 /**
@@ -310,7 +303,7 @@ void SubutaiResponse::setUuid(const string& uuid)
  */
 int SubutaiResponse::getRequestSequenceNumber()
 {								//getting RequestSeqnumber
-	return this->requestSequenceNumber;
+    return this->requestSequenceNumber;
 }
 
 /**
@@ -318,7 +311,7 @@ int SubutaiResponse::getRequestSequenceNumber()
  */
 void SubutaiResponse::setRequestSequenceNumber(int requestSequenceNumber)
 {	//setting RequestSeqnumber
-	this->requestSequenceNumber = requestSequenceNumber;
+    this->requestSequenceNumber = requestSequenceNumber;
 }
 
 /**
@@ -326,7 +319,7 @@ void SubutaiResponse::setRequestSequenceNumber(int requestSequenceNumber)
  */
 int SubutaiResponse::getResponseSequenceNumber()
 {									//getting ResponseSeqnumber
-	return this->responseSequenceNumber;
+    return this->responseSequenceNumber;
 }
 
 /**
@@ -334,7 +327,7 @@ int SubutaiResponse::getResponseSequenceNumber()
  */
 void SubutaiResponse::setResponseSequenceNumber(int responseSequenceNumber)
 {			//setting ResponseSeqnumber
-	this->responseSequenceNumber = responseSequenceNumber;
+    this->responseSequenceNumber = responseSequenceNumber;
 }
 
 /**
@@ -342,14 +335,14 @@ void SubutaiResponse::setResponseSequenceNumber(int responseSequenceNumber)
  */
 string& SubutaiResponse::getStandardError()
 {						//getting standard err
-	return this->stdErr;
+    return this->stdErr;
 }
 /**
  *  \details   setting "stdErr" private variable of SubutaiResponse instance
  */
 void SubutaiResponse::setStandardError(const string& mystderr)
 {		//setting standard err
-	this->stdErr = mystderr;
+    this->stdErr = mystderr;
 }
 
 /**
@@ -357,7 +350,7 @@ void SubutaiResponse::setStandardError(const string& mystderr)
  */
 string& SubutaiResponse::getStandardOutput()
 {						//getting standard out
-	return this->stdOut;
+    return this->stdOut;
 }
 
 /**
@@ -365,7 +358,7 @@ string& SubutaiResponse::getStandardOutput()
  */
 void SubutaiResponse::setStandardOutput(const string& mystdout)
 { 	//setting standard out
-	this->stdOut = mystdout;
+    this->stdOut = mystdout;
 }
 
 /**
@@ -373,7 +366,7 @@ void SubutaiResponse::setStandardOutput(const string& mystdout)
  */
 string& SubutaiResponse::getParentHostname()
 {
-	return this->parentHostname;
+    return this->parentHostname;
 }
 
 /**
@@ -382,7 +375,7 @@ string& SubutaiResponse::getParentHostname()
  */
 void SubutaiResponse::setParentHostname(const string& parenthostname)
 {
-	this->parentHostname = parenthostname;
+    this->parentHostname = parenthostname;
 }
 
 /**
@@ -390,7 +383,7 @@ void SubutaiResponse::setParentHostname(const string& parenthostname)
  */
 string& SubutaiResponse::getHostname()
 {
-	return this->hostname;
+    return this->hostname;
 }
 
 /**
@@ -398,7 +391,7 @@ string& SubutaiResponse::getHostname()
  */
 string& SubutaiResponse::getEnvironmentId()
 {
-	return this->environmentId;
+    return this->environmentId;
 }
 
 /**
@@ -407,7 +400,7 @@ string& SubutaiResponse::getEnvironmentId()
  */
 void SubutaiResponse::setHostname(const string& hostname)
 {
-	this->hostname = hostname;
+    this->hostname = hostname;
 }
 
 /**
@@ -415,7 +408,7 @@ void SubutaiResponse::setHostname(const string& hostname)
  */
 string& SubutaiResponse::getMacAddress()
 {
-	return this->macAddress;
+    return this->macAddress;
 }
 
 /**
@@ -424,7 +417,7 @@ string& SubutaiResponse::getMacAddress()
  */
 void SubutaiResponse::setMacAddress(const string& macAddress)
 {
-	this->macAddress = macAddress;
+    this->macAddress = macAddress;
 }
 
 /**
@@ -432,7 +425,7 @@ void SubutaiResponse::setMacAddress(const string& macAddress)
  */
 void SubutaiResponse::setEnvironmentId(const string& envID)
 {
-	this->environmentId = envID;
+    this->environmentId = envID;
 }
 
 /**
@@ -440,7 +433,7 @@ void SubutaiResponse::setEnvironmentId(const string& envID)
  */
 string& SubutaiResponse::getTaskUuid()
 {
-	return this->taskUuid;
+    return this->taskUuid;
 }
 
 /**
@@ -449,7 +442,7 @@ string& SubutaiResponse::getTaskUuid()
  */
 void SubutaiResponse::setTaskUuid(const string& taskuuid)
 {
-	this->taskUuid = taskuuid;
+    this->taskUuid = taskuuid;
 }
 
 /**
@@ -458,11 +451,11 @@ void SubutaiResponse::setTaskUuid(const string& taskuuid)
  */
 void SubutaiResponse::setIps(vector<string> myvector)
 {
-	this->ips.clear();
-	for(unsigned int index=0 ; index< myvector.size(); index++)
-	{
-		this->ips.push_back(myvector[index]);
-	}
+    this->ips.clear();
+    for(unsigned int index=0 ; index< myvector.size(); index++)
+    {
+        this->ips.push_back(myvector[index]);
+    }
 }
 
 /**
@@ -471,7 +464,7 @@ void SubutaiResponse::setIps(vector<string> myvector)
 vector<string>& SubutaiResponse::getIps()
 {					//getting ips vector
 
-	return this->ips;
+    return this->ips;
 }
 
 /**
@@ -479,7 +472,7 @@ vector<string>& SubutaiResponse::getIps()
  */
 string& SubutaiResponse::getSource()
 {
-	return this->source;
+    return this->source;
 }
 
 /**
@@ -488,7 +481,7 @@ string& SubutaiResponse::getSource()
  */
 void SubutaiResponse::setSource(const string& source)
 {
-	this->source = source;
+    this->source = source;
 }
 
 /**
@@ -497,7 +490,7 @@ void SubutaiResponse::setSource(const string& source)
  */
 void SubutaiResponse::setconfigPoint(const string& configPoint)
 {
-	this->configPoint = configPoint;
+    this->configPoint = configPoint;
 }
 
 /**
@@ -505,7 +498,7 @@ void SubutaiResponse::setconfigPoint(const string& configPoint)
  */
 string& SubutaiResponse::getconfigPoint()
 {
-	return this->configPoint;
+    return this->configPoint;
 }
 
 /**
@@ -514,7 +507,7 @@ string& SubutaiResponse::getconfigPoint()
  */
 void SubutaiResponse::setDateTime(const string& dateTime)
 {
-	this->dateTime = dateTime;
+    this->dateTime = dateTime;
 }
 
 /**
@@ -522,7 +515,7 @@ void SubutaiResponse::setDateTime(const string& dateTime)
  */
 string& SubutaiResponse::getDateTime()
 {
-	return this->dateTime;
+    return this->dateTime;
 }
 
 /**
@@ -531,7 +524,7 @@ string& SubutaiResponse::getDateTime()
  */
 void SubutaiResponse::setChangeType(const string& changeType)
 {
-	this->changeType = changeType;
+    this->changeType = changeType;
 }
 
 /**
@@ -539,7 +532,7 @@ void SubutaiResponse::setChangeType(const string& changeType)
  */
 string& SubutaiResponse::getChangeType()
 {
-	return this->changeType;
+    return this->changeType;
 }
 
 /**
@@ -548,11 +541,11 @@ string& SubutaiResponse::getChangeType()
  */
 void SubutaiResponse::setConfPoints(vector<string> myvector)
 {
-	this->confPoints.clear();
-	for(unsigned int index=0 ; index< myvector.size(); index++)
-	{
-		this->confPoints.push_back(myvector[index]);
-	}
+    this->confPoints.clear();
+    for(unsigned int index=0 ; index< myvector.size(); index++)
+    {
+        this->confPoints.push_back(myvector[index]);
+    }
 }
 
 /**
@@ -561,5 +554,5 @@ void SubutaiResponse::setConfPoints(vector<string> myvector)
 vector<string>& SubutaiResponse::getConfPoints()
 {					//getting ips vector
 
-	return this->confPoints;
+    return this->confPoints;
 }

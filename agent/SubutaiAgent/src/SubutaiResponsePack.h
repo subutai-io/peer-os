@@ -31,14 +31,14 @@ class SubutaiResponsePack : public SubutaiResponse
 public:
 	SubutaiResponsePack();
 	virtual ~SubutaiResponsePack();
-	string createResponseMessage(string,int,int,int,string,string,string,string);
-	string createExitMessage(string,int, int, int,string,string,int);
+	string createResponseMessage(string,int,int,int,string,string,string);
+	string createExitMessage(string,int, int, int,string,int);
 	string createRegistrationMessage(string,string,string,string,string,vector<string>);
-	string createTerminateMessage(string,int,string,string);
-	string createFailTerminateMessage(string,int,string,string);
+	string createTerminateMessage(string,int,string);
+	string createFailTerminateMessage(string,int,string);
 	string createInQueueMessage(string,string);
 	string createHeartBeatMessage(string,string,string);
-	string createTimeoutMessage(string,int,int,int,string,string,string,string);
+	string createTimeoutMessage(string,int,int,int,string,string,string);
 	string createInotifyMessage(string,string,string,string);
 	string createInotifyShowMessage(string,vector<string>);
 private:
