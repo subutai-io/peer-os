@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.impl;
+package org.safehaus.subutai.core.peer.impl.command;
 
 
 import java.util.UUID;
@@ -7,17 +7,19 @@ import java.util.concurrent.Semaphore;
 import org.safehaus.subutai.common.cache.EntryExpiryCallback;
 import org.safehaus.subutai.common.cache.ExpiringCache;
 import org.safehaus.subutai.common.protocol.CommandCallback;
-import org.safehaus.subutai.core.messenger.api.Message;
-import org.safehaus.subutai.core.messenger.api.MessageListener;
+import org.safehaus.subutai.core.peer.api.Payload;
+import org.safehaus.subutai.core.peer.api.RequestListener;
+import org.safehaus.subutai.core.peer.impl.RecipientType;
+import org.safehaus.subutai.core.peer.impl.Timeouts;
 
 
-public class CommandResponseMessageListener extends MessageListener
+public class CommandResponseListener extends RequestListener
 {
 
     private ExpiringCache<UUID, CommandCallback> callbacks;
 
 
-    public CommandResponseMessageListener()
+    public CommandResponseListener()
     {
         super( RecipientType.COMMAND_RESPONSE.name() );
         callbacks = new ExpiringCache<>();
@@ -45,9 +47,9 @@ public class CommandResponseMessageListener extends MessageListener
 
 
     @Override
-    public void onMessage( final Message message )
+    public Object onRequest( final Payload payload )
     {
-        final CommandResponse commandResponse = message.getPayload( CommandResponse.class );
+        final CommandResponse commandResponse = payload.getMessage( CommandResponse.class );
 
         CommandCallback callback = callbacks.get( commandResponse.getRequestId() );
 
@@ -55,5 +57,7 @@ public class CommandResponseMessageListener extends MessageListener
         {
             callback.onResponse( commandResponse.getResponse(), commandResponse.getCommandResult() );
         }
+
+        return null;
     }
 }

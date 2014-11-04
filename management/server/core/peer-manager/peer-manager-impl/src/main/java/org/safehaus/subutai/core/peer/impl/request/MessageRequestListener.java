@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.impl;
+package org.safehaus.subutai.core.peer.impl.request;
 
 
 import java.util.Set;
@@ -10,6 +10,7 @@ import org.safehaus.subutai.core.messenger.api.MessageListener;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
+import org.safehaus.subutai.core.peer.impl.RecipientType;
 
 
 public class MessageRequestListener extends MessageListener
@@ -21,7 +22,7 @@ public class MessageRequestListener extends MessageListener
     private ExecutorService notifier = Executors.newCachedThreadPool();
 
 
-    protected MessageRequestListener( PeerManager peerManager, Messenger messenger, Set<RequestListener> listeners )
+    public MessageRequestListener( PeerManager peerManager, Messenger messenger, Set<RequestListener> listeners )
     {
         super( RecipientType.PEER_REQUEST_LISTENER.name() );
         this.peerManager = peerManager;

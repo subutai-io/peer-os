@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.impl;
+package org.safehaus.subutai.core.peer.impl.request;
 
 
 import java.util.Map;
@@ -10,6 +10,8 @@ import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.common.cache.ExpiringCache;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageListener;
+import org.safehaus.subutai.core.peer.impl.RecipientType;
+import org.safehaus.subutai.core.peer.impl.Timeouts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +24,7 @@ public class MessageResponseListener extends MessageListener
     private ExpiringCache<UUID, MessageResponse> responses = new ExpiringCache<>();
 
 
-    protected MessageResponseListener()
+    public MessageResponseListener()
     {
         super( RecipientType.PEER_RESPONSE_LISTENER.name() );
     }

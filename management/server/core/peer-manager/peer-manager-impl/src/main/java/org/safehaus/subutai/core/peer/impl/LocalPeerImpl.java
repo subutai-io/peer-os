@@ -56,7 +56,6 @@ import org.safehaus.subutai.core.strategy.api.StrategyManager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
 
 
@@ -79,11 +78,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private ConcurrentMap<String, AtomicInteger> sequences;
-    /**
-     * cache of currently connected agents with expiry ttl. Agents will expire unless they send heartbeat message
-     * regularly
-     */
-    private Cache<UUID, Agent> agents;
+
     private Set<RequestListener> requestListeners;
 
 
@@ -271,7 +266,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                     serverMetricMap.put( resourceHost.getAgent(), resourceHost.getMetric() );
                 }
             }
-            Map<Agent, Integer> slots = null;
+            Map<Agent, Integer> slots;
             try
             {
                 slots = strategyManager.getPlacementDistribution( serverMetricMap, quantity, strategyId, criteria );
@@ -783,7 +778,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             {
                 try
                 {
-                    Object response = requestListener.onRequest( new Payload( request ) );
+                    Object response = requestListener.onRequest( new Payload( request, getId() ) );
 
                     if ( response != null && responseType != null )
                     {
