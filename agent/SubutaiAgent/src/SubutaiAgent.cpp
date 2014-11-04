@@ -277,14 +277,6 @@ int main(int argc,char *argv[],char *envp[])
     /*
      * sending registration message : For the new subutai agent arch. heartbeat will be used for registration.
      */
-/*
-    sendout = response.createRegistrationMessage(
-            environment.getAgentUuidValue(), environment.getAgentMacAddressValue(),
-            environment.getAgentHostnameValue(),environment.getAgentParentHostnameValue(),
-            environment.getAgentEnvironmentIdValue(),environment.getAgentIpValue());
-    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Registration Message:", sendout));
-    connection->sendMessage(sendout);
-*/
 
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Shared Memory MessageQueue is initializing.."));
     message_queue messageQueue
@@ -299,21 +291,6 @@ int main(int argc,char *argv[],char *envp[])
     /* Change the file mode mask */
     umask(0);
 
-    /*
-     * initializing timer settings
-     *//*
-    boost::posix_time::ptime start =            boost::posix_time::second_clock::local_time();
-    boost::posix_time::ptime startQueue =       boost::posix_time::second_clock::local_time();
-
-    unsigned int exectimeout =                  175;    //180 seconds for HeartBeat Default Timeout
-    unsigned int queuetimeout =                 30;     //30 seconds for In Queue Default Timeout
-    unsigned int startsec  =                    start.time_of_day().seconds();
-    unsigned int startsecQueue  =               start.time_of_day().seconds();
-    bool overflag =                             false;
-    bool overflagQueue =                        false;
-    unsigned int count =                        1;
-    unsigned int countQueue =                   1;
-    */
     list<int> pidList;
     int ncores =                                -1;
     ncores =                                    sysconf(_SC_NPROCESSORS_CONF);
@@ -337,7 +314,7 @@ int main(int argc,char *argv[],char *envp[])
     SubutaiTimer timer(logMain, &environment, &cman, connection);
     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Timer is initializing.."));
 
-    // Send initial heratbeat for registration of resource host and container nodes attached to this host.
+    // Send initial heartbeat for registration of resource host and container nodes attached to this host.
     timer.sendHeartBeat();
     while(true)
     {
@@ -409,13 +386,6 @@ int main(int argc,char *argv[],char *envp[])
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Command WatchArgs:", command.getWatchArguments()[i]));
                     }
 
-                    /*
-                    if (command.getType() == "REGISTRATION_REQUEST_DONE") //type is registration done
-                    {
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Registration is done.."));
-                        // agent is registered to server now
-                    }
-                    else*/
                     if (command.getType() == "EXECUTE_REQUEST")	//execution request will be executed in other process.
                     {
                         if (isLocal) {
@@ -438,54 +408,70 @@ int main(int argc,char *argv[],char *envp[])
                         subprocess->threadFunction(&messageQueue,&command,argv);
                         delete subprocess;
                     }
-                    /*
-                    else if (command.getType()=="HEARTBEAT_REQUEST")
-                    {
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Heartbeat message has been taken.."));
-                        response.clear();
-                        /*
-                         * Refresh new agent ip address set for each heartbeat message
-                         *//*
-                        if (isLocal) {
-                            environment.getAgentIpAddress();
-                            response.setIps(environment.getAgentIpValue());
-                            response.setHostname(environment.getAgentHostnameValue());
-                            response.setParentHostname(environment.getAgentParentHostnameValue());
-                            response.setMacAddress(environment.getAgentMacAddressValue());
-                            string resp = response.createHeartBeatMessage(environment.getAgentUuidValue(),
-                                    environment.getAgentParentHostnameValue(), environment.getAgentMacAddressValue());
-                            connection->sendMessage(resp);
-                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","HeartBeat Response:", resp));
-                        } else {
-                        }
-                    }
-                    */
                     else if (command.getType() == "TERMINATE_REQUEST")
                     {
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",toString(command.getPid())));
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID.."));
-                        if (command.getPid() > 0)
-                        {
-                            int retstatus = kill(command.getPid(),SIGKILL);
-                            if (retstatus == 0) //termination is successfully done
-                            {
-                                string resp = response.createTerminateMessage(environment.getAgentUuidValue(),
-                                        command.getRequestSequenceNumber(),command.getSource(),command.getTaskUuid());
-                                connection->sendMessage(resp);
-                                logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
-                            }
-                            else if (retstatus == -1) //termination is failed
-                            {
-                                string resp = response.createFailTerminateMessage(environment.getAgentUuidValue(),
-                                        command.getRequestSequenceNumber(),command.getSource(),command.getTaskUuid());
-                                connection->sendMessage(resp);
-                                logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", toString(command.getPid())));
-                            }
-                        }
-                        else
-                        {
-                            logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Irrelevant Terminate Request"));
-                        }
+                    	if(isLocal)
+                    	{
+							logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",toString(command.getPid())));
+							logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID.."));
+							if (command.getPid() > 0)
+							{
+								std::stringstream oss;
+								std::streambuf* old = std::cerr.rdbuf( oss.rdbuf() );
+								int retstatus = kill(command.getPid(),SIGKILL);
+
+								string err = oss.str();
+								std::cerr.rdbuf(old);
+								if (retstatus == 0) //termination is successfully done
+								{
+									string resp = response.createTerminateMessage(environment.getAgentUuidValue(),
+											command.getRequestSequenceNumber(),command.getTaskUuid(), command.getPid());
+									connection->sendMessage(resp);
+									logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
+								}
+								else if (retstatus == -1) //termination is failed
+								{
+									string resp = response.createFailTerminateMessage(environment.getAgentUuidValue(),
+											command.getRequestSequenceNumber(),command.getTaskUuid(), command.getPid(), err);
+									connection->sendMessage(resp);
+									logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", toString(command.getPid())));
+								}
+							}
+							else
+							{
+								logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Irrelevant Terminate Request"));
+							}
+                    	}
+                    	else
+                    	{
+                    		logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",toString(command.getPid())));
+                    		logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on LXC.."));
+                    		if (command.getPid() > 0)
+                    		{
+                    			command.setProgram("kill -9 " + command.getPid());
+                    			ExecutionResult execResult = target_container->RunCommand(&command);
+                    			int retstatus  = execResult.exit_code;
+
+                    			if (retstatus == 0) //termination is successfully done
+                    			{
+                    				string resp = response.createTerminateMessage(target_container->getContainerIdValue(),
+                    								command.getRequestSequenceNumber(),command.getTaskUuid(), command.getPid());
+                    				connection->sendMessage(resp);
+                    				logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
+                    			}
+                    			else if (retstatus == -1) //termination is failed
+                    			{
+                    				string resp = response.createFailTerminateMessage(target_container->getContainerIdValue(),
+                    				command.getRequestSequenceNumber(),command.getTaskUuid(), command.getPid(), execResult.err);
+                    				connection->sendMessage(resp);
+                    				logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", toString(command.getPid())));
+                    			}
+                    		}
+                    		else
+                    		{
+                    			logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Irrelevant Terminate Request"));
+                    		}
+                    	}
                     }
                     else if (command.getType()=="INOTIFY_CREATE_REQUEST")
                     {

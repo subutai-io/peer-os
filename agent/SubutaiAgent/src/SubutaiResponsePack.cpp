@@ -147,7 +147,7 @@ string SubutaiResponsePack::createInQueueMessage(string uuid,string taskuuid)	//
 string SubutaiResponsePack::createHeartBeatMessage(string uuid,	string hostname,string macaddress)	//Creating HeartBeat Message
 {
 	clear();
-	this->setType("HEARTBEAT_RESPONSE");
+	this->setType("HEARTBEAT");
 	this->setUuid(uuid);
 	this->setHostname(hostname);
 	this->setMacAddress(macaddress);
@@ -159,34 +159,57 @@ string SubutaiResponsePack::createHeartBeatMessage(string uuid,	string hostname,
 
 /**
  *  \details   This method creates  SuccessTermination message.
+ *          "type":"TERMINATE_RESPONSE",
+
+        "id":"56b0ac88-5140-4a32-8691-916d75d62f1c"
+
+        "commandId":"c6cd5988-ceac-11e3-82b2-ebd389e743a3",
+
+        "pid":1234,
+
+        "exitCode" : 0
  */
-string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string source,string taskuuid)	//Creating Terminate Message
+string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string taskuuid, int pid)	//Creating Terminate Message
 {
 	clear();
-	this->setType("TERMINATE_RESPONSE_DONE");
-	this->setSource(source);
+	this->setType("TERMINATE_RESPONSE");
 	this->setExitCode(0);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(1);
 	this->setTaskUuid(taskuuid);
+	this->setPid(pid);
 	this->serialize(sendout);
 	return sendout;
 }
 
 /**
  *  \details   This method creates Fail Termination message.
+ *
+    									"type":"TERMINATE_RESPONSE",
+
+										"id":"56b0ac88-5140-4a32-8691-916d75d62f1c"
+
+										"commandId":"c6cd5988-ceac-11e3-82b2-ebd389e743a3",
+
+										"pid":1234,
+
+										"stdErr":"bash: line 0: kill: (1234) - No such process\n",
+
+										"exitCode" : 1
+
  */
-string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,string source,string taskuuid)
+string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,string taskuuid, int pid,const string& stderr)
 {
 	clear();
-	this->setType("TERMINATE_RESPONSE_FAILED");
-	this->setSource(source);
+	this->setType("TERMINATE_RESPONSE");
 	this->setExitCode(1);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(1);
 	this->setTaskUuid(taskuuid);
+	this->setPid(pid);
+	this->setStandardError(stderr);
 	this->serialize(sendout);
 	return sendout;
 }
