@@ -27,9 +27,7 @@ SubutaiCommand::SubutaiCommand()
     this->setPid(-1);
     this->setRequestSequenceNumber(-1);
     this->setStandardError("");
-    this->setStandardErrPath("");
     this->setStandardOutput("");
-    this->setStandardOutPath("");
     this->setRunAs("");
     this->setTimeout(30);
     this->getArguments().clear();
@@ -60,9 +58,7 @@ void SubutaiCommand::clear()
     this->setPid(-1);
     this->setRequestSequenceNumber(-1);
     this->setStandardError("");
-    this->setStandardErrPath("");
     this->setStandardOutput("");
-    this->setStandardOutPath("");
     this->setRunAs("");
     this->setTimeout(30);
     this->getArguments().clear();
@@ -108,17 +104,9 @@ bool SubutaiCommand::deserialize(string& input)
         {
             this->setStandardOutput(root["request"]["stdOut"].asString());		//initialize standardOutput parameter if it is not null
         }
-        if(!root["request"]["stdOutPath"].isNull())
-        {
-            this->setStandardOutPath(root["request"]["stdOutPath"].asString());		//initialize standardOutpath parameter if it is not null
-        }
         if(!root["request"]["stdErr"].isNull())
         {
             this->setStandardError(root["request"]["stdErr"].asString());		//initialize standardError parameter if it is not null
-        }
-        if(!root["request"]["stdErrPath"].isNull())
-        {
-            this->setStandardErrPath(root["request"]["stdErrPath"].asString());		//initialize standardError parameter if it is not null
         }
         if(!root["request"]["id"].isNull())
         {
@@ -360,13 +348,6 @@ string& SubutaiCommand::getStandardError()
 }
 
 /**
- *  \details   getting "stdErrPath" private variable of SubutaiCommand instance.
- */
-string& SubutaiCommand::getStandardErrPath()
-{					//getting standard errpath
-    return this->stdErrPath;
-}
-/**
  *  \details   setting "stdErr" private variable of SubutaiCommand instance.
  *  			It has the mode of Error.
  *  			it Should be: "CAPTURE", "CAPTURE_AND_RETURN" ,"RETURN" , "NO"
@@ -377,14 +358,6 @@ void SubutaiCommand::setStandardError(const string& mystderr)
 }
 
 /**
- *  \details   setting "stdErrPath" private variable of SubutaiCommand instance.
- *  		   This variable holds the path and file name for capturing error responses
- */
-void SubutaiCommand::setStandardErrPath(const string& mystderrpath)
-{		//setting standard errpath
-    this->stdErrPath=mystderrpath;
-}
-/**
  *  \details   getting "stdOut" private variable of SubutaiCommand instance.
  */
 string& SubutaiCommand::getStandardOutput()
@@ -393,13 +366,6 @@ string& SubutaiCommand::getStandardOutput()
 }
 
 /**
- *  \details   getting "stdOuthPath" private variable of SubutaiCommand instance.
- */
-string& SubutaiCommand::getStandardOutputPath()
-{					//getting standard outpath
-    return this->stdOuthPath;
-}
-/**
  *  \details   setting "stdOut" private variable of SubutaiCommand instance.
  *  			It has the mode of Output.
  *  			it Should be: "CAPTURE", "CAPTURE_AND_RETURN" ,"RETURN" , "NO"
@@ -407,15 +373,6 @@ string& SubutaiCommand::getStandardOutputPath()
 void SubutaiCommand::setStandardOutput(const string& mystdout)
 { 	//setting standard out
     this->stdOut = mystdout;
-}
-
-/**
- *  \details   setting "stdOuthPath" private variable of SubutaiCommand instance.
- *  		   This variable holds the path and file name for capturing error responses
- */
-void SubutaiCommand::setStandardOutPath(const string& mystdoutpath)
-{		//setting standard outpath
-    this->stdOuthPath=mystdoutpath;
 }
 
 /**

@@ -376,9 +376,7 @@ int main(int argc,char *argv[],char *envp[])
                                 toString(command.getRequestSequenceNumber())));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request workingDirectory:", command.getWorkingDirectory()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request StdOut:", command.getStandardOutput()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request stdOutPath:", command.getStandardOutputPath()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request StdErr:", command.getStandardError()));
-                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request stdErrPath:", command.getStandardErrPath()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request Command:", command.getCommand()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request runAs:", command.getRunAs()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request timeout:", toString(command.getTimeout())));

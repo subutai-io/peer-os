@@ -52,8 +52,6 @@ public:
 	string& getStandardError();
 	string& getStandardOutput();
 	string& getType();
-	string& getStandardOutputPath();
-	string& getStandardErrPath();
 	int getPid();
 	string& getHostname();
 	string& getMacAddress();
@@ -76,8 +74,6 @@ public:
 	void setRunAs(const string&);
 	void setStandardError(const string&);
 	void setStandardOutput(const string&);
-	void setStandardErrPath(const string&);
-	void setStandardOutPath(const string&);
 	void setType(const string&);
 	bool deserialize(string&);					//Deserializing Json String to Command Instance
 	bool checkCommandString(const string&);
@@ -93,8 +89,6 @@ private:
 	string        	stdErr;
 	string       	workingDirectory;
 	string        	runAs;
-	string 			stdOuthPath;
-	string 			stdErrPath;
 	vector<string>	args;
 	list<pair<string,string> > environment;
 	string			taskUuid;

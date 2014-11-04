@@ -714,10 +714,10 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
         string processpid = "";	                        //processpid for execution
         logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Fork is Starting!!", toString(getpid())));
         this->getOutputStream().setMode(command->getStandardOutput());
-        this->getOutputStream().setPath(command->getStandardOutputPath());
+        //this->getOutputStream().setPath(command->getStandardOutputPath());
         this->getOutputStream().setIdentity("output");
         this->getErrorStream().setMode(command->getStandardError());
-        this->getErrorStream().setPath(command->getStandardErrPath());
+        //this->getErrorStream().setPath(command->getStandardErrPath());
         this->getErrorStream().setIdentity("error");
 
         if (this->getOutputStream().openPipe() == false || this->getErrorStream().openPipe() == false) {
