@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.registry.impl;
+package org.safehaus.subutai.common.protocol.impl;
 
 
 import java.util.Arrays;
@@ -11,7 +11,6 @@ import javax.persistence.Persistence;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Template;
 import org.slf4j.Logger;
@@ -26,25 +25,24 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 
-@Ignore
-public class TemplateDAOTest
+public class TemplateServiceImplTest
 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger( TemplateDAOTest.class.getName() );
+    private static final Logger LOGGER = LoggerFactory.getLogger( TemplateServiceImplTest.class.getName() );
 
     //    private EntityManager em;
     private EntityManagerFactory emf;
     //    private EntityTransaction tx;
 
-    private TemplateDAO templateDAO;
+    private TemplateServiceImpl templateServiceImpl;
 
 
     @Before
     public void setUp() throws Exception
     {
         emf = Persistence.createEntityManagerFactory( "default" );
-        templateDAO = new TemplateDAO();
-        templateDAO.setEntityManagerFactory( emf );
+        templateServiceImpl = new TemplateServiceImpl();
+        templateServiceImpl.setEntityManagerFactory( emf );
     }
 
 
@@ -60,8 +58,9 @@ public class TemplateDAOTest
     public void testSaveTemplate() throws Exception
     {
         Template template = TestUtils.getParentTemplate();
-        templateDAO.saveTemplate( template );
-        Template savedTemplate = templateDAO.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
+        templateServiceImpl.saveTemplate( template );
+        Template savedTemplate =
+                templateServiceImpl.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
         assertEquals( template, savedTemplate );
     }
 
@@ -85,14 +84,14 @@ public class TemplateDAOTest
         LOGGER.info( "Templates going to be persisted" );
         for ( Map.Entry<Pair<String, String>, Template> pairTemplateEntry : templates.entrySet() )
         {
-            templateDAO.saveTemplate( pairTemplateEntry.getValue() );
+            templateServiceImpl.saveTemplate( pairTemplateEntry.getValue() );
             LOGGER.warn( pairTemplateEntry.getValue().getTemplateName() );
         }
 
 
         LOGGER.info( "Templates persisted in database" );
         Map<Pair<String, String>, Template> savedTemplatesMap = new HashMap<>();
-        List<Template> savedTemplates = templateDAO.getAllTemplates();
+        List<Template> savedTemplates = templateServiceImpl.getAllTemplates();
         for ( Template savedTemplate : savedTemplates )
         {
             savedTemplatesMap.put( new ImmutablePair<>( savedTemplate.getTemplateName(), savedTemplate.getLxcArch() ),
@@ -109,19 +108,20 @@ public class TemplateDAOTest
     {
         LOGGER.warn( "\n\n\n\nTesting Remove Template" );
         Template template = TestUtils.getParentTemplate();
-        templateDAO.saveTemplate( template );
+        templateServiceImpl.saveTemplate( template );
 
-        Template savedTemplate = templateDAO.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
+        Template savedTemplate =
+                templateServiceImpl.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
         LOGGER.warn( template.toString() );
         LOGGER.warn( savedTemplate.toString() );
         LOGGER.warn( "\n\n\n\nGetting all templates from DB" );
-        for ( Template template1 : templateDAO.getAllTemplates() )
+        for ( Template template1 : templateServiceImpl.getAllTemplates() )
         {
             LOGGER.warn( template1.getTemplateName() );
         }
         assertEquals( template, savedTemplate );
-        templateDAO.removeTemplate( template );
-        savedTemplate = templateDAO.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
+        templateServiceImpl.removeTemplate( template );
+        savedTemplate = templateServiceImpl.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
         LOGGER.warn( "\n\n\n\nGetting template from database" );
         LOGGER.warn( savedTemplate.toString() );
         assertNotNull( savedTemplate );
@@ -134,9 +134,9 @@ public class TemplateDAOTest
         Template parentTemplate = TestUtils.getParentTemplate();
         Template childTemplate = TestUtils.getChildTemplate();
         parentTemplate.addChildren( Arrays.asList( childTemplate ) );
-        templateDAO.saveTemplate( parentTemplate );
+        templateServiceImpl.saveTemplate( parentTemplate );
         List<Template> childTemplates =
-                templateDAO.getChildTemplates( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() );
+                templateServiceImpl.getChildTemplates( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() );
         assertTrue( childTemplates.contains( childTemplate ) );
     }
 
@@ -145,8 +145,9 @@ public class TemplateDAOTest
     public void testGetTemplateByName() throws Exception
     {
         Template template = TestUtils.getParentTemplate();
-        templateDAO.saveTemplate( template );
-        Template savedTemplate = templateDAO.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
+        templateServiceImpl.saveTemplate( template );
+        Template savedTemplate =
+                templateServiceImpl.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
         assertEquals( template, savedTemplate );
     }
 }

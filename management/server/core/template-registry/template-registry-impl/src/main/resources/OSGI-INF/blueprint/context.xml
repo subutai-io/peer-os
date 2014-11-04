@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:~/registry" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
-  </bean>
-
-  <service id="templateDAO" interface="org.safehaus.subutai.common.protocol.api.TemplateService" />
+  <reference id="templateService" interface="org.safehaus.subutai.common.protocol.api.TemplateService"
+             availability="mandatory" />
 
   <bean id="templateRegistry" scope="singleton" activation="eager"
         class="org.safehaus.subutai.core.registry.impl.TemplateRegistryImpl">
-    <property name="templateDAO" ref="templateDAO" />
+    <property name="templateService" ref="templateService" />
   </bean>
 
   <service ref="templateRegistry"

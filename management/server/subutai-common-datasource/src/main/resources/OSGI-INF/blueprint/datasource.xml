@@ -11,7 +11,7 @@
 
   <service interface="javax.sql.DataSource" ref="dataSource">
     <service-properties>
-      <entry key="osgi.jndi.service.name" value="openjpa/qwerService" />
+      <entry key="osgi.jndi.service.name" value="openjpa/commonService" />
     </service-properties>
   </service>
 </blueprint>

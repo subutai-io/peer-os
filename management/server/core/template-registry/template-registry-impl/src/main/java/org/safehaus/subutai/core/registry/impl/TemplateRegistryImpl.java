@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.protocol.api.TemplateService;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.registry.api.RegistryException;
@@ -46,13 +47,13 @@ public class TemplateRegistryImpl implements TemplateRegistry
     private static final String TEMPLATE_NOT_FOUND_MSG = "Template %s not found";
 
 
-    public void setTemplateDAO( final TemplateDAO templateDAO )
+    public void setTemplateService( final TemplateService templateDAO )
     {
-        this.templateDAO = templateDAO;
+        this.templateService = templateDAO;
     }
 
 
-    protected TemplateDAO templateDAO;
+    protected TemplateService templateService;
 
 
     public TemplateRegistryImpl() throws DaoException
@@ -82,7 +83,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
         try
         {
 
-            templateDAO.saveTemplate( template );
+            templateService.saveTemplate( template );
             return true;
         }
         catch ( Exception e )
@@ -267,7 +268,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
             //delete template from storage
             try
             {
-                templateDAO.removeTemplate( template );
+                templateService.removeTemplate( template );
             }
             catch ( Exception e )
             {
@@ -313,7 +314,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
         //retrieve template from storage
         try
         {
-            return templateDAO.getTemplateByName( templateName, lxcArch );
+            return templateService.getTemplateByName( templateName, lxcArch );
         }
         catch ( Exception e )
         {
@@ -354,7 +355,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
         //retrieve child templates from storage
         try
         {
-            return templateDAO.getChildTemplates( parentTemplateName, lxcArch );
+            return templateService.getChildTemplates( parentTemplateName, lxcArch );
         }
         catch ( Exception e )
         {
@@ -416,7 +417,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
         TemplateTree templateTree = new TemplateTree();
         try
         {
-            List<Template> allTemplates = templateDAO.getAllTemplates();
+            List<Template> allTemplates = templateService.getAllTemplates();
             for ( Template template : allTemplates )
             {
                 templateTree.addTemplate( template );
@@ -494,7 +495,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
         try
         {
-            List<Template> allTemplates = templateDAO.getAllTemplates();
+            List<Template> allTemplates = templateService.getAllTemplates();
             List<Template> result = new ArrayList<>();
             for ( Template template : allTemplates )
             {
@@ -539,7 +540,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
             template.setInUseOnFAI( faiHostname, inUse );
             try
             {
-                templateDAO.saveTemplate( template );
+                templateService.saveTemplate( template );
             }
             catch ( Exception e )
             {
@@ -582,7 +583,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
         try
         {
 
-            templateDAO.saveTemplate( template );
+            templateService.saveTemplate( template );
         }
         catch ( Exception e )
         {
