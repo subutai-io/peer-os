@@ -29,16 +29,22 @@ public class RemoteMetricRequestListener extends RequestListener
     {
         ContainerHostMetricRequest request = payload.getMessage( ContainerHostMetricRequest.class );
 
-
-        Set<ContainerHostMetricImpl> metrics = monitor.getLocalContainerHostMetrics( request.getEnvironmentId() );
-
-        if ( !metrics.isEmpty() )
+        if ( request != null )
         {
-            return new ContainerHostMetricResponse( metrics );
+            Set<ContainerHostMetricImpl> metrics = monitor.getLocalContainerHostMetrics( request.getEnvironmentId() );
+
+            if ( !metrics.isEmpty() )
+            {
+                return new ContainerHostMetricResponse( metrics );
+            }
+            else
+            {
+                LOG.warn( String.format( "Could not get metrics about environment %s", request.getEnvironmentId() ) );
+            }
         }
         else
         {
-            LOG.warn( String.format( "Could not get metrics about environment %s", request.getEnvironmentId() ) );
+            LOG.warn( "Null request" );
         }
         return null;
     }

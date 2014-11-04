@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.impl;
+package org.safehaus.subutai.core.peer.impl.request;
 
 
 import org.safehaus.subutai.core.messenger.api.Message;
@@ -8,6 +8,8 @@ import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
+import org.safehaus.subutai.core.peer.impl.RecipientType;
+import org.safehaus.subutai.core.peer.impl.Timeouts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +46,8 @@ public class RequestNotifier implements Runnable
             Object response = listener.onRequest( messageRequest.getPayload() );
             if ( response != null )
             {
-                messageResponse = new MessageResponse( messageRequest.getId(), new Payload( response ), null );
+                messageResponse = new MessageResponse( messageRequest.getId(),
+                        new Payload( response, peerManager.getLocalPeer().getId() ), null );
             }
         }
         catch ( Exception e )
