@@ -162,12 +162,12 @@ void SubutaiContainer::UpdateUsersList() {
  */
 bool SubutaiContainer::getContainerId()
 {
-    if(this-> status != RUNNING) return false;
+    if (this-> status != RUNNING) return false;
     try
     {
         vector<string> args;
         args.push_back("/etc/subutai-agent/uuid.txt");
-        this-> id = RunProgram("/bin/cat", args);
+        this->id = RunProgram("/bin/cat", args);
         if (this->id.empty())		//if uuid is null or not reading successfully
         {
             boost::uuids::random_generator gen;
@@ -179,7 +179,7 @@ bool SubutaiContainer::getContainerId()
             args.push_back(">");
             args.push_back("/etc/subutai-agent/uuid.txt");
             this-> id = RunProgram("/bin/echo", args);
-            containerLogger->writeLog(1,containerLogger->setLogData("<SubutaiAgent>","Subutai Agent UUID: ",this->id));
+            containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiAgent>","Container UUID: ",this->id));
             return false;
         }
         return true;
