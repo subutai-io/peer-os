@@ -99,8 +99,7 @@ public class MonitorImplTest
 
     static class MonitorImplExt extends MonitorImpl
     {
-        public MonitorImplExt( final DataSource dataSource, final PeerManager peerManager )
-                throws DaoException
+        public MonitorImplExt( final DataSource dataSource, final PeerManager peerManager ) throws DaoException
         {
             super( dataSource, peerManager );
         }
@@ -156,13 +155,6 @@ public class MonitorImplTest
     public void testConstructorShouldFailOnNullPeerManager() throws Exception
     {
         new MonitorImpl( dataSource, null );
-    }
-
-
-    @Test(expected = NullPointerException.class)
-    public void testConstructorShouldFailOnNullMessenger() throws Exception
-    {
-        new MonitorImpl( dataSource, peerManager );
     }
 
 

@@ -17,7 +17,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 public interface ScriptManagerRest
 {
     @POST
-    @Path( "/script" )
+    @Path( "/" )
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     public Response uploadFile( @Multipart( "script" ) Attachment attachment );
 }

@@ -19,15 +19,18 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
  */
 public class ScriptManagerRestImpl implements ScriptManagerRest
 {
+    private static final String SCRIPTS_DIRECTORY = "/var/lib/subutai/pre-post-scripts/";
+
+
     @Override
     public Response uploadFile( final Attachment attachment )
     {
         String filename = attachment.getContentDisposition().getParameter( "filename" );
 
-        File dir = new File( "/var/lib/subutai/pre-post-scripts/" );
+        File dir = new File( SCRIPTS_DIRECTORY );
         dir.mkdirs();
 
-        Path path = Paths.get( "/var/lib/subutai/pre-post-scripts/" + filename );
+        Path path = Paths.get( SCRIPTS_DIRECTORY + filename );
 
 
         InputStream in = attachment.getObject( InputStream.class );
