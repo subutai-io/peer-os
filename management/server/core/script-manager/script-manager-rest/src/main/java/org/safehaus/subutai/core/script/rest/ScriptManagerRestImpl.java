@@ -23,17 +23,17 @@ public class ScriptManagerRestImpl implements ScriptManagerRest
 
 
     @Override
-    public Response uploadFile( final Attachment attachment )
+    public Response uploadScript( final Attachment scriptFile )
     {
-        String filename = attachment.getContentDisposition().getParameter( "filename" );
+        String scriptFileName = scriptFile.getContentDisposition().getParameter( "filename" );
 
         File dir = new File( SCRIPTS_DIRECTORY );
         dir.mkdirs();
 
-        Path path = Paths.get( SCRIPTS_DIRECTORY + filename );
+        Path path = Paths.get( SCRIPTS_DIRECTORY + scriptFileName );
 
 
-        InputStream in = attachment.getObject( InputStream.class );
+        InputStream in = scriptFile.getObject( InputStream.class );
 
         try
         {
@@ -44,6 +44,24 @@ public class ScriptManagerRestImpl implements ScriptManagerRest
         catch ( IOException e )
         {
             return Response.serverError().entity( e ).build();
+        }
+    }
+
+
+    @Override
+    public Response downloadScript( final String scriptName )
+    {
+        File scriptFile = new File( SCRIPTS_DIRECTORY + scriptName );
+
+        if ( scriptFile.exists() )
+        {
+            return Response.ok( scriptFile )
+                           .header( "Content-Disposition", String.format( "attachment; filename=%s", scriptName ) )
+                           .build();
+        }
+        else
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
         }
     }
 }
