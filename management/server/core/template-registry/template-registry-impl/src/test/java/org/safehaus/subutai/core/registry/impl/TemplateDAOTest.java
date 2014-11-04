@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -42,7 +41,6 @@ public class TemplateDAOTest
     public void setUp() throws Exception
     {
         emf = Persistence.createEntityManagerFactory( "default" );
-        EntityManager em = emf.createEntityManager();
         templateDAO = new TemplateDAO();
         templateDAO.setEntityManagerFactory( emf );
     }
@@ -74,10 +72,10 @@ public class TemplateDAOTest
         Template childTemplate = TestUtils.getChildTemplate();
         Template parentTemplate = TestUtils.getParentTemplate();
 
-        templates.put( new ImmutablePair<String, String>( childTemplate.getTemplateName(), childTemplate.getLxcArch() ),
+        templates.put( new ImmutablePair<>( childTemplate.getTemplateName(), childTemplate.getLxcArch() ),
                 childTemplate );
-        templates.put( new ImmutablePair<String, String>( parentTemplate.getTemplateName(),
-                parentTemplate.getLxcArch() ), parentTemplate );
+        templates.put( new ImmutablePair<>( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() ),
+                parentTemplate );
 
         //        templates.add( TestUtils.getChildTemplate() );
         //        templates.add( TestUtils.getParentTemplate() );
@@ -95,8 +93,8 @@ public class TemplateDAOTest
         List<Template> savedTemplates = templateDAO.getAllTemplates();
         for ( Template savedTemplate : savedTemplates )
         {
-            savedTemplatesMap.put( new ImmutablePair<String, String>( savedTemplate.getTemplateName(),
-                    savedTemplate.getLxcArch() ), savedTemplate );
+            savedTemplatesMap.put( new ImmutablePair<>( savedTemplate.getTemplateName(), savedTemplate.getLxcArch() ),
+                    savedTemplate );
             LOGGER.warn( savedTemplate.getTemplateName() );
         }
 

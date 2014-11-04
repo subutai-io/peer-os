@@ -130,12 +130,12 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
             //check if template with supplied md5sum already exists
             List<Template> allTemplates = getAllTemplates( template.getLxcArch() );
-            for ( Template templ : allTemplates )
+            for ( Template template1 : allTemplates )
             {
-                if ( StringUtil.areStringsEqual( templ.getMd5sum(), template.getMd5sum() ) )
+                if ( StringUtil.areStringsEqual( template1.getMd5sum(), template.getMd5sum() ) )
                 {
                     throw new RegistryException( String.format( "Template %s with the same md5sum already exists",
-                            templ.getTemplateName() ) );
+                            template1.getTemplateName() ) );
                 }
             }
 

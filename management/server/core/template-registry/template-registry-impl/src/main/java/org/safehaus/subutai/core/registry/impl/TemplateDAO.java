@@ -14,8 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 
 /**
@@ -24,7 +22,6 @@ import com.google.gson.GsonBuilder;
 public class TemplateDAO implements TemplateService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateDAO.class.getName() );
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
 
     private EntityManagerFactory entityManagerFactory;
@@ -130,7 +127,7 @@ public class TemplateDAO implements TemplateService
         EntityManager em = null;
         try
         {
-            Template template = null;
+            Template template;
             em = entityManagerFactory.createEntityManager();
             em.getTransaction().begin();
             Query query = em.createNamedQuery( Template.QUERY_GET_TEMPLATE_BY_NAME_ARCH );
@@ -163,7 +160,7 @@ public class TemplateDAO implements TemplateService
     @Override
     public List<Template> getAllTemplates()
     {
-        EntityManager entityManager = null;
+        EntityManager entityManager;
 
         try
         {
