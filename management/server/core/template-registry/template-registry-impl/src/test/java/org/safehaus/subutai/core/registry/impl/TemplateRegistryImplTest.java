@@ -1,11 +1,11 @@
 package org.safehaus.subutai.core.registry.impl;
 
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -30,36 +30,20 @@ import static org.mockito.Mockito.when;
 /**
  * Test for TemplateRegistryImpl
  */
-@Ignore
 public class TemplateRegistryImplTest
 {
 
-    private TemplateRegistryImplExt templateRegistry;
+    private TemplateRegistryImpl templateRegistry;
     private TemplateDAO templateDAO;
 
-
-    static class TemplateRegistryImplExt extends TemplateRegistryImpl
-    {
-
-
-        public TemplateRegistryImplExt() throws DaoException
-        {
-        }
-
-
-        public void setTemplateDao( TemplateDAO templateDao )
-        {
-            this.templateDAO = templateDao;
-        }
-    }
 
 
     @Before
     public void setUp() throws Exception
     {
-        templateRegistry = new TemplateRegistryImplExt();
+        templateRegistry = new TemplateRegistryImpl();
         templateDAO = mock( TemplateDAO.class );
-        templateRegistry.setTemplateDao( templateDAO );
+        templateRegistry.setTemplateDAO( templateDAO );
     }
 
 
@@ -75,8 +59,7 @@ public class TemplateRegistryImplTest
     @Test(expected = RegistryException.class)
     public void testRegisterTemplateRuntimeException() throws Exception
     {
-        Mockito.doThrow( new RuntimeException() ).when( templateDAO )
-               .getTemplateByName( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH );
+        Mockito.doThrow( new RuntimeException() ).when( templateDAO ).saveTemplate( TestUtils.getParentTemplate() );
 
 
         templateRegistry.registerTemplate( TestUtils.CONFIG_FILE, TestUtils.PACKAGES_MANIFEST, TestUtils.MD_5_SUM );
@@ -292,7 +275,7 @@ public class TemplateRegistryImplTest
     @Test
     public void testGetTemplateTreeException() throws Exception
     {
-        when( templateDAO.getAllTemplates() ).thenThrow( new DaoException( null ) );
+        when( templateDAO.getAllTemplates() ).thenReturn( Collections.<Template>emptyList() );
 
         TemplateTree templateTree = templateRegistry.getTemplateTree();
 
@@ -330,7 +313,7 @@ public class TemplateRegistryImplTest
     @Test
     public void testGetAllTemplatesException() throws Exception
     {
-        when( templateDAO.getAllTemplates() ).thenThrow( new DaoException( null ) );
+        when( templateDAO.getAllTemplates() ).thenReturn( Collections.<Template>emptyList() );
 
         List<Template> templates = templateRegistry.getAllTemplates();
 

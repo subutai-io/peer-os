@@ -16,10 +16,10 @@ public interface TemplateService
 
     public List<Template> getAllTemplates();
 
-    public void removeTemplate( Template template );
+    public void removeTemplate( Template template ) throws DaoException;
 
-    public List<Template> getChildTemplates( String parentTemplateName, String lxcArch );
+    public List<Template> getChildTemplates( String parentTemplateName, String lxcArch ) throws DaoException;
 
 
-    public Template getTemplateByName( String templateName, String lxcArch );
+    public Template getTemplateByName( String templateName, String lxcArch ) throws DaoException;
 }

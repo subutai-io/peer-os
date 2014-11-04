@@ -41,7 +41,7 @@ public class TemplateDAOTest
     @Before
     public void setUp() throws Exception
     {
-        emf = Persistence.createEntityManagerFactory( "default", System.getProperties() );
+        emf = Persistence.createEntityManagerFactory( "default" );
         EntityManager em = emf.createEntityManager();
         templateDAO = new TemplateDAO();
         templateDAO.setEntityManagerFactory( emf );
