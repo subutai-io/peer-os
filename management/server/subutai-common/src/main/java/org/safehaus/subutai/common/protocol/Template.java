@@ -10,9 +10,10 @@ import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -28,13 +29,14 @@ import com.google.gson.annotations.Expose;
  * Template represents template entry in registry
  */
 @Entity( name = "Template" )
+@IdClass( TemplatePK.class )
 @NamedQueries(value = {
         @NamedQuery( name = "Template.getAll", query = "SELECT t FROM Template t" ),
         @NamedQuery( name = "Template.getTemplateByNameArch",
-                query = "SELECT t FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = " +
+                query = "SELECT t FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = " +
                         ":lxcArch" ),
         @NamedQuery( name = "Template.removeTemplateByNameArch",
-                query = "DELETE FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = :lxcArch" )
+                query = "DELETE FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = :lxcArch" )
 })
 @XmlRootElement( name = "" )
 public class Template
@@ -47,8 +49,11 @@ public class Template
     public static final String QUERY_GET_TEMPLATE_BY_NAME_ARCH = "Template.getTemplateByNameArch";
     public static final String QUERY_REMOVE_TEMPLATE_BY_NAME_ARCH = "Template.removeTemplateByNameArch";
 
-    @EmbeddedId
-    TemplatePK pk;
+    @Id
+    String templateName;
+
+    @Id
+    String lxcArch;
 
     //name of parent template
     @Expose
@@ -133,7 +138,9 @@ public class Template
         Preconditions.checkArgument( !Strings.isNullOrEmpty( packagesManifest ), "Missing packages manifest" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( md5sum ), "Missing md5sum" );
 
-        this.pk = new TemplatePK( lxcUtsname, lxcArch );
+        this.templateName = lxcUtsname;
+        this.lxcArch = lxcArch;
+        //        this.pk = new TemplatePK( lxcUtsname, lxcArch );
         this.lxcUtsname = lxcUtsname;
         this.subutaiConfigPath = subutaiConfigPath;
         this.subutaiParent = subutaiParent;
@@ -143,7 +150,8 @@ public class Template
         this.parentTemplateName = subutaiParent;
         this.md5sum = md5sum;
 
-        if ( pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
+        //        if ( pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
+        if ( this.templateName.equalsIgnoreCase( parentTemplateName ) )
         {
             parentTemplateName = null;
         }
@@ -222,7 +230,7 @@ public class Template
 
     public String getLxcArch()
     {
-        return pk.getLxcArch();
+        return lxcArch;
     }
 
 
@@ -264,7 +272,7 @@ public class Template
 
     public String getTemplateName()
     {
-        return pk.getTemplateName();
+        return templateName;
     }
 
 
@@ -312,8 +320,7 @@ public class Template
 
     public Template getRemoteClone( UUID peerId )
     {
-        Template result =
-                new Template( this.pk.getLxcArch(), this.lxcUtsname, this.subutaiConfigPath, this.subutaiParent,
+        Template result = new Template( this.lxcArch, this.lxcUtsname, this.subutaiConfigPath, this.subutaiParent,
                 this.subutaiGitBranch, this.subutaiGitUuid, this.packagesManifest, this.md5sum );
         result.setRemote( true );
         result.setPeerId( peerId );
@@ -324,7 +331,7 @@ public class Template
     @Override
     public int hashCode()
     {
-        return pk.hashCode();
+        return super.hashCode();
     }
 
 
@@ -342,7 +349,7 @@ public class Template
 
         final Template template = ( Template ) o;
 
-        return pk.equals( template.pk );
+        return super.equals( template );
     }
 
 
@@ -350,9 +357,9 @@ public class Template
     public String toString()
     {
         return "Template{" +
-                "templateName='" + pk.getTemplateName() + '\'' +
+                "templateName='" + templateName + '\'' +
                 ", parentTemplateName='" + parentTemplateName + '\'' +
-                ", lxcArch='" + pk.getLxcArch() + '\'' +
+                ", lxcArch='" + lxcArch + '\'' +
                 ", lxcUtsname='" + lxcUtsname + '\'' +
                 ", subutaiConfigPath='" + subutaiConfigPath + '\'' +
                 ", subutaiParent='" + subutaiParent + '\'' +

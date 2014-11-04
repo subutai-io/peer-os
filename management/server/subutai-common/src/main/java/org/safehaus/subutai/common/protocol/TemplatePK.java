@@ -4,15 +4,13 @@ package org.safehaus.subutai.common.protocol;
 import java.io.Serializable;
 
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
 
 
-@Embeddable
 public class TemplatePK implements Serializable
 {
-    @Column( name = "templateName" )
+    @Column(name = "templateName")
     String templateName;
-    @Column( name = "lxcArch" )
+    @Column(name = "lxcArch")
     String lxcArch;
 
 

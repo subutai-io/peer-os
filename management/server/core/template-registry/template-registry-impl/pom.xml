@@ -58,11 +58,6 @@
       <version>2.3.0</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.eclipse.persistence</groupId>
-      <artifactId>eclipselink</artifactId>
-      <version>2.5.1</version>
-    </dependency>
   </dependencies>
 
   <build>
@@ -70,6 +65,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>

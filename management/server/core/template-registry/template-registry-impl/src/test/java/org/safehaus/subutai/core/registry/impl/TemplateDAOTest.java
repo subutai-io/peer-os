@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 public class TemplateDAOTest
 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger( TemplateDAO.class.getName() );
+    private static final Logger LOGGER = LoggerFactory.getLogger( TemplateDAOTest.class.getName() );
 
     //    private EntityManager em;
     private EntityManagerFactory emf;
