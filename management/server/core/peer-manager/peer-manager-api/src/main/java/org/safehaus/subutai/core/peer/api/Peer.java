@@ -11,6 +11,7 @@ import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 
 
@@ -34,9 +35,9 @@ public interface Peer
                                                 int quantity, String strategyId, List<Criteria> criteria )
             throws ContainerCreateException;
 
-    public boolean startContainer( ContainerHost containerHost ) throws PeerException;
+    public void startContainer( ContainerHost containerHost ) throws PeerException;
 
-    public boolean stopContainer( ContainerHost containerHost ) throws PeerException;
+    public void stopContainer( ContainerHost containerHost ) throws PeerException;
 
     public void destroyContainer( ContainerHost containerHost ) throws PeerException;
 
@@ -51,4 +52,18 @@ public interface Peer
             throws CommandException;
 
     public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException;
+
+    public boolean isLocal();
+
+    public String getQuota( ContainerHost host, QuotaEnum quota ) throws PeerException;
+
+    public void setQuota( ContainerHost host, QuotaEnum quota, String value ) throws PeerException;
+
+    public Template getTemplate( ContainerHost containerHost ) throws PeerException;
+
+    public boolean isOnline() throws PeerException;
+
+    public <T, V> V sendRequest( T request, String recipient, int timeout, Class<V> responseType ) throws PeerException;
+
+    public <T> void sendRequest( T request, String recipient, int timeout ) throws PeerException;
 }

@@ -33,8 +33,8 @@ import com.google.gson.JsonSyntaxException;
  */
 public class MessengerImpl implements Messenger, MessageProcessor
 {
-    private static final Logger LOG = LoggerFactory.getLogger( MessengerImpl.class.getName() );
-    private final Set<MessageListener> listeners =
+    protected static Logger LOG = LoggerFactory.getLogger( MessengerImpl.class.getName() );
+    protected final Set<MessageListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MessageListener, Boolean>() );
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     private final PeerManager peerManager;
@@ -106,23 +106,19 @@ public class MessengerImpl implements Messenger, MessageProcessor
             Envelope envelope = messengerDao.getEnvelope( messageId );
             if ( envelope != null )
             {
-
                 if ( envelope.isSent() )
                 {
                     return MessageStatus.SENT;
                 }
+                //give 10 extra seconds in case background sender is in process of transmitting this message
+                else if ( ( envelope.getCreateDate().getTime() + envelope.getTimeToLive() * 1000 )
+                        < System.currentTimeMillis() + 10000 )
+                {
+                    return MessageStatus.IN_PROCESS;
+                }
                 else
                 {
-                    //give 10 extra seconds in case background sender is in process of transmitting this message
-                    if ( ( envelope.getCreateDate().getTime() + envelope.getTimeToLive() * 1000 )
-                            < System.currentTimeMillis() + 10 * 1000 )
-                    {
-                        return MessageStatus.IN_PROCESS;
-                    }
-                    else
-                    {
-                        return MessageStatus.EXPIRED;
-                    }
+                    return MessageStatus.EXPIRED;
                 }
             }
 
@@ -144,7 +140,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
             Envelope envelope = JsonUtil.fromJson( envelopeString, Envelope.class );
             notifyListeners( envelope );
         }
-        catch ( JsonSyntaxException e )
+        catch ( NullPointerException | JsonSyntaxException e )
         {
             LOG.error( "Error in processMessage", e );
             throw new MessageException( e );

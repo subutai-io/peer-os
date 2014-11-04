@@ -13,44 +13,57 @@ import org.safehaus.subutai.common.protocol.CommandStatus;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.RemotePeer;
+import org.safehaus.subutai.core.peer.impl.command.BlockingCommandCallback;
+import org.safehaus.subutai.core.peer.impl.command.CommandRequest;
+import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
+import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequest;
+import org.safehaus.subutai.core.peer.impl.container.CreateContainerResponse;
+import org.safehaus.subutai.core.peer.impl.request.MessageRequest;
+import org.safehaus.subutai.core.peer.impl.request.MessageResponse;
+import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 
 /**
- * Created by timur on 10/22/14.
+ * Remote Peer implementation
  */
 public class RemotePeerImpl implements RemotePeer
 {
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerImpl.class.getName() );
 
+    private LocalPeer localPeer;
     protected PeerInfo peerInfo;
     protected Messenger messenger;
-    private CommandResponseMessageListener commandResponseMessageListener;
+
+    private CommandResponseListener commandResponseListener;
+    private MessageResponseListener messageResponseListener;
 
 
-    public RemotePeerImpl( final PeerInfo peerInfo, final Messenger messenger,
-                           CommandResponseMessageListener commandResponseMessageListener )
+    public RemotePeerImpl( LocalPeer localPeer, final PeerInfo peerInfo, final Messenger messenger,
+                           CommandResponseListener commandResponseListener,
+                           MessageResponseListener messageResponseListener )
     {
+        this.localPeer = localPeer;
         this.peerInfo = peerInfo;
         this.messenger = messenger;
-        this.commandResponseMessageListener = commandResponseMessageListener;
-    }
-
-
-    @Override
-    public boolean isOnline() throws PeerException
-    {
-        return false;
+        this.commandResponseListener = commandResponseListener;
+        this.messageResponseListener = messageResponseListener;
     }
 
 
@@ -58,6 +71,28 @@ public class RemotePeerImpl implements RemotePeer
     public UUID getId()
     {
         return peerInfo.getId();
+    }
+
+
+    @Override
+    public boolean isOnline() throws PeerException
+    {
+        if ( peerInfo.getId().equals( getRemoteId() ) )
+        {
+            return true;
+        }
+        else
+        {
+            throw new PeerException( "Invalid peer ID." );
+        }
+    }
+
+
+    @Override
+    public UUID getRemoteId() throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.getId();
     }
 
 
@@ -71,7 +106,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public UUID getOwnerId()
     {
-        return null;
+        return peerInfo.getOwnerId();
     }
 
 
@@ -96,25 +131,46 @@ public class RemotePeerImpl implements RemotePeer
                                                 final String strategyId, final List<Criteria> criteria )
             throws ContainerCreateException
     {
-        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
-        return remotePeerRestClient
-                .createContainers( creatorPeerId, environmentId, templates, quantity, strategyId, criteria );
+        try
+        {
+            //send create request
+            CreateContainerRequest request =
+                    new CreateContainerRequest( creatorPeerId, environmentId, templates, quantity, strategyId,
+                            criteria );
+
+            CreateContainerResponse response = sendRequest( request, RecipientType.CONTAINER_CREATE_REQUEST.name(),
+                    Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainerResponse.class );
+
+            if ( response != null )
+            {
+                return response.getContainerHosts();
+            }
+            else
+            {
+                throw new ContainerCreateException( "Received null response" );
+            }
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( "Error in createContainers", e );
+            throw new ContainerCreateException( e.getMessage() );
+        }
     }
 
 
     @Override
-    public boolean startContainer( final ContainerHost containerHost ) throws PeerException
+    public void startContainer( final ContainerHost containerHost ) throws PeerException
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
-        return remotePeerRestClient.startContainer( containerHost );
+        remotePeerRestClient.startContainer( containerHost );
     }
 
 
     @Override
-    public boolean stopContainer( final ContainerHost containerHost ) throws PeerException
+    public void stopContainer( final ContainerHost containerHost ) throws PeerException
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
-        return remotePeerRestClient.stopContainer( containerHost );
+        remotePeerRestClient.stopContainer( containerHost );
     }
 
 
@@ -131,6 +187,26 @@ public class RemotePeerImpl implements RemotePeer
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
         return remotePeerRestClient.isConnected( host );
+    }
+
+
+    @Override
+    public String getQuota( final ContainerHost host, final QuotaEnum quota ) throws PeerException
+    {
+        throw new PeerException( "Operation not allowed." );
+        //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(),
+        // "8181" );
+        //        return remotePeerRestClient.getQuota( host, quota );
+    }
+
+
+    @Override
+    public void setQuota( final ContainerHost host, final QuotaEnum quota, final String value ) throws PeerException
+    {
+        throw new PeerException( "Operation not allowed." );
+        //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(),
+        // "8181" );
+        //        remotePeerRestClient.setQuota( host, quota, value );
     }
 
 
@@ -156,7 +232,7 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( commandResult == null )
         {
-            commandResult = new CommandResult( requestBuilder.getCommandId(), null, null, null, CommandStatus.TIMEOUT );
+            commandResult = new CommandResult( null, null, null, CommandStatus.TIMEOUT );
         }
 
         return commandResult;
@@ -178,6 +254,13 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @Override
+    public boolean isLocal()
+    {
+        return false;
+    }
+
+
     private void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback,
                                Semaphore semaphore ) throws CommandException
     {
@@ -190,19 +273,86 @@ public class RemotePeerImpl implements RemotePeer
         {
             throw new CommandException( "Operation not allowed" );
         }
-        //cache callback
-        commandResponseMessageListener
-                .addCallback( requestBuilder.getCommandId(), callback, requestBuilder.getTimeout(), semaphore );
 
-        //send command message to remote peer
+        CommandRequest request = new CommandRequest( requestBuilder, ( ContainerHost ) host );
+        //cache callback
+        commandResponseListener.addCallback( request.getRequestId(), callback, requestBuilder.getTimeout(), semaphore );
+
+        //send command request to remote peer counterpart
         try
         {
-            Message message = messenger.createMessage( new CommandRequest( requestBuilder, ( ContainerHost ) host ) );
-            messenger.sendMessage( this, message, CommandRecipientType.COMMAND_REQUEST.name(), 10 );
+            sendRequest( request, RecipientType.COMMAND_REQUEST.name(), Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT );
         }
-        catch ( MessageException e )
+        catch ( PeerException e )
         {
             throw new CommandException( e );
         }
+    }
+
+
+    @Override
+    public Template getTemplate( final ContainerHost containerHost ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.getTemplate( containerHost );
+    }
+
+
+    @Override
+    public <T, V> V sendRequest( final T request, String recipient, final int timeout, Class<V> responseType )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( responseType, "Invalid response type" );
+
+        //send request
+        MessageRequest messageRequest = sendRequestInternal( request, recipient, timeout );
+
+        //wait for response here
+        MessageResponse messageResponse = messageResponseListener.waitResponse( messageRequest.getId(), timeout );
+
+        if ( messageResponse != null )
+        {
+            if ( messageResponse.getException() != null )
+            {
+                throw new PeerException( messageResponse.getException() );
+            }
+            else if ( messageResponse.getPayload() != null )
+            {
+                return messageResponse.getPayload().getMessage( responseType );
+            }
+        }
+
+        return null;
+    }
+
+
+    @Override
+    public <T> void sendRequest( final T request, final String recipient, final int timeout ) throws PeerException
+    {
+        sendRequestInternal( request, recipient, timeout );
+    }
+
+
+    private <T> MessageRequest sendRequestInternal( final T request, final String recipient, final int timeout )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( request, "Invalid request" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
+        Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
+
+        MessageRequest messageRequest = new MessageRequest( new Payload( request, localPeer.getId() ), recipient );
+        Message message = messenger.createMessage( messageRequest );
+
+        try
+        {
+            messenger.sendMessage( this, message, RecipientType.PEER_REQUEST_LISTENER.name(),
+                    Timeouts.PEER_MESSAGE_TIMEOUT );
+        }
+        catch ( MessageException e )
+        {
+            throw new PeerException( e );
+        }
+
+        return messageRequest;
     }
 }

@@ -8,6 +8,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -74,7 +75,11 @@ public class HostsCommand extends OsgiCommandSupport
 
             if ( c.getCreatorPeerId() != null )
             {
-                containerInfo += " " + peerManager.getPeer( c.getCreatorPeerId() ).getPeerInfo().getIp();
+                Peer peer = peerManager.getPeer( c.getCreatorPeerId() );
+                if ( peer != null )
+                {
+                    containerInfo += " " + peer.getPeerInfo().getIp();
+                }
             }
         }
 
