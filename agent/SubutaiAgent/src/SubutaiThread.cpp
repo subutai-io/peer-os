@@ -44,14 +44,11 @@ bool SubutaiThread::checkCWD(SubutaiCommand *command, SubutaiContainer* cont)
     if (cont) {
         return cont->checkCWD(command->getWorkingDirectory());
     } else {
-        if ((chdir(command->getWorkingDirectory().c_str())) < 0)
-        {		
+        if ((chdir(command->getWorkingDirectory().c_str())) < 0) {		
             //changing working directory first
             logger.writeLog(3, logger.setLogData("<SubutaiThread::checkCWD> " " Changing working Directory failed..", "pid", toString(getpid()), "CWD", command->getWorkingDirectory()));
             return false;
-        }
-        else
-        {
+        } else {
             return true;
         }
     }
@@ -66,15 +63,12 @@ bool SubutaiThread::checkUID(SubutaiCommand *command, SubutaiContainer* containe
     if (container) {
         return container->checkUser(command->getRunAs());
     } else {
-        if (uid.getIDs(ruid, euid, command->getRunAs()))
-        {	
+        if (uid.getIDs(ruid, euid, command->getRunAs())) {	
             //checking user id is on system ?
             logger.writeLog(4, logger.setLogData("<SubutaiThread::checkUID> " "User id successfully found on system..", "pid", toString(getpid()), "RunAs", command->getRunAs()));
             uid.doSetuid(this->euid);
             return true;
-        }
-        else
-        {
+        } else {
             logger.writeLog(3, logger.setLogData("<SubutaiThread::checkUID> " "User id could not found on system..", "pid", toString(getpid()), "RunAs", command->getRunAs()));
             logger.writeLog(3, logger.setLogData("<SubutaiThread::checkUID> " "Thread will be closed..", "pid", toString(getpid()), "RunAs", command->getRunAs()));
             uid.undoSetuid(ruid);
@@ -401,43 +395,32 @@ void SubutaiThread::checkAndWrite(message_queue *messageQueue,SubutaiCommand* co
  */
 bool SubutaiThread::checkExecutionTimeout(unsigned int* startsec,bool* overflag,unsigned int* exectimeout,unsigned int* count)
 {
-    if (*exectimeout != 0)
-    {
+    if (*exectimeout != 0) {
         boost::posix_time::ptime current = boost::posix_time::second_clock::local_time();
         unsigned int currentsec = current.time_of_day().seconds();
 
-        if ((currentsec > *startsec) && *overflag == false)
-        {
-            if (currentsec != 59)
-            {
+        if ((currentsec > *startsec) && *overflag == false) {
+            if (currentsec != 59) {
                 *count = *count + (currentsec - *startsec);
                 *startsec = currentsec;
-            }
-            else
-            {
+            } else {
                 *count = *count + (currentsec - *startsec);
                 *overflag = true;
                 *startsec = 0;
             }
         }
-        if (currentsec == 59)
-        {
+        if (currentsec == 59) {
             *overflag = true;
             *startsec = 0;
-        }
-        else
-        {
+        } else {
             *overflag = false;
         }
-        if (*count >= *exectimeout) //timeout
-        {
+        if (*count >= *exectimeout) { //timeout
             this->getLogger().writeLog(4,this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "Timeout Occured!!"));
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "count:",toString(*count)));
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "exectimeout:",toString(*exectimeout)));
             return true;	//timeout occured now
-        }
-        else
-        {
+        } else {
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "count:",toString(*count)));
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "exectimeout:",toString(*exectimeout)));
             return false; //no timeout occured
@@ -461,32 +444,26 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
     this->setPpid(newpid);
     pid_t result = waitpid(newpid, &status, WNOHANG);
     this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Find pid start","current pid:",toString(newpid)));
-    while ((result = waitpid(newpid, &status, WNOHANG)) == 0)
-    {
+    while ((result = waitpid(newpid, &status, WNOHANG)) == 0) {
         string cmd;
         cmd = "pgrep -P "+toString(newpid);
         cmd = this->getProcessPid(cmd.c_str());
-
         cmd = "pgrep -P "+ cmd;
         cmd = this->getProcessPid(cmd.c_str());
-
         this->setPpid(atoi(cmd.c_str()));
-        if (this->getPpid())
-        {
+        if (this->getPpid()) {
             break;
         }
         this->setPpid(newpid);
     }
-    if (result > 0)
-    {
+    if (result > 0) {
         this->setPpid(newpid);
     }
     this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Find pid finished","current pid:",toString(processpid)));
     /*
      * if the execution is done process pid could not be read and should be skipped now..
      */
-    if (!checkCWD(command))
-    {
+    if (!checkCWD(command)) {
         this->setCWDERR(true);
         string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
                 "Working Directory Does Not Exist on System","",command->getSource(),command->getTaskUuid());
@@ -494,8 +471,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
         this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
         //problem about absolute path
     }
-    if (!checkUID(command))
-    {
+    if (!checkUID(command)) {
         this->setUIDERR(true);
         string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
                 "User Does Not Exist on System","",command->getSource(),command->getTaskUuid());

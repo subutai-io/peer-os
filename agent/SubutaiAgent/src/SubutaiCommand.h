@@ -17,7 +17,7 @@
  *  @brief     SubutaiCommand.h
  *  @class     SubutaiCommand.h
  *  @details   SubutaiCommand Class is designed for marshaling and unmarshalling command instance.
- *  		   This class's instance can serialize and deserialize JSON/string datas.
+ *  	       This class's instance can serialize and deserialize JSON/string datas.
  *  @author    Emin INAL
  *  @author    Bilal BAL
  *  @version   1.1.0

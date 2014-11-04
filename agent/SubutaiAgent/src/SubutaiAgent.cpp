@@ -424,12 +424,12 @@ int main(int argc,char *argv[],char *envp[])
                     }
                     else if (command.getType()=="PS_REQUEST")
                     {
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","PS execution operation is starting.."));
+                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "PS execution operation is starting.."));
                         SubutaiThread* subprocess = new SubutaiThread;
                         subprocess->getLogger().setLogLevel(logMain.getLogLevel());
                         command.setProgram("for i in `ps aux | grep '[s]h -c' | awk -F \" \" '{print $2}'`; do ps aux | grep `pgrep -P $i` | sed '/grep/d' ; done 2> /dev/null");
                         command.setWorkingDirectory("/");
-                        subprocess->threadFunction(&messageQueue,&command,argv);
+                        subprocess->threadFunction(&messageQueue, &command, argv);
                         delete subprocess;
                     }
                     else if (command.getType()=="HEARTBEAT_REQUEST")
@@ -453,6 +453,7 @@ int main(int argc,char *argv[],char *envp[])
                             connection->sendMessage(resp);
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","HeartBeat Response:", resp));
                         } else {
+                            // It is container
                         }
                     }
                     else if (command.getType() == "TERMINATE_REQUEST")
