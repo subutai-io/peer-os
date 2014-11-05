@@ -22,7 +22,7 @@ public class PigConfig implements ConfigBase
     private String hadoopClusterName;
     private Set<ContainerHost> nodes = new HashSet<>();
     private Set<UUID> agentNodes = new HashSet<>();
-    private Set<UUID> hadoopNodes = new HashSet<>();
+    private Set<ContainerHost> hadoopNodes = new HashSet<>();
     private UUID environmentId;
 
 
@@ -96,13 +96,13 @@ public class PigConfig implements ConfigBase
         this.clusterName = hadoopClusterName;
     }
 
-    public Set<UUID> getHadoopNodes()
+    public Set<ContainerHost> getHadoopNodes()
     {
         return hadoopNodes;
     }
 
 
-    public void setHadoopNodes( final Set<UUID> hadoopNodes )
+    public void setHadoopNodes( final Set<ContainerHost> hadoopNodes )
     {
         this.hadoopNodes = hadoopNodes;
     }
