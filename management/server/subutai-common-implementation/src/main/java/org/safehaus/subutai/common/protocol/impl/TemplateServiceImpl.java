@@ -1,10 +1,12 @@
 package org.safehaus.subutai.common.protocol.impl;
 
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import org.safehaus.subutai.common.exception.DaoException;
@@ -16,9 +18,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 
 
-/**
- * Created by talas on 11/4/14.
- */
 public class TemplateServiceImpl implements TemplateService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateServiceImpl.class.getName() );
@@ -44,10 +43,6 @@ public class TemplateServiceImpl implements TemplateService
     public Template saveTemplate( Template template ) throws DaoException
     {
         Template savedTemplate = null;
-        if ( template.getTemplateName() == null || "".equals( template.getTemplateName() ) )
-        {
-            throw new RuntimeException( "Template Name is required" );
-        }
 
         EntityManager entityManager = null;
         try
@@ -94,13 +89,24 @@ public class TemplateServiceImpl implements TemplateService
         {
             entityManager = entityManagerFactory.createEntityManager();
             entityManager.getTransaction().begin();
-            entityManager.remove( template );
+            Query query = entityManager.createNamedQuery( Template.QUERY_REMOVE_TEMPLATE_BY_NAME_ARCH );
+            query.setParameter( "templateName", template.getTemplateName() );
+            query.setParameter( "lxcArch", template.getLxcArch() );
+            query.executeUpdate();
             entityManager.getTransaction().commit();
             LOGGER.info( String.format( "Template deleted : %s", template.getTemplateName() ) );
         }
         catch ( Exception ex )
         {
+
             LOGGER.error( "Exception deleting template : %s", template.getTemplateName() );
+            if ( entityManager != null )
+            {
+                if ( entityManager.getTransaction().isActive() )
+                {
+                    entityManager.getTransaction().rollback();
+                }
+            }
             throw new DaoException( ex );
         }
         finally
@@ -124,30 +130,25 @@ public class TemplateServiceImpl implements TemplateService
     @Override
     public Template getTemplateByName( String templateName, String lxcArch ) throws DaoException
     {
-        EntityManager em = null;
+        EntityManager entityManager;
         try
         {
             Template template;
-            em = entityManagerFactory.createEntityManager();
-            em.getTransaction().begin();
-            Query query = em.createNamedQuery( Template.QUERY_GET_TEMPLATE_BY_NAME_ARCH );
+            entityManager = entityManagerFactory.createEntityManager();
+            Query query = entityManager.createNamedQuery( Template.QUERY_GET_TEMPLATE_BY_NAME_ARCH );
             query.setParameter( "templateName", templateName );
             query.setParameter( "lxcArch", lxcArch );
             template = ( Template ) query.getSingleResult();
 
-            em.getTransaction().commit();
             return template;
+        }
+        catch ( NoResultException e )
+        {
+            return null;
         }
         catch ( Exception ex )
         {
             throw new DaoException( ex );
-        }
-        finally
-        {
-            if ( em != null )
-            {
-                em.close();
-            }
         }
     }
 
@@ -188,7 +189,14 @@ public class TemplateServiceImpl implements TemplateService
         try
         {
             Template template = this.getTemplateByName( parentTemplateName, lxcArch );
-            return template.getChildren();
+            if ( template != null )
+            {
+                return template.getChildren();
+            }
+            else
+            {
+                return Collections.emptyList();
+            }
         }
         catch ( Exception ex )
         {
