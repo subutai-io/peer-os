@@ -7,10 +7,10 @@ import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.api.OperationType;
-import org.safehaus.subutai.plugin.common.impl.AbstractOperationTask;
+import org.safehaus.subutai.plugin.common.impl.AbstractNodeOperationTask;
 
 
-public class OperationTask extends AbstractOperationTask implements Runnable
+public class NodeOperationTask extends AbstractNodeOperationTask implements Runnable
 {
     private final String clusterName;
     private final ContainerHost containerHost;
@@ -20,8 +20,9 @@ public class OperationTask extends AbstractOperationTask implements Runnable
     private OperationType operationType;
 
 
-    public OperationTask( Elasticsearch elasticsearch, Tracker tracker, String clusterName, ContainerHost containerHost,
-                          OperationType operationType, CompleteEvent completeEvent, UUID trackID )
+    public NodeOperationTask( Elasticsearch elasticsearch, Tracker tracker, String clusterName,
+                              ContainerHost containerHost, OperationType operationType, CompleteEvent completeEvent,
+                              UUID trackID )
     {
         super( tracker, operationType, elasticsearch.getCluster( clusterName ), completeEvent, trackID, containerHost );
         this.elasticsearch = elasticsearch;
@@ -34,19 +35,19 @@ public class OperationTask extends AbstractOperationTask implements Runnable
 
 
     @Override
-    public UUID startOperation()
+    public UUID runTask()
     {
         UUID trackID = null;
         switch ( operationType )
         {
             case START:
-                trackID = elasticsearch.startNode( clusterName, containerHost.getAgent().getUuid() );
+                trackID = elasticsearch.startNode( clusterName, containerHost.getHostname() );
                 break;
             case STOP:
-                trackID = elasticsearch.stopNode( clusterName, containerHost.getAgent().getUuid() );
+                trackID = elasticsearch.stopNode( clusterName, containerHost.getHostname() );
                 break;
             case STATUS:
-                trackID = elasticsearch.checkNode( clusterName, containerHost.getAgent().getUuid() );
+                trackID = elasticsearch.checkNode( clusterName, containerHost.getHostname() );
                 break;
         }
         return trackID;

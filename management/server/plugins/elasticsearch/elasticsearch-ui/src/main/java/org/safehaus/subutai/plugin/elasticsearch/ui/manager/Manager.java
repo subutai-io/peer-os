@@ -20,7 +20,7 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
-import org.safehaus.subutai.plugin.elasticsearch.api.OperationTask;
+import org.safehaus.subutai.plugin.elasticsearch.api.NodeOperationTask;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -347,7 +347,8 @@ public class Manager
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
-            executorService.execute( new OperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
+            executorService.execute(
+                    new NodeOperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
                             OperationType.START, new CompleteEvent()
                     {
                         @Override
@@ -370,7 +371,8 @@ public class Manager
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
-            executorService.execute( new OperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
+            executorService.execute(
+                    new NodeOperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
                             OperationType.STOP, new CompleteEvent()
                     {
                         @Override
@@ -681,7 +683,7 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new OperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
+                        new NodeOperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
                                 OperationType.STOP, new CompleteEvent()
                         {
                             @Override
@@ -709,7 +711,7 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new OperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
+                        new NodeOperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
                                 OperationType.START, new CompleteEvent()
                         {
                             @Override
@@ -738,7 +740,7 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new OperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
+                        new NodeOperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
                                 OperationType.STATUS, new CompleteEvent()
                         {
                             public void onComplete( NodeState nodeState )

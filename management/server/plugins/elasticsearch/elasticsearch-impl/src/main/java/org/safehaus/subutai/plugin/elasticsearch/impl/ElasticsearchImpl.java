@@ -186,30 +186,30 @@ public class ElasticsearchImpl implements Elasticsearch
 
 
     @Override
-    public UUID checkNode( final String clusterName, final UUID agentUUID )
+    public UUID checkNode( final String clusterName, final String hostname )
     {
         AbstractOperationHandler operationHandler =
-                new NodeOperationHandler( this, clusterName, agentUUID, OperationType.STATUS );
+                new NodeOperationHandler( this, clusterName, hostname, OperationType.STATUS );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID startNode( final String clusterName, final UUID agentUUID )
+    public UUID startNode( final String clusterName, final String hostname )
     {
         AbstractOperationHandler operationHandler =
-                new NodeOperationHandler( this, clusterName, agentUUID, OperationType.START );
+                new NodeOperationHandler( this, clusterName, hostname, OperationType.START );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID stopNode( final String clusterName, final UUID agentUUID )
+    public UUID stopNode( final String clusterName, final String hostname )
     {
         AbstractOperationHandler operationHandler =
-                new NodeOperationHandler( this, clusterName, agentUUID, OperationType.STOP );
+                new NodeOperationHandler( this, clusterName, hostname, OperationType.STOP );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }

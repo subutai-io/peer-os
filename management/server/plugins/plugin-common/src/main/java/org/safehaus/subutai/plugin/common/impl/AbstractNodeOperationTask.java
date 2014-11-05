@@ -10,11 +10,11 @@ import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.api.OperationTaskInterface;
+import org.safehaus.subutai.plugin.common.api.NodeOperationTaskInterface;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 
 
-public abstract class AbstractOperationTask implements Runnable, OperationTaskInterface
+public abstract class AbstractNodeOperationTask implements Runnable, NodeOperationTaskInterface
 {
 
     private final CompleteEvent completeEvent;
@@ -24,8 +24,8 @@ public abstract class AbstractOperationTask implements Runnable, OperationTaskIn
     private ContainerHost containerHost;
     private OperationType operationType;
 
-    public AbstractOperationTask( Tracker tracker, OperationType operationType, ConfigBase clusterConfig,
-                                  CompleteEvent completeEvent, UUID trackID, ContainerHost containerHost )
+    public AbstractNodeOperationTask( Tracker tracker, OperationType operationType, ConfigBase clusterConfig,
+                                      CompleteEvent completeEvent, UUID trackID, ContainerHost containerHost )
     {
         this.tracker = tracker;
         this.completeEvent = completeEvent;
@@ -64,7 +64,7 @@ public abstract class AbstractOperationTask implements Runnable, OperationTaskIn
 
         if ( containerHost != null )
         {
-            UUID trackID = startOperation();
+            UUID trackID = runTask();
             waitUntilOperationFinish( trackID );
         }
     }

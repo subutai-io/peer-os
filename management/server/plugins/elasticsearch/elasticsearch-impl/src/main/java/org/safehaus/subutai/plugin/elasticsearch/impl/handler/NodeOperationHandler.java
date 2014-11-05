@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 
 
 import java.util.Iterator;
-import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -28,15 +27,15 @@ public class NodeOperationHandler extends AbstractOperationHandler<Elasticsearch
 {
 
     private String clusterName;
-    private UUID agentUUID;
+    private String hostname;
     private OperationType operationType;
 
 
-    public NodeOperationHandler( final ElasticsearchImpl manager, final String clusterName, final UUID agentUUID,
+    public NodeOperationHandler( final ElasticsearchImpl manager, final String clusterName, final String hostname,
                                  OperationType operationType )
     {
         super( manager, clusterName );
-        this.agentUUID = agentUUID;
+        this.hostname = hostname;
         this.clusterName = clusterName;
         this.operationType = operationType;
         this.trackerOperation = manager.getTracker()
@@ -61,7 +60,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<Elasticsearch
         while ( iterator.hasNext() )
         {
             host = ( ContainerHost ) iterator.next();
-            if ( host.getId().equals( agentUUID ) )
+            if ( host.getHostname().equals( hostname ) )
             {
                 break;
             }
@@ -69,7 +68,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<Elasticsearch
 
         if ( host == null )
         {
-            trackerOperation.addLogFailed( String.format( "No Container with ID %s", agentUUID ) );
+            trackerOperation.addLogFailed( String.format( "No Container with ID %s", hostname ) );
             return;
         }
 

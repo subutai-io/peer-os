@@ -21,11 +21,11 @@ public interface Elasticsearch extends ApiBase<ElasticsearchClusterConfiguration
 
     public UUID addNode( String clusterName, String lxcHostname );
 
-    public UUID checkNode( String clusterName, UUID agentUUID );
+    public UUID checkNode( String clusterName, String lxcHostname );
 
-    public UUID startNode( String clusterName, UUID agentUUID );
+    public UUID startNode( String clusterName, String lxcHostname );
 
-    public UUID stopNode( String clusterName, UUID agentUUID );
+    public UUID stopNode( String clusterName, String lxcHostname );
 
     public UUID destroyNode( String clusterName, String lxcHostname );
 
