@@ -20,8 +20,6 @@ set -e
 
 case "$1" in
     configure)
-	# Add symlinks of subutai-cli-net bindings under subutai bindings directory
-    ln -sf /usr/share/subutai-cli-net/bindings/* /etc/subutai/bindings/
     # invoke _subutai-net function with complete command
     ;;
 
