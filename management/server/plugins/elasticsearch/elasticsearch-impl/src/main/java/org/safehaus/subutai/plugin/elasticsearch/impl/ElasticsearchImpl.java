@@ -20,12 +20,12 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.ClusterOperationHandler;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.NodeOperationHandler;
-import org.safehaus.subutai.plugin.elasticsearch.impl.handler.OperationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

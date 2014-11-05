@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
 public class ElasticsearchClusterConfiguration implements ConfigBase
@@ -19,15 +20,11 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
 
     private String clusterName = "";
     private int numberOfNodes;
-    private int numberOfMasterNodes;
-    private int numberOfDataNodes;
-    private int numberOfShards = 5;
-    private int numberOfReplicas = 5;
     private UUID environmentId;
 
-    private Set<UUID> nodes = new HashSet<>();
-    private Set<UUID> masterNodes = new HashSet<>();
-    private Set<UUID> dataNodes = new HashSet<>();
+    private Set<ContainerHost> nodes = new HashSet<>();
+    private Set<ContainerHost> masterNodes = new HashSet<>();
+    private Set<ContainerHost> dataNodes = new HashSet<>();
 
 
     public static PlacementStrategy getNodePlacementStrategy()
@@ -81,85 +78,37 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
     }
 
 
-    public int getNumberOfShards()
-    {
-        return numberOfShards;
-    }
-
-
-    public void setNumberOfShards( final int numberOfShards )
-    {
-        this.numberOfShards = numberOfShards;
-    }
-
-
-    public int getNumberOfReplicas()
-    {
-        return numberOfReplicas;
-    }
-
-
-    public void setNumberOfReplicas( final int numberOfReplicas )
-    {
-        this.numberOfReplicas = numberOfReplicas;
-    }
-
-
-    public int getNumberOfMasterNodes()
-    {
-        return numberOfMasterNodes;
-    }
-
-
-    public void setNumberOfMasterNodes( int numberOfSeeds )
-    {
-        this.numberOfMasterNodes = numberOfSeeds;
-    }
-
-
-    public int getNumberOfDataNodes()
-    {
-        return numberOfDataNodes;
-    }
-
-
-    public void setNumberOfDataNodes( int numberOfDataNodes )
-    {
-        this.numberOfDataNodes = numberOfDataNodes;
-    }
-
-
-    public Set<UUID> getNodes()
+    public Set<ContainerHost> getNodes()
     {
         return nodes;
     }
 
 
-    public void setNodes( Set<UUID> nodes )
+    public void setNodes( Set<ContainerHost> nodes )
     {
         this.nodes = nodes;
     }
 
 
-    public Set<UUID> getMasterNodes()
+    public Set<ContainerHost> getMasterNodes()
     {
         return masterNodes;
     }
 
 
-    public void setMasterNodes( Set<UUID> nodes )
+    public void setMasterNodes( Set<ContainerHost> nodes )
     {
         this.masterNodes = nodes;
     }
 
 
-    public Set<UUID> getDataNodes()
+    public Set<ContainerHost> getDataNodes()
     {
         return dataNodes;
     }
 
 
-    public void setDataNodes( Set<UUID> nodes )
+    public void setDataNodes( Set<ContainerHost> nodes )
     {
         this.dataNodes = nodes;
     }

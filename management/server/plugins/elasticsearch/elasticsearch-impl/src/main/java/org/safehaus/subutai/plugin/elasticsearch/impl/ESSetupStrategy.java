@@ -65,35 +65,12 @@ public class ESSetupStrategy implements ClusterSetupStrategy
                     config.getNumberOfNodes(), environment.getContainers().size() ) );
         }
 
-        Set<UUID> esNodes = new HashSet<>();
-        for ( ContainerHost environmentContainer : environment.getContainers() )
+        Set<ContainerHost> esNodes = new HashSet<>();
+        for ( ContainerHost containerHost : environment.getContainers() )
         {
-            esNodes.add( environmentContainer.getAgent().getUuid() );
+            esNodes.add( containerHost );
         }
         config.setNodes( esNodes );
-
-        Iterator iterator = esNodes.iterator();
-        Set<UUID> masterNodes = new HashSet<>();
-        while ( iterator.hasNext() )
-        {
-            masterNodes.add( ( UUID ) iterator.next() );
-            if ( masterNodes.size() == config.getNumberOfMasterNodes() )
-            {
-                break;
-            }
-        }
-        config.setMasterNodes( masterNodes );
-
-        Set<UUID> dataNodes = new HashSet<>();
-        while ( iterator.hasNext() )
-        {
-            masterNodes.add( ( UUID ) iterator.next() );
-            if ( dataNodes.size() == config.getNumberOfDataNodes() )
-            {
-                break;
-            }
-        }
-        config.setMasterNodes( dataNodes );
 
         try
         {

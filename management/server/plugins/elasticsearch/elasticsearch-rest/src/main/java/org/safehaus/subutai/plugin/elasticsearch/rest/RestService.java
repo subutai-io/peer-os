@@ -57,20 +57,12 @@ public class RestService
     @Path( "clusters" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response installCluster( @PathParam( "clusterName" ) String clusterName,
-                                    @QueryParam( "numberOfNodes" ) int numberOfNodes,
-                                    @QueryParam( "numberOfMasterNodes" ) int numberOfMasterNodes,
-                                    @QueryParam( "numberOfDataNodes" ) int numberOfDataNodes,
-                                    @QueryParam( "numberOfShards" ) int numberOfShards,
-                                    @QueryParam( "numberOfReplicas" ) int numberOfReplicas )
+                                    @QueryParam( "numberOfNodes" ) int numberOfNodes)
     {
 
         ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = new ElasticsearchClusterConfiguration();
         elasticsearchClusterConfiguration.setClusterName( clusterName );
         elasticsearchClusterConfiguration.setNumberOfNodes( numberOfNodes );
-        elasticsearchClusterConfiguration.setNumberOfMasterNodes( numberOfMasterNodes );
-        elasticsearchClusterConfiguration.setNumberOfDataNodes( numberOfDataNodes );
-        elasticsearchClusterConfiguration.setNumberOfShards( numberOfShards );
-        elasticsearchClusterConfiguration.setNumberOfReplicas( numberOfReplicas );
 
         UUID uuid = elasticsearch.installCluster( elasticsearchClusterConfiguration );
 

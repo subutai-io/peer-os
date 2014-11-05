@@ -4,6 +4,7 @@ package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 import java.util.Iterator;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.CommandResult;
@@ -11,6 +12,7 @@ import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
@@ -19,7 +21,7 @@ import com.google.common.base.Preconditions;
 
 
 /**
- * This class handles operations that are related to just single node.
+ * This class handles operations that are related to just one node.
  *
  * TODO: add nodes and delete node operation should be implemented.
  */
@@ -40,7 +42,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<Elasticsearch
         this.operationType = operationType;
         this.trackerOperation = manager.getTracker()
                                        .createTrackerOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-                                               String.format( "Checking %s cluster...", clusterName ) );
+                                               String.format( "Creating %s tracker object...", clusterName ) );
     }
 
 
@@ -74,20 +76,19 @@ public class NodeOperationHandler extends AbstractOperationHandler<Elasticsearch
 
         try
         {
-            CommandResult result = null;
             switch ( operationType )
             {
                 case START:
-                    result = host.execute( new RequestBuilder( Commands.startCommand ) );
+                    host.execute( new RequestBuilder( Commands.startCommand ) );
                     break;
                 case STOP:
-                    result = host.execute( new RequestBuilder( Commands.stopCommand ) );
+                    host.execute( new RequestBuilder( Commands.stopCommand ) );
                     break;
                 case STATUS:
-                    result = host.execute( new RequestBuilder( Commands.statusCommand ) );
+                    host.execute( new RequestBuilder( Commands.statusCommand ) );
                     break;
             }
-            logResults( trackerOperation, result );
+            trackerOperation.addLogDone( "Command successfully run." );
         }
         catch ( CommandException e )
         {
@@ -99,6 +100,9 @@ public class NodeOperationHandler extends AbstractOperationHandler<Elasticsearch
     public static void logResults( TrackerOperation po, CommandResult result )
     {
         Preconditions.checkNotNull( result );
+
+        NodeState nodeState = NodeState.UNKNOWN;
+
         StringBuilder log = new StringBuilder();
         String status = "UNKNOWN";
         if ( result.getExitCode() == 0 )

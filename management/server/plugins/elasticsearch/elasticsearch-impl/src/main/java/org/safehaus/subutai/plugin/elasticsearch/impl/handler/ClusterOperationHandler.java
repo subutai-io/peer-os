@@ -14,6 +14,8 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildExcep
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
+import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
@@ -27,7 +29,8 @@ import com.google.common.base.Strings;
 /**
  * This class handles operations that are related to whole cluster.
  */
-public class ClusterOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
+public class ClusterOperationHandler extends AbstractOperationHandler<ElasticsearchImpl> implements
+        ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
     private OperationType operationType;
@@ -82,7 +85,8 @@ public class ClusterOperationHandler extends AbstractOperationHandler<Elasticsea
     }
 
 
-    private void runOperationOnContainers( OperationType operationType )
+    @Override
+    public void runOperationOnContainers( OperationType operationType )
     {
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
         CommandResult result = null;
@@ -127,7 +131,8 @@ public class ClusterOperationHandler extends AbstractOperationHandler<Elasticsea
     }
 
 
-    private void setupCluster()
+    @Override
+    public void setupCluster()
     {
         if ( Strings.isNullOrEmpty( config.getClusterName() ) )
         {
@@ -160,7 +165,8 @@ public class ClusterOperationHandler extends AbstractOperationHandler<Elasticsea
     }
 
 
-    private void destroyCluster()
+    @Override
+    public void destroyCluster()
     {
         ElasticsearchClusterConfiguration config = manager.getCluster( clusterName );
         if ( config == null )
