@@ -17,6 +17,9 @@ echo
 echo Usage:   List Environment IP and VLAN ID of Container
 echo "        "subutai \[-qh\] network CONTAINER -l
 echo
+echo Usage:   Help For Network
+echo "        "subutai \[-qh\] network -h 
+echo
 echo --------------------------------------------------------------------------
 }
 
@@ -32,17 +35,21 @@ function network {
   local extra="$5"
   local config=/var/lib/lxc/$container/config
 
-  lxc_assert $container
+  if [ "$1" == "-h" ]
+  then
+    show_usage "`network_usage`"
+  fi
+
+  lxc_assert "$container" "`network_usage`"
   if [ "$2" != "-a" ] && [ "$2" != "-m" ] && [ "$2" != "-r" ] && [ "$2" != "-l" ]
   then
      msg_error "Error Getting Options. Aborting..."
      show_usage "`network_usage`"
-     exit 1
   fi
   OPTIND=0
   shift
   shift_amount=0;
-  while getopts ":amrl" opt; do
+  while getopts ":amrlh" opt; do
     case $opt in
       a)
         assign="true"
