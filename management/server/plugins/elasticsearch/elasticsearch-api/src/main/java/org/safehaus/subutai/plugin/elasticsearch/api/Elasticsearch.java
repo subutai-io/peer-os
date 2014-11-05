@@ -13,11 +13,11 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 public interface Elasticsearch extends ApiBase<ElasticsearchClusterConfiguration>
 {
 
-    public UUID startAllNodes( String clusterName );
+    public UUID startAllNodes( ElasticsearchClusterConfiguration config );
 
-    public UUID checkAllNodes( String clusterName );
+    public UUID checkAllNodes( ElasticsearchClusterConfiguration config );
 
-    public UUID stopAllNodes( String clusterName );
+    public UUID stopAllNodes( ElasticsearchClusterConfiguration config );
 
     public UUID addNode( String clusterName, String lxcHostname );
 
@@ -28,6 +28,8 @@ public interface Elasticsearch extends ApiBase<ElasticsearchClusterConfiguration
     public UUID stopNode( String clusterName, UUID agentUUID );
 
     public UUID destroyNode( String clusterName, String lxcHostname );
+
+    public UUID uninstallCluster( ElasticsearchClusterConfiguration config );
 
     ClusterSetupStrategy getClusterSetupStrategy( Environment environment,
                                                   ElasticsearchClusterConfiguration elasticsearchClusterConfiguration,

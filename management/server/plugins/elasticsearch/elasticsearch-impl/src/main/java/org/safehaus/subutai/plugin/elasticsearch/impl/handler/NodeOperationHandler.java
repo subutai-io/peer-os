@@ -18,6 +18,11 @@ import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 import com.google.common.base.Preconditions;
 
 
+/**
+ * This class handles operations that are related to just single node.
+ *
+ * TODO: add nodes and delete node operation should be implemented.
+ */
 public class NodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
 {
 
@@ -82,7 +87,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<Elasticsearch
                     result = host.execute( new RequestBuilder( Commands.statusCommand ) );
                     break;
             }
-            logStatusResults( trackerOperation, result );
+            logResults( trackerOperation, result );
         }
         catch ( CommandException e )
         {
@@ -91,7 +96,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<Elasticsearch
     }
 
 
-    public static void logStatusResults( TrackerOperation po, CommandResult result )
+    public static void logResults( TrackerOperation po, CommandResult result )
     {
         Preconditions.checkNotNull( result );
         StringBuilder log = new StringBuilder();

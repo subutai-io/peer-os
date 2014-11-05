@@ -28,8 +28,8 @@ public class ClusterConfiguration
     public void configureCluster( final ElasticsearchClusterConfiguration config, Environment environment )
             throws ClusterConfigurationException
     {
-        String script = ". /etc/profile && /usr/bin/es-conf.sh %s";
-        String clusterNameParam = "cluster_name " + config.getClusterName();
+        // es-conf.sh cluster_name test
+        String clusterConfigureCommand = Commands.configure + "cluster_name " + config.getClusterName();
 
         for ( ContainerHost containerHost : environment.getContainers() )
         {
@@ -37,8 +37,7 @@ public class ClusterConfiguration
             {
                 po.addLog( "Configuring node: " + containerHost.getId() );
                 // Setting cluster name
-                CommandResult commandResult =
-                        containerHost.execute( new RequestBuilder( String.format( script, clusterNameParam ) ) );
+                CommandResult commandResult = containerHost.execute( new RequestBuilder( clusterConfigureCommand ) );
                 po.addLog( commandResult.getStdOut() );
             }
             catch ( CommandException e )

@@ -6,5 +6,6 @@ public enum OperationType
     START,
     STOP,
     STATUS,
+    INSTALL,
     DESTROY
 }

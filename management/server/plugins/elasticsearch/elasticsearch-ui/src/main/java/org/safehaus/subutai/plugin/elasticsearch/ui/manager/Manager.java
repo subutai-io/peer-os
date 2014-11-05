@@ -328,7 +328,7 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = elasticsearch.uninstallCluster( config.getClusterName() );
+                            UUID trackID = elasticsearch.uninstallCluster( config );
 
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     ElasticsearchClusterConfiguration.PRODUCT_KEY );
@@ -697,18 +697,18 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute( new OperationTask( elasticsearch, tracker, config.getClusterName(),
-                                containerHost.getAgent().getUuid(), OperationType.STOP, new CompleteEvent()
+                        containerHost.getAgent().getUuid(), OperationType.STOP, new CompleteEvent()
+                {
+                    @Override
+                    public void onComplete( String result )
+                    {
+                        synchronized ( PROGRESS_ICON )
                         {
-                            @Override
-                            public void onComplete( String result )
-                            {
-                                synchronized ( PROGRESS_ICON )
-                                {
-                                    enableButtons( buttons );
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                }
-                            }
-                        } ) );
+                            enableButtons( buttons );
+                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                        }
+                    }
+                } ) );
             }
         } );
     }
@@ -724,18 +724,18 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute( new OperationTask( elasticsearch, tracker, config.getClusterName(),
-                                containerHost.getAgent().getUuid(), OperationType.START, new CompleteEvent()
+                        containerHost.getAgent().getUuid(), OperationType.START, new CompleteEvent()
+                {
+                    @Override
+                    public void onComplete( String result )
+                    {
+                        synchronized ( PROGRESS_ICON )
                         {
-                            @Override
-                            public void onComplete( String result )
-                            {
-                                synchronized ( PROGRESS_ICON )
-                                {
-                                    enableButtons( buttons );
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                }
-                            }
-                        } ) );
+                            enableButtons( buttons );
+                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                        }
+                    }
+                } ) );
             }
         } );
     }
@@ -752,29 +752,29 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute( new OperationTask( elasticsearch, tracker, config.getClusterName(),
-                                containerHost.getAgent().getUuid(), OperationType.STATUS, new CompleteEvent()
+                        containerHost.getAgent().getUuid(), OperationType.STATUS, new CompleteEvent()
+                {
+                    public void onComplete( String result )
+                    {
+                        synchronized ( PROGRESS_ICON )
                         {
-                            public void onComplete( String result )
+                            resultHolder.setValue( parseServiceResult( result ) );
+                            if ( resultHolder.getValue().contains( "not" ) )
                             {
-                                synchronized ( PROGRESS_ICON )
-                                {
-                                    resultHolder.setValue( parseServiceResult( result ) );
-                                    if ( resultHolder.getValue().contains( "not" ) )
-                                    {
-                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                    }
-                                    else
-                                    {
-                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                    }
-                                    PROGRESS_ICON.setVisible( false );
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                    getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                }
+                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
                             }
-                        } ) );
+                            else
+                            {
+                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                            }
+                            PROGRESS_ICON.setVisible( false );
+                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                            getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
+                        }
+                    }
+                } ) );
             }
         } );
     }

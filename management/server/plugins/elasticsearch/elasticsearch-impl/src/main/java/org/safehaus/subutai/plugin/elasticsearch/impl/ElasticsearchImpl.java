@@ -24,10 +24,8 @@ import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.ClusterOperationHandler;
-import org.safehaus.subutai.plugin.elasticsearch.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.NodeOperationHandler;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.OperationType;
-import org.safehaus.subutai.plugin.elasticsearch.impl.handler.UninstallOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,10 +118,9 @@ public class ElasticsearchImpl implements Elasticsearch
     }
 
 
-    public UUID installCluster( final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration )
+    public UUID installCluster( final ElasticsearchClusterConfiguration config )
     {
-        AbstractOperationHandler operationHandler =
-                new InstallOperationHandler( this, elasticsearchClusterConfiguration );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, OperationType.INSTALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -132,9 +129,7 @@ public class ElasticsearchImpl implements Elasticsearch
     @Override
     public UUID uninstallCluster( String clusterName )
     {
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
+        return null;
     }
 
 
@@ -156,30 +151,27 @@ public class ElasticsearchImpl implements Elasticsearch
 
 
     @Override
-    public UUID startAllNodes( String clusterName )
+    public UUID startAllNodes( final ElasticsearchClusterConfiguration config )
     {
-        AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, clusterName, OperationType.START );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, OperationType.START );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID checkAllNodes( final String clusterName )
+    public UUID checkAllNodes( final ElasticsearchClusterConfiguration config )
     {
-        AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, clusterName, OperationType.STATUS );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, OperationType.STATUS );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID stopAllNodes( final String clusterName )
+    public UUID stopAllNodes( final ElasticsearchClusterConfiguration config )
     {
-        AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, clusterName, OperationType.STOP );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, OperationType.STOP );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -228,6 +220,15 @@ public class ElasticsearchImpl implements Elasticsearch
     {
         // TODO
         return null;
+    }
+
+
+    @Override
+    public UUID uninstallCluster( final ElasticsearchClusterConfiguration config )
+    {
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, OperationType.DESTROY );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
