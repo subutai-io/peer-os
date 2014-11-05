@@ -39,6 +39,7 @@
     <module>metric</module>
     <module>messenger</module>
     <module>script-manager</module>
+    <module>repository-manager</module>
   </modules>
 
 </project>
