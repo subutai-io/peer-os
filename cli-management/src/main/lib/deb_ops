@@ -1,0 +1,91 @@
+#!/bin/bash
+
+# ==========================================================================
+# Set of functions that operates on debian packages
+# ==========================================================================
+
+SUBUTAI_REPO_DIR=/repo/ksks
+SUBUTAI_TMPDIR=/tmp
+
+
+function add_package {
+  local file_path=$1
+  assert_file "$file_path"
+  # extract debian package name from full path
+  local debian_package=$(echo $file_path | sed 's/.*\///')
+  assert_debian_package "$debian_package"
+
+  cp -a "$file_path $SUBUTAI_REPO_DIRECTORY/amd64/trusty/"
+  pushd $SUBUTAI_REPO_DIRECTORY > /dev/null
+  reprepro includedeb trusty amd64/trusty/$debian_package
+  popd > /dev/null
+}
+
+
+function remove_package {
+  local debian_package=$1
+  local file_path="$SUBUTAI_REPO_DIR/amd64/trusty/$debian_package"
+  assert_file "$file_path"
+  assert_debian_package "$debian_package"
+
+  rm $file_path
+  pushd $SUBUTAI_REPO_DIR > /dev/null
+  local package_control_name=$(echo $debian_package | cut -f1 -d"_")
+  reprepro remove trusty $package_control_name
+  popd > /dev/null
+}
+
+
+function extract_package {
+  local debian_package=$1
+  assert_debian_package "$debian_package"
+  local file_path="$SUBUTAI_REPO_DIR/amd64/trusty/$debian_package"
+  assert_file "$file_path"
+
+  pushd $SUBUTAI_TMPDIR > /dev/null
+  
+  local directory_name=${debian_package:0:$((${#debian_package} - 4))}
+  msg_debug "directory $directory_name is going to be created under `pwd`"
+  # extract the package under $SUBUTAI_TMPDIR
+  dpkg -x $file_path "$SUBUTAI_TMPDIR/$directory_name"
+  popd > /dev/null
+}
+
+
+function list_package {
+  search_pattern=$1
+  if [ -z $search_pattern ]; then
+    msg_error "Search pattern is not provided. Aborting!"
+    exit 1
+  fi
+  echo "$(apt-cache search $search_pattern)"
+}
+
+
+function assert_file {
+  local file=$1
+  if [ -z $file ]; then
+    msg_error "File name cannot be empty"
+    exit 1
+  fi
+
+  if [ ! -f $file ]; then
+    msg_error "File $file does not exist."
+    exit 1
+  fi
+}
+
+
+function assert_debian_package {
+  local file=$1
+  if [ -z $file ]; then
+    msg_error "Package name cannot be empty"
+    exit 1
+  fi
+
+  if [[ $file != *.deb ]]
+  then
+    msg_error "$file is not a debian package!"
+    exit 1
+  fi
+}

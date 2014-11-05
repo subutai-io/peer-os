@@ -1,5 +1,4 @@
 #!/bin/bash
-. /usr/share/subutai-cli/subutai/lib/net-ops
 
 function management_network_usage {
 echo -------------------------------------------------------------------------------

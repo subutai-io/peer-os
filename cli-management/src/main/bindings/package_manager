@@ -1,0 +1,37 @@
+#!/bin/bash
+
+function package_manager_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Package manager wrapper
+  echo
+  echo "        "subutai \[-qh\] package_manager \[add\|remove\|extract debian_package_path\] \| \[list search_pattern\]
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+
+function package_manager {
+  operation=$1
+  if [ -z "$operation" ]; then
+    show_usage "`package_manager_usage`" 
+  fi
+
+  if [ $operation == "add" ]; then
+    add_package $2
+  elif [ $operation == "remove" ]; then
+    remove_package $2
+  elif [ $operation == "extract" ]; then
+    extract_package $2
+  elif [ $operation == "list" ]; then
+    list_package $2
+  else
+    msg_error "Unrecognized operation $operation"
+    exit 1
+  fi
+}
+
+
+function package_manager_description {
+  echo "package-manager wrapper for subutai management application"
+}
+
