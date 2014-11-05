@@ -23,16 +23,16 @@ import com.google.gson.JsonSyntaxException;
 /**
  * PluginDAO is used to manage cluster configuration information in database
  */
-public class PluginDao
+public class PluginDAO
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( PluginDao.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( PluginDAO.class.getName() );
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     protected DbUtil dbUtil;
 
 
-    public PluginDao( DataSource dataSource ) throws SQLException
+    public PluginDAO( DataSource dataSource ) throws SQLException
     {
         Preconditions.checkNotNull( dataSource, "DataSource is null" );
         this.dbUtil = new DbUtil( dataSource );
