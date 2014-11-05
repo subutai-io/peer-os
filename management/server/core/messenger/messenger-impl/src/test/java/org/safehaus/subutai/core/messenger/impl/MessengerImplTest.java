@@ -129,7 +129,7 @@ public class MessengerImplTest
 
         verify( messengerDao ).saveEnvelope( isA( Envelope.class ) );
 
-        doThrow( new DaoException( null ) ).when( messengerDao ).saveEnvelope( any( Envelope.class ) );
+        doThrow( new DaoException( "" ) ).when( messengerDao ).saveEnvelope( any( Envelope.class ) );
 
         try
         {
@@ -184,7 +184,7 @@ public class MessengerImplTest
         assertEquals( MessageStatus.SENT, status );
 
         //test exception
-        doThrow( new DaoException( null ) ).when( messengerDao ).getEnvelope( MESSAGE_ID );
+        doThrow( new DaoException( "" ) ).when( messengerDao ).getEnvelope( MESSAGE_ID );
         try
         {
             messenger.getMessageStatus( MESSAGE_ID );

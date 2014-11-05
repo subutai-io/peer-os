@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
+import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,10 +31,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class ScriptManagerRestImplTest
 {
-    private static final String SCRIPTS_PATH = "./";
+    private static final String SCRIPTS_PATH = ".";
     private static final String SCRIPT_NAME = "test.sh";
 
 
@@ -55,8 +56,18 @@ public class ScriptManagerRestImplTest
     public void setUp() throws Exception
     {
         sut = new SUT();
-        file = new File( SCRIPTS_PATH + SCRIPT_NAME );
+        file = new File( SCRIPTS_PATH + "/" + SCRIPT_NAME );
         fileCreated = file.exists() || file.createNewFile();
+    }
+
+
+    @After
+    public void tearDown() throws Exception
+    {
+        if ( fileCreated )
+        {
+            file.delete();
+        }
     }
 
 
@@ -89,6 +100,7 @@ public class ScriptManagerRestImplTest
     @Test
     public void testRemoveScript() throws Exception
     {
+        Assume.assumeTrue( fileCreated );
 
         Response response = sut.removeScript( SCRIPT_NAME );
 
@@ -109,6 +121,9 @@ public class ScriptManagerRestImplTest
     @Test
     public void testDownloadScript() throws Exception
     {
+
+        Assume.assumeTrue( fileCreated );
+
         Response response = sut.downloadScript( SCRIPT_NAME );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -128,6 +143,9 @@ public class ScriptManagerRestImplTest
     @Test
     public void testListScripts() throws Exception
     {
+
+        Assume.assumeTrue( fileCreated );
+
         Response response = sut.listScripts();
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );

@@ -216,7 +216,7 @@ public class MonitorImplTest
     @Test(expected = MonitorException.class)
     public void testAlertThresholdExcessException() throws Exception
     {
-        doThrow( new DaoException( null ) ).when( monitorDao ).getEnvironmentSubscribersIds( ENVIRONMENT_ID );
+        doThrow( new DaoException( "" ) ).when( monitorDao ).getEnvironmentSubscribersIds( ENVIRONMENT_ID );
 
         monitor.alertThresholdExcess( containerHostMetric );
     }
@@ -283,7 +283,7 @@ public class MonitorImplTest
     @Test(expected = MonitorException.class)
     public void testStartMonitoringException() throws Exception
     {
-        doThrow( new DaoException( null ) ).when( monitorDao ).addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
+        doThrow( new DaoException( "" ) ).when( monitorDao ).addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
 
         monitor.startMonitoring( metricListener, environment );
     }
@@ -306,7 +306,7 @@ public class MonitorImplTest
     @Test(expected = MonitorException.class)
     public void testStopMonitoringException() throws Exception
     {
-        doThrow( new DaoException( null ) ).when( monitorDao ).removeSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
+        doThrow( new DaoException( "" ) ).when( monitorDao ).removeSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
 
         monitor.stopMonitoring( metricListener, environment );
     }
