@@ -44,14 +44,11 @@ bool SubutaiThread::checkCWD(SubutaiCommand *command, SubutaiContainer* cont)
     if (cont) {
         return cont->checkCWD(command->getWorkingDirectory());
     } else {
-        if ((chdir(command->getWorkingDirectory().c_str())) < 0)
-        {		
+        if ((chdir(command->getWorkingDirectory().c_str())) < 0) {		
             //changing working directory first
             logger.writeLog(3, logger.setLogData("<SubutaiThread::checkCWD> " " Changing working Directory failed..", "pid", toString(getpid()), "CWD", command->getWorkingDirectory()));
             return false;
-        }
-        else
-        {
+        } else {
             return true;
         }
     }
@@ -66,15 +63,12 @@ bool SubutaiThread::checkUID(SubutaiCommand *command, SubutaiContainer* containe
     if (container) {
         return container->checkUser(command->getRunAs());
     } else {
-        if (uid.getIDs(ruid, euid, command->getRunAs()))
-        {	
+        if (uid.getIDs(ruid, euid, command->getRunAs())) {	
             //checking user id is on system ?
             logger.writeLog(4, logger.setLogData("<SubutaiThread::checkUID> " "User id successfully found on system..", "pid", toString(getpid()), "RunAs", command->getRunAs()));
             uid.doSetuid(this->euid);
             return true;
-        }
-        else
-        {
+        } else {
             logger.writeLog(3, logger.setLogData("<SubutaiThread::checkUID> " "User id could not found on system..", "pid", toString(getpid()), "RunAs", command->getRunAs()));
             logger.writeLog(3, logger.setLogData("<SubutaiThread::checkUID> " "Thread will be closed..", "pid", toString(getpid()), "RunAs", command->getRunAs()));
             uid.undoSetuid(ruid);
@@ -112,12 +106,12 @@ string SubutaiThread::createExecString(SubutaiCommand *command)
     logger.writeLog(7, logger.setLogData("<SubutaiThread::createExecString> " "Full Environment List: ", "Environments:", environment));
     if (environment.empty())
     {
-        exec = command->getProgram() + " " + argument ;		//arguments added execution string
+        exec = command->getCommand() + " " + argument ;		//arguments added execution string
         logger.writeLog(7, logger.setLogData("<SubutaiThread::createExecString> " "Execution command has been created without environment", "Command:", exec));
     }
     else
     {
-        exec = environment + command->getProgram() + " " + argument ;
+        exec = environment + command->getCommand() + " " + argument ;
         logger.writeLog(7, logger.setLogData("<SubutaiThread::createExecString> " "Execution command has been created with environment", "Command:", exec));
     }
     logger.writeLog(6, logger.setLogData("<SubutaiThread::createExecString>""CreateExecString Method finished....", "pid", toString(getpid())));
@@ -141,18 +135,15 @@ void SubutaiThread::lastCheckAndSend(message_queue *messageQueue,SubutaiCommand*
     unsigned int outBuffsize = this->getoutBuff().size();					//real output buffer size
     unsigned int errBuffsize = this->geterrBuff().size();					//real error buffer size
 
-    if (outBuffsize != 0 || errBuffsize!= 0)
-    {
-        if (outBuffsize != 0 && errBuffsize!= 0)
-        {
+    if (outBuffsize != 0 || errBuffsize!= 0) {
+        if (outBuffsize != 0 && errBuffsize!= 0) {
             if ((command->getStandardOutput() == "CAPTURE_AND_RETURN" || command->getStandardOutput() == "RETURN")
-                    && (command->getStandardError() == "CAPTURE_AND_RETURN" || command->getStandardError() == "RETURN"))
-            {
+                    && (command->getStandardError() == "CAPTURE_AND_RETURN" || command->getStandardError() == "RETURN")) {
                 /*
                  * send main buffers without blocking output and error
                  */
                 string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                        this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+                        this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getCommandId());
                 this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::lastCheckAndSend1> " "Message was created for send to the shared memory","Message:",message));
                 while (!messageQueue->try_send(message.data(), message.size(), 0));
                 this->getResponsecount() = this->getResponsecount() + 1;
@@ -167,7 +158,7 @@ void SubutaiThread::lastCheckAndSend(message_queue *messageQueue,SubutaiCommand*
                  */
                 this->geterrBuff().clear();
                 string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                        this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+                        this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getCommandId());
                 this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::lastCheckAndSend2> " "Message was created for send to the shared memory","Message:",message));
                 while (!messageQueue->try_send(message.data(), message.size(), 0));
                 this->getResponsecount() = this->getResponsecount() + 1;
@@ -181,7 +172,7 @@ void SubutaiThread::lastCheckAndSend(message_queue *messageQueue,SubutaiCommand*
                  */
                 this->getoutBuff().clear();
                 string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                        this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+                        this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getCommandId());
                 this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::lastCheckAndSend3> " "Message was created for send to the shared memory","Message:",message));
                 while (!messageQueue->try_send(message.data(), message.size(), 0));
                 this->getResponsecount() = this->getResponsecount() + 1;
@@ -203,7 +194,7 @@ void SubutaiThread::lastCheckAndSend(message_queue *messageQueue,SubutaiCommand*
                  */
                 this->geterrBuff().clear();
                 string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                        this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+                        this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getCommandId());
                 this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::lastCheckAndSend4> " "Message was created for send to the shared memory","Message:",message));
                 while (!messageQueue->try_send(message.data(), message.size(), 0));
                 this->getResponsecount() = this->getResponsecount() + 1;
@@ -225,7 +216,7 @@ void SubutaiThread::lastCheckAndSend(message_queue *messageQueue,SubutaiCommand*
                  */
                 this->getoutBuff().clear();
                 string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                        this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+                        this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getCommandId());
                 this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::lastCheckAndSend5> " "Message was created for send to the shared memory","Message:",message));
                 while (!messageQueue->try_send(message.data(), message.size(), 0));
                 this->getResponsecount() = this->getResponsecount() + 1;
@@ -260,7 +251,7 @@ void SubutaiThread::checkAndSend(message_queue* messageQueue,SubutaiCommand* com
             this->geterrBuff().clear();
 
             string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                    this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+                    this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getCommandId());
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndSend1> " "Message was created for sending to the shared memory","Message:",message));
             while (!messageQueue->try_send(message.data(), message.size(), 0));
             this->getResponsecount() = this->getResponsecount()+1;
@@ -272,7 +263,7 @@ void SubutaiThread::checkAndSend(message_queue* messageQueue,SubutaiCommand* com
              * send main buffers without blocking
              */
             string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                    this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+                    this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getCommandId());
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndSend2> " "Message was created for sending to the shared memory","Message:",message));
             while (!messageQueue->try_send(message.data(), message.size(), 0));
             this->getResponsecount() = this->getResponsecount()+1;
@@ -295,7 +286,7 @@ void SubutaiThread::checkAndSend(message_queue* messageQueue,SubutaiCommand* com
              */
             this->getoutBuff().clear();
             string message = this->getResponse().createResponseMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(),
-                    this->getResponsecount(), this->geterrBuff(), this->getoutBuff(), command->getSource(), command->getTaskUuid());
+                    this->getResponsecount(), this->geterrBuff(), this->getoutBuff(), command->getCommandId());
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndSend2> " "Message was created for sending to the shared memory","Message:",message));
             while (!messageQueue->try_send(message.data(), message.size(), 0));
             this->getResponsecount() = this->getResponsecount()+1;
@@ -401,43 +392,32 @@ void SubutaiThread::checkAndWrite(message_queue *messageQueue,SubutaiCommand* co
  */
 bool SubutaiThread::checkExecutionTimeout(unsigned int* startsec,bool* overflag,unsigned int* exectimeout,unsigned int* count)
 {
-    if (*exectimeout != 0)
-    {
+    if (*exectimeout != 0) {
         boost::posix_time::ptime current = boost::posix_time::second_clock::local_time();
         unsigned int currentsec = current.time_of_day().seconds();
 
-        if ((currentsec > *startsec) && *overflag == false)
-        {
-            if (currentsec != 59)
-            {
+        if ((currentsec > *startsec) && *overflag == false) {
+            if (currentsec != 59) {
                 *count = *count + (currentsec - *startsec);
                 *startsec = currentsec;
-            }
-            else
-            {
+            } else {
                 *count = *count + (currentsec - *startsec);
                 *overflag = true;
                 *startsec = 0;
             }
         }
-        if (currentsec == 59)
-        {
+        if (currentsec == 59) {
             *overflag = true;
             *startsec = 0;
-        }
-        else
-        {
+        } else {
             *overflag = false;
         }
-        if (*count >= *exectimeout) //timeout
-        {
+        if (*count >= *exectimeout) { //timeout
             this->getLogger().writeLog(4,this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "Timeout Occured!!"));
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "count:",toString(*count)));
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "exectimeout:",toString(*exectimeout)));
             return true;	//timeout occured now
-        }
-        else
-        {
+        } else {
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "count:",toString(*count)));
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "exectimeout:",toString(*exectimeout)));
             return false; //no timeout occured
@@ -461,44 +441,37 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
     this->setPpid(newpid);
     pid_t result = waitpid(newpid, &status, WNOHANG);
     this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Find pid start","current pid:",toString(newpid)));
-    while ((result = waitpid(newpid, &status, WNOHANG)) == 0)
-    {
+    while ((result = waitpid(newpid, &status, WNOHANG)) == 0) {
         string cmd;
-        cmd = "pgrep -P "+toString(newpid);
+        cmd = "pgrep -P " + toString(newpid);
         cmd = this->getProcessPid(cmd.c_str());
-
-        cmd = "pgrep -P "+ cmd;
+        cmd = "pgrep -P " + cmd;
         cmd = this->getProcessPid(cmd.c_str());
-
         this->setPpid(atoi(cmd.c_str()));
-        if (this->getPpid())
-        {
+        if (this->getPpid()) {
             break;
         }
         this->setPpid(newpid);
     }
-    if (result > 0)
-    {
+    if (result > 0) {
         this->setPpid(newpid);
     }
     this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Find pid finished","current pid:",toString(processpid)));
     /*
      * if the execution is done process pid could not be read and should be skipped now..
      */
-    if (!checkCWD(command))
-    {
+    if (!checkCWD(command)) {
         this->setCWDERR(true);
         string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
-                "Working Directory Does Not Exist on System","",command->getSource(),command->getTaskUuid());
+                "Working Directory Does Not Exist on System","",command->getCommandId());
         while (!messageQueue->try_send(message.data(), message.size(), 0));
         this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
         //problem about absolute path
     }
-    if (!checkUID(command))
-    {
+    if (!checkUID(command)) {
         this->setUIDERR(true);
         string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
-                "User Does Not Exist on System","",command->getSource(),command->getTaskUuid());
+                "User Does Not Exist on System","",command->getCommandId());
         while (!messageQueue->try_send(message.data(), message.size(), 0));
         this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "User id not found on system..","RunAs:",command->getRunAs()));
         //problem about UID
@@ -575,7 +548,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
                      */
                     this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "(HEARTBEAT TIMEOUT)Sending I'm alive Message!!"));
                     string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                            this->getResponsecount(),"","",command->getSource(),command->getTaskUuid());
+                            this->getResponsecount(),"","",command->getCommandId());
                     this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Sending I'm alive Message!!","Message:",message));
                     while (!messageQueue->try_send(message.data(), message.size(), 0));
                     this->getResponsecount() = this->getResponsecount()+1;
@@ -600,7 +573,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
                      * sending I'm alive message
                      */
                     string message =  this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                            this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getSource(),command->getTaskUuid());
+                            this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getCommandId());
                     while (!messageQueue->try_send(message.data(), message.size(), 0));
                     this->geterrBuff().clear();
                     this->getoutBuff().clear();
@@ -681,7 +654,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
         this->lastCheckAndSend(messageQueue,command);
         this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Timeout Done message is sending.."));
         string message = this->getResponse().createTimeoutMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                this->getResponsecount(),"","",command->getSource(),command->getTaskUuid());
+                this->getResponsecount(),"","",command->getCommandId());
         while (!messageQueue->try_send(message.data(), message.size(), 0));
         this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Process Last Message",message));
         if (this->getPpid())
@@ -712,7 +685,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
 
         this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Done message is sending.."));
         string message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                this->getResponsecount(),command->getSource(),command->getTaskUuid(),val);
+                this->getResponsecount(),command->getCommandId(),val);
         while (!messageQueue->try_send(message.data(), message.size(), 0));
         this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Process Last Message",message));
     }
@@ -741,33 +714,29 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
         string processpid = "";	                        //processpid for execution
         logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Fork is Starting!!", toString(getpid())));
         this->getOutputStream().setMode(command->getStandardOutput());
-        this->getOutputStream().setPath(command->getStandardOutputPath());
+        //this->getOutputStream().setPath(command->getStandardOutputPath());
         this->getOutputStream().setIdentity("output");
         this->getErrorStream().setMode(command->getStandardError());
-        this->getErrorStream().setPath(command->getStandardErrPath());
+        //this->getErrorStream().setPath(command->getStandardErrPath());
         this->getErrorStream().setIdentity("error");
 
-        if (this->getOutputStream().openPipe() == false || this->getErrorStream().openPipe() == false)
-        {
+        if (this->getOutputStream().openPipe() == false || this->getErrorStream().openPipe() == false) {
             /* an error occurred pipe of pipeerror or output */
             logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Error opening pipes!!"));
         }
 
-
         string executecmd = createExecString(command).c_str();
         string latest = executecmd.substr(executecmd.length()-3);
-        if (latest.find("&") != std::string::npos)
-        {
+        if (latest.find("&") != std::string::npos) {
             logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Process will be executed as a Daemon process!!"));
             int myval = daemon(0, 0);
-            if (!checkCWD(command, container)) //if the CWD does not exist
-            {
+            if (!checkCWD(command, container)) { //if the CWD does not exist
                 string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
-                        "Working Directory Does Not Exist on System","",command->getSource(),command->getTaskUuid());
+                        "Working Directory Does Not Exist on System","",command->getCommandId());
                 while (!messageQueue->try_send(message.data(), message.size(), 0));
                 myval = 1 ;
                 message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                        this->getResponsecount(),command->getSource(),command->getTaskUuid(),myval);
+                        this->getResponsecount(),command->getCommandId(),myval);
                 while (!messageQueue->try_send(message.data(), message.size(), 0));
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
                 exit(1);
@@ -776,16 +745,16 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
             if (!checkUID(command, container)) //if the User does not exist
             {
                 string message = this->getResponse().createResponseMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(), 1,
-                        "User Does Not Exist on System", "", command->getSource(), command->getTaskUuid());
+                        "User Does Not Exist on System", "", command->getCommandId());
                 while (!messageQueue->try_send(message.data(), message.size(), 0));
                 myval = 1 ;
                 message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                        this->getResponsecount(),command->getSource(),command->getTaskUuid(),myval);
+                        this->getResponsecount(),command->getCommandId(),myval);
                 while (!messageQueue->try_send(message.data(), message.size(), 0));
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "User id not found on system..","RunAs:",command->getRunAs()));
                 exit(1);
             }
-            logger.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getProgram()));
+            logger.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getCommand()));
             if (!container) {
                 //executing the process on background
                 system(createExecString(command).c_str());
@@ -794,7 +763,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
             }
             //parent returns with success if the daemon successfully send to process to background
             string message = this->getResponse().createExitMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(),
-                    this->getResponsecount(), command->getSource(), command->getTaskUuid(), myval);
+                    this->getResponsecount(), command->getCommandId(), myval);
             while (!messageQueue->try_send(message.data(), message.size(), 0));
 
             exit(1);

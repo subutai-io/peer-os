@@ -21,24 +21,21 @@ SubutaiCommand::SubutaiCommand()
 {			//Setting default values..
     // TODO Auto-generated constructor stub
     this->setType("");
-    this->setProgram("");
+    this->setCommand("");
     this->setWorkingDirectory("");
     this->setUuid("");
     this->setPid(-1);
     this->setRequestSequenceNumber(-1);
     this->setStandardError("");
-    this->setStandardErrPath("");
     this->setStandardOutput("");
-    this->setStandardOutPath("");
     this->setRunAs("");
     this->setTimeout(30);
     this->getArguments().clear();
     this->getEnvironment().clear();
-    this->setTaskUuid("");
+    this->setCommandId("");
     this->setMacAddress("");
     this->setHostname("");
     this->getIps().clear();
-    this->setSource("");
 }
 
 /**
@@ -55,24 +52,21 @@ SubutaiCommand::~SubutaiCommand()
 void SubutaiCommand::clear()
 {		//clear the all variables..
     this->setType("");
-    this->setProgram("");
+    this->setCommand("");
     this->setWorkingDirectory("");
     this->setUuid("");
     this->setPid(-1);
     this->setRequestSequenceNumber(-1);
     this->setStandardError("");
-    this->setStandardErrPath("");
     this->setStandardOutput("");
-    this->setStandardOutPath("");
     this->setRunAs("");
     this->setTimeout(30);
     this->getArguments().clear();
     this->getEnvironment().clear();
-    this->setTaskUuid("");
+    this->setCommandId("");
     this->setMacAddress("");
     this->setHostname("");
     this->getIps().clear();
-    this->setSource("");
 }
 
 /**
@@ -127,6 +121,7 @@ bool SubutaiCommand::deserialize(string& input)
             this->setWorkingDirectory(root["request"]["workingDirectory"].asString());		//initialize workingDirectory parameter if it is not null
         }
         /* removed
+
         if(!root["request"]["requestSequenceNumber"].isNull())
         {
             this->setRequestSequenceNumber(root["request"]["requestSequenceNumber"].asInt()); //initialize requestSequenceNumber parameter if it is not null
@@ -138,10 +133,14 @@ bool SubutaiCommand::deserialize(string& input)
         if(!root["request"]["stdErrPath"].isNull())
         {
             this->setStandardErrPath(root["request"]["stdErrPath"].asString());		//initialize standardError parameter if it is not null
+        }
+        if(!root["request"]["source"].isNull())
+        {
+            setSource(root["request"]["source"].asString());		//initialize hostname parameter if it is not null
         }*/
         if(!root["request"]["command"].isNull())
         {
-            this->setProgram(root["request"]["command"].asString());		//initialize program parameter if it is not null
+            this->setCommand(root["request"]["command"].asString());		//initialize program parameter if it is not null
         }
         if(!root["request"]["runAs"].isNull())
         {
@@ -168,7 +167,7 @@ bool SubutaiCommand::deserialize(string& input)
         }
         if(!root["request"]["commandId"].isNull())
         {
-            setTaskUuid(root["request"]["commandId"].asString());		//initialize taskUuid parameter if it is not null
+            setCommandId(root["request"]["commandId"].asString());		//initialize taskUuid parameter if it is not null
         }
         if(!root["request"]["hostname"].isNull())
         {
@@ -184,10 +183,9 @@ bool SubutaiCommand::deserialize(string& input)
             arg =  root["request"]["ips"][index].asString();
             this->getIps().push_back(arg);
         }
-        if(!root["request"]["source"].isNull())
-        {
-            setSource(root["request"]["source"].asString());		//initialize hostname parameter if it is not null
-        }
+
+
+
         string arg1;
         arg1.clear();
         watchArgs.clear();
@@ -308,8 +306,8 @@ void SubutaiCommand::setWorkingDirectory(const string& workingdirectory)
 /**
  *  \details   getting "program" private variable of SubutaiCommand instance.
  */
-string& SubutaiCommand::getProgram()
-{					//getting Program path
+string& SubutaiCommand::getCommand()
+{					//getting Command path
     return this->program;
 }
 
@@ -318,9 +316,9 @@ string& SubutaiCommand::getProgram()
  *  		   This variable is an absolute program path.
  *  		   For instance: "/bin/ls" or "/usr/bin/tail"
  */
-void SubutaiCommand::setProgram(const string& myprogram)
-{	//setting Program path
-    this->program = myprogram;
+void SubutaiCommand::setCommand(const string& mycommand)
+{	//setting Command path
+    this->program = mycommand;
 }
 
 /**
@@ -367,13 +365,6 @@ string& SubutaiCommand::getStandardError()
 }
 
 /**
- *  \details   getting "stdErrPath" private variable of SubutaiCommand instance.
- */
-string& SubutaiCommand::getStandardErrPath()
-{					//getting standard errpath
-    return this->stdErrPath;
-}
-/**
  *  \details   setting "stdErr" private variable of SubutaiCommand instance.
  *  			It has the mode of Error.
  *  			it Should be: "CAPTURE", "CAPTURE_AND_RETURN" ,"RETURN" , "NO"
@@ -384,14 +375,6 @@ void SubutaiCommand::setStandardError(const string& mystderr)
 }
 
 /**
- *  \details   setting "stdErrPath" private variable of SubutaiCommand instance.
- *  		   This variable holds the path and file name for capturing error responses
- */
-void SubutaiCommand::setStandardErrPath(const string& mystderrpath)
-{		//setting standard errpath
-    this->stdErrPath=mystderrpath;
-}
-/**
  *  \details   getting "stdOut" private variable of SubutaiCommand instance.
  */
 string& SubutaiCommand::getStandardOutput()
@@ -400,13 +383,6 @@ string& SubutaiCommand::getStandardOutput()
 }
 
 /**
- *  \details   getting "stdOuthPath" private variable of SubutaiCommand instance.
- */
-string& SubutaiCommand::getStandardOutputPath()
-{					//getting standard outpath
-    return this->stdOuthPath;
-}
-/**
  *  \details   setting "stdOut" private variable of SubutaiCommand instance.
  *  			It has the mode of Output.
  *  			it Should be: "CAPTURE", "CAPTURE_AND_RETURN" ,"RETURN" , "NO"
@@ -414,15 +390,6 @@ string& SubutaiCommand::getStandardOutputPath()
 void SubutaiCommand::setStandardOutput(const string& mystdout)
 { 	//setting standard out
     this->stdOut = mystdout;
-}
-
-/**
- *  \details   setting "stdOuthPath" private variable of SubutaiCommand instance.
- *  		   This variable holds the path and file name for capturing error responses
- */
-void SubutaiCommand::setStandardOutPath(const string& mystdoutpath)
-{		//setting standard outpath
-    this->stdOuthPath=mystdoutpath;
 }
 
 /**
@@ -498,7 +465,7 @@ void SubutaiCommand::setMacAddress(const string& macAddress)
 /**
  *  \details   getting "taskUuid" private variable of SubutaiCommand instance.
  */
-string& SubutaiCommand::getTaskUuid()
+string& SubutaiCommand::getCommandId()
 {
     return this->taskUuid;
 }
@@ -507,7 +474,7 @@ string& SubutaiCommand::getTaskUuid()
  *  \details   setting "taskUuid" private variable of SubutaiCommand instance.
  *  		   This holds the task uuid of the command
  */
-void SubutaiCommand::setTaskUuid(const string& taskuuid)
+void SubutaiCommand::setCommandId(const string& taskuuid)
 {
     this->taskUuid = taskuuid;
 }
@@ -532,23 +499,6 @@ vector<string>& SubutaiCommand::getIps()
 {					//getting ips vector
 
     return this->ips;
-}
-
-/**
- *  \details   getting "source" private variable of SubutaiCommand instance.
- */
-string& SubutaiCommand::getSource()
-{
-    return this->source;
-}
-
-/**
- *  \details   setting "source" private variable of SubutaiCommand instance.
- *  		   This holds the task source information of the command
- */
-void SubutaiCommand::setSource(const string& source)
-{
-    this->source = source;
 }
 
 /**

@@ -64,16 +64,13 @@ bool SubutaiConnection::openSession()
     string clientKey = certpath + "client.key";
     int sslresult = tls_set(ca.c_str(),NULL,clientCrt.c_str(),clientKey.c_str(),password_callback);
     int result = connect(this->host, this->port, this->keepalive);
-    if(result == MOSQ_ERR_SUCCESS && sslresult == MOSQ_ERR_SUCCESS)
-    {
+    if (result == MOSQ_ERR_SUCCESS && sslresult == MOSQ_ERR_SUCCESS) {
         subscribe(NULL, this->subscribedTopic,2); //subscribed to agent own Topic.
         subscribe(NULL, this->broadcastTopic,2); //subscribed to broadcastTopic.
         this->connectionStatus=true;
         return true;
         //	if(result == MOSQ_ERR_SUCCESS)
-    }
-    else 
-    {
+    } else {
         return false;
     }
 }
@@ -109,10 +106,13 @@ SubutaiConnection::~SubutaiConnection()
 /**
  *  \details   This method sends the given strings about execution responses to MQTT Broker.
  */
-bool SubutaiConnection::sendMessage(string message)
+bool SubutaiConnection::sendMessage(string message, string topic)
 {
     const  char * _message = message.c_str();
-    int ret = publish(NULL,this->publishedTopic,strlen(_message),_message,2,true);
+    if (topic.size() == 0) {
+        topic = this->publishedTopic;
+    }
+    int ret = publish(NULL, topic.c_str(), strlen(_message), _message, 2, true);
     return (ret == MOSQ_ERR_SUCCESS);
 }
 

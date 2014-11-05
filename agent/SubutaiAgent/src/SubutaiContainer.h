@@ -63,52 +63,54 @@ enum containerStatus { RUNNING, STOPPED, FROZEN };
 
 class SubutaiContainer
 {
-public:
-	SubutaiContainer( SubutaiLogger*, lxc_container* cont );
-	virtual ~SubutaiContainer( void );
-	string toString( int );
-	bool getContainerId();
-	bool getContainerMacAddress();
-	bool getContainerHostname();
-	bool getContainerParentHostname();
-	bool getContainerIpAddress();
-	string getContainerIdValue();
-	string getContainerHostnameValue();
-	string getContainerMacAddressValue();
-	string getContainerParentHostnameValue();
-	string getContainerConnectionUrlValue();
-	string getContainerConnectionPortValue();
-	string getContainerConnectionOptionsValue();
-	lxc_container* getLxcContainerValue();
-	vector<string> getContainerIpValue();
-	string getContainerStatus();
-	bool isContainerRunning();
-	bool isContainerStopped();
-	bool isContainerFrozen();
-
-    void UpdateUsersList();
-	void setContainerHostname(string);
-	void setContainerStatus(containerStatus);
-	void getContainerAllFields();
-    ExecutionResult RunCommand(SubutaiCommand* command);
-	string RunProgram(string , vector<string>);
-	ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT);
-	void write();
-    bool checkCWD(string cwd);
-    bool checkUser(string username);
-    int getRunAsUserId(string username);
-    string findFullProgramPath(string program_name);
-
-private:
-	containerStatus status;
-	lxc_container* container;
-	string id;
-	string macAddress;
-	string hostname;
-	string parentHostname;
-    map<int, string> _users;        // List of users available in system
-	vector<string> ipAddress;
-	SubutaiLogger*	containerLogger;
+    public:
+        SubutaiContainer(SubutaiLogger*, lxc_container* cont);
+        virtual ~SubutaiContainer(void);
+        string toString(int);
+        bool getContainerId();
+        bool getContainerMacAddress();
+        bool getContainerHostname();
+        bool getContainerParentHostname();
+        bool getContainerIpAddress();
+        string getContainerIdValue();
+        string getContainerHostnameValue();
+        string getContainerMacAddressValue();
+        string getContainerParentHostnameValue();
+        string getContainerConnectionUrlValue();
+        string getContainerConnectionPortValue();
+        string getContainerConnectionOptionsValue();
+        lxc_container* getLxcContainerValue();
+        vector<string> getContainerIpValue();
+        string getContainerStatus();
+        bool isContainerRunning();
+        bool isContainerStopped();
+        bool isContainerFrozen();
+        void UpdateUsersList();
+        void setContainerHostname(string);
+        void setContainerStatus(containerStatus);
+        void getContainerAllFields();
+        ExecutionResult RunCommand(SubutaiCommand* command);
+        string RunProgram(string , vector<string>);
+        ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT);
+        void write();
+        bool checkCWD(string cwd);
+        bool checkUser(string username);
+        int getRunAsUserId(string username);
+        void PutToFile(string filename, string text);
+        string findFullProgramPath(string program_name);
+        void RunPsCommand();
+    protected:
+        vector<string> ExplodeCommandArguments(SubutaiCommand* command);
+    private:
+        containerStatus status;
+        lxc_container* container;
+        string id;
+        string macAddress;
+        string hostname;
+        string parentHostname;
+        map<int, string> _users;        // List of users available in system
+        vector<string> ipAddress;
+        SubutaiLogger*	containerLogger;
 };
 #endif /* SUBUTAICONTAINER_H_ */
 

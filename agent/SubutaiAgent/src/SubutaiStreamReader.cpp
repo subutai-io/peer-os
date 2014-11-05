@@ -20,12 +20,12 @@
  */
 SubutaiStreamReader::SubutaiStreamReader()
 {
-	setIdentity("");
-	setMode("");
-	setPath("");
-	setSelectResult(1);
-	setReadResult(1);
-	clearBuffer();
+    setIdentity("");
+    setMode("");
+    setPath("");
+    setSelectResult(1);
+    setReadResult(1);
+    clearBuffer();
 }
 
 /**
@@ -33,12 +33,12 @@ SubutaiStreamReader::SubutaiStreamReader()
  */
 SubutaiStreamReader::SubutaiStreamReader(string mode,string path,string identity)
 {
-	setMode(mode);
-	setPath(path);
-	setIdentity(identity);
-	setSelectResult(1);
-	setReadResult(1);
-	clearBuffer();
+    setMode(mode);
+    setPath(path);
+    setIdentity(identity);
+    setSelectResult(1);
+    setReadResult(1);
+    clearBuffer();
 }
 
 /**
@@ -55,7 +55,7 @@ SubutaiStreamReader::~SubutaiStreamReader()
  */
 void SubutaiStreamReader::setIdentity(string identity)
 {
-	this->identity = identity;
+    this->identity = identity;
 }
 
 /**
@@ -63,7 +63,7 @@ void SubutaiStreamReader::setIdentity(string identity)
  */
 string& SubutaiStreamReader::getIdentity()
 {
-	return this->identity;
+    return this->identity;
 }
 
 /**
@@ -72,7 +72,7 @@ string& SubutaiStreamReader::getIdentity()
  */
 void SubutaiStreamReader::setMode(string mode)
 {
-	this->mode = mode;
+    this->mode = mode;
 }
 
 /**
@@ -80,7 +80,7 @@ void SubutaiStreamReader::setMode(string mode)
  */
 string& SubutaiStreamReader::getMode()
 {
-	return this->mode;
+    return this->mode;
 }
 
 /**
@@ -89,7 +89,7 @@ string& SubutaiStreamReader::getMode()
  */
 void SubutaiStreamReader::setPath(string path)
 {
-	this->path = path;
+    this->path = path;
 }
 
 /**
@@ -97,7 +97,7 @@ void SubutaiStreamReader::setPath(string path)
  */
 string& SubutaiStreamReader::getPath()
 {
-	return this->path;
+    return this->path;
 }
 
 /**
@@ -106,7 +106,7 @@ string& SubutaiStreamReader::getPath()
  */
 void SubutaiStreamReader::setFileDec(fd_set fileDec)
 {
-	this->fileDec = fileDec;
+    this->fileDec = fileDec;
 }
 
 /**
@@ -114,8 +114,8 @@ void SubutaiStreamReader::setFileDec(fd_set fileDec)
  */
 void SubutaiStreamReader::prepareFileDec()
 {
-	FD_ZERO(&fileDec);
-	FD_SET(mypipe[0],&fileDec);
+    FD_ZERO(&fileDec);
+    FD_SET(mypipe[0],&fileDec);
 }
 
 /**
@@ -123,7 +123,7 @@ void SubutaiStreamReader::prepareFileDec()
  */
 fd_set& SubutaiStreamReader::getFileDec()
 {
-	return this->fileDec;
+    return this->fileDec;
 }
 
 /**
@@ -132,22 +132,19 @@ fd_set& SubutaiStreamReader::getFileDec()
  */
 void SubutaiStreamReader::preparePipe()
 {
-	dup2(mypipe[0], STDIN_FILENO);
-	if(identity == "output")
-	{
-		dup2(mypipe[1], STDOUT_FILENO);
-	}
-	else if (identity == "error")
-	{
-		dup2(mypipe[1], STDERR_FILENO);
-	}
+    dup2(mypipe[0], STDIN_FILENO);
+    if (identity == "output"){
+        dup2(mypipe[1], STDOUT_FILENO);
+    } else if (identity == "error") {
+        dup2(mypipe[1], STDERR_FILENO);
+    }
 }
 /**
  *  \details   getting "mypipe" private variable of SubutaiStreamReader instance.
  */
 int* SubutaiStreamReader::getPipe()
 {
-	return mypipe;
+    return mypipe;
 }
 
 /**
@@ -156,14 +153,11 @@ int* SubutaiStreamReader::getPipe()
  */
 bool SubutaiStreamReader::openPipe()
 {
-	if(!pipe(mypipe))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+    if(!pipe(mypipe)) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -171,7 +165,7 @@ bool SubutaiStreamReader::openPipe()
  */
 void SubutaiStreamReader::closePipe(int i)
 {
-	close(mypipe[i]);
+    close(mypipe[i]);
 }
 
 /**
@@ -180,7 +174,7 @@ void SubutaiStreamReader::closePipe(int i)
  */
 void SubutaiStreamReader::setSelectResult(int selectresult)
 {
-	this->selectResult = selectresult;
+    this->selectResult = selectresult;
 }
 
 /**
@@ -188,7 +182,7 @@ void SubutaiStreamReader::setSelectResult(int selectresult)
  */
 int SubutaiStreamReader::getSelectResult()
 {
-	return this->selectResult;
+    return this->selectResult;
 }
 
 /**
@@ -197,7 +191,7 @@ int SubutaiStreamReader::getSelectResult()
  */
 void SubutaiStreamReader::setReadResult(int readresult)
 {
-	this->readResult = readresult;
+    this->readResult = readresult;
 }
 
 /**
@@ -205,7 +199,7 @@ void SubutaiStreamReader::setReadResult(int readresult)
  */
 int SubutaiStreamReader::getReadResult()
 {
-	return this->readResult;
+    return this->readResult;
 }
 
 /**
@@ -213,7 +207,7 @@ int SubutaiStreamReader::getReadResult()
  */
 void SubutaiStreamReader::clearBuffer()
 {
-	memset(buffer,0,1000);
+    memset(buffer, 0, 1000);
 }
 
 /**
@@ -221,7 +215,7 @@ void SubutaiStreamReader::clearBuffer()
  */
 char* SubutaiStreamReader::getBuffer()
 {
-	return buffer;
+    return buffer;
 }
 
 /**
@@ -229,8 +223,8 @@ char* SubutaiStreamReader::getBuffer()
  */
 void SubutaiStreamReader::setTimeout(unsigned int usecond)
 {
-	this->timeout.tv_sec = 0;
-	this->timeout.tv_usec = usecond;
+    this->timeout.tv_sec = 0;
+    this->timeout.tv_usec = usecond;
 }
 
 /**
@@ -238,7 +232,7 @@ void SubutaiStreamReader::setTimeout(unsigned int usecond)
  */
 void SubutaiStreamReader::startSelection()
 {
-	this->selectResult = select(mypipe[0]+1,&fileDec,NULL,NULL,&timeout);
+    this->selectResult = select(mypipe[0] + 1, &fileDec, NULL, NULL, &timeout);
 }
 
 /**
@@ -246,7 +240,7 @@ void SubutaiStreamReader::startSelection()
  */
 void SubutaiStreamReader::startReading()
 {
-	this->readResult = read(mypipe[0] , buffer,sizeof(buffer));
+    this->readResult = read(mypipe[0], buffer, sizeof(buffer));
 }
 
 /**
@@ -254,16 +248,12 @@ void SubutaiStreamReader::startReading()
  */
 bool SubutaiStreamReader::openFile()
 {
-	this->file = fopen(this->path.c_str(),"a+");
-
-	if(file)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+    this->file = fopen(this->path.c_str(), "a+");
+    if (file) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -271,7 +261,7 @@ bool SubutaiStreamReader::openFile()
  */
 void SubutaiStreamReader::closeFile()
 {
-	fclose(this->file);
+    fclose(this->file);
 }
 
 /**
@@ -279,5 +269,5 @@ void SubutaiStreamReader::closeFile()
  */
 void SubutaiStreamReader::appendFile(string value)
 {
-	fputs(value.c_str(),this->file);
+    fputs(value.c_str(), this->file);
 }

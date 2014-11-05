@@ -292,11 +292,10 @@ vector<SubutaiContainer> SubutaiContainerManager::getFrozenContainers()
 vector<SubutaiContainer> SubutaiContainerManager::getAllContainers()
 {
 	vector<SubutaiContainer> concat;
-	concat.reserve( _runningContainers.size() + _stoppedContainers.size() + _frozenContainers.size() ); // preallocate memory
-	concat.insert( concat.end(), _runningContainers.begin(), _runningContainers.end() );
-	concat.insert( concat.end(), _stoppedContainers.begin(), _stoppedContainers.end() );
-	concat.insert( concat.end(), _frozenContainers.begin(),  _frozenContainers.end()  );
-
+	concat.reserve(_runningContainers.size() + _stoppedContainers.size() + _frozenContainers.size()); // preallocate memory
+	concat.insert(concat.end(), _runningContainers.begin(), _runningContainers.end());
+	concat.insert(concat.end(), _stoppedContainers.begin(), _stoppedContainers.end());
+	concat.insert(concat.end(), _frozenContainers.begin(),  _frozenContainers.end());
 	return concat;
 }
 
