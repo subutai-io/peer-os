@@ -70,12 +70,12 @@ class SubutaiContainer
         bool getContainerId();
         bool getContainerMacAddress();
         bool getContainerHostname();
-        bool getContainerParentHostname();
+        //bool getContainerParentHostname();
         bool getContainerIpAddress();
         string getContainerIdValue();
         string getContainerHostnameValue();
         string getContainerMacAddressValue();
-        string getContainerParentHostnameValue();
+        //string getContainerParentHostnameValue();
         string getContainerConnectionUrlValue();
         string getContainerConnectionPortValue();
         string getContainerConnectionOptionsValue();
@@ -93,12 +93,14 @@ class SubutaiContainer
         string RunProgram(string , vector<string>);
         ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT);
         void write();
+        void clear();
         bool checkCWD(string cwd);
         bool checkUser(string username);
         int getRunAsUserId(string username);
         void PutToFile(string filename, string text);
         string findFullProgramPath(string program_name);
         void RunPsCommand();
+
     protected:
         vector<string> ExplodeCommandArguments(SubutaiCommand* command);
     private:
@@ -107,7 +109,7 @@ class SubutaiContainer
         string id;
         string macAddress;
         string hostname;
-        string parentHostname;
+        //string parentHostname;
         map<int, string> _users;        // List of users available in system
         vector<string> ipAddress;
         SubutaiLogger*	containerLogger;

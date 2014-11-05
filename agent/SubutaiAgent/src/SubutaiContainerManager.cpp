@@ -156,20 +156,6 @@ SubutaiContainer* SubutaiContainerManager::findContainerById(string container_id
     return NULL;
 }
 
-/*
- * \details send registration message from all lxcs
- *
- */
-void SubutaiContainerManager::registerAllContainers(SubutaiConnection* connection)
-{
-	/*
-
-    // TODO: Do we need to register all containers? Maybe active only?
-    for (ContainerIterator it = _runningContainers.begin(); it != _runningContainers.end(); it++) {
-        (*it).registerContainer(connection);
-    }
-    */
-}
 
 /*
  * \details execute a terminal command. type = r, w, rw
@@ -273,6 +259,7 @@ void SubutaiContainerManager::updateContainerLists()
 	  {
 		  (*it).getContainerAllFields();
 	  }
+
 }
 
 

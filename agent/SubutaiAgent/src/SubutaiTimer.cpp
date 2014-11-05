@@ -122,6 +122,7 @@ void SubutaiTimer::sendHeartBeat()
     string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue(), environment->getAgentMacAddressValue());
     connection->sendMessage(resp, "HEARTBEAT_TOPIC");
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat:", resp));
+    cout << resp << endl;
 }
 
 bool SubutaiTimer::checkHeartBeatTimer(SubutaiCommand command)

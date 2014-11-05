@@ -66,7 +66,6 @@ class SubutaiContainerManager {
 
         void UpdateNetworkingInfo(SubutaiContainer*,string );
         void UpdateUsersList(SubutaiContainer* );
-        void registerAllContainers(SubutaiConnection* );
 
     private:
         string                          _lxc_path;

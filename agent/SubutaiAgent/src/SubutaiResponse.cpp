@@ -110,6 +110,10 @@ void SubutaiResponse::serialize(string& output)
     {
         root["response"]["requestNumber"] = this->getRequestSequenceNumber();
     }
+    if(this->getExitCode() >= 0)
+    {
+        root["response"]["exitCode"] = this->getExitCode();										//check the pid is assigned or not
+    }
     if(this->getResponseSequenceNumber() >= 0)										//check the responseSequenceNumber is assigned or not
     {
         root["response"]["responseNumber"] = this->getResponseSequenceNumber();
