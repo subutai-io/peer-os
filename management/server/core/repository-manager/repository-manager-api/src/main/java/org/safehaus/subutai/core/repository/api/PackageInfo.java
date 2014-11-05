@@ -1,6 +1,10 @@
 package org.safehaus.subutai.core.repository.api;
 
 
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+
+
 /**
  * Contains package info
  */
@@ -13,6 +17,10 @@ public class PackageInfo
 
     public PackageInfo( final String status, final String name, final String description )
     {
+        Preconditions.checkNotNull( status, "Invalid status" );
+        Preconditions.checkNotNull( name, "Invalid name" );
+        Preconditions.checkNotNull( description, "Invalid description" );
+
         this.status = status;
         this.name = name;
         this.description = description;
@@ -40,11 +48,8 @@ public class PackageInfo
     @Override
     public String toString()
     {
-        return "PackageInfo{" +
-                "status='" + status + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                '}';
+        return Objects.toStringHelper( this ).add( "status", status ).add( "name", name )
+                      .add( "description", description ).toString();
     }
 
 
@@ -62,15 +67,15 @@ public class PackageInfo
 
         final PackageInfo that = ( PackageInfo ) o;
 
-        if ( description != null ? !description.equals( that.description ) : that.description != null )
+        if ( !description.equals( that.description ) )
         {
             return false;
         }
-        if ( name != null ? !name.equals( that.name ) : that.name != null )
+        if ( !name.equals( that.name ) )
         {
             return false;
         }
-        if ( status != null ? !status.equals( that.status ) : that.status != null )
+        if ( !status.equals( that.status ) )
         {
             return false;
         }
@@ -82,9 +87,9 @@ public class PackageInfo
     @Override
     public int hashCode()
     {
-        int result = status != null ? status.hashCode() : 0;
-        result = 31 * result + ( name != null ? name.hashCode() : 0 );
-        result = 31 * result + ( description != null ? description.hashCode() : 0 );
+        int result = status.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + description.hashCode();
         return result;
     }
 }
