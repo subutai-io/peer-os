@@ -154,35 +154,63 @@ string SubutaiResponsePack::createHeartBeatMessage(string uuid,	string hostname,
 
 /**
  *  \details   This method creates  SuccessTermination message.
+ *          "type":"TERMINATE_RESPONSE",
+
+        "id":"56b0ac88-5140-4a32-8691-916d75d62f1c"
+
+        "commandId":"c6cd5988-ceac-11e3-82b2-ebd389e743a3",
+
+        "pid":1234,
+
+        "exitCode" : 0
  */
-string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string taskuuid)	//Creating Terminate Message
+string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string taskuuid, int pid, int exitCode)	//Creating Terminate Message
 {
 	clear();
-	this->setType("TERMINATE_RESPONSE_DONE");
-	this->setExitCode(0);
+	this->setType("TERMINATE_RESPONSE");
+	this->setExitCode(exitCode);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(1);
 	this->setCommandId(taskuuid);
+	this->setPid(pid);
+
 	this->serialize(sendout);
 	return sendout;
 }
 
 /**
  *  \details   This method creates Fail Termination message.
- */
-string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,string taskuuid)
+
+ *
+    									"type":"TERMINATE_RESPONSE",
+
+										"id":"56b0ac88-5140-4a32-8691-916d75d62f1c"
+
+										"commandId":"c6cd5988-ceac-11e3-82b2-ebd389e743a3",
+
+										"pid":1234,
+
+										"stdErr":"bash: line 0: kill: (1234) - No such process\n",
+
+										"exitCode" : 1
+
+
+string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,string taskuuid, int pid,const string& stderr)
 {
 	clear();
-	this->setType("TERMINATE_RESPONSE_FAILED");
+	this->setType("TERMINATE_RESPONSE");
+
 	this->setExitCode(1);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(1);
-	this->setCommandId(taskuuid);
+	this->setTaskUuid(taskuuid);
+	this->setPid(pid);
+	this->setStandardError(stderr);
 	this->serialize(sendout);
 	return sendout;
-}
+}*/
 
 /**
  *  \details   This method creates Timeout message.

@@ -91,9 +91,10 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     dup2(fd[1], 1);
     char buffer[1000];
     ExecutionResult result;
+    fflush(stdout);fflush(stderr);
+    close(fd[1]);
     result.exit_code = this->container->attach_run_wait(this->container, &opts, program.c_str(), _params);
     fflush(stdout);
-    close(fd[1]);
     dup2(_stdout, 1);
     close(_stdout);
     string command_output;
@@ -108,8 +109,10 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
         }
     }
     if (result.exit_code == 0) {
+    	cout << "success " << command_output << endl;
         result.out = command_output;
     } else {
+    	cout << "err " << command_output << endl;
         result.err = command_output;
     }
     containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>","Program executed: ", program));
@@ -383,7 +386,10 @@ vector<string> SubutaiContainer::getContainerIpValue()
 void SubutaiContainer::getContainerAllFields()
 {
     getContainerHostname();
-    getContainerId();
+    getContainerId();/*
+    if (command->getRunAs() != "" && checkUser(command->getRunAs())) {
+        opts.uid = getRunAsUserId(command->getRunAs());
+    }*/
     getContainerMacAddress();
     getContainerParentHostname();
     getContainerIpAddress();
@@ -398,6 +404,7 @@ ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command)
     }
     if (command->getRunAs() != "" && checkUser(command->getRunAs())) {
         opts.uid = getRunAsUserId(command->getRunAs());
+
     }
     vector<string> pr = ExplodeCommandArguments(command);
     bool hasProgram = false;

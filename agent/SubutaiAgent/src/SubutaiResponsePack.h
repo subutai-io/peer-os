@@ -34,8 +34,8 @@ public:
 	string createResponseMessage(string,int,int,int,string,string,string);
 	string createExitMessage(string,int, int, int,string,int);
 	string createRegistrationMessage(string,string,string,string,string,vector<string>);
-	string createTerminateMessage(string,int,string);
-	string createFailTerminateMessage(string,int,string);
+	string createTerminateMessage(string,int,string,int, int);
+	//string createFailTerminateMessage(string,int,string,int,const string& );
 	string createInQueueMessage(string,string);
 	string createHeartBeatMessage(string,string,string);
 	string createTimeoutMessage(string,int,int,int,string,string,string);

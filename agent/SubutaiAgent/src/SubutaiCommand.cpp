@@ -120,10 +120,24 @@ bool SubutaiCommand::deserialize(string& input)
         {
             this->setWorkingDirectory(root["request"]["workingDirectory"].asString());		//initialize workingDirectory parameter if it is not null
         }
+        /* removed
+
         if(!root["request"]["requestSequenceNumber"].isNull())
         {
             this->setRequestSequenceNumber(root["request"]["requestSequenceNumber"].asInt()); //initialize requestSequenceNumber parameter if it is not null
         }
+        if(!root["request"]["stdOutPath"].isNull())
+        {
+            this->setStandardOutPath(root["request"]["stdOutPath"].asString());		//initialize standardOutpath parameter if it is not null
+        }
+        if(!root["request"]["stdErrPath"].isNull())
+        {
+            this->setStandardErrPath(root["request"]["stdErrPath"].asString());		//initialize standardError parameter if it is not null
+        }
+        if(!root["request"]["source"].isNull())
+        {
+            setSource(root["request"]["source"].asString());		//initialize hostname parameter if it is not null
+        }*/
         if(!root["request"]["command"].isNull())
         {
             this->setCommand(root["request"]["command"].asString());		//initialize program parameter if it is not null
@@ -169,6 +183,9 @@ bool SubutaiCommand::deserialize(string& input)
             arg =  root["request"]["ips"][index].asString();
             this->getIps().push_back(arg);
         }
+
+
+
         string arg1;
         arg1.clear();
         watchArgs.clear();
