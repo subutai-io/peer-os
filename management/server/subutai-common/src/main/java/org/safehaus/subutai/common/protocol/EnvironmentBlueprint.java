@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.UUIDUtil;
 
 
 /**
@@ -20,19 +19,19 @@ public class EnvironmentBlueprint
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private boolean linkHosts;
     private boolean exchangeSshKeys;
-    private UUID id;
+    //    private UUID id;
 
 
     public EnvironmentBlueprint()
     {
-        this.id = UUIDUtil.generateTimeBasedUUID();
+        //        this.id = UUIDUtil.generateTimeBasedUUID();
         this.nodeGroups = new HashSet<>();
     }
 
 
     public UUID getId()
     {
-        return id;
+        return UUID.nameUUIDFromBytes( toString().getBytes() );
     }
 
 
@@ -111,11 +110,11 @@ public class EnvironmentBlueprint
     public String toString()
     {
         return "EnvironmentBlueprint{" +
-                "name='" + name + '\'' +
-                ", nodeGroups=" + nodeGroups +
+                "nodeGroups=" + nodeGroups +
+                ", name='" + name + '\'' +
+                ", domainName='" + domainName + '\'' +
                 ", linkHosts=" + linkHosts +
                 ", exchangeSshKeys=" + exchangeSshKeys +
-                ", domainName='" + domainName + '\'' +
                 '}';
     }
 

@@ -64,6 +64,4 @@ public interface EnvironmentManager
     boolean saveBuildProcessB2PG( UUID blueprintId, UUID peerGroupId ) throws EnvironmentManagerException;
 
     EnvironmentBlueprint getEnvironmentBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
-
-
 }

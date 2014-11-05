@@ -11,7 +11,7 @@ downloadFileAndMakeChanges() {
 	# Create directories that are required for the debian package
         mkdir -p $confDirectory
 
-	wget http://www.apache.org/dist/hadoop/core/hadoop-1.2.1/$tarFile -P $tempDirectory
+	wget http://archive.apache.org/dist/hadoop/core/hadoop-1.2.1/$tarFile -P $tempDirectory
 	if [ -f $BASE/$fileName/opt/README ]; then
 	        rm $BASE/$fileName/opt/README
 	fi
