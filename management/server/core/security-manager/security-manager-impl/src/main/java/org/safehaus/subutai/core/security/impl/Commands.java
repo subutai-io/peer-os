@@ -24,7 +24,7 @@ public class Commands
     }
 
 
-    public RequestBuilder getReadSSHCommand(  )
+    public RequestBuilder getReadSSHCommand()
     {
         return new RequestBuilder( "cat /root/.ssh/id_dsa.pub" );
     }
