@@ -6,6 +6,7 @@ d = debian/subutai-cli-net-dev
 BINDINGS=/etc/subutai/bindings
 SCRIPTS=/usr/bin
 LIBDIR=/usr/share/subutai-cli/subutai/lib
+BASHCOMPDIR=/etc/bash_completion.d/
 
 %:
 	dh $@
@@ -32,10 +33,12 @@ install: build
 	mkdir -p ${d}${BINDINGS}
 	mkdir -p ${d}${SCRIPTS}
 	mkdir -p ${d}${LIBDIR}
+	mkdir -p ${d}${BASHCOMPDIR}
 	cp -a src/main/lib/* ${d}${LIBDIR}
 	cp -a src/main/bindings/* ${d}${BINDINGS}
 	cp -a ../cli/src/main/lib/bsfl ${d}${LIBDIR}
 	cp -a ../cli/src/main/scripts/subutai ${d}${SCRIPTS}
+	cp debian/subutai-cli-net-dev.bash_completion ${d}${BASHCOMPDIR}
 	dh_link
 
 # build architecture-independent files
