@@ -110,10 +110,10 @@ public class RepositoryManagerImpl implements RepositoryManager
 
             if ( line != null )
             {
-                String[] packageFields = line.split( "\\s{2,}" );
-                if ( packageFields.length == 3 )
+                String[] packageFields = line.split( "\\s+-\\s+" );
+                if ( packageFields.length == 2 )
                 {
-                    packages.add( new PackageInfo( packageFields[0], packageFields[1], packageFields[2] ) );
+                    packages.add( new PackageInfo( packageFields[0], packageFields[1] ) );
                 }
             }
         }

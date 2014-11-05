@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 public class RepositoryManagerImplTest
 {
     private static final String ARGUMENT = "argument";
-    private static final String LIST_OUTPUT = "i   subutai-repo-hadoop           - Subutai Repository Package";
+    private static final String LIST_OUTPUT = "subutai-repo-hbase - Subutai Repository Package";
     @Mock
     PeerManager peerManager;
 

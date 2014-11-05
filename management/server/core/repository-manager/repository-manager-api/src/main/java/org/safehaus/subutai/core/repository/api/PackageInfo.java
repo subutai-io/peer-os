@@ -10,26 +10,17 @@ import com.google.common.base.Preconditions;
  */
 public class PackageInfo
 {
-    private String status;
     private String name;
     private String description;
 
 
-    public PackageInfo( final String status, final String name, final String description )
+    public PackageInfo( final String name, final String description )
     {
-        Preconditions.checkNotNull( status, "Invalid status" );
         Preconditions.checkNotNull( name, "Invalid name" );
         Preconditions.checkNotNull( description, "Invalid description" );
 
-        this.status = status;
         this.name = name;
         this.description = description;
-    }
-
-
-    public String getStatus()
-    {
-        return status;
     }
 
 
@@ -48,8 +39,7 @@ public class PackageInfo
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "status", status ).add( "name", name )
-                      .add( "description", description ).toString();
+        return Objects.toStringHelper( this ).add( "name", name ).add( "description", description ).toString();
     }
 
 
@@ -75,10 +65,6 @@ public class PackageInfo
         {
             return false;
         }
-        if ( !status.equals( that.status ) )
-        {
-            return false;
-        }
 
         return true;
     }
@@ -87,8 +73,7 @@ public class PackageInfo
     @Override
     public int hashCode()
     {
-        int result = status.hashCode();
-        result = 31 * result + name.hashCode();
+        int result = name.hashCode();
         result = 31 * result + description.hashCode();
         return result;
     }
