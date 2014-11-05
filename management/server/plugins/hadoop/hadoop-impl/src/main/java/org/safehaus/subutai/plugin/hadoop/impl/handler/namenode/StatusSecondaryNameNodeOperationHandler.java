@@ -82,31 +82,37 @@ public class StatusSecondaryNameNodeOperationHandler extends AbstractOperationHa
     private void logStatusResults( TrackerOperation po, CommandResult result, String hostname)
     {
         NodeState nodeState = NodeState.UNKNOWN;
-        if ( result.getStdOut() != null && result.getStdOut().contains( "SecondaryNameNode" ) )
-        {
-            String[] array = result.getStdOut().split( "\n" );
 
-            for ( String status : array )
+            if ( result.getStdOut() != null && result.getStdOut().contains( "SecondaryNameNode" ) )
             {
-                String temp = status.replaceAll( "SecondaryNameNode is ", "" );
-                if ( temp.toLowerCase().contains( "not" ) )
+                String[] array = result.getStdOut().split( "\n" );
+
+                for ( String status : array )
                 {
-                    nodeState = NodeState.STOPPED;
-                }
-                else
-                {
-                    nodeState = NodeState.RUNNING;
+                    if ( status.contains( "SecondaryNameNode" ) )
+                    {
+                        String temp = status.replaceAll( "SecondaryNameNode is ", "" );
+                        if ( temp.toLowerCase().contains( "not" ) )
+                        {
+                            nodeState = NodeState.STOPPED;
+                        }
+                        else
+                        {
+                            nodeState = NodeState.RUNNING;
+                        }
+                    }
                 }
             }
-        }
+
+
         if ( NodeState.UNKNOWN.equals( nodeState ) )
         {
-            trackerOperation.addLogFailed( String.format( "Failed to check status of node") );
+            trackerOperation.addLogFailed( String.format( "Failed to check status" ) );
         }
         else
         {
             trackerOperation
-                    .addLogDone( String.format( "Secondary NameNode %s is %s", hostname, nodeState ) );
+                    .addLogDone( String.format( "Secondary NameNode is %s", nodeState ) );
         }
     }
 }

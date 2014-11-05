@@ -378,19 +378,6 @@ public class Manager
 
 
 
-//    protected void populateTable( final Table table, List<ContainerHost> containerHosts )
-//    {
-//
-//        table.removeAllItems();
-//
-//        // Add UI components into relevant fields according to its role in cluster
-//        for ( final ContainerHost containerHost : containerHosts )
-//        {
-//            addRowComponents( table, containerHost );
-//        }
-//    }
-
-
     private void startAllNodes( Table table )
     {
         for ( Object o : table.getItemIds() )
@@ -428,10 +415,10 @@ public class Manager
             HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
             if ( availableOperationsLayout != null )
             {
-                Button startButton = getStopButton( availableOperationsLayout );
-                if ( startButton != null )
+                Button stopButton = getStopButton( availableOperationsLayout );
+                if ( stopButton != null )
                 {
-                    startButton.click();
+                    stopButton.click();
                 }
             }
         }
@@ -744,12 +731,6 @@ public class Manager
         managerListener.refreshClusterList();
     }
 
-
-//    @Override
-//    public void addRowComponents( final Table table, final Agent agent )
-//    {
-//
-//    }
 
     public void addRowComponents( Table table, final ContainerHost containerHost )
     {

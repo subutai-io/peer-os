@@ -454,7 +454,6 @@ public class ManagerListener
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
         final Button startStopButton = hadoopManager.getStartStopButton( availableOperationsLayout );
 
-
         return new Button.ClickListener()
         {
             @Override
@@ -470,7 +469,6 @@ public class ManagerListener
                             new StartTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), NodeType.JOBTRACKER,
                                     hadoopManager.getHadoopCluster(), new CompleteEvent()
                             {
-
                                 public void onComplete( NodeState state )
                                 {
                                     try
@@ -494,7 +492,6 @@ public class ManagerListener
                             new StopTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), NodeType.JOBTRACKER,
                                     hadoopManager.getHadoopCluster(), new CompleteEvent()
                             {
-
                                 public void onComplete( NodeState state )
                                 {
                                     hadoopManager.disableProgressBar();

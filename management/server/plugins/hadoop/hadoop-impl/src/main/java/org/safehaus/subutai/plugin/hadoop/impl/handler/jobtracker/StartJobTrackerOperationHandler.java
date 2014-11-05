@@ -3,15 +3,11 @@ package org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker;
 
 import java.util.Iterator;
 
-import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -49,7 +45,7 @@ public class StartJobTrackerOperationHandler extends AbstractOperationHandler<Ha
         while ( iterator.hasNext() )
         {
             host = ( ContainerHost ) iterator.next();
-            if ( host.getAgent().getUuid().equals( hadoopClusterConfig.getNameNode().getAgent().getUuid() ) )
+            if ( host.getAgent().getUuid().equals( hadoopClusterConfig.getJobTracker().getAgent().getUuid() ) )
             {
                 break;
             }

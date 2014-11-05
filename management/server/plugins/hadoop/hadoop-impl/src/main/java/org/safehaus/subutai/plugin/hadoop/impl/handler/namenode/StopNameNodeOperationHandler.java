@@ -7,12 +7,9 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -82,17 +79,42 @@ public class StopNameNodeOperationHandler extends AbstractOperationHandler<Hadoo
 
     private void logStatusResults( TrackerOperation po, CommandResult result )
     {
-        if ( result.getStdOut() != null && result.getStdOut().contains( "NameNode" ) )
-        {
-            String[] array = result.getStdOut().split( "\n" );
+        NodeState nodeState = NodeState.UNKNOWN;
 
-            for ( String status : array )
+        if ( result != null )
+        {
+            if ( result.getStdOut().contains( "NameNode" ) )
             {
-                if ( status.contains( "NameNode" ) )
+                String[] array = result.getStdOut().split( "\n" );
+
+                for ( String status : array )
                 {
-                    trackerOperation.addLogDone( status );
+                    if ( status.contains( "NameNode" ) )
+                    {
+                        String temp = status.replaceAll(
+                                Pattern.quote( "!(SecondaryNameNode is not running on this " + "machine)" ), "" ).
+                                                    replaceAll( "NameNode is ", "" );
+                        if ( temp.toLowerCase().contains( "not" ) )
+                        {
+                            nodeState = NodeState.STOPPED;
+                        }
+                        else
+                        {
+                            nodeState = NodeState.RUNNING;
+                        }
+                    }
                 }
             }
+        }
+
+        if ( NodeState.STOPPED.equals( nodeState ) )
+        {
+            trackerOperation.addLogDone( String.format( "NameNode on stopped" ) );
+        }
+        else
+        {
+            trackerOperation.addLogFailed(
+                    String.format( "Failed to start NameNode" ) );
         }
     }
 }

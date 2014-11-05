@@ -68,7 +68,7 @@ public class Commands
     }
 
     public String getConfigureSecondaryNameNodeCommand(){
-        return ". /etc/profile && " + "hadoop-master-slave.sh masters " + config.getNameNode().getHostname();
+        return ". /etc/profile && " + "hadoop-master-slave.sh masters " + config.getSecondaryNameNode().getHostname();
     }
 
     public String getConfigureDataNodesCommand( String hostname ){

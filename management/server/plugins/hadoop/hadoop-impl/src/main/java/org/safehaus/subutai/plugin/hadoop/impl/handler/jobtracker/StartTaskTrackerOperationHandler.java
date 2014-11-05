@@ -78,6 +78,8 @@ public class StartTaskTrackerOperationHandler extends AbstractOperationHandler<H
 
     private void logStatusResults( TrackerOperation po, CommandResult result )
     {
+        NodeState nodeState = NodeState.UNKNOWN;
+
         if ( result.getStdOut() != null && result.getStdOut().contains( "TaskTracker" ) )
         {
             String[] array = result.getStdOut().split( "\n" );
@@ -86,9 +88,27 @@ public class StartTaskTrackerOperationHandler extends AbstractOperationHandler<H
             {
                 if ( status.contains( "TaskTracker" ) )
                 {
-                    trackerOperation.addLogDone( status );
+                    String temp = status.replaceAll( "TaskTracker is ", "" );
+                    if ( temp.toLowerCase().contains( "not" ) )
+                    {
+                        nodeState = NodeState.STOPPED;
+                    }
+                    else
+                    {
+                        nodeState = NodeState.RUNNING;
+                    }
                 }
             }
+        }
+
+
+        if ( NodeState.UNKNOWN.equals( nodeState ) )
+        {
+            trackerOperation.addLogFailed( String.format( "Failed to check status of" ) );
+        }
+        else
+        {
+            trackerOperation.addLogDone( String.format( "TaskTracker is %s", nodeState ) );
         }
     }
 }

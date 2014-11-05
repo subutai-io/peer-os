@@ -3,7 +3,9 @@ package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
 
 import java.util.Iterator;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.CommandResult;
@@ -77,7 +79,10 @@ public class StartNameNodeOperationHandler extends AbstractOperationHandler<Hado
 
     private void logStatusResults( TrackerOperation po, CommandResult result )
     {
-        if ( result.getStdOut() != null && result.getStdOut().contains( "NameNode" ) )
+        NodeState nodeState = NodeState.UNKNOWN;
+
+
+        if ( result.getStdOut().contains( "NameNode" ) )
         {
             String[] array = result.getStdOut().split( "\n" );
 
@@ -85,9 +90,28 @@ public class StartNameNodeOperationHandler extends AbstractOperationHandler<Hado
             {
                 if ( status.contains( "NameNode" ) )
                 {
-                    trackerOperation.addLogDone( status );
+                    String temp = status.replaceAll(
+                            Pattern.quote( "!(SecondaryNameNode is not running on this " + "machine)" ), "" ).
+                                                replaceAll( "NameNode is ", "" );
+                    if ( temp.toLowerCase().contains( "not" ) )
+                    {
+                        nodeState = NodeState.STOPPED;
+                    }
+                    else
+                    {
+                        nodeState = NodeState.RUNNING;
+                    }
                 }
             }
+        }
+
+        if ( NodeState.RUNNING.equals( nodeState ) )
+        {
+            trackerOperation.addLogDone( String.format( "NameNode on started" ) );
+        }
+        else
+        {
+            trackerOperation.addLogFailed( String.format( "Failed to start NameNode)" ) );
         }
     }
 }

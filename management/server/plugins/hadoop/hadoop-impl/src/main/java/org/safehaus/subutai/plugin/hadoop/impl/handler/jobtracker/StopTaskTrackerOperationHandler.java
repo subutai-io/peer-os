@@ -17,18 +17,19 @@ import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
 
 import java.util.Iterator;
+import java.util.UUID;
 
 
 public class StopTaskTrackerOperationHandler extends AbstractOperationHandler<HadoopImpl>
 {
 
-    private String lxcHostName;
+    private UUID agentUUID;
 
 
-    public StopTaskTrackerOperationHandler( HadoopImpl manager, String clusterName, String lxcHostname )
+    public StopTaskTrackerOperationHandler( HadoopImpl manager, String clusterName, Agent agent )
     {
         super( manager, clusterName );
-        this.lxcHostName = lxcHostname;
+        this.agentUUID = agent.getUuid();
         trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Stopping TaskTracker in %s", clusterName ) );
     }
@@ -52,7 +53,7 @@ public class StopTaskTrackerOperationHandler extends AbstractOperationHandler<Ha
         while ( iterator.hasNext() )
         {
             host = ( ContainerHost ) iterator.next();
-            if ( host.getAgent().getUuid().equals( hadoopClusterConfig.getNameNode().getAgent().getUuid() ) )
+            if ( host.getAgent().getUuid().equals( agentUUID ) )
             {
                 break;
             }

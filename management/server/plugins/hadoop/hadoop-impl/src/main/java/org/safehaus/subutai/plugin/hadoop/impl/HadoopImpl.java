@@ -399,7 +399,7 @@ public class HadoopImpl implements Hadoop
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
         AbstractOperationHandler operationHandler =
-                new StopTaskTrackerOperationHandler( this, hadoopClusterConfig.getClusterName(), agent.getHostname() );
+                new StopTaskTrackerOperationHandler( this, hadoopClusterConfig.getClusterName(), agent );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -415,7 +415,7 @@ public class HadoopImpl implements Hadoop
 
         AbstractOperationHandler operationHandler =
                 new StatusTaskTrackerOperationHandler( this, hadoopClusterConfig.getClusterName(),
-                        agent.getHostname() );
+                        agent );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }

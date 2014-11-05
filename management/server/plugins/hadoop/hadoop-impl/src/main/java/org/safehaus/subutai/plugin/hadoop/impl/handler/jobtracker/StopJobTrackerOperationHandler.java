@@ -49,7 +49,7 @@ public class StopJobTrackerOperationHandler extends AbstractOperationHandler<Had
         while ( iterator.hasNext() )
         {
             host = ( ContainerHost ) iterator.next();
-            if ( host.getAgent().getUuid().equals( hadoopClusterConfig.getNameNode().getAgent().getUuid() ) )
+            if ( host.getAgent().getUuid().equals( hadoopClusterConfig.getJobTracker().getAgent().getUuid() ) )
             {
                 break;
             }
