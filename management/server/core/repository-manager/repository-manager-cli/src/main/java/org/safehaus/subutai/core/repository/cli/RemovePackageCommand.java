@@ -25,7 +25,7 @@ public class RemovePackageCommand extends OsgiCommandSupport
     private final RepositoryManager repositoryManager;
 
 
-    public RemovePackageCommand( final RepositoryManager repositoryManager ) throws RepositoryException
+    public RemovePackageCommand( final RepositoryManager repositoryManager )
     {
 
         Preconditions.checkNotNull( repositoryManager, "Repo manager is null" );

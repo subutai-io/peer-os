@@ -25,7 +25,7 @@ public class AddPackageCommand extends OsgiCommandSupport
     private final RepositoryManager repositoryManager;
 
 
-    public AddPackageCommand( final RepositoryManager repositoryManager ) throws RepositoryException
+    public AddPackageCommand( final RepositoryManager repositoryManager )
     {
 
         Preconditions.checkNotNull( repositoryManager, "Repo manager is null" );

@@ -25,7 +25,7 @@ public class ExtractPackageCommand extends OsgiCommandSupport
     private final RepositoryManager repositoryManager;
 
 
-    public ExtractPackageCommand( final RepositoryManager repositoryManager ) throws RepositoryException
+    public ExtractPackageCommand( final RepositoryManager repositoryManager )
     {
 
         Preconditions.checkNotNull( repositoryManager, "Repo manager is null" );
