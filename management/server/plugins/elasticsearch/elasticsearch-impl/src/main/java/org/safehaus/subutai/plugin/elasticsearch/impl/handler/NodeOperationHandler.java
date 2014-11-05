@@ -4,7 +4,6 @@ package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 import java.util.Iterator;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.CommandResult;
@@ -76,19 +75,20 @@ public class NodeOperationHandler extends AbstractOperationHandler<Elasticsearch
 
         try
         {
+            CommandResult result = null;
             switch ( operationType )
             {
                 case START:
-                    host.execute( new RequestBuilder( Commands.startCommand ) );
+                    result = host.execute( new RequestBuilder( Commands.startCommand ) );
                     break;
                 case STOP:
-                    host.execute( new RequestBuilder( Commands.stopCommand ) );
+                    result = host.execute( new RequestBuilder( Commands.stopCommand ) );
                     break;
                 case STATUS:
-                    host.execute( new RequestBuilder( Commands.statusCommand ) );
+                    result = host.execute( new RequestBuilder( Commands.statusCommand ) );
                     break;
             }
-            trackerOperation.addLogDone( "Command successfully run." );
+            logResults( trackerOperation, result );
         }
         catch ( CommandException e )
         {
@@ -100,9 +100,6 @@ public class NodeOperationHandler extends AbstractOperationHandler<Elasticsearch
     public static void logResults( TrackerOperation po, CommandResult result )
     {
         Preconditions.checkNotNull( result );
-
-        NodeState nodeState = NodeState.UNKNOWN;
-
         StringBuilder log = new StringBuilder();
         String status = "UNKNOWN";
         if ( result.getExitCode() == 0 )

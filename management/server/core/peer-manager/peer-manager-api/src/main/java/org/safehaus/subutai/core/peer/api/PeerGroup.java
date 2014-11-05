@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 
 
 /**
- * Created by bahadyr on 10/8/14.
+ * Peer group
  */
 public class PeerGroup
 {

@@ -29,8 +29,8 @@ import com.google.common.base.Strings;
 /**
  * This class handles operations that are related to whole cluster.
  */
-public class ClusterOperationHandler extends AbstractOperationHandler<ElasticsearchImpl> implements
-        ClusterOperationHandlerInterface
+public class ClusterOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
+        implements ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
     private OperationType operationType;
@@ -56,21 +56,21 @@ public class ClusterOperationHandler extends AbstractOperationHandler<Elasticsea
         {
             case INSTALL:
                 executor.execute( new Runnable()
-                        {
-                            public void run()
-                            {
-                                setupCluster();
-                            }
-                        } );
+                {
+                    public void run()
+                    {
+                        setupCluster();
+                    }
+                } );
                 break;
             case DESTROY:
                 executor.execute( new Runnable()
-                        {
-                            public void run()
-                            {
-                                destroyCluster();
-                            }
-                        } );
+                {
+                    public void run()
+                    {
+                        destroyCluster();
+                    }
+                } );
                 break;
             case START:
                 runOperationOnContainers( OperationType.START );

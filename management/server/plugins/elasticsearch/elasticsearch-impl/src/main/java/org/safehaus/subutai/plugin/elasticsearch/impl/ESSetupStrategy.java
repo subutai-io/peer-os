@@ -2,9 +2,7 @@ package org.safehaus.subutai.plugin.elasticsearch.impl;
 
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
-import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
@@ -74,7 +72,7 @@ public class ESSetupStrategy implements ClusterSetupStrategy
 
         try
         {
-            new ClusterConfiguration( elasticsearchManager, po ).configureCluster( config, environment );
+            new ClusterConfiguration( elasticsearchManager, po ).configureCluster( config );
         }
         catch ( ClusterConfigurationException ex )
         {

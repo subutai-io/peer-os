@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.naming.NamingException;
@@ -183,22 +182,6 @@ public class Manager
     }
 
 
-    /**
-     * Parses output of 'service cassandra status' command
-     */
-    private static String parseServiceResult( String result )
-    {
-        StringBuilder parsedResult = new StringBuilder();
-        Matcher tracersMatcher = ELASTICSEARCH_PATTERN.matcher( result );
-        if ( tracersMatcher.find() )
-        {
-            parsedResult.append( tracersMatcher.group( 1 ) ).append( " " );
-        }
-
-        return parsedResult.toString();
-    }
-
-
     private void addClickListenerToAddNodeButton()
     {
         addNodeBtn.addClickListener( new Button.ClickListener()
@@ -364,20 +347,19 @@ public class Manager
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
-            executorService.execute(
-                    new OperationTask( elasticsearch, tracker, config.getClusterName(), containerHost, OperationType.START,
-                            new CompleteEvent()
+            executorService.execute( new OperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
+                            OperationType.START, new CompleteEvent()
+                    {
+                        @Override
+                        public void onComplete( NodeState nodeState )
+                        {
+                            synchronized ( PROGRESS_ICON )
                             {
-                                @Override
-                                public void onComplete( NodeState nodeState )
-                                {
-                                    synchronized ( PROGRESS_ICON )
-                                    {
-                                        disableOREnableAllButtonsOnTable( nodesTable, true );
-                                        checkAllNodes();
-                                    }
-                                }
-                            }, null ) );
+                                disableOREnableAllButtonsOnTable( nodesTable, true );
+                                checkAllNodes();
+                            }
+                        }
+                    }, null ) );
         }
     }
 
@@ -388,20 +370,19 @@ public class Manager
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
-            executorService.execute(
-                    new OperationTask( elasticsearch, tracker, config.getClusterName(), containerHost, OperationType.STOP,
-                            new CompleteEvent()
+            executorService.execute( new OperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
+                            OperationType.STOP, new CompleteEvent()
+                    {
+                        @Override
+                        public void onComplete( NodeState nodeState )
+                        {
+                            synchronized ( PROGRESS_ICON )
                             {
-                                @Override
-                                public void onComplete( NodeState nodeState )
-                                {
-                                    synchronized ( PROGRESS_ICON )
-                                    {
-                                        disableOREnableAllButtonsOnTable( nodesTable, true );
-                                        checkAllNodes();
-                                    }
-                                }
-                            }, null ) );
+                                disableOREnableAllButtonsOnTable( nodesTable, true );
+                                checkAllNodes();
+                            }
+                        }
+                    }, null ) );
         }
     }
 
@@ -487,7 +468,7 @@ public class Manager
                     while ( iterator.hasNext() )
                     {
                         containerHost = ( ContainerHost ) iterator.next();
-                        if ( containerHost.getId().equals( UUID.fromString( containerId ) ) )
+                        if ( containerHost.getHostname().equals( containerId ) )
                         {
                             break;
                         }
@@ -699,19 +680,20 @@ public class Manager
             {
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
-                executorService.execute( new OperationTask( elasticsearch, tracker, config.getClusterName(),
-                        containerHost, OperationType.STOP, new CompleteEvent()
-                {
-                    @Override
-                    public void onComplete( NodeState nodeState )
-                    {
-                        synchronized ( PROGRESS_ICON )
+                executorService.execute(
+                        new OperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
+                                OperationType.STOP, new CompleteEvent()
                         {
-                            enableButtons( buttons );
-                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                        }
-                    }
-                }, null ) );
+                            @Override
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
+                                {
+                                    enableButtons( buttons );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        }, null ) );
             }
         } );
     }
@@ -726,19 +708,20 @@ public class Manager
             {
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
-                executorService.execute( new OperationTask( elasticsearch, tracker, config.getClusterName(),
-                        containerHost, OperationType.START, new CompleteEvent()
-                {
-                    @Override
-                    public void onComplete( NodeState nodeState )
-                    {
-                        synchronized ( PROGRESS_ICON )
+                executorService.execute(
+                        new OperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
+                                OperationType.START, new CompleteEvent()
                         {
-                            enableButtons( buttons );
-                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                        }
-                    }
-                }, null ) );
+                            @Override
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
+                                {
+                                    enableButtons( buttons );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        }, null ) );
             }
         } );
     }
@@ -754,32 +737,36 @@ public class Manager
             {
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
-                executorService.execute( new OperationTask( elasticsearch, tracker, config.getClusterName(),
-                        containerHost, OperationType.STATUS, new CompleteEvent()
-                {
-                    public void onComplete( NodeState nodeState )
-                    {
-                        synchronized ( PROGRESS_ICON )
+                executorService.execute(
+                        new OperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
+                                OperationType.STATUS, new CompleteEvent()
                         {
-                            if ( nodeState.equals( NodeState.RUNNING ) ){
-                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
+                                {
+                                    if ( nodeState.equals( NodeState.RUNNING ) )
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    }
+                                    else if ( nodeState.equals( NodeState.STOPPED ) )
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                    }
+                                    else if ( nodeState.equals( NodeState.UNKNOWN ) )
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    }
+                                    resultHolder.setValue( nodeState.name() );
+                                    PROGRESS_ICON.setVisible( false );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                }
                             }
-                            else if ( nodeState.equals( NodeState.STOPPED ) ) {
-                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                            }
-                            else if ( nodeState.equals( NodeState.UNKNOWN ) ){
-                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                            }
-                            resultHolder.setValue( nodeState.name() );
-                            PROGRESS_ICON.setVisible( false );
-                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                            getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
-                        }
-                    }
-                }, null ) );
+                        }, null ) );
             }
         } );
     }

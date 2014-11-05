@@ -319,7 +319,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                     {
                         metricMap.put( rh.getAgent(), rh.getMetric() );
                     }
-                    catch ( CommandException e )
+                    catch ( PeerException e )
                     {
                         show( e.toString() );
                     }
@@ -379,115 +379,6 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                     ( String ) template.getValue() ) );
             executor.shutdown();
         }
-    }
-
-
-    private void startCloneTaskOld()
-    {
-        final String productName = textFieldLxcName.getValue().trim();
-
-        if ( Strings.isNullOrEmpty( productName ) )
-        {
-            show( "Please specify product name" );
-            return;
-        }
-
-        if ( !Strings.isNullOrEmpty( productName ) && !productName.matches( hostValidatorRegex ) )
-        {
-            show( "Please, use only letters, digits, dots and hyphens in product name" );
-            return;
-        }
-
-        if ( strategy.getValue() == null )
-        {
-            show( "Please specify placement strategy" );
-            return;
-        }
-
-        Set<Agent> physicalAgents = null;// AgentUtil.filterPhysicalAgents( agentTree.getSelectedAgents() );
-        final Map<Agent, List<String>> agentFamilies = new HashMap<>();
-        final double count = slider.getValue();
-        List<Criteria> criteria = new ArrayList<>();
-        if ( physicalAgents.isEmpty() )
-        { // process cloning by selected strategy
-
-            //            List<ContainerPlacementStrategy> strategies = containerManager.getPlacementStrategies();
-            if ( placementStrategies == null || placementStrategies.isEmpty() )
-            {
-                show( "There is no placement strategy." );
-                return;
-            }
-            ContainerPlacementStrategy selectedStrategy =
-                    placementStrategies.get( placementStrategies.indexOf( strategy.getValue() ) );
-            //            String placementStrategyId = selectedStrategy.getId();
-            if ( selectedStrategy.hasCriteria() )
-            {
-                BeanItemContainer<Criteria> beans = criteriaBeansMap.get( selectedStrategy );
-                criteria = Lists.newArrayList( beans.getItemIds() );
-                for ( Criteria c : criteria )
-                {
-                    LOG.info( String.format( "%s %s %s", c.getId(), c.getTitle(), c.getValue() ) );
-                }
-            }
-            Map<Agent, Integer> bestServers = null;
-            //            try
-            //            {
-            //                bestServers = strategyManager
-            //                        .getPlacementDistribution( containerManager.getPhysicalServerMetrics(),
-            // ( int ) count,
-            //                                selectedStrategy.getId(), criteria );
-            //            }
-            //            catch ( StrategyException e )
-            //            {
-            //                show( e.toString() );
-            //                return;
-            //            }
-
-            for ( int i = 1; i <= count; i++ )
-            {
-                Map<Agent, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( bestServers );
-                final Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
-                bestServers.put( entry.getKey(), entry.getValue() - 1 );
-                List<String> lxcHostNames = agentFamilies.get( entry.getKey() );
-                if ( lxcHostNames == null )
-                {
-                    lxcHostNames = new ArrayList<>();
-                    agentFamilies.put( entry.getKey(), lxcHostNames );
-                }
-                lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
-                        UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 11 ) );
-            }
-        }
-        else
-        { // process cloning in selected hosts
-            for ( Agent physAgent : physicalAgents )
-            {
-                List<String> lxcHostNames = new ArrayList<>();
-                for ( int i = 1; i <= count; i++ )
-                {
-                    lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
-                            UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 11 ) );
-                }
-                agentFamilies.put( physAgent, lxcHostNames );
-            }
-        }
-
-        indicator.setVisible( true );
-        populateLxcTable( agentFamilies );
-        countProcessed = new AtomicInteger( ( int ) ( count ) );
-        errorProcessed = new AtomicInteger( 0 );
-        UUID envId = UUIDUtil.generateMACBasedUUID();
-        //        for ( final Map.Entry<Agent, List<String>> agent : agentFamilies.entrySet() )
-        //        {
-        //            AgentExecutor agentExecutor = new AgentExecutorImpl( agent.getKey().getHostname(),
-        // agent.getValue() );
-        //            agentExecutor.addListener( this );
-        //            ExecutorService executor = Executors.newFixedThreadPool( 1 );
-        //            agentExecutor.execute( executor,
-        //                    new CloneCommandFactory( containerManager, envId, agent.getKey().getHostname(),
-        //                            ( String ) template.getValue() ) );
-        //            executor.shutdown();
-        //        }
     }
 
 

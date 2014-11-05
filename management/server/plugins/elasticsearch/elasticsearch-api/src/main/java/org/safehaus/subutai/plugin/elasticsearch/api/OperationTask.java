@@ -20,10 +20,10 @@ public class OperationTask extends AbstractOperationTask implements Runnable
     private OperationType operationType;
 
 
-    public OperationTask ( Elasticsearch elasticsearch, Tracker tracker, String clusterName, ContainerHost containerHost,
+    public OperationTask( Elasticsearch elasticsearch, Tracker tracker, String clusterName, ContainerHost containerHost,
                           OperationType operationType, CompleteEvent completeEvent, UUID trackID )
     {
-        super(tracker, operationType, elasticsearch.getCluster( clusterName ), completeEvent, trackID, containerHost);
+        super( tracker, operationType, elasticsearch.getCluster( clusterName ), completeEvent, trackID, containerHost );
         this.elasticsearch = elasticsearch;
         this.tracker = tracker;
         this.clusterName = clusterName;
@@ -31,6 +31,7 @@ public class OperationTask extends AbstractOperationTask implements Runnable
         this.completeEvent = completeEvent;
         this.operationType = operationType;
     }
+
 
     @Override
     public UUID startOperation()
@@ -45,7 +46,7 @@ public class OperationTask extends AbstractOperationTask implements Runnable
                 trackID = elasticsearch.stopNode( clusterName, containerHost.getAgent().getUuid() );
                 break;
             case STATUS:
-                trackID = elasticsearch.checkNode( clusterName,  containerHost.getAgent().getUuid()  );
+                trackID = elasticsearch.checkNode( clusterName, containerHost.getAgent().getUuid() );
                 break;
         }
         return trackID;

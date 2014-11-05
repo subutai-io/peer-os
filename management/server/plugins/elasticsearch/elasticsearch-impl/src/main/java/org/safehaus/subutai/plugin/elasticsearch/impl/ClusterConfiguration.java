@@ -4,14 +4,16 @@ package org.safehaus.subutai.plugin.elasticsearch.impl;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.common.api.ClusterConfigurationInterface;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 
 
-public class ClusterConfiguration
+public class ClusterConfiguration implements ClusterConfigurationInterface
 {
 
     private ElasticsearchImpl manager;
@@ -25,10 +27,12 @@ public class ClusterConfiguration
     }
 
 
-    public void configureCluster( final ElasticsearchClusterConfiguration config, Environment environment )
-            throws ClusterConfigurationException
+    public void configureCluster( final ConfigBase config ) throws ClusterConfigurationException
     {
         // es-conf.sh cluster_name test
+        ElasticsearchClusterConfiguration esConfiguration = ( ElasticsearchClusterConfiguration ) config;
+        Environment environment =
+                manager.getEnvironmentManager().getEnvironmentByUUID( esConfiguration.getEnvironmentId() );
         String clusterConfigureCommand = Commands.configure + "cluster_name " + config.getClusterName();
 
         for ( ContainerHost containerHost : environment.getContainers() )
@@ -46,7 +50,7 @@ public class ClusterConfiguration
                 throw new ClusterConfigurationException( e.getMessage() );
             }
         }
-        config.setEnvironmentId( environment.getId() );
+        esConfiguration.setEnvironmentId( environment.getId() );
         manager.getPluginDAO()
                .saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, config.getClusterName(), config );
         po.addLogDone( ElasticsearchClusterConfiguration.PRODUCT_KEY + " cluster data saved into database" );
