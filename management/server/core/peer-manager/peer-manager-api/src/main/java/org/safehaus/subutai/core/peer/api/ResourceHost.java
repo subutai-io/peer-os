@@ -228,7 +228,7 @@ public class ResourceHost extends SubutaiHost
         }
         if ( parseOk )
         {
-            return new ServerMetric( freeHddMb, freeRamMb, ( int ) cpuLoadPercent, numOfProc, null );
+            return new ServerMetric( getHostname(), freeHddMb, freeRamMb, ( int ) cpuLoadPercent, numOfProc, null );
         }
         else
         {

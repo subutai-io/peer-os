@@ -167,12 +167,12 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     }
 
 
-    public ContainerHost createContainer( final ResourceHost resourceHost, final UUID creatorPeerId,
-                                          final UUID environmentId, final List<Template> templates,
-                                          final String containerName ) throws PeerException
-    {
-        return resourceHost.createContainer( creatorPeerId, environmentId, templates, containerName );
-    }
+    //    public ContainerHost createContainer( final ResourceHost resourceHost, final UUID creatorPeerId,
+    //                                          final UUID environmentId, final List<Template> templates,
+    //                                          final String containerName ) throws PeerException
+    //    {
+    //        return resourceHost.createContainer( creatorPeerId, environmentId, templates, containerName );
+    //    }
 
 
     //    @Override
@@ -236,15 +236,15 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             String templateName = templates.get( templates.size() - 1 ).getTemplateName();
 
 
-            Map<Agent, ServerMetric> serverMetricMap = new HashMap<>();
+            List<ServerMetric> serverMetricMap = new ArrayList<>();
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
                 if ( resourceHost.isConnected() )
                 {
-                    serverMetricMap.put( resourceHost.getAgent(), resourceHost.getMetric() );
+                    serverMetricMap.add( resourceHost.getMetric() );
                 }
             }
-            Map<Agent, Integer> slots;
+            Map<ServerMetric, Integer> slots;
             try
             {
                 slots = strategyManager.getPlacementDistribution( serverMetricMap, quantity, strategyId, criteria );
@@ -257,9 +257,9 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             Set<String> existingContainerNames = getContainerNames();
 
             // clone specified number of instances and store their names
-            Map<Agent, Set<String>> cloneNames = new HashMap<>();
+            Map<ResourceHost, Set<String>> cloneNames = new HashMap<>();
 
-            for ( Map.Entry<Agent, Integer> e : slots.entrySet() )
+            for ( Map.Entry<ServerMetric, Integer> e : slots.entrySet() )
             {
                 Set<String> hostCloneNames = new HashSet<>();
                 for ( int i = 0; i < e.getValue(); i++ )
@@ -267,19 +267,19 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                     String newContainerName = nextHostName( templateName, existingContainerNames );
                     hostCloneNames.add( newContainerName );
                 }
-                cloneNames.put( e.getKey(), hostCloneNames );
+                ResourceHost resourceHost = getResourceHostByName( e.getKey().getHostname() );
+                cloneNames.put( resourceHost, hostCloneNames );
             }
 
-            for ( final Map.Entry<Agent, Set<String>> e : cloneNames.entrySet() )
+            for ( final Map.Entry<ResourceHost, Set<String>> e : cloneNames.entrySet() )
             {
-
-                Agent a = e.getKey();
+                ResourceHost rh = e.getKey();
                 Set<String> clones = e.getValue();
-                ResourceHost resourceHost = getResourceHostByName( a.getHostname() );
+                ResourceHost resourceHost = getResourceHostByName( rh.getHostname() );
                 for ( String cloneName : clones )
                 {
                     ContainerHost containerHost =
-                            createContainer( resourceHost, creatorPeerId, environmentId, templates, cloneName );
+                            resourceHost.createContainer( creatorPeerId, environmentId, templates, cloneName );
                     resourceHost.addContainerHost( containerHost );
                     result.add( containerHost );
                     peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
