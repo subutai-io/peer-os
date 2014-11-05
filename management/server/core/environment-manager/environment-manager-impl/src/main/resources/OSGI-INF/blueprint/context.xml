@@ -11,8 +11,8 @@
 
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
-  <reference id="networkManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.network.api.NetworkManager" />
+  <reference id="securityManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.security.api.SecurityManager" />
   <reference id="peerManager"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
   <reference id="tracker" interface="org.safehaus.subutai.core.tracker.api.Tracker" />
@@ -22,7 +22,7 @@
         destroy-method="destroy"
         class="org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl">
     <property name="templateRegistry" ref="templateRegistry" />
-    <property name="networkManager" ref="networkManager" />
+    <property name="securityManager" ref="securityManager" />
     <property name="tracker" ref="tracker" />
     <property name="peerManager" ref="peerManager" />
     <argument ref="dataSource" />

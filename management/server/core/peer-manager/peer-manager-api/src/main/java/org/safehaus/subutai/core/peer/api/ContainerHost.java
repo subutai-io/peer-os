@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.peer.api;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.container.api.ContainerState;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 
 
@@ -18,12 +18,25 @@ public class ContainerHost extends SubutaiHost
     private String templateName;
     private String templateArch;
     private ContainerState state = ContainerState.UNKNOWN;
+    private String nodeGroupName;
 
 
     public ContainerHost( final Agent agent, UUID peerId, UUID environmentId )
     {
         super( agent, peerId );
         this.environmentId = environmentId;
+    }
+
+
+    public String getNodeGroupName()
+    {
+        return nodeGroupName;
+    }
+
+
+    public void setNodeGroupName( final String nodeGroupName )
+    {
+        this.nodeGroupName = nodeGroupName;
     }
 
 
@@ -96,14 +109,28 @@ public class ContainerHost extends SubutaiHost
 
     public String getQuota( final QuotaEnum quota ) throws PeerException
     {
-        Peer peer = getPeer( this.getPeerId() );
+        Peer peer = getPeer();
         return peer.getQuota( this, quota );
     }
 
 
     public void setQuota( final QuotaEnum quota, final String value ) throws PeerException
     {
-        Peer peer = getPeer( this.getPeerId() );
+        Peer peer = getPeer();
         peer.setQuota( this, quota, value );
+    }
+
+
+    public Template getTemplate() throws PeerException
+    {
+        Peer peer = getPeer();
+        return peer.getTemplate( getTemplateName() );
+    }
+
+
+    public void dispose() throws PeerException
+    {
+        Peer peer = getPeer();
+        peer.destroyContainer( this );
     }
 }

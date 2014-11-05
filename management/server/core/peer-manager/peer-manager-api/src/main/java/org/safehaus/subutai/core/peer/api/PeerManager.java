@@ -8,10 +8,8 @@ import java.util.UUID;
 public interface PeerManager
 {
 
-    @Deprecated
-    boolean register( PeerInfo peerInfo );
+    boolean register( PeerInfo peerInfo ) throws PeerException;
 
-    @Deprecated
     boolean update( PeerInfo peerInfo );
 
 
@@ -22,8 +20,7 @@ public interface PeerManager
 
     public PeerInfo getPeerInfo( UUID uuid );
 
-    @Deprecated
-    boolean unregister( String uuid );
+    boolean unregister( String uuid ) throws PeerException;
 
 
     List<PeerGroup> peersGroups();
@@ -40,4 +37,8 @@ public interface PeerManager
     public LocalPeer getLocalPeer();
 
     PeerGroup getPeerGroup( UUID peerGroupId );
+
+    public void addRequestListener( RequestListener listener );
+
+    public void removeRequestListener( RequestListener listener );
 }

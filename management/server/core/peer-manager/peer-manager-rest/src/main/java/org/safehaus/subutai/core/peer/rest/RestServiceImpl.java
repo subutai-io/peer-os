@@ -19,7 +19,6 @@ import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -65,12 +64,27 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public String getId()
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        return localPeer.getId().toString();
+    }
+
+
+    @Override
     public PeerInfo registerPeer( String config )
     {
         if ( config != null )
         {
             PeerInfo peerInfo = GSON.fromJson( config, PeerInfo.class );
-            peerManager.register( peerInfo );
+            try
+            {
+                peerManager.register( peerInfo );
+            }
+            catch ( PeerException e )
+            {
+                return null;
+            }
             return peerInfo;
         }
         else
@@ -113,8 +127,15 @@ public class RestServiceImpl implements RestService
     public Response processRegisterRequest( String peer )
     {
         PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
-        peerManager.register( p );
-        return Response.ok( GSON.toJson( p ) ).build();
+        try
+        {
+            peerManager.register( p );
+            return Response.ok( GSON.toJson( p ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).entity( e.toString() ).build();
+        }
     }
 
 
@@ -122,14 +143,21 @@ public class RestServiceImpl implements RestService
     public Response unregisterPeer( String peerId )
     {
         UUID id = GSON.fromJson( peerId, UUID.class );
-        boolean result = peerManager.unregister( id.toString() );
-        if ( result )
+        try
         {
-            return Response.ok( "Successfully unregistered peer: " + peerId ).build();
+            boolean result = peerManager.unregister( id.toString() );
+            if ( result )
+            {
+                return Response.ok( "Successfully unregistered peer: " + peerId ).build();
+            }
+            else
+            {
+                return Response.status( Response.Status.NOT_FOUND ).build();
+            }
         }
-        else
+        catch ( PeerException pe )
         {
-            return Response.status( Response.Status.NOT_FOUND ).build();
+            return Response.status( Response.Status.NOT_FOUND ).entity( pe.toString() ).build();
         }
     }
 
@@ -199,11 +227,12 @@ public class RestServiceImpl implements RestService
             Set<ContainerHost> result = localPeer
                     .createContainers( UUID.fromString( ownerPeerId ), UUID.fromString( environmentId ),
                             ( List<Template> ) JsonUtil.fromJson( templates, new TypeToken<List<Template>>()
-                            {}.getType() ), quantity, strategyId, criteriaList );
+                            {
+                            }.getType() ), quantity, strategyId, criteriaList );
             return Response.ok( JsonUtil.toJson( result ) ).build();
             //            return Response.ok().entity( result ).build();
         }
-        catch ( ContainerCreateException e )
+        catch ( PeerException e )
         {
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
@@ -313,6 +342,23 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
+
+
+    @Override
+    public Response getTemplate( final String templateName )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            Template result = localPeer.getTemplate( templateName );
+            return Response.ok( JsonUtil.toJson( result ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
 
     //
     //    @Override

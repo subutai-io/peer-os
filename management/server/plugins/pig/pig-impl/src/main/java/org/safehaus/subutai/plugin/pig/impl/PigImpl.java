@@ -11,23 +11,29 @@ import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDao;
+import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.pig.api.Pig;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.SetupType;
-import org.safehaus.subutai.plugin.pig.impl.handler.DestroyClusterOperationHandler;
-import org.safehaus.subutai.plugin.pig.impl.handler.InstallOperationHandler;
+import org.safehaus.subutai.plugin.pig.impl.handler.ClusterOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 
 public class PigImpl implements Pig
@@ -39,7 +45,7 @@ public class PigImpl implements Pig
     private ExecutorService executor;
     private EnvironmentManager environmentManager;
     private Hadoop hadoopManager;
-    private PluginDao pluginDao;
+    private PluginDAO pluginDao;
     private DataSource dataSource;
 
 
@@ -76,7 +82,7 @@ public class PigImpl implements Pig
     {
         try
         {
-            this.pluginDao = new PluginDao( dataSource );
+            this.pluginDao = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
         {
@@ -105,7 +111,7 @@ public class PigImpl implements Pig
     }
 
 
-    public PluginDao getPluginDao()
+    public PluginDAO getPluginDao()
     {
         return pluginDao;
     }
@@ -132,7 +138,7 @@ public class PigImpl implements Pig
     @Override
     public UUID installCluster( PigConfig config, HadoopClusterConfig hadoopConfig )
     {
-        InstallOperationHandler operationHandler = new InstallOperationHandler( this, config );
+        ClusterOperationHandler operationHandler = new ClusterOperationHandler( this, config, OperationType.INSTALL );
         operationHandler.setHadoopConfig( hadoopConfig );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
@@ -152,6 +158,7 @@ public class PigImpl implements Pig
     @Override
     public UUID addNode( final String clusterName, final String containerHost )
     {
+        // TODO
         /*AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();*/
@@ -180,7 +187,7 @@ public class PigImpl implements Pig
     public UUID installCluster( PigConfig config )
     {
         Preconditions.checkNotNull( config, "Configuration is null" );
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, OperationType.INSTALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -189,7 +196,7 @@ public class PigImpl implements Pig
     @Override
     public UUID uninstallCluster( final String clusterName )
     {
-        AbstractOperationHandler operationHandler = new DestroyClusterOperationHandler( this, clusterName );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, null, OperationType.UNINSTALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -207,4 +214,5 @@ public class PigImpl implements Pig
     {
         return pluginDao.getInfo( PigConfig.PRODUCT_KEY, clusterName, PigConfig.class );
     }
+
 }

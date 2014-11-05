@@ -2,27 +2,31 @@ package org.safehaus.subutai.core.peer.impl;
 
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
-import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.RequestListener;
+import org.safehaus.subutai.core.peer.impl.command.CommandRequestListener;
+import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
+import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequestListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
+import org.safehaus.subutai.core.peer.impl.request.MessageRequestListener;
+import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.slf4j.Logger;
@@ -45,7 +49,7 @@ public class PeerManagerImpl implements PeerManager
     private static final String PEER_GROUP = "PEER_GROUP";
     private AgentManager agentManager;
     private PeerDAO peerDAO;
-    private ContainerManager containerManager;
+//    private ContainerManager containerManager;
     private CommandRunner commandRunner;
     private QuotaManager quotaManager;
     private TemplateRegistry templateRegistry;
@@ -55,8 +59,9 @@ public class PeerManagerImpl implements PeerManager
     private StrategyManager strategyManager;
     private PeerInfo peerInfo;
     private Messenger messenger;
-    private CommandResponseMessageListener commandResponseMessageListener;
-    private CreateContainerResponseListener createContainerResponseListener;
+    private CommandResponseListener commandResponseListener;
+    private Set<RequestListener> requestListeners = Sets.newHashSet();
+    private MessageResponseListener messageResponseListener;
 
 
     public PeerManagerImpl( final DataSource dataSource, final Messenger messenger )
@@ -91,20 +96,25 @@ public class PeerManagerImpl implements PeerManager
         {
             peerInfo = result.get( 0 );
         }
-        localPeer = new LocalPeerImpl( this, containerManager, templateRegistry, peerDAO, communicationManager,
-                commandRunner, quotaManager );
+        localPeer =
+                new LocalPeerImpl( this, agentManager, templateRegistry, peerDAO, communicationManager, commandRunner,
+                        quotaManager, strategyManager, requestListeners );
         localPeer.init();
 
-        //subscribe to command request messages from remote peer
-        messenger.addMessageListener( new CommandRequestMessageListener( localPeer, messenger, this ) );
-        //subscribe to command response messages from remote peer
-        commandResponseMessageListener = new CommandResponseMessageListener();
-        messenger.addMessageListener( commandResponseMessageListener );
-        //subscribe to create container requests from remote peer
-        messenger.addMessageListener( new CreateContainerRequestListener( localPeer, messenger, this ) );
-        //subscribe to create containers responses from remote peer
-        createContainerResponseListener = new CreateContainerResponseListener();
-        messenger.addMessageListener( createContainerResponseListener );
+        //add command request listener
+        addRequestListener( new CommandRequestListener( localPeer, this ) );
+        //add command response listener
+        commandResponseListener = new CommandResponseListener();
+        addRequestListener( commandResponseListener );
+        //subscribe to peer message requests
+        messenger.addMessageListener( new MessageRequestListener( this, messenger, requestListeners ) );
+        //subscribe to peer message responses
+        messageResponseListener = new MessageResponseListener();
+        messenger.addMessageListener( messageResponseListener );
+        //add create container requests listener
+        addRequestListener( new CreateContainerRequestListener( localPeer ) );
+        //add echo listener
+        addRequestListener( new EchoRequestListener() );
     }
 
 
@@ -143,11 +153,11 @@ public class PeerManagerImpl implements PeerManager
         this.templateRegistry = templateRegistry;
     }
 
-
-    public void setContainerManager( final ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
-    }
+    //
+    //    public void setContainerManager( final ContainerManager containerManager )
+    //    {
+    //        this.containerManager = containerManager;
+    //    }
 
 
     public void setQuotaManager( final QuotaManager quotaManager )
@@ -157,21 +167,10 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public boolean register( final PeerInfo peerInfo )
+    public boolean register( final PeerInfo peerInfo ) throws PeerException
     {
-        Agent management = agentManager.getAgentByHostname( "management" );
-        String cmd = String.format( "sed '/^path_map.*$/ s/$/ ; %s %s/' apt-cacher.conf > apt-cacher.conf"
-                        + ".new && mv apt-cacher.conf.new apt-cacher.conf && /etc/init.d/apt-cacher reload",
-                peerInfo.getId().toString(),
-                ( "http://" + peerInfo.getIp() + "/ksks" ).replace( ".", "\\." ).replace( "/", "\\/" ) );
-
-        LOG.info( cmd );
-        RequestBuilder rb = new RequestBuilder( cmd );
-        rb.withCwd( "/etc/apt-cacher/" );
-        Command command = commandRunner.createCommand( rb, Sets.newHashSet( management ) );
-        commandRunner.runCommand( command );
-        boolean r = command.hasSucceeded();
-        LOG.info( "Apt-cacher mapping result: " + r );
+        ManagementHost managementHost = getLocalPeer().getManagementHost();
+        managementHost.addAptSource( peerInfo.getId().toString(), peerInfo.getIp() );
         return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId().toString(), peerInfo );
     }
 
@@ -212,8 +211,11 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public boolean unregister( final String uuid )
+    public boolean unregister( final String uuid ) throws PeerException
     {
+        ManagementHost managementHost = getLocalPeer().getManagementHost();
+        PeerInfo p = getPeerInfo( UUID.fromString( uuid ) );
+        managementHost.removeAptSource( p.getId().toString(), p.getIp() );
         return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, uuid );
     }
 
@@ -277,8 +279,8 @@ public class PeerManagerImpl implements PeerManager
 
         if ( peerInfo != null )
         {
-            return new RemotePeerImpl( peerInfo, messenger, commandResponseMessageListener,
-                    createContainerResponseListener );
+            return new RemotePeerImpl( localPeer, peerInfo, messenger, commandResponseListener,
+                    messageResponseListener );
         }
         return null;
     }
@@ -295,5 +297,25 @@ public class PeerManagerImpl implements PeerManager
     public PeerInfo getLocalPeerInfo()
     {
         return peerInfo;
+    }
+
+
+    @Override
+    public void addRequestListener( RequestListener listener )
+    {
+        if ( listener != null )
+        {
+            requestListeners.add( listener );
+        }
+    }
+
+
+    @Override
+    public void removeRequestListener( RequestListener listener )
+    {
+        if ( listener != null )
+        {
+            requestListeners.add( listener );
+        }
     }
 }

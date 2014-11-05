@@ -19,6 +19,7 @@
     <module>solr</module>
     <module>hadoop</module>
     <module>pig</module>
+    <module>elasticsearch</module>
     <!--<module>accumulo</module>
     <module>hadoop</module>
     <module>zookeeper</module>
@@ -33,11 +34,11 @@
     <module>shark</module>
     <module>sqoop</module>
     <module>lucene</module>
-    <module>elasticsearch</module>
     <module>hbase</module>
     <module>mahout</module>
     <module>hipi</module>
     <module>nutch</module>
+    <module>plugin-common</module>
     <module>jetty</module>-->
     <module>plugin-common</module>
   </modules>

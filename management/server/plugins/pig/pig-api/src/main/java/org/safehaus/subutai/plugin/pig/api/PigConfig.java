@@ -96,7 +96,6 @@ public class PigConfig implements ConfigBase
         this.clusterName = hadoopClusterName;
     }
 
-
     public Set<UUID> getHadoopNodes()
     {
         return hadoopNodes;

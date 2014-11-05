@@ -38,6 +38,11 @@ public interface RestService
     @Produces(MediaType.APPLICATION_JSON)
     public String getPeerJsonFormat();
 
+    @GET
+    @Path("id")
+    @Produces("text/plain")
+    public String getId();
+
 
     @POST
     @Path("container/create")
@@ -64,9 +69,15 @@ public interface RestService
     public Response stopContainer( @FormParam("host") String host );
 
     @POST
-    @Path( "container/isconnected" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response isContainerConnected( @FormParam( "host" ) String host );
+    @Path("container/isconnected")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response isContainerConnected( @FormParam("host") String host );
+
+
+    @POST
+    @Path("template/get")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTemplate( @FormParam("templateName") String templateName );
 
     @POST
     @Path("execute")

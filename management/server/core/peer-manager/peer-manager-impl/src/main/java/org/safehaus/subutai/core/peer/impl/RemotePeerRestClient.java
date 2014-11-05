@@ -8,6 +8,7 @@ import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
@@ -90,7 +91,8 @@ public class RemotePeerRestClient
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             return JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHost>>()
-            {}.getType() );
+            {
+            }.getType() );
         }
 
         if ( response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() )
@@ -182,6 +184,53 @@ public class RemotePeerRestClient
         else
         {
             throw new PeerException( response.getEntity().toString() );
+        }
+    }
+
+
+    public Template getTemplate( final String templateName ) throws PeerException
+    {
+        String path = "peer/template/get";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "templateName", templateName );
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), Template.class );
+        }
+        else
+        {
+            throw new PeerException( "Could not retrieve remote template.", response.getEntity().toString() );
+        }
+    }
+
+
+    public UUID getId() throws PeerException
+    {
+        String path = "peer/id";
+        try
+        {
+            WebClient client = createWebClient();
+
+            Response response = client.path( path ).accept( MediaType.TEXT_PLAIN ).get();
+
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+                return UUID.fromString( response.readEntity( String.class ) );
+            }
+            else
+            {
+                throw new PeerException( "Could not retrieve remote peer ID." );
+            }
+        }
+        catch ( Exception ce )
+        {
+            throw new PeerException( "Could not retrieve remote peer ID.", ce.toString() );
         }
     }
 }
