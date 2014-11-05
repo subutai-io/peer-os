@@ -302,6 +302,72 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
+    public void createAdditionalContainers( final UUID id, final String ngJson, final Peer peer )
+            throws EnvironmentBuildException
+    {
+        Environment environment = getEnvironmentByUUID( id );
+        NodeGroup nodeGroup = GSON.fromJson( ngJson, NodeGroup.class );
+
+        List<Template> templatesData = new ArrayList();
+
+        List<Template> templates = templateRegistry.getParentTemplates( nodeGroup.getTemplateName() );
+        Template installationTemplate = templateRegistry.getTemplate( nodeGroup.getTemplateName() );
+        if ( installationTemplate != null )
+        {
+            templates.add( installationTemplate );
+        }
+        else
+        {
+            environment.setStatus( EnvironmentStatusEnum.BROKEN );
+            saveEnvironment( environment );
+            throw new EnvironmentBuildException( "Could not get installation template data" );
+        }
+
+        UUID peerId = peerManager.getLocalPeer().getId();
+
+        if ( peerId == null )
+        {
+            environment.setStatus( EnvironmentStatusEnum.BROKEN );
+            saveEnvironment( environment );
+            throw new EnvironmentBuildException( "Could not get Peer ID" );
+        }
+
+
+        for ( Template t : templates )
+        {
+            templatesData.add( t.getRemoteClone( peerId ) );
+        }
+
+        try
+        {
+            Set<ContainerHost> containers = peerManager.getPeer( peer.getId() ).
+                    createContainers( peerId, environment.getId(), templatesData, nodeGroup.getNumberOfNodes(),
+                            nodeGroup.getPlacementStrategy().toString(), null );
+            if ( !containers.isEmpty() )
+            {
+                for ( ContainerHost container : containers )
+                {
+                    container.setNodeGroupName( nodeGroup.getName() );
+                    environment.addContainer( container );
+                }
+            }
+            else
+            {
+                environment.setStatus( EnvironmentStatusEnum.BROKEN );
+                saveEnvironment( environment );
+                throw new EnvironmentBuildException(
+                        String.format( "FAILED creating environment on %s", peer.getId() ) );
+            }
+        }
+        catch ( PeerException e )
+        {
+            throw new EnvironmentBuildException( e.getMessage() );
+        }
+        saveEnvironment( environment );
+    }
+
+
+    @Override
     public Environment buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
     {
         try
