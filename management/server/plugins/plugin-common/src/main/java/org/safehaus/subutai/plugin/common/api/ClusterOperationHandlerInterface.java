@@ -5,9 +5,7 @@ public interface ClusterOperationHandlerInterface
 {
 
     /**
-     * Runs operations on containers.
-     * This method will be used to start, stop, status
-     * whole cluster.
+     * This method will be used to send START, STOP and STATUS operations to containers.
      * @param operationType type of operation (START, STOP, STATUS)
      */
     public void runOperationOnContainers( OperationType operationType );

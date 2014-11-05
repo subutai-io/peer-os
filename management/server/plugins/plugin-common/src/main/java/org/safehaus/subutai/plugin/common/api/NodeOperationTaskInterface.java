@@ -8,7 +8,7 @@ public interface NodeOperationTaskInterface
 {
     /**
      * Runs operation tasks on cluster.
-     * Example operations could start, stop, status.
+     * Example operations: start, stop, status.
      *
      * @return
      */
@@ -16,26 +16,25 @@ public interface NodeOperationTaskInterface
 
 
     /**
-     * This string is going to be used to check if
-     * product is running on containers. Particularly for
-     * elasticsearch, you need to return "elasticsearch is
-     * not running". Then this returned value is going to be
-     * used while comparing command results coming from containers.
-     * e.g. ( elasticsearch is not running )
+     * This string will be used while comparing command result
+     * to verify if product is running on container.
      *
-     * @return
+     * For example; this method should return "elasticsearch is running",
+     * since the output of "service elasticsearch status" command
+     * "elasticsearch is running" or "elasticsearch is not running".
+     * @return should be equal to the result of "service {product} status" command.
      */
     public String getProductStoppedIdentifier();
 
 
     /**
-     * This string is going to be used to check if
-     * product is running on containers. Particularly for
-     * elasticsearch, you need to return "elasticsearch is
-     * running". Then this returned value is going to be
-     * used while comparing command results coming from containers.
-     * e.g. ( elasticsearch is running )
-     * @return
+     * This string will be used while comparing command result
+     * to verify if product is running on container.
+     *
+     * For example; this method should return "elasticsearch is running",
+     * since the output of "service elasticsearch status" command
+     * "elasticsearch is running" or "elasticsearch is not running".
+     * @return should be equal to the result of "service {product} status" command.
      */
     public String getProductRunningIdentifier();
 
