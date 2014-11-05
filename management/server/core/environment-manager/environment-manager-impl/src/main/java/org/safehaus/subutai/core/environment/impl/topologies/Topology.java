@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.environment.impl.topologies;
 
 
 import java.util.List;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.core.environment.impl.environment.ContainerDistributionMessage;
@@ -14,5 +15,6 @@ public abstract class Topology
 {
 
 
-    public abstract List<ContainerDistributionMessage> digestBlueprint( final EnvironmentBlueprint blueprint );
+    public abstract List<ContainerDistributionMessage> digestBlueprint( final EnvironmentBlueprint blueprint,
+                                                                        UUID environmentId );
 }

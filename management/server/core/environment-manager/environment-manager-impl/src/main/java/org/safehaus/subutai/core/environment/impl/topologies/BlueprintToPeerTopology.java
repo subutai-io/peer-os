@@ -3,12 +3,14 @@ package org.safehaus.subutai.core.environment.impl.topologies;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.environment.impl.environment.ContainerDistributionMessage;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 
 /**
@@ -18,17 +20,20 @@ public class BlueprintToPeerTopology extends Topology
 {
 
 
-    Peer peer;
+    private final TemplateRegistry templateRegistry;
+    private final Peer peer;
 
 
-    public BlueprintToPeerTopology( final Peer peer )
+    public BlueprintToPeerTopology( final Peer peer, TemplateRegistry templateRegistry )
     {
         this.peer = peer;
+        this.templateRegistry = templateRegistry;
     }
 
 
     @Override
-    public List<ContainerDistributionMessage> digestBlueprint( final EnvironmentBlueprint blueprint )
+    public List<ContainerDistributionMessage> digestBlueprint( final EnvironmentBlueprint blueprint,
+                                                               UUID environmentId )
     {
         List<ContainerDistributionMessage> messages = new ArrayList<>();
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
@@ -38,16 +43,31 @@ public class BlueprintToPeerTopology extends Topology
             message.setNumberOfContainers( nodeGroup.getNumberOfNodes() );
             message.setTargetPeerId( peer.getId() );
             message.setCriterias( null );
-            message.setTemplates( fetchRequiredTempaltes() );
-
+            message.setEnvironmentId( environmentId );
+            message.setTemplates( fetchRequiredTempaltes( peer.getId(), nodeGroup.getTemplateName() ) );
             messages.add( message );
         }
         return messages;
     }
 
 
-    private List<Template> fetchRequiredTempaltes()
+    private List<Template> fetchRequiredTempaltes( UUID sourcePeerId, final String templateName )
     {
-        return null;
+        List<Template> requiredTemplates = new ArrayList<>();
+        List<Template> templates = templateRegistry.getParentTemplates( templateName );
+
+        Template installationTemplate = templateRegistry.getTemplate( templateName );
+        if ( installationTemplate != null )
+        {
+            templates.add( installationTemplate );
+        }
+
+
+        for ( Template t : templates )
+        {
+            requiredTemplates.add( t.getRemoteClone( sourcePeerId ) );
+        }
+
+        return requiredTemplates;
     }
 }
