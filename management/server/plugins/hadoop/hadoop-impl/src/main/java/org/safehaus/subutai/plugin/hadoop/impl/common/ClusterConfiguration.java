@@ -21,8 +21,7 @@ public class ClusterConfiguration
     private HadoopImpl hadoopManager;
 
 
-
-    public ClusterConfiguration( final TrackerOperation operation, final HadoopImpl cassandraManager)
+    public ClusterConfiguration( final TrackerOperation operation, final HadoopImpl cassandraManager )
     {
         this.po = operation;
         this.hadoopManager = cassandraManager;
@@ -36,13 +35,15 @@ public class ClusterConfiguration
         po.addLog( String.format( "Configuring cluster: %s", config.getClusterName() ) );
 
         // Clear configuration files
-        for ( ContainerHost containerHost : environment.getContainers() ){
+        for ( ContainerHost containerHost : environment.getContainers() )
+        {
             containerHost.execute( new RequestBuilder( commands.getClearMastersCommand() ) );
             containerHost.execute( new RequestBuilder( commands.getClearSlavesCommand() ) );
         }
 
         // Configure NameNode
-        for ( ContainerHost containerHost : environment.getContainers() ){
+        for ( ContainerHost containerHost : environment.getContainers() )
+        {
             containerHost.execute( new RequestBuilder( commands.getSetMastersCommand() ) );
         }
 
@@ -55,15 +56,17 @@ public class ClusterConfiguration
 
 
         // Configure DataNodes
-        for ( ContainerHost containerHost : config.getDataNodes() ){
+        for ( ContainerHost containerHost : config.getDataNodes() )
+        {
             config.getNameNode().execute(
                     new RequestBuilder( commands.getConfigureDataNodesCommand( containerHost.getHostname() ) ) );
         }
 
         // Configure TaskTrackers
-        for ( ContainerHost containerHost : config.getTaskTrackers() ){
+        for ( ContainerHost containerHost : config.getTaskTrackers() )
+        {
             config.getJobTracker().execute(
-                    new RequestBuilder( commands.getConfigureTaskTrackersCcommand( containerHost.getHostname() ) ) );
+                    new RequestBuilder( commands.getConfigureTaskTrackersCommand( containerHost.getHostname() ) ) );
         }
 
         // Format NameNode

@@ -46,8 +46,8 @@ public class StopNameNodeOperationHandler extends AbstractOperationHandler<Hadoo
             return;
         }
 
-        Environment
-                environment = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
+        Environment environment =
+                manager.getEnvironmentManager().getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
         Iterator iterator = environment.getContainers().iterator();
 
         ContainerHost host = null;
@@ -76,6 +76,7 @@ public class StopNameNodeOperationHandler extends AbstractOperationHandler<Hadoo
             trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
         }
     }
+
 
     private void logStatusResults( TrackerOperation po, CommandResult result )
     {
@@ -113,8 +114,7 @@ public class StopNameNodeOperationHandler extends AbstractOperationHandler<Hadoo
         }
         else
         {
-            trackerOperation.addLogFailed(
-                    String.format( "Failed to start NameNode" ) );
+            trackerOperation.addLogFailed( String.format( "Failed to start NameNode" ) );
         }
     }
 }

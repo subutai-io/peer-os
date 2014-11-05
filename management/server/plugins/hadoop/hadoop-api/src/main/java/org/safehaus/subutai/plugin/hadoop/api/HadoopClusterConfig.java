@@ -41,6 +41,111 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
+    public static List<NodeType> getNodeRoles( HadoopClusterConfig clusterConfig, final ContainerHost containerHost )
+    {
+        List<NodeType> nodeRoles = new ArrayList<>();
+
+        if ( clusterConfig.isNameNode( containerHost ) )
+        {
+            nodeRoles.add( NodeType.NAMENODE );
+        }
+        if ( clusterConfig.isSecondaryNameNode( containerHost ) )
+        {
+            nodeRoles.add( NodeType.SECONDARY_NAMENODE );
+        }
+        if ( clusterConfig.isJobTracker( containerHost ) )
+        {
+            nodeRoles.add( NodeType.JOBTRACKER );
+        }
+        if ( clusterConfig.isDataNode( containerHost ) )
+        {
+            nodeRoles.add( NodeType.DATANODE );
+        }
+        if ( clusterConfig.isTaskTracker( containerHost ) )
+        {
+            nodeRoles.add( NodeType.TASKTRACKER );
+        }
+
+        return nodeRoles;
+    }
+
+
+    public boolean isDataNode( ContainerHost containerHost )
+    {
+        return getAllDataNodeAgent().contains( containerHost.getAgent().getUuid() );
+    }
+
+
+    public Set<UUID> getAllDataNodeAgent()
+    {
+        Set<UUID> allAgents = new HashSet<>();
+        for ( ContainerHost containerHost : getDataNodes() )
+        {
+            allAgents.add( containerHost.getAgent().getUuid() );
+        }
+        return allAgents;
+    }
+
+
+    public List<ContainerHost> getDataNodes()
+    {
+        return dataNodes;
+    }
+
+
+    public void setDataNodes( List<ContainerHost> dataNodes )
+    {
+        this.dataNodes = dataNodes;
+    }
+
+
+    public boolean isTaskTracker( ContainerHost containerHost )
+    {
+        return getAllTaskTrackerNodeAgents().contains( containerHost.getAgent().getUuid() );
+    }
+
+
+    public Set<UUID> getAllTaskTrackerNodeAgents()
+    {
+        Set<UUID> allAgents = new HashSet<>();
+        for ( ContainerHost containerHost : getTaskTrackers() )
+        {
+            allAgents.add( containerHost.getAgent().getUuid() );
+        }
+        return allAgents;
+    }
+
+
+    public List<ContainerHost> getTaskTrackers()
+    {
+        return taskTrackers;
+    }
+
+
+    public void setTaskTrackers( List<ContainerHost> taskTrackers )
+    {
+        this.taskTrackers = taskTrackers;
+    }
+
+
+    public boolean isNameNode( ContainerHost containerHost )
+    {
+        return getNameNode().getAgent().getUuid().equals( containerHost.getAgent().getUuid() );
+    }
+
+
+    public boolean isJobTracker( ContainerHost containerHost )
+    {
+        return getJobTracker().getAgent().getUuid().equals( containerHost.getAgent().getUuid() );
+    }
+
+
+    public boolean isSecondaryNameNode( ContainerHost containerHost )
+    {
+        return getSecondaryNameNode().getAgent().getUuid().equals( containerHost.getAgent().getUuid() );
+    }
+
+
     public UUID getEnvironmentId()
     {
         return environmentId;
@@ -62,6 +167,20 @@ public class HadoopClusterConfig implements ConfigBase
     public void setTemplateName( final String templateName )
     {
         this.templateName = templateName;
+    }
+
+
+    public ContainerHost getNode( Agent agent )
+    {
+        Preconditions.checkNotNull( agent, "Agent is null" );
+        for ( ContainerHost containerHost : getAllNodes() )
+        {
+            if ( containerHost.getAgent().getUuid().equals( agent.getUuid() ) )
+            {
+                return containerHost;
+            }
+        }
+        return null;
     }
 
 
@@ -94,21 +213,22 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public ContainerHost getNode( Agent agent ){
-        Preconditions.checkNotNull( agent, "Agent is null");
-        for ( ContainerHost containerHost : getAllNodes() ){
-            if ( containerHost.getAgent().getUuid().equals( agent.getUuid() ) ){
-                return  containerHost;
-            }
+    public Set<UUID> getAllMasterNodesAgents()
+    {
+        Set<UUID> allAgents = new HashSet<>();
+        for ( ContainerHost containerHost : getAllMasterNodes() )
+        {
+            allAgents.add( containerHost.getAgent().getUuid() );
         }
-        return null;
+        return allAgents;
     }
 
 
-    public Set<ContainerHost> getAllMasterNodes(){
-        Preconditions.checkNotNull( nameNode, "NameNode is null");
-        Preconditions.checkNotNull( jobTracker, "JobTracker is null");
-        Preconditions.checkNotNull( secondaryNameNode, "SecondaryNameNode is null");
+    public Set<ContainerHost> getAllMasterNodes()
+    {
+        Preconditions.checkNotNull( nameNode, "NameNode is null" );
+        Preconditions.checkNotNull( jobTracker, "JobTracker is null" );
+        Preconditions.checkNotNull( secondaryNameNode, "SecondaryNameNode is null" );
         Set<ContainerHost> allMastersNodes = new HashSet<>();
         allMastersNodes.add( nameNode );
         allMastersNodes.add( jobTracker );
@@ -116,13 +236,17 @@ public class HadoopClusterConfig implements ConfigBase
         return allMastersNodes;
     }
 
-    public Set<UUID> getAllMasterNodesAgents(){
+
+    public Set<UUID> getAllSlaveNodesAgents()
+    {
         Set<UUID> allAgents = new HashSet<>();
-        for( ContainerHost containerHost : getAllMasterNodes() ){
+        for ( ContainerHost containerHost : getAllSlaveNodes() )
+        {
             allAgents.add( containerHost.getAgent().getUuid() );
         }
-        return  allAgents;
+        return allAgents;
     }
+
 
     public List<ContainerHost> getAllSlaveNodes()
     {
@@ -137,33 +261,6 @@ public class HadoopClusterConfig implements ConfigBase
         }
 
         return new ArrayList<>( allAgents );
-    }
-
-
-    public Set<UUID> getAllSlaveNodesAgents(){
-        Set<UUID> allAgents = new HashSet<>();
-        for( ContainerHost containerHost : getAllSlaveNodes() ){
-            allAgents.add( containerHost.getAgent().getUuid() );
-        }
-        return  allAgents;
-    }
-
-
-    public Set<UUID> getAllTaskTrackerNodeAgents(){
-        Set<UUID> allAgents = new HashSet<>();
-        for( ContainerHost containerHost : getTaskTrackers() ){
-            allAgents.add( containerHost.getAgent().getUuid() );
-        }
-        return  allAgents;
-    }
-
-
-    public Set<UUID> getAllDataNodeAgent(){
-        Set<UUID> allAgents = new HashSet<>();
-        for( ContainerHost containerHost : getDataNodes() ){
-            allAgents.add( containerHost.getAgent().getUuid() );
-        }
-        return  allAgents;
     }
 
 
@@ -295,60 +392,6 @@ public class HadoopClusterConfig implements ConfigBase
     public void setSecondaryNameNode( ContainerHost secondaryNameNode )
     {
         this.secondaryNameNode = secondaryNameNode;
-    }
-
-
-    public boolean isDataNode( ContainerHost containerHost )
-    {
-        return getAllDataNodeAgent().contains( containerHost.getAgent().getUuid() );
-    }
-
-
-    public List<ContainerHost> getDataNodes()
-    {
-        return dataNodes;
-    }
-
-
-    public void setDataNodes( List<ContainerHost> dataNodes )
-    {
-        this.dataNodes = dataNodes;
-    }
-
-
-    public boolean isTaskTracker( ContainerHost containerHost )
-    {
-        return getAllTaskTrackerNodeAgents().contains( containerHost.getAgent().getUuid() );
-    }
-
-
-    public List<ContainerHost> getTaskTrackers()
-    {
-        return taskTrackers;
-    }
-
-
-    public void setTaskTrackers( List<ContainerHost> taskTrackers )
-    {
-        this.taskTrackers = taskTrackers;
-    }
-
-
-    public boolean isNameNode( ContainerHost containerHost )
-    {
-        return getNameNode().getAgent().getUuid().equals( containerHost.getAgent().getUuid() );
-    }
-
-
-    public boolean isJobTracker( ContainerHost containerHost )
-    {
-        return getJobTracker().getAgent().getUuid().equals( containerHost.getAgent().getUuid() );
-    }
-
-
-    public boolean isSecondaryNameNode( ContainerHost containerHost )
-    {
-        return getSecondaryNameNode().getAgent().getUuid().equals( containerHost.getAgent().getUuid() );
     }
 
 

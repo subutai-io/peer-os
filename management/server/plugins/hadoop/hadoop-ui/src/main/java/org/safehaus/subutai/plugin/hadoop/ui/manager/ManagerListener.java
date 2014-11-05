@@ -36,9 +36,7 @@ import org.safehaus.subutai.plugin.hadoop.ui.manager.components.StopTask;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.QuestionDialog;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.event.Action;
 import com.vaadin.event.ItemClickEvent;
@@ -66,32 +64,34 @@ public class ManagerListener
 
     protected ItemClickEvent.ItemClickListener getTableClickListener( final Table table )
     {
-//        return new ItemClickEvent.ItemClickListener()
-//        {
-//            @Override
-//            public void itemClick( ItemClickEvent event )
-//            {
-//                if ( event.isDoubleClick() )
-//                {
-//                    String lxcHostname =
-//                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-//                    Environ
-//
-//                    Agent lxcAgent = hadoopManager.getAgentManager().getAgentByHostname( lxcHostname );
-//                    if ( lxcAgent != null )
-//                    {
-//                        TerminalWindow terminal =
-//                                new TerminalWindow( Sets.newHashSet( lxcAgent ), hadoopManager.getExecutorService(),
-//                                        hadoopManager.getCommandRunner(), hadoopManager.getAgentManager() );
-//                        hadoopManager.getContentRoot().getUI().addWindow( terminal.getWindow() );
-//                    }
-//                    else
-//                    {
-//                        hadoopManager.show( "Agent of " + lxcHostname + " is not connected" );
-//                    }
-//                }
-//            }
-//        };
+        //        return new ItemClickEvent.ItemClickListener()
+        //        {
+        //            @Override
+        //            public void itemClick( ItemClickEvent event )
+        //            {
+        //                if ( event.isDoubleClick() )
+        //                {
+        //                    String lxcHostname =
+        //                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" )
+        // .getValue();
+        //                    Environ
+        //
+        //                    Agent lxcAgent = hadoopManager.getAgentManager().getAgentByHostname( lxcHostname );
+        //                    if ( lxcAgent != null )
+        //                    {
+        //                        TerminalWindow terminal =
+        //                                new TerminalWindow( Sets.newHashSet( lxcAgent ),
+        // hadoopManager.getExecutorService(),
+        //                                        hadoopManager.getCommandRunner(), hadoopManager.getAgentManager() );
+        //                        hadoopManager.getContentRoot().getUI().addWindow( terminal.getWindow() );
+        //                    }
+        //                    else
+        //                    {
+        //                        hadoopManager.show( "Agent of " + lxcHostname + " is not connected" );
+        //                    }
+        //                }
+        //            }
+        //        };
         return null;
     }
 
@@ -432,6 +432,13 @@ public class ManagerListener
     }
 
 
+    private void enableCheckAllButton()
+    {
+        if ( hadoopManager.getProcessCount() == 0 )
+        {
+            hadoopManager.getCheckAllButton().setEnabled( true );
+        }
+    }
 
 
     protected Button.ClickListener secondaryNameNodeURLButtonListener( final Agent agent )
@@ -743,7 +750,6 @@ public class ManagerListener
                                     }
 
 
-
                                     if ( hadoopManager.getCheckAllButton().isEnabled() )
                                     {
                                         checkDecommissioningStatus( row, checkButton );
@@ -790,14 +796,6 @@ public class ManagerListener
                 }
             }
         };
-    }
-
-    private void enableCheckAllButton()
-    {
-        if ( hadoopManager.getProcessCount() == 0 )
-        {
-            hadoopManager.getCheckAllButton().setEnabled( true );
-        }
     }
 
 
@@ -851,7 +849,6 @@ public class ManagerListener
                                 executeSlaveNodeCheckButtonFinishCommands( row, checkButton );
                             }
                         }, null ) );
-
     }
 
 

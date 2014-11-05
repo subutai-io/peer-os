@@ -45,7 +45,8 @@ public class StatusTaskTrackerOperationHandler extends AbstractOperationHandler<
             return;
         }
 
-        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
+        Environment environment =
+                manager.getEnvironmentManager().getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
         Iterator iterator = environment.getContainers().iterator();
 
         ContainerHost host = null;
@@ -74,6 +75,7 @@ public class StatusTaskTrackerOperationHandler extends AbstractOperationHandler<
             trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
         }
     }
+
 
     private void logStatusResults( TrackerOperation po, CommandResult result )
     {

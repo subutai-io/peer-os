@@ -7,7 +7,6 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
@@ -68,10 +67,9 @@ public interface Hadoop extends ApiBase<HadoopClusterConfig>
 
     public ClusterSetupStrategy getClusterSetupStrategy( TrackerOperation po, HadoopClusterConfig hadoopClusterConfig );
 
-    public ClusterSetupStrategy getClusterSetupStrategy( TrackerOperation po, HadoopClusterConfig hadoopClusterConfig,
-                                                         Environment environment );
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment,
+                                                         HadoopClusterConfig hadoopClusterConfig, TrackerOperation po );
 
     public org.safehaus.subutai.common.protocol.EnvironmentBlueprint getDefaultEnvironmentBlueprint(
-            final HadoopClusterConfig config )
-            throws ClusterSetupException;
+            final HadoopClusterConfig config ) throws ClusterSetupException;
 }

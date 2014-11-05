@@ -23,6 +23,7 @@ public class StatusDataNodeOperationHandler extends AbstractOperationHandler<Had
 
     private UUID agentUUID;
 
+
     public StatusDataNodeOperationHandler( HadoopImpl manager, String clusterName, Agent agent )
     {
         super( manager, clusterName );
@@ -51,7 +52,8 @@ public class StatusDataNodeOperationHandler extends AbstractOperationHandler<Had
             return;
         }
 
-        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
+        Environment environment =
+                manager.getEnvironmentManager().getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
         Iterator iterator = environment.getContainers().iterator();
 
         ContainerHost host = null;
@@ -80,6 +82,7 @@ public class StatusDataNodeOperationHandler extends AbstractOperationHandler<Had
             trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
         }
     }
+
 
     private void logStatusResults( TrackerOperation po, CommandResult result )
     {
@@ -116,5 +119,4 @@ public class StatusDataNodeOperationHandler extends AbstractOperationHandler<Had
             trackerOperation.addLogDone( String.format( "DataNode is %s", nodeState ) );
         }
     }
-
 }

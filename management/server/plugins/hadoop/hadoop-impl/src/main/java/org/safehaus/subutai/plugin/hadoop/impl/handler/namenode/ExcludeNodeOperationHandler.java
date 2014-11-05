@@ -82,7 +82,8 @@
 //        hadoopClusterConfig.getBlockedAgents().add( node );
 //
 //        manager.getPluginDAO()
-//               .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(), hadoopClusterConfig );
+//               .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+// hadoopClusterConfig );
 //        trackerOperation.addLogDone( "Cluster info saved to DB" );
 //    }
 //

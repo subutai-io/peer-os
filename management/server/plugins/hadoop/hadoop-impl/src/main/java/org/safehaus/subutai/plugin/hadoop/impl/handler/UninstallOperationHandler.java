@@ -8,12 +8,11 @@ import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Sets;
-
 
 public class UninstallOperationHandler extends AbstractOperationHandler<HadoopImpl>
 {
     private static final Logger LOG = LoggerFactory.getLogger( UninstallOperationHandler.class );
+
 
     public UninstallOperationHandler( HadoopImpl manager, String clusterName )
     {

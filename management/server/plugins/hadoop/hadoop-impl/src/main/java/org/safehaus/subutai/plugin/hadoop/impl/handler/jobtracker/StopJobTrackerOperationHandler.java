@@ -3,15 +3,11 @@ package org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker;
 
 import java.util.Iterator;
 
-import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -42,7 +38,8 @@ public class StopJobTrackerOperationHandler extends AbstractOperationHandler<Had
             return;
         }
 
-        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
+        Environment environment =
+                manager.getEnvironmentManager().getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
         Iterator iterator = environment.getContainers().iterator();
 
         ContainerHost host = null;
@@ -71,6 +68,7 @@ public class StopJobTrackerOperationHandler extends AbstractOperationHandler<Had
             trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
         }
     }
+
 
     private void logStatusResults( TrackerOperation po, CommandResult result )
     {

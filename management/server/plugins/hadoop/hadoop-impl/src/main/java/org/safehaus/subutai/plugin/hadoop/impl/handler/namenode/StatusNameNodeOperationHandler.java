@@ -46,8 +46,8 @@ public class StatusNameNodeOperationHandler extends AbstractOperationHandler<Had
             return;
         }
 
-        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID(
-                hadoopClusterConfig.getEnvironmentId() );
+        Environment environment =
+                manager.getEnvironmentManager().getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
         Iterator iterator = environment.getContainers().iterator();
 
         ContainerHost host = null;
@@ -77,6 +77,7 @@ public class StatusNameNodeOperationHandler extends AbstractOperationHandler<Had
         }
     }
 
+
     private void logStatusResults( TrackerOperation trackerOperation, CommandResult result )
     {
         NodeState nodeState = NodeState.UNKNOWN;
@@ -90,7 +91,7 @@ public class StatusNameNodeOperationHandler extends AbstractOperationHandler<Had
                 {
                     String temp = status.replaceAll(
                             Pattern.quote( "!(SecondaryNameNode is not running on this " + "machine)" ), "" ).
-                            replaceAll( "NameNode is ", "" );
+                                                replaceAll( "NameNode is ", "" );
                     if ( temp.toLowerCase().contains( "not" ) )
                     {
                         nodeState = NodeState.STOPPED;
@@ -104,12 +105,11 @@ public class StatusNameNodeOperationHandler extends AbstractOperationHandler<Had
         }
         if ( NodeState.UNKNOWN.equals( nodeState ) )
         {
-            trackerOperation.addLogFailed( String.format( "Failed to check status of node") );
+            trackerOperation.addLogFailed( String.format( "Failed to check status of node" ) );
         }
         else
         {
-            trackerOperation
-                    .addLogDone( String.format( "NameNode is %s", nodeState ) );
+            trackerOperation.addLogDone( String.format( "NameNode is %s", nodeState ) );
         }
     }
 }

@@ -898,6 +898,7 @@
       </dependency>
 
 
+      <!-- HADOOP -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>hadoop-plugin-api</artifactId>

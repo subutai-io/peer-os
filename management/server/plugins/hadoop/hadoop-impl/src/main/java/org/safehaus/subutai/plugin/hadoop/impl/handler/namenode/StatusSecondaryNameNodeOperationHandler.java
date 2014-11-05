@@ -1,22 +1,19 @@
 package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
 
 
+import java.util.Iterator;
+
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
-
-import java.util.Iterator;
 
 
 public class StatusSecondaryNameNodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
@@ -48,8 +45,8 @@ public class StatusSecondaryNameNodeOperationHandler extends AbstractOperationHa
             return;
         }
 
-        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID(
-                hadoopClusterConfig.getEnvironmentId() );
+        Environment environment =
+                manager.getEnvironmentManager().getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
         Iterator iterator = environment.getContainers().iterator();
 
         ContainerHost host = null;
@@ -79,30 +76,31 @@ public class StatusSecondaryNameNodeOperationHandler extends AbstractOperationHa
         }
     }
 
-    private void logStatusResults( TrackerOperation po, CommandResult result, String hostname)
+
+    private void logStatusResults( TrackerOperation po, CommandResult result, String hostname )
     {
         NodeState nodeState = NodeState.UNKNOWN;
 
-            if ( result.getStdOut() != null && result.getStdOut().contains( "SecondaryNameNode" ) )
-            {
-                String[] array = result.getStdOut().split( "\n" );
+        if ( result.getStdOut() != null && result.getStdOut().contains( "SecondaryNameNode" ) )
+        {
+            String[] array = result.getStdOut().split( "\n" );
 
-                for ( String status : array )
+            for ( String status : array )
+            {
+                if ( status.contains( "SecondaryNameNode" ) )
                 {
-                    if ( status.contains( "SecondaryNameNode" ) )
+                    String temp = status.replaceAll( "SecondaryNameNode is ", "" );
+                    if ( temp.toLowerCase().contains( "not" ) )
                     {
-                        String temp = status.replaceAll( "SecondaryNameNode is ", "" );
-                        if ( temp.toLowerCase().contains( "not" ) )
-                        {
-                            nodeState = NodeState.STOPPED;
-                        }
-                        else
-                        {
-                            nodeState = NodeState.RUNNING;
-                        }
+                        nodeState = NodeState.STOPPED;
+                    }
+                    else
+                    {
+                        nodeState = NodeState.RUNNING;
                     }
                 }
             }
+        }
 
 
         if ( NodeState.UNKNOWN.equals( nodeState ) )
@@ -111,8 +109,7 @@ public class StatusSecondaryNameNodeOperationHandler extends AbstractOperationHa
         }
         else
         {
-            trackerOperation
-                    .addLogDone( String.format( "Secondary NameNode is %s", nodeState ) );
+            trackerOperation.addLogDone( String.format( "Secondary NameNode is %s", nodeState ) );
         }
     }
 }

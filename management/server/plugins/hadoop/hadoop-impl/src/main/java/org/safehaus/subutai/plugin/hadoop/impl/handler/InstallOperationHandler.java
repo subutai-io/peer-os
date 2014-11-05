@@ -65,7 +65,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<HadoopImpl
         {
             Environment env = manager.getEnvironmentManager()
                                      .buildEnvironment( manager.getDefaultEnvironmentBlueprint( config ) );
-            ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( trackerOperation, config, env );
+            ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( env, config, trackerOperation );
             setupStrategy.setup();
 
             trackerOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
