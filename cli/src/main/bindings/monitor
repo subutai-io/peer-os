@@ -7,7 +7,6 @@ function monitor_usage {
   echo
   echo "        "subutai \[-qh\] monitor \[-c\|-s metric_type\|-e metric_type\|-q metric_type\] \[hostname\]
   echo "          "parameters:
-  echo "                    "p -- physical machine
   echo "                    "c -- create monitoring infrastructure for container
   echo "                    "s -- starts monitoring of container for given metric
   echo "                    "e -- ends monitoring of container for given metric
