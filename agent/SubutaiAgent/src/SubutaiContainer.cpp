@@ -70,6 +70,7 @@ string SubutaiContainer::RunProgram(string program, vector<string> params)
 
 ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> params, bool return_result, lxc_attach_options_t opts) 
 {
+    containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Running program: ", program));
     char* _params[params.size() + 2];
     _params[0] = const_cast<char*>(program.c_str());
     vector<string>::iterator it;
@@ -105,6 +106,7 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     } else {
         result.err = command_output;
     }
+    containerLogger->writeLog(1,containerLogger->setLogData("<SubutaiContainer>","Program executed: ", program));
     return result;
 }
 

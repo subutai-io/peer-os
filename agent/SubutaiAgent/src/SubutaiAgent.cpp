@@ -394,7 +394,6 @@ int main(int argc,char *argv[],char *envp[])
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Request WatchArgs:", command.getWatchArguments()[i]));
                         }
                     }
-
                     if (command.getType() == "EXECUTE_REQUEST")	//execution request will be executed in other process.
                     {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Received Message to internal currentProcess!"));
@@ -411,8 +410,8 @@ int main(int argc,char *argv[],char *envp[])
                         subprocess->threadFunction(&messageQueue,&command,argv);
                         delete subprocess;
                     } else if (command.getType() == "TERMINATE_REQUEST") {
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",toString(command.getPid())));
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID.."));
+                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Termination request ID:", toString(command.getPid())));
+                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Killing given PID"));
                         if (command.getPid() > 0) {
                             int retstatus = kill(command.getPid(), SIGKILL);
                             if (retstatus == 0) { //termination is successfully done
@@ -440,8 +439,8 @@ int main(int argc,char *argv[],char *envp[])
                         sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(), response.getConfPoints());
                         connection->sendMessage(sendout);
                         Watcher.stats();
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ",sendout));
-                    } else if (command.getType()=="INOTIFY_REMOVE_REQUEST") {
+                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));
+                    } else if (command.getType() == "INOTIFY_REMOVE_REQUEST") {
                         logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "executing INOTIFY_CANCEL_REQUEST.."));
                         for (unsigned int i = 0; i < command.getWatchArguments().size(); i++) {
                             Watcher.eraseWatcher(command.getWatchArguments()[i]);
@@ -453,7 +452,7 @@ int main(int argc,char *argv[],char *envp[])
                         connection->sendMessage(sendout);
                         Watcher.stats();
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));
-                    } else if (command.getType()=="INOTIFY_LIST_REQUEST") {
+                    } else if (command.getType() == "INOTIFY_LIST_REQUEST") {
                         logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "executing INOTIFY_SHOW_REQUEST.."));
                         Watcher.stats();
                         sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(),response.getConfPoints());

@@ -108,6 +108,7 @@ bool SubutaiTimer::checkExecutionTimeout(unsigned int* startsec,bool* overflag,u
 
 void SubutaiTimer::sendHeartBeat()
 {
+    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Starting collecting of HEARTBEAT data"));
     response->clear();
     /*
      * Refresh new agent ip address set for each heartbeat message
@@ -125,7 +126,7 @@ void SubutaiTimer::sendHeartBeat()
 
 bool SubutaiTimer::checkHeartBeatTimer(SubutaiCommand command)
 {
-    if (checkExecutionTimeout(&startsec,&overflag,&exectimeout,&count)) //checking Default Timeout
+    if (checkExecutionTimeout(&startsec, &overflag, &exectimeout, &count)) //checking Default Timeout
     {
         sendHeartBeat();
 

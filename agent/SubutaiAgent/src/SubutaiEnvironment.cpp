@@ -122,7 +122,7 @@ bool SubutaiEnvironment::getAgentMacAddress()
         file.close();
         if(this->macAddress.empty())		//if mac is null or not reading successfully
         {
-            environmentLogger->writeLog(3,environmentLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read !!"));
+            environmentLogger->writeLog(3,environmentLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read"));
             return false;
         }
         environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent MacID:",this->macAddress));
