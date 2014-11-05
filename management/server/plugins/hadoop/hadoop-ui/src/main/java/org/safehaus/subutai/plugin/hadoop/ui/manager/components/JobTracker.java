@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
@@ -33,7 +32,7 @@ public class JobTracker extends ClusterNode
         this.executorService = executorService;
         this.hadoop = hadoop;
 
-        setHostname( cluster.getJobTracker().getHostname() );
+//        setHostname( cluster.getJobTracker().getHostname() );
 
         startButton.addClickListener( new MouseEvents.ClickListener()
         {
@@ -81,36 +80,36 @@ public class JobTracker extends ClusterNode
             slaveNode.setLoading( true );
         }
 
-        executorService.execute( new CheckTask( hadoop, tracker, NodeType.JOBTRACKER, cluster, new CompleteEvent()
-        {
-
-            public void onComplete( NodeState state )
-            {
-                synchronized ( progressButton )
-                {
-                    boolean isRunning = false;
-                    if ( state == NodeState.RUNNING )
-                    {
-                        isRunning = true;
-                    }
-                    else if ( state == NodeState.STOPPED )
-                    {
-                        isRunning = false;
-                    }
-
-                    startButton.setEnabled( !isRunning );
-                    restartButton.setEnabled( isRunning );
-                    stopButton.setEnabled( isRunning );
-
-                    for ( ClusterNode slaveNode : slaveNodes )
-                    {
-                        slaveNode.getStatus( null );
-                    }
-
-                    setLoading( false );
-                }
-            }
-        }, trackID, cluster.getJobTracker() ) );
+//        executorService.execute( new CheckTask( hadoop, tracker, NodeType.JOBTRACKER, cluster, new CompleteEvent()
+//        {
+//
+//            public void onComplete( NodeState state )
+//            {
+//                synchronized ( progressButton )
+//                {
+//                    boolean isRunning = false;
+//                    if ( state == NodeState.RUNNING )
+//                    {
+//                        isRunning = true;
+//                    }
+//                    else if ( state == NodeState.STOPPED )
+//                    {
+//                        isRunning = false;
+//                    }
+//
+//                    startButton.setEnabled( !isRunning );
+//                    restartButton.setEnabled( isRunning );
+//                    stopButton.setEnabled( isRunning );
+//
+//                    for ( ClusterNode slaveNode : slaveNodes )
+//                    {
+//                        slaveNode.getStatus( null );
+//                    }
+//
+//                    setLoading( false );
+//                }
+//            }
+//        }, trackID, cluster.getJobTracker() ) );
     }
 
 

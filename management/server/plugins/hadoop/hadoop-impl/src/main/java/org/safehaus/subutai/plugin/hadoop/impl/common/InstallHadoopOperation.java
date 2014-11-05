@@ -8,9 +8,6 @@ import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 
-/**
- * Created with IntelliJ IDEA. User: daralbaev Date: 1/31/14 Time: 10:08 PM
- */
 public class InstallHadoopOperation
 {
     private final HadoopClusterConfig hadoopClusterConfig;
@@ -24,13 +21,13 @@ public class InstallHadoopOperation
         commandList = new ArrayList<>();
 
         //		commandList.add(commands.getInstallCommand(config));
-        commandList.add( commands.getClearMastersCommand( hadoopClusterConfig ) );
-        commandList.add( commands.getClearSlavesCommand( hadoopClusterConfig ) );
-        commandList.add( commands.getSetMastersCommand( hadoopClusterConfig ) );
-        commandList.add( commands.getAddSecondaryNamenodeCommand( hadoopClusterConfig ) );
-        commandList.add( commands.getSetDataNodeCommand( hadoopClusterConfig ) );
-        commandList.add( commands.getSetTaskTrackerCommand( hadoopClusterConfig ) );
-        commandList.add( commands.getFormatNameNodeCommand( hadoopClusterConfig ) );
+//        commandList.add( commands.getClearMastersCommand( hadoopClusterConfig ) );
+//        commandList.add( commands.getClearSlavesCommand( hadoopClusterConfig ) );
+//        commandList.add( commands.getSetMastersCommand( hadoopClusterConfig ) );
+//        commandList.add( commands.getAddSecondaryNamenodeCommand( hadoopClusterConfig ) );
+//        commandList.add( commands.getSetDataNodeCommand( hadoopClusterConfig ) );
+//        commandList.add( commands.getSetTaskTrackerCommand( hadoopClusterConfig ) );
+//        commandList.add( commands.getFormatNameNodeCommand( hadoopClusterConfig ) );
     }
 
 

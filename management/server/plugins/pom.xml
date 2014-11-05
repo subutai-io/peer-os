@@ -17,6 +17,7 @@
   <modules>
     <module>cassandra</module>
     <module>solr</module>
+    <module>hadoop</module>
     <!--<module>accumulo</module>
     <module>hadoop</module>
     <module>zookeeper</module>
@@ -24,6 +25,7 @@
     <module>flume</module>
     <module>hive</module>
     <module>storm</module>
+    <module>oozie</module>
     <module>pig</module>
     <module>presto</module>
     <module>spark</module>
@@ -33,7 +35,6 @@
     <module>elasticsearch</module>
     <module>hbase</module>
     <module>mahout</module>
-    <module>oozie</module>
     <module>hipi</module>
     <module>nutch</module>
     <module>jetty</module>-->

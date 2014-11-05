@@ -2,15 +2,18 @@ package org.safehaus.subutai.plugin.hadoop.impl.handler;
 
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 
 
 public class UninstallOperationHandler extends AbstractOperationHandler<HadoopImpl>
 {
+    private static final Logger LOG = LoggerFactory.getLogger( UninstallOperationHandler.class );
 
     public UninstallOperationHandler( HadoopImpl manager, String clusterName )
     {
@@ -31,21 +34,17 @@ public class UninstallOperationHandler extends AbstractOperationHandler<HadoopIm
             return;
         }
 
-        trackerOperation.addLog( "Destroying lxc containers..." );
-
         try
         {
-            manager.getContainerManager().clonesDestroy( Sets.newHashSet( hadoopClusterConfig.getAllNodes() ) );
-            trackerOperation.addLog( "Lxc containers successfully destroyed" );
+            trackerOperation.addLog( "Destroying environment..." );
+            manager.getEnvironmentManager().destroyEnvironment( hadoopClusterConfig.getEnvironmentId() );
+            manager.getPluginDAO().deleteInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName() );
+            trackerOperation.addLogDone( "Cluster destroyed" );
         }
-        catch ( LxcDestroyException ex )
+        catch ( EnvironmentDestroyException e )
         {
-            trackerOperation.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
+            trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
+            LOG.error( e.getMessage(), e );
         }
-
-        trackerOperation.addLog( "Updating db..." );
-
-        manager.getPluginDAO().deleteInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName() );
-        trackerOperation.addLogDone( "Information updated in database" );
     }
 }

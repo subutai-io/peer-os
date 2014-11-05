@@ -440,7 +440,7 @@
       <artifactId>solr-plugin-ui</artifactId>
     </dependency>
 
-    <!--<dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hadoop-plugin-api</artifactId>
     </dependency>
@@ -460,6 +460,8 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>hadoop-plugin-ui</artifactId>
     </dependency>
+
+    <!--
 
     <dependency>
       <groupId>${project.groupId}</groupId>

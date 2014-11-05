@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.common.api;
+package org.safehaus.subutai.plugin.hadoop.api;
 
 
 public enum NodeType

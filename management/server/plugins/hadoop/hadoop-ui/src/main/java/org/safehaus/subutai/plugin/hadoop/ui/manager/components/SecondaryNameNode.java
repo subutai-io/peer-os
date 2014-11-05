@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
@@ -29,7 +28,7 @@ public class SecondaryNameNode extends ClusterNode
         this.hadoop = hadoop;
         this.tracker = tracker;
         this.executorService = executorService;
-        setHostname( cluster.getSecondaryNameNode().getHostname() );
+//        setHostname( cluster.getSecondaryNameNode().getHostname() );
 
         restartButton.setVisible( false );
         restartButton.setId( "secondaryRestart" );
@@ -45,32 +44,32 @@ public class SecondaryNameNode extends ClusterNode
     @Override
     protected void getStatus( UUID trackID )
     {
-        setLoading( true );
-
-        executorService
-                .execute( new CheckTask( hadoop, tracker, NodeType.SECONDARY_NAMENODE, cluster, new CompleteEvent()
-                {
-
-                    public void onComplete( NodeState state )
-                    {
-                        synchronized ( progressButton )
-                        {
-                            boolean isRunning = false;
-                            if ( state == NodeState.RUNNING )
-                            {
-                                isRunning = true;
-                            }
-                            else if ( state == NodeState.STOPPED )
-                            {
-                                isRunning = false;
-                            }
-
-                            setLoading( false );
-                            startButton.setVisible( isRunning );
-                            stopButton.setVisible( !isRunning );
-                        }
-                    }
-                }, trackID, cluster.getSecondaryNameNode() ) );
+//        setLoading( true );
+//
+//        executorService
+//                .execute( new CheckTask( hadoop, tracker, NodeType.SECONDARY_NAMENODE, cluster, new CompleteEvent()
+//                {
+//
+//                    public void onComplete( NodeState state )
+//                    {
+//                        synchronized ( progressButton )
+//                        {
+//                            boolean isRunning = false;
+//                            if ( state == NodeState.RUNNING )
+//                            {
+//                                isRunning = true;
+//                            }
+//                            else if ( state == NodeState.STOPPED )
+//                            {
+//                                isRunning = false;
+//                            }
+//
+//                            setLoading( false );
+//                            startButton.setVisible( isRunning );
+//                            stopButton.setVisible( !isRunning );
+//                        }
+//                    }
+//                }, trackID, cluster.getSecondaryNameNode() ) );
     }
 
 
