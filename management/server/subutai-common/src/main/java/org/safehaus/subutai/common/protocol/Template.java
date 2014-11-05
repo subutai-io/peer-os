@@ -28,14 +28,14 @@ import com.google.gson.annotations.Expose;
  * Template represents template entry in registry
  */
 @Entity(name = "Template")
-@IdClass( TemplatePK.class )
+@IdClass(TemplatePK.class)
 //@Table(name = "Template")
 @NamedQueries(value = {
-        @NamedQuery( name = "Template.getAll", query = "SELECT t FROM Template t" ),
-        @NamedQuery( name = "Template.getTemplateByNameArch",
-                query = "SELECT t FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = " + ":lxcArch" ),
-        @NamedQuery( name = "Template.removeTemplateByNameArch",
-                query = "DELETE FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = :lxcArch" )
+        @NamedQuery(name = "Template.getAll", query = "SELECT t FROM Template t"),
+        @NamedQuery(name = "Template.getTemplateByNameArch",
+                query = "SELECT t FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = " + ":lxcArch"),
+        @NamedQuery(name = "Template.removeTemplateByNameArch",
+                query = "DELETE FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = :lxcArch")
 })
 @XmlRootElement(name = "")
 public class Template
@@ -52,10 +52,12 @@ public class Template
     //    TemplatePK pk;
 
     @Id
+    @Expose
     private String templateName;
 
 
     @Id
+    @Expose
     private String lxcArch;
 
 
@@ -96,13 +98,13 @@ public class Template
 
     //children of template, this property is calculated upon need and is null by default (see REST API for calculation)
     @Expose
-    @OneToMany( fetch = FetchType.EAGER, cascade = { CascadeType.ALL }, orphanRemoval = true )
+    @OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL }, orphanRemoval = true)
     private List<Template> children;
 
     //subutai products present only in this template excluding all subutai products present in the whole ancestry
     // lineage above
     @Expose
-    @ElementCollection( targetClass = String.class )
+    @ElementCollection(targetClass = String.class)
     private Set<String> products;
 
     //template's md5sum hash
@@ -111,7 +113,7 @@ public class Template
 
     //indicates whether this template is in use on any of FAIs connected to Subutai
     @Expose
-    @ElementCollection( targetClass = String.class )
+    @ElementCollection(targetClass = String.class)
     private Set<String> faisUsingThisTemplate = new HashSet<>();
 
     //indicates where template is generated
