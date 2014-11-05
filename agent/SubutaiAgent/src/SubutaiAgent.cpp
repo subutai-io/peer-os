@@ -338,9 +338,11 @@ int main(int argc,char *argv[],char *envp[])
         try
         {
             //In 30 second periods send heartbeat and in_queue responses.
-            timer.checkHeartBeatTimer(command);
-            timer.checkCommandQueueInfoTimer(command);
-            command.clear();
+            if (currentProcess < ncores) {
+                timer.checkHeartBeatTimer(command);
+                timer.checkCommandQueueInfoTimer(command);
+                command.clear();
+            }
             for (list<int>::iterator iter = pidList.begin(); iter != pidList.end();iter++) {
                 if (pidList.begin() != pidList.end()) {
                     int status;

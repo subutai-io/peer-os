@@ -75,10 +75,16 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     _params[0] = const_cast<char*>(program.c_str());
     vector<string>::iterator it;
     int i = 1;
-    for (it = params.begin(); it != params.end(); it++, i++) {
-        _params[i] = const_cast<char*>(it->c_str());
+    for (it = params.begin(); it != params.end(); it++) {
+        _params[i] = const_cast<char*>((*it).c_str());
+        i++;
     }
     _params[i] = NULL;
+#if _DEBUG
+    for (int __j = 0; __j < params.size() + 2; __j++) {
+        cout << "<DEBUG> PARAMS DATA: " << _params[__j] << endl;
+    }
+#endif
     int fd[2];
     int _stdout = dup(1);
     pipe(fd);
@@ -106,7 +112,7 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     } else {
         result.err = command_output;
     }
-    containerLogger->writeLog(1,containerLogger->setLogData("<SubutaiContainer>","Program executed: ", program));
+    containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>","Program executed: ", program));
     return result;
 }
 
@@ -310,16 +316,15 @@ bool SubutaiContainer::getContainerIpAddress()
     ipAddress.clear();
     char** interfaces = this->container->get_interfaces(this->container);
     int i = 0;
-    while (interfaces[i]) {
+    while (interfaces[i] != NULL) {
         char** ips = this->container->get_ips(this->container, interfaces[i], "inet", 0);
         int j = 0;
-        while (ips[j]) {
+        while (ips[j] != NULL) {
             ipAddress.push_back(ips[j]);
             j++;
         }
         i++;
     }
-    delete [] interfaces;
     if (ipAddress.size() > 0) {
         return true;
     } else {

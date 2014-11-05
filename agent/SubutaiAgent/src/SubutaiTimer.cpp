@@ -119,7 +119,7 @@ void SubutaiTimer::sendHeartBeat()
     response->setHostname(environment->getAgentHostnameValue());
     response->setMacAddress(environment->getAgentMacAddressValue());
     response->setContainerSet(containerManager->getAllContainers());
-    string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue(),  environment->getAgentMacAddressValue());
+    string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue(), environment->getAgentMacAddressValue());
     connection->sendMessage(resp, "HEARTBEAT_TOPIC");
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat:", resp));
 }

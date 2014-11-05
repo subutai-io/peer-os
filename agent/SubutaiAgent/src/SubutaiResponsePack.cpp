@@ -143,7 +143,6 @@ string SubutaiResponsePack::createInQueueMessage(string uuid,string taskuuid)	//
  */
 string SubutaiResponsePack::createHeartBeatMessage(string uuid,	string hostname,string macaddress)	//Creating HeartBeat Message
 {
-        cout << "HOSTNAME: " << hostname << endl;
 	clear();
 	this->setType("HEARTBEAT");
 	this->setUuid(uuid);

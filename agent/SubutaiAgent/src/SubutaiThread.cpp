@@ -443,9 +443,9 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
     this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Find pid start","current pid:",toString(newpid)));
     while ((result = waitpid(newpid, &status, WNOHANG)) == 0) {
         string cmd;
-        cmd = "pgrep -P "+toString(newpid);
+        cmd = "pgrep -P " + toString(newpid);
         cmd = this->getProcessPid(cmd.c_str());
-        cmd = "pgrep -P "+ cmd;
+        cmd = "pgrep -P " + cmd;
         cmd = this->getProcessPid(cmd.c_str());
         this->setPpid(atoi(cmd.c_str()));
         if (this->getPpid()) {
