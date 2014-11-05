@@ -3,10 +3,9 @@ package org.safehaus.subutai.core.environment.impl.environment;
 
 import java.util.List;
 import java.util.Observable;
-import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 
@@ -18,6 +17,7 @@ public class EnvironmentBuilderThread extends Observable implements Runnable
     EnvironmentBuilderImpl environmentBuilder;
     List<ContainerDistributionMessage> messages;
     PeerManager peerManager;
+    ExecutorService executorService;
 
 
     public EnvironmentBuilderThread( final EnvironmentBuilderImpl environmentBuilder,
@@ -26,6 +26,7 @@ public class EnvironmentBuilderThread extends Observable implements Runnable
         this.environmentBuilder = environmentBuilder;
         this.messages = messages;
         this.peerManager = peerManager;
+        this.executorService = Executors.newCachedThreadPool();
     }
 
 
@@ -34,17 +35,8 @@ public class EnvironmentBuilderThread extends Observable implements Runnable
     {
         for ( ContainerDistributionMessage message : messages )
         {
-            try
-            {
-                Set<ContainerHost> containers = peerManager.getPeer( message.getSourcePeerId() ).
-                        createContainers( message.targetPeerId(), message.getEnvironmentId(), message.getTemplates(),
-                                message.getNumberOfContainers(), message.getPlacementStrategy(), null );
-                environmentBuilder.update( this, containers );
-            }
-            catch ( PeerException e )
-            {
-                e.printStackTrace();
-            }
+            ContainerCreatorThread creatorThread = new ContainerCreatorThread( message, peerManager );
+            executorService.execute( creatorThread );
         }
     }
 }

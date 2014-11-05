@@ -17,7 +17,6 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
  */
 public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
 {
-    ContainerDisributor containerDisributor;
     PeerManager peerManager;
     ExecutorService executorService;
 
@@ -35,12 +34,11 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
     public void build( final EnvironmentBlueprint blueprint, Topology topology ) throws BuildException
     {
 
-        TopologyApplier topologyApplier = new TopologyApplierImpl();
-        List<ContainerDistributionMessage> messageList = topologyApplier.applyTopology( topology, blueprint );
+        TopologyApplicator topologyApplicator = new TopologyApplicatorImpl();
+        List<ContainerDistributionMessage> messageList = topologyApplicator.applyTopology( topology, blueprint );
 
         EnvironmentBuilderThread builderThread = new EnvironmentBuilderThread( this, messageList, peerManager );
         executorService.execute( builderThread );
-
     }
 
 

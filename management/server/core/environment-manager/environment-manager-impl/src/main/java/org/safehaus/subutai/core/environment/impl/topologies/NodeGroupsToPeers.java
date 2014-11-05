@@ -1,10 +1,12 @@
 package org.safehaus.subutai.core.environment.impl.topologies;
 
 
-import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.core.peer.api.Peer;
+import java.util.List;
+import java.util.UUID;
 
-import com.google.common.collect.Multimap;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.core.environment.impl.environment.ContainerDistributionMessage;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 
 /**
@@ -13,17 +15,16 @@ import com.google.common.collect.Multimap;
 public class NodeGroupsToPeers extends Topology
 {
 
-    Multimap<Peer, NodeGroup> peerNodeGroupMap;
-
-
-    public NodeGroupsToPeers()
+    public NodeGroupsToPeers( final TemplateRegistry templateRegistry )
     {
         super( templateRegistry );
     }
 
 
-    public Multimap<Peer, NodeGroup> getPeerNodeGroupMap()
+    @Override
+    public List<ContainerDistributionMessage> digestBlueprint( final EnvironmentBlueprint blueprint,
+                                                               final UUID environmentId )
     {
-        return peerNodeGroupMap;
+        return null;
     }
 }

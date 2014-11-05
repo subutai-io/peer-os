@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.environment.impl.environment.ContainerDistributionMessage;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -52,26 +51,6 @@ public class BlueprintToPeerTopology extends Topology
     }
 
 
-    /**
-     * Fetches the template information required to build environment
-     */
-    private List<Template> fetchRequiredTempaltes( UUID sourcePeerId, final String templateName )
-    {
-        List<Template> requiredTemplates = new ArrayList<>();
-        List<Template> templates = templateRegistry.getParentTemplates( templateName );
-
-        Template installationTemplate = templateRegistry.getTemplate( templateName );
-        if ( installationTemplate != null )
-        {
-            templates.add( installationTemplate );
-        }
 
 
-        for ( Template t : templates )
-        {
-            requiredTemplates.add( t.getRemoteClone( sourcePeerId ) );
-        }
-
-        return requiredTemplates;
-    }
 }
