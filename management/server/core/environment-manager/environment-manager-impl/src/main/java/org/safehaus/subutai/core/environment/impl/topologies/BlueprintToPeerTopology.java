@@ -19,18 +19,19 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 public class BlueprintToPeerTopology extends Topology
 {
 
-
-    private final TemplateRegistry templateRegistry;
     private final Peer peer;
 
 
     public BlueprintToPeerTopology( final Peer peer, TemplateRegistry templateRegistry )
     {
+        super( templateRegistry );
         this.peer = peer;
-        this.templateRegistry = templateRegistry;
     }
 
 
+    /**
+     * Prepares list of messages from Blueprint to build environment.
+     */
     @Override
     public List<ContainerDistributionMessage> digestBlueprint( final EnvironmentBlueprint blueprint,
                                                                UUID environmentId )
@@ -51,6 +52,9 @@ public class BlueprintToPeerTopology extends Topology
     }
 
 
+    /**
+     * Fetches the template information required to build environment
+     */
     private List<Template> fetchRequiredTempaltes( UUID sourcePeerId, final String templateName )
     {
         List<Template> requiredTemplates = new ArrayList<>();

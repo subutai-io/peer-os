@@ -8,7 +8,8 @@ public class ContainerToPeerTopology extends Topology
 {
 
 
-
-
-
+    public ContainerToPeerTopology()
+    {
+        super( templateRegistry );
+    }
 }

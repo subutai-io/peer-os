@@ -16,6 +16,12 @@ public class NodeGroupsToPeers extends Topology
     Multimap<Peer, NodeGroup> peerNodeGroupMap;
 
 
+    public NodeGroupsToPeers()
+    {
+        super( templateRegistry );
+    }
+
+
     public Multimap<Peer, NodeGroup> getPeerNodeGroupMap()
     {
         return peerNodeGroupMap;
