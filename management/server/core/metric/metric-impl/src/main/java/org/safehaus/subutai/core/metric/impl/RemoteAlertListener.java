@@ -1,10 +1,10 @@
 package org.safehaus.subutai.core.metric.impl;
 
 
-import org.safehaus.subutai.core.messenger.api.Message;
-import org.safehaus.subutai.core.messenger.api.MessageListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MonitorException;
+import org.safehaus.subutai.core.peer.api.Payload;
+import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,9 +12,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Listens to alerts from remote peers
  */
-public class RemoteAlertListener extends MessageListener
+public class RemoteAlertListener extends RequestListener
 {
-    public static final String ALERT_RECIPIENT = "alert";
     protected static Logger LOG = LoggerFactory.getLogger( RemoteAlertListener.class.getName() );
 
     protected MonitorImpl monitor;
@@ -22,15 +21,16 @@ public class RemoteAlertListener extends MessageListener
 
     protected RemoteAlertListener( MonitorImpl monitor )
     {
-        super( ALERT_RECIPIENT );
+        super( RecipientType.ALERT_RECIPIENT.name() );
         this.monitor = monitor;
     }
 
 
     @Override
-    public void onMessage( final Message message )
+    public Object onRequest( final Payload payload )
     {
-        ContainerHostMetric containerHostMetric = message.getPayload( ContainerHostMetricImpl.class );
+        ContainerHostMetric containerHostMetric = payload.getMessage( ContainerHostMetricImpl.class );
+
         try
         {
             monitor.alertThresholdExcess( containerHostMetric );
@@ -39,5 +39,7 @@ public class RemoteAlertListener extends MessageListener
         {
             LOG.error( "Error in RemoteAlertListener.onMessage", e );
         }
+
+        return null;
     }
 }

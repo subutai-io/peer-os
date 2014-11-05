@@ -66,6 +66,18 @@
         <version>${project.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>subutai-common-datasource</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>subutai-common-implementation</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- core -->
 
@@ -317,6 +329,15 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- script-manager -->
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>script-manager-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- monitor -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -338,6 +359,11 @@
         <artifactId>metric-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>metric-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- queue -->
@@ -354,6 +380,19 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>messenger-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- security-manager -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>security-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>security-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -824,14 +863,15 @@
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- plugins -->
-      <!--<dependency>
+      <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>plugin-common</artifactId>
         <version>${project.version}</version>
-      </dependency>-->
+      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
+      <!-- CASSANDRA -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>cassandra-plugin-api</artifactId>
@@ -855,6 +895,33 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>cassandra-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ELASTICSEARCH -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>elasticsearch-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>elasticsearch-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>elasticsearch-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>elasticsearch-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>elasticsearch-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -952,31 +1019,7 @@
          <version>${project.version}</version>
        </dependency>
 
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>elasticsearch-plugin-api</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>elasticsearch-plugin-impl</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>elasticsearch-plugin-cli</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>elasticsearch-plugin-rest</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>elasticsearch-plugin-ui</artifactId>
-         <version>${project.version}</version>
-       </dependency>
+
 
        <dependency>
          <groupId>${project.groupId}</groupId>

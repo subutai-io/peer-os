@@ -79,21 +79,30 @@ public class BlueprintUploadForm
         environmentBlueprint.setDomainName( "intra.lan" );
         environmentBlueprint.setExchangeSshKeys( true );
         environmentBlueprint.setLinkHosts( true );
-        environmentBlueprint.setName( "My environment" );
+        environmentBlueprint.setName( "My cassandra + master environment" );
 
         Set<NodeGroup> groups = new HashSet<>();
 
         NodeGroup nodeGroup1 = new NodeGroup();
         nodeGroup1.setDomainName( "intra.lan" );
-        nodeGroup1.setName( "Some name" );
+        nodeGroup1.setName( "Cassandra node group" );
         nodeGroup1.setLinkHosts( true );
         nodeGroup1.setExchangeSshKeys( true );
         nodeGroup1.setNumberOfNodes( 2 );
         nodeGroup1.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
-        nodeGroup1.setTemplateName( "master" );
+        nodeGroup1.setTemplateName( "cassandra" );
+
+        NodeGroup nodeGroup2 = new NodeGroup();
+        nodeGroup2.setDomainName( "intra.lan" );
+        nodeGroup2.setName( "Master node group" );
+        nodeGroup2.setLinkHosts( true );
+        nodeGroup2.setExchangeSshKeys( true );
+        nodeGroup2.setNumberOfNodes( 2 );
+        nodeGroup2.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        nodeGroup2.setTemplateName( "master" );
 
         groups.add( nodeGroup1 );
-        groups.add( nodeGroup1 );
+        groups.add( nodeGroup2 );
 
         environmentBlueprint.setNodeGroups( groups );
         return environmentBlueprint;

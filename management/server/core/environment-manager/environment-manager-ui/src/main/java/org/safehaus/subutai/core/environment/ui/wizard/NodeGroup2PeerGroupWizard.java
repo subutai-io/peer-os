@@ -116,7 +116,7 @@ public class NodeGroup2PeerGroupWizard extends Window
             nodeGroupMap.put( itemId, ng );
         }
 
-        Button nextButton = new Button( "Next" );
+        Button nextButton = new Button( "Save build task" );
         nextButton.addClickListener( new Button.ClickListener()
         {
             @Override

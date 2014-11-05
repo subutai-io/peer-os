@@ -21,6 +21,19 @@ public class CloneContainersMessage extends PeerCommandMessage
     private String Strategy;
     private List<String> criteria;
     private List<Template> templates = new ArrayList();
+    private String nodeGroupName;
+
+
+    public String getNodeGroupName()
+    {
+        return nodeGroupName;
+    }
+
+
+    public void setNodeGroupName( final String nodeGroupName )
+    {
+        this.nodeGroupName = nodeGroupName;
+    }
     //    private Set<Agent> agents;
 
 

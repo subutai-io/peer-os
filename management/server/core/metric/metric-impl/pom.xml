@@ -32,10 +32,6 @@
       <artifactId>environment-manager-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>messenger-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
@@ -57,6 +53,12 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.catch-exception</groupId>
+      <artifactId>catch-exception</artifactId>
+      <version>1.2.0</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

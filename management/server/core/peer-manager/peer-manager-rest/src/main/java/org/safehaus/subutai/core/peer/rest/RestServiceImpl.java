@@ -15,29 +15,22 @@ import javax.ws.rs.core.Response;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.CommandResult;
-import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
-import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
-import org.safehaus.subutai.common.protocol.PeerCommandMessage;
-import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.PeerStatus;
-import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 
@@ -71,12 +64,27 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public String getId()
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        return localPeer.getId().toString();
+    }
+
+
+    @Override
     public PeerInfo registerPeer( String config )
     {
         if ( config != null )
         {
             PeerInfo peerInfo = GSON.fromJson( config, PeerInfo.class );
-            peerManager.register( peerInfo );
+            try
+            {
+                peerManager.register( peerInfo );
+            }
+            catch ( PeerException e )
+            {
+                return null;
+            }
             return peerInfo;
         }
         else
@@ -84,18 +92,6 @@ public class RestServiceImpl implements RestService
             return null;
         }
     }
-
-
-    //    @Override
-    //    public String createContainers( final String createContainersMsg )
-    //    {
-    //        CloneContainersMessage ccm = GSON.fromJson( createContainersMsg, CloneContainersMessage.class );
-    //        LOG.info( "Message to clone container received for environment: " + ccm.getEnvId() );
-    ////        peerManager.createContainers( ccm );
-    //
-    //        return JsonUtil.toJson( ccm.getResult() );
-    //
-    //    }
 
 
     @Override
@@ -121,89 +117,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public String getId()
-    {
-
-        UUID id = peerManager.getPeerId();
-        return GSON.toJson( id );
-    }
-
-
-    @Override
-    public Response processMessage( final String peerId, final String recipient, final String message )
-    {
-        try
-        {
-            String response = peerManager.processPeerMessage( peerId, recipient, message );
-
-            return Response.ok( response ).build();
-        }
-        catch ( PeerMessageException e )
-        {
-            return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
-        }
-    }
-
-
-    @Override
-    public Response getConnectedAgents( final String environmentId )
-    {
-        try
-        {
-            String response = JsonUtil.toJson( peerManager.getConnectedAgents( environmentId ) );
-            return Response.ok( response ).build();
-        }
-        catch ( JsonSyntaxException | PeerException e )
-        {
-            return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
-        }
-    }
-
-
-    @Override
-    public Response invoke( final String commandType, final String command )
-    {
-
-        LOG.info( String.format( "Received a new command: %s", commandType ) );
-        PeerCommandType type = PeerCommandType.valueOf( commandType );
-        Class clazz = getMessageClass( type );
-        PeerCommandMessage commandMessage = ( PeerCommandMessage ) JsonUtil.fromJson( command, clazz );
-        if ( commandMessage == null )
-        {
-            return Response.status( Response.Status.BAD_REQUEST ).entity( "Could not restore command from JSON." )
-                           .build();
-        }
-
-        LOG.debug( String.format( "Command before invoking PCD [%s]", commandMessage ) );
-        peerManager.invoke( commandMessage );
-        LOG.debug( String.format( "Command after invoking PCD [%s]", commandMessage ) );
-
-        if ( commandMessage.isSuccess() )
-        {
-            return Response.ok().entity( commandMessage.toJson() ).build();
-        }
-        else
-        {
-            return Response.status( Response.Status.BAD_REQUEST ).entity( commandMessage.toJson() ).build();
-        }
-    }
-
-
-    private Class getMessageClass( final PeerCommandType type )
-    {
-        switch ( type )
-        {
-            case CLONE:
-                return CloneContainersMessage.class;
-            case EXECUTE:
-                return ExecuteCommandMessage.class;
-            default:
-                return DefaultCommandMessage.class;
-        }
-    }
-
-
-    @Override
     public Response ping()
     {
         return Response.ok().build();
@@ -214,8 +127,15 @@ public class RestServiceImpl implements RestService
     public Response processRegisterRequest( String peer )
     {
         PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
-        peerManager.register( p );
-        return Response.ok( GSON.toJson( p ) ).build();
+        try
+        {
+            peerManager.register( p );
+            return Response.ok( GSON.toJson( p ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).entity( e.toString() ).build();
+        }
     }
 
 
@@ -223,14 +143,21 @@ public class RestServiceImpl implements RestService
     public Response unregisterPeer( String peerId )
     {
         UUID id = GSON.fromJson( peerId, UUID.class );
-        boolean result = peerManager.unregister( id.toString() );
-        if ( result )
+        try
         {
-            return Response.ok( "Successfully unregistered peer: " + peerId ).build();
+            boolean result = peerManager.unregister( id.toString() );
+            if ( result )
+            {
+                return Response.ok( "Successfully unregistered peer: " + peerId ).build();
+            }
+            else
+            {
+                return Response.status( Response.Status.NOT_FOUND ).build();
+            }
         }
-        else
+        catch ( PeerException pe )
         {
-            return Response.status( Response.Status.NOT_FOUND ).build();
+            return Response.status( Response.Status.NOT_FOUND ).entity( pe.toString() ).build();
         }
     }
 
@@ -250,7 +177,7 @@ public class RestServiceImpl implements RestService
         PeerInfo peerInfo = new PeerInfo();
         peerInfo.setName( "Peer on " + localIp );
         peerInfo.setIp( localIp );
-        peerInfo.setId( peerManager.getPeerId() );
+        peerInfo.setId( peerManager.getLocalPeer().getId() );
         peerInfo.setStatus( PeerStatus.REQUESTED );
         return peerInfo;
     }
@@ -305,7 +232,7 @@ public class RestServiceImpl implements RestService
             return Response.ok( JsonUtil.toJson( result ) ).build();
             //            return Response.ok().entity( result ).build();
         }
-        catch ( ContainerCreateException e )
+        catch ( PeerException e )
         {
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
@@ -373,8 +300,8 @@ public class RestServiceImpl implements RestService
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
             ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
-            Boolean result = localPeer.startContainer( containerHost );
-            return Response.ok( result.toString() ).build();
+            localPeer.startContainer( containerHost );
+            return Response.ok().build();
         }
         catch ( PeerException e )
         {
@@ -390,8 +317,8 @@ public class RestServiceImpl implements RestService
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
             ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
-            Boolean result = localPeer.stopContainer( containerHost );
-            return Response.ok( result.toString() ).build();
+            localPeer.stopContainer( containerHost );
+            return Response.ok().build();
         }
         catch ( PeerException e )
         {
@@ -415,4 +342,56 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
+
+
+    @Override
+    public Response getTemplate( final String templateName )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            Template result = localPeer.getTemplate( templateName );
+            return Response.ok( JsonUtil.toJson( result ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    //
+    //    @Override
+    //    public Response getQuota( @FormParam( "host" ) final String host, @FormParam( "host" ) final String quota )
+    //    {
+    //        try
+    //        {
+    //            LocalPeer localPeer = peerManager.getLocalPeer();
+    //            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+    //            String result = localPeer.getQuota( containerHost, QuotaEnum.valueOf( quota ) );
+    //            return Response.ok( result.toString() ).build();
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+    //        }
+    //    }
+    //
+    //
+    //    @Override
+    //    public Response setQuota( @FormParam( "host" ) final String host, @FormParam( "host" ) final String quota,
+    //                              @FormParam( "value" ) final String value )
+    //    {
+    //        try
+    //        {
+    //            LocalPeer localPeer = peerManager.getLocalPeer();
+    //            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+    //            localPeer.setQuota( containerHost, QuotaEnum.valueOf( quota ), value );
+    //            return Response.ok().build();
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+    //        }
+    //    }
 }

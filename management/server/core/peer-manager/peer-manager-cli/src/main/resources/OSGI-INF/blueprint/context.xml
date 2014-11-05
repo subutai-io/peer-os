@@ -1,6 +1,14 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/message">
+      <action class="org.safehaus.subutai.core.peer.cli.MessageCommand">
+        <argument ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/register">
       <action class="org.safehaus.subutai.core.peer.cli.RegisterCommand">
         <property name="peerManager" ref="peerManager" />
@@ -75,7 +83,6 @@
       </action>
     </command>
   </command-bundle>
-
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/start-container">

@@ -53,6 +53,7 @@ public class TopologyBuilder
             {
                 CloneContainersMessage ccm = new CloneContainersMessage( peer.getId() );
                 ccm.setEnvId( process.getId() );
+                ccm.setNodeGroupName( ng.getName() );
                 ccm.setTemplate( ng.getTemplateName() );
                 ccm.setNumberOfNodes( 1 );
                 ccm.setStrategy( ng.getPlacementStrategy().toString() );
@@ -84,6 +85,7 @@ public class TopologyBuilder
             {
                 CloneContainersMessage ccm = new CloneContainersMessage( peer.getId() );
                 ccm.setEnvId( process.getId() );
+                ccm.setNodeGroupName( ng.getName() );
                 ccm.setTemplate( ng.getTemplateName() );
                 ccm.setNumberOfNodes( ng.getNumberOfNodes() );
                 ccm.setStrategy( ng.getPlacementStrategy().toString() );
@@ -113,6 +115,7 @@ public class TopologyBuilder
                 String key = peerId.toString() + "-" + nodeGroup.getTemplateName();
                 CloneContainersMessage ccm = new CloneContainersMessage( peerId );
                 ccm.setEnvId( process.getId() );
+                ccm.setNodeGroupName( nodeGroup.getName() );
                 ccm.setTemplate( nodeGroup.getTemplateName() );
                 ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
                 ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );
@@ -146,6 +149,7 @@ public class TopologyBuilder
                 String key = peerId.toString() + "-" + nodeGroup.getTemplateName();
                 CloneContainersMessage ccm = new CloneContainersMessage( peerId );
                 ccm.setEnvId( process.getId() );
+                ccm.setNodeGroupName( nodeGroup.getName() );
                 ccm.setTemplate( nodeGroup.getTemplateName() );
                 ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
                 ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );
@@ -182,6 +186,7 @@ public class TopologyBuilder
                 String key = peerId.toString() + "-" + nodeGroup.getTemplateName();
                 CloneContainersMessage ccm = new CloneContainersMessage( peerId );
                 ccm.setEnvId( process.getId() );
+                ccm.setNodeGroupName( nodeGroup.getName() );
                 ccm.setTemplate( nodeGroup.getTemplateName() );
                 ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
                 ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );

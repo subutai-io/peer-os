@@ -16,6 +16,7 @@
 
   <modules>
     <module>cassandra</module>
+    <module>elasticsearch</module>
     <!--<module>accumulo</module>
     <module>hadoop</module>
     <module>solr</module>
@@ -30,14 +31,15 @@
     <module>sqoop</module>
     <module>lucene</module>
     <module>pig</module>
-    <module>elasticsearch</module>
     <module>hbase</module>
     <module>mahout</module>
     <module>oozie</module>
     <module>hipi</module>
     <module>nutch</module>
+    <module>plugin-common</module>
     <module>jetty</module>-->
-    <!--<module>plugin-common</module>-->
+    <module>plugin-common</module>
+
   </modules>
 
 </project>

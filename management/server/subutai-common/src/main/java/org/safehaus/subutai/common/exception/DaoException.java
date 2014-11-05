@@ -10,4 +10,10 @@ public class DaoException extends Exception
     {
         super( cause );
     }
+
+
+    public DaoException( final String message )
+    {
+        super( message );
+    }
 }
