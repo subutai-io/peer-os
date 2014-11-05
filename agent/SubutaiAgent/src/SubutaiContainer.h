@@ -98,6 +98,7 @@ class SubutaiContainer
         int getRunAsUserId(string username);
         void PutToFile(string filename, string text);
         string findFullProgramPath(string program_name);
+        void RunPsCommand();
     protected:
         vector<string> ExplodeCommandArguments(SubutaiCommand* command);
     private:

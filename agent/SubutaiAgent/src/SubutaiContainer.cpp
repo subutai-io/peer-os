@@ -497,6 +497,10 @@ string SubutaiContainer::findFullProgramPath(string program_name)
     return locations; // TODO: Parse whereis output
 }
 
+void SubutaiContainer::RunPsCommand() {
+
+}
+
 vector<string> SubutaiContainer::ExplodeCommandArguments(SubutaiCommand* command) 
 {
     vector<string> result;
