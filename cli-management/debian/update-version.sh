@@ -9,8 +9,8 @@
 #(5) if commit and push worked then generate the package with the new (X+1) version number which must be unique, else exit
 #------------------------------------------------------
 
-package_name="subutai-cli-net-dev"
-absPath="cli-net-dev"
+package_name="subutai-cli-management"
+absPath="cli-management"
 currentDirectory=$(pwd)
 # This function returns true if variable is empty, false if not empty
 function isEmpty {

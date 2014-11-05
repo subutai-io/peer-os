@@ -27,8 +27,6 @@ case "$1" in
 
     *)
         echo "postinst called with unknown argument \`$1'" >&2
-        # call subutai bash completion script
-        . /etc/bash_completion.d/subutai-cli-net-dev.bash_completion
         exit
     ;;
 esac

@@ -1,3 +1,3 @@
 # What is this?
 
-Define what this subutai-cli-net-dev is all about...
+This subutai-cli-management package is designed for subutai management server machine to abstract the OS dependent commands from management server application.

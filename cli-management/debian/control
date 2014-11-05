@@ -1,4 +1,4 @@
-Source: subutai-cli-net-dev
+Source: subutai-cli-management
 Section: devel
 Priority: optional
 Maintainer: Subutai
@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 8.0.0)
 Standards-Version: 3.9.4
 Homepage: http://www.safehaus.org
 
-Package: subutai-cli-net-dev
+Package: subutai-cli-management
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Conflicts: subutai-cli
