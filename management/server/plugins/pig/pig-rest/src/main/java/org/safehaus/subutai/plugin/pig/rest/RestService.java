@@ -58,12 +58,12 @@ public class RestService
 
         if ( !CollectionUtil.isCollectionEmpty( trimmedConfig.getNodes() ) )
         {
-            Set<Agent> nodes = new HashSet<>();
+            Set<UUID> nodes = new HashSet<>();
             for ( String hostname : trimmedConfig.getNodes() )
             {
-                nodes.add( agentManager.getAgentByHostname( hostname ) );
+                nodes.add( UUID.fromString( hostname ) );
             }
-            pigConfig.setNodes( nodes );
+            pigConfig.setAgentNodes( nodes );
         }
 
         UUID uuid = pigManager.installCluster( pigConfig );

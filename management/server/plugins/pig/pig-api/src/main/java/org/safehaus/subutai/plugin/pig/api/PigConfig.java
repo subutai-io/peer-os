@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
 public class PigConfig implements ConfigBase
@@ -19,8 +20,10 @@ public class PigConfig implements ConfigBase
     private String clusterName = "";
     private SetupType setupType;
     private String hadoopClusterName;
-    private Set<UUID> nodes = new HashSet<>();
+    private Set<ContainerHost> nodes = new HashSet<>();
+    private Set<UUID> agentNodes = new HashSet<>();
     private Set<UUID> hadoopNodes = new HashSet<>();
+    private UUID environmentId;
 
 
     public String getClusterName()
@@ -50,13 +53,13 @@ public class PigConfig implements ConfigBase
     }
 
 
-    public Set<UUID> getNodes()
+    public Set<ContainerHost> getNodes()
     {
         return nodes;
     }
 
 
-    public void setNodes( Set<UUID> nodes )
+    public void setNodes( Set<ContainerHost> nodes )
     {
         this.nodes = nodes;
     }
@@ -103,5 +106,33 @@ public class PigConfig implements ConfigBase
     public void setHadoopNodes( final Set<UUID> hadoopNodes )
     {
         this.hadoopNodes = hadoopNodes;
+    }
+
+
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
+    }
+
+
+    public Set<UUID> getAgentNodes()
+    {
+        for( ContainerHost host : getNodes())
+        {
+            agentNodes.add( host.getAgent().getUuid() );
+        }
+        return agentNodes;
+    }
+
+
+    public void setAgentNodes( final Set<UUID> agentNodes )
+    {
+        this.agentNodes = agentNodes;
     }
 }

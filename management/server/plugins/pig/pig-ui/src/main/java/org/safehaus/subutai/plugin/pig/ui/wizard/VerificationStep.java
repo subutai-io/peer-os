@@ -1,10 +1,13 @@
 package org.safehaus.subutai.plugin.pig.ui.wizard;
 
 
+import java.util.Iterator;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.pig.api.Pig;
@@ -47,9 +50,9 @@ public class VerificationStep extends Panel
 
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            for ( Agent agent : wizard.getConfig().getNodes() )
+            for ( ContainerHost host : wizard.getConfig().getNodes() )
             {
-                cfgView.addStringCfg( "Node to install", agent.getHostname() + "" );
+                cfgView.addStringCfg( "Node to install", host.getHostname() + "" );
             }
         }
         else if ( config.getSetupType() == SetupType.WITH_HADOOP )

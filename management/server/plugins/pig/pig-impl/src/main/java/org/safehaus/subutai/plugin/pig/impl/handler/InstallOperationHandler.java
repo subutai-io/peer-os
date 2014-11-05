@@ -1,9 +1,12 @@
 package org.safehaus.subutai.plugin.pig.impl.handler;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
@@ -18,6 +21,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<PigImpl>
 {
     private final PigConfig config;
     private HadoopClusterConfig hadoopConfig;
+    private TrackerOperation trackerOperation;
 
 
     public InstallOperationHandler( PigImpl manager, PigConfig config )
@@ -32,6 +36,12 @@ public class InstallOperationHandler extends AbstractOperationHandler<PigImpl>
     public void setHadoopConfig( HadoopClusterConfig hadoopConfig )
     {
         this.hadoopConfig = hadoopConfig;
+    }
+
+    @Override
+    public UUID getTrackerId()
+    {
+        return trackerOperation.getId();
     }
 
 
@@ -54,7 +64,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<PigImpl>
             hadoopConfig.setTemplateName( PigConfig.TEMPLATE_NAME );
             try
             {
-                EnvironmentBuildTask eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
+                EnvironmentBlueprint eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
                 env = manager.getEnvironmentManager().buildEnvironment( eb );
             }
             catch ( ClusterSetupException ex )

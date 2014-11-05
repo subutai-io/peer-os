@@ -16,9 +16,9 @@ public interface Pig extends ApiBase<PigConfig>
 
     public UUID installCluster( PigConfig config, HadoopClusterConfig hadoopConfig );
 
-    public UUID destroyNode( String clusterName, ContainerHost containerHost );
+    public UUID destroyNode( String clusterName, String containerHost );
 
-    public UUID addNode( String clusterName, ContainerHost containerHost );
+    public UUID addNode( String clusterName, String containerHost );
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment env, PigConfig config, TrackerOperation po );
 }

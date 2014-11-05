@@ -14,7 +14,6 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.Commands;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
-import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 
 import com.google.common.base.Preconditions;
 

@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
@@ -100,6 +101,10 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
             catch ( ClusterConfigurationException e )
             {
                 throw new ClusterSetupException( e.getMessage() );
+            }
+            catch ( CommandException e )
+            {
+                e.printStackTrace();
             }
         }
         catch ( EnvironmentBuildException e )

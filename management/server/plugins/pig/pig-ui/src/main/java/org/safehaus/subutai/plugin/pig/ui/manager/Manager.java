@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.pig.ui.manager;
 
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -9,10 +10,11 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -53,23 +55,21 @@ public class Manager
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
-    private final AgentManager agentManager;
-    private final CommandRunner commandRunner;
     private final Tracker tracker;
     private final ExecutorService executorService;
     private final Pig pig;
     private final Hadoop hadoop;
     private PigConfig config;
+    private final EnvironmentManager environmentManager;
 
 
     public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
         this.pig = serviceLocator.getService( Pig.class );
         this.tracker = serviceLocator.getService( Tracker.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
         this.executorService = executorService;
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -151,74 +151,74 @@ public class Manager
 
     public void addClickListenerToAddNodeButton()
     {
-        addNodeBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config == null )
-                {
-                    show( "Please, select cluster" );
-                }
-                else
-                {
-                    if ( config.getSetupType() == SetupType.OVER_HADOOP )
-                    {
-                        String hn = config.getHadoopClusterName();
-                        if ( hn == null || hn.isEmpty() )
-                        {
-                            show( "Undefined Hadoop cluster name" );
-                            return;
-                        }
-                        HadoopClusterConfig info = hadoop.getCluster( hn );
-                        if ( info != null )
-                        {
-                            HashSet<Agent> nodes = new HashSet<>( info.getAllNodes() );
-                            nodes.removeAll( config.getNodes() );
-                            if ( !nodes.isEmpty() )
-                            {
-                                AddNodeWindow addNodeWindow =
-                                        new AddNodeWindow( pig, executorService, tracker, config, nodes );
-                                contentRoot.getUI().addWindow( addNodeWindow );
-                                addNodeWindow.addCloseListener( new Window.CloseListener()
-                                {
-                                    @Override
-                                    public void windowClose( Window.CloseEvent closeEvent )
-                                    {
-                                        refreshClustersInfo();
-                                    }
-                                } );
-                            }
-                            else
-                            {
-                                show( "All nodes in corresponding Hadoop cluster have Presto installed" );
-                            }
-                        }
-                        else
-                        {
-                            show( "Hadoop cluster info not found" );
-                        }
-                    }
-                    else if ( config.getSetupType() == SetupType.WITH_HADOOP )
-                    {
-                        ConfirmationDialog d = new ConfirmationDialog( "Add node to cluster", "OK", "Cancel" );
-                        d.getOk().addClickListener( new Button.ClickListener()
-                        {
-
-                            @Override
-                            public void buttonClick( Button.ClickEvent event )
-                            {
-                                UUID trackId = pig.addNode( config.getClusterName(), null );
-                                ProgressWindow w =
-                                        new ProgressWindow( executorService, tracker, trackId, PigConfig.PRODUCT_KEY );
-                                contentRoot.getUI().addWindow( w.getWindow() );
-                            }
-                        } );
-                        contentRoot.getUI().addWindow( d.getAlert() );
-                    }
-                }
-            }
-        } );
+//        addNodeBtn.addClickListener( new Button.ClickListener()
+//        {
+//            @Override
+//            public void buttonClick( Button.ClickEvent clickEvent )
+//            {
+//                if ( config == null )
+//                {
+//                    show( "Please, select cluster" );
+//                }
+//                else
+//                {
+//                    if ( config.getSetupType() == SetupType.OVER_HADOOP )
+//                    {
+//                        String hn = config.getHadoopClusterName();
+//                        if ( hn == null || hn.isEmpty() )
+//                        {
+//                            show( "Undefined Hadoop cluster name" );
+//                            return;
+//                        }
+//                        HadoopClusterConfig info = hadoop.getCluster( hn );
+//                        if ( info != null )
+//                        {
+//                            HashSet<ContainerHost> nodes = new HashSet<>( info.getAllNodes() );
+//                            nodes.removeAll( config.getNodes() );
+//                            if ( !nodes.isEmpty() )
+//                            {
+//                                AddNodeWindow addNodeWindow =
+//                                        new AddNodeWindow( pig, executorService, tracker, config, nodes );
+//                                contentRoot.getUI().addWindow( addNodeWindow );
+//                                addNodeWindow.addCloseListener( new Window.CloseListener()
+//                                {
+//                                    @Override
+//                                    public void windowClose( Window.CloseEvent closeEvent )
+//                                    {
+//                                        refreshClustersInfo();
+//                                    }
+//                                } );
+//                            }
+//                            else
+//                            {
+//                                show( "All nodes in corresponding Hadoop cluster have Presto installed" );
+//                            }
+//                        }
+//                        else
+//                        {
+//                            show( "Hadoop cluster info not found" );
+//                        }
+//                    }
+//                    else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+//                    {
+//                        ConfirmationDialog d = new ConfirmationDialog( "Add node to cluster", "OK", "Cancel" );
+//                        d.getOk().addClickListener( new Button.ClickListener()
+//                        {
+//
+//                            @Override
+//                            public void buttonClick( Button.ClickEvent event )
+//                            {
+//                                UUID trackId = pig.addNode( config.getClusterName(), null );
+//                                ProgressWindow w =
+//                                        new ProgressWindow( executorService, tracker, trackId, PigConfig.PRODUCT_KEY );
+//                                contentRoot.getUI().addWindow( w.getWindow() );
+//                            }
+//                        } );
+//                        contentRoot.getUI().addWindow( d.getAlert() );
+//                    }
+//                }
+//            }
+//        } );
     }
 
 
@@ -292,14 +292,23 @@ public class Manager
             {
                 if ( event.isDoubleClick() )
                 {
-                    String lxcHostname =
+                    String containerId =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
+                    Set<ContainerHost> containerHosts =
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers();
+                    Iterator iterator = containerHosts.iterator();
+                    ContainerHost containerHost = null;
+                    while ( iterator.hasNext() )
                     {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
-                                        agentManager );
+                        containerHost = ( ContainerHost ) iterator.next();
+                        if ( containerHost.getId().equals( UUID.fromString( containerId ) ) )
+                        {
+                            break;
+                        }
+                    }
+                    if ( containerHost != null )
+                    {
+                        TerminalWindow terminal = new TerminalWindow( containerHosts );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
@@ -322,7 +331,8 @@ public class Manager
     {
         if ( config != null )
         {
-            populateTable( nodesTable, config.getNodes() );
+            Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+            populateTable( nodesTable, environment.getContainers() );
         }
         else
         {
@@ -331,13 +341,13 @@ public class Manager
     }
 
 
-    private void populateTable( final Table table, Set<Agent> agents )
+    private void populateTable( final Table table, Set<ContainerHost> containerHosts )
     {
         table.removeAllItems();
-        for ( final Agent agent : agents )
+        for ( final ContainerHost host : containerHosts )
         {
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( agent.getListIP().get( 0 ) + "-pigDestroy" );
+            destroyBtn.setId( host.getAgent().getListIP().get( 0 ) + "-pigDestroy" );
             destroyBtn.addStyleName( "default" );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();
@@ -347,15 +357,15 @@ public class Manager
             addGivenComponents( availableOperations, destroyBtn );
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), availableOperations
+                    host.getHostname(), host.getAgent().getListIP().get( 0 ), availableOperations
             }, null );
 
-            addClickListenerToDestroyButton( agent, destroyBtn );
+            addClickListenerToDestroyButton( host, destroyBtn );
         }
     }
 
 
-    private void addClickListenerToDestroyButton( final Agent agent, Button... buttons )
+    private void addClickListenerToDestroyButton( final ContainerHost host, Button... buttons )
     {
         getButton( DESTROY_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -363,13 +373,13 @@ public class Manager
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 ConfirmationDialog alert = new ConfirmationDialog(
-                        String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
+                        String.format( "Do you want to destroy the %s node?", host.getHostname() ), "Yes", "No" );
                 alert.getOk().addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( Button.ClickEvent clickEvent )
                     {
-                        UUID trackID = pig.destroyNode( config.getClusterName(), agent.getHostname() );
+                        UUID trackID = pig.destroyNode( config.getClusterName(), host.getHostname() );
                         ProgressWindow window =
                                 new ProgressWindow( executorService, tracker, trackID, PigConfig.PRODUCT_KEY );
                         window.getWindow().addCloseListener( new Window.CloseListener()

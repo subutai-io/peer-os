@@ -18,6 +18,7 @@
     <module>cassandra</module>
     <module>solr</module>
     <module>hadoop</module>
+    <module>pig</module>
     <!--<module>accumulo</module>
     <module>hadoop</module>
     <module>zookeeper</module>
