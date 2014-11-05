@@ -169,11 +169,11 @@ string SubutaiResponsePack::createHeartBeatMessage(string uuid,	string hostname,
 
         "exitCode" : 0
  */
-string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string taskuuid, int pid)	//Creating Terminate Message
+string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string taskuuid, int pid, int exitCode)	//Creating Terminate Message
 {
 	clear();
 	this->setType("TERMINATE_RESPONSE");
-	this->setExitCode(0);
+	this->setExitCode(exitCode);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(1);
@@ -198,7 +198,7 @@ string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum
 
 										"exitCode" : 1
 
- */
+
 string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,string taskuuid, int pid,const string& stderr)
 {
 	clear();
@@ -212,7 +212,7 @@ string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSe
 	this->setStandardError(stderr);
 	this->serialize(sendout);
 	return sendout;
-}
+}*/
 
 /**
  *  \details   This method creates Timeout message.

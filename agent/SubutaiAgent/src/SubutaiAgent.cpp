@@ -50,6 +50,7 @@
 #include <unistd.h>
 #include <iostream>
 
+using namespace std;
 /**
  *  \details   This method designed for Typically conversion from integer to string.
  */
@@ -377,6 +378,7 @@ int main(int argc,char *argv[],char *envp[])
                     // Check if this uuid belongs this FAI or one of child containers
                     bool isLocal = true;
                     SubutaiContainer* target_container = cman.findContainerById(command.getUuid());
+
                     if (target_container) {
                         isLocal = false;
                     }    
@@ -412,27 +414,26 @@ int main(int argc,char *argv[],char *envp[])
                     {
                     	if(isLocal)
                     	{
+
 							logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",toString(command.getPid())));
 							logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID.."));
 							if (command.getPid() > 0)
 							{
-								std::stringstream oss;
-								std::streambuf* old = std::cerr.rdbuf( oss.rdbuf() );
 								int retstatus = kill(command.getPid(),SIGKILL);
-
-								string err = oss.str();
-								std::cerr.rdbuf(old);
 								if (retstatus == 0) //termination is successfully done
 								{
 									string resp = response.createTerminateMessage(environment.getAgentUuidValue(),
-											command.getRequestSequenceNumber(),command.getTaskUuid(), command.getPid());
+											command.getRequestSequenceNumber(),command.getTaskUuid(), command.getPid(), retstatus);
+									cout << "msg: " << resp << endl;
 									connection->sendMessage(resp);
 									logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
 								}
 								else if (retstatus == -1) //termination is failed
-								{
-									string resp = response.createFailTerminateMessage(environment.getAgentUuidValue(),
-											command.getRequestSequenceNumber(),command.getTaskUuid(), command.getPid(), err);
+								{ // ERROR FIELD NEEDS TO BE FILLED
+									string resp = response.createTerminateMessage(environment.getAgentUuidValue(),
+											command.getRequestSequenceNumber(),command.getTaskUuid(), command.getPid(), retstatus);
+
+									cout << "err: " << resp << endl;
 									connection->sendMessage(resp);
 									logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", toString(command.getPid())));
 								}
@@ -444,25 +445,35 @@ int main(int argc,char *argv[],char *envp[])
                     	}
                     	else
                     	{
+
+
                     		logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",toString(command.getPid())));
                     		logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on LXC.."));
                     		if (command.getPid() > 0)
                     		{
-                    			command.setProgram("kill -9 " + command.getPid());
+                    			vector<string> arg_set;
+                    			arg_set.push_back("-9");
+                    			arg_set.push_back(toString(command.getPid()));
+
+                    			command.setProgram("/bin/kill");
+                    			command.setArguments(arg_set);
+
                     			ExecutionResult execResult = target_container->RunCommand(&command);
                     			int retstatus  = execResult.exit_code;
 
                     			if (retstatus == 0) //termination is successfully done
                     			{
                     				string resp = response.createTerminateMessage(target_container->getContainerIdValue(),
-                    								command.getRequestSequenceNumber(),command.getTaskUuid(), command.getPid());
+                    								command.getRequestSequenceNumber(),command.getTaskUuid(), command.getPid(), retstatus);
+                    				cout << "msg: " << resp << endl;
                     				connection->sendMessage(resp);
                     				logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
                     			}
                     			else if (retstatus == -1) //termination is failed
                     			{
-                    				string resp = response.createFailTerminateMessage(target_container->getContainerIdValue(),
-                    				command.getRequestSequenceNumber(),command.getTaskUuid(), command.getPid(), execResult.err);
+                    				string resp = response.createTerminateMessage(target_container->getContainerIdValue(),
+                    				command.getRequestSequenceNumber(),command.getTaskUuid(), command.getPid(), retstatus);
+                    				cout << "err: " << resp << endl;
                     				connection->sendMessage(resp);
                     				logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", toString(command.getPid())));
                     			}

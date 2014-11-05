@@ -73,20 +73,23 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     vector<string>::iterator it;
     int i = 1;
     for (it = params.begin(); it != params.end(); it++, i++) {
-        _params[i] = const_cast<char*>(it->c_str());
+    	_params[i] = const_cast<char*>(it->c_str());
     }
     _params[i] = NULL;
     int fd[2];
     int _stdout = dup(1);
+    int _stderr = dup(2);
     pipe(fd);
     dup2(fd[1], 1);
+    dup2(fd[1], 2);
     char buffer[1000];
     ExecutionResult result;
-    result.exit_code = this->container->attach_run_wait(this->container, &opts, program.c_str(), _params);
-    fflush(stdout);
+    fflush(stdout);fflush(stderr);
     close(fd[1]);
-    dup2(_stdout, 1);
-    close(_stdout);
+    result.exit_code = this->container->attach_run_wait(this->container, &opts, program.c_str(), _params);
+    fflush(stdout);fflush(stderr);
+    dup2(_stdout, 1);dup2(_stderr, 2);
+    close(_stdout);close(_stderr);
     string command_output;
     while (1) {
         ssize_t size = read(fd[0], buffer, 1000);
@@ -99,8 +102,10 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
         }
     }
     if (result.exit_code == 0) {
+    	cout << "success " << command_output << endl;
         result.out = command_output;
     } else {
+    	cout << "err " << command_output << endl;
         result.err = command_output;
     }
     return result;
@@ -162,11 +167,7 @@ void SubutaiContainer::UpdateUsersList() {
 bool SubutaiContainer::getContainerId()
 {
     try
-    {/*
-        vector<string> args;
-        args.push_back("/etc/subutai-agent/uuid.txt");
-        this-> id = RunProgram("/bin/cat", args);
-        */
+    {
     	string uuidFile = "/var/lib/lxc/" + this->hostname + "/rootfs/etc/subutai-agent/uuid.txt";
     	ifstream file(uuidFile.c_str());	//opening uuid.txt
     	getline(file,this->id);
@@ -178,13 +179,6 @@ bool SubutaiContainer::getContainerId()
             boost::uuids::uuid u = gen();
             const std::string tmp = boost::lexical_cast<std::string>(u);
             this->id = tmp;
-            /*
-            args.clear();
-            args.push_back(this->id);
-            args.push_back(">");
-            args.push_back("/etc/subutai-agent/uuid.txt");
-            this-> id = RunProgram("/bin/echo", args);
-            */
             ofstream file(uuidFile.c_str());
             file << this->id;
             file.close();
@@ -399,7 +393,10 @@ vector<string> SubutaiContainer::getContainerIpValue()
 void SubutaiContainer::getContainerAllFields()
 {
     getContainerHostname();
-    getContainerId();
+    getContainerId();/*
+    if (command->getRunAs() != "" && checkUser(command->getRunAs())) {
+        opts.uid = getRunAsUserId(command->getRunAs());
+    }*/
     getContainerMacAddress();
     getContainerParentHostname();
     getContainerIpAddress();
@@ -409,12 +406,13 @@ ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command) {
     lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT;
     if (command->getWorkingDirectory() != "" && checkCWD(command->getWorkingDirectory())) {
         opts.initial_cwd = const_cast<char*>(command->getWorkingDirectory().c_str());
-    }
+    }/*
     if (command->getRunAs() != "" && checkUser(command->getRunAs())) {
         opts.uid = getRunAsUserId(command->getRunAs());
-    }
+    }*/
     vector<string> args;
-    ExecutionResult res = RunProgram(command->getProgram(), args, true, opts);
+    cout << command->getProgram() << endl;
+    ExecutionResult res = RunProgram(command->getProgram(), command->getArguments(), true, opts);
     return res;
 }
 
