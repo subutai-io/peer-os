@@ -10,6 +10,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 import java.util.UUID;
 
@@ -52,7 +54,7 @@ import com.google.gson.JsonParseException;
 /**
  * This is an implementation of EnvironmentManager
  */
-public class EnvironmentManagerImpl implements EnvironmentManager
+public class EnvironmentManagerImpl implements EnvironmentManager, Observer
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class.getName() );
@@ -598,5 +600,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void setPeerManager( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
+    }
+
+
+    @Override
+    public void update( final Observable o, final Object arg )
+    {
+
     }
 }
