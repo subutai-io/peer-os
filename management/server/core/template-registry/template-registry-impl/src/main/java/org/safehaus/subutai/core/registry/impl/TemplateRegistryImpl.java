@@ -593,4 +593,29 @@ public class TemplateRegistryImpl implements TemplateRegistry
         }
         return true;
     }
+
+
+    public void init()
+    {
+        try
+        {
+            //            Template template = TestUtilsDuplicate.getParentTemplate();
+            //            templateService.saveTemplate( template );
+
+            LOG.warn( "Printing saved templates..." );
+            List<Template> templates = templateService.getAllTemplates();
+            for ( Template template1 : templates )
+            {
+                LOG.warn( template1.getTemplateName() );
+            }
+        }
+        //        catch ( IOException e )
+        //        {
+        //            LOG.error( "Error in TestUtilsDuplicate.getParentTemplate()@TemplateRegistryImpl service: ", e );
+        //        }
+        catch ( DaoException e )
+        {
+            LOG.error( "Error while saving template: ", e );
+        }
+    }
 }
