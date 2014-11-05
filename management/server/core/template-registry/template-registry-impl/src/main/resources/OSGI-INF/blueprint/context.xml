@@ -6,7 +6,7 @@
              availability="mandatory" />
 
   <bean id="templateRegistry" scope="singleton" activation="eager"
-        class="org.safehaus.subutai.core.registry.impl.TemplateRegistryImpl" init-method="test">
+        class="org.safehaus.subutai.core.registry.impl.TemplateRegistryImpl">
   <property name="templateService" ref="templateService" />
   </bean>
 
