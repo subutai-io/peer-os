@@ -14,6 +14,7 @@ import org.safehaus.subutai.core.strategy.api.Criteria;
 public class ContainerDistributionMessage
 {
 
+    UUID targetPeerId;
     private UUID sourcePeerId;
     private UUID environmentId;
     private List<Template> templates;
@@ -91,5 +92,17 @@ public class ContainerDistributionMessage
     public void setCriterias( final List<Criteria> criterias )
     {
         this.criterias = criterias;
+    }
+
+
+    public void setTargetPeerId( final UUID targetPeerId )
+    {
+        this.targetPeerId = targetPeerId;
+    }
+
+
+    public UUID targetPeerId()
+    {
+        return targetPeerId;
     }
 }

@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.core.environment.impl.topologies.Topology;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 
 
 /**
@@ -17,13 +18,14 @@ import org.safehaus.subutai.core.environment.impl.topologies.Topology;
 public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
 {
     ContainerDisributor containerDisributor;
-
+    PeerManager peerManager;
     ExecutorService executorService;
 
 
-    public EnvironmentBuilderImpl()
+    public EnvironmentBuilderImpl( PeerManager peerManager )
     {
-        executorService = Executors.newSingleThreadExecutor();
+        this.executorService = Executors.newSingleThreadExecutor();
+        this.peerManager = peerManager;
     }
 
 
@@ -34,11 +36,10 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
     {
 
         TopologyApplier topologyApplier = new TopologyApplierImpl();
-
         List<ContainerDistributionMessage> messageList = topologyApplier.applyTopology( topology, blueprint );
 
-        EnvironmentBuilderThread builderThread = new EnvironmentBuilderThread( this, messageList );
-
+        EnvironmentBuilderThread builderThread = new EnvironmentBuilderThread( this, messageList, peerManager );
+        executorService.execute( builderThread );
 
     }
 
