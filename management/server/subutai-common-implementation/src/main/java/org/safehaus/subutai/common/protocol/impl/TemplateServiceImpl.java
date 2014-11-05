@@ -158,7 +158,7 @@ public class TemplateServiceImpl implements TemplateService
      * @return {@code List<Template>}
      */
     @Override
-    public List<Template> getAllTemplates()
+    public List<Template> getAllTemplates() throws DaoException
     {
         EntityManager entityManager;
 
@@ -169,7 +169,7 @@ public class TemplateServiceImpl implements TemplateService
         }
         catch ( Exception ex )
         {
-            throw new RuntimeException( ex );
+            throw new DaoException( ex );
         }
     }
 

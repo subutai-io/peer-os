@@ -29,6 +29,7 @@ import com.google.gson.annotations.Expose;
  */
 @Entity(name = "Template")
 @IdClass( TemplatePK.class )
+//@Table(name = "Template")
 @NamedQueries(value = {
         @NamedQuery( name = "Template.getAll", query = "SELECT t FROM Template t" ),
         @NamedQuery( name = "Template.getTemplateByNameArch",
@@ -47,11 +48,16 @@ public class Template
     public static final String QUERY_GET_TEMPLATE_BY_NAME_ARCH = "Template.getTemplateByNameArch";
     public static final String QUERY_REMOVE_TEMPLATE_BY_NAME_ARCH = "Template.removeTemplateByNameArch";
 
-    @Id
-    String templateName;
+    //    @EmbeddedId
+    //    TemplatePK pk;
 
     @Id
-    String lxcArch;
+    private String templateName;
+
+
+    @Id
+    private String lxcArch;
+
 
     //name of parent template
     @Expose
@@ -90,8 +96,7 @@ public class Template
 
     //children of template, this property is calculated upon need and is null by default (see REST API for calculation)
     @Expose
-    @OneToMany( fetch = FetchType.EAGER, cascade = { CascadeType.ALL },
-            orphanRemoval = true )
+    @OneToMany( fetch = FetchType.EAGER, cascade = { CascadeType.ALL }, orphanRemoval = true )
     private List<Template> children;
 
     //subutai products present only in this template excluding all subutai products present in the whole ancestry
@@ -230,6 +235,7 @@ public class Template
     public String getLxcArch()
     {
         return lxcArch;
+        //        return pk.getLxcArch();
     }
 
 
@@ -272,6 +278,7 @@ public class Template
     public String getTemplateName()
     {
         return templateName;
+        //        return pk.getTemplateName();
     }
 
 
@@ -285,8 +292,8 @@ public class Template
     //    {
     //        return parentTemplate;
     //    }
-    //
-    //
+
+
     //    public void setParentTemplate( Template template )
     //    {
     //        this.parentTemplate = template;
@@ -332,6 +339,8 @@ public class Template
     {
         int result = templateName.hashCode();
         result = 31 * result + lxcArch.hashCode();
+        //        int result = pk.getTemplateName().hashCode();
+        //        result = 31 * result + pk.getLxcArch().hashCode();
         return result;
     }
 
@@ -351,6 +360,8 @@ public class Template
         final Template template = ( Template ) o;
 
         return lxcArch.equals( template.getLxcArch() ) && templateName.equals( template.getTemplateName() );
+        //        return pk.getLxcArch().equals( template.getLxcArch() ) && pk.getTemplateName()
+        //                                                                    .equals( template.getTemplateName() );
     }
 
 

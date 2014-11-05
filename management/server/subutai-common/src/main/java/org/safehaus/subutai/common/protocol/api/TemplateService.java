@@ -14,7 +14,7 @@ public interface TemplateService
 {
     public Template saveTemplate( Template templateClone ) throws DaoException;
 
-    public List<Template> getAllTemplates();
+    public List<Template> getAllTemplates() throws DaoException;
 
     public void removeTemplate( Template template ) throws DaoException;
 

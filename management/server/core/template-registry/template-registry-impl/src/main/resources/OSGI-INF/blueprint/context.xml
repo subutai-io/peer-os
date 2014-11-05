@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="templateService" interface="org.safehaus.subutai.common.protocol.api.TemplateService"
+  <reference id="templateService"
+             interface="org.safehaus.subutai.common.protocol.api.TemplateService"
              availability="mandatory" />
 
   <bean id="templateRegistry" scope="singleton" activation="eager"
-        class="org.safehaus.subutai.core.registry.impl.TemplateRegistryImpl">
-    <property name="templateService" ref="templateService" />
+        class="org.safehaus.subutai.core.registry.impl.TemplateRegistryImpl" init-method="test">
+  <property name="templateService" ref="templateService" />
   </bean>
 
   <service ref="templateRegistry"
