@@ -42,11 +42,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>subutai-template-service</artifactId>
-      <version>2.0.0</version>
-    </dependency>
-    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <version>1.3.160</version>
