@@ -48,7 +48,7 @@ public class RepositoryManagerImpl implements RepositoryManager
     }
 
 
-    private CommandResult executeCommand( RequestBuilder requestBuilder ) throws RepositoryException
+    protected CommandResult executeCommand( RequestBuilder requestBuilder ) throws RepositoryException
     {
         try
         {
