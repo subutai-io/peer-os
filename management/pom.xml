@@ -317,6 +317,15 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- script-manager -->
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>script-manager-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- monitor -->
       <dependency>
         <groupId>${project.groupId}</groupId>
