@@ -246,7 +246,7 @@ int main(int argc,char *argv[],char *envp[])
     int reconnectDelay = atoi(environment.getAgentConnectionOptionsValue().c_str()) - 4;
 
     if (reconnectDelay <= 0) {
-        logMain.writeLog(3, logMain.setLogData("<SubutaiAgent>", "Reconnect Delay cannot be under 0 !!",
+        logMain.writeLog(3, logMain.setLogData("<SubutaiAgent>", "Reconnect Delay cannot be under 0",
                     " Using default timeout(10).", toString(reconnectDelay)));
         reconnectDelay = 10;
     }
@@ -254,7 +254,7 @@ int main(int argc,char *argv[],char *envp[])
     while (true) {
         if (!connection->openSession()) {
             sleep(reconnectDelay);
-            logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Trying connect to MQTT Broker..:", 
+            logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Trying connect to MQTT Broker:", 
                         environment.getAgentConnectionUrlValue()));
             if (connection->reConnect()) {
                 break;
@@ -266,7 +266,7 @@ int main(int argc,char *argv[],char *envp[])
 
     logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Connection Successfully opened with MQTT Broker: ",
                 environment.getAgentConnectionUrlValue()));
-    logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Registration Message is sending to MQTT Broker.."));
+    logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Registration Message is sending to MQTT Broker"));
 
     /*
      * sending registration message : For the new subutai agent arch. heartbeat will be used for registration.
