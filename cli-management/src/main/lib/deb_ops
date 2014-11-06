@@ -4,8 +4,9 @@
 # Set of functions that operates on debian packages
 # ==========================================================================
 
-SUBUTAI_REPO_DIR=/repo/ksks
-SUBUTAI_TMPDIR=/tmp
+SUBUTAI_REPO_DIR="/repo/ksks"
+SUBUTAI_TMPDIR="/tmp"
+SUBUTAI_REMOVED_PACKAGES_DIR="/var/lib/subutai/removed-packages/"
 
 
 function add_package {
@@ -14,23 +15,28 @@ function add_package {
   # extract debian package name from full path
   local debian_package=$(echo $file_path | sed 's/.*\///')
   assert_debian_package "$debian_package"
-
-  cp -a "$file_path $SUBUTAI_REPO_DIRECTORY/amd64/trusty/"
-  pushd $SUBUTAI_REPO_DIRECTORY > /dev/null
+  
+  pushd $SUBUTAI_REPO_DIR > /dev/null
+  # Copy file under custom package directory
+  cp -a "$file_path" "$SUBUTAI_REPO_DIR/amd64/trusty/"
+  # Add file to the apt repository
   reprepro includedeb trusty amd64/trusty/$debian_package
   popd > /dev/null
 }
 
 
 function remove_package {
-  local debian_package=$1
-  local file_path="$SUBUTAI_REPO_DIR/amd64/trusty/$debian_package"
+  local package_control_name=$1
+  local debian_package=$package_control_name"_*.deb"
+  local file_path=$SUBUTAI_REPO_DIR/amd64/trusty/$debian_package
   assert_file "$file_path"
   assert_debian_package "$debian_package"
 
-  rm $file_path
+  # Remove file under custom package directory
+  mkdir -p "$SUBUTAI_REMOVED_PACKAGES_DIR"
+  mv $file_path $SUBUTAI_REMOVED_PACKAGES_DIR
   pushd $SUBUTAI_REPO_DIR > /dev/null
-  local package_control_name=$(echo $debian_package | cut -f1 -d"_")
+  # Remove file from the apt repository
   reprepro remove trusty $package_control_name
   popd > /dev/null
 }
@@ -43,11 +49,15 @@ function extract_package {
   assert_file "$file_path"
 
   pushd $SUBUTAI_TMPDIR > /dev/null
-  
-  local directory_name=${debian_package:0:$((${#debian_package} - 4))}
-  msg_debug "directory $directory_name is going to be created under `pwd`"
+  # If the debian package arguement is provided with wilcards,
+  # then get the full package name
+  full_package_name=$(ls $file_path | sed 's/.*\///')
+  local extract_directory_name=${full_package_name:0:$((${#full_package_name} - 4))}
+  # delete directory if exists
+  rm -r "$SUBUTAI_TMPDIR/$extract_directory_name"
   # extract the package under $SUBUTAI_TMPDIR
-  dpkg -x $file_path "$SUBUTAI_TMPDIR/$directory_name"
+  dpkg -x $file_path "$SUBUTAI_TMPDIR/$extract_directory_name"
+  dpkg -e $file_path "$SUBUTAI_TMPDIR/$extract_directory_name/DEBIAN/"
   popd > /dev/null
 }
 
@@ -58,6 +68,7 @@ function list_package {
     msg_error "Search pattern is not provided. Aborting!"
     exit 1
   fi
+
   echo "$(apt-cache search $search_pattern)"
 }
 
@@ -88,4 +99,20 @@ function assert_debian_package {
     msg_error "$file is not a debian package!"
     exit 1
   fi
+}
+
+
+function get_package_control_name {
+  local debian_package=$1
+  if [ -z $debian_package ]; then
+    msg_error "Package name cannot be empty"
+    exit 1
+  fi
+
+  if [[ $debian_package == *\/* ]]; then
+    msg_error "Package name should not contain \/ character"
+    exit 1
+  fi
+
+  echo $debian_package | cut -f1 -d"_"
 }

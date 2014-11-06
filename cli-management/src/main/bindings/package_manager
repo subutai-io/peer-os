@@ -4,7 +4,7 @@ function package_manager_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Package manager wrapper
   echo
-  echo "        "subutai \[-qh\] package_manager \[add\|remove\|extract debian_package_path\] \| \[list search_pattern\]
+  echo "        "subutai \[-qh\] package_manager \[add\|extract debian_package_path\|remove debian_package_name\] \| \[list search_pattern\]
   echo
   echo -----------------------------------------------------------------------
 }
