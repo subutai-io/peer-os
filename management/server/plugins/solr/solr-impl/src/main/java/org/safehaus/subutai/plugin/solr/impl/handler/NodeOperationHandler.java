@@ -11,6 +11,7 @@ import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.Commands;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
@@ -18,19 +19,19 @@ import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import com.google.common.base.Preconditions;
 
 
-public class ManageOperationHandler extends AbstractOperationHandler<SolrImpl>
+public class NodeOperationHandler extends AbstractOperationHandler<SolrImpl>
 {
 
     private String clusterName;
-    private UUID agentUUID;
+    private String hostName;
     private OperationType operationType;
 
 
-    public ManageOperationHandler( final SolrImpl manager, final String clusterName, final UUID agentUUID,
-                                   OperationType operationType )
+    public NodeOperationHandler( final SolrImpl manager, final String clusterName, final String hostName,
+                                 OperationType operationType )
     {
         super( manager, clusterName );
-        this.agentUUID = agentUUID;
+        this.hostName = hostName;
         this.clusterName = clusterName;
         this.operationType = operationType;
         this.trackerOperation = manager.getTracker()
@@ -55,7 +56,7 @@ public class ManageOperationHandler extends AbstractOperationHandler<SolrImpl>
         while ( iterator.hasNext() )
         {
             host = ( ContainerHost ) iterator.next();
-            if ( host.getId().equals( agentUUID ) )
+            if ( host.getHostname().equals( hostName ) )
             {
                 break;
             }
@@ -63,7 +64,7 @@ public class ManageOperationHandler extends AbstractOperationHandler<SolrImpl>
 
         if ( host == null )
         {
-            trackerOperation.addLogFailed( String.format( "No Container with ID %s", agentUUID ) );
+            trackerOperation.addLogFailed( String.format( "No Container with ID %s", hostName ) );
             return;
         }
 

@@ -21,13 +21,13 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDao;
+import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
-import org.safehaus.subutai.plugin.solr.impl.handler.InstallOperationHandler;
-import org.safehaus.subutai.plugin.solr.impl.handler.ManageOperationHandler;
-import org.safehaus.subutai.plugin.solr.impl.handler.OperationType;
-import org.safehaus.subutai.plugin.solr.impl.handler.UninstallOperationHandler;
+import org.safehaus.subutai.plugin.solr.impl.handler.ClusterOperationHandler;
+import org.safehaus.subutai.plugin.solr.impl.handler.NodeOperationHandler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ public class SolrImpl implements Solr
     private Tracker tracker;
     private EnvironmentManager environmentManager;
     private ExecutorService executor;
-    private PluginDao pluginDAO;
+    private PluginDAO pluginDAO;
     private DataSource dataSource;
 
 
@@ -53,7 +53,7 @@ public class SolrImpl implements Solr
     }
 
 
-    public PluginDao getPluginDAO()
+    public PluginDAO getPluginDAO()
     {
         return pluginDAO;
     }
@@ -63,7 +63,7 @@ public class SolrImpl implements Solr
     {
         try
         {
-            this.pluginDAO = new PluginDao( dataSource );
+            this.pluginDAO = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
         {
@@ -114,7 +114,7 @@ public class SolrImpl implements Solr
 
         Preconditions.checkNotNull( solrClusterConfig, "Configuration is null" );
 
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, solrClusterConfig );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, solrClusterConfig, OperationType.INSTALL );
 
         executor.execute( operationHandler );
 
@@ -122,11 +122,19 @@ public class SolrImpl implements Solr
     }
 
 
+    @Override
     public UUID uninstallCluster( final String clusterName )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        return null;
+    }
 
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
+
+    @Override
+    public UUID uninstallCluster( final SolrClusterConfig config )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( config.getClusterName() ), "Cluster name is null or empty" );
+
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, OperationType.DESTROY );
 
         executor.execute( operationHandler );
 
@@ -156,61 +164,53 @@ public class SolrImpl implements Solr
     }
 
 
-    public UUID startNode( final String clusterName, final ContainerHost containerHost )
+    @Override
+    public UUID destroyNode( final String clusterName, final String lxcHostname )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHost.getHostname() ), "Lxc hostname is null or empty" );
-
-
-        AbstractOperationHandler operationHandler = new ManageOperationHandler( this, clusterName, containerHost.getAgent().getUuid(), OperationType.START );
-
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
-    }
-
-
-    public UUID stopNode( final String clusterName, final ContainerHost containerHost )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHost.getHostname() ), "Lxc hostname is null or empty" );
-
-
-        AbstractOperationHandler operationHandler = new ManageOperationHandler( this, clusterName, containerHost.getAgent().getUuid(), OperationType.STOP );
-
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
-    }
-
-
-    public UUID checkNode( final String clusterName, final ContainerHost containerHost )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-        //Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostName ), "Lxc hostname is null or empty" );
-
-
-        AbstractOperationHandler operationHandler = new ManageOperationHandler( this, clusterName, containerHost.getAgent().getUuid(), OperationType.STATUS );
-
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
-    }
-
-
-    public UUID addNode( final String clusterName )
-    {
-       //TODO
         return null;
     }
 
 
-    public UUID destroyNode( final String clusterName, final ContainerHost containerHost )
+    public UUID startNode( final String clusterName, final String hostName )
     {
-        //TODO
-        return null;
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostName ), "Lxc hostname is null or empty" );
+
+
+        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, clusterName, hostName, OperationType.START );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
     }
 
+
+    public UUID stopNode( final String clusterName, final String hostName )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostName ), "Lxc hostname is null or empty" );
+
+
+        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, clusterName, hostName, OperationType.STOP );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
+
+
+    public UUID checkNode( final String clusterName, final String hostName )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostName ), "Lxc hostname is null or empty" );
+
+
+        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, clusterName, hostName, OperationType.STATUS );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
 
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final SolrClusterConfig config,

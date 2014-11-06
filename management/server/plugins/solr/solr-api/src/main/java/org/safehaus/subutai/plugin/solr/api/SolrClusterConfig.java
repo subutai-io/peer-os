@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -24,14 +25,11 @@ public class SolrClusterConfig implements ConfigBase
     private String templateName = PRODUCT_NAME;
     private String clusterName = "";
     private int numberOfNodes = 1;
-    private Set<UUID> nodes = new HashSet<>();
+    private Set<ContainerHost> nodes = new HashSet<>();
     private UUID environmentId;
 
 
-    public String getClusterName()
-    {
-        return clusterName;
-    }
+
 
 
     public SolrClusterConfig setClusterName( String clusterName )
@@ -40,6 +38,10 @@ public class SolrClusterConfig implements ConfigBase
         return this;
     }
 
+    public String getClusterName()
+    {
+        return clusterName;
+    }
 
     @Override
     public String getProductName()
@@ -79,13 +81,13 @@ public class SolrClusterConfig implements ConfigBase
     }
 
 
-    public Set<UUID> getNodes()
+    public Set<ContainerHost> getNodes()
     {
         return nodes;
     }
 
 
-    public void setNodes( final Set<UUID> nodes )
+    public void setNodes( final Set<ContainerHost> nodes )
     {
         this.nodes = nodes;
     }

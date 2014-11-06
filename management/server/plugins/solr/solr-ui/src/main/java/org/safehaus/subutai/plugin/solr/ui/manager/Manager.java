@@ -14,16 +14,20 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.solr.api.NodeOperationTask;
 import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
+import org.safehaus.subutai.plugin.common.api.OperationType;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -161,7 +165,7 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = solr.uninstallCluster( solrClusterConfig.getClusterName() );
+                            UUID trackID = solr.uninstallCluster( solrClusterConfig );
                             final ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     SolrClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
@@ -288,29 +292,34 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new OperationTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost, OperationType.STATUS,
-                                new CompleteEvent()
+                        new NodeOperationTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost,
+                                OperationType.STATUS, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                        {
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    public void onComplete( String result )
+                                    if ( nodeState.equals( NodeState.RUNNING ) )
                                     {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            resultHolder.setValue( result );
-                                            if ( resultHolder.getValue().contains( "not" ) )
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                            }
-                                            else
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            }
-                                            PROGRESS_ICON.setVisible( false );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                        }
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
                                     }
-                                } ) );
+                                    else if ( nodeState.equals( NodeState.STOPPED ) )
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                    }
+                                    else if ( nodeState.equals( NodeState.UNKNOWN ) )
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    }
+                                    resultHolder.setValue( nodeState.name() );
+                                    PROGRESS_ICON.setVisible( false );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                }
+                            }
+                        }, null ) );
             }
         } );
     }
@@ -339,19 +348,19 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new OperationTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost, OperationType.STOP,
-                                new CompleteEvent()
+                        new NodeOperationTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost,
+                                OperationType.STOP, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            enableButtons( buttons );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    enableButtons( buttons );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        }, null ) );
             }
         } );
     }
@@ -367,19 +376,19 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new OperationTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost,OperationType.START,
-                                new CompleteEvent()
+                        new NodeOperationTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost,
+                                OperationType.START, new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            enableButtons( buttons );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    enableButtons( buttons );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        }, null ) );
             }
         } );
     }

@@ -83,7 +83,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl> i
                 {
                     public void run()
                     {
-                        uninstallCluster();
+                        destroyCluster();
                     }
                 } );
                 break;

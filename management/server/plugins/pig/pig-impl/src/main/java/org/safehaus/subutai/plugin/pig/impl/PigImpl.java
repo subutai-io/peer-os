@@ -134,6 +134,13 @@ public class PigImpl implements Pig
         this.executor = executor;
     }
 
+    @Override
+    public UUID installCluster( final PigConfig config )
+    {
+        ClusterOperationHandler operationHandler = new ClusterOperationHandler( this, config, OperationType.INSTALL );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
 
     @Override
     public UUID installCluster( PigConfig config, HadoopClusterConfig hadoopConfig )
@@ -144,19 +151,34 @@ public class PigImpl implements Pig
         return operationHandler.getTrackerId();
     }
 
+    @Override
+    public UUID uninstallCluster( final PigConfig config )
+    {
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, OperationType.UNINSTALL );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+
+
 
     @Override
-    public UUID destroyNode( final String clusterName, final String containerHost )
+    public UUID uninstallCluster( final String clusterName )
     {
-//        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, containerHost );
-//        executor.execute( operationHandler );
-//        return operationHandler.getTrackerId();
+        return null;
+    }
+
+    @Override
+    public UUID destroyNode( final String clusterName, final String lxcHostname )
+    {
+        // TODO
         return null;
     }
 
 
     @Override
-    public UUID addNode( final String clusterName, final String containerHost )
+    public UUID addNode( final String clusterName, final String lxcHostName )
     {
         // TODO
         /*AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
@@ -164,7 +186,6 @@ public class PigImpl implements Pig
         return operationHandler.getTrackerId();*/
         return null;
     }
-
 
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( Environment env, PigConfig config, TrackerOperation po )
@@ -180,25 +201,6 @@ public class PigImpl implements Pig
 //            return s;
 //        }
         return null;
-    }
-
-
-    @Override
-    public UUID installCluster( PigConfig config )
-    {
-        Preconditions.checkNotNull( config, "Configuration is null" );
-        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, OperationType.INSTALL );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
-    }
-
-
-    @Override
-    public UUID uninstallCluster( final String clusterName )
-    {
-        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, null, OperationType.UNINSTALL );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
     }
 
 

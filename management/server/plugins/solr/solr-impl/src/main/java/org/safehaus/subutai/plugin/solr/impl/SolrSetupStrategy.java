@@ -10,6 +10,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
@@ -79,10 +80,10 @@ public class SolrSetupStrategy implements ClusterSetupStrategy
                     environment.getContainers().size(), config.getNumberOfNodes() ) );
         }
 
-        Set<UUID> solrNodes = new HashSet<>();
-        for ( ContainerHost environmentContainer : environment.getContainers() )
+        Set<ContainerHost> solrNodes = new HashSet<>();
+        for ( ContainerHost host : environment.getContainers() )
         {
-            solrNodes.add( environmentContainer.getAgent().getUuid() );
+            solrNodes.add( host );
         }
 
         config.setNodes( solrNodes );

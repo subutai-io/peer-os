@@ -22,15 +22,17 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 public interface Solr extends ApiBase<SolrClusterConfig>
 {
 
-    public UUID startNode( String clusterName, ContainerHost containerHost );
+    public UUID startNode( String clusterName, String lxcHostname );
 
-    public UUID stopNode( String clusterName, ContainerHost containerHost );
+    public UUID stopNode( String clusterName, String lxcHostname );
 
-    public UUID checkNode( String clusterName, ContainerHost containerHost );
+    public UUID checkNode( String clusterName, String lxcHostname );
 
-    public UUID addNode( String clusterName );
+    public UUID addNode( String clusterName, String lxcHostname );
 
-    public UUID destroyNode( String clusterName, ContainerHost containerHost );
+    public UUID destroyNode( String clusterName, String lxcHostname );
+
+    public UUID uninstallCluster( SolrClusterConfig config );
 
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final SolrClusterConfig config,
                                                          final TrackerOperation po );
