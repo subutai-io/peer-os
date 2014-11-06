@@ -16,7 +16,7 @@ import org.safehaus.subutai.core.peer.api.Peer;
 /**
  * Created by bahadyr on 11/6/14.
  */
-public class NodeGroup2PeerBuilder extends TopologyBuilder
+public class NodeGroup2PeerBuilder extends EnvironmentBuildProcessFactory
 {
     public NodeGroup2PeerBuilder( final EnvironmentManagerImpl environmentManager )
     {
@@ -25,7 +25,7 @@ public class NodeGroup2PeerBuilder extends TopologyBuilder
 
 
     @Override
-    public EnvironmentBuildProcess prepareBuildProcess( final TopologyData topologyData ) throws TopologyBuilderException
+    public EnvironmentBuildProcess prepareBuildProcess( final TopologyData topologyData ) throws ProcessBuilderException
     {
         NodeGroup2PeerData data = (NodeGroup2PeerData) topologyData;
         EnvironmentBuildProcess process = new EnvironmentBuildProcess( data.getBlueprintId() );

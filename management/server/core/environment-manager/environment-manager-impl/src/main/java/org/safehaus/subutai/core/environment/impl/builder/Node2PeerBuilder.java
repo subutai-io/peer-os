@@ -16,7 +16,7 @@ import org.safehaus.subutai.core.peer.api.Peer;
 /**
  * Created by bahadyr on 11/6/14.
  */
-public class Node2PeerBuilder extends TopologyBuilder
+public class Node2PeerBuilder extends EnvironmentBuildProcessFactory
 {
 
     public Node2PeerBuilder( final EnvironmentManagerImpl environmentManager )

@@ -14,19 +14,21 @@ import org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl;
 /**
  * Created by bahadyr on 10/21/14.
  */
-public abstract class TopologyBuilder
+public abstract class EnvironmentBuildProcessFactory
 {
 
     EnvironmentManagerImpl environmentManager;
 
 
-    public TopologyBuilder( final EnvironmentManagerImpl environmentManager )
+    public EnvironmentBuildProcessFactory( final EnvironmentManagerImpl environmentManager )
     {
         this.environmentManager = environmentManager;
     }
 
 
-    public abstract EnvironmentBuildProcess prepareBuildProcess( TopologyData topologyData ) throws TopologyBuilderException;
+    public abstract EnvironmentBuildProcess prepareBuildProcess( TopologyData topologyData )
+            throws ProcessBuilderException;
+
 
     public List<Template> fetchRequiredTemplates( UUID sourcePeerId, final String templateName )
     {

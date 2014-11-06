@@ -51,7 +51,8 @@ public interface RestService
                                       @FormParam("environmentId") String environmentId,
                                       @FormParam("templates") String templates, @FormParam("quantity") int quantity,
                                       @FormParam("strategyId") String strategyId,
-                                      @FormParam("criteria") String criteria );
+                                      @FormParam("criteria") String criteria,
+                                      @FormParam( "nodeGroupName" ) String nodeGroupName );
 
     @POST
     @Path("container/destroy")

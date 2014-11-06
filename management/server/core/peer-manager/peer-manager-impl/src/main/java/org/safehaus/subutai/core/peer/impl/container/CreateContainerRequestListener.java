@@ -39,7 +39,7 @@ public class CreateContainerRequestListener extends RequestListener
                 Set<ContainerHost> containerHosts = localPeer
                         .createContainers( request.getCreatorPeerId(), request.getEnvironmentId(),
                                 request.getTemplates(), request.getQuantity(), request.getStrategyId(),
-                                request.getCriteria() );
+                                request.getCriteria(), request.getNodeGroupName() );
 
                 return new CreateContainerResponse( containerHosts );
             }

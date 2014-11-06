@@ -52,6 +52,8 @@ public interface EnvironmentManager
 
     Environment buildEnvironment( EnvironmentBuildProcess environmentBuildProcess ) throws EnvironmentBuildException;
 
+    public Environment buildEnvironmentNew( final EnvironmentBuildProcess process ) throws EnvironmentBuildException;
+
     void deleteBuildProcess( EnvironmentBuildProcess environmentBuildProcess );
 
 

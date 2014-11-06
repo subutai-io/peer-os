@@ -23,7 +23,7 @@ import com.google.common.collect.Lists;
 /**
  * Created by bahadyr on 11/6/14.
  */
-public class NodeGroup2PeerGroupBuilder extends TopologyBuilder
+public class NodeGroup2PeerGroupBuilder extends EnvironmentBuildProcessFactory
 {
 
     public NodeGroup2PeerGroupBuilder( final EnvironmentManagerImpl environmentManager )
@@ -34,7 +34,7 @@ public class NodeGroup2PeerGroupBuilder extends TopologyBuilder
 
     @Override
     public EnvironmentBuildProcess prepareBuildProcess( final TopologyData topologyData )
-            throws TopologyBuilderException
+            throws ProcessBuilderException
     {
         NodeGroup2PeerGroupData data = ( NodeGroup2PeerGroupData ) topologyData;
         EnvironmentBuildProcess process = new EnvironmentBuildProcess( data.getBlueprintId() );
@@ -67,7 +67,7 @@ public class NodeGroup2PeerGroupBuilder extends TopologyBuilder
         }
         catch ( EnvironmentManagerException e )
         {
-            throw new TopologyBuilderException( e.getMessage() );
+            throw new ProcessBuilderException( e.getMessage() );
         }
     }
 

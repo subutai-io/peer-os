@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.impl.container;
+package org.safehaus.subutai.core.peer.api;
 
 
 import java.util.List;
@@ -9,9 +9,9 @@ import org.safehaus.subutai.core.strategy.api.Criteria;
 
 
 /**
- * Request for container creation at a remote peer
+ * Created by bahadyr on 11/6/14.
  */
-public class CreateContainerRequest
+public class CreateContainerInfo
 {
     private final UUID creatorPeerId;
     private final UUID environmentId;
@@ -19,11 +19,12 @@ public class CreateContainerRequest
     private final int quantity;
     private final String strategyId;
     private final List<Criteria> criteria;
-    private final String nodeGroupName;
+    private final String groupName;
 
 
-    public CreateContainerRequest( final UUID creatorPeerId, final UUID environmentId, final List<Template> templates,
-                                   final int quantity, final String strategyId, final List<Criteria> criteria, final String nodeGroupName )
+    public CreateContainerInfo( final UUID creatorPeerId, final UUID environmentId, final List<Template> templates,
+                                final int quantity, final String strategyId, final List<Criteria> criteria,
+                                final String groupName )
     {
         this.creatorPeerId = creatorPeerId;
         this.environmentId = environmentId;
@@ -31,13 +32,7 @@ public class CreateContainerRequest
         this.quantity = quantity;
         this.strategyId = strategyId;
         this.criteria = criteria;
-        this.nodeGroupName = nodeGroupName;
-    }
-
-
-    public String getNodeGroupName()
-    {
-        return nodeGroupName;
+        this.groupName = groupName;
     }
 
 
@@ -74,5 +69,11 @@ public class CreateContainerRequest
     public List<Criteria> getCriteria()
     {
         return criteria;
+    }
+
+
+    public String getGroupName()
+    {
+        return groupName;
     }
 }

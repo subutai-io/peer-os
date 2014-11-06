@@ -18,7 +18,7 @@ import org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl;
 /**
  * Created by bahadyr on 11/6/14.
  */
-public class Blueprint2PeerBuilder extends TopologyBuilder
+public class Blueprint2PeerBuilder extends EnvironmentBuildProcessFactory
 {
     public Blueprint2PeerBuilder( final EnvironmentManagerImpl environmentManager )
     {
@@ -28,7 +28,7 @@ public class Blueprint2PeerBuilder extends TopologyBuilder
 
     @Override
     public EnvironmentBuildProcess prepareBuildProcess( final TopologyData topologyData )
-            throws TopologyBuilderException
+            throws ProcessBuilderException
     {
         Blueprint2PeerData data = ( Blueprint2PeerData ) topologyData;
         EnvironmentBuildProcess process = new EnvironmentBuildProcess( data.getBlueprintId() );
@@ -56,7 +56,7 @@ public class Blueprint2PeerBuilder extends TopologyBuilder
         }
         catch ( EnvironmentManagerException e )
         {
-            throw new TopologyBuilderException( e.getMessage() );
+            throw new ProcessBuilderException( e.getMessage() );
         }
     }
 }
