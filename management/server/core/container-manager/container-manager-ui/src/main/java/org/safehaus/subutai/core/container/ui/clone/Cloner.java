@@ -105,7 +105,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
         for ( ContainerPlacementStrategy st : placementStrategies )
         {
             BeanItemContainer<Criteria> beanItems = new BeanItemContainer<>( Criteria.class );
-            beanItems.addAll( st.getCriteriaDefinition() );
+            beanItems.addAll( st.getCriteria() );
             criteriaBeansMap.put( st, beanItems );
         }
 
