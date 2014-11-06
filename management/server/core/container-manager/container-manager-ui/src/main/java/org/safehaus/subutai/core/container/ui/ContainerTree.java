@@ -142,7 +142,7 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
                 managementHostItem.getItemProperty( "value" ).setValue( managementHost );
                 tree.setItemCaption( managementHost.getId(),
                         String.format( localPeer.getPeerInfo().getName(), localPeer.getPeerInfo().getId() ) );
-                for ( ResourceHost rh : managementHost.getResourceHosts() )
+                for ( ResourceHost rh : localPeer.getResourceHosts() )
                 {
                     Item resourceHostItem = container.addItem( rh.getId() );
                     tree.setItemCaption( rh.getId(), rh.getHostname() );

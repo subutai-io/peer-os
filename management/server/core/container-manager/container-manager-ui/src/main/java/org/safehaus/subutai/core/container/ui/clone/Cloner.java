@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.container.ui.clone;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -104,7 +105,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
         for ( ContainerPlacementStrategy st : placementStrategies )
         {
             BeanItemContainer<Criteria> beanItems = new BeanItemContainer<>( Criteria.class );
-            beanItems.addAll( st.getCriteria() );
+            beanItems.addAll( st.getCriteriaDefinition() );
             criteriaBeansMap.put( st, beanItems );
         }
 
@@ -334,22 +335,36 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                 show( e.toString() );
                 return;
             }
+            Map<ServerMetric, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( bestServers );
 
-            for ( int i = 1; i <= count; i++ )
+            Iterator<ServerMetric> serverMetricIterator = sortedBestServers.keySet().iterator();
+            while ( serverMetricIterator.hasNext() )
             {
-                Map<ServerMetric, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( bestServers );
-                final Map.Entry<ServerMetric, Integer> entry = sortedBestServers.entrySet().iterator().next();
-                bestServers.put( entry.getKey(), entry.getValue() - 1 );
-                List<String> lxcHostNames = resourceHostFamilies.get( entry.getKey() );
-                if ( lxcHostNames == null )
+                ServerMetric serverMetric = serverMetricIterator.next();
+                ResourceHost rh = localPeer.getResourceHostByName( serverMetric.getHostname() );
+                List<String> lxcHostNames = new ArrayList<>();
+                for ( int i = 0; i < sortedBestServers.get( serverMetric ); i++ )
                 {
-                    lxcHostNames = new ArrayList<>();
-                    ResourceHost rh = localPeer.getResourceHostByName( entry.getKey().getHostname() );
-                    resourceHostFamilies.put( rh, lxcHostNames );
+                    lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
+                            UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 11 ) );
                 }
-                lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
-                        UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 11 ) );
+                resourceHostFamilies.put( rh, lxcHostNames );
             }
+//            for ( int i = 1; i <= count; i++ )
+            //            {
+            //                final Map.Entry<ServerMetric, Integer> entry = sortedBestServers.entrySet().iterator()
+            // .next();
+            //                bestServers.put( entry.getKey(), entry.getValue() - 1 );
+            //                List<String> lxcHostNames = resourceHostFamilies.get( entry.getKey() );
+            //                if ( lxcHostNames == null )
+            //                {
+            //                    lxcHostNames = new ArrayList<>();
+            //                    ResourceHost rh = localPeer.getResourceHostByName( entry.getKey().getHostname() );
+            //                    resourceHostFamilies.put( rh, lxcHostNames );
+            //                }
+            //                lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
+            //                        UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 11 ) );
+            //            }
         }
         else
         { // process cloning in selected hosts

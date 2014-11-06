@@ -1,15 +1,11 @@
 package org.safehaus.subutai.core.peer.api;
 
 
-import java.util.Iterator;
-import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
-
-import com.google.common.collect.Sets;
 
 
 /**
@@ -18,7 +14,7 @@ import com.google.common.collect.Sets;
 public class ManagementHost extends SubutaiHost
 {
     //    private static final String DEFAULT_MANAGEMENT_HOSTNAME = "management";
-    private Set<ResourceHost> resourceHosts = Sets.newHashSet();
+    //    private Set<ResourceHost> resourceHosts = Sets.newHashSet();
 
 
     public ManagementHost( final Agent agent, UUID peerId )
@@ -35,50 +31,50 @@ public class ManagementHost extends SubutaiHost
     //    }
 
 
-    public Set<ResourceHost> getResourceHosts()
-    {
-        return resourceHosts;
-    }
+    //    public Set<ResourceHost> getResourceHosts()
+    //    {
+    //        return resourceHosts;
+    //    }
+    //
+    //
+    //    public void setResourceHosts( final Set<ResourceHost> resourceHosts )
+    //    {
+    //        this.resourceHosts = resourceHosts;
+    //    }
+    //
 
-
-    public void setResourceHosts( final Set<ResourceHost> resourceHosts )
-    {
-        this.resourceHosts = resourceHosts;
-    }
-
-
-    public ResourceHost getResourceHostByName( final String hostname )
-    {
-        return findResourceHostByName( hostname );
-    }
-
-
-    public void addResourceHost( final ResourceHost host )
-    {
-        if ( host == null )
-        {
-            throw new IllegalArgumentException( "Resource host could not be null." );
-        }
-        resourceHosts.add( host );
-    }
-
-
-    private ResourceHost findResourceHostByName( final String hostname )
-    {
-        ResourceHost result = null;
-        Iterator iterator = resourceHosts.iterator();
-
-        while ( result == null && iterator.hasNext() )
-        {
-            ResourceHost host = ( ResourceHost ) iterator.next();
-
-            if ( host.getHostname().equals( hostname ) )
-            {
-                result = host;
-            }
-        }
-        return result;
-    }
+    //    public ResourceHost getResourceHostByName( final String hostname )
+    //    {
+    //        return findResourceHostByName( hostname );
+    //    }
+    //
+    //
+    //    public void addResourceHost( final ResourceHost host )
+    //    {
+    //        if ( host == null )
+    //        {
+    //            throw new IllegalArgumentException( "Resource host could not be null." );
+    //        }
+    //        resourceHosts.add( host );
+    //    }
+    //
+    //
+    //    private ResourceHost findResourceHostByName( final String hostname )
+    //    {
+    //        ResourceHost result = null;
+    //        Iterator iterator = resourceHosts.iterator();
+    //
+    //        while ( result == null && iterator.hasNext() )
+    //        {
+    //            ResourceHost host = ( ResourceHost ) iterator.next();
+    //
+    //            if ( host.getHostname().equals( hostname ) )
+    //            {
+    //                result = host;
+    //            }
+    //        }
+    //        return result;
+    //    }
 
 
     public void addAptSource( final String host, final String ip ) throws PeerException

@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.util.UUID;
+
 import javax.sql.DataSource;
 
 import org.junit.Before;
@@ -13,6 +15,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -25,8 +28,6 @@ import org.safehaus.subutai.core.strategy.api.StrategyManager;
 @RunWith( MockitoJUnitRunner.class )
 public class LocalPeerImplTest
 {
-    LocalPeerImpl localPeer;
-
     @Mock
     PeerManager peerManager;
     @Mock
@@ -60,14 +61,16 @@ public class LocalPeerImplTest
     {
         peerManager = new PeerManagerImpl( dataSource, messenger );
         //        peerManager.init();
-        this.localPeer = new LocalPeerImpl( peerManager, agentManager, templateRegistry, peerDAO, communicationManager,
-                commandRunner, quotaManager, strategyManager, null );
     }
 
 
-    @Test
-    public void test()
+    @Test( expected = PeerException.class )
+    public void testBindHostShouldFailOnNotExistenceHost() throws PeerException
     {
-        System.out.println( localPeer.getPeerInfo() );
+//        LocalPeerImpl localPeer =
+        //                new LocalPeerImpl( peerManager, agentManager, templateRegistry, peerDAO, communicationManager,
+        //                        commandRunner, quotaManager, strategyManager, null );
+        //
+        //        localPeer.bindHost( UUID.randomUUID() );
     }
 }
