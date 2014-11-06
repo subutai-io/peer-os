@@ -34,7 +34,7 @@ public interface EnvironmentManager
 
     boolean destroyEnvironment( UUID environmentId ) throws EnvironmentDestroyException;
 
-    boolean saveBlueprint( String blueprint );
+    UUID saveBlueprint( String blueprint ) throws EnvironmentManagerException;
 
     List<EnvironmentBuildTask> getBlueprintTasks();
 
@@ -58,7 +58,7 @@ public interface EnvironmentManager
     Environment getEnvironmentByUUID( UUID environmentId );
 
 
-    boolean saveBuildProcess( TopologyData topologyData ) throws EnvironmentManagerException;
+    UUID saveBuildProcess( TopologyData topologyData ) throws EnvironmentManagerException;
 
     EnvironmentBlueprint getEnvironmentBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
 

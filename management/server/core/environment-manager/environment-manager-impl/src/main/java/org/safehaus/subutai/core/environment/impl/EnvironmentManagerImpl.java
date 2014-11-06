@@ -165,17 +165,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public Environment buildEnvironment( final EnvironmentBlueprint blueprint ) throws EnvironmentBuildException
     {
-
-        saveBlueprint( GSON.toJson( blueprint ) );
-        EnvironmentBuildProcessFactory environmentBuildProcessFactory = new Blueprint2PeerBuilder( this );
         try
         {
-            EnvironmentBuildProcess process = environmentBuildProcessFactory.prepareBuildProcess(
-                    new Blueprint2PeerData( blueprint.getId(), peerManager.getLocalPeer().getId() ) );
-            environmentDAO.saveInfo( PROCESS, process.getId().toString(), process );
+            UUID blueprintId = saveBlueprint( GSON.toJson( blueprint ) );
+            TopologyData data = new Blueprint2PeerData( peerManager.getLocalPeer().getId(), blueprintId );
+            UUID processId = saveBuildProcess( data );
+
+            EnvironmentBuildProcess process =
+                    environmentDAO.getInfo( PROCESS, processId.toString(), EnvironmentBuildProcess.class );
             return buildEnvironment( process );
         }
-        catch ( ProcessBuilderException e )
+        catch ( EnvironmentManagerException e )
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
@@ -233,19 +233,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public boolean saveBlueprint( String blueprint )
+    public UUID saveBlueprint( String blueprint ) throws EnvironmentManagerException
     {
         try
         {
             EnvironmentBlueprint environmentBlueprint = GSON.fromJson( blueprint, EnvironmentBlueprint.class );
-            environmentDAO.saveBlueprint( environmentBlueprint );
-            return true;
+            return environmentDAO.saveBlueprint( environmentBlueprint );
         }
         catch ( JsonParseException | EnvironmentPersistenceException e )
         {
             LOG.error( e.getMessage() );
+            throw new EnvironmentManagerException( e.getMessage() );
         }
-        return false;
     }
 
 
@@ -388,41 +387,40 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public boolean saveBuildProcess( final TopologyData topologyData ) throws EnvironmentManagerException
+    public UUID saveBuildProcess( final TopologyData topologyData ) throws EnvironmentManagerException
     {
-        EnvironmentBuildProcessFactory environmentBuildProcessFactory = null;
+        EnvironmentBuildProcessFactory factory = null;
         if ( topologyData instanceof Blueprint2PeerData )
         {
-            environmentBuildProcessFactory = new Blueprint2PeerBuilder( this );
+            factory = new Blueprint2PeerBuilder( this );
         }
         else if ( topologyData instanceof Blueprint2PeerGroupData )
         {
-            environmentBuildProcessFactory = new Blueprint2PeerGroupBuilder( this );
+            factory = new Blueprint2PeerGroupBuilder( this );
         }
         else if ( topologyData instanceof Node2PeerData )
         {
-            environmentBuildProcessFactory = new Node2PeerBuilder( this );
+            factory = new Node2PeerBuilder( this );
         }
         else if ( topologyData instanceof NodeGroup2PeerData )
         {
-            environmentBuildProcessFactory = new NodeGroup2PeerBuilder( this );
+            factory = new NodeGroup2PeerBuilder( this );
         }
         else if ( topologyData instanceof NodeGroup2PeerGroupData )
         {
-            environmentBuildProcessFactory = new NodeGroup2PeerGroupBuilder( this );
+            factory = new NodeGroup2PeerGroupBuilder( this );
         }
 
         try
         {
-            EnvironmentBuildProcess process = environmentBuildProcessFactory.prepareBuildProcess( topologyData );
+            EnvironmentBuildProcess process = factory.prepareBuildProcess( topologyData );
             environmentDAO.saveInfo( PROCESS, process.getId().toString(), process );
+            return process.getId();
         }
         catch ( ProcessBuilderException e )
         {
             throw new EnvironmentManagerException( e.getMessage() );
         }
-
-        return true;
     }
 
 
