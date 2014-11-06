@@ -343,8 +343,10 @@ public class Manager
 
     public void startAllNodes()
     {
-        for ( ContainerHost containerHost : config.getNodes() )
+        for ( UUID containerUUID : config.getNodes() )
         {
+            ContainerHost containerHost = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() )
+                                                            .getContainerHostByUUID( containerUUID );
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
@@ -367,8 +369,10 @@ public class Manager
 
     private void stopAllNodes()
     {
-        for ( ContainerHost containerHost : config.getNodes() )
+        for ( UUID containerUUID : config.getNodes() )
         {
+            ContainerHost containerHost = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() )
+                                                            .getContainerHostByUUID( containerUUID );
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(

@@ -27,12 +27,10 @@ public class ClusterConfiguration implements ClusterConfigurationInterface
     }
 
 
-    public void configureCluster( final ConfigBase config ) throws ClusterConfigurationException
+    public void configureCluster( final ConfigBase config, Environment environment ) throws ClusterConfigurationException
     {
         // es-conf.sh cluster_name test
         ElasticsearchClusterConfiguration esConfiguration = ( ElasticsearchClusterConfiguration ) config;
-        Environment environment =
-                manager.getEnvironmentManager().getEnvironmentByUUID( esConfiguration.getEnvironmentId() );
         String clusterConfigureCommand = Commands.configure + "cluster_name " + config.getClusterName();
 
         for ( ContainerHost containerHost : environment.getContainers() )
