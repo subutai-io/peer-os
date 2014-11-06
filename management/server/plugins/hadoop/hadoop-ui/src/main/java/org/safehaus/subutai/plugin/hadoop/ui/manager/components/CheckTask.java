@@ -88,11 +88,11 @@ public class CheckTask implements Runnable
             }
             if ( nodeType.equals( NodeType.DATANODE ) )
             {
-                trackID = hadoop.statusDataNode( hadoopClusterConfig, agent );
+                trackID = hadoop.statusDataNode( hadoopClusterConfig, agent.getHostname() );
             }
             else if ( nodeType.equals( NodeType.TASKTRACKER ) )
             {
-                trackID = hadoop.statusTaskTracker( hadoopClusterConfig, agent );
+                trackID = hadoop.statusTaskTracker( hadoopClusterConfig, agent.getHostname() );
             }
 
 

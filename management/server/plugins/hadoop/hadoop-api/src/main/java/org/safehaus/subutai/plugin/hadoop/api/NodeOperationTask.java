@@ -84,15 +84,16 @@ public class NodeOperationTask extends AbstractNodeOperationTask implements Runn
                     switch ( operationType )
                     {
                         case START:
-                            trackID =
-                                    hadoop.startDataNode( hadoop.getCluster( clusterName ), containerHost.getAgent() );
+                            trackID = hadoop.startDataNode( hadoop.getCluster( clusterName ),
+                                    containerHost.getHostname() );
                             break;
                         case STOP:
-                            trackID = hadoop.stopDataNode( hadoop.getCluster( clusterName ), containerHost.getAgent() );
+                            trackID = hadoop.stopDataNode( hadoop.getCluster( clusterName ),
+                                    containerHost.getHostname() );
                             break;
                         case STATUS:
-                            trackID =
-                                    hadoop.statusDataNode( hadoop.getCluster( clusterName ), containerHost.getAgent() );
+                            trackID = hadoop.statusDataNode( hadoop.getCluster( clusterName ),
+                                    containerHost.getHostname() );
                             break;
                     }
                     break;
@@ -101,15 +102,15 @@ public class NodeOperationTask extends AbstractNodeOperationTask implements Runn
                     {
                         case START:
                             trackID = hadoop.startTaskTracker( hadoop.getCluster( clusterName ),
-                                    containerHost.getAgent() );
+                                    containerHost.getHostname() );
                             break;
                         case STOP:
                             trackID = hadoop.stopTaskTracker( hadoop.getCluster( clusterName ),
-                                    containerHost.getAgent() );
+                                    containerHost.getHostname() );
                             break;
                         case STATUS:
                             trackID = hadoop.statusTaskTracker( hadoop.getCluster( clusterName ),
-                                    containerHost.getAgent() );
+                                    containerHost.getHostname() );
                             break;
                     }
                     break;

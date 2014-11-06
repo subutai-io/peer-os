@@ -11,12 +11,12 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "hadoop", name = "describe-clusters", description = "Shows the details of Hadoop cluster")
+@Command( scope = "hadoop", name = "describe-clusters", description = "Shows the details of Hadoop cluster" )
 public class DescribeClusterCommand extends OsgiCommandSupport
 {
 
-    @Argument(index = 0, name = "clusterName", required = true, multiValued = false,
-            description = "The name of the Hadoop cluster")
+    @Argument( index = 0, name = "clusterName", required = true, multiValued = false,
+            description = "The name of the Hadoop cluster" )
     String clusterName;
     private Hadoop hadoopManager;
 

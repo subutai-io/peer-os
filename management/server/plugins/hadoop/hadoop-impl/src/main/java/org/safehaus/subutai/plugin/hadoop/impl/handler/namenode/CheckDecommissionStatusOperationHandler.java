@@ -53,7 +53,7 @@ public class CheckDecommissionStatusOperationHandler extends AbstractOperationHa
         while ( iterator.hasNext() )
         {
             host = ( ContainerHost ) iterator.next();
-            if ( host.getAgent().getUuid().equals( hadoopClusterConfig.getNameNode().getAgent().getUuid() ) )
+            if ( host.getAgent().getUuid().equals( hadoopClusterConfig.getNameNode() ) )
             {
                 break;
             }

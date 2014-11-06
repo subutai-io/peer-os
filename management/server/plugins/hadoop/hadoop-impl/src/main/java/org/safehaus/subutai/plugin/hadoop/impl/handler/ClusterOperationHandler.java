@@ -16,6 +16,7 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -95,6 +96,13 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
     {
         try
         {
+            ContainerHost namenode = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
+                                            .getContainerHostByUUID( config.getNameNode() );
+            ContainerHost jobtracker = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
+                                              .getContainerHostByUUID( config.getJobTracker() );
+            ContainerHost secondaryNameNode =
+                    manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
+                           .getContainerHostByUUID( config.getSecondaryNameNode() );
             CommandResult result = null;
             switch ( operationType )
             {
@@ -102,12 +110,10 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                     switch ( nodeType )
                     {
                         case NAMENODE:
-                            result = config.getNameNode()
-                                           .execute( new RequestBuilder( Commands.getStartNameNodeCommand() ) );
+                            result = namenode.execute( new RequestBuilder( Commands.getStartNameNodeCommand() ) );
                             break;
                         case JOBTRACKER:
-                            result = config.getJobTracker()
-                                           .execute( new RequestBuilder( Commands.getStartJobTrackerCommand() ) );
+                            result = jobtracker.execute( new RequestBuilder( Commands.getStartJobTrackerCommand() ) );
                             break;
                         //                        case SECONDARY_NAMENODE:
                         //                            break;
@@ -122,12 +128,10 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                     switch ( nodeType )
                     {
                         case NAMENODE:
-                            result = config.getNameNode()
-                                           .execute( new RequestBuilder( Commands.getStopNameNodeCommand() ) );
+                            result = namenode.execute( new RequestBuilder( Commands.getStopNameNodeCommand() ) );
                             break;
                         case JOBTRACKER:
-                            result = config.getJobTracker()
-                                           .execute( new RequestBuilder( Commands.getStopJobTrackerCommand() ) );
+                            result = jobtracker.execute( new RequestBuilder( Commands.getStopJobTrackerCommand() ) );
                             break;
                         //                        case SECONDARY_NAMENODE:
                         //                            break;
@@ -142,16 +146,14 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                     switch ( nodeType )
                     {
                         case NAMENODE:
-                            result = config.getNameNode()
-                                           .execute( new RequestBuilder( Commands.getStatusNameNodeCommand() ) );
+                            result = namenode.execute( new RequestBuilder( Commands.getStatusNameNodeCommand() ) );
                             break;
                         case JOBTRACKER:
-                            result = config.getJobTracker()
-                                           .execute( new RequestBuilder( Commands.getStatusJobTrackerCommand() ) );
+                            result = jobtracker.execute( new RequestBuilder( Commands.getStatusJobTrackerCommand() ) );
                             break;
                         case SECONDARY_NAMENODE:
-                            result = config.getSecondaryNameNode()
-                                           .execute( new RequestBuilder( Commands.getStatusNameNodeCommand() ) );
+                            result = secondaryNameNode
+                                    .execute( new RequestBuilder( Commands.getStatusNameNodeCommand() ) );
                             break;
                         //                        case DATANODE:
                         //                            break;
@@ -178,7 +180,8 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
 
             for ( String status : array )
             {
-                switch ( nodeType ){
+                switch ( nodeType )
+                {
 
                     case NAMENODE:
                         if ( status.contains( "NameNode" ) )
@@ -254,34 +257,34 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                             }
                         }
                         break;
-//                    case SLAVE_NODE:
-//                        if ( status.contains( "DataNode" ) )
-//                        {
-//                            String temp = status.replaceAll( "DataNode is ", "" );
-//                            if ( temp.toLowerCase().contains( "not" ) )
-//                            {
-//                                nodeState = NodeState.STOPPED;
-//                            }
-//                            else
-//                            {
-//                                nodeState = NodeState.RUNNING;
-//                            }
-//                            break;
-//                        }
-//                        else if ( status.contains( "TaskTracker" ) )
-//                        {
-//                            String temp = status.replaceAll( "TaskTracker is ", "" );
-//                            if ( temp.toLowerCase().contains( "not" ) )
-//                            {
-//                                nodeState = NodeState.STOPPED;
-//                            }
-//                            else
-//                            {
-//                                nodeState = NodeState.RUNNING;
-//                            }
-//                            break;
-//                        }
-//                        break;
+                    //                    case SLAVE_NODE:
+                    //                        if ( status.contains( "DataNode" ) )
+                    //                        {
+                    //                            String temp = status.replaceAll( "DataNode is ", "" );
+                    //                            if ( temp.toLowerCase().contains( "not" ) )
+                    //                            {
+                    //                                nodeState = NodeState.STOPPED;
+                    //                            }
+                    //                            else
+                    //                            {
+                    //                                nodeState = NodeState.RUNNING;
+                    //                            }
+                    //                            break;
+                    //                        }
+                    //                        else if ( status.contains( "TaskTracker" ) )
+                    //                        {
+                    //                            String temp = status.replaceAll( "TaskTracker is ", "" );
+                    //                            if ( temp.toLowerCase().contains( "not" ) )
+                    //                            {
+                    //                                nodeState = NodeState.STOPPED;
+                    //                            }
+                    //                            else
+                    //                            {
+                    //                                nodeState = NodeState.RUNNING;
+                    //                            }
+                    //                            break;
+                    //                        }
+                    //                        break;
                 }
             }
         }

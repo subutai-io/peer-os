@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.common.api;
 
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
