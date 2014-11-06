@@ -104,7 +104,7 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
         {
             throw new ClusterSetupException( "Could not find Hadoop cluster " + config.getHadoopClusterName() );
         }
-        if ( !hc.getAllNodesIds().containsAll( config.getAllNodesIds() ) )
+        if ( !hc.getAllNodes().containsAll( config.getAllNodesIds() ) )
         {
             throw new ClusterSetupException(
                     "Not all nodes belong to Hadoop cluster " + config.getHadoopClusterName() );

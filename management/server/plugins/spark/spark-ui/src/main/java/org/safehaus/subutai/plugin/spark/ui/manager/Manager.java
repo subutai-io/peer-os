@@ -199,7 +199,7 @@ public class Manager
                         HadoopClusterConfig hci = hadoop.getCluster( hn );
                         if ( hci != null )
                         {
-                            set = environment.getHostsByIds( hci.getAllNodesIds() );
+                            set = environment.getHostsByIds( Sets.newHashSet( hci.getAllNodes() ) );
                         }
                     }
                 }

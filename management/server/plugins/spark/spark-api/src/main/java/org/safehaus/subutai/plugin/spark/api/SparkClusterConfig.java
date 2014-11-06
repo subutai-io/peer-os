@@ -2,12 +2,15 @@ package org.safehaus.subutai.plugin.spark.api;
 
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.util.CollectionUtil;
+
+import com.google.common.collect.Lists;
 
 
 public class SparkClusterConfig implements ConfigBase
@@ -127,9 +130,9 @@ public class SparkClusterConfig implements ConfigBase
     }
 
 
-    public Set<UUID> getAllNodesIds()
+    public List<UUID> getAllNodesIds()
     {
-        Set<UUID> allNodesIds = new HashSet<>();
+        List<UUID> allNodesIds = Lists.newArrayList();
         if ( !CollectionUtil.isCollectionEmpty( slaveIds ) )
         {
             allNodesIds.addAll( slaveIds );

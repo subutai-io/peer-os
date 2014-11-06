@@ -133,19 +133,4 @@ public class Environment
         }
         return hosts;
     }
-
-    /*public void invoke( PeerCommandMessage commandMessage )
-    {
-        try
-        {
-            EnvironmentManager environmentManager = this.serviceLocator.getServiceNoCache( EnvironmentManager.class );
-            environmentManager.invoke( commandMessage );
-        }
-        catch ( NamingException e )
-        {
-            commandMessage.setProccessed( true );
-            commandMessage.setExceptionMessage( e.toString() );
-            //            commandMessage.setSuccess( false );
-        }
-    }*/
 }
