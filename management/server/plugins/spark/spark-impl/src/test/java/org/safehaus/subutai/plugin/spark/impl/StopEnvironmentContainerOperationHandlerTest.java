@@ -5,25 +5,26 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.handler.StopNodeOperationHandler;
-import org.safehaus.subutai.plugin.spark.impl.mock.SparkImplMock;
 
 
 @Ignore
 public class StopEnvironmentContainerOperationHandlerTest
 {
-    private SparkImplMock mock;
+    @Mock
+    SparkImpl mock;
     private AbstractOperationHandler handler;
 
 
     @Before
     public void setUp()
     {
-        mock = new SparkImplMock();
+
         handler = new StopNodeOperationHandler( mock, "test-cluster", "test-host", true );
     }
 
@@ -44,7 +45,7 @@ public class StopEnvironmentContainerOperationHandlerTest
     public void testWithNotConnectedAgents()
     {
         SparkClusterConfig config = new SparkClusterConfig();
-        mock.setClusterConfig( config );
+        //        mock.setClusterConfig( config );
         handler.run();
 
         TrackerOperation po = handler.getTrackerOperation();

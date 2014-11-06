@@ -5,26 +5,26 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.handler.StartNodeOperationHandler;
-import org.safehaus.subutai.plugin.spark.impl.mock.SparkImplMock;
 
 
 @Ignore
 public class StartEnvironmentContainerNodeOperationHandlerTest
 {
 
-    private SparkImplMock mock;
+    @Mock
+    SparkImpl mock;
     private AbstractOperationHandler handler;
 
 
     @Before
     public void setUp()
     {
-        mock = new SparkImplMock();
+        //        mock = new SparkImplMock();
         handler = new StartNodeOperationHandler( mock, "test-cluster", "test-host", true );
     }
 
@@ -44,7 +44,7 @@ public class StartEnvironmentContainerNodeOperationHandlerTest
     @Test
     public void testFail()
     {
-        mock.setClusterConfig( new SparkClusterConfig() );
+        //        mock.setClusterConfig( new SparkClusterConfig() );
         handler.run();
 
         TrackerOperation po = handler.getTrackerOperation();

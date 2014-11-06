@@ -13,6 +13,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 
 public class HadoopClusterConfig implements ConfigBase
@@ -210,6 +211,19 @@ public class HadoopClusterConfig implements ConfigBase
         }
 
         return new ArrayList<>( allAgents );
+    }
+
+
+    public Set<UUID> getAllNodesIds()
+    {
+        List<ContainerHost> allNodes = getAllNodes();
+        Set<UUID> ids = Sets.newHashSet();
+        for ( ContainerHost node : allNodes )
+        {
+            ids.add( node.getId() );
+        }
+
+        return ids;
     }
 
 

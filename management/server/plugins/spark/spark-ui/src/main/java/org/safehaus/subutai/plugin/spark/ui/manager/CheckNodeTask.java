@@ -10,30 +10,32 @@ import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 
-public class CheckTaskMaster implements Runnable
+public class CheckNodeTask implements Runnable
 {
 
     private final String clusterName, lxcHostname;
     private final CompleteEvent completeEvent;
     private final Spark spark;
     private final Tracker tracker;
+    private final boolean master;
 
 
-    public CheckTaskMaster( final Spark spark, final Tracker tracker, String clusterName, String lxcHostname,
-                            CompleteEvent completeEvent )
+    public CheckNodeTask( final Spark spark, final Tracker tracker, String clusterName, String lxcHostname,
+                          CompleteEvent completeEvent, boolean master )
     {
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
         this.completeEvent = completeEvent;
         this.spark = spark;
         this.tracker = tracker;
+        this.master = master;
     }
 
 
     @Override
     public void run()
     {
-        UUID trackID = spark.checkMasterNode( clusterName, lxcHostname );
+        UUID trackID = spark.checkNode( clusterName, lxcHostname, master );
 
         long start = System.currentTimeMillis();
         while ( !Thread.interrupted() )
