@@ -1,3 +1,0 @@
-# What is this?
-
-Define what this subutai-cli-net-dev is all about...

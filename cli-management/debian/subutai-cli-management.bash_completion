@@ -1,4 +1,4 @@
-_subutai_net()
+_subutai_management()
 {
     local cur prev opts bindings
     bindings=/etc/subutai/bindings
@@ -16,4 +16,4 @@ _subutai_net()
     COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
 }
 
-complete -F _subutai_net subutai
+complete -F _subutai_management subutai
