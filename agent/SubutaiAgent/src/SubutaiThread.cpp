@@ -46,7 +46,7 @@ bool SubutaiThread::checkCWD(SubutaiCommand *command, SubutaiContainer* cont)
     } else {
         if ((chdir(command->getWorkingDirectory().c_str())) < 0) {		
             //changing working directory first
-            logger.writeLog(3, logger.setLogData("<SubutaiThread::checkCWD> " " Changing working Directory failed..", "pid", toString(getpid()), "CWD", command->getWorkingDirectory()));
+            logger.writeLog(3, logger.setLogData("<SubutaiThread::checkCWD> " " Changing working Directory failed..", "pid", helper.toString(getpid()), "CWD", command->getWorkingDirectory()));
             return false;
         } else {
             return true;
@@ -65,12 +65,12 @@ bool SubutaiThread::checkUID(SubutaiCommand *command, SubutaiContainer* containe
     } else {
         if (uid.getIDs(ruid, euid, command->getRunAs())) {	
             //checking user id is on system ?
-            logger.writeLog(4, logger.setLogData("<SubutaiThread::checkUID> " "User id successfully found on system..", "pid", toString(getpid()), "RunAs", command->getRunAs()));
+            logger.writeLog(4, logger.setLogData("<SubutaiThread::checkUID> " "User id successfully found on system..", "pid", helper.toString(getpid()), "RunAs", command->getRunAs()));
             uid.doSetuid(this->euid);
             return true;
         } else {
-            logger.writeLog(3, logger.setLogData("<SubutaiThread::checkUID> " "User id could not found on system..", "pid", toString(getpid()), "RunAs", command->getRunAs()));
-            logger.writeLog(3, logger.setLogData("<SubutaiThread::checkUID> " "Thread will be closed..", "pid", toString(getpid()), "RunAs", command->getRunAs()));
+            logger.writeLog(3, logger.setLogData("<SubutaiThread::checkUID> " "User id could not found on system..", "pid", helper.toString(getpid()), "RunAs", command->getRunAs()));
+            logger.writeLog(3, logger.setLogData("<SubutaiThread::checkUID> " "Thread will be closed..", "pid", helper.toString(getpid()), "RunAs", command->getRunAs()));
             uid.undoSetuid(ruid);
             return false;
         }
@@ -86,14 +86,14 @@ string SubutaiThread::createExecString(SubutaiCommand *command)
 {
     string arg,env;
     exec.clear();
-    logger.writeLog(6, logger.setLogData("<SubutaiThread::createExecString>""Method starts...", "pid", toString(getpid())));
+    logger.writeLog(6, logger.setLogData("<SubutaiThread::createExecString>""Method starts...", "pid", helper.toString(getpid())));
     argument.clear();
     environment.clear();
     for(unsigned int i = 0; i < command->getArguments().size(); i++)	//getting arguments for creating Execution string
     {
         arg = command->getArguments()[i];
         argument = argument + arg + " ";
-        logger.writeLog(7, logger.setLogData("<SubutaiThread::createExecString>", "pid", toString(getpid()), "Argument", arg.c_str()));
+        logger.writeLog(7, logger.setLogData("<SubutaiThread::createExecString>", "pid", helper.toString(getpid()), "Argument", arg.c_str()));
     }
     logger.writeLog(7, logger.setLogData("<SubutaiThread::createExecString> " "Full Argument List: ", "Arguments:", argument));
     for (std::list< pair<string, string> >::iterator it = command->getEnvironment().begin(); it != command->getEnvironment().end(); it++)
@@ -114,7 +114,7 @@ string SubutaiThread::createExecString(SubutaiCommand *command)
         exec = environment + command->getCommand() + " " + argument ;
         logger.writeLog(7, logger.setLogData("<SubutaiThread::createExecString> " "Execution command has been created with environment", "Command:", exec));
     }
-    logger.writeLog(6, logger.setLogData("<SubutaiThread::createExecString>""CreateExecString Method finished....", "pid", toString(getpid())));
+    logger.writeLog(6, logger.setLogData("<SubutaiThread::createExecString>""CreateExecString Method finished....", "pid", helper.toString(getpid())));
     return exec;
 }
 
@@ -335,9 +335,9 @@ void SubutaiThread::checkAndWrite(message_queue *messageQueue,SubutaiCommand* co
     this->getErrorStream().clearBuffer();	//clear stream buffer
 
     unsigned int outBuffsize = this->getoutBuff().size();					//real output buffer size
-    this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite2> ","OutBuffSize:",toString(outBuffsize)));
+    this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite2> ","OutBuffSize:",helper.toString(outBuffsize)));
     unsigned int errBuffsize = this->geterrBuff().size();					//real error buffer size
-    this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite3> ","errBuffSize:",toString(errBuffsize)));
+    this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite3> ","errBuffSize:",helper.toString(errBuffsize)));
 
     if (errBuffsize > 0)	//if there is an error in the pipe, it will be set.
         this->setEXITSTATUS(1);
@@ -362,8 +362,8 @@ void SubutaiThread::checkAndWrite(message_queue *messageQueue,SubutaiCommand* co
         {
             string divisionOut = this->getoutBuff().substr(MaxBuffSize, (outBuffsize-MaxBuffSize));	//cut the excess string from buffer
             this->getoutBuff() = this->getoutBuff().substr(0, MaxBuffSize);
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ", "Excess_DataSize:", toString(divisionOut.size())));
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ", "CuttedDataSize:", toString(outBuffsize)));
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ", "Excess_DataSize:", helper.toString(divisionOut.size())));
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ", "CuttedDataSize:", helper.toString(outBuffsize)));
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ", "Excess_Data:", divisionOut));
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndWrite> ", "CuttedData:", this->getoutBuff()));
             checkAndSend(messageQueue,command);
@@ -414,12 +414,12 @@ bool SubutaiThread::checkExecutionTimeout(unsigned int* startsec,bool* overflag,
         }
         if (*count >= *exectimeout) { //timeout
             this->getLogger().writeLog(4,this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "Timeout Occured!!"));
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "count:",toString(*count)));
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "exectimeout:",toString(*exectimeout)));
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "count:",helper.toString(*count)));
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "exectimeout:",helper.toString(*exectimeout)));
             return true;	//timeout occured now
         } else {
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "count:",toString(*count)));
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "exectimeout:",toString(*exectimeout)));
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "count:",helper.toString(*count)));
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "exectimeout:",helper.toString(*exectimeout)));
             return false; //no timeout occured
         }
     }
@@ -440,10 +440,10 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
     int status;
     this->setPpid(newpid);
     pid_t result = waitpid(newpid, &status, WNOHANG);
-    this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Find pid start","current pid:",toString(newpid)));
+    this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Find pid start","current pid:",helper.toString(newpid)));
     while ((result = waitpid(newpid, &status, WNOHANG)) == 0) {
         string cmd;
-        cmd = "pgrep -P " + toString(newpid);
+        cmd = "pgrep -P " + helper.toString(newpid);
         cmd = this->getProcessPid(cmd.c_str());
         cmd = "pgrep -P " + cmd;
         cmd = this->getProcessPid(cmd.c_str());
@@ -456,7 +456,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
     if (result > 0) {
         this->setPpid(newpid);
     }
-    this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Find pid finished","current pid:",toString(processpid)));
+    this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Find pid finished","current pid:",helper.toString(processpid)));
     /*
      * if the execution is done process pid could not be read and should be skipped now..
      */
@@ -507,10 +507,10 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
         this->getErrorStream().prepareFileDec();
 
         this->getOutputStream().startSelection();	//Selecting Output first
-        this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Output Selection:",toString(this->getOutputStream().getSelectResult())));
+        this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Output Selection:",helper.toString(this->getOutputStream().getSelectResult())));
 
         this->getErrorStream().startSelection();	//Selecting Error Second
-        this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Error Selection:",toString(this->getErrorStream().getSelectResult())));
+        this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Error Selection:",helper.toString(this->getErrorStream().getSelectResult())));
 
         if (this->checkExecutionTimeout(&startsec,&overflag,&exectimeout,&count)) //checking general Execution Timeout.
         {
@@ -604,7 +604,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
         {
             this->getOutputStream().clearBuffer();
             this->getOutputStream().startReading();
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Output Read Result:",toString(this->getOutputStream().getReadResult())));
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Output Read Result:",helper.toString(this->getOutputStream().getReadResult())));
         }
 
         if (this->getErrorStream().getSelectResult() == 0 )
@@ -616,7 +616,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
         {
             this->getErrorStream().clearBuffer();
             this->getErrorStream().startReading();
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Error Read Result:",toString(this->getErrorStream().getReadResult())));
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Error Read Result:",helper.toString(this->getErrorStream().getReadResult())));
         }
 
         if (this->getOutputStream().getSelectResult() > 0 || this->getErrorStream().getSelectResult() > 0 )
@@ -626,9 +626,9 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
         if (this->getOutputStream().getReadResult() > 0 || this->getErrorStream().getReadResult() > 0)
         {
             //getting buffers
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Output Read Result:",toString(this->getOutputStream().getReadResult())));
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Output Read Result:",helper.toString(this->getOutputStream().getReadResult())));
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Output Buffer:",this->getOutputStream().getBuffer()));
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Error  Read Result:",toString(this->getErrorStream().getReadResult())));
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Error  Read Result:",helper.toString(this->getErrorStream().getReadResult())));
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Error Buffer:",this->getErrorStream().getBuffer()));
 
             this->checkAndWrite(messageQueue,command);
@@ -638,8 +638,8 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
             /*
              * End of Reading pipes.
              */
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Output Read Result:",toString(this->getOutputStream().getReadResult())));
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Error  Read Result:",toString(this->getErrorStream().getReadResult())));
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Output Read Result:",helper.toString(this->getOutputStream().getReadResult())));
+            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Error  Read Result:",helper.toString(this->getErrorStream().getReadResult())));
             this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Breaking!!"));
             break;
         }
@@ -659,12 +659,12 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
         this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Process Last Message",message));
         if (this->getPpid())
         {
-            this->getLogger().writeLog(7, logger.setLogData("<SubutaiThread::optionReadSend> " "Process will be killed.","pid:",toString(this->getPpid())));
+            this->getLogger().writeLog(7, logger.setLogData("<SubutaiThread::optionReadSend> " "Process will be killed.","pid:",helper.toString(this->getPpid())));
             kill(this->getPpid(),SIGKILL); //killing the process after timeout
         }
         else
         {
-            this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Process pid is not valid.","pid:",toString(this->getPpid())));
+            this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Process pid is not valid.","pid:",helper.toString(this->getPpid())));
         }
     }
 
@@ -710,9 +710,9 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
         int argv0size = strlen(argv[0]);
         strncpy(argv[0], "subutai-agent-child", argv0size);
         logger.openLogFile(getpid(),command->getRequestSequenceNumber());
-        string pidparnumstr = toString(getpid());       //geting pid number of the process
+        string pidparnumstr = helper.toString(getpid());       //geting pid number of the process
         string processpid = "";	                        //processpid for execution
-        logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Fork is Starting!!", toString(getpid())));
+        logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Fork is Starting!!", helper.toString(getpid())));
         this->getOutputStream().setMode(command->getStandardOutput());
         //this->getOutputStream().setPath(command->getStandardOutputPath());
         this->getOutputStream().setIdentity("output");
@@ -778,7 +778,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
             int newpid = fork();
             if (newpid == 0)
             {	// Child execute the command
-                string pidchldnumstr = toString(getpid());
+                string pidchldnumstr = helper.toString(getpid());
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Child Process is starting for pipes","Parentpid",pidparnumstr,"pid",pidchldnumstr));
                 this->getOutputStream().preparePipe();
                 this->getErrorStream().preparePipe();
@@ -793,7 +793,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                 }
                 if (!checkUID(command, container))
                 {
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "USer id not found on system..","RunAs:",command->getRunAs()));
+                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "User id not found on system..","RunAs:",command->getRunAs()));
                     kill(getpid(), SIGKILL);		//killing child
                     exit(1);
                     //problem about UID
@@ -826,12 +826,12 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                     signal(SIGCHLD, SIG_IGN);
                     this->getErrorStream().closePipe(1);
                     this->getOutputStream().closePipe(1);
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend is starting!!","pid",toString(getpid())));
+                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend is starting!!","pid",helper.toString(getpid())));
                     optionReadSend(messageQueue,command,newpid,ret);
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend has finished!!","pid",toString(getpid())));
+                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend has finished!!","pid",helper.toString(getpid())));
                     this->getErrorStream().closePipe(0);
                     this->getOutputStream().closePipe(0);
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Thread is Stopping!!","pid",toString(getpid())));
+                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Thread is Stopping!!","pid",helper.toString(getpid())));
                     logger.closeLogFile();
                     kill(getpid(),SIGKILL);		//killing child
                     return true; //thread successfully done its work.
@@ -846,12 +846,12 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
     }
     else if (pid == -1)
     {
-        //log.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "ERROR DURING MAIN FORK!!","pid",toString(getpid())));
+        //log.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "ERROR DURING MAIN FORK!!","pid",helper.toString(getpid())));
         return pid;
     }
     else if (pid > 0)	//parent continue its process and return back
     {
-        //logger.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "Parent Process continue!!","pid",toString(getpid())));
+        //logger.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "Parent Process continue!!","pid",helper.toString(getpid())));
         return pid;	//parent successfully done
     }
     return pid;
@@ -1065,14 +1065,4 @@ string SubutaiThread::getProcessPid(const char* cmd)
     }
     pclose(pipe);
     return result;
-}
-
-/**
- *  \details   This method designed for Typically conversion from integer to string.
- */
-string SubutaiThread::toString(int intcont)
-{		//integer to string conversion
-    ostringstream dummy;
-    dummy << intcont;
-    return dummy.str();
 }

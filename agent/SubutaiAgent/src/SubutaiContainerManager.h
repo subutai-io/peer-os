@@ -35,6 +35,7 @@
 #include <map>
 
 #include "SubutaiLogger.h"
+#include "SubutaiHelper.h"
 #include "SubutaiContainer.h"
 
 using namespace std;
@@ -74,6 +75,7 @@ class SubutaiContainerManager {
         vector<SubutaiContainer>        _frozenContainers;
         vector<SubutaiContainer>        _stoppedContainers;
         vector<SubutaiContainer>        _runningContainers;
+        SubutaiHelper					_helper;
 };
 
 #endif
