@@ -179,12 +179,10 @@ void SubutaiContainer::UpdateUsersList()
     vector<string> params;
     params.push_back("/etc/passwd");
     string passwd = RunProgram("/bin/cat", params);
-    size_t n = 0;
-    size_t p = 0;
+
     stringstream ss(passwd);
     string line;
     while (getline(ss, line, '\n')) {
-        int c = 0;
         int uid;
         string uname;
 
@@ -196,7 +194,7 @@ void SubutaiContainer::UpdateUsersList()
         uid   = atoi(line.substr(found_second+1, found_third).c_str());
 
         this->_users.insert(make_pair(uid, uname));
-        cout << " user: " <<  uid << " " << uname << endl;
+        //cout << " user: " <<  uid << " " << uname << endl;
 
     }
 }
@@ -390,14 +388,13 @@ void SubutaiContainer::getContainerAllFields()
 
 ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command) 
 {
-    cout << "RUN COMMAND REQUEST!!!!!!!!!!!" << endl;
     lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT;
     if (command->getWorkingDirectory() != "" && checkCWD(command->getWorkingDirectory())) {
         opts.initial_cwd = const_cast<char*>(command->getWorkingDirectory().c_str());
-    }/*
+    }
     if (command->getRunAs() != "" && checkUser(command->getRunAs())) {
         opts.uid = getRunAsUserId(command->getRunAs());
-    }*/
+    }
     vector<string> pr = ExplodeCommandArguments(command);
     bool hasProgram = false;
     string program;

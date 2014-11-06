@@ -317,27 +317,34 @@ int main(int argc,char *argv[],char *envp[])
                     }
                     else if (command.getType() == "TERMINATE_REQUEST")
                     {
-                    	int retstatus;
+                    	int retstatus; string resp;
 						logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",helper.toString(command.getPid())));
 						logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID.."));
 
 						if (command.getPid() > 0)
 						{
-							if( isLocal) retstatus = kill(command.getPid(),SIGKILL);
+							if( isLocal)
+							{
+								retstatus = kill(command.getPid(),SIGKILL);
+								resp = response.createTerminateMessage(environment.getAgentUuidValue(),
+										command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
+							}
 							else
 							{
 								command.setCommand("/bin/kill -9 " + helper.toString(command.getPid()) );
 								ExecutionResult execResult = target_container->RunCommand(&command);
 								retstatus  = execResult.exit_code;
+
+								resp = response.createTerminateMessage(target_container->getContainerIdValue(),
+										command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
 							}
-							string resp = response.createTerminateMessage(environment.getAgentUuidValue(),
-													command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
+
 							cout << "msg: " << resp << endl;
 							connection->sendMessage(resp);
 
 							if (retstatus == 0) //termination is successfully done
 								logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
-							else if (retstatus == -1) //termination is failed
+							else //termination is failed
 								logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", helper.toString(command.getPid())));
 						}
 						else
