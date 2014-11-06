@@ -54,15 +54,15 @@ public class JobTracker extends ClusterNode
         } );
         stopButton.setId( "jobTrackerStop" );
 
-        restartButton.addClickListener( new MouseEvents.ClickListener()
-        {
-            @Override
-            public void click( MouseEvents.ClickEvent clickEvent )
-            {
-                setLoading( true );
-                getStatus( hadoop.restartJobTracker( cluster ) );
-            }
-        } );
+//        restartButton.addClickListener( new MouseEvents.ClickListener()
+//        {
+//            @Override
+//            public void click( MouseEvents.ClickEvent clickEvent )
+//            {
+//                setLoading( true );
+//                getStatus( hadoop.restartJobTracker( cluster ) );
+//            }
+//        } );
         restartButton.setId( "jobTrackerRestart" );
 
         getStatus( null );

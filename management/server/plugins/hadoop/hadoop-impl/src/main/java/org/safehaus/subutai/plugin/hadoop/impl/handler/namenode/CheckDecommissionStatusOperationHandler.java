@@ -67,7 +67,7 @@ public class CheckDecommissionStatusOperationHandler extends AbstractOperationHa
 
         try
         {
-            CommandResult result = host.execute( new RequestBuilder( commands.getReportHadoopCommand() ) );
+            CommandResult result = host.execute( new RequestBuilder( Commands.getReportHadoopCommand() ) );
             logStatusResults( trackerOperation, result );
         }
         catch ( CommandException e )

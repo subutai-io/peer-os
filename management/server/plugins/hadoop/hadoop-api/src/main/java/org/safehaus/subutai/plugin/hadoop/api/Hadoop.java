@@ -14,12 +14,11 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 public interface Hadoop extends ApiBase<HadoopClusterConfig>
 {
 
+    public UUID uninstallCluster( HadoopClusterConfig config );
 
     public UUID startNameNode( HadoopClusterConfig hadoopClusterConfig );
 
     public UUID stopNameNode( HadoopClusterConfig hadoopClusterConfig );
-
-    public UUID restartNameNode( HadoopClusterConfig hadoopClusterConfig );
 
     public UUID statusNameNode( HadoopClusterConfig hadoopClusterConfig );
 
@@ -35,8 +34,6 @@ public interface Hadoop extends ApiBase<HadoopClusterConfig>
 
     public UUID stopJobTracker( HadoopClusterConfig hadoopClusterConfig );
 
-    public UUID restartJobTracker( HadoopClusterConfig hadoopClusterConfig );
-
     public UUID statusJobTracker( HadoopClusterConfig hadoopClusterConfig );
 
     public UUID startTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent );
@@ -49,8 +46,6 @@ public interface Hadoop extends ApiBase<HadoopClusterConfig>
 
     public UUID addNode( String clusterName );
 
-    public UUID blockDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
-
     public UUID destroyNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
     public UUID checkDecomissionStatus( HadoopClusterConfig hadoopClusterConfig );
@@ -58,12 +53,6 @@ public interface Hadoop extends ApiBase<HadoopClusterConfig>
     public UUID excludeNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
     public UUID includeNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
-
-    public UUID blockTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent );
-
-    public UUID unblockDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
-
-    public UUID unblockTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
     public ClusterSetupStrategy getClusterSetupStrategy( TrackerOperation po, HadoopClusterConfig hadoopClusterConfig );
 

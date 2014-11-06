@@ -116,7 +116,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                         //                        case TASKTRACKER:
                         //                            break;
                     }
-                    logStatusResults( trackerOperation, result );
+                    logStatusResults( trackerOperation, result, nodeType );
                     break;
                 case STOP:
                     switch ( nodeType )
@@ -136,7 +136,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                         //                        case TASKTRACKER:
                         //                            break;
                     }
-                    logStatusResults( trackerOperation, result );
+                    logStatusResults( trackerOperation, result, nodeType );
                     break;
                 case STATUS:
                     switch ( nodeType )
@@ -158,7 +158,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                         //                        case TASKTRACKER:
                         //                            break;
                     }
-                    logStatusResults( trackerOperation, result );
+                    logStatusResults( trackerOperation, result, nodeType );
                     break;
             }
         }
@@ -169,7 +169,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
     }
 
 
-    private void logStatusResults( TrackerOperation trackerOperation, CommandResult result )
+    public static void logStatusResults( TrackerOperation trackerOperation, CommandResult result, NodeType nodeType )
     {
         NodeState nodeState = NodeState.UNKNOWN;
         if ( result.getStdOut() != null )
@@ -178,59 +178,110 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
 
             for ( String status : array )
             {
-                if ( status.contains( "NameNode" ) )
-                {
-                    String temp = status.replaceAll(
-                            Pattern.quote( "!(SecondaryNameNode is not running on this " + "machine)" ), "" ).
-                                                replaceAll( "NameNode is ", "" );
-                    if ( temp.toLowerCase().contains( "not" ) )
-                    {
-                        nodeState = NodeState.STOPPED;
-                    }
-                    else
-                    {
-                        nodeState = NodeState.RUNNING;
-                    }
-                    break;
-                }
-                else if ( status.contains( "JobTracker" ) )
-                {
-                    String temp = status.replaceAll( "JobTracker is ", "" );
-                    if ( temp.toLowerCase().contains( "not" ) )
-                    {
-                        nodeState = NodeState.STOPPED;
-                    }
-                    else
-                    {
-                        nodeState = NodeState.RUNNING;
-                    }
-                    break;
-                }
-                else if ( status.contains( "DataNode" ) )
-                {
-                    String temp = status.replaceAll( "DataNode is ", "" );
-                    if ( temp.toLowerCase().contains( "not" ) )
-                    {
-                        nodeState = NodeState.STOPPED;
-                    }
-                    else
-                    {
-                        nodeState = NodeState.RUNNING;
-                    }
-                    break;
-                }
-                else if ( status.contains( "TaskTracker" ) )
-                {
-                    String temp = status.replaceAll( "TaskTracker is ", "" );
-                    if ( temp.toLowerCase().contains( "not" ) )
-                    {
-                        nodeState = NodeState.STOPPED;
-                    }
-                    else
-                    {
-                        nodeState = NodeState.RUNNING;
-                    }
-                    break;
+                switch ( nodeType ){
+
+                    case NAMENODE:
+                        if ( status.contains( "NameNode" ) )
+                        {
+                            String temp = status.replaceAll(
+                                    Pattern.quote( "!(SecondaryNameNode is not running on this " + "machine)" ), "" ).
+                                                        replaceAll( "NameNode is ", "" );
+                            if ( temp.toLowerCase().contains( "not" ) )
+                            {
+                                nodeState = NodeState.STOPPED;
+                            }
+                            else
+                            {
+                                nodeState = NodeState.RUNNING;
+                            }
+                            break;
+                        }
+                        break;
+                    case JOBTRACKER:
+                        if ( status.contains( "JobTracker" ) )
+                        {
+                            String temp = status.replaceAll( "JobTracker is ", "" );
+                            if ( temp.toLowerCase().contains( "not" ) )
+                            {
+                                nodeState = NodeState.STOPPED;
+                            }
+                            else
+                            {
+                                nodeState = NodeState.RUNNING;
+                            }
+                            break;
+                        }
+                        break;
+                    case SECONDARY_NAMENODE:
+                        if ( status.contains( "SecondaryNameNode" ) )
+                        {
+                            String temp = status.replaceAll( "SecondaryNameNode is ", "" );
+                            if ( temp.toLowerCase().contains( "not" ) )
+                            {
+                                nodeState = NodeState.STOPPED;
+                            }
+                            else
+                            {
+                                nodeState = NodeState.RUNNING;
+                            }
+                        }
+                        break;
+                    case DATANODE:
+                        if ( status.contains( "DataNode" ) )
+                        {
+                            String temp = status.replaceAll( "DataNode is ", "" );
+                            if ( temp.toLowerCase().contains( "not" ) )
+                            {
+                                nodeState = NodeState.STOPPED;
+                            }
+                            else
+                            {
+                                nodeState = NodeState.RUNNING;
+                            }
+                        }
+                        break;
+                    case TASKTRACKER:
+                        if ( status.contains( "TaskTracker" ) )
+                        {
+                            String temp = status.replaceAll( "TaskTracker is ", "" );
+                            if ( temp.toLowerCase().contains( "not" ) )
+                            {
+                                nodeState = NodeState.STOPPED;
+                            }
+                            else
+                            {
+                                nodeState = NodeState.RUNNING;
+                            }
+                        }
+                        break;
+                    case SLAVE_NODE:
+                        if ( status.contains( "DataNode" ) )
+                        {
+                            String temp = status.replaceAll( "DataNode is ", "" );
+                            if ( temp.toLowerCase().contains( "not" ) )
+                            {
+                                nodeState = NodeState.STOPPED;
+                            }
+                            else
+                            {
+                                nodeState = NodeState.RUNNING;
+                            }
+                            break;
+                        }
+                        else if ( status.contains( "TaskTracker" ) )
+                        {
+                            String temp = status.replaceAll( "TaskTracker is ", "" );
+                            if ( temp.toLowerCase().contains( "not" ) )
+                            {
+                                nodeState = NodeState.STOPPED;
+                            }
+                            else
+                            {
+                                nodeState = NodeState.RUNNING;
+                            }
+                            break;
+                        }
+                        break;
                 }
             }
         }
@@ -265,17 +316,19 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
         {
             Environment env = manager.getEnvironmentManager()
                                      .buildEnvironment( manager.getDefaultEnvironmentBlueprint( config ) );
-
-            ClusterSetupStrategy clusterSetupStrategy =
-                    manager.getClusterSetupStrategy( env, config, trackerOperation );
-            clusterSetupStrategy.setup();
+            ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( env, config, trackerOperation );
+            setupStrategy.setup();
 
             trackerOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
-        catch ( EnvironmentBuildException | ClusterSetupException e )
+        catch ( ClusterSetupException e )
         {
             trackerOperation.addLogFailed(
-                    String.format( "Failed to setup Elasticsearch cluster %s : %s", clusterName, e.getMessage() ) );
+                    String.format( "Failed to setup Hadoop cluster %s : %s", clusterName, e.getMessage() ) );
+        }
+        catch ( EnvironmentBuildException e )
+        {
+            e.printStackTrace();
         }
     }
 
@@ -284,10 +337,10 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
     public void destroyCluster()
     {
         HadoopClusterConfig config = manager.getCluster( clusterName );
+
         if ( config == null )
         {
-            trackerOperation.addLogFailed(
-                    String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 

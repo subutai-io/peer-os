@@ -1,8 +1,6 @@
 package org.safehaus.subutai.plugin.hadoop.impl.common;
 
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 
@@ -71,20 +69,7 @@ public class Commands
     }
 
 
-    public static String getAddSecondaryNamenodeCommand( HadoopClusterConfig hadoopClusterConfig )
-    {
-        return ". /etc/profile && " + "hadoop-master-slave.sh masters %s " + hadoopClusterConfig.getNameNode()
-                                                                                                .getHostname();
-    }
-
-
-    public static String getSetDataNodeCommand( HadoopClusterConfig hadoopClusterConfig, ContainerHost containerHost )
-    {
-        return ". /etc/profile && " + "hadoop-master-slave.sh masters %s " + containerHost.getHostname();
-    }
-
-
-    public static String getRefreshJobTrackerCommand( HadoopClusterConfig hadoopClusterConfig )
+    public static String getRefreshJobTrackerCommand()
     {
         return ". /etc/profile && " + "hadoop mradmin -refreshNodes";
     }
@@ -116,7 +101,7 @@ public class Commands
 
     public static String getStatusTaskTrackerCommand()
     {
-        return ". /etc/profile && " + "hadoop-daemons.sh stop tasktracker";
+        return "service hadoop-mapred status";
     }
 
 
@@ -165,119 +150,57 @@ public class Commands
     }
 
 
-    public String getRefreshNameNodeCommand( HadoopClusterConfig hadoopClusterConfig )
+    public static String getRefreshNameNodeCommand()
     {
         return ". /etc/profile && " + "hadoop dfsadmin -refreshNodes";
     }
 
 
-    public String getStopDatanodeCommand( Agent agent )
+    public static String getSetDataNodeCommand( String hostname )
     {
-        return ". /etc/profile && " + "hadoop-daemons.sh stop datanode";
+        return ". /etc/profile && " + "hadoop-master-slave.sh slaves " + hostname;
+    }
+
+
+    public static String getExcludeDataNodeCommand( String ip )
+    {
+        return ". /etc/profile && " + "hadoop-master-slave.sh dfs.exclude clear " + ip;
+    }
+
+
+    public static String getSetTaskTrackerCommand( String hostname )
+    {
+        return ". /etc/profile && " + "hadoop-master-slave.sh slaves " + hostname;
+    }
+
+
+    public static String getExcludeTaskTrackerCommand( String ip )
+    {
+
+        return ". /etc/profile && " + "hadoop-master-slave.sh mapred.exclude clear " + ip;
+    }
+
+
+    public static String getRemoveTaskTrackerCommand( String hostname )
+    {
+        return ". /etc/profile && " + "hadoop-master-slave.sh slaves clear " + hostname;
+    }
+
+
+    public static String getIncludeTaskTrackerCommand( String ip )
+    {
+        return ". /etc/profile && " + "hadoop-master-slave.sh mapred.exclude " + ip;
+    }
+
+
+    public static String getRemoveDataNodeCommand( String hostname )
+    {
+        return ". /etc/profile && " + "hadoop-master-slave.sh slaves clear " + hostname;
+    }
+
+
+    public static String getIncludeDataNodeCommand( String ip )
+    {
+        return ". /etc/profile && " + "hadoop-master-slave.sh mapred.exclude " + ip;
     }
 }
-
-//
-//    public Command getNameNodeCommand( Agent agent, String command )
-//    {
-//        return commandRunner
-//                .createCommand( String.format( "Execute NameNode/SecondaryNameNode/DataNode command %s",
-// command ),
-//                        new RequestBuilder( String.format( "service hadoop-dfs %s", command ) ).withTimeout( 20 ),
-//                        Sets.newHashSet( agent ) );
-//    }
-//
-//
-
-//
-//    public Command getSetDataNodeCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent )
-//    {
-//
-//        return commandRunner.createCommand( "Set DataNodes for NameNode", new RequestBuilder(
-//                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ",
-//                        agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
-//    }
-//
-//
-//    public Command getSetTaskTrackerCommand( HadoopClusterConfig hadoopClusterConfig )
-//    {
-//
-//        StringBuilder cmd = new StringBuilder();
-//        for ( Agent agent : hadoopClusterConfig.getTaskTrackers() )
-//        {
-//            cmd.append(
-//                    String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ",
-// agent.getHostname() ) );
-//        }
-//
-//        return commandRunner.createCommand( "Set TaskTrackers for JobTracker",
-// new RequestBuilder( cmd.toString() ),
-//                Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
-//    }
-//
-//
-//    public Command getSetTaskTrackerCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent )
-//    {
-//
-//        return commandRunner.createCommand( "Set TaskTrackers for JobTracker", new RequestBuilder(
-//                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ",
-//                        agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
-//    }
-//
-//
-//    public Command getRemoveDataNodeCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent )
-//    {
-//
-//        return commandRunner.createCommand( "Remove DataNode from NameNode", new RequestBuilder(
-//                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
-//                        agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
-//    }
-//
-//
-//    public Command getRemoveTaskTrackerCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent )
-//    {
-//
-//        return commandRunner.createCommand( "Remove TaskTrackers from JobTracker", new RequestBuilder(
-//                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
-//                        agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
-//    }
-//
-//
-//    public Command getExcludeDataNodeCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent )
-//    {
-//        return commandRunner.createCommand( "Remove DataNode from dfs blacklist", new RequestBuilder(
-//                String.format( ". /etc/profile && " + "hadoop-master-slave.sh dfs.exclude clear %s",
-//                        agent.getListIP().get( 0 ) ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
-//    }
-//
-//
-//    public Command getExcludeTaskTrackerCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent )
-//    {
-//        return commandRunner.createCommand( "Remove TaskTracker from mapred blacklist", new RequestBuilder(
-//                String.format( ". /etc/profile && " + "hadoop-master-slave.sh mapred.exclude clear %s",
-//                        agent.getListIP().get( 0 ) ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
-//    }
-//
-//
-//    public Command getIncludeDataNodeCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent )
-//    {
-//        return commandRunner.createCommand( "Add DataNode to dfs blacklist", new RequestBuilder(
-//                String.format( ". /etc/profile && " + "hadoop-master-slave.sh dfs.exclude %s",
-//                        agent.getListIP().get( 0 ) ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
-//    }
-//
-//
-//    public Command getIncludeTaskTrackerCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent )
-//    {
-//        return commandRunner.createCommand( "Add TaskTracker to mapred blacklist", new RequestBuilder(
-//                String.format( ". /etc/profile && " + "hadoop-master-slave.sh mapred.exclude %s",
-//                        agent.getListIP().get( 0 ) ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
-//    }
-//
-
-//    public String getJobTrackerCommand( Agent agent, String command )
-//    {
-//        return commandRunner.createCommand( String.format( "Execute JobTracker/TaskTracker command %s", command ),
-//                new RequestBuilder( String.format( "service hadoop-mapred %s", command ) ).withTimeout( 20 ),
-//                Sets.newHashSet( agent ) );
-//    }

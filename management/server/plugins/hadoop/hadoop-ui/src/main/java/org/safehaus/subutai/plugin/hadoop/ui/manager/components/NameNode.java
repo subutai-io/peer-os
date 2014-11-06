@@ -53,15 +53,15 @@ public class NameNode extends ClusterNode
         } );
         stopButton.setId( "nameNodeStop" );
 
-        restartButton.addClickListener( new MouseEvents.ClickListener()
-        {
-            @Override
-            public void click( MouseEvents.ClickEvent clickEvent )
-            {
-                setLoading( true );
-                getStatus( hadoop.restartNameNode( cluster ) );
-            }
-        } );
+//        restartButton.addClickListener( new MouseEvents.ClickListener()
+//        {
+//            @Override
+//            public void click( MouseEvents.ClickEvent clickEvent )
+//            {
+//                setLoading( true );
+//                getStatus( hadoop.restartNameNode( cluster ) );
+//            }
+//        } );
         restartButton.setId( "nameNodeRestart" );
 
         getStatus( null );
