@@ -41,6 +41,7 @@ public class VerificationStep extends Panel
         cfgView.addStringCfg( "Cluster Name", config.getClusterName() );
         if ( config.isExternalZookeeper() )
         {
+
             cfgView.addStringCfg( "Master node", config.getNimbus().getHostname() );
         }
         cfgView.addStringCfg( "Supervisor nodes count", config.getSupervisorsCount() + "" );

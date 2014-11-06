@@ -56,7 +56,7 @@ public abstract class SubutaiHost implements Host
 
     public Peer getPeer( UUID peerId ) throws PeerException
     {
-        Peer result = null;
+        Peer result;
         try
         {
             PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
@@ -121,28 +121,6 @@ public abstract class SubutaiHost implements Host
     }
 
 
-    public String echo( String text ) throws CommandException
-    {
-        RequestBuilder requestBuilder = new RequestBuilder( "echo " + text );
-        CommandResult result = execute( requestBuilder );
-        if ( result.hasSucceeded() )
-        {
-            return result.getStdOut();
-        }
-        else
-        {
-            if ( result.hasTimedOut() )
-            {
-                throw new CommandException( "Command timed out" );
-            }
-            else
-            {
-                throw new CommandException( "Echo execution error: " + result.getStdErr() );
-            }
-        }
-    }
-
-
     @Override
     public UUID getPeerId()
     {
@@ -177,6 +155,15 @@ public abstract class SubutaiHost implements Host
     }
 
 
+    public void resetHeartbeat()
+    {
+        if ( lastHeartbeat > 10 * 100 * 6 )
+        {
+            lastHeartbeat -= 10 * 10 * 6;
+        }
+    }
+
+
     @Override
     public boolean isConnected()
     {
@@ -190,11 +177,9 @@ public abstract class SubutaiHost implements Host
 
             return false;
         }
-        //return ( System.currentTimeMillis() - lastHeartbeat ) < INACTIVE_TIME;
     }
 
 
-    @Override
     public long getLastHeartbeat()
     {
         return lastHeartbeat;

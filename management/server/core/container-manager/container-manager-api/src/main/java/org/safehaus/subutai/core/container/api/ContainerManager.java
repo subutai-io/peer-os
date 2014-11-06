@@ -117,8 +117,4 @@ public interface ContainerManager
      */
     public void removeListener( ContainerEventListener listener );
 
-    /**
-     * Returns the templates list
-     */
-    public List<String> getTemplates();
 }

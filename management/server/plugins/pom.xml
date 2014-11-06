@@ -19,7 +19,9 @@
     <!--<module>accumulo</module>
     <module>hadoop</module>
     <module>solr</module>
+     -->
     <module>zookeeper</module>
+    <!--
     <module>mongodb</module>
     <module>flume</module>
     <module>hive</module>

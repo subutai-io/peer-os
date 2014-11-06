@@ -90,7 +90,7 @@ public class Environment
     }
 
 
-    public ContainerHost getContainerHostByUUID( UUID uuid ) {
+    public ContainerHost getContainerHostByUUID( final UUID uuid ) {
         Iterator<ContainerHost> iterator = containers.iterator();
         iterator.next();
         while ( iterator.hasNext() ) {

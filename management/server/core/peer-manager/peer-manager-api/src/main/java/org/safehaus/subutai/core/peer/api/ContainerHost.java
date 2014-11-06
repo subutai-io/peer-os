@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.container.api.ContainerState;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 
 import sun.security.util.DerValue;
 
@@ -21,13 +22,24 @@ public class ContainerHost extends SubutaiHost
     private String templateArch;
     private ContainerState state = ContainerState.UNKNOWN;
     private String nodeGroupName;
-    private Template template;
 
 
     public ContainerHost( final Agent agent, UUID peerId, UUID environmentId )
     {
         super( agent, peerId );
         this.environmentId = environmentId;
+    }
+
+
+    public String getNodeGroupName()
+    {
+        return nodeGroupName;
+    }
+
+
+    public void setNodeGroupName( final String nodeGroupName )
+    {
+        this.nodeGroupName = nodeGroupName;
     }
 
 
@@ -98,20 +110,21 @@ public class ContainerHost extends SubutaiHost
     }
 
 
-    public String getNodeGroupName()
+    public String getQuota( final QuotaEnum quota ) throws PeerException
     {
-        return nodeGroupName;
+        Peer peer = getPeer( this.getPeerId() );
+        return peer.getQuota( this, quota );
     }
 
 
-    public Template getTemplate()
+    public void setQuota( final QuotaEnum quota, final String value ) throws PeerException
     {
-        return template;
+        Peer peer = getPeer( this.getPeerId() );
+        peer.setQuota( this, quota, value );
     }
 
-    //    @Override
-    //    public boolean isConnected()
-    //    {
-    //        return ContainerState.RUNNING.equals( state ) && super.isConnected();
-    //    }
+    public Template getTemplate() throws PeerException {
+        Peer peer = getPeer( this.getPeerId() );
+        return peer.getTemplate(this);
+    }
 }

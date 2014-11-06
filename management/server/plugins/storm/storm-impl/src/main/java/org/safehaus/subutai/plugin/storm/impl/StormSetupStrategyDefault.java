@@ -19,6 +19,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
@@ -59,22 +60,29 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         // check installed packages
         for ( ContainerHost n : environment.getContainers() )
         {
-            if ( !n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
+            try
             {
-                throw new ClusterSetupException(
-                        String.format( "Node %s does not have Storm installed", n.getAgent().getHostname() ) );
-            }
-            else if ( !config.isExternalZookeeper() )
-            {
-                // check nimbus node if embedded Zookeeper is used
-                String zk_pack = Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME;
-                if ( n.getNodeGroupName().equals( StormService.NIMBUS.toString() ) )
+                if ( !n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
                 {
-                    if ( !n.getTemplate().getProducts().contains( zk_pack ) )
+                    throw new ClusterSetupException(
+                            String.format( "Node %s does not have Storm installed", n.getAgent().getHostname() ) );
+                }
+                else if ( !config.isExternalZookeeper() )
+                {
+                    // check nimbus node if embedded Zookeeper is used
+                    String zk_pack = Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME;
+                    if ( n.getNodeGroupName().equals( StormService.NIMBUS.toString() ) )
                     {
-                        throw new ClusterSetupException( "Nimbus node does not have Zookeeper installed" );
+                        if ( !n.getTemplate().getProducts().contains( zk_pack ) )
+                        {
+                            throw new ClusterSetupException( "Nimbus node does not have Zookeeper installed" );
+                        }
                     }
                 }
+            }
+            catch ( PeerException e )
+            {
+                e.printStackTrace();
             }
         }
 

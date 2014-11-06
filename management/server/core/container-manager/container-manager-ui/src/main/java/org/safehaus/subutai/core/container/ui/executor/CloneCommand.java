@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.container.ui.executor;
 import java.util.UUID;
 
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
-import org.safehaus.subutai.core.container.api.ContainerManager;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 
 
 /**
@@ -12,17 +12,17 @@ import org.safehaus.subutai.core.container.api.ContainerManager;
  */
 public class CloneCommand implements AgentCommand
 {
-    private ContainerManager containerManager;
+    //    private ContainerManager containerManager;
+    private LocalPeer localPeer;
     private String hostName;
     private String templateName;
     private String cloneName;
     private UUID envId;
 
 
-    public CloneCommand( ContainerManager containerManager, String hostName, String templateName, String cloneName,
-                         UUID envId )
+    public CloneCommand( LocalPeer localPeer, String hostName, String templateName, String cloneName, UUID envId )
     {
-        this.containerManager = containerManager;
+        this.localPeer = localPeer;
         this.hostName = hostName;
         this.templateName = templateName;
         this.cloneName = cloneName;
@@ -35,7 +35,8 @@ public class CloneCommand implements AgentCommand
     {
         try
         {
-            containerManager.clone( envId, hostName, templateName, cloneName );
+            localPeer.createContainer( hostName, templateName, cloneName, envId );
+            //            containerManager.clone( envId, hostName, templateName, cloneName );
         }
         catch ( ContainerCreateException e )
         {
