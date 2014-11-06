@@ -9,9 +9,6 @@ package org.safehaus.subutai.core.environment.impl;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,7 +21,6 @@ import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.TopologyEnum;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -32,7 +28,19 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenc
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
+import org.safehaus.subutai.core.environment.api.topology.Blueprint2PeerData;
+import org.safehaus.subutai.core.environment.api.topology.Blueprint2PeerGroupData;
+import org.safehaus.subutai.core.environment.api.topology.Node2PeerData;
+import org.safehaus.subutai.core.environment.api.topology.NodeGroup2PeerData;
+import org.safehaus.subutai.core.environment.api.topology.NodeGroup2PeerGroupData;
+import org.safehaus.subutai.core.environment.api.topology.TopologyData;
+import org.safehaus.subutai.core.environment.impl.builder.Blueprint2PeerBuilder;
+import org.safehaus.subutai.core.environment.impl.builder.Blueprint2PeerGroupBuilder;
+import org.safehaus.subutai.core.environment.impl.builder.Node2PeerBuilder;
+import org.safehaus.subutai.core.environment.impl.builder.NodeGroup2PeerBuilder;
+import org.safehaus.subutai.core.environment.impl.builder.NodeGroup2PeerGroupBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.TopologyBuilder;
+import org.safehaus.subutai.core.environment.impl.builder.TopologyBuilderException;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -54,7 +62,7 @@ import com.google.gson.JsonParseException;
 /**
  * This is an implementation of EnvironmentManager
  */
-public class EnvironmentManagerImpl implements EnvironmentManager, Observer
+public class EnvironmentManagerImpl implements EnvironmentManager
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class.getName() );
@@ -63,7 +71,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, Observer
     private static final String BLUEPRINT = "BLUEPRINT";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private PeerManager peerManager;
-    private TopologyBuilder topologyBuilder;
+    //    private TopologyBuilder topologyBuilder;
     //    private ServiceLocator serviceLocator;
     private EnvironmentDAO environmentDAO;
     private TemplateRegistry templateRegistry;
@@ -119,7 +127,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, Observer
     {
         try
         {
-            this.topologyBuilder = new TopologyBuilder( this );
+            //            this.topologyBuilder = new TopologyBuilder( this );
             this.environmentDAO = new EnvironmentDAO( dataSource );
         }
         catch ( SQLException e )
@@ -136,7 +144,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, Observer
         this.securityManager = null;
         this.peerManager = null;
         this.tracker = null;
-        this.topologyBuilder = null;
+        //        this.topologyBuilder = null;
         this.environmentDAO = null;
     }
 
@@ -161,8 +169,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager, Observer
     {
 
         saveBlueprint( GSON.toJson( blueprint ) );
-        EnvironmentBuildProcess process = topologyBuilder
-                .createEnvironmentBuildProcessB2P( blueprint.getId(), peerManager.getLocalPeer().getId() );
+        TopologyBuilder topologyBuilder = new Blueprint2PeerBuilder( this );
+        EnvironmentBuildProcess process = null;
+        try
+        {
+            process = topologyBuilder.prepareBuildProcess(
+                    new Blueprint2PeerData( blueprint.getId(), peerManager.getLocalPeer().getId() ) );
+        }
+        catch ( TopologyBuilderException e )
+        {
+            throw new EnvironmentBuildException( e.getMessage() );
+        }
 
 
         return buildEnvironment( process );
@@ -513,6 +530,45 @@ public class EnvironmentManagerImpl implements EnvironmentManager, Observer
 
 
     @Override
+    public boolean saveBuildProcess( final TopologyData topologyData ) throws EnvironmentManagerException
+    {
+        TopologyBuilder topologyBuilder = null;
+        if ( topologyData instanceof Blueprint2PeerData )
+        {
+            topologyBuilder = new Blueprint2PeerBuilder( this );
+        }
+        else if ( topologyData instanceof Blueprint2PeerGroupData )
+        {
+            topologyBuilder = new Blueprint2PeerGroupBuilder( this );
+        }
+        else if ( topologyData instanceof Node2PeerData )
+        {
+            topologyBuilder = new Node2PeerBuilder( this );
+        }
+        else if ( topologyData instanceof NodeGroup2PeerData )
+        {
+            topologyBuilder = new NodeGroup2PeerBuilder( this );
+        }
+        else if ( topologyData instanceof NodeGroup2PeerGroupData )
+        {
+            topologyBuilder = new NodeGroup2PeerGroupBuilder( this );
+        }
+
+        try
+        {
+            EnvironmentBuildProcess process = topologyBuilder.prepareBuildProcess( topologyData );
+            environmentDAO.saveInfo( PROCESS, process.getId().toString(), process );
+        }
+        catch ( TopologyBuilderException e )
+        {
+            throw new EnvironmentManagerException( e.getMessage() );
+        }
+
+        return true;
+    }
+
+
+    /*@Override
     public boolean saveBuildProcess( final UUID blueprintId, final Map<Object, Peer> topology,
                                      final Map<Object, NodeGroup> map, TopologyEnum topologyEnum )
     {
@@ -522,6 +578,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, Observer
         {
             case NODE_2_PEER:
             {
+
                 process = topologyBuilder.createEnvironmentBuildProcessN2P( blueprintId, topology, map );
                 break;
             }
@@ -549,10 +606,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, Observer
         {
             return false;
         }
-    }
+    }*/
 
 
-    @Override
+    /*@Override
     public boolean saveBuildProcessB2PG( final UUID blueprintId, final UUID peerGroupId )
             throws EnvironmentManagerException
     {
@@ -574,7 +631,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, Observer
         {
             throw new EnvironmentManagerException( e.getMessage() );
         }
-    }
+    }*/
 
 
     @Override
@@ -600,12 +657,5 @@ public class EnvironmentManagerImpl implements EnvironmentManager, Observer
     public void setPeerManager( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
-    }
-
-
-    @Override
-    public void update( final Observable o, final Object arg )
-    {
-
     }
 }

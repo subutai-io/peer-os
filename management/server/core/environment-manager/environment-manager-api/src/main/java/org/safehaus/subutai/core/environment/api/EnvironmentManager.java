@@ -7,17 +7,16 @@ package org.safehaus.subutai.core.environment.api;
 
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
+import org.safehaus.subutai.core.environment.api.topology.TopologyData;
 import org.safehaus.subutai.core.peer.api.Peer;
 
 
@@ -58,12 +57,21 @@ public interface EnvironmentManager
 
     Environment getEnvironmentByUUID( UUID environmentId );
 
-    boolean saveBuildProcess( UUID blueprintId, Map<Object, Peer> topology, Map<Object, NodeGroup> map,
-                              TopologyEnum topologyEnum );
+    /*boolean saveBuildProcess( UUID blueprintId, Map<Object, Peer> topology, Map<Object, NodeGroup> map,
+                              TopologyEnum topologyEnum );*/
 
-    boolean saveBuildProcessB2PG( UUID blueprintId, UUID peerGroupId ) throws EnvironmentManagerException;
+
+//    boolean saveBuildProcessB2PG( UUID blueprintId, UUID peerGroupId ) throws EnvironmentManagerException;
+
+    boolean saveBuildProcess(TopologyData topologyData) throws EnvironmentManagerException;
 
     EnvironmentBlueprint getEnvironmentBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
 
     void createAdditionalContainers( UUID id, String ngJson, Peer peer ) throws EnvironmentBuildException;
+
+    //    void createEnvironment( EnvironmentBlueprint blueprint, Peer peer );
+
+//    void createEnvironment( List<NodeData> nodeData );
+
+
 }
