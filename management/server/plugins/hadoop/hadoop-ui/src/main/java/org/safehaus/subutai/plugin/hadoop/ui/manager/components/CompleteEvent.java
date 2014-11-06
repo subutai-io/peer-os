@@ -6,11 +6,7 @@
 package org.safehaus.subutai.plugin.hadoop.ui.manager.components;
 
 
-/**
- * @author dilshat
- */
 public interface CompleteEvent
 {
-
     public void onComplete( String operationLog );
 }

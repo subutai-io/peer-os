@@ -99,85 +99,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
         {
             for ( final EnvironmentBuildProcess process : processList )
             {
-                Button viewButton = new Button( "Info" );
-                viewButton.addClickListener( new Button.ClickListener()
-                {
-                    @Override
-                    public void buttonClick( final Button.ClickEvent clickEvent )
-                    {
-                        Window window = genProcessWindow( process );
-                        window.setVisible( true );
-                    }
-                } );
-
-                Button processButton = null;
-                Button destroyButton = null;
-                Embedded icon = null;
-
-                switch ( process.getProcessStatusEnum() )
-                {
-                    case NEW_PROCESS:
-                    {
-                        processButton = new Button( "Build" );
-                        icon = new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) );
-                        processButton.addClickListener( new Button.ClickListener()
-                        {
-                            @Override
-                            public void buttonClick( final Button.ClickEvent clickEvent )
-                            {
-                                startBuildProcess( process );
-                            }
-                        } );
-
-                        break;
-                    }
-                    case IN_PROGRESS:
-                    {
-                        processButton = new Button( "Terminate" );
-                        icon = new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) );
-                        processButton.addClickListener( new Button.ClickListener()
-                        {
-                            @Override
-                            public void buttonClick( final Button.ClickEvent clickEvent )
-                            {
-                                terminateBuildProcess( process );
-                            }
-                        } );
-                        break;
-                    }
-                    case FAILED:
-                        icon = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
-                        break;
-                    case TERMINATED:
-                    {
-                        icon = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
-                        break;
-                    }
-                    case SUCCESSFUL:
-                    {
-                        icon = new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) );
-                        break;
-                    }
-
-                    default:
-                    {
-                        break;
-                    }
-                }
-
-                destroyButton = new Button( "Destroy" );
-                destroyButton.addClickListener( new Button.ClickListener()
-                {
-                    @Override
-                    public void buttonClick( final Button.ClickEvent clickEvent )
-                    {
-                        destroyBuildProcess( process );
-                        environmentsButton.click();
-                    }
-                } );
-                environmentsTable.addItem( new Object[] {
-                        process.getBlueprintId().toString(), icon, viewButton, processButton, destroyButton
-                }, process.getId() );
+                addProcessToTable( process );
             }
         }
         else
@@ -185,6 +107,90 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
             Notification.show( EnvAnswer.NO_BUILD_PROCESS.getAnswer() );
         }
         environmentsTable.refreshRowCache();
+    }
+
+
+    public void addProcessToTable( final EnvironmentBuildProcess process )
+    {
+        Button viewButton = new Button( "Info" );
+        viewButton.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                Window window = genProcessWindow( process );
+                window.setVisible( true );
+            }
+        } );
+
+        Button processButton = null;
+        Button destroyButton = null;
+        Embedded icon = null;
+
+        switch ( process.getProcessStatusEnum() )
+        {
+            case NEW_PROCESS:
+            {
+                processButton = new Button( "Build" );
+                icon = new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) );
+                processButton.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
+                        startBuildProcess( process );
+                    }
+                } );
+
+                break;
+            }
+            case IN_PROGRESS:
+            {
+                processButton = new Button( "Terminate" );
+                icon = new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) );
+                processButton.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
+                        terminateBuildProcess( process );
+                    }
+                } );
+                break;
+            }
+            case FAILED:
+                icon = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
+                break;
+            case TERMINATED:
+            {
+                icon = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
+                break;
+            }
+            case SUCCESSFUL:
+            {
+                icon = new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) );
+                break;
+            }
+
+            default:
+            {
+                break;
+            }
+        }
+
+        destroyButton = new Button( "Destroy" );
+        destroyButton.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                destroyBuildProcess( process );
+                environmentsButton.click();
+            }
+        } );
+        environmentsTable.addItem( new Object[] {
+                process.getBlueprintId().toString(), icon, viewButton, processButton, destroyButton
+        }, process.getId() );
     }
 
 
@@ -242,13 +248,12 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     }
 
 
-    private void startBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
+    public void startBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
     {
 
         BuildProcessExecutor buildProcessExecutor = new BuildProcessExecutorImpl( environmentBuildProcess );
         buildProcessExecutor.addListener( this );
         ExecutorService executor = Executors.newCachedThreadPool();
-        executorServiceMap.put( environmentBuildProcess.getId(), executor );
 
 
         buildProcessExecutor.execute( executor,

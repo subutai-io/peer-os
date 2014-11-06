@@ -10,7 +10,6 @@ import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 
@@ -33,7 +32,7 @@ public interface Peer
 
     public Set<ContainerHost> createContainers( UUID creatorPeerId, UUID environmentId, List<Template> templates,
                                                 int quantity, String strategyId, List<Criteria> criteria )
-            throws ContainerCreateException;
+            throws PeerException;
 
     public void startContainer( ContainerHost containerHost ) throws PeerException;
 
@@ -59,5 +58,11 @@ public interface Peer
 
     public void setQuota( ContainerHost host, QuotaEnum quota, String value ) throws PeerException;
 
-    public Template getTemplate( ContainerHost containerHost ) throws PeerException;
+    public Template getTemplate( String templateName ) throws PeerException;
+
+    public boolean isOnline() throws PeerException;
+
+    public <T, V> V sendRequest( T request, String recipient, int timeout, Class<V> responseType ) throws PeerException;
+
+    public <T> void sendRequest( T request, String recipient, int timeout ) throws PeerException;
 }

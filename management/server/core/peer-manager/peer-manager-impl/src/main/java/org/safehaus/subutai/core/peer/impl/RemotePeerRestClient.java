@@ -188,24 +188,49 @@ public class RemotePeerRestClient
     }
 
 
-    public Template getTemplate( final ContainerHost containerHost ) throws PeerException
+    public Template getTemplate( final String templateName ) throws PeerException
     {
         String path = "peer/template/get";
 
         WebClient client = createWebClient();
 
         Form form = new Form();
-        form.set( "host", JsonUtil.toJson( containerHost ) );
+        form.set( "templateName", templateName );
         Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
                                   .accept( MediaType.APPLICATION_JSON ).post( form );
 
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
-            return JsonUtil.fromJson( response.getEntity().toString(), Template.class );
+            return JsonUtil.fromJson( response.readEntity( String.class ), Template.class );
         }
         else
         {
             throw new PeerException( "Could not retrieve remote template.", response.getEntity().toString() );
+        }
+    }
+
+
+    public UUID getId() throws PeerException
+    {
+        String path = "peer/id";
+        try
+        {
+            WebClient client = createWebClient();
+
+            Response response = client.path( path ).accept( MediaType.TEXT_PLAIN ).get();
+
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+                return UUID.fromString( response.readEntity( String.class ) );
+            }
+            else
+            {
+                throw new PeerException( "Could not retrieve remote peer ID." );
+            }
+        }
+        catch ( Exception ce )
+        {
+            throw new PeerException( "Could not retrieve remote peer ID.", ce.toString() );
         }
     }
 }

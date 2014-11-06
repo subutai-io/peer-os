@@ -26,8 +26,9 @@ import java.util.UUID;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
-import org.safehaus.subutai.plugin.common.api.NodeType;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.ui.manager.components.CheckDecommissionStatusTask;
 import org.safehaus.subutai.plugin.hadoop.ui.manager.components.CheckTask;
 import org.safehaus.subutai.plugin.hadoop.ui.manager.components.StartTask;
@@ -35,9 +36,7 @@ import org.safehaus.subutai.plugin.hadoop.ui.manager.components.StopTask;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.QuestionDialog;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.event.Action;
 import com.vaadin.event.ItemClickEvent;
@@ -65,30 +64,35 @@ public class ManagerListener
 
     protected ItemClickEvent.ItemClickListener getTableClickListener( final Table table )
     {
-        return new ItemClickEvent.ItemClickListener()
-        {
-            @Override
-            public void itemClick( ItemClickEvent event )
-            {
-                if ( event.isDoubleClick() )
-                {
-                    String lxcHostname =
-                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = hadoopManager.getAgentManager().getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
-                    {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), hadoopManager.getExecutorService(),
-                                        hadoopManager.getCommandRunner(), hadoopManager.getAgentManager() );
-                        hadoopManager.getContentRoot().getUI().addWindow( terminal.getWindow() );
-                    }
-                    else
-                    {
-                        hadoopManager.show( "Agent of " + lxcHostname + " is not connected" );
-                    }
-                }
-            }
-        };
+        //        return new ItemClickEvent.ItemClickListener()
+        //        {
+        //            @Override
+        //            public void itemClick( ItemClickEvent event )
+        //            {
+        //                if ( event.isDoubleClick() )
+        //                {
+        //                    String lxcHostname =
+        //                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" )
+        // .getValue();
+        //                    Environ
+        //
+        //                    Agent lxcAgent = hadoopManager.getAgentManager().getAgentByHostname( lxcHostname );
+        //                    if ( lxcAgent != null )
+        //                    {
+        //                        TerminalWindow terminal =
+        //                                new TerminalWindow( Sets.newHashSet( lxcAgent ),
+        // hadoopManager.getExecutorService(),
+        //                                        hadoopManager.getCommandRunner(), hadoopManager.getAgentManager() );
+        //                        hadoopManager.getContentRoot().getUI().addWindow( terminal.getWindow() );
+        //                    }
+        //                    else
+        //                    {
+        //                        hadoopManager.show( "Agent of " + lxcHostname + " is not connected" );
+        //                    }
+        //                }
+        //            }
+        //        };
+        return null;
     }
 
 
@@ -159,7 +163,6 @@ public class ManagerListener
 
     protected Button.ClickListener destroyClusterButtonListener()
     {
-
         return new Button.ClickListener()
         {
             @Override
@@ -429,6 +432,13 @@ public class ManagerListener
     }
 
 
+    private void enableCheckAllButton()
+    {
+        if ( hadoopManager.getProcessCount() == 0 )
+        {
+            hadoopManager.getCheckAllButton().setEnabled( true );
+        }
+    }
 
 
     protected Button.ClickListener secondaryNameNodeURLButtonListener( final Agent agent )
@@ -451,7 +461,6 @@ public class ManagerListener
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
         final Button startStopButton = hadoopManager.getStartStopButton( availableOperationsLayout );
 
-
         return new Button.ClickListener()
         {
             @Override
@@ -467,7 +476,6 @@ public class ManagerListener
                             new StartTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), NodeType.JOBTRACKER,
                                     hadoopManager.getHadoopCluster(), new CompleteEvent()
                             {
-
                                 public void onComplete( NodeState state )
                                 {
                                     try
@@ -491,7 +499,6 @@ public class ManagerListener
                             new StopTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), NodeType.JOBTRACKER,
                                     hadoopManager.getHadoopCluster(), new CompleteEvent()
                             {
-
                                 public void onComplete( NodeState state )
                                 {
                                     hadoopManager.disableProgressBar();
@@ -580,7 +587,6 @@ public class ManagerListener
                         new CheckTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), NodeType.NAMENODE,
                                 hadoopManager.getHadoopCluster(), new CompleteEvent()
                         {
-
                             public void onComplete( NodeState state )
                             {
                                 if ( state == NodeState.RUNNING )
@@ -687,9 +693,9 @@ public class ManagerListener
 
     protected Button.ClickListener slaveNodeCheckButtonListener( final Item row )
     {
-
         final Agent agent = hadoopManager.getAgentByRow( row );
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
+        final ContainerHost containerHost = hadoopManager.getHadoopCluster().getNode( agent );
         final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );
         final Button checkButton = hadoopManager.getCheckButton( availableOperationsLayout );
         final Button excludeIncludeNodeButton = hadoopManager.getExcludeIncludeButton( availableOperationsLayout );
@@ -704,7 +710,7 @@ public class ManagerListener
             {
 
                 if ( hadoopManager.getHadoop().getCluster( hadoopManager.getHadoopCluster().getClusterName() )
-                                  .getBlockedAgents().contains( agent ) )
+                                  .getBlockedAgentUUIDs().contains( agent.getUuid() ) )
                 {
                     excludeIncludeNodeButton.setCaption( Manager.INCLUDE_BUTTON_CAPTION );
                 }
@@ -717,7 +723,7 @@ public class ManagerListener
                 excludeIncludeNodeButton.setEnabled( false );
                 destroyButton.setEnabled( false );
                 if ( hadoopManager.getHadoop().getCluster( hadoopManager.getHadoopCluster().getClusterName() )
-                                  .isDataNode( agent ) )
+                                  .isDataNode( containerHost ) )
                 {
                     hadoopManager.enableProgressBar();
                     hadoopManager.getExecutorService().execute(
@@ -744,7 +750,6 @@ public class ManagerListener
                                     }
 
 
-
                                     if ( hadoopManager.getCheckAllButton().isEnabled() )
                                     {
                                         checkDecommissioningStatus( row, checkButton );
@@ -757,7 +762,7 @@ public class ManagerListener
                             }, null, agent ) );
                 }
                 if ( hadoopManager.getHadoop().getCluster( hadoopManager.getHadoopCluster().getClusterName() )
-                                  .isTaskTracker( agent ) )
+                                  .isTaskTracker( containerHost ) )
                 {
                     hadoopManager.enableProgressBar();
                     hadoopManager.getExecutorService().execute(
@@ -791,14 +796,6 @@ public class ManagerListener
                 }
             }
         };
-    }
-
-    private void enableCheckAllButton()
-    {
-        if ( hadoopManager.getProcessCount() == 0 )
-        {
-            hadoopManager.getCheckAllButton().setEnabled( true );
-        }
     }
 
 
@@ -852,7 +849,6 @@ public class ManagerListener
                                 executeSlaveNodeCheckButtonFinishCommands( row, checkButton );
                             }
                         }, null ) );
-
     }
 
 
@@ -882,7 +878,6 @@ public class ManagerListener
                         hadoopManager.getHadoopCluster(),
                         new org.safehaus.subutai.plugin.hadoop.ui.manager.components.CompleteEvent()
                         {
-
                             public void onComplete( String operationLog )
                             {
                                 hadoopManager.setDecommissionStatus( operationLog );

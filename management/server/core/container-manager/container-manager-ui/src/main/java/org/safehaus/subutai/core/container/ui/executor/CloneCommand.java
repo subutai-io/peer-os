@@ -3,8 +3,8 @@ package org.safehaus.subutai.core.container.ui.executor;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.PeerException;
 
 
 /**
@@ -38,7 +38,7 @@ public class CloneCommand implements AgentCommand
             localPeer.createContainer( hostName, templateName, cloneName, envId );
             //            containerManager.clone( envId, hostName, templateName, cloneName );
         }
-        catch ( ContainerCreateException e )
+        catch ( PeerException e )
         {
             throw new AgentExecutionException( e.getMessage() );
         }

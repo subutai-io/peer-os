@@ -109,7 +109,7 @@ public class Blueprint2PeerGroupWizard extends Window
         peerGroupsCombo.setTextInputAllowed( false );
         peerGroupsCombo.setItemCaptionPropertyId( "name" );
 
-        Button nextButton = new Button( "Next" );
+        Button nextButton = new Button( "Save build task" );
         nextButton.addClickListener( new Button.ClickListener()
         {
             @Override

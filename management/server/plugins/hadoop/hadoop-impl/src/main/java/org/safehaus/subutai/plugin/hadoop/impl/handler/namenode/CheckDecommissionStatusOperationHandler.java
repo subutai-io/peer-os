@@ -1,12 +1,18 @@
 package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
 
 
+import java.util.Iterator;
+
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
+import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
 
 
 public class CheckDecommissionStatusOperationHandler extends AbstractOperationHandler<HadoopImpl>
@@ -25,6 +31,7 @@ public class CheckDecommissionStatusOperationHandler extends AbstractOperationHa
     public void run()
     {
         HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
+        Commands commands = new Commands( hadoopClusterConfig );
 
         if ( hadoopClusterConfig == null )
         {
@@ -38,21 +45,51 @@ public class CheckDecommissionStatusOperationHandler extends AbstractOperationHa
             return;
         }
 
-        Agent node = manager.getAgentManager().getAgentByHostname( hadoopClusterConfig.getNameNode().getHostname() );
-        if ( node == null )
+        Environment environment =
+                manager.getEnvironmentManager().getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
+        Iterator iterator = environment.getContainers().iterator();
+
+        ContainerHost host = null;
+        while ( iterator.hasNext() )
         {
-            trackerOperation.addLogFailed( "NameNode is not connected" );
+            host = ( ContainerHost ) iterator.next();
+            if ( host.getAgent().getUuid().equals( hadoopClusterConfig.getNameNode().getAgent().getUuid() ) )
+            {
+                break;
+            }
+        }
+
+        if ( host == null )
+        {
+            trackerOperation.addLogFailed( String.format( "No Container with ID %s", host.getId() ) );
             return;
         }
 
-        Command statusCommand = manager.getCommands().getReportHadoopCommand( hadoopClusterConfig );
-        manager.getCommandRunner().runCommand( statusCommand );
-
-        AgentResult result = statusCommand.getResults().get( hadoopClusterConfig.getNameNode().getUuid() );
-
-        if ( statusCommand.hasCompleted() )
+        try
         {
-            trackerOperation.addLogDone( result.getStdOut() );
+            CommandResult result = host.execute( new RequestBuilder( Commands.getReportHadoopCommand() ) );
+            logStatusResults( trackerOperation, result );
+        }
+        catch ( CommandException e )
+        {
+            trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
+        }
+    }
+
+
+    private void logStatusResults( TrackerOperation po, CommandResult result )
+    {
+        if ( result.getStdOut() != null && result.getStdOut().contains( "NameNode" ) )
+        {
+            String[] array = result.getStdOut().split( "\n" );
+
+            for ( String status : array )
+            {
+                if ( status.contains( "NameNode" ) )
+                {
+                    trackerOperation.addLogDone( status );
+                }
+            }
         }
     }
 }

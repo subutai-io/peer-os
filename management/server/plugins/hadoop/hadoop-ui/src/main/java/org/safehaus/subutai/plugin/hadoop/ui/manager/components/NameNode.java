@@ -4,10 +4,7 @@ package org.safehaus.subutai.plugin.hadoop.ui.manager.components;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
@@ -32,7 +29,7 @@ public class NameNode extends ClusterNode
         this.executorService = executorService;
         this.hadoop = hadoop;
         this.tracker = tracker;
-        setHostname( cluster.getNameNode().getHostname() );
+        //        setHostname( cluster.getNameNode().getHostname() );
 
         startButton.addClickListener( new MouseEvents.ClickListener()
         {
@@ -56,15 +53,15 @@ public class NameNode extends ClusterNode
         } );
         stopButton.setId( "nameNodeStop" );
 
-        restartButton.addClickListener( new MouseEvents.ClickListener()
-        {
-            @Override
-            public void click( MouseEvents.ClickEvent clickEvent )
-            {
-                setLoading( true );
-                getStatus( hadoop.restartNameNode( cluster ) );
-            }
-        } );
+//        restartButton.addClickListener( new MouseEvents.ClickListener()
+//        {
+//            @Override
+//            public void click( MouseEvents.ClickEvent clickEvent )
+//            {
+//                setLoading( true );
+//                getStatus( hadoop.restartNameNode( cluster ) );
+//            }
+//        } );
         restartButton.setId( "nameNodeRestart" );
 
         getStatus( null );
@@ -80,36 +77,37 @@ public class NameNode extends ClusterNode
             slaveNode.setLoading( true );
         }
 
-        executorService.execute( new CheckTask( hadoop, tracker, NodeType.NAMENODE, cluster, new CompleteEvent()
-        {
-
-            public void onComplete( NodeState state )
-            {
-                synchronized ( progressButton )
-                {
-                    boolean isRunning = false;
-                    if ( state == NodeState.RUNNING )
-                    {
-                        isRunning = true;
-                    }
-                    else if ( state == NodeState.STOPPED )
-                    {
-                        isRunning = false;
-                    }
-
-                    startButton.setEnabled( !isRunning );
-                    restartButton.setEnabled( isRunning );
-                    stopButton.setEnabled( isRunning );
-
-                    for ( ClusterNode slaveNode : slaveNodes )
-                    {
-                        slaveNode.getStatus( null );
-                    }
-
-                    setLoading( false );
-                }
-            }
-        }, trackID, cluster.getNameNode() ) );
+        //        executorService.execute( new CheckTask( hadoop, tracker, NodeType.NAMENODE, cluster,
+        // new CompleteEvent()
+        //        {
+        //
+        //            public void onComplete( NodeState state )
+        //            {
+        //                synchronized ( progressButton )
+        //                {
+        //                    boolean isRunning = false;
+        //                    if ( state == NodeState.RUNNING )
+        //                    {
+        //                        isRunning = true;
+        //                    }
+        //                    else if ( state == NodeState.STOPPED )
+        //                    {
+        //                        isRunning = false;
+        //                    }
+        //
+        //                    startButton.setEnabled( !isRunning );
+        //                    restartButton.setEnabled( isRunning );
+        //                    stopButton.setEnabled( isRunning );
+        //
+        //                    for ( ClusterNode slaveNode : slaveNodes )
+        //                    {
+        //                        slaveNode.getStatus( null );
+        //                    }
+        //
+        //                    setLoading( false );
+        //                }
+        //            }
+        //        }, trackID, cluster.getNameNode() ) );
     }
 
 

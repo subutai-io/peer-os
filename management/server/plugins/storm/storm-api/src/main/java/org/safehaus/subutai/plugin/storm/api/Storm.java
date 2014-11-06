@@ -19,6 +19,8 @@ public interface Storm extends ApiBase<StormConfig>
 
     public UUID stopNode( String clusterName, String hostname );
 
+    public UUID checkNode( String clusterName, String hostname );
+
     public UUID restartNode( String clusterName, String hostname );
 
     /**
