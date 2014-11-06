@@ -1,7 +1,9 @@
 package org.safehaus.subutai.plugin.hadoop.impl.handler;
 
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -106,6 +108,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
                             result = host.execute( new RequestBuilder( Commands.getStartDataNodeCommand() ) );
                             break;
                     }
+                    ClusterOperationHandler.logStatusResults( trackerOperation, result, nodeType );
                     break;
                 case STOP:
                     switch ( nodeType )
@@ -123,6 +126,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
                             result = host.execute( new RequestBuilder( Commands.getStopDataNodeCommand() ) );
                             break;
                     }
+                    ClusterOperationHandler.logStatusResults( trackerOperation, result, nodeType );
                     break;
                 case STATUS:
                     switch ( nodeType )
@@ -143,6 +147,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
                             result = host.execute( new RequestBuilder( Commands.getStatusDataNodeCommand() ) );
                             break;
                     }
+                    ClusterOperationHandler.logStatusResults( trackerOperation, result, nodeType );
                     break;
                 case EXCLUDE:
                     executor.execute( new Runnable()
@@ -163,7 +168,6 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
                     } );
                     break;
             }
-            ClusterOperationHandler.logStatusResults( trackerOperation, result, nodeType );
         }
         catch ( CommandException e )
         {
@@ -197,6 +201,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
             trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
         }
 
+        config.getBlockedAgents().add( host );
         manager.getPluginDAO()
                .saveInfo( HadoopClusterConfig.PRODUCT_KEY, config.getClusterName(),
                        config );
@@ -253,6 +258,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
             trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
         }
 
+        config.getBlockedAgents().remove( host );
         manager.getPluginDAO()
                .saveInfo( HadoopClusterConfig.PRODUCT_KEY, config.getClusterName(),
                        config );

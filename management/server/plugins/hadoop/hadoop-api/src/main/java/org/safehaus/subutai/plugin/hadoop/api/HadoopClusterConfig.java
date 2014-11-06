@@ -344,6 +344,14 @@ public class HadoopClusterConfig implements ConfigBase
         return blockedAgents;
     }
 
+    public Set<UUID> getBlockedAgentUUIDs(){
+        Set<UUID> blockedAgents = new HashSet<>();
+        for ( ContainerHost containerHost : getBlockedAgents() ){
+            blockedAgents.add( containerHost.getAgent().getUuid() );
+        }
+        return blockedAgents;
+    }
+
 
     public void setBlockedAgents( HashSet<ContainerHost> blockedAgents )
     {
