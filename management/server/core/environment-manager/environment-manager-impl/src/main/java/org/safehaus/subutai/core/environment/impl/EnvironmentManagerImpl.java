@@ -14,7 +14,6 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
@@ -35,10 +34,10 @@ import org.safehaus.subutai.core.environment.api.topology.NodeGroup2PeerGroupDat
 import org.safehaus.subutai.core.environment.api.topology.TopologyData;
 import org.safehaus.subutai.core.environment.impl.builder.Blueprint2PeerBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.Blueprint2PeerGroupBuilder;
+import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuildProcessFactory;
 import org.safehaus.subutai.core.environment.impl.builder.Node2PeerBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.NodeGroup2PeerBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.NodeGroup2PeerGroupBuilder;
-import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuildProcessFactory;
 import org.safehaus.subutai.core.environment.impl.builder.ProcessBuilderException;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.environment.BuildException;
@@ -320,7 +319,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Environment buildEnvironmentNew( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
+    public Environment buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
     {
         try
         {
@@ -373,106 +372,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 throw new EnvironmentConfigureException( e.getMessage() );
             }
-        }
-    }
-
-
-    /**
-     * Deprecated
-     */
-    @Override
-    @Deprecated
-    public Environment buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
-    {
-        try
-        {
-            EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBlueprintId() );
-            Environment environment = new Environment( blueprint.getName() );
-            saveEnvironment( environment );
-
-            int containerCount = 0;
-            for ( String key : process.getMessageMap().keySet() )
-            {
-                CloneContainersMessage ccm = process.getMessageMap().get( key );
-                ccm.setEnvId( environment.getId() );
-
-                containerCount = containerCount + ccm.getNumberOfNodes();
-
-                try
-                {
-                    Set<ContainerHost> containers = peerManager.getPeer( ccm.getPeerId() ).
-                            createContainers( peerManager.getLocalPeer().getId(), ccm.getEnvId(), ccm.getTemplates(),
-                                    ccm.getNumberOfNodes(), ccm.getStrategy(), null, ccm.getNodeGroupName() );
-                    if ( !containers.isEmpty() )
-                    {
-                        for ( ContainerHost container : containers )
-                        {
-                            container.setNodeGroupName( ccm.getNodeGroupName() );
-                            environment.addContainer( container );
-                        }
-                    }
-                    else
-                    {
-                        environment.setStatus( EnvironmentStatusEnum.BROKEN );
-                        saveEnvironment( environment );
-                        throw new EnvironmentBuildException(
-                                String.format( "FAILED creating environment on %s", ccm.getPeerId() ) );
-                    }
-                }
-                catch ( PeerException e )
-                {
-                    LOG.error( e.getMessage(), e );
-                    environment.setStatus( EnvironmentStatusEnum.BROKEN );
-                    saveEnvironment( environment );
-                    throw new EnvironmentBuildException( e.getMessage() );
-                }
-            }
-
-            if ( environment.getContainers().isEmpty() )
-            {
-                environment.setStatus( EnvironmentStatusEnum.EMPTY );
-                saveEnvironment( environment );
-                throw new EnvironmentBuildException( "No containers assigned to the Environment" );
-            }
-            else
-            {
-                if ( blueprint.isExchangeSshKeys() )
-                {
-                    try
-                    {
-                        securityManager.configSshOnAgents( environment.getContainers() );
-                    }
-                    catch ( SecurityManagerException e )
-                    {
-                        throw new EnvironmentBuildException( e.getMessage() );
-                    }
-                }
-                if ( blueprint.isLinkHosts() )
-                {
-                    try
-                    {
-                        securityManager.configHostsOnAgents( environment.getContainers(), blueprint.getDomainName() );
-                    }
-                    catch ( SecurityManagerException e )
-                    {
-                        throw new EnvironmentBuildException( e.getMessage() );
-                    }
-                }
-                if ( environment.getContainers().size() != containerCount )
-                {
-                    environment.setStatus( EnvironmentStatusEnum.UNHEALTHY );
-                }
-                else
-                {
-                    environment.setStatus( EnvironmentStatusEnum.HEALTHY );
-                }
-                saveEnvironment( environment );
-            }
-            return environment;
-        }
-        catch ( EnvironmentPersistenceException e )
-        {
-            throw new EnvironmentBuildException( e.getMessage() );
         }
     }
 
