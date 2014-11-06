@@ -4,7 +4,10 @@ package org.safehaus.subutai.plugin.hadoop.api;
 import java.util.List;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.common.tracker.OperationState;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.api.OperationType;
@@ -116,7 +119,6 @@ public class NodeOperationTask extends AbstractNodeOperationTask implements Runn
                     break;
             }
         }
-
         return trackID;
     }
 
@@ -124,13 +126,13 @@ public class NodeOperationTask extends AbstractNodeOperationTask implements Runn
     @Override
     public String getProductStoppedIdentifier()
     {
-        return "hadoop is not running";
+        return NodeState.STOPPED.name();
     }
 
 
     @Override
     public String getProductRunningIdentifier()
     {
-        return "hadoop is running";
+        return NodeState.RUNNING.name();
     }
 }
