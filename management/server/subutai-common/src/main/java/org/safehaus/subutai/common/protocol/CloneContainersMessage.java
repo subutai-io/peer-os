@@ -133,6 +133,12 @@ public class CloneContainersMessage extends PeerCommandMessage
     }
 
 
+    public void setTemplates( final List<Template> templates )
+    {
+        this.templates = templates;
+    }
+
+
     public void addTemplate( Template t )
     {
         if ( t == null )

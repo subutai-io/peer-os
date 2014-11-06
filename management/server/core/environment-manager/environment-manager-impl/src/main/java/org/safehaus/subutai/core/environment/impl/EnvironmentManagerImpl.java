@@ -71,8 +71,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private static final String BLUEPRINT = "BLUEPRINT";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private PeerManager peerManager;
-    //    private TopologyBuilder topologyBuilder;
-    //    private ServiceLocator serviceLocator;
     private EnvironmentDAO environmentDAO;
     private TemplateRegistry templateRegistry;
     private SecurityManager securityManager;
@@ -170,19 +168,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         saveBlueprint( GSON.toJson( blueprint ) );
         TopologyBuilder topologyBuilder = new Blueprint2PeerBuilder( this );
-        EnvironmentBuildProcess process = null;
         try
         {
-            process = topologyBuilder.prepareBuildProcess(
+            EnvironmentBuildProcess process = topologyBuilder.prepareBuildProcess(
                     new Blueprint2PeerData( blueprint.getId(), peerManager.getLocalPeer().getId() ) );
+            environmentDAO.saveInfo( PROCESS, process.getId().toString(), process );
+            return buildEnvironment( process );
         }
         catch ( TopologyBuilderException e )
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
-
-
-        return buildEnvironment( process );
     }
 
 
@@ -405,40 +401,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
                 containerCount = containerCount + ccm.getNumberOfNodes();
 
-                //TODO: move template addition on create ccm
-                List<Template> templates = templateRegistry.getParentTemplates( ccm.getTemplate() );
-                Template installationTemplate = templateRegistry.getTemplate( ccm.getTemplate() );
-                if ( installationTemplate != null )
-                {
-                    templates.add( installationTemplate );
-                }
-                else
-                {
-                    environment.setStatus( EnvironmentStatusEnum.BROKEN );
-                    saveEnvironment( environment );
-                    throw new EnvironmentBuildException( "Could not get installation template data" );
-                }
-
-                UUID peerId = peerManager.getLocalPeer().getId();
-
-                if ( peerId == null )
-                {
-                    environment.setStatus( EnvironmentStatusEnum.BROKEN );
-                    saveEnvironment( environment );
-                    throw new EnvironmentBuildException( "Could not get Peer ID" );
-                }
-
-
-                for ( Template t : templates )
-                {
-                    ccm.addTemplate( t.getRemoteClone( peerId ) );
-                }
-
                 try
                 {
                     Set<ContainerHost> containers = peerManager.getPeer( ccm.getPeerId() ).
-                            createContainers( peerId, ccm.getEnvId(), ccm.getTemplates(), ccm.getNumberOfNodes(),
-                                    ccm.getStrategy(), null );
+                            createContainers( peerManager.getLocalPeer().getId(), ccm.getEnvId(), ccm.getTemplates(),
+                                    ccm.getNumberOfNodes(), ccm.getStrategy(), null );
                     if ( !containers.isEmpty() )
                     {
                         for ( ContainerHost container : containers )
@@ -566,72 +533,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         return true;
     }
-
-
-    /*@Override
-    public boolean saveBuildProcess( final UUID blueprintId, final Map<Object, Peer> topology,
-                                     final Map<Object, NodeGroup> map, TopologyEnum topologyEnum )
-    {
-        EnvironmentBuildProcess process = null;
-
-        switch ( topologyEnum )
-        {
-            case NODE_2_PEER:
-            {
-
-                process = topologyBuilder.createEnvironmentBuildProcessN2P( blueprintId, topology, map );
-                break;
-            }
-            case NODE_GROUP_2_PEER:
-            {
-                process = topologyBuilder.createEnvironmentBuildProcessNG2Peer( blueprintId, topology, map );
-                break;
-            }
-            case BLUEPRINT_2_PEER:
-                break;
-            case BLUEPRINT_2_PEER_GROUP:
-                break;
-            case NODE_GROUP_2_PEER_GROUP:
-                break;
-            default:
-            {
-                break;
-            }
-        }
-        if ( process != null )
-        {
-            return environmentDAO.saveInfo( PROCESS, process.getId().toString(), process );
-        }
-        else
-        {
-            return false;
-        }
-    }*/
-
-
-    /*@Override
-    public boolean saveBuildProcessB2PG( final UUID blueprintId, final UUID peerGroupId )
-            throws EnvironmentManagerException
-    {
-        TopologyBuilder topologyBuilder = new TopologyBuilder( this );
-        try
-        {
-            EnvironmentBuildProcess process =
-                    topologyBuilder.createEnvironmentBuildProcessB2PG( blueprintId, peerGroupId );
-            if ( process != null )
-            {
-                return environmentDAO.saveInfo( PROCESS, process.getId().toString(), process );
-            }
-            else
-            {
-                return false;
-            }
-        }
-        catch ( EnvironmentBuildException e )
-        {
-            throw new EnvironmentManagerException( e.getMessage() );
-        }
-    }*/
 
 
     @Override

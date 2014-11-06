@@ -1,8 +1,11 @@
 package org.safehaus.subutai.core.environment.impl.builder;
 
 
+import java.util.List;
+
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.topology.NodeGroup2PeerData;
 import org.safehaus.subutai.core.environment.api.topology.TopologyData;
@@ -30,18 +33,22 @@ public class NodeGroup2PeerBuilder extends TopologyBuilder
         for ( Object itemId : data.getMap().keySet() )
         {
             Peer peer = data.getTopology().get( itemId );
-            NodeGroup ng = data.getMap().get( itemId );
+            NodeGroup nodeGroup = data.getMap().get( itemId );
 
-            String key = peer.getId().toString() + "-" + ng.getTemplateName();
+            String key = peer.getId().toString() + "-" + nodeGroup.getTemplateName();
 
             if ( !process.getMessageMap().containsKey( key ) )
             {
                 CloneContainersMessage ccm = new CloneContainersMessage( peer.getId() );
                 ccm.setEnvId( process.getId() );
-                ccm.setNodeGroupName( ng.getName() );
-                ccm.setTemplate( ng.getTemplateName() );
-                ccm.setNumberOfNodes( ng.getNumberOfNodes() );
-                ccm.setStrategy( ng.getPlacementStrategy().toString() );
+                ccm.setNodeGroupName( nodeGroup.getName() );
+                ccm.setTemplate( nodeGroup.getTemplateName() );
+                ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
+                ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );
+                List<Template> templates =
+                        fetchRequiredTemplates( environmentManager.getPeerManager().getLocalPeer().getId(),
+                                nodeGroup.getTemplateName() );
+                ccm.setTemplates( templates );
                 process.putCloneContainerMessage( key, ccm );
             }
         }

@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.topology.Blueprint2PeerGroupData;
@@ -55,6 +56,10 @@ public class Blueprint2PeerGroupBuilder extends TopologyBuilder
                 ccm.setTemplate( nodeGroup.getTemplateName() );
                 ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
                 ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );
+                List<Template> templates =
+                        fetchRequiredTemplates( environmentManager.getPeerManager().getLocalPeer().getId(),
+                                nodeGroup.getTemplateName() );
+                ccm.setTemplates( templates );
                 process.putCloneContainerMessage( key, ccm );
             }
 
