@@ -388,7 +388,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBlueprintId() );
-
             Environment environment = new Environment( blueprint.getName() );
             saveEnvironment( environment );
             TrackerOperation operation = tracker.createTrackerOperation( environment.getName(), environment.getName() );

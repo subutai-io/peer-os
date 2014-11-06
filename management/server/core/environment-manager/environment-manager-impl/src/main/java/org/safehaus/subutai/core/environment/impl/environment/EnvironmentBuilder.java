@@ -1,8 +1,7 @@
 package org.safehaus.subutai.core.environment.impl.environment;
 
 
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.core.environment.impl.topologies.Topology;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 
 
 /**
@@ -11,6 +10,6 @@ import org.safehaus.subutai.core.environment.impl.topologies.Topology;
 public interface EnvironmentBuilder
 {
 
-    public void build(EnvironmentBlueprint blueprint, Topology topology) throws BuildException;
+    public void build(final EnvironmentBuildProcess process) throws BuildException;
 
 }

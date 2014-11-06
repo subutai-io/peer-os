@@ -1,50 +1,26 @@
 package org.safehaus.subutai.core.environment.impl.environment;
 
 
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.core.environment.impl.topologies.Topology;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 
 
 /**
  * Created by bahadyr on 11/5/14.
  */
-public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
+public class EnvironmentBuilderImpl implements Runnable
 {
-    PeerManager peerManager;
-    ExecutorService executorService;
 
 
-    public EnvironmentBuilderImpl( PeerManager peerManager )
-    {
-        this.executorService = Executors.newSingleThreadExecutor();
-        this.peerManager = peerManager;
-    }
-
-
-    /**
-     * Builds environment with a given topology
-     */
-    public void build( final EnvironmentBlueprint blueprint, Topology topology ) throws BuildException
+    public EnvironmentBuilderImpl( final EnvironmentBuildProcess process )
     {
 
-        TopologyApplicator topologyApplicator = new TopologyApplicatorImpl();
-        List<ContainerDistributionMessage> messageList = topologyApplicator.applyTopology( topology, blueprint );
-
-        EnvironmentBuilderThread builderThread = new EnvironmentBuilderThread( this, messageList, peerManager );
-        executorService.execute( builderThread );
     }
 
 
     @Override
-    public void update( final Observable o, final Object arg )
+    public void run()
     {
+
 
     }
 }
