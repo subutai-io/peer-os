@@ -84,4 +84,10 @@ public class Environment
     {
         return id;
     }
+
+
+    public void addContainers( final Set<ContainerHost> containerHosts )
+    {
+        this.containers.addAll( containerHosts );
+    }
 }

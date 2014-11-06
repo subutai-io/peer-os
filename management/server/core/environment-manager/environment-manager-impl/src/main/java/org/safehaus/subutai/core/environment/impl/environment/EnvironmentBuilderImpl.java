@@ -14,6 +14,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
 import org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.slf4j.Logger;
@@ -27,9 +28,11 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentBuilderImpl.class.getName() );
-    ExecutorService executorService;
-    EnvironmentManagerImpl manager;
-    Environment environment;
+    private ExecutorService executorService;
+    private EnvironmentManagerImpl manager;
+    private Environment environment;
+    private int containersCreated;
+    private int approximateCloneTime = 30; //Seconds
 
 
     public EnvironmentBuilderImpl( EnvironmentManagerImpl manager )
@@ -61,7 +64,7 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
 
         try
         {
-            int timeout = containersAmount * 30;
+            int timeout = containersAmount * approximateCloneTime;
             executorService.awaitTermination( timeout, TimeUnit.SECONDS );
         }
         catch ( InterruptedException e )
@@ -70,6 +73,14 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
             throw new BuildException( e.getMessage() );
         }
 
+        if ( environment.getContainers().size() == containersCreated )
+        {
+            environment.setStatus( EnvironmentStatusEnum.HEALTHY );
+        }
+        else
+        {
+            environment.setStatus( EnvironmentStatusEnum.UNHEALTHY );
+        }
         return environment;
     }
 
@@ -100,10 +111,9 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
     {
         if ( arg instanceof Set )
         {
-            for ( ContainerHost containerHost : ( Set<ContainerHost> ) arg )
-            {
-                environment.addContainer( containerHost );
-            }
+            Set<ContainerHost> containerHosts = ( Set<ContainerHost> ) arg;
+            this.containersCreated = containersCreated + containerHosts.size();
+            environment.addContainers( containerHosts );
         }
         else if ( arg instanceof Exception )
         {

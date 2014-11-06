@@ -25,7 +25,6 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerExc
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenceException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
 import org.safehaus.subutai.core.environment.api.topology.Blueprint2PeerData;
 import org.safehaus.subutai.core.environment.api.topology.Blueprint2PeerGroupData;
 import org.safehaus.subutai.core.environment.api.topology.Node2PeerData;
@@ -144,7 +143,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.securityManager = null;
         this.peerManager = null;
         this.tracker = null;
-        //        this.topologyBuilder = null;
         this.environmentDAO = null;
     }
 
@@ -325,7 +323,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBlueprintId() );
             Environment environment = environmentBuilder.build( blueprint, process );
-            environment.setStatus( EnvironmentStatusEnum.HEALTHY );
             saveEnvironment( environment );
 
             configureSshBetweenContainers( blueprint, environment.getContainers() );
@@ -460,8 +457,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         else
         {
-            environment.setStatus( EnvironmentStatusEnum.BROKEN );
-            saveEnvironment( environment );
             throw new EnvironmentBuildException( "Could not get installation template data" );
         }
 
@@ -469,8 +464,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         if ( peerId == null )
         {
-            environment.setStatus( EnvironmentStatusEnum.BROKEN );
-            saveEnvironment( environment );
             throw new EnvironmentBuildException( "Could not get Peer ID" );
         }
 
@@ -495,10 +488,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             else
             {
-                environment.setStatus( EnvironmentStatusEnum.BROKEN );
-                saveEnvironment( environment );
-                throw new EnvironmentBuildException(
-                        String.format( "FAILED creating environment on %s", peer.getId() ) );
+                throw new EnvironmentBuildException( String.format( "FAILED create container on %s", peer.getId() ) );
             }
         }
         catch ( PeerException e )
