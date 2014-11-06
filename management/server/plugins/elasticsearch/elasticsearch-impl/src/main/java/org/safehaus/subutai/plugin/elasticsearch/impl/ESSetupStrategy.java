@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.elasticsearch.impl;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
@@ -63,10 +64,10 @@ public class ESSetupStrategy implements ClusterSetupStrategy
                     config.getNumberOfNodes(), environment.getContainers().size() ) );
         }
 
-        Set<ContainerHost> esNodes = new HashSet<>();
+        Set<UUID> esNodes = new HashSet<>();
         for ( ContainerHost containerHost : environment.getContainers() )
         {
-            esNodes.add( containerHost );
+            esNodes.add( containerHost.getAgent().getUuid() );
         }
         config.setNodes( esNodes );
 

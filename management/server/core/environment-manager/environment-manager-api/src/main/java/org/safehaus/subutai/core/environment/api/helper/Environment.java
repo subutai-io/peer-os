@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.environment.api.helper;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
@@ -83,5 +84,17 @@ public class Environment
     public UUID getId()
     {
         return id;
+    }
+
+
+    public ContainerHost getContainerHostByUUID( UUID uuid ) {
+        Iterator<ContainerHost> iterator = containers.iterator();
+        iterator.next();
+        while ( iterator.hasNext() ) {
+            ContainerHost containerHost = iterator.next();
+            if ( containerHost.getId().equals( uuid ) )
+                return containerHost;
+        }
+        return null;
     }
 }
