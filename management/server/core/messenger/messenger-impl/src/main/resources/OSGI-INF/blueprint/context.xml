@@ -7,13 +7,14 @@
     <property name="password" value="" />
   </bean>
 
-  <reference id="peerManager" availability="mandatory"
+  <reference id="peerManager" availability="optional"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
-  <bean id="messenger" class="org.safehaus.subutai.core.messenger.impl.MessengerImpl" scope="singleton" init-method="init"
+  <bean id="messenger" class="org.safehaus.subutai.core.messenger.impl.MessengerImpl" scope="singleton"
+        init-method="init"
         destroy-method="destroy">
-    <argument ref="peerManager" />
     <argument ref="dataSource" />
+    <argument ref="peerManager" />
   </bean>
 
   <service ref="messenger" interface="org.safehaus.subutai.core.messenger.api.Messenger" />

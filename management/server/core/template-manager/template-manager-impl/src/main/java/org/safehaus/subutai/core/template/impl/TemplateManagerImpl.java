@@ -322,43 +322,4 @@ public class TemplateManagerImpl extends TemplateManagerBase
             scriptExecutor.execute( agent, ActionType.APT_GET_UPDATE );
         }
     }
-
-
-    //
-    //    @Override
-    //    public boolean prepareTemplates( final Set<TemplatePackage> templatePackages )
-    //    {
-    //        for ( TemplatePackage templatePackage : templatePackages )
-    //        {
-    //            for ( SubutaiPackage subutaiPackage : templatePackage.getSubutaiPackages() )
-    //            {
-    //                if ( !isTemplateExists( templatePackage.getAgentId(), subutaiPackage.getName() ) )
-    //                {
-    //                    install( templatePackage.getAgentId(), subutaiPackage );
-    //                }
-    //            }
-    //        }
-    //        return false;
-    //    }
-    //
-    //
-    //    protected boolean install( final UUID agentId, final SubutaiPackage subutaiPackage )
-    //    {
-    //        Agent agent = agentManager.getAgentByUUID( agentId );
-    //
-    //        return scriptExecutor
-    //                .execute( agent, ActionType.PREPARE, 60 * 24, TimeUnit.MINUTES,
-    // subutaiPackage.getUrl().toString() );
-    //    }
-    //
-    //
-    //    protected boolean isTemplateExists( UUID agentId, String templateName )
-    //    {
-    //        Agent agent = agentManager.getAgentByUUID( agentId );
-    //        if ( agent == null )
-    //        {
-    //            return false;
-    //        }
-    //        return scriptExecutor.execute( agent, ActionType.LIST_TEMPLATES, templateName );
-    //    }
 }

@@ -10,12 +10,17 @@
 
   <service ref="peerManager" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
+  <reference id="messenger" availability="mandatory"
+             interface="org.safehaus.subutai.core.messenger.api.Messenger" />
+
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
 
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
-  <reference id="containerManager" interface="org.safehaus.subutai.core.container.api.ContainerManager" />
+  <!--
+    <reference id="containerManager" interface="org.safehaus.subutai.core.container.api.ContainerManager" />
+  -->
 
   <reference id="templateRegistry" interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
 
@@ -23,15 +28,20 @@
 
   <reference id="strategyManager" interface="org.safehaus.subutai.core.strategy.api.StrategyManager" />
 
+  <reference id="quotaManager" interface="org.safehaus.subutai.core.lxc.quota.api.QuotaManager" />
+
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
     <property name="agentManager" ref="agentManager" />
-    <property name="containerManager" ref="containerManager" />
+    <!--<property name="containerManager" ref="containerManager" />-->
     <property name="commandRunner" ref="commandRunner" />
     <property name="templateRegistry" ref="templateRegistry" />
     <property name="communicationManager" ref="communicationManager" />
     <property name="strategyManager" ref="strategyManager" />
+    <property name="quotaManager" ref="quotaManager" />
+
     <argument ref="dataSource" />
+    <argument ref="messenger" />
   </bean>
 
 </blueprint>

@@ -1,15 +1,18 @@
 package org.safehaus.subutai.core.peer.api;
 
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.NullAgent;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.ServiceLocator;
 
 import com.google.common.base.Preconditions;
@@ -20,17 +23,18 @@ import com.google.common.base.Preconditions;
  */
 public abstract class SubutaiHost implements Host
 {
+    private UUID peerId;
     private Agent agent = NullAgent.getInstance();
     private Agent parentAgent = NullAgent.getInstance();
-    private long lastHeartbeat = System.currentTimeMillis();
-    transient private static final long INACTIVE_TIME = 5 * 1000 * 60; // 5 min
+    protected long lastHeartbeat = System.currentTimeMillis();
 
 
-    protected SubutaiHost( final Agent agent )
+    protected SubutaiHost( final Agent agent, UUID peerId )
     {
         Preconditions.checkNotNull( agent, "Agent is null" );
 
         this.agent = agent;
+        this.peerId = peerId;
     }
 
 
@@ -52,9 +56,9 @@ public abstract class SubutaiHost implements Host
     }
 
 
-    public Peer getPeer( UUID peerId ) throws PeerException
+    public Peer getPeer() throws PeerException
     {
-        Peer result = null;
+        Peer result;
         try
         {
             PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
@@ -76,11 +80,18 @@ public abstract class SubutaiHost implements Host
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder ) throws CommandException
     {
+        return execute( requestBuilder, null );
+    }
+
+
+    @Override
+    public CommandResult execute( final RequestBuilder requestBuilder, final CommandCallback callback )
+            throws CommandException
+    {
         try
         {
-            Peer peer = getPeer( this.getPeerId() );
-            CommandResult commandResult = peer.execute( requestBuilder, this );
-            return commandResult;
+            Peer peer = getPeer();
+            return peer.execute( requestBuilder, this, callback );
         }
         catch ( PeerException e )
         {
@@ -89,24 +100,25 @@ public abstract class SubutaiHost implements Host
     }
 
 
-    public String echo( String text ) throws CommandException
+    @Override
+    public void executeAsync( final RequestBuilder requestBuilder ) throws CommandException
     {
-        RequestBuilder requestBuilder = new RequestBuilder( "echo " + text );
-        CommandResult result = execute( requestBuilder );
-        if ( result.hasSucceeded() )
+        executeAsync( requestBuilder, null );
+    }
+
+
+    @Override
+    public void executeAsync( final RequestBuilder requestBuilder, final CommandCallback callback )
+            throws CommandException
+    {
+        try
         {
-            return result.getStdOut();
+            Peer peer = getPeer();
+            peer.executeAsync( requestBuilder, this, callback );
         }
-        else
+        catch ( PeerException e )
         {
-            if ( result.hasTimedOut() )
-            {
-                throw new CommandException( "Command timed out" );
-            }
-            else
-            {
-                throw new CommandException( "Echo execution error: " + result.getStdErr() );
-            }
+            throw new CommandException( e.toString() );
         }
     }
 
@@ -114,7 +126,7 @@ public abstract class SubutaiHost implements Host
     @Override
     public UUID getPeerId()
     {
-        return agent.getSiteId();
+        return peerId;
     }
 
 
@@ -145,16 +157,36 @@ public abstract class SubutaiHost implements Host
     }
 
 
-    @Override
-    public boolean isConnected()
+    public void resetHeartbeat()
     {
-        return ( System.currentTimeMillis() - lastHeartbeat ) < INACTIVE_TIME;
+        if ( lastHeartbeat > 10 * 100 * 6 )
+        {
+            lastHeartbeat -= 10 * 10 * 6;
+        }
     }
 
 
     @Override
+    public boolean isConnected()
+    {
+        try
+        {
+            Peer peer = getPeer();
+            return peer.isConnected( this );
+        }
+        catch ( PeerException e )
+        {
+
+            return false;
+        }
+    }
+
+
     public long getLastHeartbeat()
     {
         return lastHeartbeat;
     }
+
+
+
 }

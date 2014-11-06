@@ -8,6 +8,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -16,7 +17,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command( scope = "peer", name = "hosts" )
+@Command(scope = "peer", name = "hosts")
 public class HostsCommand extends OsgiCommandSupport
 {
 
@@ -69,15 +70,20 @@ public class HostsCommand extends OsgiCommandSupport
             containerInfo += c.getState();
             if ( c.getEnvironmentId() != null )
             {
-                containerInfo += c.getEnvironmentId();
+                containerInfo += " " + c.getEnvironmentId();
             }
 
             if ( c.getCreatorPeerId() != null )
             {
-                containerInfo += " "+peerManager.getPeer( c.getCreatorPeerId() ).getName();
+                Peer peer = peerManager.getPeer( c.getCreatorPeerId() );
+                if ( peer != null )
+                {
+                    containerInfo += " " + peer.getPeerInfo().getIp();
+                }
             }
         }
 
-        System.out.println( String.format( "%s+--%s %s", padding, host.getHostname(), containerInfo ) );
+        System.out
+                .println( String.format( "%s+--%s %s %s", padding, host.getHostname(), host.getId(), containerInfo ) );
     }
 }

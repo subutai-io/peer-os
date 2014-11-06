@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 
@@ -31,11 +32,13 @@ public interface Host extends Serializable
 
     public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException;
 
+    public CommandResult execute( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
+
+    public void executeAsync( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
+
+    public void executeAsync( RequestBuilder requestBuilder ) throws CommandException;
+
     public boolean isConnected();
 
     public long getLastHeartbeat();
-
-    //    public PeerInfo getPeer( UUID peerId ) throws PeerException;
-
-    //    public void updateHeartbeat();
 }

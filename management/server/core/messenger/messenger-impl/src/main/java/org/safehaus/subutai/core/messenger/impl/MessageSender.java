@@ -29,20 +29,24 @@ import com.google.common.collect.Maps;
  */
 public class MessageSender
 {
-    private static final Logger LOG = LoggerFactory.getLogger( MessageSender.class.getName() );
-    private static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
-
-    private final ScheduledExecutorService mainLoopExecutor = Executors.newSingleThreadScheduledExecutor();
+    public static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
     private final PeerManager peerManager;
     private final MessengerDao messengerDao;
-    private ExecutorService restExecutor = Executors.newCachedThreadPool();
+    private final MessengerImpl messenger;
+
+    protected static Logger LOG = LoggerFactory.getLogger( MessageSender.class.getName() );
+    protected ScheduledExecutorService mainLoopExecutor = Executors.newSingleThreadScheduledExecutor();
+    protected ExecutorService restExecutor = Executors.newCachedThreadPool();
     protected RestUtil restUtil;
+    protected CompletionService<Boolean> completer = new ExecutorCompletionService<>( restExecutor );
 
 
-    public MessageSender( final PeerManager peerManager, final MessengerDao messengerDao )
+    public MessageSender( final PeerManager peerManager, final MessengerDao messengerDao,
+                          final MessengerImpl messenger )
     {
         this.peerManager = peerManager;
         this.messengerDao = messengerDao;
+        this.messenger = messenger;
         this.restUtil = new RestUtil();
     }
 
@@ -77,7 +81,7 @@ public class MessageSender
     }
 
 
-    private void purgeExpiredMessages()
+    protected void purgeExpiredMessages()
     {
         messengerDao.purgeExpiredMessages();
     }
@@ -115,13 +119,20 @@ public class MessageSender
             peerEnvelopes.add( envelope );
         }
 
-        CompletionService<Boolean> completer = new ExecutorCompletionService<>( restExecutor );
 
         //try to send messages in parallel - one thread per peer
         for ( Map.Entry<UUID, Set<Envelope>> envelopsPerPeer : peerEnvelopesMap.entrySet() )
         {
             Peer targetPeer = peerManager.getPeer( envelopsPerPeer.getKey() );
-            completer.submit( new PeerMessageSender( restUtil, messengerDao, targetPeer, envelopsPerPeer.getValue() ) );
+            if ( targetPeer.isLocal() )
+            {
+                completer.submit( new LocalPeerMessageSender( messenger, messengerDao, envelopsPerPeer.getValue() ) );
+            }
+            else
+            {
+                completer.submit(
+                        new RemotePeerMessageSender( restUtil, messengerDao, targetPeer, envelopsPerPeer.getValue() ) );
+            }
         }
 
         //wait for completion
@@ -133,9 +144,9 @@ public class MessageSender
                 future.get();
             }
         }
-        catch ( InterruptedException | ExecutionException ignore )
+        catch ( InterruptedException | ExecutionException e )
         {
-            LOG.warn( ignore.getMessage() );
+            LOG.warn( "ignore", e );
         }
     }
 }

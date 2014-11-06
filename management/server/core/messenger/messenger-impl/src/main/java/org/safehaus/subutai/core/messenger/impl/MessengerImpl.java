@@ -18,6 +18,7 @@ import org.safehaus.subutai.core.messenger.api.MessageListener;
 import org.safehaus.subutai.core.messenger.api.MessageProcessor;
 import org.safehaus.subutai.core.messenger.api.MessageStatus;
 import org.safehaus.subutai.core.messenger.api.Messenger;
+import org.safehaus.subutai.core.messenger.api.MessengerException;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
@@ -32,8 +33,8 @@ import com.google.gson.JsonSyntaxException;
  */
 public class MessengerImpl implements Messenger, MessageProcessor
 {
-    private static final Logger LOG = LoggerFactory.getLogger( MessengerImpl.class.getName() );
-    private final Set<MessageListener> listeners =
+    protected static Logger LOG = LoggerFactory.getLogger( MessengerImpl.class.getName() );
+    protected final Set<MessageListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MessageListener, Boolean>() );
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     private final PeerManager peerManager;
@@ -41,14 +42,20 @@ public class MessengerImpl implements Messenger, MessageProcessor
     protected MessageSender messageSender;
 
 
-    public MessengerImpl( final PeerManager peerManager, final DataSource dataSource ) throws DaoException
+    public MessengerImpl( final DataSource dataSource, final PeerManager peerManager ) throws MessengerException
     {
-        Preconditions.checkNotNull( peerManager, "Peer Manager is null" );
         Preconditions.checkNotNull( dataSource, "Data source is null" );
 
-        this.peerManager = peerManager;
-        this.messengerDao = new MessengerDao( dataSource );
-        this.messageSender = new MessageSender( peerManager, messengerDao );
+        try
+        {
+            this.peerManager = peerManager;
+            this.messengerDao = new MessengerDao( dataSource );
+            this.messageSender = new MessageSender( peerManager, messengerDao, this );
+        }
+        catch ( DaoException e )
+        {
+            throw new MessengerException( e );
+        }
     }
 
 
@@ -66,7 +73,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
 
 
     @Override
-    public Message createMessage( final Object payload ) throws MessageException
+    public Message createMessage( final Object payload )
     {
         return new MessageImpl( peerManager.getLocalPeer().getId(), payload );
     }
@@ -78,8 +85,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
     {
         try
         {
-            Envelope envelope =
-                    new Envelope( ( MessageImpl ) message, peerManager.getLocalPeer().getId(), recipient, timeToLive );
+            Envelope envelope = new Envelope( ( MessageImpl ) message, peer.getId(), recipient, timeToLive );
 
             messengerDao.saveEnvelope( envelope );
         }
@@ -100,23 +106,19 @@ public class MessengerImpl implements Messenger, MessageProcessor
             Envelope envelope = messengerDao.getEnvelope( messageId );
             if ( envelope != null )
             {
-
                 if ( envelope.isSent() )
                 {
                     return MessageStatus.SENT;
                 }
+                //give 10 extra seconds in case background sender is in process of transmitting this message
+                else if ( ( envelope.getCreateDate().getTime() + envelope.getTimeToLive() * 1000 )
+                        < System.currentTimeMillis() + 10000 )
+                {
+                    return MessageStatus.IN_PROCESS;
+                }
                 else
                 {
-                    //give 10 extra seconds in case background sender is in process of transmitting this message
-                    if ( ( envelope.getCreateDate().getTime() + envelope.getTimeToLive() * 1000 )
-                            < System.currentTimeMillis() + 10 * 1000 )
-                    {
-                        return MessageStatus.IN_PROCESS;
-                    }
-                    else
-                    {
-                        return MessageStatus.EXPIRED;
-                    }
+                    return MessageStatus.EXPIRED;
                 }
             }
 
@@ -136,20 +138,26 @@ public class MessengerImpl implements Messenger, MessageProcessor
         try
         {
             Envelope envelope = JsonUtil.fromJson( envelopeString, Envelope.class );
-            Message message = envelope.getMessage();
-
-            for ( MessageListener listener : listeners )
-            {
-                if ( listener.getRecipient().equalsIgnoreCase( envelope.getRecipient() ) )
-                {
-                    notificationExecutor.execute( new MessageNotifier( listener, message ) );
-                }
-            }
+            notifyListeners( envelope );
         }
-        catch ( JsonSyntaxException e )
+        catch ( NullPointerException | JsonSyntaxException e )
         {
             LOG.error( "Error in processMessage", e );
             throw new MessageException( e );
+        }
+    }
+
+
+    protected void notifyListeners( Envelope envelope )
+    {
+        Message message = envelope.getMessage();
+
+        for ( MessageListener listener : listeners )
+        {
+            if ( listener.getRecipient().equalsIgnoreCase( envelope.getRecipient() ) )
+            {
+                notificationExecutor.execute( new MessageNotifier( listener, message ) );
+            }
         }
     }
 

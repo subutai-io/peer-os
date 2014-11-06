@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.metric.impl;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,6 +14,7 @@ import javax.sql.DataSource;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
@@ -29,19 +31,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 import com.google.gson.JsonSyntaxException;
 
 
 /**
  * Implementation of Monitor
- *
- * TODO subscribe to message queue (once implemented) for getting remote alerts
  */
 public class MonitorImpl implements Monitor
 {
+    private static final String ENVIRONMENT_IS_NULL_MSG = "Environment is null";
+    private static final String METRIC_IS_NULL_MSG = "Metric listener is null";
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class.getName() );
-    //max length of subscriber id to store in database varchar(100) field
-    private static final int MAX_SUBSCRIBER_ID_LEN = 100;
+
     //set of metric subscribers
     protected Set<MetricListener> metricListeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MetricListener, Boolean>() );
@@ -59,45 +61,147 @@ public class MonitorImpl implements Monitor
 
         this.monitorDao = new MonitorDao( dataSource );
         this.peerManager = peerManager;
+        peerManager.addRequestListener( new RemoteAlertListener( this ) );
+        peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
     }
 
 
     @Override
     public Set<ContainerHostMetric> getContainerMetrics( final Environment environment ) throws MonitorException
     {
-        Preconditions.checkNotNull( environment, "Environment is null" );
+        Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
 
         Set<ContainerHostMetric> metrics = new HashSet<>();
+
+        //obtain environment containers
+        Set<ContainerHost> containerHosts = environment.getContainers();
+
+        Set<Peer> peers = Sets.newHashSet();
+
+        //determine container peers
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            try
+            {
+                peers.add( containerHost.getPeer() );
+            }
+            catch ( PeerException e )
+            {
+                LOG.warn( String.format( "Could not obtain peer for container %s", containerHost.getHostname() ), e );
+            }
+        }
+
+        //send metric requests to target peers
+        for ( Peer peer : peers )
+        {
+            if ( peer.isLocal() )
+            {
+                //dispatch locally
+                metrics.addAll( getLocalContainerHostMetrics( environment.getId() ) );
+            }
+            else
+            {
+                //send remote request
+                metrics.addAll( getRemoteContainerHostsMetrics( environment.getId(), peer ) );
+            }
+        }
+
+        return metrics;
+    }
+
+
+    protected Set<ContainerHostMetricImpl> getRemoteContainerHostsMetrics( UUID environmentId, Peer peer )
+    {
+        Set<ContainerHostMetricImpl> metrics = Sets.newHashSet();
         try
         {
+            //create request for metrics
+            ContainerHostMetricRequest request = new ContainerHostMetricRequest( environmentId );
 
-            Set<ContainerHost> containerHosts = environment.getContainerHosts();
-            //iterate containers within the environment and get their metrics
-            for ( ContainerHost containerHost : containerHosts )
+            //send request and obtain metrics
+            ContainerHostMetricResponse response =
+                    peer.sendRequest( request, RecipientType.METRIC_REQUEST_RECIPIENT.name(),
+                            Constants.METRIC_REQUEST_TIMEOUT, ContainerHostMetricResponse.class );
+
+            //if response contains metrics, add them to result
+            if ( response != null && !CollectionUtil.isCollectionEmpty( response.getMetrics() ) )
             {
-                CommandResult result = containerHost
-                        .execute( commands.getReadContainerHostMetricCommand( containerHost.getHostname() ) );
+                metrics.addAll( response.getMetrics() );
+            }
+        }
+        catch ( PeerException e )
+        {
+            LOG.warn( String.format( "Error obtaining metrics from peer %s", peer.getName() ), e );
+        }
+        return metrics;
+    }
+
+
+    protected Set<ContainerHostMetricImpl> getLocalContainerHostMetrics( UUID environmentId )
+    {
+
+        Set<ContainerHostMetricImpl> metrics = Sets.newHashSet();
+        try
+        {
+            //obtain environment containers
+            Set<ContainerHost> localContainers =
+                    peerManager.getLocalPeer().getContainerHostsByEnvironmentId( environmentId );
+
+            for ( ContainerHost localContainer : localContainers )
+            {
+                try
+                {
+                    //get container's resource host
+                    ResourceHost resourceHost =
+                            peerManager.getLocalPeer().getResourceHostByName( localContainer.getParentHostname() );
+                    getContainerMetrics( environmentId, resourceHost, localContainer, metrics );
+                }
+                catch ( PeerException e )
+                {
+                    LOG.error( "Error in getLocalContainerHostMetrics", e );
+                }
+            }
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( "Error in getLocalContainerHostMetrics", e );
+        }
+        return metrics;
+    }
+
+
+    protected void getContainerMetrics( final UUID environmentId, final ResourceHost resourceHost,
+                                        final ContainerHost localContainer, Set<ContainerHostMetricImpl> metrics )
+    {
+        if ( resourceHost != null )
+        {
+            try
+            {
+                //execute metrics command
+                CommandResult result = resourceHost
+                        .execute( commands.getReadContainerHostMetricCommand( localContainer.getHostname() ) );
                 if ( result.hasSucceeded() )
                 {
                     ContainerHostMetricImpl metric =
                             JsonUtil.fromJson( result.getStdOut(), ContainerHostMetricImpl.class );
-                    metric.setEnvironmentId( environment.getId() );
+                    metric.setEnvironmentId( environmentId );
                     metrics.add( metric );
                 }
                 else
                 {
-                    throw new MonitorException(
-                            String.format( "Could not get metrics from %s : %s", containerHost.getHostname(),
-                                    result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
+                    LOG.warn( String.format( "Error getting metrics from %s: %s", localContainer.getHostname(),
+                            result.getStdErr() ) );
                 }
             }
+            catch ( CommandException | JsonSyntaxException e )
+            {
+                LOG.error( "Error in getContainerMetrics", e );
+            }
         }
-        catch ( CommandException | JsonSyntaxException e )
+        else
         {
-            LOG.error( "Error in getContainerMetrics", e );
-            throw new MonitorException( e );
+            LOG.warn( String.format( "Could not find resource host %s", localContainer.getParentHostname() ) );
         }
-        return metrics;
     }
 
 
@@ -112,24 +216,10 @@ public class MonitorImpl implements Monitor
             //iterate resource hosts and get their metrics
             for ( ResourceHost resourceHost : resourceHosts )
             {
-                CommandResult result = resourceHost.execute( commands.getReadResourceHostMetricCommand() );
-                if ( result.hasSucceeded() )
-                {
-                    ResourceHostMetricImpl metric =
-                            JsonUtil.fromJson( result.getStdOut(), ResourceHostMetricImpl.class );
-                    //set peer id for future reference
-                    metric.setPeerId( peerManager.getLocalPeer().getId() );
-                    metrics.add( metric );
-                }
-                else
-                {
-                    throw new MonitorException(
-                            String.format( "Could not get metrics from %s : %s", resourceHost.getHostname(),
-                                    result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
-                }
+                getResourceMetrics( resourceHost, metrics );
             }
         }
-        catch ( CommandException | PeerException | JsonSyntaxException e )
+        catch ( PeerException e )
         {
             LOG.error( "Error in getResourceHostMetrics", e );
             throw new MonitorException( e );
@@ -139,17 +229,42 @@ public class MonitorImpl implements Monitor
     }
 
 
+    protected void getResourceMetrics( ResourceHost resourceHost, Set<ResourceHostMetric> metrics )
+    {
+        try
+        {
+            CommandResult result = resourceHost.execute( commands.getReadResourceHostMetricCommand() );
+            if ( result.hasSucceeded() )
+            {
+                ResourceHostMetricImpl metric = JsonUtil.fromJson( result.getStdOut(), ResourceHostMetricImpl.class );
+                //set peer id for future reference
+                metric.setPeerId( peerManager.getLocalPeer().getId() );
+                metrics.add( metric );
+            }
+            else
+            {
+                LOG.warn( String.format( "Error getting metrics from %s: %s", resourceHost.getHostname(),
+                        result.getStdErr() ) );
+            }
+        }
+        catch ( CommandException | JsonSyntaxException e )
+        {
+            LOG.error( "Error in getResourceMetrics", e );
+        }
+    }
+
+
     @Override
     public void startMonitoring( final MetricListener metricListener, final Environment environment )
             throws MonitorException
     {
-        Preconditions.checkNotNull( metricListener, "Metric listener is null" );
-        Preconditions.checkNotNull( environment, "Environment is null" );
+        Preconditions.checkNotNull( metricListener, METRIC_IS_NULL_MSG );
+        Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
         //make sure subscriber id is truncated to 100 characters
         String subscriberId = metricListener.getSubscriberId();
-        if ( subscriberId.length() > MAX_SUBSCRIBER_ID_LEN )
+        if ( subscriberId.length() > Constants.MAX_SUBSCRIBER_ID_LEN )
         {
-            subscriberId = subscriberId.substring( 0, MAX_SUBSCRIBER_ID_LEN );
+            subscriberId = subscriberId.substring( 0, Constants.MAX_SUBSCRIBER_ID_LEN );
         }
         //save subscription to database
         try
@@ -168,13 +283,13 @@ public class MonitorImpl implements Monitor
     public void stopMonitoring( final MetricListener metricListener, final Environment environment )
             throws MonitorException
     {
-        Preconditions.checkNotNull( metricListener, "Metric listener is null" );
-        Preconditions.checkNotNull( environment, "Environment is null" );
+        Preconditions.checkNotNull( metricListener, METRIC_IS_NULL_MSG );
+        Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
         //make sure subscriber id is truncated to 100 characters
         String subscriberId = metricListener.getSubscriberId();
-        if ( subscriberId.length() > MAX_SUBSCRIBER_ID_LEN )
+        if ( subscriberId.length() > Constants.MAX_SUBSCRIBER_ID_LEN )
         {
-            subscriberId = subscriberId.substring( 0, MAX_SUBSCRIBER_ID_LEN );
+            subscriberId = subscriberId.substring( 0, Constants.MAX_SUBSCRIBER_ID_LEN );
         }
         //remove subscription from database
         try
@@ -206,24 +321,28 @@ public class MonitorImpl implements Monitor
             //find associated container host
             ContainerHost containerHost =
                     peerManager.getLocalPeer().getContainerHostByName( containerHostMetric.getHost() );
-            //set metric's environment id for future reference on the receiving end
-            containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
-
-            //find container's owner peer
-            Peer ownerPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
-
-            //if container is "owned" by local peer, alert local peer
-            if ( peerManager.getLocalPeer().getId().compareTo( ownerPeer.getId() ) == 0 )
+            if ( containerHost != null )
             {
-                alertThresholdExcess( containerHostMetric );
-            }
-            //send metric to owner peer
-            else
-            {
-                //TODO send alert to ownerPeer once message queue is implemented
+                //set metric's environment id for future reference on the receiving end
+                containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
+
+                //find container's owner peer
+                Peer ownerPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
+
+                //if container is "owned" by local peer, alert local peer
+                if ( ownerPeer.isLocal() )
+                {
+                    alertThresholdExcess( containerHostMetric );
+                }
+                //send metric to owner peer
+                else
+                {
+                    ownerPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
+                            Constants.ALERT_TIMEOUT );
+                }
             }
         }
-        catch ( PeerException | RuntimeException e )
+        catch ( PeerException | JsonSyntaxException e )
         {
             LOG.error( "Error in alertThresholdExcess", e );
             throw new MonitorException( e );
@@ -233,9 +352,7 @@ public class MonitorImpl implements Monitor
 
     /**
      * This methods is called by REST endpoint when a remote peer sends an alert from one of its hosted containers
-     * belonging to this peer
-     *
-     * TODO call this method once remote alert arrives
+     * belonging to this peer or when local "own" container is under stress
      *
      * @param metric - {@code ContainerHostMetric} metric of the host where thresholds are being exceeded
      */
@@ -288,6 +405,7 @@ public class MonitorImpl implements Monitor
             metricListeners.add( metricListener );
         }
     }
+
 
     @Override
     public void removeMetricListener( MetricListener metricListener )

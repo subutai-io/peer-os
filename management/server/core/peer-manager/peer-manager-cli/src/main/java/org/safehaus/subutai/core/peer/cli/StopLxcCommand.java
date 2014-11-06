@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.peer.cli;
 
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Argument;
@@ -10,7 +11,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "peer", name = "stop-lxc")
+@Command( scope = "peer", name = "stop-container" )
 public class StopLxcCommand extends OsgiCommandSupport
 {
 
@@ -23,7 +24,7 @@ public class StopLxcCommand extends OsgiCommandSupport
     }
 
 
-    @Argument(index = 0, name = "hostname", multiValued = false, description = "LXC name")
+    @Argument( index = 0, name = "hostname", multiValued = false, description = "LXC name" )
     private String hostname;
 
 
@@ -37,11 +38,18 @@ public class StopLxcCommand extends OsgiCommandSupport
 
         if ( host == null )
         {
-            System.out.println( "LXC not found." );
+            System.out.println( "Container not found." );
         }
 
-        boolean result = localPeer.stopContainer( host );
-        System.out.println( String.format( "%s", result ? "LXC stopped successfully" : "Could not stop LXC" ) );
+        try
+        {
+            localPeer.stopContainer( host );
+            System.out.println( "Container stopped successfully" );
+        }
+        catch ( PeerException e )
+        {
+            System.out.println( "Could not stop container. Error occurred: " + e.toString() );
+        }
         return null;
     }
 }

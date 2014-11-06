@@ -26,12 +26,6 @@ public interface RestService
     @Consumes(MediaType.TEXT_PLAIN)
     public PeerInfo registerPeer( @QueryParam("peer") String peer );
 
-    //    @POST
-    //    @Path("containers")
-    //    @Produces(MediaType.APPLICATION_JSON)
-    //    @Consumes(MediaType.TEXT_PLAIN)
-    //    public String createContainers( String createContainersMsg );
-    //
 
     @GET
     @Path("containers/format")
@@ -46,25 +40,8 @@ public interface RestService
 
     @GET
     @Path("id")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces("text/plain")
     public String getId();
-
-
-    @POST
-    @Path("message")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response processMessage( @FormParam("peerId") String peerId, @FormParam("recipient") String recipient,
-                                    @FormParam("message") String message );
-
-    @GET
-    @Path("agents")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getConnectedAgents( @QueryParam("envId") String environmentId );
-
-    @POST
-    @Path("invoke")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response invoke( @FormParam("commandType") String commandType, @FormParam("command") String command );
 
 
     @POST
@@ -77,9 +54,40 @@ public interface RestService
                                       @FormParam("criteria") String criteria );
 
     @POST
-    @Path( "execute" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response execute( @FormParam( "requestBuilder" ) String requestBuilder, @FormParam( "host" ) String host );
+    @Path("container/destroy")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response destroyContainer( @FormParam("host") String host );
+
+    @POST
+    @Path("container/start")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response startContainer( @FormParam("host") String host );
+
+    @POST
+    @Path("container/stop")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response stopContainer( @FormParam("host") String host );
+
+    @POST
+    @Path("container/isconnected")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response isContainerConnected( @FormParam("host") String host );
+
+
+    @POST
+    @Path("template/get")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTemplate( @FormParam("templateName") String templateName );
+
+    @POST
+    @Path("execute")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response execute( @FormParam("requestBuilder") String requestBuilder, @FormParam("host") String host );
+
+    @POST
+    @Path("environment/containers")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response environmentContainers( @FormParam("environmentId") String envId );
 
     @GET
     @Path("ping")

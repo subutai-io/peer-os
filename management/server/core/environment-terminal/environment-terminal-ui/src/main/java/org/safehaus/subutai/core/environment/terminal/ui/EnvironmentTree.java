@@ -1,10 +1,8 @@
 package org.safehaus.subutai.core.environment.terminal.ui;
 
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -13,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-//import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.server.ui.component.ConcurrentComponent;
 import org.slf4j.Logger;
@@ -32,6 +29,8 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.UI;
+
+//import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 
 
 /**
@@ -62,8 +61,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 LOG.info( "Refreshing containers state..." );
                 if ( environment != null )
                 {
-                    Set<ContainerHost> containers = environmentManager.getConnectedContainers( environment );
-                    refreshContainers( containers );
+                    refreshContainers();
                 }
                 LOG.info( "Refreshing done." );
             }
@@ -161,26 +159,20 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         tree.removeAllItems();
         if ( environment != null )
         {
-            Set<String> peers = new HashSet<>();
-
-            for ( ContainerHost ec : environment.getContainers() )
-            {
-                peers.add( ec.getPeerId().toString() );
-            }
 
             for ( ContainerHost ec : environment.getContainers() )
             {
                 //TODO: remove next line when persistent API is JPA
                 ec.setEnvironmentId( environment.getId() );
                 String peerId = ec.getPeerId().toString();
-                String itemId = peerId + ":" + ec.getCreatorPeerId();
+                String itemId = peerId + ":" + ec.getId();
 
                 Item peer = container.getItem( peerId );
                 if ( peer == null )
                 {
                     peer = container.addItem( peerId );
                     container.setChildrenAllowed( peerId, true );
-                    tree.setItemCaption( itemId, peerId.toString() );
+                    tree.setItemCaption( itemId, peerId );
                     peer.getItemProperty( "value" ).setValue( null );
                 }
                 Item item = container.addItem( itemId );
@@ -205,37 +197,23 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
     }
 
 
-    private void refreshContainers( final Set<ContainerHost> freshContainers )
+    private void refreshContainers()
     {
-
-        if ( freshContainers == null || freshContainers.size() < 1 )
-        {
-            return;
-        }
-
-        List<String> agentIdList = new ArrayList<>();
-        for ( ContainerHost container : freshContainers )
-        {
-
-            agentIdList.add( String
-                    .format( "%s:%s", container.getPeerId().toString(), container.getCreatorPeerId().toString() ) );
-        }
-
         for ( Object itemObj : container.getItemIds() )
         {
             String itemId = ( String ) itemObj;
             if ( itemId.indexOf( ':' ) < 0 )
             {
-                continue;    // peer
+                continue;
             }
-            if ( agentIdList.contains( itemId ) )
+            Item item = container.getItem( itemId );
+            Object o = item.getItemProperty( "value" ).getValue();
+            if ( ( o instanceof ContainerHost ) && ( ( ( ContainerHost ) o ).isConnected() ) )
             {
-                Item item = container.getItem( itemId );
                 item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
             }
             else
             {
-                Item item = container.getItem( itemId );
                 item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual-stopped.png" ) );
             }
         }

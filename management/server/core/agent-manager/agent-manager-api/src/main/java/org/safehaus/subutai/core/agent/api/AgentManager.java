@@ -87,6 +87,7 @@ public interface AgentManager
      *
      * @return set of agents
      */
+    @Deprecated
     public Set<Agent> getAgentsByEnvironmentId( UUID environmentId );
 
     /**
