@@ -87,6 +87,9 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
             case STATUS:
                 runOperationOnContainers( OperationType.STATUS );
                 break;
+            case DECOMISSION:
+                runOperationOnContainers( OperationType.DECOMISSION );
+                break;
         }
     }
 
@@ -115,12 +118,6 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                         case JOBTRACKER:
                             result = jobtracker.execute( new RequestBuilder( Commands.getStartJobTrackerCommand() ) );
                             break;
-                        //                        case SECONDARY_NAMENODE:
-                        //                            break;
-                        //                        case DATANODE:
-                        //                            break;
-                        //                        case TASKTRACKER:
-                        //                            break;
                     }
                     logStatusResults( trackerOperation, result, nodeType );
                     break;
@@ -133,12 +130,6 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                         case JOBTRACKER:
                             result = jobtracker.execute( new RequestBuilder( Commands.getStopJobTrackerCommand() ) );
                             break;
-                        //                        case SECONDARY_NAMENODE:
-                        //                            break;
-                        //                        case DATANODE:
-                        //                            break;
-                        //                        case TASKTRACKER:
-                        //                            break;
                     }
                     logStatusResults( trackerOperation, result, nodeType );
                     break;
@@ -155,12 +146,12 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                             result = secondaryNameNode
                                     .execute( new RequestBuilder( Commands.getStatusNameNodeCommand() ) );
                             break;
-                        //                        case DATANODE:
-                        //                            break;
-                        //                        case TASKTRACKER:
-                        //                            break;
                     }
                     logStatusResults( trackerOperation, result, nodeType );
+                    break;
+                case DECOMISSION:
+                    result = namenode.execute( new RequestBuilder( Commands.getReportHadoopCommand() ) );
+                    logStatusResults( trackerOperation, result, NodeType.NAMENODE );
                     break;
             }
         }
@@ -257,34 +248,9 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                             }
                         }
                         break;
-                    //                    case SLAVE_NODE:
-                    //                        if ( status.contains( "DataNode" ) )
-                    //                        {
-                    //                            String temp = status.replaceAll( "DataNode is ", "" );
-                    //                            if ( temp.toLowerCase().contains( "not" ) )
-                    //                            {
-                    //                                nodeState = NodeState.STOPPED;
-                    //                            }
-                    //                            else
-                    //                            {
-                    //                                nodeState = NodeState.RUNNING;
-                    //                            }
-                    //                            break;
-                    //                        }
-                    //                        else if ( status.contains( "TaskTracker" ) )
-                    //                        {
-                    //                            String temp = status.replaceAll( "TaskTracker is ", "" );
-                    //                            if ( temp.toLowerCase().contains( "not" ) )
-                    //                            {
-                    //                                nodeState = NodeState.STOPPED;
-                    //                            }
-                    //                            else
-                    //                            {
-                    //                                nodeState = NodeState.RUNNING;
-                    //                            }
-                    //                            break;
-                    //                        }
-                    //                        break;
+                    default:
+                        trackerOperation.addLog( result.getStdOut() );
+                        break;
                 }
             }
         }

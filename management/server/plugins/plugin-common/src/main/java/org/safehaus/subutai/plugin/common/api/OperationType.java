@@ -11,5 +11,6 @@ public enum OperationType
     INSTALL,
     UNINSTALL,
     EXCLUDE,
-    INCLUDE
+    INCLUDE,
+    DECOMISSION
 }

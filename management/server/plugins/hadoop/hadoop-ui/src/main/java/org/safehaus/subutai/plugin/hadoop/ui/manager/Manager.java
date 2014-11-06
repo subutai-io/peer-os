@@ -834,6 +834,12 @@ public class Manager
     }
 
 
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
+    }
+
+
     public synchronized int getProcessCount()
     {
         return processCount;

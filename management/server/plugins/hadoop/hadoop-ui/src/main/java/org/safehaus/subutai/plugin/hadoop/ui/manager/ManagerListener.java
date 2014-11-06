@@ -26,7 +26,10 @@ import java.util.UUID;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hadoop.api.NodeOperationTask;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.ui.manager.components.CheckDecommissionStatusTask;
 import org.safehaus.subutai.plugin.hadoop.ui.manager.components.CheckTask;
@@ -458,6 +461,10 @@ public class ManagerListener
     protected Button.ClickListener jobTrackerStartStopButtonListener( final Item row )
     {
         final Agent agent = hadoopManager.getAgentByRow( row );
+        final ContainerHost containerHost = hadoopManager.getEnvironmentManager().
+                getEnvironmentByUUID( hadoopManager.getHadoopCluster().getEnvironmentId() ).getContainerHostByUUID(
+                agent.getUuid() );
+        final String clusterName = hadoopManager.getHadoopCluster().getClusterName();
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
         final Button startStopButton = hadoopManager.getStartStopButton( availableOperationsLayout );
 
@@ -473,8 +480,8 @@ public class ManagerListener
                 {
                     startStopButton.setEnabled( false );
                     hadoopManager.getExecutorService().execute(
-                            new StartTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), NodeType.JOBTRACKER,
-                                    hadoopManager.getHadoopCluster(), new CompleteEvent()
+                            new NodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
+                                                   containerHost, OperationType.START, new CompleteEvent()
                             {
                                 public void onComplete( NodeState state )
                                 {
@@ -490,7 +497,7 @@ public class ManagerListener
                                     hadoopManager.checkAllIfNoProcessRunning();
                                     startStopButton.setEnabled( true );
                                 }
-                            }, null, agent ) );
+                            }, null ) );
                 }
                 else
                 {
@@ -841,7 +848,6 @@ public class ManagerListener
                         hadoopManager.getHadoopCluster(),
                         new org.safehaus.subutai.plugin.hadoop.ui.manager.components.CompleteEvent()
                         {
-
                             public void onComplete( String operationLog )
                             {
                                 hadoopManager.setDecommissionStatus( operationLog );

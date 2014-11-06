@@ -447,7 +447,7 @@ public class HadoopImpl implements Hadoop
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
         AbstractOperationHandler operationHandler =
-                new CheckDecommissionStatusOperationHandler( this, hadoopClusterConfig.getClusterName() );
+                new ClusterOperationHandler( this, hadoopClusterConfig, OperationType.DECOMISSION, null );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
