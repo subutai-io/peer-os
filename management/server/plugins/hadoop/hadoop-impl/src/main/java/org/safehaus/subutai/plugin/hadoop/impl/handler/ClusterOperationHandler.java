@@ -254,34 +254,34 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                             }
                         }
                         break;
-                    case SLAVE_NODE:
-                        if ( status.contains( "DataNode" ) )
-                        {
-                            String temp = status.replaceAll( "DataNode is ", "" );
-                            if ( temp.toLowerCase().contains( "not" ) )
-                            {
-                                nodeState = NodeState.STOPPED;
-                            }
-                            else
-                            {
-                                nodeState = NodeState.RUNNING;
-                            }
-                            break;
-                        }
-                        else if ( status.contains( "TaskTracker" ) )
-                        {
-                            String temp = status.replaceAll( "TaskTracker is ", "" );
-                            if ( temp.toLowerCase().contains( "not" ) )
-                            {
-                                nodeState = NodeState.STOPPED;
-                            }
-                            else
-                            {
-                                nodeState = NodeState.RUNNING;
-                            }
-                            break;
-                        }
-                        break;
+//                    case SLAVE_NODE:
+//                        if ( status.contains( "DataNode" ) )
+//                        {
+//                            String temp = status.replaceAll( "DataNode is ", "" );
+//                            if ( temp.toLowerCase().contains( "not" ) )
+//                            {
+//                                nodeState = NodeState.STOPPED;
+//                            }
+//                            else
+//                            {
+//                                nodeState = NodeState.RUNNING;
+//                            }
+//                            break;
+//                        }
+//                        else if ( status.contains( "TaskTracker" ) )
+//                        {
+//                            String temp = status.replaceAll( "TaskTracker is ", "" );
+//                            if ( temp.toLowerCase().contains( "not" ) )
+//                            {
+//                                nodeState = NodeState.STOPPED;
+//                            }
+//                            else
+//                            {
+//                                nodeState = NodeState.RUNNING;
+//                            }
+//                            break;
+//                        }
+//                        break;
                 }
             }
         }

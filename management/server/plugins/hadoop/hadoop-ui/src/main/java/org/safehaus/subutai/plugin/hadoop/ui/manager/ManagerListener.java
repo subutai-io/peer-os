@@ -710,7 +710,7 @@ public class ManagerListener
             {
 
                 if ( hadoopManager.getHadoop().getCluster( hadoopManager.getHadoopCluster().getClusterName() )
-                                  .getBlockedAgents().contains( agent ) )
+                                  .getBlockedAgentUUIDs().contains( agent.getUuid() ) )
                 {
                     excludeIncludeNodeButton.setCaption( Manager.INCLUDE_BUTTON_CAPTION );
                 }
