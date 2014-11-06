@@ -20,9 +20,8 @@ public class PigConfig implements ConfigBase
     private String clusterName = "";
     private SetupType setupType;
     private String hadoopClusterName;
-    private Set<ContainerHost> nodes = new HashSet<>();
-    private Set<UUID> agentNodes = new HashSet<>();
-    private Set<ContainerHost> hadoopNodes = new HashSet<>();
+    private Set<UUID> nodes = new HashSet<>();
+    private Set<UUID> hadoopNodes = new HashSet<>();
     private UUID environmentId;
 
 
@@ -53,13 +52,13 @@ public class PigConfig implements ConfigBase
     }
 
 
-    public Set<ContainerHost> getNodes()
+    public Set<UUID> getNodes()
     {
         return nodes;
     }
 
 
-    public void setNodes( Set<ContainerHost> nodes )
+    public void setNodes( Set<UUID> nodes )
     {
         this.nodes = nodes;
     }
@@ -96,13 +95,13 @@ public class PigConfig implements ConfigBase
         this.clusterName = hadoopClusterName;
     }
 
-    public Set<ContainerHost> getHadoopNodes()
+    public Set<UUID> getHadoopNodes()
     {
         return hadoopNodes;
     }
 
 
-    public void setHadoopNodes( final Set<ContainerHost> hadoopNodes )
+    public void setHadoopNodes( final Set<UUID> hadoopNodes )
     {
         this.hadoopNodes = hadoopNodes;
     }
@@ -117,21 +116,5 @@ public class PigConfig implements ConfigBase
     public void setEnvironmentId( final UUID environmentId )
     {
         this.environmentId = environmentId;
-    }
-
-
-    public Set<UUID> getAgentNodes()
-    {
-        for( ContainerHost host : getNodes())
-        {
-            agentNodes.add( host.getAgent().getUuid() );
-        }
-        return agentNodes;
-    }
-
-
-    public void setAgentNodes( final Set<UUID> agentNodes )
-    {
-        this.agentNodes = agentNodes;
     }
 }

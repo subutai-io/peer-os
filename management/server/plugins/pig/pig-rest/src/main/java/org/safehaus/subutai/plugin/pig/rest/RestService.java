@@ -63,7 +63,7 @@ public class RestService
             {
                 nodes.add( UUID.fromString( hostname ) );
             }
-            pigConfig.setAgentNodes( nodes );
+            pigConfig.setNodes( nodes );
         }
 
         UUID uuid = pigManager.installCluster( pigConfig );

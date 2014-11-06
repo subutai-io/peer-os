@@ -15,7 +15,6 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
@@ -28,10 +27,12 @@ import com.google.common.base.Strings;
 class OverHadoopSetupStrategy extends PigSetupStrategy
 {
     private static final Logger LOG = LoggerFactory.getLogger( OverHadoopSetupStrategy.class.getName() );
+    private Environment environment;
 
-    public OverHadoopSetupStrategy( PigImpl manager, PigConfig config, TrackerOperation po )
+    public OverHadoopSetupStrategy( PigImpl manager, PigConfig config, TrackerOperation po, Environment environment )
     {
         super( manager, config, po );
+        this.environment = environment;
     }
 
 
@@ -52,16 +53,19 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
                             config.getClusterName() ) );
         }
 
-        // Check if node agent is connected
-        for ( Iterator<ContainerHost> it = config.getNodes().iterator(); it.hasNext(); )
-        {
-            ContainerHost host = it.next();
 
-            if (  host.getHostname() == null )
+        // Check if node agent is connected
+        for ( Iterator<UUID> it = config.getNodes().iterator(); it.hasNext(); )
+        {
+            UUID containerUUID = it.next();
+
+            ContainerHost containerHost = environment.getContainerHostByUUID( containerUUID );
+
+            if (  containerHost.getHostname() == null )
             {
                 trackerOperation.addLog(
                         String.format( "Node %s is not connected. Omitting this node from installation",
-                                host.getHostname() ) );
+                                containerHost.getHostname() ) );
                 it.remove();
             }
         }
@@ -76,34 +80,28 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
         // Check installed packages
         trackerOperation.addLog( "Installing Pig..." );
 
-        Map<ContainerHost, CommandResult> hostResult = new HashMap<>();
-        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+        Map<UUID, CommandResult> hostResult = new HashMap<>();
         for ( ContainerHost host : environment.getContainers() )
         {
-            try
-            {
-                CommandResult result = host.execute( new RequestBuilder( Commands.checkCommand ) );
-                hostResult.put( host, result );
+                CommandResult result = executeCommand( host, Commands.checkCommand );
+                hostResult.put( host.getAgent().getUuid(), result );
                 if ( !result.hasSucceeded() )
                 {
                     throw new ClusterSetupException( "Failed to check presence of installed packages\nInstallation aborted" );
                 }
-            }
-            catch ( CommandException e )
-            {
-                LOG.error( e.getMessage(), e );
-            }
+
         }
-        for ( Iterator<ContainerHost> it = config.getNodes().iterator(); it.hasNext(); )
+        for ( Iterator<UUID> it = config.getNodes().iterator(); it.hasNext(); )
         {
-            ContainerHost host = it.next();
-            CommandResult result = hostResult.get( host );
+            UUID containerUUID = it.next();
+            CommandResult result = hostResult.get( containerUUID );
+            String hostName = environment.getContainerHostByUUID( containerUUID ).getHostname();
 
             if ( result.getStdOut().contains( PigConfig.PRODUCT_PACKAGE ) )
             {
                 trackerOperation.addLog(
                         String.format( "Node %s already has Pig installed. Omitting this node from installation",
-                                host.getHostname() ));
+                                hostName ));
                 it.remove();
             }
         }
@@ -113,12 +111,13 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
             throw new ClusterSetupException( "No nodes eligible for installation. Operation aborted" );
         }
 
-        for ( Iterator<ContainerHost> it = config.getNodes().iterator(); it.hasNext(); )
+
+        for ( Iterator<UUID> it = config.getNodes().iterator(); it.hasNext(); )
         {
-            ContainerHost host = it.next();
-            try
-            {
-                CommandResult result = host.execute( new RequestBuilder( Commands.installCommand ) );
+            UUID containerUUID = it.next();
+            ContainerHost host = environment.getContainerHostByUUID( containerUUID );
+            CommandResult result = executeCommand( host, Commands.installCommand );
+
                 if ( result.hasSucceeded() )
                 {
                     trackerOperation.addLog( "Installation succeeded" );
@@ -132,12 +131,48 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
                             .addLogFailed( String.format( "Installation failed, %s", result.getStdErr() ) );
                 }
             }
-            catch ( CommandException e )
-            {
-                LOG.error( e.getMessage(), e );
-            }
-        }
-
         return config;
     }
+
+    private CommandResult executeCommand( ContainerHost containerHost, String command )
+    {
+        CommandResult result = null;
+        try
+        {
+            result = containerHost.execute( new RequestBuilder( command ) );
+        }
+        catch ( CommandException e )
+        {
+            LOG.error( "Could not execute command correctly. ", command );
+            e.printStackTrace();
+        }
+        return result;
+    }
+    private boolean executeCommandAll( Set<UUID> nodes, Environment environment, String command )
+    {
+        boolean result = true;
+
+        try
+        {
+            for ( Iterator<UUID> it = nodes.iterator(); it.hasNext(); )
+            {
+                UUID containerUUID = it.next();
+                ContainerHost host = environment.getContainerHostByUUID( containerUUID );
+                CommandResult commandResult = host.execute( new RequestBuilder( command ) );
+                if( !commandResult.hasSucceeded())
+                {
+                    result = false;
+                    break;
+                }
+            }
+        }
+        catch ( CommandException e )
+        {
+            LOG.error( "Could not execute command correctly. ", command );
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
 }

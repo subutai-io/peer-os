@@ -64,13 +64,13 @@ public class NodeOperationTask extends AbstractNodeOperationTask implements Runn
     @Override
     public String getProductStoppedIdentifier()
     {
-        return "solr is running";
+        return "Solr is not running";
     }
 
 
     @Override
     public String getProductRunningIdentifier()
     {
-        return "solr is not running";
+        return "Solr is running";
     }
 }

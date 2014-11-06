@@ -80,10 +80,10 @@ public class SolrSetupStrategy implements ClusterSetupStrategy
                     environment.getContainers().size(), config.getNumberOfNodes() ) );
         }
 
-        Set<ContainerHost> solrNodes = new HashSet<>();
+        Set<UUID> solrNodes = new HashSet<>();
         for ( ContainerHost host : environment.getContainers() )
         {
-            solrNodes.add( host );
+            solrNodes.add( host.getAgent().getUuid() );
         }
 
         config.setNodes( solrNodes );

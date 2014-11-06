@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.pig.impl.handler;
 
 
 import java.util.Iterator;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -173,14 +174,15 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl> i
         TrackerOperation po = trackerOperation;
         po.addLog( "Uninstalling Pig..." );
 
-        for ( Iterator<ContainerHost> it = config.getNodes().iterator(); it.hasNext(); )
+        for ( Iterator<UUID> it = config.getNodes().iterator(); it.hasNext(); )
         {
-            ContainerHost host = it.next();
+            UUID containerUUID = it.next();
+            ContainerHost containerHost = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHostByUUID( containerUUID );
 
             CommandResult result = null;
             try
             {
-                result = host.execute( new RequestBuilder( Commands.uninstallCommand ) );
+                result = containerHost.execute( new RequestBuilder( Commands.uninstallCommand ) );
                 if ( !result.hasSucceeded() )
                 {
                     po.addLog( result.getStdErr() );

@@ -188,11 +188,11 @@ public class PigImpl implements Pig
     }
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, PigConfig config, TrackerOperation po )
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment env, final PigConfig config, TrackerOperation po )
     {
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            return new OverHadoopSetupStrategy( this, config, po );
+            return new OverHadoopSetupStrategy( this, config, po, env );
         }
 //        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
 //        {
