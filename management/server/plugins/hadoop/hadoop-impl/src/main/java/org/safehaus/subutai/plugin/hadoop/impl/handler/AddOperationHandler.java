@@ -91,7 +91,8 @@ public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl>
         //                else
         //                {
         //                    trackerOperation
-        //                            .addLogFailed( "Could not configure network! Please see logs\nLXC creation aborted" );
+        //                            .addLogFailed( "Could not configure network! Please see logs\nLXC creation
+        // aborted" );
         //                }
         //            }
         //        }

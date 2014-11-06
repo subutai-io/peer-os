@@ -26,7 +26,6 @@ import java.util.UUID;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.ui.manager.components.CheckDecommissionStatusTask;
@@ -285,7 +284,8 @@ public class ManagerListener
                     @Override
                     public void buttonClick( Button.ClickEvent clickEvent )
                     {
-                        UUID trackID = hadoopManager.getHadoop().destroyNode( hadoopManager.getHadoopCluster(), agent );
+                        UUID trackID = hadoopManager.getHadoop().destroyNode( hadoopManager.getHadoopCluster(),
+                                agent.getHostname() );
                         ProgressWindow window =
                                 new ProgressWindow( hadoopManager.getExecutorService(), hadoopManager.getTracker(),
                                         trackID, HadoopClusterConfig.PRODUCT_KEY );
@@ -331,8 +331,8 @@ public class ManagerListener
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
                             excludeIncludeNodeButton.setEnabled( false );
-                            UUID trackID =
-                                    hadoopManager.getHadoop().includeNode( hadoopManager.getHadoopCluster(), agent );
+                            UUID trackID = hadoopManager.getHadoop().includeNode( hadoopManager.getHadoopCluster(),
+                                    agent.getHostname() );
                             ProgressWindow window =
                                     new ProgressWindow( hadoopManager.getExecutorService(), hadoopManager.getTracker(),
                                             trackID, HadoopClusterConfig.PRODUCT_KEY );
@@ -361,8 +361,8 @@ public class ManagerListener
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
                             excludeIncludeNodeButton.setEnabled( false );
-                            UUID trackID =
-                                    hadoopManager.getHadoop().excludeNode( hadoopManager.getHadoopCluster(), agent );
+                            UUID trackID = hadoopManager.getHadoop().excludeNode( hadoopManager.getHadoopCluster(),
+                                    agent.getHostname() );
                             ProgressWindow window =
                                     new ProgressWindow( hadoopManager.getExecutorService(), hadoopManager.getTracker(),
                                             trackID, HadoopClusterConfig.PRODUCT_KEY );
@@ -695,7 +695,6 @@ public class ManagerListener
     {
         final Agent agent = hadoopManager.getAgentByRow( row );
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
-        final ContainerHost containerHost = hadoopManager.getHadoopCluster().getNode( agent );
         final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );
         final Button checkButton = hadoopManager.getCheckButton( availableOperationsLayout );
         final Button excludeIncludeNodeButton = hadoopManager.getExcludeIncludeButton( availableOperationsLayout );
@@ -710,7 +709,7 @@ public class ManagerListener
             {
 
                 if ( hadoopManager.getHadoop().getCluster( hadoopManager.getHadoopCluster().getClusterName() )
-                                  .getBlockedAgents().contains( agent ) )
+                                  .getBlockedAgentUUIDs().contains( agent.getUuid() ) )
                 {
                     excludeIncludeNodeButton.setCaption( Manager.INCLUDE_BUTTON_CAPTION );
                 }
@@ -723,7 +722,7 @@ public class ManagerListener
                 excludeIncludeNodeButton.setEnabled( false );
                 destroyButton.setEnabled( false );
                 if ( hadoopManager.getHadoop().getCluster( hadoopManager.getHadoopCluster().getClusterName() )
-                                  .isDataNode( containerHost ) )
+                                  .isDataNode( agent.getUuid() ) )
                 {
                     hadoopManager.enableProgressBar();
                     hadoopManager.getExecutorService().execute(
@@ -762,7 +761,7 @@ public class ManagerListener
                             }, null, agent ) );
                 }
                 if ( hadoopManager.getHadoop().getCluster( hadoopManager.getHadoopCluster().getClusterName() )
-                                  .isTaskTracker( containerHost ) )
+                                  .isTaskTracker( agent.getUuid() ) )
                 {
                     hadoopManager.enableProgressBar();
                     hadoopManager.getExecutorService().execute(

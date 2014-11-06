@@ -1,19 +1,22 @@
 package org.safehaus.subutai.plugin.hadoop.impl.common;
 
 
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.common.api.ClusterConfigurationInterface;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
 
-public class ClusterConfiguration
+public class ClusterConfiguration implements ClusterConfigurationInterface
 {
 
     private static final Logger LOG = Logger.getLogger( ClusterConfiguration.class.getName() );
@@ -28,60 +31,74 @@ public class ClusterConfiguration
     }
 
 
-    public void configureCluster( HadoopClusterConfig config, Environment environment )
-            throws ClusterConfigurationException, CommandException
-    {
+    public void configureCluster( ConfigBase configBase, Environment environment ) throws ClusterConfigurationException    {
+
+        HadoopClusterConfig config = ( HadoopClusterConfig ) configBase;
         Commands commands = new Commands( config );
-        po.addLog( String.format( "Configuring cluster: %s", config.getClusterName() ) );
+
+        ContainerHost namenode = environment.getContainerHostByUUID( config.getNameNode() );
+        ContainerHost jobtracker = environment.getContainerHostByUUID( config.getJobTracker() );
+        ContainerHost secondaryNameNode = environment.getContainerHostByUUID( config.getSecondaryNameNode() );
+        po.addLog( String.format( "Configuring cluster: %s", configBase.getClusterName() ) );
 
         // Clear configuration files
         for ( ContainerHost containerHost : environment.getContainers() )
         {
-            containerHost.execute( new RequestBuilder( commands.getClearMastersCommand() ) );
-            containerHost.execute( new RequestBuilder( commands.getClearSlavesCommand() ) );
+            executeCommandOnContainer( containerHost, Commands.getClearMastersCommand() );
+            executeCommandOnContainer( containerHost, Commands.getClearSlavesCommand() );
         }
 
         // Configure NameNode
         for ( ContainerHost containerHost : environment.getContainers() )
         {
-            containerHost.execute( new RequestBuilder( commands.getSetMastersCommand() ) );
+            executeCommandOnContainer( containerHost, commands.getSetMastersCommand( namenode.getHostname(), jobtracker.getHostname() ) );
         }
 
         // Configure JobTracker
-        config.getJobTracker().execute( new RequestBuilder( commands.getConfigureJobTrackerCommand() ) );
+        executeCommandOnContainer( jobtracker, commands.getConfigureJobTrackerCommand( jobtracker.getHostname() ) );
 
 
         // Configure Secondary NameNode
-        config.getNameNode().execute( new RequestBuilder( commands.getConfigureSecondaryNameNodeCommand() ) );
+        executeCommandOnContainer( namenode, commands.getConfigureSecondaryNameNodeCommand( secondaryNameNode.getHostname() ) );
 
 
         // Configure DataNodes
-        for ( ContainerHost containerHost : config.getDataNodes() )
+        for ( UUID uuid : config.getDataNodes() )
         {
-            config.getNameNode().execute(
-                    new RequestBuilder( commands.getConfigureDataNodesCommand( containerHost.getHostname() ) ) );
+            executeCommandOnContainer( namenode,
+                    commands.getConfigureDataNodesCommand( environment.getContainerHostByUUID( uuid ).getHostname() ) );
         }
 
         // Configure TaskTrackers
-        for ( ContainerHost containerHost : config.getTaskTrackers() )
+        for ( UUID uuid : config.getTaskTrackers() )
         {
-            config.getJobTracker().execute(
-                    new RequestBuilder( commands.getConfigureTaskTrackersCommand( containerHost.getHostname() ) ) );
+            executeCommandOnContainer( jobtracker, commands.getConfigureTaskTrackersCommand( environment.getContainerHostByUUID( uuid ).getHostname() ) );
         }
 
         // Format NameNode
-        config.getNameNode().execute( new RequestBuilder( commands.getFormatNameNodeCommand() ) );
+        executeCommandOnContainer( namenode, Commands.getFormatNameNodeCommand() );
 
 
         // Start Hadoop cluster
-        config.getNameNode().execute( new RequestBuilder( commands.getStartNameNodeCommand() ) );
-        config.getJobTracker().execute( new RequestBuilder( commands.getStartJobTrackerCommand() ) );
+        executeCommandOnContainer( namenode, Commands.getStartNameNodeCommand() );
+        executeCommandOnContainer( jobtracker, Commands.getStartJobTrackerCommand() );
 
 
         po.addLog( "Configuration is finished !" );
 
         config.setEnvironmentId( environment.getId() );
-        hadoopManager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        hadoopManager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, configBase.getClusterName(), configBase );
         po.addLogDone( "Hadoop cluster data saved into database" );
+    }
+
+    private void executeCommandOnContainer( ContainerHost containerHost, String command ){
+        try
+        {
+            containerHost.execute( new RequestBuilder( command ) );
+        }
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
+        }
     }
 }

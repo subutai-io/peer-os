@@ -75,11 +75,11 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
         }
 
         runCommand( host, operationType, nodeType );
-//        List<NodeType> roles = HadoopClusterConfig.getNodeRoles( config, host );
-//        for ( NodeType role : roles )
-//        {
-//            runCommand( host, operationType, role );
-//        }
+        //        List<NodeType> roles = HadoopClusterConfig.getNodeRoles( config, host );
+        //        for ( NodeType role : roles )
+        //        {
+        //            runCommand( host, operationType, role );
+        //        }
     }
 
 
@@ -106,6 +106,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
                             result = host.execute( new RequestBuilder( Commands.getStartDataNodeCommand() ) );
                             break;
                     }
+                    ClusterOperationHandler.logStatusResults( trackerOperation, result, nodeType );
                     break;
                 case STOP:
                     switch ( nodeType )
@@ -123,6 +124,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
                             result = host.execute( new RequestBuilder( Commands.getStopDataNodeCommand() ) );
                             break;
                     }
+                    ClusterOperationHandler.logStatusResults( trackerOperation, result, nodeType );
                     break;
                 case STATUS:
                     switch ( nodeType )
@@ -131,7 +133,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
                             result = host.execute( new RequestBuilder( Commands.getStatusNameNodeCommand() ) );
                             break;
                         case JOBTRACKER:
-                            result =  host.execute( new RequestBuilder( Commands.getStatusJobTrackerCommand() ) );
+                            result = host.execute( new RequestBuilder( Commands.getStatusJobTrackerCommand() ) );
                             break;
                         case SECONDARY_NAMENODE:
                             result = host.execute( new RequestBuilder( Commands.getStatusNameNodeCommand() ) );
@@ -143,6 +145,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
                             result = host.execute( new RequestBuilder( Commands.getStatusDataNodeCommand() ) );
                             break;
                     }
+                    ClusterOperationHandler.logStatusResults( trackerOperation, result, nodeType );
                     break;
                 case EXCLUDE:
                     executor.execute( new Runnable()
@@ -163,7 +166,6 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
                     } );
                     break;
             }
-            ClusterOperationHandler.logStatusResults( trackerOperation, result, nodeType );
         }
         catch ( CommandException e )
         {
@@ -172,7 +174,8 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
     }
 
 
-    private void excludeNode(){
+    private void excludeNode()
+    {
         HadoopClusterConfig config = manager.getCluster( clusterName );
         ContainerHost host = findNodeInCluster( hostname );
 
@@ -180,93 +183,43 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
         {
             // TaskTracker
             host.execute( new RequestBuilder( Commands.getRemoveTaskTrackerCommand( host.getHostname() ) ) );
-            host.execute( new RequestBuilder( Commands.getIncludeTaskTrackerCommand( host.getAgent().getListIP().get( 0 ) ) ) );
+            host.execute( new RequestBuilder(
+                    Commands.getIncludeTaskTrackerCommand( host.getAgent().getListIP().get( 0 ) ) ) );
 
             // DataNode
             host.execute( new RequestBuilder( Commands.getRemoveDataNodeCommand( host.getHostname() ) ) );
-            host.execute( new RequestBuilder( Commands.getIncludeDataNodeCommand( host.getAgent().getListIP().get( 0 ) ) ) );
+            host.execute(
+                    new RequestBuilder( Commands.getIncludeDataNodeCommand( host.getAgent().getListIP().get( 0 ) ) ) );
 
 
             // refresh NameNode and JobTracker
-            config.getNameNode().execute( new RequestBuilder( Commands.getRefreshNameNodeCommand() ) );
-            config.getJobTracker().execute( new RequestBuilder( Commands.getRefreshJobTrackerCommand() ) );
+            ContainerHost namenode = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
+                                            .getContainerHostByUUID( config.getNameNode() );
+            ContainerHost jobtracker = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
+                                              .getContainerHostByUUID( config.getJobTracker() );
 
+            namenode.execute( new RequestBuilder( Commands.getRefreshNameNodeCommand() ) );
+            jobtracker.execute( new RequestBuilder( Commands.getRefreshJobTrackerCommand() ) );
         }
         catch ( CommandException e )
         {
             trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
         }
 
-        manager.getPluginDAO()
-               .saveInfo( HadoopClusterConfig.PRODUCT_KEY, config.getClusterName(),
-                       config );
+        config.getBlockedAgents().add( host.getAgent().getUuid() );
+        manager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
         trackerOperation.addLogDone( "Cluster info saved to DB" );
     }
 
 
-    private void includeNode(){
-
-        HadoopClusterConfig config = manager.getCluster( clusterName );
-        ContainerHost host = findNodeInCluster( hostname );
-
-        try
-        {
-            /** DataNode Operations */
-            // set data node
-            config.getNameNode().execute(
-                    new RequestBuilder( Commands.getSetDataNodeCommand( host.getHostname() ) ) );
-
-            // remove data node from dfs.exclude
-            config.getNameNode().execute(
-                    new RequestBuilder( Commands.getExcludeDataNodeCommand( host.getAgent().getListIP().get( 0 ) ) ) );
-
-            // stop data node
-            host.execute( new RequestBuilder( Commands.getStopDataNodeCommand() ) );
-
-            // start data node
-            host.execute( new RequestBuilder( Commands.getStartDataNodeCommand() ) );
-
-            // refresh name node
-            config.getNameNode().execute( new RequestBuilder( Commands.getRefreshNameNodeCommand() ) );
-
-
-            /** TaskTracker Operations */
-            // set task tracker
-            config.getJobTracker().execute(
-                    new RequestBuilder( Commands.getSetTaskTrackerCommand( host.getHostname() ) ) );
-
-            // remove task tracker from dfs.exclude
-            config.getJobTracker().execute(
-                    new RequestBuilder( Commands.getExcludeTaskTrackerCommand( host.getAgent().getListIP().get( 0 ) ) ) );
-
-            // stop task tracker
-            host.execute( new RequestBuilder( Commands.getStopTaskTrackerCommand() ) );
-
-            // start task tracker
-            host.execute( new RequestBuilder( Commands.getStartTaskTrackerCommand() ) );
-
-            // refresh job tracker
-            config.getNameNode().execute( new RequestBuilder( Commands.getRefreshJobTrackerCommand() ) );
-        }
-        catch ( CommandException e )
-        {
-            trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
-        }
-
-        manager.getPluginDAO()
-               .saveInfo( HadoopClusterConfig.PRODUCT_KEY, config.getClusterName(),
-                       config );
-        trackerOperation.addLogDone( "Cluster info saved to DB" );
-    }
-
-
-    private ContainerHost findNodeInCluster( String hostname ){
+    private ContainerHost findNodeInCluster( String hostname )
+    {
         HadoopClusterConfig config = manager.getCluster( clusterName );
 
         if ( config == null )
         {
             trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
-            return null ;
+            return null;
         }
 
         if ( config.getNameNode() == null )
@@ -275,8 +228,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
             return null;
         }
 
-        Environment environment =
-                manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
         Iterator iterator = environment.getContainers().iterator();
 
         ContainerHost host = null;
@@ -295,5 +247,64 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
             return null;
         }
         return host;
+    }
+
+
+    private void includeNode()
+    {
+
+        HadoopClusterConfig config = manager.getCluster( clusterName );
+        ContainerHost host = findNodeInCluster( hostname );
+
+        try
+        {
+            ContainerHost namenode = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
+                                            .getContainerHostByUUID( config.getNameNode() );
+            ContainerHost jobtracker = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
+                                              .getContainerHostByUUID( config.getJobTracker() );
+
+            /** DataNode Operations */
+            // set data node
+            namenode.execute( new RequestBuilder( Commands.getSetDataNodeCommand( host.getHostname() ) ) );
+
+            // remove data node from dfs.exclude
+            namenode.execute(
+                    new RequestBuilder( Commands.getExcludeDataNodeCommand( host.getAgent().getListIP().get( 0 ) ) ) );
+
+            // stop data node
+            host.execute( new RequestBuilder( Commands.getStopDataNodeCommand() ) );
+
+            // start data node
+            host.execute( new RequestBuilder( Commands.getStartDataNodeCommand() ) );
+
+            // refresh name node
+            namenode.execute( new RequestBuilder( Commands.getRefreshNameNodeCommand() ) );
+
+
+            /** TaskTracker Operations */
+            // set task tracker
+            jobtracker.execute( new RequestBuilder( Commands.getSetTaskTrackerCommand( host.getHostname() ) ) );
+
+            // remove task tracker from dfs.exclude
+            jobtracker.execute( new RequestBuilder(
+                    Commands.getExcludeTaskTrackerCommand( host.getAgent().getListIP().get( 0 ) ) ) );
+
+            // stop task tracker
+            host.execute( new RequestBuilder( Commands.getStopTaskTrackerCommand() ) );
+
+            // start task tracker
+            host.execute( new RequestBuilder( Commands.getStartTaskTrackerCommand() ) );
+
+            // refresh job tracker
+            jobtracker.execute( new RequestBuilder( Commands.getRefreshJobTrackerCommand() ) );
+        }
+        catch ( CommandException e )
+        {
+            trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
+        }
+
+        config.getBlockedAgents().remove( host.getAgent().getUuid() );
+        manager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        trackerOperation.addLogDone( "Cluster info saved to DB" );
     }
 }

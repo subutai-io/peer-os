@@ -165,7 +165,7 @@ public class RestServiceImpl implements RestService
     {
         Agent agent = agentManager.getAgentByHostname( hostname );
         String operationId = JsonUtil.toJson( OPERATION_ID,
-                hadoopManager.statusDataNode( hadoopManager.getCluster( clusterName ), agent ) );
+                hadoopManager.statusDataNode( hadoopManager.getCluster( clusterName ), agent.getHostname() ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
 
@@ -175,8 +175,8 @@ public class RestServiceImpl implements RestService
     {
         Agent agent = agentManager.getAgentByHostname( hostname );
         HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( clusterName );
-        String operationId =
-                JsonUtil.toJson( OPERATION_ID, hadoopManager.statusTaskTracker( hadoopClusterConfig, agent ) );
+        String operationId = JsonUtil.toJson( OPERATION_ID,
+                hadoopManager.statusTaskTracker( hadoopClusterConfig, agent.getHostname() ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
 }
