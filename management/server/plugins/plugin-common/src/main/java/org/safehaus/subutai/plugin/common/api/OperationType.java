@@ -9,5 +9,7 @@ public enum OperationType
     STATUS,
     DESTROY,
     INSTALL,
-    UNINSTALL
+    UNINSTALL,
+    EXCLUDE,
+    INCLUDE
 }

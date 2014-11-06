@@ -20,8 +20,10 @@
     <module>hadoop</module>
     <module>pig</module>
     <module>elasticsearch</module>
-    <!--<module>accumulo</module>
-    <module>hadoop</module>
+
+    <!--
+    <module>accumulo</module>
+    <module>solr</module>
     <module>zookeeper</module>
     <module>mongodb</module>
     <module>flume</module>
@@ -39,7 +41,8 @@
     <module>hipi</module>
     <module>nutch</module>
     <module>plugin-common</module>
-    <module>jetty</module>-->
+    <module>jetty</module>
+    -->
     <module>plugin-common</module>
   </modules>
 

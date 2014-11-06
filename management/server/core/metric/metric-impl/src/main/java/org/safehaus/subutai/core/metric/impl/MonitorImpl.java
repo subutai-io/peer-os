@@ -321,22 +321,25 @@ public class MonitorImpl implements Monitor
             //find associated container host
             ContainerHost containerHost =
                     peerManager.getLocalPeer().getContainerHostByName( containerHostMetric.getHost() );
-            //set metric's environment id for future reference on the receiving end
-            containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
-
-            //find container's owner peer
-            Peer ownerPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
-
-            //if container is "owned" by local peer, alert local peer
-            if ( ownerPeer.isLocal() )
+            if ( containerHost != null )
             {
-                alertThresholdExcess( containerHostMetric );
-            }
-            //send metric to owner peer
-            else
-            {
-                ownerPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
-                        Constants.ALERT_TIMEOUT );
+                //set metric's environment id for future reference on the receiving end
+                containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
+
+                //find container's owner peer
+                Peer ownerPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
+
+                //if container is "owned" by local peer, alert local peer
+                if ( ownerPeer.isLocal() )
+                {
+                    alertThresholdExcess( containerHostMetric );
+                }
+                //send metric to owner peer
+                else
+                {
+                    ownerPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
+                            Constants.ALERT_TIMEOUT );
+                }
             }
         }
         catch ( PeerException | JsonSyntaxException e )

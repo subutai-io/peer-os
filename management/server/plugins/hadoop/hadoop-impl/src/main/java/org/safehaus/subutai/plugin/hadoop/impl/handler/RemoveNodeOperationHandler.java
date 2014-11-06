@@ -34,7 +34,8 @@ public class RemoveNodeOperationHandler extends AbstractOperationHandler<HadoopI
         //
         //        if ( hadoopClusterConfig == null )
         //        {
-        //            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+        //            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist",
+        // clusterName ) );
         //            return;
         //        }
         //
@@ -42,7 +43,8 @@ public class RemoveNodeOperationHandler extends AbstractOperationHandler<HadoopI
         //                                                                                         .contains( node ) )
         //        {
         //            trackerOperation
-        //                    .addLogFailed( String.format( "Node in %s cluster as a slave does not exist", clusterName ) );
+        //                    .addLogFailed( String.format( "Node in %s cluster as a slave does not exist",
+        // clusterName ) );
         //            return;
         //        }
         //
@@ -62,21 +64,25 @@ public class RemoveNodeOperationHandler extends AbstractOperationHandler<HadoopI
         //        manager.getCommandRunner().runCommand( excludeTaskTrackerCommand );
         //        logCommand( excludeTaskTrackerCommand, trackerOperation );
         //
-        //        Command removeDataNodeCommand = manager.getCommands().getRemoveDataNodeCommand( hadoopClusterConfig, node );
+        //        Command removeDataNodeCommand = manager.getCommands().getRemoveDataNodeCommand(
+        // hadoopClusterConfig, node );
         //        manager.getCommandRunner().runCommand( removeDataNodeCommand );
         //        logCommand( removeDataNodeCommand, trackerOperation );
         //
-        //        Command excludeDataNodeCommand = manager.getCommands().getExcludeDataNodeCommand( hadoopClusterConfig, node );
+        //        Command excludeDataNodeCommand = manager.getCommands().getExcludeDataNodeCommand(
+        // hadoopClusterConfig, node );
         //        manager.getCommandRunner().runCommand( excludeDataNodeCommand );
         //        logCommand( excludeDataNodeCommand, trackerOperation );
         //
         //
-        //        Command refreshJobTrackerCommand = manager.getCommands().getRefreshJobTrackerCommand( hadoopClusterConfig );
+        //        Command refreshJobTrackerCommand = manager.getCommands().getRefreshJobTrackerCommand(
+        // hadoopClusterConfig );
         //        manager.getCommandRunner().runCommand( refreshJobTrackerCommand );
         //        trackerOperation.addLog( refreshJobTrackerCommand.getDescription() );
         //
         //
-        //        Command refreshNameNodeCommand = manager.getCommands().getRefreshNameNodeCommand( hadoopClusterConfig );
+        //        Command refreshNameNodeCommand = manager.getCommands().getRefreshNameNodeCommand(
+        // hadoopClusterConfig );
         //        manager.getCommandRunner().runCommand( refreshNameNodeCommand );
         //        trackerOperation.addLog( refreshNameNodeCommand.getDescription() );
         //
@@ -90,13 +96,15 @@ public class RemoveNodeOperationHandler extends AbstractOperationHandler<HadoopI
         //        catch ( LxcDestroyException ex )
         //        {
         //            trackerOperation
-        //                    .addLogFailed( String.format( "Lxc container could not destroyed: %s, ", ex.getMessage() ) );
+        //                    .addLogFailed( String.format( "Lxc container could not destroyed: %s, ",
+        // ex.getMessage() ) );
         //        }
         //
         //        hadoopClusterConfig.removeNode( node );
         //
         //        manager.getPluginDAO()
-        //               .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(), hadoopClusterConfig );
+        //               .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+        // hadoopClusterConfig );
         //        trackerOperation.addLogDone( "Cluster info saved to DB" );
     }
 
