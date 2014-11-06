@@ -99,13 +99,11 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
     {
         try
         {
-            ContainerHost namenode = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
-                                            .getContainerHostByUUID( config.getNameNode() );
-            ContainerHost jobtracker = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
-                                              .getContainerHostByUUID( config.getJobTracker() );
-            ContainerHost secondaryNameNode =
-                    manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
-                           .getContainerHostByUUID( config.getSecondaryNameNode() );
+            Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+            ContainerHost namenode = environment.getContainerHostByUUID( config.getNameNode() );
+            ContainerHost jobtracker = environment.getContainerHostByUUID( config.getJobTracker() );
+            ContainerHost secondaryNameNode = environment.getContainerHostByUUID( config.getSecondaryNameNode() );
+
             CommandResult result = null;
             switch ( operationType )
             {
@@ -151,7 +149,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                     break;
                 case DECOMISSION:
                     result = namenode.execute( new RequestBuilder( Commands.getReportHadoopCommand() ) );
-                    logStatusResults( trackerOperation, result, NodeType.NAMENODE );
+                    logStatusResults( trackerOperation, result, null );
                     break;
             }
         }
@@ -173,7 +171,6 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
             {
                 switch ( nodeType )
                 {
-
                     case NAMENODE:
                         if ( status.contains( "NameNode" ) )
                         {
@@ -249,7 +246,8 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                         }
                         break;
                     default:
-                        trackerOperation.addLog( result.getStdOut() );
+
+                        trackerOperation.addLogDone( result.getStdOut() );
                         break;
                 }
             }

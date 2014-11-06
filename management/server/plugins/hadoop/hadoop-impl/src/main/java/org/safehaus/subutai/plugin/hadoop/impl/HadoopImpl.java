@@ -25,18 +25,17 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
 import org.safehaus.subutai.plugin.hadoop.impl.common.HadoopSetupStrategy;
-import org.safehaus.subutai.plugin.hadoop.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.AddOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.ClusterOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.NodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.RemoveNodeOperationHandler;
-import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.CheckDecommissionStatusOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,11 +54,8 @@ public class HadoopImpl implements Hadoop
     private ExecutorService executor;
     private EnvironmentManager environmentManager;
     private Commands commands;
-
-
     private PluginDAO pluginDAO;
     private DataSource dataSource;
-
 
     public HadoopImpl( DataSource dataSource )
     {

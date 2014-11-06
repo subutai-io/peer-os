@@ -765,7 +765,6 @@ public class ManagerListener
                                         excludeIncludeNodeButton.setEnabled( false );
                                     }
 
-
                                     if ( hadoopManager.getCheckAllButton().isEnabled() )
                                     {
                                         checkDecommissioningStatus( row, checkButton );
@@ -825,7 +824,6 @@ public class ManagerListener
         if ( agent != null )
         {
             statusDecommission.setValue( Manager.DECOMMISSION_STATUS_CAPTION + hadoopManager
-
                     .getDecommissionStatus( hadoopManager.getDecommissionStatus(), agent ) );
             checkButton.setEnabled( true );
             destroyButton.setEnabled( true );
