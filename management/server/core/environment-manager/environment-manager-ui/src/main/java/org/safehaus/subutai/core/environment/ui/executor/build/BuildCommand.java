@@ -30,7 +30,7 @@ public class BuildCommand implements BuildProcessCommand
     {
         try
         {
-            environmentManager.buildEnvironmentNew( environmentBuildProcess );
+            environmentManager.buildEnvironment( environmentBuildProcess );
         }
         catch ( EnvironmentBuildException e )
         {

@@ -71,7 +71,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private static final String PROCESS = "PROCESS";
     private static final String BLUEPRINT = "BLUEPRINT";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    EnvironmentBuilder environmentBuilder;
+    private EnvironmentBuilder environmentBuilder;
     private PeerManager peerManager;
     private EnvironmentDAO environmentDAO;
     private TemplateRegistry templateRegistry;
