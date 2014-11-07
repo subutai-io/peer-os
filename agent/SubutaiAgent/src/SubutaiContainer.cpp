@@ -497,8 +497,7 @@ string SubutaiContainer::findFullProgramPath(string program_name)
  */
 string SubutaiContainer::RunPsCommand() {
     vector<string> args;
-    args.push_back("for i in `ps aux | grep '[s]h -c' | awk -F \" \" '{print $2}'`; do ps aux | grep `pgrep -P $i` | sed '/grep/d' ; done 2> /dev/null");
-    return RunProgram("/bin/bash", args);
+    return RunProgram("/opt/psrun", args);
 }
 
 /**

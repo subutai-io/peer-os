@@ -844,9 +844,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                 }
             }
         }
-    }
-    else if (pid == -1)
-    {
+    } else if (pid == -1) {
         //log.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "ERROR DURING MAIN FORK!!","pid",helper.toString(getpid())));
         return pid;
     }
