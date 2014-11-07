@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.hadoop.impl.common;
+package org.safehaus.subutai.plugin.hadoop.impl;
 
 
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;

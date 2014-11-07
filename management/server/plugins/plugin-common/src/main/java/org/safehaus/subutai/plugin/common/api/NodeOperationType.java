@@ -1,15 +1,14 @@
 package org.safehaus.subutai.plugin.common.api;
 
 
-public enum OperationType
+public enum NodeOperationType
 {
     START,
     STOP,
     RESTART,
     STATUS,
     DESTROY,
-    INSTALL,
-    UNINSTALL,
     EXCLUDE,
-    INCLUDE
+    INCLUDE,
+    DECOMISSION_STATUS
 }

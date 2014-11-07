@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.hadoop.impl.common;
+package org.safehaus.subutai.plugin.hadoop.impl;
 
 
 import java.util.HashSet;
@@ -8,13 +8,13 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hadoop.impl.ClusterConfiguration;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
 import com.google.common.base.Preconditions;
@@ -94,7 +94,8 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
 
             try
             {
-                new ClusterConfiguration( trackerOperation, hadoopManager ).configureCluster( hadoopClusterConfig, environment );
+                new ClusterConfiguration( trackerOperation, hadoopManager ).configureCluster( hadoopClusterConfig,
+                        environment );
             }
             catch ( ClusterConfigurationException e )
             {

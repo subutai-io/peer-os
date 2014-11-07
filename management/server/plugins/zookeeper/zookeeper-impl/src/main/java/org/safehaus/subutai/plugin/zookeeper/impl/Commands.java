@@ -6,19 +6,12 @@
 package org.safehaus.subutai.plugin.zookeeper.impl;
 
 
-import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.common.enums.OutputRedirection;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-
-import com.google.common.collect.Sets;
 
 
 /**
@@ -28,100 +21,67 @@ public class Commands
 {
 
     public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_KEY.toLowerCase();
-    private final CommandRunnerBase commandRunnerBase;
 
 
-    public Commands( CommandRunnerBase commandRunnerBase )
+    public String getCheckInstalledCommand()
     {
-        this.commandRunnerBase = commandRunnerBase;
+        return "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH;
     }
 
 
-    public Command getCheckInstalledCommand( Set<Agent> agents )
+    public String getInstallCommand()
     {
-        return commandRunnerBase.createCommand(
-                new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH ), agents );
+        return "apt-get --force-yes --assume-yes install " + PACKAGE_NAME;
     }
 
 
-    public Command getInstallCommand( Set<Agent> agents )
+    public String getUninstallCommand()
     {
-        return commandRunnerBase.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 900 )
-                                                                                                .withStdOutRedirection(
-                                                                                                        OutputRedirection.NO ),
-                agents );
+        return "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME;
     }
 
 
-    public Command getUninstallCommand( Set<Agent> agents )
+    public String getStartCommand()
     {
-        return commandRunnerBase.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 900 )
-                                                                                              .withStdOutRedirection(
-                                                                                                      OutputRedirection.NO ),
-                agents );
+        return "service zookeeper start";
     }
 
 
-    public Command getStartCommand( Set<Agent> agents )
+    public String getRestartCommand()
     {
-        return commandRunnerBase
-                .createCommand( new RequestBuilder( "service zookeeper start" ).withTimeout( 15 ), agents );
+        return "service zookeeper restart";
     }
 
 
-    public Command getRestartCommand( Set<Agent> agents )
+    public String getStopCommand()
     {
-        return commandRunnerBase
-                .createCommand( new RequestBuilder( "service zookeeper restart" ).withTimeout( 15 ), agents );
+        return "service zookeeper stop";
     }
 
 
-    public Command getStopCommand( Agent agent )
+    public String getStatusCommand()
     {
-        return commandRunnerBase
-                .createCommand( new RequestBuilder( "service zookeeper stop" ), Sets.newHashSet( agent ) );
+        return "service zookeeper status";
     }
 
 
-    public Command getStatusCommand( Agent agent )
+    public String getConfigureClusterCommand( String zooCfgFileContents, String zooCfgFilePath, int id )
     {
-        return commandRunnerBase
-                .createCommand( new RequestBuilder( "service zookeeper status" ), Sets.newHashSet( agent ) );
+        return String.format( ". /etc/profile && zookeeper-setID.sh %s && echo '%s' > %s", id,
+                            zooCfgFileContents, zooCfgFilePath );
     }
 
 
-    public Command getConfigureClusterCommand( Set<Agent> agents, String myIdFilePath, String zooCfgFileContents,
-                                               String zooCfgFilePath )
+    public String getAddPropertyCommand( String fileName, String propertyName, String propertyValue )
     {
-        Set<AgentRequestBuilder> requestBuilders = new HashSet<>();
-
-        int id = 0;
-        for ( Agent agent : agents )
-        {
-            requestBuilders.add( new AgentRequestBuilder( agent,
-                    String.format( ". /etc/profile && zookeeper-setID.sh %s && echo '%s' > %s", ++id,
-                            zooCfgFileContents, zooCfgFilePath ) ) );
-        }
-
-        return commandRunnerBase.createCommand( requestBuilders );
-    }
-
-
-    public Command getAddPropertyCommand( String fileName, String propertyName, String propertyValue,
-                                          Set<Agent> agents )
-    {
-        return commandRunnerBase.createCommand( new RequestBuilder(
+        return
                 String.format( ". /etc/profile && zookeeper-property.sh add %s %s %s", fileName, propertyName,
-                        propertyValue ) ), agents );
+                        propertyValue );
     }
 
 
-    public Command getRemovePropertyCommand( String fileName, String propertyName, Set<Agent> agents )
+    public String getRemovePropertyCommand( String fileName, String propertyName )
     {
-        return commandRunnerBase.createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName, propertyName ) ),
-                agents );
+        return String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName, propertyName );
     }
 }

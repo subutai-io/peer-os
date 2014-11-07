@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.common.impl.AbstractNodeOperationTask;
 
 
@@ -14,22 +14,18 @@ public class NodeOperationTask extends AbstractNodeOperationTask implements Runn
 {
     private final String clusterName;
     private final ContainerHost containerHost;
-    private final CompleteEvent completeEvent;
     private final Elasticsearch elasticsearch;
-    private final Tracker tracker;
-    private OperationType operationType;
+    private NodeOperationType operationType;
 
 
     public NodeOperationTask( Elasticsearch elasticsearch, Tracker tracker, String clusterName,
-                              ContainerHost containerHost, OperationType operationType, CompleteEvent completeEvent,
+                              ContainerHost containerHost, NodeOperationType operationType, CompleteEvent completeEvent,
                               UUID trackID )
     {
-        super( tracker, operationType, elasticsearch.getCluster( clusterName ), completeEvent, trackID, containerHost );
+        super( tracker, elasticsearch.getCluster( clusterName ), completeEvent, trackID, containerHost );
         this.elasticsearch = elasticsearch;
-        this.tracker = tracker;
         this.clusterName = clusterName;
         this.containerHost = containerHost;
-        this.completeEvent = completeEvent;
         this.operationType = operationType;
     }
 

@@ -88,8 +88,7 @@ public class Environment
     }
 
 
-    public ContainerHost getContainerHostByUUID( UUID uuid )
-    {
+    public ContainerHost getContainerHostByUUID( final UUID uuid ) {
         Iterator<ContainerHost> iterator = containers.iterator();
         iterator.next();
         while ( iterator.hasNext() )
@@ -107,7 +106,6 @@ public class Environment
     public ContainerHost getContainerHostByHostname( String hostname )
     {
         Iterator<ContainerHost> iterator = containers.iterator();
-        iterator.next();
         while ( iterator.hasNext() )
         {
             ContainerHost containerHost = iterator.next();

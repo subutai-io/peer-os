@@ -18,9 +18,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * @author dilshat
- */
 public class WelcomeStep extends VerticalLayout
 {
 
