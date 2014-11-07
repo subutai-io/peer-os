@@ -19,16 +19,20 @@
     <module>elasticsearch</module>
     <module>hadoop</module>
     <module>storm</module>
+    <module>spark</module>
     <module>zookeeper</module>
 
-
     <!--<module>accumulo</module>
+    <module>solr</module>
+
+
+
+    <module>accumulo</module>
     <module>solr</module>
     <module>mongodb</module>
     <module>flume</module>
     <module>hive</module>
     <module>presto</module>
-    <module>spark</module>
     <module>shark</module>
     <module>sqoop</module>
     <module>lucene</module>

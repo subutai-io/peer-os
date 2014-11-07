@@ -8,8 +8,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
+import com.google.common.collect.Sets;
 
 public class Environment
 {
@@ -68,10 +70,9 @@ public class Environment
     }
 
 
-    //TODO implement this method after migrating to new domain model
-    public Set<ContainerHost> getContainerHosts()
+    public void destroyContainer( UUID containerId ) throws EnvironmentManagerException
     {
-        return Collections.EMPTY_SET;
+        //TODO Baha fill in the logic
     }
 
 
@@ -87,9 +88,8 @@ public class Environment
     }
 
 
-    public ContainerHost getContainerHostByUUID( final UUID uuid ) {
+    public ContainerHost getContainerHostByUUID( UUID uuid ) {
         Iterator<ContainerHost> iterator = containers.iterator();
-        iterator.next();
         while ( iterator.hasNext() ) {
             ContainerHost containerHost = iterator.next();
             if ( containerHost.getId().equals( uuid ) )
@@ -99,31 +99,31 @@ public class Environment
     }
 
 
-    public ContainerHost getContainerHostByHostname( final String hostname )
+    public ContainerHost getContainerHostByHostname( String hostname )
     {
         Iterator<ContainerHost> iterator = containers.iterator();
-        iterator.next();
         while ( iterator.hasNext() ) {
             ContainerHost containerHost = iterator.next();
-            if ( containerHost.getHostname().equals( hostname ) )
+            if ( containerHost.getHostname().equalsIgnoreCase( hostname ) )
+            {
                 return containerHost;
+            }
         }
         return null;
     }
 
 
-    /*public void invoke( PeerCommandMessage commandMessage )
+    public Set<ContainerHost> getHostsByIds( Set<UUID> ids )
     {
-        try
+        Set<ContainerHost> hosts = Sets.newHashSet();
+        for ( UUID id : ids )
         {
-            EnvironmentManager environmentManager = this.serviceLocator.getServiceNoCache( EnvironmentManager.class );
-            environmentManager.invoke( commandMessage );
+            ContainerHost host = getContainerHostByUUID( id );
+            if ( host != null )
+            {
+                hosts.add( host );
+            }
         }
-        catch ( NamingException e )
-        {
-            commandMessage.setProccessed( true );
-            commandMessage.setExceptionMessage( e.toString() );
-            //            commandMessage.setSuccess( false );
-        }
-    }*/
+        return hosts;
+    }
 }

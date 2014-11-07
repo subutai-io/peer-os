@@ -6,7 +6,7 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
 
-public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl>
+public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl, HadoopClusterConfig>
 {
 
     private int nodeCount;
@@ -91,7 +91,8 @@ public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl>
         //                else
         //                {
         //                    trackerOperation
-        //                            .addLogFailed( "Could not configure network! Please see logs\nLXC creation aborted" );
+        //                            .addLogFailed( "Could not configure network! Please see logs\nLXC creation
+        // aborted" );
         //                }
         //            }
         //        }

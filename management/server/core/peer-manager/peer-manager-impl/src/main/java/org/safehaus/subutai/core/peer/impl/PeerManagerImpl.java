@@ -49,7 +49,6 @@ public class PeerManagerImpl implements PeerManager
     private static final String PEER_GROUP = "PEER_GROUP";
     private AgentManager agentManager;
     private PeerDAO peerDAO;
-//    private ContainerManager containerManager;
     private CommandRunner commandRunner;
     private QuotaManager quotaManager;
     private TemplateRegistry templateRegistry;
@@ -152,12 +151,6 @@ public class PeerManagerImpl implements PeerManager
     {
         this.templateRegistry = templateRegistry;
     }
-
-    //
-    //    public void setContainerManager( final ContainerManager containerManager )
-    //    {
-    //        this.containerManager = containerManager;
-    //    }
 
 
     public void setQuotaManager( final QuotaManager quotaManager )

@@ -9,5 +9,6 @@ public enum NodeOperationType
     STATUS,
     DESTROY,
     EXCLUDE,
-    INCLUDE
+    INCLUDE,
+    DECOMISSION_STATUS
 }

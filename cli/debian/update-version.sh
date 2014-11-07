@@ -30,6 +30,11 @@ function exitIfNoCommits {
   
   # Check if there are local commits
   git_diff=$(git diff origin/$branch_name..HEAD)
+  local status=$?
+  if [ $status == "128" ]; then
+    echo "[WARN] Your branch does not exist on your remote git repository."
+    echo "[WARN] This causes make process to ignore version update!"
+  fi
   isDiffEmpty=$(isEmpty $git_diff)
   echo "isDiffEmpty: $isDiffEmpty"
   echo "Checking if there are local commits for branch: $branch_name"

@@ -107,7 +107,5 @@ public abstract class AbstractNodeOperationTask implements Runnable, NodeOperati
 
         completeEvent.onComplete( state );
     }
-
-
 }
 
