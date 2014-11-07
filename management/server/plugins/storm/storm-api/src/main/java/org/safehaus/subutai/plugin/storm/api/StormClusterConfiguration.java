@@ -9,12 +9,11 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
 
-public class StormConfig implements ConfigBase
+public class StormClusterConfiguration implements ConfigBase
 {
 
     public static final String PRODUCT_NAME = "Storm";
-    public static final String TEMPLATE_NAME_NIMBUS = "stormnimbus";
-    public static final String TEMPLATE_NAME_WORKER = "storm";
+    public static final String TEMPLATE_NAME = "storm";
 
     private String clusterName;
     private int supervisorsCount;
@@ -135,9 +134,9 @@ public class StormConfig implements ConfigBase
     @Override
     public boolean equals( Object obj )
     {
-        if ( obj instanceof StormConfig )
+        if ( obj instanceof StormClusterConfiguration )
         {
-            StormConfig other = ( StormConfig ) obj;
+            StormClusterConfiguration other = ( StormClusterConfiguration ) obj;
             return clusterName.equals( other.clusterName );
         }
         return false;

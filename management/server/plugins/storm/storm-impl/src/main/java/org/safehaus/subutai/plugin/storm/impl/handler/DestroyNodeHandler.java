@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 
 
@@ -19,7 +19,7 @@ public class DestroyNodeHandler extends AbstractHandler
     public DestroyNodeHandler( StormImpl manager, String clusterName, String hostname )
     {
         super( manager, clusterName );
-        this.trackerOperation = manager.getTracker().createTrackerOperation( StormConfig.PRODUCT_NAME,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( StormClusterConfiguration.PRODUCT_NAME,
                 "Remove node from cluster: " + hostname );
         this.hostname = hostname;
     }
@@ -29,7 +29,7 @@ public class DestroyNodeHandler extends AbstractHandler
     public void run()
     {
         TrackerOperation po = trackerOperation;
-        StormConfig config = manager.getCluster( clusterName );
+        StormClusterConfiguration config = manager.getCluster( clusterName );
         if ( config == null )
         {
             po.addLogFailed( String.format( "Cluster '%s' does not exist", clusterName ) );

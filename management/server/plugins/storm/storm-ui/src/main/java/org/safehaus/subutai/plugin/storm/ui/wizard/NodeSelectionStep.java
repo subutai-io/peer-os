@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.storm.ui.wizard;
 import java.util.Arrays;
 import java.util.List;
 
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
@@ -148,7 +148,7 @@ public class NodeSelectionStep extends Panel
             @Override
             public void buttonClick( Button.ClickEvent event )
             {
-                StormConfig config = wizard.getConfig();
+                StormClusterConfiguration config = wizard.getConfig();
                 if ( Strings.isNullOrEmpty( config.getClusterName() ) )
                 {
                     show( "Enter cluster name" );

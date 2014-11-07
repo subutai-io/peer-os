@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.storm.impl.handler;
 
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -10,10 +9,9 @@ import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.storm.impl.CommandType;
 import org.safehaus.subutai.plugin.storm.impl.Commands;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
@@ -25,7 +23,7 @@ public class UninstallHandler extends AbstractHandler
     public UninstallHandler( StormImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        this.trackerOperation = manager.getTracker().createTrackerOperation( StormConfig.PRODUCT_NAME,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( StormClusterConfiguration.PRODUCT_NAME,
                 "Uninstall cluster " + clusterName );
     }
 
@@ -34,7 +32,7 @@ public class UninstallHandler extends AbstractHandler
     public void run()
     {
         TrackerOperation po = trackerOperation;
-        StormConfig config = manager.getCluster( clusterName );
+        StormClusterConfiguration config = manager.getCluster( clusterName );
         if ( config == null )
         {
             po.addLogFailed( "Cluster not found: " + clusterName );
@@ -95,7 +93,7 @@ public class UninstallHandler extends AbstractHandler
 //        manager.getContainerManager().clonesDestroy( nodes );
 //        po.addLog( "Container(s) destroyed" );
 
-        manager.getPluginDao().deleteInfo( StormConfig.PRODUCT_NAME, clusterName );
+        manager.getPluginDAO().deleteInfo( StormClusterConfiguration.PRODUCT_NAME, clusterName );
         po.addLogDone( "Cluster info deleted" );
     }
 }

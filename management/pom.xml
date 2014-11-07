@@ -1864,7 +1864,7 @@
          <artifactId>sqoop-plugin-ui</artifactId>
          <version>${project.version}</version>
        </dependency>
--->
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>storm-plugin-api</artifactId>
@@ -1916,6 +1916,7 @@
         <artifactId>zookeeper-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+      -->
       <!--
                    <dependency>
                      <groupId>${project.groupId}</groupId>

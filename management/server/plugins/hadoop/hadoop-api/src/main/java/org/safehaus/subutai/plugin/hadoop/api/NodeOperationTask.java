@@ -24,7 +24,7 @@ public class NodeOperationTask extends AbstractNodeOperationTask implements Runn
     public NodeOperationTask( Hadoop hadoop, Tracker tracker, String clusterName, ContainerHost containerHost,
                               NodeOperationType operationType, CompleteEvent completeEvent, UUID trackID )
     {
-        super( tracker, operationType, hadoop.getCluster( clusterName ), completeEvent, trackID, containerHost );
+        super( tracker, hadoop.getCluster( clusterName ), completeEvent, trackID, containerHost );
         this.hadoop = hadoop;
         this.tracker = tracker;
         this.clusterName = clusterName;

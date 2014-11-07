@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.common.impl.AbstractNodeOperationTask;
 
 
@@ -14,23 +14,19 @@ public class StormNodeOperationTask extends AbstractNodeOperationTask implements
 {
     private final String clusterName;
     private final ContainerHost containerHost;
-    private final CompleteEvent completeEvent;
     private final Storm storm;
-    private final Tracker tracker;
-    private OperationType operationType;
+    private NodeOperationType nodeOperationType;
 
 
     public StormNodeOperationTask( Storm storm, Tracker tracker, String clusterName,
-                                   ContainerHost containerHost, OperationType operationType,
+                                   ContainerHost containerHost, NodeOperationType operationType,
                                    CompleteEvent completeEvent, UUID trackID )
     {
-        super( tracker, operationType, storm.getCluster( clusterName ), completeEvent, trackID, containerHost );
+        super( tracker, storm.getCluster( clusterName ), completeEvent, trackID, containerHost );
         this.storm = storm;
-        this.tracker = tracker;
         this.clusterName = clusterName;
         this.containerHost = containerHost;
-        this.completeEvent = completeEvent;
-        this.operationType = operationType;
+        this.nodeOperationType = operationType;
     }
 
 
@@ -38,7 +34,7 @@ public class StormNodeOperationTask extends AbstractNodeOperationTask implements
     public UUID runTask()
     {
         UUID trackID = null;
-        switch ( operationType )
+        switch ( nodeOperationType )
         {
             case START:
                 trackID = storm.startNode( clusterName, containerHost.getHostname() );

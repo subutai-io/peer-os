@@ -7,21 +7,21 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 
 
 public class InstallHandler extends AbstractHandler
 {
 
-    private final StormConfig config;
+    private final StormClusterConfiguration config;
 
 
-    public InstallHandler( StormImpl manager, StormConfig config )
+    public InstallHandler( StormImpl manager, StormClusterConfiguration config )
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        this.trackerOperation = manager.getTracker().createTrackerOperation( StormConfig.PRODUCT_NAME,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( StormClusterConfiguration.PRODUCT_NAME,
                 "Install cluster " + config.getClusterName() );
     }
 

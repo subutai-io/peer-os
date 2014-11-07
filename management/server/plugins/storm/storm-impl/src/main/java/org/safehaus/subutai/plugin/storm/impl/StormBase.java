@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDao;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.storm.api.Storm;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.slf4j.Logger;
@@ -24,7 +24,7 @@ public abstract class StormBase implements Storm
     protected Zookeeper zookeeperManager;
     protected EnvironmentManager environmentManager;
 
-    protected PluginDao pluginDao;
+    protected PluginDAO pluginDAO;
     protected ExecutorService executor;
     protected DataSource dataSource;
 
@@ -33,7 +33,7 @@ public abstract class StormBase implements Storm
     {
         try
         {
-            this.pluginDao = new PluginDao( dataSource );
+            this.pluginDAO = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
         {
@@ -86,15 +86,15 @@ public abstract class StormBase implements Storm
     }
 
 
-    public PluginDao getPluginDao()
+    public PluginDAO getPluginDAO()
     {
-        return pluginDao;
+        return pluginDAO;
     }
 
 
-    public void setPluginDao( PluginDao pluginDao )
+    public void setPluginDAO( PluginDAO pluginDAO )
     {
-        this.pluginDao = pluginDao;
+        this.pluginDAO = pluginDAO;
     }
 
 

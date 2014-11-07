@@ -10,10 +10,8 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 
-public interface Storm extends ApiBase<StormConfig>
+public interface Storm extends ApiBase<StormClusterConfiguration>
 {
-
-    public UUID statusCheck( String clusterName, String hostname );
 
     public UUID startNode( String clusterName, String hostname );
 
@@ -34,8 +32,8 @@ public interface Storm extends ApiBase<StormConfig>
 
     public UUID destroyNode( String clusterName, String hostname );
 
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( StormConfig config );
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( StormClusterConfiguration config );
 
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, StormConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, StormClusterConfiguration config,
                                                          TrackerOperation po );
 }

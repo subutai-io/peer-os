@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 
 
@@ -20,7 +20,7 @@ abstract class AbstractHandler extends AbstractOperationHandler<StormImpl>
     }
 
 
-    boolean isNimbusNode( StormConfig config, String hostname )
+    boolean isNimbusNode( StormClusterConfiguration config, String hostname )
     {
         Environment environment =
                 manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
@@ -34,7 +34,7 @@ abstract class AbstractHandler extends AbstractOperationHandler<StormImpl>
      *
      * @return number of connected nodes
      */
-    int checkSupervisorNodes( StormConfig config, boolean removeDisconnected )
+    int checkSupervisorNodes( StormClusterConfiguration config, boolean removeDisconnected )
     {
         int connected = 0;
         Iterator<UUID> it = config.getSupervisors().iterator();
@@ -56,7 +56,7 @@ abstract class AbstractHandler extends AbstractOperationHandler<StormImpl>
     }
 
 
-    boolean isNodeConnected( StormConfig config, UUID uuid )
+    boolean isNodeConnected( StormClusterConfiguration config, UUID uuid )
     {
         Environment environment =
                 manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );

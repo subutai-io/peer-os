@@ -20,7 +20,7 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 
@@ -28,12 +28,12 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
 {
 
     private final StormImpl manager;
-    private final StormConfig config;
+    private final StormClusterConfiguration config;
     private final Environment environment;
     private final TrackerOperation po;
 
 
-    public StormSetupStrategyDefault( StormImpl manager, StormConfig config, Environment environment,
+    public StormSetupStrategyDefault( StormImpl manager, StormClusterConfiguration config, Environment environment,
                                       TrackerOperation po )
     {
         this.manager = manager;
@@ -159,7 +159,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
 
         configure();
 
-        manager.getPluginDao().saveInfo( StormConfig.PRODUCT_NAME, config.getClusterName(), config );
+        manager.getPluginDAO().saveInfo( StormClusterConfiguration.PRODUCT_NAME, config.getClusterName(), config );
         po.addLog( "Cluster info successfully saved" );
 
         return config;
@@ -207,7 +207,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
     }
 
 
-    private String makeZookeeperServersList( StormConfig config )
+    private String makeZookeeperServersList( StormClusterConfiguration config )
     {
         if ( config.isExternalZookeeper() )
         {

@@ -37,14 +37,14 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
         implements ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
-    private NodeOperationType operationType;
+    private ClusterOperationType operationType;
     private HadoopClusterConfig config;
     private NodeType nodeType;
     private ExecutorService executor = Executors.newCachedThreadPool();
 
 
     public ClusterOperationHandler( final HadoopImpl manager, final HadoopClusterConfig config,
-                                    final NodeOperationType operationType, NodeType nodeType )
+                                    final ClusterOperationType operationType, NodeType nodeType )
     {
         super( manager, config.getClusterName() );
         this.operationType = operationType;
@@ -69,7 +69,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                     }
                 } );
                 break;
-            case DESTROY:
+            case UNINSTALL:
                 executor.execute( new Runnable()
                 {
                     public void run()
@@ -78,14 +78,10 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                     }
                 } );
                 break;
-            case START:
-                runOperationOnContainers( NodeOperationType.START );
-                break;
-            case STOP:
-                runOperationOnContainers( NodeOperationType.STOP );
-                break;
-            case STATUS:
-                runOperationOnContainers( NodeOperationType.STATUS );
+            case START_ALL:
+            case STOP_ALL:
+            case STATUS_ALL:
+                runOperationOnContainers( operationType );
                 break;
         }
     }
@@ -99,7 +95,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
             CommandResult result = null;
             switch ( clusterOperationType )
             {
-                case START:
+                case START_ALL:
                     switch ( nodeType )
                     {
                         case NAMENODE:
@@ -119,7 +115,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                     }
                     logStatusResults( trackerOperation, result, nodeType );
                     break;
-                case STOP:
+                case STOP_ALL:
                     switch ( nodeType )
                     {
                         case NAMENODE:
@@ -139,7 +135,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                     }
                     logStatusResults( trackerOperation, result, nodeType );
                     break;
-                case STATUS:
+                case STATUS_ALL:
                     switch ( nodeType )
                     {
                         case NAMENODE:

@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.storm.impl.CommandType;
 import org.safehaus.subutai.plugin.storm.impl.Commands;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
@@ -30,7 +30,7 @@ public class StartHandler extends AbstractHandler
         super( manager, clusterName );
         this.hostname = hostname;
         this.trackerOperation =
-                manager.getTracker().createTrackerOperation( StormConfig.PRODUCT_NAME, "Start node " + hostname );
+                manager.getTracker().createTrackerOperation( StormClusterConfiguration.PRODUCT_NAME, "Start node " + hostname );
     }
 
 
@@ -38,7 +38,7 @@ public class StartHandler extends AbstractHandler
     public void run()
     {
         TrackerOperation po = trackerOperation;
-        StormConfig config = manager.getCluster( clusterName );
+        StormClusterConfiguration config = manager.getCluster( clusterName );
         if ( config == null )
         {
             po.addLogFailed( String.format( "Cluster '%s' does not exist", clusterName ) );

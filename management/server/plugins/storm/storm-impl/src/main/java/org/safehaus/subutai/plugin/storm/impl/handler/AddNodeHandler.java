@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.storm.impl.handler;
 
 
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 
 
@@ -12,7 +12,7 @@ public class AddNodeHandler extends AbstractHandler
     public AddNodeHandler( StormImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        this.trackerOperation = manager.getTracker().createTrackerOperation( StormConfig.PRODUCT_NAME,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( StormClusterConfiguration.PRODUCT_NAME,
                 "Add node to cluster " + clusterName );
     }
 
@@ -21,7 +21,7 @@ public class AddNodeHandler extends AbstractHandler
     public void run()
     {
         TrackerOperation po = trackerOperation;
-        StormConfig config = manager.getCluster( clusterName );
+        StormClusterConfiguration config = manager.getCluster( clusterName );
         if ( config == null )
         {
             po.addLogFailed( String.format( "Cluster '%s' does not exist", clusterName ) );
