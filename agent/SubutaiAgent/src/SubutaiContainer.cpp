@@ -403,6 +403,14 @@ ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command)
     if (command->getRunAs() != "" && checkUser(command->getRunAs())) {
         opts.uid = getRunAsUserId(command->getRunAs());
     }
+    // Settings env variables
+    list< pair<string, string> >::iterator it;
+    int i = 0;
+    for (it = command->getEnvironment().begin(); it != command->getEnvironment().end(); it++, i++) {
+        stringstream ss;
+        ss << it->first << "=" << it->second;
+        strcpy(opts.extra_env_vars[i], ss.str().c_str());
+    }
     vector<string> pr = ExplodeCommandArguments(command);
     bool hasProgram = false;
     string program;
@@ -415,6 +423,10 @@ ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command)
         } 
         args.push_back((*it));
     }
+    vector<string> full_args;
+    full_args.reserve(args.size() + command->getArguments().size());
+    full_args.insert(full_args.end(), args.begin(), args.end());
+    full_args.insert(full_args.end(), command->getArguments().begin(), command->getArguments().end());
     ExecutionResult res = RunProgram(program, args, true, opts, false);
     cout <<"result: " << res.out << endl;
     return res;
