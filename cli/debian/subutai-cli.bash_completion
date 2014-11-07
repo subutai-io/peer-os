@@ -24,78 +24,16 @@ _subutai()
             COMPREPLY=( $(compgen -W "${listArgs}" -- ${cur}))
             return 0
             ;;
-        promote)
-            promoteArgs="-c -n"
-            COMPREPLY=( $(compgen -W "${promoteArgs}" -- ${cur}) )
-            return 0;
-            ;;  
-        *)
-            case "${prev}" in
-                -q) 
-                    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-                    return 0
-                    ;;
-                -c | -n)
-                    args=$(subutai -q list -t)
-                    COMPREPLY=( $(compgen -W "${args}" ) )
-                    return 0;
-                    ;;
-                -t | -c | -p | -a | -h)
-                    return 0;
-                    ;;
-                *)           
-                    ;;
-            esac    
-            COMPREPLY=( $(compgen -W "${opts} ${global_switches}" -- ${cur}) )
-            ;;
-    esac
-}
-
-_subutai-dev()
-{
-    local cur prev opts bindings
-    bindings=/etc/subutai/bindings
-    COMPREPLY=()
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts=$(for x in `ls ${bindings}`; do echo ${x} ; done )
-    global_switches="-q -h"
-    case "${prev}" in
-        master_create)
-            ;;
-        master_destroy)
-            ;;
-        master_export)
-            ;;
-        master_import)
-	    ;;
-	setup)
-            ;;
-        clone | demote | destroy | publish)
-            localArgs=$(subutai -q list -t)
-            COMPREPLY=( $(compgen -W "${localArgs}" -- ${cur}))
-            return 0
-            ;; 
-        export | import | rename)
-            localArgs=$(subutai -q list -c)
-            COMPREPLY=( $(compgen -W "${localArgs}" -- ${cur}))
-            return 0
-            ;;    
-        list)
-            listArgs="-t -c -p -a"
-            COMPREPLY=( $(compgen -W "${listArgs}" -- ${cur}))
-            return 0
-            ;;
-        promote)
-            promoteArgs="-c -n"
-            COMPREPLY=( $(compgen -W "${promoteArgs}" -- ${cur}) )
-            return 0;
-            ;;    
         network)
             networkArgs="-a -h -l -m -r"
             COMPREPLY=( $(compgen -W "${networkArgs}" -- ${cur}) )
             return 0
             ;;
+        promote)
+            promoteArgs="-c -n"
+            COMPREPLY=( $(compgen -W "${promoteArgs}" -- ${cur}) )
+            return 0;
+            ;;  
         *)
             case "${prev}" in
                 -q) 
