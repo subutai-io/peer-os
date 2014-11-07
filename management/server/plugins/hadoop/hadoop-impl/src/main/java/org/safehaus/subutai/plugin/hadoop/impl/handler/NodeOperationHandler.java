@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.NodeType;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 import org.safehaus.subutai.plugin.hadoop.impl.Commands;
@@ -28,13 +28,13 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
 
     private String clusterName;
     private String hostname;
-    private OperationType operationType;
+    private NodeOperationType operationType;
     private NodeType nodeType;
     private ExecutorService executor = Executors.newCachedThreadPool();
 
 
     public NodeOperationHandler( final HadoopImpl manager, final String clusterName, final String hostname,
-                                 OperationType operationType, NodeType nodeType )
+                                 NodeOperationType operationType, NodeType nodeType )
     {
         super( manager, clusterName );
         this.hostname = hostname;
@@ -83,7 +83,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
     }
 
 
-    private void runCommand( ContainerHost host, OperationType operationType, NodeType nodeType )
+    private void runCommand( ContainerHost host, NodeOperationType operationType, NodeType nodeType )
     {
         try
         {

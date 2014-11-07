@@ -7,8 +7,8 @@ import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeType;
-import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.common.impl.AbstractNodeOperationTask;
 
 
@@ -17,15 +17,15 @@ public class HadoopNodeOperationTask extends AbstractNodeOperationTask implement
     private final String clusterName;
     private final ContainerHost containerHost;
     private final Hadoop hadoop;
-    private OperationType operationType;
+    private NodeOperationType operationType;
     private final NodeType nodeType;
 
 
     public HadoopNodeOperationTask( Hadoop hadoop, Tracker tracker, String clusterName, ContainerHost containerHost,
-                                    OperationType operationType, NodeType nodeType, CompleteEvent completeEvent,
+                                    NodeOperationType operationType, NodeType nodeType, CompleteEvent completeEvent,
                                     UUID trackID )
     {
-        super( tracker, operationType, hadoop.getCluster( clusterName ), completeEvent, trackID, containerHost );
+        super( tracker, hadoop.getCluster( clusterName ), completeEvent, trackID, containerHost );
         this.hadoop = hadoop;
         this.clusterName = clusterName;
         this.containerHost = containerHost;

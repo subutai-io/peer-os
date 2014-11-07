@@ -27,8 +27,8 @@ import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeType;
-import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.CheckDecommissionStatusTask;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopNodeOperationTask;
@@ -407,7 +407,7 @@ public class ManagerListener
                 checkButton.setEnabled( false );
                 hadoopManager.getExecutorService().execute(
                         new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                containerHost, OperationType.STATUS, NodeType.SECONDARY_NAMENODE, new CompleteEvent()
+                                containerHost, NodeOperationType.STATUS, NodeType.SECONDARY_NAMENODE, new CompleteEvent()
                         {
 
                             public void onComplete( NodeState state )
@@ -481,7 +481,7 @@ public class ManagerListener
                     startStopButton.setEnabled( false );
                     hadoopManager.getExecutorService().execute(
                             new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                    containerHost, OperationType.START, NodeType.JOBTRACKER, new CompleteEvent()
+                                    containerHost, NodeOperationType.START, NodeType.JOBTRACKER, new CompleteEvent()
                             {
                                 public void onComplete( NodeState state )
                                 {
@@ -504,7 +504,7 @@ public class ManagerListener
                     startStopButton.setEnabled( false );
                     hadoopManager.getExecutorService().execute(
                             new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                    containerHost, OperationType.STOP, NodeType.JOBTRACKER, new CompleteEvent()
+                                    containerHost, NodeOperationType.STOP, NodeType.JOBTRACKER, new CompleteEvent()
                             {
                                 public void onComplete( NodeState state )
                                 {
@@ -542,7 +542,7 @@ public class ManagerListener
                 checkButton.setEnabled( false );
                 hadoopManager.getExecutorService().execute(
                         new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                containerHost, OperationType.STATUS, NodeType.JOBTRACKER, new CompleteEvent()
+                                containerHost, NodeOperationType.STATUS, NodeType.JOBTRACKER, new CompleteEvent()
                         {
 
                             public void onComplete( NodeState state )
@@ -598,7 +598,7 @@ public class ManagerListener
                 startStopButton.setEnabled( false );
                 hadoopManager.getExecutorService().execute(
                         new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                containerHost, OperationType.STATUS, NodeType.NAMENODE, new CompleteEvent()
+                                containerHost, NodeOperationType.STATUS, NodeType.NAMENODE, new CompleteEvent()
                         {
                             public void onComplete( NodeState state )
                             {
@@ -651,7 +651,7 @@ public class ManagerListener
                 {
                     hadoopManager.getExecutorService().execute(
                             new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                    containerHost, OperationType.START, NodeType.NAMENODE, new CompleteEvent()
+                                    containerHost, NodeOperationType.START, NodeType.NAMENODE, new CompleteEvent()
                             {
 
                                 public void onComplete( NodeState state )
@@ -674,7 +674,7 @@ public class ManagerListener
                 {
                     hadoopManager.getExecutorService().execute(
                             new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                    containerHost, OperationType.STOP, NodeType.NAMENODE, new CompleteEvent()
+                                    containerHost, NodeOperationType.STOP, NodeType.NAMENODE, new CompleteEvent()
                             {
 
                                 public void onComplete( NodeState state )
@@ -745,7 +745,7 @@ public class ManagerListener
                     hadoopManager.enableProgressBar();
                     hadoopManager.getExecutorService().execute(
                             new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                    containerHost, OperationType.STATUS, NodeType.DATANODE, new CompleteEvent()
+                                    containerHost, NodeOperationType.STATUS, NodeType.DATANODE, new CompleteEvent()
                             {
                                 public void onComplete( NodeState state )
                                 {
@@ -783,7 +783,7 @@ public class ManagerListener
                     hadoopManager.enableProgressBar();
                     hadoopManager.getExecutorService().execute(
                             new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                    containerHost, OperationType.STATUS, NodeType.TASKTRACKER, new CompleteEvent()
+                                    containerHost, NodeOperationType.STATUS, NodeType.TASKTRACKER, new CompleteEvent()
                             {
 
                                 public void onComplete( NodeState state )

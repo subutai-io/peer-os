@@ -5,19 +5,19 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 
-public interface Storm extends ApiBase<StormConfig>
+public interface Storm extends ApiBase<StormClusterConfiguration>
 {
-
-    public UUID statusCheck( String clusterName, String hostname );
 
     public UUID startNode( String clusterName, String hostname );
 
     public UUID stopNode( String clusterName, String hostname );
+
+    public UUID checkNode( String clusterName, String hostname );
 
     public UUID restartNode( String clusterName, String hostname );
 
@@ -32,8 +32,8 @@ public interface Storm extends ApiBase<StormConfig>
 
     public UUID destroyNode( String clusterName, String hostname );
 
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( StormConfig config );
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( StormClusterConfiguration config );
 
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, StormConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, StormClusterConfiguration config,
                                                          TrackerOperation po );
 }

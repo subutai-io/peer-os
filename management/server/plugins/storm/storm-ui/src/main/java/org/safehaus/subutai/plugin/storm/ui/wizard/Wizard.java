@@ -8,7 +8,7 @@ import javax.naming.NamingException;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.storm.api.Storm;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 
 import com.vaadin.ui.Component;
@@ -24,7 +24,7 @@ public class Wizard
     private final Tracker tracker;
     private final Zookeeper zookeeper;
     private int step = 1;
-    private StormConfig config = new StormConfig();
+    private StormClusterConfiguration config = new StormClusterConfiguration();
 
 
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -100,13 +100,13 @@ public class Wizard
     protected void init( boolean externalZookeeper )
     {
         step = 1;
-        config = new StormConfig();
+        config = new StormClusterConfiguration();
         config.setExternalZookeeper( externalZookeeper );
         putForm();
     }
 
 
-    public StormConfig getConfig()
+    public StormClusterConfiguration getConfig()
     {
         return config;
     }
