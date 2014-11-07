@@ -1,57 +1,80 @@
 _subutai()
 {
-    local cur prev opts bindings
+    local cur prev bindings
     bindings=/etc/subutai/bindings
-    COMPREPLY=()
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
     opts=$(for x in `ls ${bindings}`; do echo ${x} ; done )
-    global_switches="-q -h"
+    cur=${COMP_WORDS[COMP_CWORD]}
+    prev=${COMP_WORDS[COMP_CWORD-1]}
+    template_list="`subutai -q list -t`"
+    container_list="`subutai -q list -c`"
+    global_switches="-h -q"
+    config_binding_switches="-a -d"
+    list_binding_switches="-t -c -p -a"
+    promote_binding_switches="-c -n"
 
-    case "${prev}" in
-        clone | demote | destroy | publish)
-            localArgs=$(subutai -q list -t)
-            COMPREPLY=( $(compgen -W "${localArgs}" -- ${cur}))
-            return 0
-            ;; 
-        export | import | rename)
-            localArgs=$(subutai -q list -c)
-            COMPREPLY=( $(compgen -W "${localArgs}" -- ${cur}))
-            return 0
-            ;;    
-        list)
-            listArgs="-t -c -p -a"
-            COMPREPLY=( $(compgen -W "${listArgs}" -- ${cur}))
-            return 0
+    case ${COMP_CWORD} in
+        1)
+            COMPREPLY=($(compgen -W "${opts} ${global_switches}" ${cur}))
             ;;
-        network)
-            networkArgs="-a -h -l -m -r"
-            COMPREPLY=( $(compgen -W "${networkArgs}" -- ${cur}) )
-            return 0
-            ;;
-        promote)
-            promoteArgs="-c -n"
-            COMPREPLY=( $(compgen -W "${promoteArgs}" -- ${cur}) )
-            return 0;
-            ;;  
-        *)
-            case "${prev}" in
-                -q) 
-                    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        2)
+            case ${prev} in
+                -q)
+                    COMPREPLY=($(compgen -W "${opts}" ${cur}))
+                    ;;
+                clone | demote | destroy | publish | export | unregister)
+                    COMPREPLY=($(compgen -W "${template_list}" ${cur}))
+                    ;;
+                promote)
+                    COMPREPLY=($(compgen -W "${container_list}" ${cur}))
+                    ;;
+                list)
+                    COMPREPLY=( $(compgen -W "${list_binding_switches}" -- ${cur}))
+                    ;;
+                config)
+                    COMPREPLY=( $(compgen -W "${config_binding_switches}" -- ${cur}))
+                    ;;
+                network)
+                    networkArgs="-a -h -l -m -r"
+                    COMPREPLY=( $(compgen -W "${networkArgs}" -- ${cur}) )
                     return 0
                     ;;
-                -c | -n)
-                    args=$(subutai -q list -t)
-                    COMPREPLY=( $(compgen -W "${args}" ) )
-                    return 0;
+                import)
+                    COMPREPLY=()
                     ;;
-                -t | -c | -p | -a | -h)
-                    return 0;
+            esac
+            ;;
+
+        3)
+            case ${prev} in
+                clone | demote | destroy | publish | export | unregister)
+                    COMPREPLY=($(compgen -W "${template_list}" ${cur}))
                     ;;
-                *)           
+                promote)
+                    COMPREPLY=($(compgen -W "${container_list}" ${cur}))
                     ;;
-            esac    
-            COMPREPLY=( $(compgen -W "${opts} ${global_switches}" -- ${cur}) )
+                list)
+                    COMPREPLY=( $(compgen -W "${list_binding_switches}" -- ${cur}))
+                    ;;
+                config)
+                    COMPREPLY=( $(compgen -W "${config_binding_switches}" -- ${cur}))
+                    ;;
+                network)
+                    networkArgs="-a -h -l -m -r"
+                    COMPREPLY=( $(compgen -W "${networkArgs}" -- ${cur}) )
+                    return 0
+                    ;;
+                import)
+                    COMPREPLY=()
+                    ;;
+		*)
+		    if [[ $container_list == *"${prev}"* ]]; then
+			COMPREPLY=($(compgen -W "${promote_binding_switches}" ${cur}))
+		    fi 
+		    ;;
+            esac
+            ;;
+        *)
+            COMPREPLY=()
             ;;
     esac
 }
