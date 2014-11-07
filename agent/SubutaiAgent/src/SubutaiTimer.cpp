@@ -117,11 +117,12 @@ void SubutaiTimer::sendHeartBeat()
     containerManager->updateContainerLists();
     response->setIps(environment->getAgentIpValue());
     response->setHostname(environment->getAgentHostnameValue());
-    response->setMacAddress(environment->getAgentMacAddressValue());
+    response->setMacAddress(environment->getAgentMacAddressValue("eth0"));
     response->setContainerSet(containerManager->getAllContainers());
-    string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue(), environment->getAgentMacAddressValue());
+    string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue(), environment->getAgentMacAddressValue("eth0"));
     connection->sendMessage(resp, "HEARTBEAT_TOPIC");
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat:", resp));
+    cout << resp << endl;
 }
 
 bool SubutaiTimer::checkHeartBeatTimer(SubutaiCommand command)
@@ -129,7 +130,6 @@ bool SubutaiTimer::checkHeartBeatTimer(SubutaiCommand command)
     if (checkExecutionTimeout(&startsec, &overflag, &exectimeout, &count)) //checking Default Timeout
     {
         sendHeartBeat();
-
         start =         boost::posix_time::second_clock::local_time();	//Reset Default Timeout value
         startsec =      start.time_of_day().seconds();
         overflag =      false;

@@ -57,18 +57,9 @@ string SubutaiLogger::getLocaltime()
 {
     boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
 
-    return toString(now.date().day().as_number())  + "-" +  toString(now.date().month().as_number()) + "-"  + toString(now.date().year())  + " " +  toString(now.time_of_day().hours()) + ":" + toString(now.time_of_day().minutes()) + ":" + toString(now.time_of_day().seconds());
+    return _helper.toString(now.date().day().as_number())  + "-" +  _helper.toString(now.date().month().as_number()) + "-"  + _helper.toString(now.date().year())  + " " +  _helper.toString(now.time_of_day().hours()) + ":" + _helper.toString(now.time_of_day().minutes()) + ":" + _helper.toString(now.time_of_day().seconds());
 }
 
-/**
- *  \details   This method designed for Typically conversion from integer to string.
- */
-string SubutaiLogger::toString(int intcont)
-{		//integer to string conversion
-    ostringstream dummy;
-    dummy << intcont;
-    return dummy.str();
-}
 
 /**
  *  \details   This method opens a log file.
@@ -80,9 +71,9 @@ bool SubutaiLogger::openLogFile(int pid,int requestSequenceNumber)
 {
     boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
     string logFileName = "/var/log/subutai-agent/"
-         + toString(now.date().year()) + toString(now.date().month().as_number()) + toString(now.date().day().as_number())
-         + "-" +  toString(now.time_of_day().total_milliseconds())
-         + "-" + toString(pid) + "-" + toString(requestSequenceNumber);
+         + _helper.toString(now.date().year()) + _helper.toString(now.date().month().as_number()) + _helper.toString(now.date().day().as_number())
+         + "-" +  _helper.toString(now.time_of_day().total_milliseconds())
+         + "-" + _helper.toString(pid) + "-" + _helper.toString(requestSequenceNumber);
     this->logFile = fopen(logFileName.c_str(),"a + ");
     if(this->logFile)
     {

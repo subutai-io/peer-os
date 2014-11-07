@@ -33,6 +33,7 @@
 #include "SubutaiCommand.h"
 #include "SubutaiResponsePack.h"
 #include "SubutaiStreamReader.h"
+#include "SubutaiHelper.h"
 #include "SubutaiLogger.h"
 #include "SubutaiContainer.h"
 #include <boost/interprocess/shared_memory_object.hpp>
@@ -82,13 +83,13 @@ public:
 	void checkAndSend(message_queue*, SubutaiCommand*);
 	void lastCheckAndSend(message_queue*, SubutaiCommand*);
 	bool checkExecutionTimeout(unsigned int*, bool*, unsigned int*, unsigned int*);
-	static string toString(int);
 private:
 	SubutaiUserID           uid;
 	SubutaiLogger           logger;
 	SubutaiResponsePack     response;
 	SubutaiStreamReader     errorStream;
 	SubutaiStreamReader     outputStream;
+	SubutaiHelper 			helper;
 	string                  argument, exec, sendout, environment;
 	string                  outBuff, errBuff;       //general buffers for error and output
 	pid_t                   pid;

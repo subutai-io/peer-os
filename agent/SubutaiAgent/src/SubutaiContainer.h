@@ -46,6 +46,7 @@
 #include "SubutaiLogger.h"
 #include "SubutaiConnection.h"
 #include "SubutaiCommand.h"
+#include "SubutaiHelper.h"
 using namespace std;
 using std::stringstream;
 using std::string;
@@ -66,16 +67,16 @@ class SubutaiContainer
     public:
         SubutaiContainer(SubutaiLogger*, lxc_container* cont);
         virtual ~SubutaiContainer(void);
-        string toString(int);
         bool getContainerId();
-        bool getContainerMacAddress();
+        bool getContainerMacAddresses();
         bool getContainerHostname();
-        bool getContainerParentHostname();
+        //bool getContainerParentHostname();
         bool getContainerIpAddress();
+        void tryLongCommand();
         string getContainerIdValue();
         string getContainerHostnameValue();
-        string getContainerMacAddressValue();
-        string getContainerParentHostnameValue();
+        string getContainerMacAddressValue(string);
+        //string getContainerParentHostnameValue();
         string getContainerConnectionUrlValue();
         string getContainerConnectionPortValue();
         string getContainerConnectionOptionsValue();
@@ -93,24 +94,27 @@ class SubutaiContainer
         string RunProgram(string , vector<string>);
         ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT);
         void write();
+        void clear();
         bool checkCWD(string cwd);
         bool checkUser(string username);
         int getRunAsUserId(string username);
         void PutToFile(string filename, string text);
         string findFullProgramPath(string program_name);
+
         string RunPsCommand();
+
     protected:
         vector<string> ExplodeCommandArguments(SubutaiCommand* command);
     private:
-        containerStatus status;
-        lxc_container* container;
-        string id;
-        string macAddress;
-        string hostname;
-        string parentHostname;
-        map<int, string> _users;        // List of users available in system
-        vector<string> ipAddress;
-        SubutaiLogger*	containerLogger;
+        containerStatus 	status;
+        lxc_container* 		container;
+        string 				id;
+        map<string,string> 	macAddresses;
+        string 				hostname;
+        map<int, string> 	_users;        // List of users available in system
+        vector<string> 		ipAddress;
+        SubutaiLogger*		containerLogger;
+        SubutaiHelper 		_helper;
 };
 #endif /* SUBUTAICONTAINER_H_ */
 

@@ -31,15 +31,6 @@ SubutaiEnvironment::~SubutaiEnvironment()
 }
 
 
-/**
- *  \details   This method designed for Typically conversion from integer to string.
- */
-string SubutaiEnvironment::toString(int intcont)
-{		//integer to string conversion
-    ostringstream dummy;
-    dummy << intcont;
-    return dummy.str();
-}
 
 /**
  *  \details   KiskisAgent's settings.xml is read by this function.
@@ -113,26 +104,35 @@ bool SubutaiEnvironment::getAgentUuid()
 /**
  *  \details   MACID(eth0) of the KiskisAgent is fetched from statically.
  */
-bool SubutaiEnvironment::getAgentMacAddress()
+bool SubutaiEnvironment::getAgentMacAddresses()
 {
-    try
-    {
-        ifstream file("/sys/class/net/eth0/address");	//opening macaddress
-        getline(file,this->macAddress);
-        file.close();
-        if(this->macAddress.empty())		//if mac is null or not reading successfully
-        {
-            environmentLogger->writeLog(3,environmentLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read"));
-            return false;
-        }
-        environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent MacID:",this->macAddress));
-        return true;
-    }
-    catch(const std::exception& error)
-    {
-        cout << error.what()<< endl;
-    }
-    return false;
+
+	macAddresses.clear();
+	try
+	{
+		vector<string> network_list = _helper.runAndSplit("/bin/ls /sys/class/net/", "r", "\n");
+	   	for (vector<string>::iterator it = network_list.begin(); it != network_list.end(); it++) {
+
+	   		string address_net;
+	    	string addressFile = "/sys/class/net/"+ (*it) +"/address";
+	    	ifstream file(addressFile.c_str());	//opening uuid.txt
+
+	    	getline(file,address_net);
+	    	file.close();
+
+	    	if (address_net.empty()) {		//if mac is null or not reading successfully
+	    		environmentLogger->writeLog(3,environmentLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read !!"));
+	    		return false;
+	    	}
+
+	    	macAddresses.insert(pair<string, string>((*it), address_net));
+	    	environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>", "Subutai Agent MacID for " + (*it) + ":", address_net));
+	    	return true;
+	    }
+	} catch(const std::exception& error) {
+	        cout << error.what()<< endl;
+	}
+	return false;
 }
 
 /**
@@ -158,37 +158,6 @@ bool SubutaiEnvironment::getAgentHostname()
     return false;
 }
 
-/**
- *  \details   Parent Hostname of the Subutai Agent machine is fetched from c paramonfig file.
- */
-bool SubutaiEnvironment::getAgentParentHostname()
-{
-    try
-    {
-        if (ifstream("/etc/subutai/lxc-config")) //file exist
-        {
-            boost::property_tree::ptree pt;
-            boost::property_tree::ini_parser::read_ini("/etc/subutai/lxc-config", pt);
-            parentHostname =  pt.get<std::string>("Subutai-Agent.subutai_parent_hostname");
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","parentHostname: ",parentHostname));
-        }
-
-        if(!parentHostname.empty())
-        {
-            return true;
-        }
-        else
-        {
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","parentHostname does not exist!"));
-            return false;
-        }
-    }
-    catch(const std::exception& error)
-    {
-        cout << error.what()<< endl;
-    }
-    return false;
-}
 
 /**
  *  \details   EnvironmentId of the Subutai Agent machine is fetched from config file.
@@ -333,18 +302,11 @@ string SubutaiEnvironment::getAgentHostnameValue()
 /**
  *  \details   getting Agent macaddress value.
  */
-string SubutaiEnvironment::getAgentMacAddressValue()
+string SubutaiEnvironment::getAgentMacAddressValue(string network)
 {
-    return macAddress;
+	return macAddresses.find(network)->second;
 }
 
-/**
- *  \details   getting Agent parentHostname value.
- */
-string SubutaiEnvironment::getAgentParentHostnameValue()
-{
-    return parentHostname;
-}
 
 /**
  *  \details   getting Agent connectionUrl value.

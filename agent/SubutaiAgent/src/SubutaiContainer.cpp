@@ -32,7 +32,7 @@
 
 using namespace std;
 /**
- *  \details   Default constructor of SubutaiEnvironment class.
+ *  \details   Default constructor of SubutaiContainer class.
  */
 SubutaiContainer::SubutaiContainer(SubutaiLogger* logger, lxc_container* cont)
 {
@@ -41,7 +41,7 @@ SubutaiContainer::SubutaiContainer(SubutaiLogger* logger, lxc_container* cont)
 }
 
 /**
- *  \details   Default destructor of SubutaiEnvironment class.
+ *  \details   Default destructor of SubutaiContainer class.
  */
 SubutaiContainer::~SubutaiContainer()
 {
@@ -49,18 +49,23 @@ SubutaiContainer::~SubutaiContainer()
 }
 
 /**
- *  \details   This method designed for Typically conversion from integer to string.
+ *  \details   Clear id, mac address and ip adresses.
  */
-string SubutaiContainer::toString(int intcont)
-{		//integer to string conversion
-    ostringstream dummy;
-    dummy << intcont;
-    return dummy.str();
+void SubutaiContainer::clear()
+{
+	id = "";
+	macAddresses.clear();
+	ipAddress.clear();
 }
 
+/**
+ * Run program given as parameter 'program' with arguments 'params'
+ * Return stdout if success or stderr if fails
+ */
 string SubutaiContainer::RunProgram(string program, vector<string> params) 
 {
     ExecutionResult result = RunProgram(program, params, true, LXC_ATTACH_OPTIONS_DEFAULT);
+    //cout << result.out << endl;
     if (result.exit_code == 0) {
         return result.out;
     } else {
@@ -68,9 +73,18 @@ string SubutaiContainer::RunProgram(string program, vector<string> params)
     }
 }
 
+/**
+ * Run program given as parameter 'program' with arguments 'params' using lxc attach options 'opts'
+ * Returns ExecutionResult object including exit_code and stdout if success or stderr if fails.
+ *
+ */
 ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> params, bool return_result, lxc_attach_options_t opts) 
 {
     containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Running program: ", program));
+
+
+     // get arguments list of the command which will be run on lxc
+
     char* _params[params.size() + 2];
     _params[0] = const_cast<char*>(program.c_str());
     vector<string>::iterator it;
@@ -80,11 +94,18 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
         i++;
     }
     _params[i] = NULL;
+
+    // DEBUG
+
 #if _DEBUG
     for (int __j = 0; __j < params.size() + 2; __j++) {
         cout << "<DEBUG> PARAMS DATA: " << _params[__j] << endl;
     }
 #endif
+
+
+    //   run command on LXC and read stdout into buffer.
+
     int fd[2];
     int _stdout = dup(1);
     pipe(fd);
@@ -96,19 +117,24 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     close(fd[1]);
     result.exit_code = this->container->attach_run_wait(this->container, &opts, program.c_str(), _params);
     fflush(stdout);
+    close(fd[1]);
     dup2(_stdout, 1);
     close(_stdout);
     string command_output;
     while (1) {
-        ssize_t size = read(fd[0], buffer, 1000);
-        if (size < 1000) {
-            buffer[size] = '\0';
-            command_output += buffer;
-            break;
-        } else {
-            command_output += buffer;
-        }
+            ssize_t size = read(fd[0], buffer, 1000);
+            if (size < 1000) {
+                buffer[size] = '\0';
+                command_output += buffer;
+                break;
+            } else {
+                command_output += buffer;
+            }
     }
+
+
+     //   get exit code, stdout and stderr.
+
     if (result.exit_code == 0) {
         result.out = command_output;
     } else {
@@ -118,59 +144,66 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     return result;
 }
 
+/**
+ * return true if container is running, false otherwise
+ */
 bool SubutaiContainer::isContainerRunning()
 {
     if (this->status == RUNNING) return true;
     return false;
 }
 
+/**
+ * return true if container is stopped, false otherwise
+ */
 bool SubutaiContainer::isContainerStopped()
 {
     if (this->status == STOPPED) return true;
     return false;
 }
 
+/**
+ * return true if container is frozen, false otherwise
+ */
 bool SubutaiContainer::isContainerFrozen()
 {
     if (this->status == FROZEN) return true;
     return false;
 }
 
+
+/**
+ *  \details   get the users defined on LXC
+ */
 void SubutaiContainer::UpdateUsersList() 
 { 
+	if(status != RUNNING) return ;
     this->_users.clear();
     vector<string> params;
     params.push_back("/etc/passwd");
     string passwd = RunProgram("/bin/cat", params);
-    size_t n = 0;
-    size_t p = 0;
+
     stringstream ss(passwd);
     string line;
     while (getline(ss, line, '\n')) {
-        int c = 0;
         int uid;
         string uname;
-        while ((n = line.find_first_of(":", p)) != string::npos) {
-            c++;
-            if (n - p != 0) {
-                if (c == 1) {
-                    // This is a username
-                    uname = line.substr(p, n - p);
-                } else if (c == 3) {
-                    // This is a uid
-                    stringstream conv(line.substr(p, n - p));
-                    if (!(conv >> uid)) {
-                        uid = -1; // We failed to convert string to int
-                    }
-                }
-            }
-            this->_users.insert(make_pair(uid, uname));
-        }
+
+        std::size_t found_first  = line.find(":");
+        std::size_t found_second = line.find(":", found_first+1);
+        std::size_t found_third  = line.find(":", found_second+1);
+
+        uname = line.substr(0, found_first);
+        uid   = atoi(line.substr(found_second+1, found_third).c_str());
+
+        this->_users.insert(make_pair(uid, uname));
+        //cout << " user: " <<  uid << " " << uname << endl;
+
     }
 }
 /**
- *  \details   UUID of the Subutai Agent is fetched from statically using this function.
- *  		   Example uuid:"ff28d7c7-54b4-4291-b246-faf3dd493544"
+ *  \details   ID of the Subutai Container is fetched from statically using this function.
+ *  		   Example id:"ff28d7c7-54b4-4291-b246-faf3dd493544"
  */
 bool SubutaiContainer::getContainerId()
 {
@@ -202,59 +235,47 @@ bool SubutaiContainer::getContainerId()
 }
 
 /**
- *  \details   MACID(eth0) of the KiskisAgent is fetched from statically.
+ *  \details   get mac ids of the Subutai Container is fetched from statically.
  */
-bool SubutaiContainer::getContainerMacAddress()
+bool SubutaiContainer::getContainerMacAddresses()
 {
+	macAddresses.clear();
     if (this->status != RUNNING) return false;
-    try {
-        vector<string> args;
-        args.push_back("/sys/class/net/eth0/address");
-        this->macAddress = RunProgram("/bin/cat", args);
-        if (this->macAddress.empty()) {		//if mac is null or not reading successfully
-            containerLogger->writeLog(3,containerLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read !!"));
-            return false;
-        }
-        containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","Subutai Agent MacID:",this->macAddress));
-        return true;
-    } catch(const std::exception& error) {
-        cout << error.what()<< endl;
-    }
-    return false;
-}
-
-/**
- *  \details   Hostname of the KiskisAgent machine is fetched from statically.
- */
-bool SubutaiContainer::getContainerHostname()
-{
-    if(this-> status != RUNNING || !this->hostname.empty()) return false;
     try
-    {
-        vector<string> args;
-        args.push_back("/etc/hostname");
-        this->hostname = RunProgram("/bin/cat", args);
+	{
+    	string s ;
+    	s.append("/bin/ls /var/lib/lxc/");  	s.append(hostname);   	s.append("/rootfs/sys/class/net/");
+    	char *command = new char[s.length() + 1];    	strcpy(command, s.c_str());
 
-        if(this->hostname.empty())		//if hostname is null or not reading successfully
-        {
-            containerLogger->writeLog(7, containerLogger->setLogData("<SubutaiAgent>","Failed to get container hostname (getContainerHostname)"));
-            return false;
-        }
-        else
-        {
-            if(this->hostname[this->hostname.size()-1] == '\n') this->hostname[this->hostname.size()-1] = '\0';
-        }
+    	vector<string> network_list = _helper.runAndSplit(command, "r", "\n");
+    	for (vector<string>::iterator it = network_list.begin(); it != network_list.end(); it++) {
 
-        containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>","Retrieved container hostname:", this->hostname));
-        return true;
-    } catch(const std::exception& error) {
-        cout << error.what()<< endl;
-    }
-    return false;
+    		string address_net;
+    	    string addressFile = "/var/lib/lxc/" + this->hostname + "/rootfs/sys/class/net/"+ (*it) +"/address";
+    	    ifstream file(addressFile.c_str());	//opening uuid.txt
+
+    	    getline(file,address_net);
+    		file.close();
+
+    		if (address_net.empty()) {		//if mac is null or not reading successfully
+    			containerLogger->writeLog(3,containerLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read !!"));
+    			return false;
+    		}
+
+    		macAddresses.insert(pair<string, string>((*it), address_net));
+
+    		containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>", "Subutai Agent MacID for " + (*it) + ":", address_net));
+    		return true;
+    	}
+	} catch(const std::exception& error) {
+	        cout << error.what()<< endl;
+	}
+	return false;
 }
 
+
 /**
- *  \details   Hostname of the KiskisAgent machine is fetched from statically.
+ *  \details   set the hostname of Subutai Container.
  */
 void SubutaiContainer::setContainerHostname(string hostname)
 {
@@ -262,55 +283,27 @@ void SubutaiContainer::setContainerHostname(string hostname)
 }
 
 /**
- *  \details   Hostname of the KiskisAgent machine is fetched from statically.
+ *  \details   get the status of Subutai Container.
  */
 string SubutaiContainer::getContainerStatus()
 {
     if (this->status == RUNNING) return "RUNNING";
     if (this->status == STOPPED) return "STOPPED";
     if (this->status == FROZEN)  return "FROZEN";
+    return "ERROR";
 }
 
+/**
+ *  \details   set the status of Subutai Container.
+ */
 void SubutaiContainer::setContainerStatus(containerStatus status)
 {
     this->status = status;
 }
-/**
- *  \details   Parent Hostname of the Subutai Agent machine is fetched from c paramonfig file.
- */
-bool SubutaiContainer::getContainerParentHostname()
-{
-    if (this->status != RUNNING) return false;
-    try {
-        vector<string> args;
-        args.push_back("/etc/hostname");
-        string config = RunProgram("/bin/cat", args);
-        if (config.empty()) { //file exist
-            ofstream file("/tmp/config.txt");
-            file << config;
-            file.close();
-
-            boost::property_tree::ptree pt;
-            boost::property_tree::ini_parser::read_ini("/tmp/config.txt", pt);
-            parentHostname =  pt.get<std::string>("Subutai-Agent.subutai_parent_hostname");
-            containerLogger->writeLog(6, containerLogger->setLogData("<SubutaiAgent>","parentHostname: ",parentHostname));
-        }
-
-        if (!parentHostname.empty()) {
-            return true;
-        } else {
-            containerLogger->writeLog(6, containerLogger->setLogData("<SubutaiAgent>", "parentHostname does not exist!"));
-            return false;
-        }
-    } catch(const std::exception& error) {
-        cout << error.what()<< endl;
-    }
-    return false;
-}
 
 
 /**
- *  \details   IpAddress of the KiskisAgent machine is fetched from statically.
+ *  \details   IpAddress of the SubutaiContainer machine is fetched from statically.
  */
 bool SubutaiContainer::getContainerIpAddress()
 {
@@ -318,15 +311,19 @@ bool SubutaiContainer::getContainerIpAddress()
     ipAddress.clear();
     char** interfaces = this->container->get_interfaces(this->container);
     int i = 0;
-    while (interfaces[i] != NULL) {
-        char** ips = this->container->get_ips(this->container, interfaces[i], "inet", 0);
-        int j = 0;
-        while (ips[j] != NULL) {
-            ipAddress.push_back(ips[j]);
-            j++;
-        }
-        i++;
+    if(interfaces != NULL)
+    {
+		while (interfaces[i] != NULL) {
+			char** ips = this->container->get_ips(this->container, interfaces[i], "inet", 0);
+			int j = 0;
+			while (ips[j] != NULL) {
+				ipAddress.push_back(ips[j]);
+				j++;
+			}
+			i++;
+		}
     }
+    free(interfaces);
     if (ipAddress.size() > 0) {
         return true;
     } else {
@@ -334,8 +331,13 @@ bool SubutaiContainer::getContainerIpAddress()
     }
 }
 
+void SubutaiContainer::write()
+{
+    cout << hostname << " " << id << endl;
+}
+
 /**
- *  \details   getting Agent uuid value.
+ *  \details   getting SubutaiContainer uuid value.
  */
 string SubutaiContainer::getContainerIdValue()
 {
@@ -343,7 +345,7 @@ string SubutaiContainer::getContainerIdValue()
 }
 
 /**
- *  \details   getting Agent hostname value.
+ *  \details   getting SubutaiContainer hostname value.
  */
 string SubutaiContainer::getContainerHostnameValue()
 {
@@ -351,7 +353,7 @@ string SubutaiContainer::getContainerHostnameValue()
 }
 
 /**
- *  \details   getting lxc container value.
+ *  \details   getting SubutaiContainer lxc container value.
  */
 lxc_container* SubutaiContainer::getLxcContainerValue()
 {
@@ -359,51 +361,42 @@ lxc_container* SubutaiContainer::getLxcContainerValue()
 }
 
 /**
- *  \details   getting Agent macaddress value.
+ *  \details   getting SubutaiContainer macaddress value for a given interface.
  */
-string SubutaiContainer::getContainerMacAddressValue()
+string SubutaiContainer::getContainerMacAddressValue(string network)
 {
-    return macAddress;
+	return macAddresses.find(network)->second;
 }
 
 /**
- *  \details   getting Agent parentHostname value.
- */
-string SubutaiContainer::getContainerParentHostnameValue()
-{
-    return parentHostname;
-}
-
-/**
- *  \details   getting Agent Ip values.
+ *  \details   getting SubutaiContainer Ip values.
  */
 vector<string> SubutaiContainer::getContainerIpValue()
 {
     return ipAddress;
 }
 
+/**
+ *  \details   update all field of Subutai Container
+ */
 void SubutaiContainer::getContainerAllFields()
 {
-    getContainerHostname();
-    getContainerId();/*
-                        if (command->getRunAs() != "" && checkUser(command->getRunAs())) {
-                        opts.uid = getRunAsUserId(command->getRunAs());
-                        }*/
-    getContainerMacAddress();
-    getContainerParentHostname();
+	clear();
+    getContainerId();
+    getContainerMacAddresses();
     getContainerIpAddress();
+
+    UpdateUsersList();
 }
 
 ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command) 
 {
-    cout << "RUN COMMAND REQUEST!!!!!!!!!!!" << endl;
     lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT;
     if (command->getWorkingDirectory() != "" && checkCWD(command->getWorkingDirectory())) {
         opts.initial_cwd = const_cast<char*>(command->getWorkingDirectory().c_str());
     }
     if (command->getRunAs() != "" && checkUser(command->getRunAs())) {
         opts.uid = getRunAsUserId(command->getRunAs());
-
     }
     vector<string> pr = ExplodeCommandArguments(command);
     bool hasProgram = false;
@@ -421,20 +414,6 @@ ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command)
     return res;
 }
 
-void SubutaiContainer::write()
-{
-    cout << " start" <<  id << "  " << macAddress << "  " << hostname << "  " << parentHostname<< " stop" <<  endl;
-}
-
-/*
-   void SubutaiContainer::registerContainer(SubutaiConnection* connection)
-   {
-   SubutaiResponsePack response;
-   getContainerAllFields();
-   string sendout = response.createRegistrationMessage(this->id, this->macAddress, this->hostname, this->parentHostname, "", this->ipAddress);
-   containerLogger->writeLog(7, containerLogger->setLogData("<SubutaiAgent>","Registration Message:", sendout));
-   connection->sendMessage(sendout);
-   }*/
 
 // We need to check if CWD is exist because in LXC API - if cwd does not
 // exist CWD will become root directory
@@ -485,6 +464,9 @@ int SubutaiContainer::getRunAsUserId(string username)
     return -1;
 }
 
+/**
+ * \details		Write info into a file on LXC
+ */
 void SubutaiContainer::PutToFile(string filename, string text) {
     vector<string> args;
     args.push_back("-c");
@@ -495,6 +477,9 @@ void SubutaiContainer::PutToFile(string filename, string text) {
     RunProgram("/bin/bash", args);
 }
 
+/**
+ * \details		Get the full path for a given program
+ */
 string SubutaiContainer::findFullProgramPath(string program_name) 
 {
     vector<string> args;
@@ -503,12 +488,18 @@ string SubutaiContainer::findFullProgramPath(string program_name)
     return locations; // TODO: Parse whereis output
 }
 
+/**
+ * \details 	run ps command on LXC.
+ */
 string SubutaiContainer::RunPsCommand() {
     vector<string> args;
     args.push_back("for i in `ps aux | grep '[s]h -c' | awk -F \" \" '{print $2}'`; do ps aux | grep `pgrep -P $i` | sed '/grep/d' ; done 2> /dev/null");
     return RunProgram("/bin/bash", args);
 }
 
+/**
+ * \details 	check and divide command and arguments if necessary.
+ */
 vector<string> SubutaiContainer::ExplodeCommandArguments(SubutaiCommand* command) 
 {
     vector<string> result;
@@ -523,5 +514,33 @@ vector<string> SubutaiContainer::ExplodeCommandArguments(SubutaiCommand* command
     if (p < command->getCommand().size()) {
         result.push_back(command->getCommand().substr(p));
     }
+    for(unsigned int i = 0; i < command->getArguments().size(); i++)
+    	result.push_back(command->getArguments()[i]);
+
     return result;
 }
+
+/**
+ * For testinf purpose
+ *
+ * Test if long commands with && can run or not:
+ * It waits until all the commands run to return.
+ */
+void SubutaiContainer::tryLongCommand() {
+    vector<string> args;
+    args.push_back("-c");
+    args.push_back("ls -la && ls && ls -la && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls");
+
+    cout << RunProgram("/bin/bash", args) << endl;
+}
+
+
+/*
+   void SubutaiContainer::registerContainer(SubutaiConnection* connection)
+   {
+   SubutaiResponsePack response;
+   getContainerAllFields();
+   string sendout = response.createRegistrationMessage(this->id, this->macAddress, this->hostname, this->parentHostname, "", this->ipAddress);
+   containerLogger->writeLog(7, containerLogger->setLogData("<SubutaiAgent>","Registration Message:", sendout));
+   connection->sendMessage(sendout);
+   }*/
