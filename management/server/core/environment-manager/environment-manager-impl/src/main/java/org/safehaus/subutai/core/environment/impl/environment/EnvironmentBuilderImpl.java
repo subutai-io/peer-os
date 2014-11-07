@@ -4,14 +4,12 @@ package org.safehaus.subutai.core.environment.impl.environment;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
@@ -51,6 +49,7 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
         int containersAmount = 0;
         this.executorService = Executors.newFixedThreadPool( messageSize );
 
+
         for ( String key : process.getMessageMap().keySet() )
         {
             CloneContainersMessage message = process.getMessageMap().get( key );
@@ -87,34 +86,13 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
 
 
     @Override
-    public void addNodeGroup( final UUID environmentId, final NodeGroup nodeGroup ) throws BuildException
-    {
-
-    }
-
-
-    @Override
-    public void addContainerToNodeGroup( final CloneContainersMessage message )
-    {
-
-    }
-
-
-    @Override
-    public void removeContainer( final ContainerHost containerHost )
-    {
-
-    }
-
-
-    @Override
     public void update( final Observable o, final Object arg )
     {
         if ( arg instanceof Set )
         {
             Set<ContainerHost> containerHosts = ( Set<ContainerHost> ) arg;
             environment.addContainers( containerHosts );
-            LOG.info( String.format( "Received %d newly created containers", containerHosts.size() ) );
+            LOG.info( String.format( "Received %d containers", containerHosts.size() ) );
             containersCreated = containersCreated + containerHosts.size();
         }
         else if ( arg instanceof Exception )

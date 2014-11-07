@@ -213,6 +213,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 environmentDAO.deleteInfo( ENVIRONMENT, environment.getId().toString() );
             }
+            else
+            {
+                throw new EnvironmentDestroyException(
+                        String.format( "Not all containers destroyed in %s", environmentId.toString() ) );
+            }
         }
         catch ( DestroyException e )
         {

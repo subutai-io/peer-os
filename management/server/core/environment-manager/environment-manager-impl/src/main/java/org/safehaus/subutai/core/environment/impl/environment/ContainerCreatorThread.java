@@ -43,6 +43,7 @@ public class ContainerCreatorThread extends Observable implements Runnable
                     createContainers( message.getTargetPeerId(), environmentId, message.getTemplates(),
                             message.getNumberOfNodes(), message.getStrategy(), null, message.getNodeGroupName() );
             LOG.info( String.format( "Got %d containers for environment %s", containers.size(), environmentId ) );
+            setChanged();
             notifyObservers( containers );
         }
         catch ( PeerException e )

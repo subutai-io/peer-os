@@ -33,6 +33,7 @@ public class EnvironmentDestroyerThread extends Observable implements Runnable
             try
             {
                 container.dispose();
+                setChanged();
                 notifyObservers( container );
             }
             catch ( PeerException e )
