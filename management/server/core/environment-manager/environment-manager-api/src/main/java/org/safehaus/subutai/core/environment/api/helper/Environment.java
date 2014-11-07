@@ -88,10 +88,21 @@ public class Environment
 
     public ContainerHost getContainerHostByUUID( UUID uuid ) {
         Iterator<ContainerHost> iterator = containers.iterator();
-        iterator.next();
         while ( iterator.hasNext() ) {
             ContainerHost containerHost = iterator.next();
-            if ( containerHost.getId().equals( uuid ) )
+            if ( containerHost.getAgent().getUuid().equals( uuid ) )
+                return containerHost;
+        }
+        return null;
+    }
+
+
+    public ContainerHost getContainerHostByHostname( String hostname )
+    {
+        Iterator<ContainerHost> iterator = containers.iterator();
+        while ( iterator.hasNext() ) {
+            ContainerHost containerHost = iterator.next();
+            if ( containerHost.getHostname().equals( hostname ) )
                 return containerHost;
         }
         return null;

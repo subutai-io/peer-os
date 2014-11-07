@@ -4,7 +4,6 @@ package org.safehaus.subutai.plugin.hadoop.api;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
@@ -24,11 +23,11 @@ public interface Hadoop extends ApiBase<HadoopClusterConfig>
 
     public UUID statusSecondaryNameNode( HadoopClusterConfig hadoopClusterConfig );
 
-    public UUID startDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
+    public UUID startDataNode( HadoopClusterConfig hadoopClusterConfig, String hostname );
 
-    public UUID stopDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
+    public UUID stopDataNode( HadoopClusterConfig hadoopClusterConfig, String hostname );
 
-    public UUID statusDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
+    public UUID statusDataNode( HadoopClusterConfig hadoopClusterConfig, String hostname );
 
     public UUID startJobTracker( HadoopClusterConfig hadoopClusterConfig );
 
@@ -36,25 +35,23 @@ public interface Hadoop extends ApiBase<HadoopClusterConfig>
 
     public UUID statusJobTracker( HadoopClusterConfig hadoopClusterConfig );
 
-    public UUID startTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent );
+    public UUID startTaskTracker( HadoopClusterConfig hadoopClusterConfig, String hostname );
 
-    public UUID stopTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent );
+    public UUID stopTaskTracker( HadoopClusterConfig hadoopClusterConfig, String hostname );
 
-    public UUID statusTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent );
+    public UUID statusTaskTracker( HadoopClusterConfig hadoopClusterConfig, String hostname );
 
     public UUID addNode( String clusterName, int nodeCount );
 
     public UUID addNode( String clusterName );
 
-    public UUID destroyNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
+    public UUID destroyNode( HadoopClusterConfig hadoopClusterConfig, String hostname );
 
     public UUID checkDecomissionStatus( HadoopClusterConfig hadoopClusterConfig );
 
-    public UUID excludeNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
+    public UUID excludeNode( HadoopClusterConfig hadoopClusterConfig, String hostname );
 
-    public UUID includeNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
-
-    public ClusterSetupStrategy getClusterSetupStrategy( TrackerOperation po, HadoopClusterConfig hadoopClusterConfig );
+    public UUID includeNode( HadoopClusterConfig hadoopClusterConfig, String hostname );
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment,
                                                          HadoopClusterConfig hadoopClusterConfig, TrackerOperation po );

@@ -25,7 +25,6 @@ public class HadoopClusterConfig implements ConfigBase
 
     private String clusterName, domainName;
     private UUID nameNode, jobTracker, secondaryNameNode;
-    private List<UUID> masterNodes;
     private List<UUID> dataNodes, taskTrackers;
     private Integer replicationFactor = 1, countOfSlaveNodes = 1;
     private Set<UUID> blockedAgents;
@@ -41,27 +40,28 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public static List<NodeType> getNodeRoles( HadoopClusterConfig clusterConfig, final UUID uuid )
+    public static List<NodeType> getNodeRoles( HadoopClusterConfig clusterConfig, final ContainerHost containerHost )
     {
         List<NodeType> nodeRoles = new ArrayList<>();
 
-        if ( clusterConfig.isNameNode( uuid ) )
+
+        if ( clusterConfig.isNameNode( containerHost.getAgent().getUuid() ) )
         {
             nodeRoles.add( NodeType.NAMENODE );
         }
-        if ( clusterConfig.isSecondaryNameNode( uuid ) )
+        if ( clusterConfig.isSecondaryNameNode( containerHost.getAgent().getUuid() ) )
         {
             nodeRoles.add( NodeType.SECONDARY_NAMENODE );
         }
-        if ( clusterConfig.isJobTracker( uuid ) )
+        if ( clusterConfig.isJobTracker( containerHost.getAgent().getUuid() ) )
         {
             nodeRoles.add( NodeType.JOBTRACKER );
         }
-        if ( clusterConfig.isDataNode( uuid ) )
+        if ( clusterConfig.isDataNode( containerHost.getAgent().getUuid() ) )
         {
             nodeRoles.add( NodeType.DATANODE );
         }
-        if ( clusterConfig.isTaskTracker( uuid ) )
+        if ( clusterConfig.isTaskTracker( containerHost.getAgent().getUuid() ) )
         {
             nodeRoles.add( NodeType.TASKTRACKER );
         }
@@ -134,15 +134,51 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
+    public UUID getNameNode()
+    {
+        return nameNode;
+    }
+
+
+    public void setNameNode( UUID nameNode )
+    {
+        this.nameNode = nameNode;
+    }
+
+
     public boolean isJobTracker( UUID uuid )
     {
         return getJobTracker().equals( uuid );
     }
 
 
+    public UUID getJobTracker()
+    {
+        return jobTracker;
+    }
+
+
+    public void setJobTracker( UUID jobTracker )
+    {
+        this.jobTracker = jobTracker;
+    }
+
+
     public boolean isSecondaryNameNode( UUID uuid )
     {
         return getSecondaryNameNode().equals( uuid );
+    }
+
+
+    public UUID getSecondaryNameNode()
+    {
+        return secondaryNameNode;
+    }
+
+
+    public void setSecondaryNameNode( UUID secondaryNameNode )
+    {
+        this.secondaryNameNode = secondaryNameNode;
     }
 
 
@@ -339,16 +375,20 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public Set<UUID> getBlockedAgents()
+
+    public Set<UUID> getBlockedAgentUUIDs()
     {
+        Set<UUID> blockedAgents = new HashSet<>();
+
+        for ( UUID uuid : getBlockedAgents() )
+        {
+            blockedAgents.add( uuid );
+        }
         return blockedAgents;
     }
 
-    public Set<UUID> getBlockedAgentUUIDs(){
-        Set<UUID> blockedAgents = new HashSet<>();
-        for ( UUID uuid : getBlockedAgents() ){
-            blockedAgents.add( uuid );
-        }
+    public Set<UUID> getBlockedAgents()
+    {
         return blockedAgents;
     }
 
@@ -359,47 +399,11 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public boolean isMasterNode( UUID uuid )
+    public boolean isMasterNode( ContainerHost containerHost )
     {
-        return uuid.equals( getNameNode() ) ||
-                uuid.equals( getJobTracker() ) ||
-                uuid.equals( getSecondaryNameNode() );
-    }
-
-
-    public UUID getNameNode()
-    {
-        return nameNode;
-    }
-
-
-    public void setNameNode( UUID nameNode )
-    {
-        this.nameNode = nameNode;
-    }
-
-
-    public UUID getJobTracker()
-    {
-        return jobTracker;
-    }
-
-
-    public void setJobTracker( UUID jobTracker )
-    {
-        this.jobTracker = jobTracker;
-    }
-
-
-    public UUID getSecondaryNameNode()
-    {
-        return secondaryNameNode;
-    }
-
-
-    public void setSecondaryNameNode( UUID secondaryNameNode )
-    {
-        this.secondaryNameNode = secondaryNameNode;
+        return containerHost.getAgent().getUuid().equals( getNameNode() ) ||
+                containerHost.getAgent().getUuid().equals( getJobTracker() ) ||
+                containerHost.getAgent().getUuid().equals( getSecondaryNameNode() );
     }
 
 

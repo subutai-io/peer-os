@@ -320,21 +320,21 @@ public class Manager
 
         if ( cluster.isMasterNode( containerHost ) )
         {
-            if ( cluster.isNameNode( containerHost ) )
+            if ( cluster.isNameNode( containerHost.getAgent().getUuid() ) )
             {
                 availableOperations.addComponent( checkButton );
                 availableOperations.addComponent( startStopButton );
                 availableOperations.addComponent( urlButton );
                 statusGroup.addComponent( statusDatanode );
             }
-            else if ( cluster.isJobTracker( containerHost ) )
+            else if ( cluster.isJobTracker( containerHost.getAgent().getUuid() ) )
             {
                 availableOperations.addComponent( checkButton );
                 availableOperations.addComponent( startStopButton );
                 availableOperations.addComponent( urlButton );
                 statusGroup.addComponent( statusTaskTracker );
             }
-            else if ( cluster.isSecondaryNameNode( containerHost ) )
+            else if ( cluster.isSecondaryNameNode( containerHost.getAgent().getUuid() ) )
             {
                 availableOperations.addComponent( checkButton );
                 availableOperations.addComponent( urlButton );
@@ -364,21 +364,21 @@ public class Manager
         if ( cluster.isMasterNode( containerHost ) )
         {
             // If Namenode
-            if ( cluster.isNameNode( containerHost ) )
+            if ( cluster.isNameNode( containerHost.getAgent().getUuid() ) )
             {
                 urlButton.addClickListener( managerListener.nameNodeURLButtonListener( containerHost.getAgent() ) );
                 checkButton.addClickListener( managerListener.nameNodeCheckButtonListener( row ) );
                 startStopButton.addClickListener( managerListener.nameNodeStartStopButtonListener( row ) );
             }
             // If Jobtracker
-            else if ( cluster.isJobTracker( containerHost ) )
+            else if ( cluster.isJobTracker( containerHost.getAgent().getUuid() ) )
             {
                 urlButton.addClickListener( jobTrackerURLButtonListener( containerHost.getAgent() ) );
                 checkButton.addClickListener( managerListener.jobTrackerCheckButtonListener( row ) );
                 startStopButton.addClickListener( managerListener.jobTrackerStartStopButtonListener( row ) );
             }
             // If SecondaryNameNode
-            else if ( cluster.isSecondaryNameNode( containerHost ) )
+            else if ( cluster.isSecondaryNameNode( containerHost.getAgent().getUuid() ) )
             {
                 urlButton.addClickListener(
                         managerListener.secondaryNameNodeURLButtonListener( containerHost.getAgent() ) );
@@ -436,23 +436,23 @@ public class Manager
     {
         List<NodeType> nodeRoles = new ArrayList<>();
 
-        if ( clusterConfig.isNameNode( containerHost ) )
+        if ( clusterConfig.isNameNode( containerHost.getAgent().getUuid() ) )
         {
             nodeRoles.add( NodeType.NAMENODE );
         }
-        if ( clusterConfig.isSecondaryNameNode( containerHost ) )
+        if ( clusterConfig.isSecondaryNameNode( containerHost.getAgent().getUuid() ) )
         {
             nodeRoles.add( NodeType.SECONDARY_NAMENODE );
         }
-        if ( clusterConfig.isJobTracker( containerHost ) )
+        if ( clusterConfig.isJobTracker( containerHost.getAgent().getUuid() ) )
         {
             nodeRoles.add( NodeType.JOBTRACKER );
         }
-        if ( clusterConfig.isDataNode( containerHost ) )
+        if ( clusterConfig.isDataNode( containerHost.getAgent().getUuid() ) )
         {
             nodeRoles.add( NodeType.DATANODE );
         }
-        if ( clusterConfig.isTaskTracker( containerHost ) )
+        if ( clusterConfig.isTaskTracker( containerHost.getAgent().getUuid() ) )
         {
             nodeRoles.add( NodeType.TASKTRACKER );
         }
@@ -843,16 +843,6 @@ public class Manager
     public Component getContent()
     {
         return contentRoot;
-    }
-
-
-    public List<ContainerHost> getMasterNodeList( final HadoopClusterConfig hadoopCluster )
-    {
-        List<ContainerHost> masterNodeList = new ArrayList<>();
-        masterNodeList.add( hadoopCluster.getNameNode() );
-        masterNodeList.add( hadoopCluster.getJobTracker() );
-        masterNodeList.add( hadoopCluster.getSecondaryNameNode() );
-        return masterNodeList;
     }
 
 

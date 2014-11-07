@@ -23,6 +23,8 @@ public interface Pig extends ApiBase<PigConfig>
 
     public UUID uninstallCluster( PigConfig config );
 
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( PigConfig config );
+
     public ClusterSetupStrategy getClusterSetupStrategy( Environment env, PigConfig config, TrackerOperation po );
 
 }
