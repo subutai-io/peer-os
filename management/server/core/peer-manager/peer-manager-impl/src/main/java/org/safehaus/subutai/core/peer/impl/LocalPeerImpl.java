@@ -290,7 +290,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                 for ( String cloneName : clones )
                 {
                     ContainerHost containerHost =
-                            createContainer( resourceHost, creatorPeerId, environmentId, templates, cloneName );
+                            resourceHost.createContainer( creatorPeerId, environmentId, templates, cloneName );
                     containerHost.setNodeGroupName( nodeGroupName );
                             resourceHost.createContainer( creatorPeerId, environmentId, templates, cloneName );
                     resourceHost.addContainerHost( containerHost );
