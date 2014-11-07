@@ -145,6 +145,7 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
         }
     }
     containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>","Program executed: ", program));
+    cout << "result: " << result.out << endl;
     return result;
 }
 
@@ -415,6 +416,7 @@ ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command)
         args.push_back((*it));
     }
     ExecutionResult res = RunProgram(program, args, true, opts, false);
+    cout <<"result: " << res.out << endl;
     return res;
 }
 
