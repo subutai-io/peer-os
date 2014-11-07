@@ -2,11 +2,15 @@ package org.safehaus.subutai.plugin.spark.api;
 
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.common.util.CollectionUtil;
+
+import com.google.common.collect.Lists;
 
 
 public class SparkClusterConfig implements ConfigBase
@@ -18,23 +22,48 @@ public class SparkClusterConfig implements ConfigBase
     private String clusterName = "";
     private String hadoopClusterName = "";
     private SetupType setupType;
-    private Agent masterNode;
-    private Set<Agent> slaves = new HashSet<>();
+    private UUID masterNodeId;
+    private Set<UUID> slaveIds = new HashSet<>();
     // for with-Hadoop installation
-    private Set<Agent> hadoopNodes = new HashSet<>();
+    private Set<UUID> hadoopNodeIds = new HashSet<>();
     // for environment blueprint
     private int slaveNodesCount;
+    private UUID environmentId;
 
 
-    public Agent getMasterNode()
+    public UUID getEnvironmentId()
     {
-        return masterNode;
+        return environmentId;
     }
 
 
-    public void setMasterNode( Agent masterNode )
+    public void setEnvironmentId( final UUID environmentId )
     {
-        this.masterNode = masterNode;
+        this.environmentId = environmentId;
+    }
+
+
+    public UUID getMasterNodeId()
+    {
+        return masterNodeId;
+    }
+
+
+    public Set<UUID> getSlaveIds()
+    {
+        return slaveIds;
+    }
+
+
+    public Set<UUID> getHadoopNodeIds()
+    {
+        return hadoopNodeIds;
+    }
+
+
+    public void setMasterNodeId( final UUID masterNodeId )
+    {
+        this.masterNodeId = masterNodeId;
     }
 
 
@@ -89,30 +118,6 @@ public class SparkClusterConfig implements ConfigBase
     }
 
 
-    public Set<Agent> getSlaveNodes()
-    {
-        return slaves;
-    }
-
-
-    public void setSlaveNodes( Set<Agent> slaves )
-    {
-        this.slaves = slaves;
-    }
-
-
-    public Set<Agent> getHadoopNodes()
-    {
-        return hadoopNodes;
-    }
-
-
-    public void setHadoopNodes( Set<Agent> hadoopNodes )
-    {
-        this.hadoopNodes = hadoopNodes;
-    }
-
-
     public int getSlaveNodesCount()
     {
         return slaveNodesCount;
@@ -125,19 +130,19 @@ public class SparkClusterConfig implements ConfigBase
     }
 
 
-    public Set<Agent> getAllNodes()
+    public List<UUID> getAllNodesIds()
     {
-        Set<Agent> allNodes = new HashSet<>();
-        if ( slaves != null )
+        List<UUID> allNodesIds = Lists.newArrayList();
+        if ( !CollectionUtil.isCollectionEmpty( slaveIds ) )
         {
-            allNodes.addAll( slaves );
+            allNodesIds.addAll( slaveIds );
         }
-        if ( masterNode != null )
+        if ( masterNodeId != null )
         {
-            allNodes.add( masterNode );
+            allNodesIds.add( masterNodeId );
         }
 
-        return allNodes;
+        return allNodesIds;
     }
 
 
@@ -165,7 +170,7 @@ public class SparkClusterConfig implements ConfigBase
     @Override
     public String toString()
     {
-        return "Config{" + "clusterName=" + clusterName + ", masterNode=" + masterNode + ", slaves=" + slaves + '}';
+        return "Config{" + "clusterName=" + clusterName + ", masterNode=" + masterNodeId + ", slaves=" + slaveIds + '}';
     }
 }
 

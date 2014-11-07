@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl>
+public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl, CassandraClusterConfig>
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( CheckServiceHandler.class.getName() );

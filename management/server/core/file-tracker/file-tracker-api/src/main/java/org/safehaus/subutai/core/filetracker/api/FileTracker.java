@@ -1,8 +1,8 @@
 package org.safehaus.subutai.core.filetracker.api;
 
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ResponseListener;
+import org.safehaus.subutai.core.peer.api.Host;
 
 
 public interface FileTracker
@@ -12,9 +12,9 @@ public interface FileTracker
 
     public void removeListener( ResponseListener listener );
 
-    public void createConfigPoints( Agent agent, String[] configPoints );
+    public void createConfigPoints( Host host, String[] configPoints ) throws FileTrackerException;
 
-    public void removeConfigPoints( Agent agent, String[] configPoints );
+    public void removeConfigPoints( Host host, String[] configPoints ) throws FileTrackerException;
 
-    public String[] listConfigPoints( Agent agent );
+    public String[] listConfigPoints( Host host ) throws FileTrackerException;
 }

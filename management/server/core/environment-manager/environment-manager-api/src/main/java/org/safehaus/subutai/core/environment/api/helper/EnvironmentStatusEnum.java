@@ -6,5 +6,5 @@ package org.safehaus.subutai.core.environment.api.helper;
  */
 public enum EnvironmentStatusEnum
 {
-    EMPTY, UNHEALTHY, HEALTHY, BROKEN;
+    EMPTY, HEALTHY, UNHEALTHY;
 }

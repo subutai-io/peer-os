@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl>
+public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl, CassandraClusterConfig>
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( StartServiceHandler.class.getName() );

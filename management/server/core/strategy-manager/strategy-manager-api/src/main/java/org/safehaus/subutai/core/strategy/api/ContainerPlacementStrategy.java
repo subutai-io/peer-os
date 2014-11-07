@@ -4,8 +4,6 @@ package org.safehaus.subutai.core.strategy.api;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.common.protocol.Agent;
-
 
 /**
  * Container placement strategy contains methods to distribute containers on physical hosts
@@ -21,7 +19,7 @@ public interface ContainerPlacementStrategy
 
     public List<Criteria> getCriteria();
 
-    public Map<Agent, Integer> calculateSlots( int nodesCount, Map<Agent, ServerMetric> serverMetrics );
+    public Map<ServerMetric, Integer> calculateSlots( int nodesCount, List<ServerMetric> serverMetrics );
 
     /**
      * This method calculates placement of lxcs on physical servers. Code should check passed server metrics to figure
@@ -30,8 +28,8 @@ public interface ContainerPlacementStrategy
      *
      * @param serverMetrics - map where key is a physical agent and value is a metric
      */
-    public void calculatePlacement( int nodesCount, Map<Agent, ServerMetric> serverMetrics, List<Criteria> criteria )
+    public void calculatePlacement( int nodesCount, List<ServerMetric> serverMetrics, List<Criteria> criteria )
             throws StrategyException;
 
-    public Map<Agent, Integer> getPlacementDistribution();
+    public Map<ServerMetric, Integer> getPlacementDistribution();
 }

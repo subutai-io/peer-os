@@ -1,10 +1,14 @@
 package org.safehaus.subutai.plugin.hive.ui.wizard;
 
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.Hive;
@@ -25,7 +29,7 @@ public class VerificationStep extends Panel
 {
 
     public VerificationStep( final Hive hive, final ExecutorService executorService, final Tracker tracker,
-                             final Wizard wizard )
+                             EnvironmentManager environmentManager, final Wizard wizard )
     {
 
         setSizeFull();
@@ -45,10 +49,15 @@ public class VerificationStep extends Panel
         cfgView.addStringCfg( "Installation name", config.getClusterName() );
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            cfgView.addStringCfg( "Server node", config.getServer().toString() );
-            for ( UUID agent : config.getClients() )
+            Environment hadoopEnvironment = environmentManager.getEnvironmentByUUID( hc.getEnvironmentId() );
+            ContainerHost master = hadoopEnvironment.getContainerHostByUUID( wizard.getConfig().getServer() );
+            Set<ContainerHost> slaves = hadoopEnvironment.getHostsByIds( wizard.getConfig().getClients() );
+
+            cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getHadoopClusterName() );
+            cfgView.addStringCfg( "Server node", master.getHostname() );
+            for ( ContainerHost slave : slaves )
             {
-                cfgView.addStringCfg( "Node(s) to install", agent.toString() + "" );
+                cfgView.addStringCfg( "Node(s) to install", slave.getHostname() );
             }
         }
         else if ( config.getSetupType() == SetupType.WITH_HADOOP )
