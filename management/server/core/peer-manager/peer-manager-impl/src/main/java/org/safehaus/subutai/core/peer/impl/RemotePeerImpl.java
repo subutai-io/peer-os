@@ -193,9 +193,6 @@ public class RemotePeerImpl implements RemotePeer
     public String getQuota( final ContainerHost host, final QuotaEnum quota ) throws PeerException
     {
         throw new PeerException( "Operation not allowed." );
-        //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(),
-        // "8181" );
-        //        return remotePeerRestClient.getQuota( host, quota );
     }
 
 
@@ -203,16 +200,12 @@ public class RemotePeerImpl implements RemotePeer
     public void setQuota( final ContainerHost host, final QuotaEnum quota, final String value ) throws PeerException
     {
         throw new PeerException( "Operation not allowed." );
-        //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(),
-        // "8181" );
-        //        remotePeerRestClient.setQuota( host, quota, value );
     }
 
 
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
-
         return execute( requestBuilder, host, null );
     }
 

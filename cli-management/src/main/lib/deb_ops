@@ -6,7 +6,6 @@
 
 SUBUTAI_REPO_DIR="/repo/ksks"
 SUBUTAI_TMPDIR="/tmp"
-SUBUTAI_REMOVED_PACKAGES_DIR="/var/lib/subutai/removed-packages/"
 
 
 function add_package {
@@ -26,17 +25,16 @@ function add_package {
 
 
 function remove_package {
-  local package_control_name=$1
-  local debian_package=$package_control_name"_*.deb"
+  local debian_package=$1
   local file_path=$SUBUTAI_REPO_DIR/amd64/trusty/$debian_package
-  assert_file "$file_path"
   assert_debian_package "$debian_package"
-
+  assert_file "$file_path"
+  
   # Remove file under custom package directory
-  mkdir -p "$SUBUTAI_REMOVED_PACKAGES_DIR"
-  mv $file_path $SUBUTAI_REMOVED_PACKAGES_DIR
+  rm $file_path
   pushd $SUBUTAI_REPO_DIR > /dev/null
   # Remove file from the apt repository
+  local package_control_name=$(get_package_control_name $debian_package)
   reprepro remove trusty $package_control_name
   popd > /dev/null
 }
@@ -44,17 +42,14 @@ function remove_package {
 
 function extract_package {
   local debian_package=$1
+  local file_path=$SUBUTAI_REPO_DIR/amd64/trusty/$debian_package
   assert_debian_package "$debian_package"
-  local file_path="$SUBUTAI_REPO_DIR/amd64/trusty/$debian_package"
   assert_file "$file_path"
 
   pushd $SUBUTAI_TMPDIR > /dev/null
-  # If the debian package arguement is provided with wilcards,
-  # then get the full package name
-  full_package_name=$(ls $file_path | sed 's/.*\///')
-  local extract_directory_name=${full_package_name:0:$((${#full_package_name} - 4))}
+  local extract_directory_name=${debian_package:0:$((${#debian_package} - 4))}
   # delete directory if exists
-  rm -r "$SUBUTAI_TMPDIR/$extract_directory_name"
+  rm -rf "$SUBUTAI_TMPDIR/$extract_directory_name"
   # extract the package under $SUBUTAI_TMPDIR
   dpkg -x $file_path "$SUBUTAI_TMPDIR/$extract_directory_name"
   dpkg -e $file_path "$SUBUTAI_TMPDIR/$extract_directory_name/DEBIAN/"
@@ -70,6 +65,17 @@ function list_package {
   fi
 
   echo "$(apt-cache search $search_pattern)"
+}
+
+
+function info_package {
+  package_name=$1
+  if [ -z $package_name ]; then
+    msg_error "Package name is not provided. Aborting!"
+    exit 1
+  fi
+
+  echo "$(apt-cache show $package_name)"
 }
 
 
