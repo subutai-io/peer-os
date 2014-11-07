@@ -12,7 +12,7 @@ import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 
 
-public class InstallClusterHandler extends AbstractOperationHandler<CassandraImpl>
+public class InstallClusterHandler extends AbstractOperationHandler<CassandraImpl, CassandraClusterConfig>
 {
 
     private CassandraClusterConfig config;

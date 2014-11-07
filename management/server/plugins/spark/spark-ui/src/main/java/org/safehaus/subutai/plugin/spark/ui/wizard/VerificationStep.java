@@ -1,11 +1,15 @@
 package org.safehaus.subutai.plugin.spark.ui.wizard;
 
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.ui.ConfigView;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.Spark;
@@ -25,7 +29,7 @@ public class VerificationStep extends Panel
 {
 
     public VerificationStep( final Tracker tracker, final Spark spark, final ExecutorService executor,
-                             final Wizard wizard )
+                             EnvironmentManager environmentManager, final Wizard wizard )
     {
 
         setSizeFull();
@@ -46,11 +50,14 @@ public class VerificationStep extends Panel
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
+            Environment hadoopEnvironment = environmentManager.getEnvironmentByUUID( hc.getEnvironmentId() );
+            ContainerHost master = hadoopEnvironment.getContainerHostByUUID( wizard.getConfig().getMasterNodeId() );
+            Set<ContainerHost> slaves = hadoopEnvironment.getHostsByIds( wizard.getConfig().getSlaveIds() );
             cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getHadoopClusterName() );
-            cfgView.addStringCfg( "Master Node", wizard.getConfig().getMasterNode().getHostname() );
-            for ( Agent agent : wizard.getConfig().getSlaveNodes() )
+            cfgView.addStringCfg( "Master Node", master.getHostname() );
+            for ( ContainerHost slave : slaves )
             {
-                cfgView.addStringCfg( "Slave nodes", agent.getHostname() + "" );
+                cfgView.addStringCfg( "Slave nodes", slave.getHostname() );
             }
         }
         else if ( config.getSetupType() == SetupType.WITH_HADOOP )
