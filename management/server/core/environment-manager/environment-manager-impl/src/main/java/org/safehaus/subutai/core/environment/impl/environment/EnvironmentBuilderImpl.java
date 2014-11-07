@@ -31,8 +31,8 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
     private ExecutorService executorService;
     private EnvironmentManagerImpl manager;
     private Environment environment;
-    private int containersCreated;
-    private int approximateCloneTime = 30; //Seconds
+    private int containersCreated = 0;
+    private int approximateCloneTime = 60; //Seconds
 
 
     public EnvironmentBuilderImpl( EnvironmentManagerImpl manager )
@@ -112,8 +112,8 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
         if ( arg instanceof Set )
         {
             Set<ContainerHost> containerHosts = ( Set<ContainerHost> ) arg;
-            this.containersCreated = containersCreated + containerHosts.size();
             environment.addContainers( containerHosts );
+            containersCreated = containersCreated + containerHosts.size();
         }
         else if ( arg instanceof Exception )
         {
