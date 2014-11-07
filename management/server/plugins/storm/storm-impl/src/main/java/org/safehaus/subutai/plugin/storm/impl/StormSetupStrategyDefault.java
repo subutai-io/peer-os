@@ -217,13 +217,13 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
             if ( zk_config != null )
             {
                 StringBuilder sb = new StringBuilder();
-                for ( Agent a : zk_config.getNodes() )
+                for ( ContainerHost containerHost : zk_config.getNodes() )
                 {
                     if ( sb.length() > 0 )
                     {
                         sb.append( "," );
                     }
-                    sb.append( a.getListIP().get( 0 ) );
+                    sb.append( containerHost.getAgent().getListIP().get( 0 ) );
                 }
                 return sb.toString();
             }

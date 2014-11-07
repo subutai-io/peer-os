@@ -4,6 +4,7 @@ package org.safehaus.subutai.plugin.storm.ui.wizard;
 import java.util.Arrays;
 import java.util.List;
 
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -70,10 +71,10 @@ public class NodeSelectionStep extends Panel
                     if ( e.getProperty().getValue() != null )
                     {
                         ZookeeperClusterConfig zk = ( ZookeeperClusterConfig ) e.getProperty().getValue();
-                        for ( Agent a : zk.getNodes() )
+                        for ( ContainerHost containerHost : zk.getNodes() )
                         {
-                            masterNodeCombo.addItem( a );
-                            masterNodeCombo.setItemCaption( a, a.getHostname() );
+                            masterNodeCombo.addItem( containerHost );
+                            masterNodeCombo.setItemCaption( containerHost, containerHost.getHostname() );
                         }
                         // do select if values exist
                         if ( wizard.getConfig().getNimbus() != null )
@@ -213,8 +214,8 @@ public class NodeSelectionStep extends Panel
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                Agent serverNode = ( Agent ) event.getProperty().getValue();
-                wizard.getConfig().setNimbus( serverNode );
+                ContainerHost serverNode = ( ContainerHost ) event.getProperty().getValue();
+                wizard.getConfig().setNimbus( serverNode.getId() );
             }
         } );
         return cb;

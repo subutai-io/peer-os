@@ -10,13 +10,13 @@
       <cxf:logging />
     </cxf:features>
   </cxf:bus>
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
+  <reference id="environmentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
   <reference id="stormManager" availability="mandatory" interface="org.safehaus.subutai.plugin.storm.api.Storm" />
 
   <bean id="restService" class="org.safehaus.subutai.plugin.storm.rest.RestService">
-    <property name="agentManager" ref="agentManager" />
+    <property name="environmentManager" ref="environmentManager" />
     <property name="stormManager" ref="stormManager" />
   </bean>
 
