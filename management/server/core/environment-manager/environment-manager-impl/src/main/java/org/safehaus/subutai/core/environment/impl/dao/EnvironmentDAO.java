@@ -178,12 +178,13 @@ public class EnvironmentDAO
     }
 
 
-    public void saveBlueprint( final EnvironmentBlueprint blueprint ) throws EnvironmentPersistenceException
+    public UUID saveBlueprint( final EnvironmentBlueprint blueprint ) throws EnvironmentPersistenceException
     {
         try
         {
             String json = GSON.toJson( blueprint );
             dbUtil.update( "merge into blueprint (id, info) values (? , ?)", blueprint.getId(), json );
+            return blueprint.getId();
         }
         catch ( JsonParseException | SQLException e )
         {
