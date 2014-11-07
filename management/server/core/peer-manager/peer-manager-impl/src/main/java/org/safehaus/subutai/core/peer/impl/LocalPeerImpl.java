@@ -45,6 +45,7 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
+import org.safehaus.subutai.core.peer.api.SubutaiHost;
 import org.safehaus.subutai.core.peer.api.SubutaiInitException;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
@@ -400,7 +401,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     {
         Host result = null;
         ManagementHost managementHost = getManagementHost();
-        if ( managementHost.getId().equals( id ) )
+        if ( managementHost != null && managementHost.getId().equals( id ) )
         {
             result = managementHost;
         }
@@ -633,13 +634,14 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                 return;
             }
 
-            // assume response from container host agent
-
-            ContainerHost containerHost = getContainerHostByName( response.getHostname() );
-
-            if ( containerHost != null )
+            try
             {
-                containerHost.updateHeartbeat();
+                SubutaiHost host = ( SubutaiHost ) bindHost( response.getUuid() );
+                host.updateHeartbeat();
+            }
+            catch ( PeerException p )
+            {
+                LOG.warn( p.toString() );
             }
         }
     }
