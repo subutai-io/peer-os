@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
@@ -28,11 +28,11 @@ public class NodeOperationHandler extends AbstractOperationHandler<Elasticsearch
 
     private String clusterName;
     private String hostname;
-    private OperationType operationType;
+    private NodeOperationType operationType;
 
 
     public NodeOperationHandler( final ElasticsearchImpl manager, final String clusterName, final String hostname,
-                                 OperationType operationType )
+                                 NodeOperationType operationType )
     {
         super( manager, clusterName );
         this.hostname = hostname;

@@ -102,9 +102,7 @@ public class Environment
     public ContainerHost getContainerHostByHostname( String hostname )
     {
         Iterator<ContainerHost> iterator = containers.iterator();
-        iterator.next();
-        while ( iterator.hasNext() )
-        {
+        while ( iterator.hasNext() ) {
             ContainerHost containerHost = iterator.next();
             if ( containerHost.getHostname().equalsIgnoreCase( hostname ) )
             {

@@ -6,17 +6,16 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.enums.ResponseType;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.filetracker.api.FileTracker;
+import org.safehaus.subutai.core.filetracker.api.FileTrackerException;
+import org.safehaus.subutai.core.peer.api.Host;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
 
 public class FileTrackerImpl implements FileTracker, ResponseListener
@@ -24,16 +23,7 @@ public class FileTrackerImpl implements FileTracker, ResponseListener
 
     private final Set<ResponseListener> listeners = new HashSet<>();
 
-    private CommandRunner commandRunner;
-
     private CommunicationManager communicationManager;
-
-
-    public void setCommandRunner( CommandRunner commandRunner )
-    {
-        Preconditions.checkNotNull( commandRunner, "CommandRunner is null." );
-        this.commandRunner = commandRunner;
-    }
 
 
     public void setCommunicationManager( CommunicationManager communicationManager )
@@ -70,39 +60,46 @@ public class FileTrackerImpl implements FileTracker, ResponseListener
 
 
     @Override
-    public void createConfigPoints( Agent agent, String[] configPoints )
+    public void createConfigPoints( Host host, String[] configPoints ) throws FileTrackerException
     {
-
-        Command command = commandRunner.createCommand(
-                new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_CREATE_REQUEST )
-                                           .withConfPoints( configPoints ), Sets.newHashSet( agent ) );
-
-        commandRunner.runCommandAsync( command );
+        try
+        {
+            host.execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_CREATE_REQUEST )
+                                                     .withConfPoints( configPoints ) );
+        }
+        catch ( CommandException e )
+        {
+            throw new FileTrackerException( "Could not create config points: " + e.toString() );
+        }
     }
 
 
     @Override
-    public void removeConfigPoints( Agent agent, String[] configPoints )
+    public void removeConfigPoints( Host host, String[] configPoints ) throws FileTrackerException
     {
-
-        Command command = commandRunner.createCommand(
-                new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_REMOVE_REQUEST )
-                                           .withConfPoints( configPoints ), Sets.newHashSet( agent ) );
-
-        commandRunner.runCommandAsync( command );
+        try
+        {
+            host.execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_REMOVE_REQUEST )
+                                                     .withConfPoints( configPoints ) );
+        }
+        catch ( CommandException e )
+        {
+            throw new FileTrackerException( "Could not remove config points: " + e.toString() );
+        }
     }
 
 
     @Override
-    public String[] listConfigPoints( final Agent agent )
+    public String[] listConfigPoints( final Host host ) throws FileTrackerException
     {
-
-        Command command = commandRunner
-                .createCommand( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_LIST_REQUEST ),
-                        Sets.newHashSet( agent ) );
-
-        commandRunner.runCommandAsync( command );
-
+        try
+        {
+            host.execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_LIST_REQUEST ) );
+        }
+        catch ( CommandException e )
+        {
+            throw new FileTrackerException( "Could not list config points: " + e.toString() );
+        }
         return new String[] { };
     }
 

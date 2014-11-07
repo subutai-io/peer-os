@@ -18,8 +18,10 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyExc
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
+
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeType;
-import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 import org.safehaus.subutai.plugin.hadoop.impl.Commands;
@@ -37,14 +39,14 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
         implements ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
-    private OperationType operationType;
+    private ClusterOperationType operationType;
     private HadoopClusterConfig config;
     private NodeType nodeType;
     private ExecutorService executor = Executors.newCachedThreadPool();
 
 
     public ClusterOperationHandler( final HadoopImpl manager, final HadoopClusterConfig config,
-                                    final OperationType operationType, NodeType nodeType )
+                                    final ClusterOperationType operationType, NodeType nodeType )
     {
         super( manager, config.getClusterName() );
         this.operationType = operationType;
@@ -69,7 +71,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                     }
                 } );
                 break;
-            case DESTROY:
+            case UNINSTALL:
                 executor.execute( new Runnable()
                 {
                     public void run()
@@ -78,24 +80,20 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                     }
                 } );
                 break;
-            case START:
-                runOperationOnContainers( OperationType.START );
-                break;
-            case STOP:
-                runOperationOnContainers( OperationType.STOP );
-                break;
-            case STATUS:
-                runOperationOnContainers( OperationType.STATUS );
+            case START_ALL:
+            case STOP_ALL:
+            case STATUS_ALL:
+                runOperationOnContainers( operationType );
                 break;
             case DECOMISSION_STATUS:
-                runOperationOnContainers( OperationType.DECOMISSION_STATUS );
+                runOperationOnContainers( ClusterOperationType.DECOMISSION_STATUS );
                 break;
         }
     }
 
 
     @Override
-    public void runOperationOnContainers( OperationType operationType )
+    public void runOperationOnContainers( ClusterOperationType clusterOperationType )
     {
         try
         {
@@ -105,9 +103,9 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
             ContainerHost secondaryNameNode = environment.getContainerHostByUUID( config.getSecondaryNameNode() );
 
             CommandResult result = null;
-            switch ( operationType )
+            switch ( clusterOperationType )
             {
-                case START:
+                case START_ALL:
                     switch ( nodeType )
                     {
                         case NAMENODE:
@@ -119,7 +117,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                     }
                     logStatusResults( trackerOperation, result, nodeType );
                     break;
-                case STOP:
+                case STOP_ALL:
                     switch ( nodeType )
                     {
                         case NAMENODE:
@@ -131,7 +129,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                     }
                     logStatusResults( trackerOperation, result, nodeType );
                     break;
-                case STATUS:
+                case STATUS_ALL:
                     switch ( nodeType )
                     {
                         case NAMENODE:

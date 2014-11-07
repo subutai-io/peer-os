@@ -21,10 +21,13 @@
     <module>spark</module>
     <!--<module>accumulo</module>
     <module>solr</module>
+
     <module>zookeeper</module>
+
     <module>mongodb</module>
     <module>flume</module>
     <module>hive</module>
+
     <module>storm</module>
     <module>presto</module>
     <module>shark</module>

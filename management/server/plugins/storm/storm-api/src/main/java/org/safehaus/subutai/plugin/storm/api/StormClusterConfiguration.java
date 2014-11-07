@@ -4,25 +4,36 @@ package org.safehaus.subutai.plugin.storm.api;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
 
-public class StormConfig implements ConfigBase
+public class StormClusterConfiguration implements ConfigBase
 {
 
     public static final String PRODUCT_NAME = "Storm";
-    public static final String TEMPLATE_NAME_NIMBUS = "stormnimbus";
-    public static final String TEMPLATE_NAME_WORKER = "storm";
+    public static final String TEMPLATE_NAME = "storm";
 
     private String clusterName;
     private int supervisorsCount;
     private boolean externalZookeeper;
     private String zookeeperClusterName;
-    private Agent nimbus; // master node
-    private Set<Agent> supervisors = new HashSet(); // worker nodes
+    private UUID nimbus; // master node
+    private Set<UUID> supervisors = new HashSet(); // worker nodes
+    private UUID environmentId;
 
+
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
+    }
 
     @Override
     public String getClusterName()
@@ -51,13 +62,13 @@ public class StormConfig implements ConfigBase
     }
 
 
-    public Agent getNimbus()
+    public UUID getNimbus()
     {
         return nimbus;
     }
 
 
-    public void setNimbus( Agent nimbus )
+    public void setNimbus( UUID nimbus )
     {
         this.nimbus = nimbus;
     }
@@ -75,13 +86,13 @@ public class StormConfig implements ConfigBase
     }
 
 
-    public Set<Agent> getSupervisors()
+    public Set<UUID> getSupervisors()
     {
         return supervisors;
     }
 
 
-    public void setSupervisors( Set<Agent> supervisors )
+    public void setSupervisors( Set<UUID> supervisors )
     {
         this.supervisors = supervisors;
     }
@@ -123,9 +134,9 @@ public class StormConfig implements ConfigBase
     @Override
     public boolean equals( Object obj )
     {
-        if ( obj instanceof StormConfig )
+        if ( obj instanceof StormClusterConfiguration )
         {
-            StormConfig other = ( StormConfig ) obj;
+            StormClusterConfiguration other = ( StormClusterConfiguration ) obj;
             return clusterName.equals( other.clusterName );
         }
         return false;
