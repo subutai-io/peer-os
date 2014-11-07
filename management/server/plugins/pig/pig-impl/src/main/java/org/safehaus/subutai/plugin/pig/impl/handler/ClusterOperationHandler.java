@@ -34,7 +34,7 @@ import com.google.common.base.Preconditions;
 /**
  * Created by ebru on 05.11.2014.
  */
-public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl> implements ClusterOperationHandlerInterface
+public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, PigConfig> implements ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
     private ClusterOperationType operationType;

@@ -18,8 +18,8 @@
         init-method="init" destroy-method="destroy">
     <argument ref="dataSource" />
     <property name="tracker" ref="tracker" />
-    <property name="environmentManager" ref="environmentManager" />
-    <property name="hadoopManager" ref="hadoopManager" />
+    <argument ref="environmentManager" />
+    <argument ref="hadoopManager" />
   </bean>
 
   <service ref="pig-impl" interface="org.safehaus.subutai.plugin.pig.api.Pig" />

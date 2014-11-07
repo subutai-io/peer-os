@@ -153,6 +153,7 @@ public class ConfigurationStep extends Panel
                     select
                             .setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
+                    config.setHadoopManager( hadoop );
                     config.getNodes().clear();
                 }
             }

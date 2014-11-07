@@ -47,7 +47,7 @@ public class VerificationStep extends Panel
         // Display config values
 
         final PigConfig config = wizard.getConfig();
-        final HadoopClusterConfig hadoopClusterConfig = wizard.getHadoopConfig();
+        final HadoopClusterConfig hadoopClusterConfig = config.getHadoopConfig();
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Hadoop cluster name", config.getHadoopClusterName() );
 
@@ -62,7 +62,7 @@ public class VerificationStep extends Panel
         }
         else if ( config.getSetupType() == SetupType.WITH_HADOOP )
         {
-            HadoopClusterConfig hc = wizard.getHadoopConfig();
+            HadoopClusterConfig hc = config.getHadoopConfig();
             cfgView.addStringCfg( "Hadoop cluster name", hc.getClusterName() );
             cfgView.addStringCfg( "Number of Hadoop slave nodes", hc.getCountOfSlaveNodes() + "" );
             cfgView.addStringCfg( "Replication factor", hc.getReplicationFactor() + "" );

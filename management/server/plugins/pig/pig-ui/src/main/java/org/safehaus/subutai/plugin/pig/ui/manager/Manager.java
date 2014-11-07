@@ -25,6 +25,7 @@ import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -65,11 +66,14 @@ public class Manager
 
     public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
-        this.pig = serviceLocator.getService( Pig.class );
+        Preconditions.checkNotNull( executorService, "Executor is null" );
+        Preconditions.checkNotNull( serviceLocator, "Service Locator is null" );
+
         this.tracker = serviceLocator.getService( Tracker.class );
         this.executorService = executorService;
         this.hadoop = serviceLocator.getService( Hadoop.class );
         this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.pig = serviceLocator.getService( Pig.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );

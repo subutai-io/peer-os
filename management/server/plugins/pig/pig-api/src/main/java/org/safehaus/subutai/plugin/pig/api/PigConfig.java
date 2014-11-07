@@ -10,6 +10,7 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 
 public class PigConfig implements ConfigBase
@@ -23,6 +24,7 @@ public class PigConfig implements ConfigBase
     private String hadoopClusterName;
     private Set<UUID> nodes = new HashSet<>();
     private Set<UUID> hadoopNodes = new HashSet<>();
+    private Hadoop hadoopManager;
     private UUID environmentId;
 
 
@@ -35,8 +37,16 @@ public class PigConfig implements ConfigBase
     public PigConfig setClusterName( String clusterName )
     {
         this.clusterName = clusterName;
-        //hadoop.getCluster( hadoopClusterName );
         return this;
+    }
+
+    public void setHadoopManager(Hadoop hadoopManager)
+    {
+        this.hadoopManager = hadoopManager;
+    }
+    public HadoopClusterConfig getHadoopConfig()
+    {
+        return hadoopManager.getCluster( hadoopClusterName );
     }
 
 

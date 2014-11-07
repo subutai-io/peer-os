@@ -33,15 +33,13 @@ import org.safehaus.subutai.plugin.pig.impl.handler.ClusterOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 
 public class PigImpl implements Pig
 {
-
-    protected Commands commands;
     private static final Logger LOG = LoggerFactory.getLogger( PigImpl.class.getName() );
+    protected Commands commands;
     private Tracker tracker;
     private ExecutorService executor;
     private EnvironmentManager environmentManager;

@@ -11,8 +11,6 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerExc
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 import com.google.common.collect.Sets;
-
-
 public class Environment
 {
 
@@ -88,17 +86,15 @@ public class Environment
     }
 
 
-    public ContainerHost getContainerHostByUUID( final UUID uuid ) {
+    public ContainerHost getContainerHostByUUID( UUID uuid ) {
         Iterator<ContainerHost> iterator = containers.iterator();
         iterator.next();
         while ( iterator.hasNext() )
         {
             ContainerHost containerHost = iterator.next();
             if ( containerHost.getId().equals( uuid ) )
-            {
                 return containerHost;
-            }
-        }
+         }
         return null;
     }
 
@@ -106,8 +102,7 @@ public class Environment
     public ContainerHost getContainerHostByHostname( String hostname )
     {
         Iterator<ContainerHost> iterator = containers.iterator();
-        while ( iterator.hasNext() )
-        {
+        while ( iterator.hasNext() ) {
             ContainerHost containerHost = iterator.next();
             if ( containerHost.getHostname().equalsIgnoreCase( hostname ) )
             {

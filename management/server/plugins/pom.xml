@@ -16,12 +16,11 @@
 
   <modules>
     <module>cassandra</module>
-    <module>solr</module>
-    <module>hadoop</module>
-    <module>pig</module>
     <module>elasticsearch</module>
+    <module>hadoop</module>
     <module>spark</module>
-
+    <module>solr</module>
+    <module>pig</module>
     <!--
     <module>accumulo</module>
     <module>spark</module>

@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.spark.ui.wizard;
+package org.safehaus.subutai.plugin.common.ui;
 
 
 import com.vaadin.data.Item;

@@ -18,7 +18,7 @@ import org.safehaus.subutai.plugin.pig.impl.PigImpl;
 /**
  * Created by ebru on 06.11.2014.
  */
-public class NodeOperationHandler extends AbstractOperationHandler<PigImpl>
+public class NodeOperationHandler extends AbstractOperationHandler<PigImpl, PigConfig>
 {
     private String clusterName;
     private String hostname;

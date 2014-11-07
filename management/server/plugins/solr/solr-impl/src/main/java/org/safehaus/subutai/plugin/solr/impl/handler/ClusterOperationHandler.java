@@ -22,7 +22,7 @@ import com.google.common.base.Preconditions;
 /**
  * Created by ebru on 06.11.2014.
  */
-public class ClusterOperationHandler extends AbstractOperationHandler<SolrImpl>
+public class ClusterOperationHandler extends AbstractOperationHandler<SolrImpl, SolrClusterConfig>
         implements ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );

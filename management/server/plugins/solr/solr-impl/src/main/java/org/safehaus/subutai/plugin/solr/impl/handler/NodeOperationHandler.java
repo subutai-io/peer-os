@@ -21,7 +21,7 @@ import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import com.google.common.base.Preconditions;
 
 
-public class NodeOperationHandler extends AbstractOperationHandler<SolrImpl>
+public class NodeOperationHandler extends AbstractOperationHandler<SolrImpl, SolrClusterConfig>
 {
 
     private String clusterName;

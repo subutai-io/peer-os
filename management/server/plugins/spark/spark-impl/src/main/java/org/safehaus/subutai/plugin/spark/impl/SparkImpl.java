@@ -17,21 +17,16 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeType;
+import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.plugin.spark.impl.handler.AddSlaveNodeOperationHandler;
-import org.safehaus.subutai.plugin.spark.impl.handler.ChangeMasterNodeOperationHandler;
-import org.safehaus.subutai.plugin.spark.impl.handler.CheckNodeOperationHandler;
-import org.safehaus.subutai.plugin.spark.impl.handler.DestroySlaveNodeOperationHandler;
-import org.safehaus.subutai.plugin.spark.impl.handler.InstallOperationHandler;
-import org.safehaus.subutai.plugin.spark.impl.handler.StartClusterOperationHandler;
-import org.safehaus.subutai.plugin.spark.impl.handler.StartNodeOperationHandler;
-import org.safehaus.subutai.plugin.spark.impl.handler.StopClusterOperationHandler;
-import org.safehaus.subutai.plugin.spark.impl.handler.StopNodeOperationHandler;
-import org.safehaus.subutai.plugin.spark.impl.handler.UninstallOperationHandler;
+import org.safehaus.subutai.plugin.spark.impl.handler.ClusterOperationHandler;
+import org.safehaus.subutai.plugin.spark.impl.handler.NodeOperationHandler;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -53,7 +48,8 @@ public class SparkImpl extends SparkBase implements Spark
 
         Preconditions.checkNotNull( config, "Configuration is null" );
 
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL, null );
 
         executor.execute( operationHandler );
 
@@ -65,7 +61,9 @@ public class SparkImpl extends SparkBase implements Spark
     public UUID uninstallCluster( final String clusterName )
     {
 
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
+        SparkClusterConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL, null );
 
         executor.execute( operationHandler );
 
@@ -97,8 +95,11 @@ public class SparkImpl extends SparkBase implements Spark
     @Override
     public UUID installCluster( SparkClusterConfig config, HadoopClusterConfig hadoopConfig )
     {
-        InstallOperationHandler operationHandler = new InstallOperationHandler( this, config );
-        operationHandler.setHadoopConfig( hadoopConfig );
+        Preconditions.checkNotNull( config, "Configuration is null" );
+        Preconditions.checkNotNull( hadoopConfig, "Hadoop Configuration is null" );
+
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL, hadoopConfig );
 
         executor.execute( operationHandler );
 
@@ -109,8 +110,9 @@ public class SparkImpl extends SparkBase implements Spark
     @Override
     public UUID addSlaveNode( final String clusterName, final String lxcHostname )
     {
-
-        AbstractOperationHandler operationHandler = new AddSlaveNodeOperationHandler( this, clusterName, lxcHostname );
+        SparkClusterConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, config, lxcHostname, OperationType.INCLUDE, null );
 
         executor.execute( operationHandler );
 
@@ -121,9 +123,9 @@ public class SparkImpl extends SparkBase implements Spark
     @Override
     public UUID destroySlaveNode( final String clusterName, final String lxcHostname )
     {
-
+        SparkClusterConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
-                new DestroySlaveNodeOperationHandler( this, clusterName, lxcHostname );
+                new NodeOperationHandler( this, config, lxcHostname, OperationType.EXCLUDE, null );
 
         executor.execute( operationHandler );
 
@@ -134,9 +136,10 @@ public class SparkImpl extends SparkBase implements Spark
     @Override
     public UUID changeMasterNode( final String clusterName, final String newMasterHostname, final boolean keepSlave )
     {
-
+        SparkClusterConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
-                new ChangeMasterNodeOperationHandler( this, clusterName, newMasterHostname, keepSlave );
+                new NodeOperationHandler( this, config, newMasterHostname, OperationType.CHANGE_MASTER,
+                        keepSlave ? NodeType.SLAVE_NODE : NodeType.MASTER_NODE );
 
         executor.execute( operationHandler );
 
@@ -147,9 +150,10 @@ public class SparkImpl extends SparkBase implements Spark
     @Override
     public UUID startNode( final String clusterName, final String lxcHostname, final boolean master )
     {
-
+        SparkClusterConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
-                new StartNodeOperationHandler( this, clusterName, lxcHostname, master );
+                new NodeOperationHandler( this, config, lxcHostname, OperationType.START,
+                        master ? NodeType.MASTER_NODE : NodeType.SLAVE_NODE );
 
         executor.execute( operationHandler );
 
@@ -160,8 +164,12 @@ public class SparkImpl extends SparkBase implements Spark
     @Override
     public UUID startCluster( final String clusterName, final String lxcHostname )
     {
-        AbstractOperationHandler operationHandler = new StartClusterOperationHandler( this, clusterName );
+        SparkClusterConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.START_ALL, null );
+
         executor.execute( operationHandler );
+
         return operationHandler.getTrackerId();
     }
 
@@ -169,9 +177,10 @@ public class SparkImpl extends SparkBase implements Spark
     @Override
     public UUID stopNode( final String clusterName, final String lxcHostname, final boolean master )
     {
-
+        SparkClusterConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
-                new StopNodeOperationHandler( this, clusterName, lxcHostname, master );
+                new NodeOperationHandler( this, config, lxcHostname, OperationType.STOP,
+                        master ? NodeType.MASTER_NODE : NodeType.SLAVE_NODE );
 
         executor.execute( operationHandler );
 
@@ -182,7 +191,9 @@ public class SparkImpl extends SparkBase implements Spark
     @Override
     public UUID stopCluster( final String clusterName, final String lxcHostname )
     {
-        AbstractOperationHandler operationHandler = new StopClusterOperationHandler( this, clusterName );
+        SparkClusterConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.STOP_ALL, null );
 
         executor.execute( operationHandler );
 
@@ -193,8 +204,10 @@ public class SparkImpl extends SparkBase implements Spark
     @Override
     public UUID checkNode( final String clusterName, final String lxcHostname, final boolean master )
     {
+        SparkClusterConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
-                new CheckNodeOperationHandler( this, clusterName, lxcHostname, master );
+                new NodeOperationHandler( this, config, lxcHostname, OperationType.STATUS,
+                        master ? NodeType.MASTER_NODE : NodeType.SLAVE_NODE );
 
         executor.execute( operationHandler );
 
