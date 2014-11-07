@@ -1,8 +1,6 @@
 package org.safehaus.subutai.core.environment.impl.environment;
 
 
-import java.util.Observable;
-
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -13,7 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by bahadyr on 11/7/14.
  */
-public class EnvironmentDestroyerThread extends Observable implements Runnable
+public class EnvironmentDestroyerThread implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDestroyerThread.class.getName() );
     private Environment environment;
@@ -33,13 +31,11 @@ public class EnvironmentDestroyerThread extends Observable implements Runnable
             try
             {
                 container.dispose();
-                setChanged();
-                notifyObservers( container );
+                LOG.info( String.format( "Container %s destroyed.", container.getId() ) );
             }
             catch ( PeerException e )
             {
-                LOG.error( String.format( "Could not destroy container %s on %s: %s", container.getHostname(),
-                        e.toString() ) );
+                LOG.error( e.getMessage(), e );
             }
         }
     }

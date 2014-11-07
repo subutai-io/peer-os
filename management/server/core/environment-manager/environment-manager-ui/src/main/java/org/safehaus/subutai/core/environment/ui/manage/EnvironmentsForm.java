@@ -5,12 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
-import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -29,7 +30,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 public class EnvironmentsForm
 {
 
@@ -51,12 +52,13 @@ public class EnvironmentsForm
     private Table environmentsTable;
     private EnvironmentManagerPortalModule managerUI;
     private Button environmentsButton;
+    private ExecutorService executorService;
 
 
     public EnvironmentsForm( final EnvironmentManagerPortalModule managerUI )
     {
         this.managerUI = managerUI;
-
+        this.executorService = Executors.newCachedThreadPool();
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing( true );
         contentRoot.setMargin( true );
@@ -124,15 +126,16 @@ public class EnvironmentsForm
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent )
                 {
-                    try
-                    {
-                        managerUI.getEnvironmentManager().destroyEnvironment( environment.getId() );
-                        environmentsButton.click();
-                    }
-                    catch ( EnvironmentDestroyException e )
-                    {
-                        Notification.show( e.getMessage() );
-                    }
+                    executorService
+                            .execute( new DestroyEnvironmentTask( managerUI, environment.getId(), new CompleteEvent()
+                            {
+                                @Override
+                                public void onComplete( final String status )
+                                {
+                                    Notification.show( status );
+                                    environmentsButton.click();
+                                }
+                            } ) );
                 }
             } );
             Button configureButton = new Button( CONFIGURE );

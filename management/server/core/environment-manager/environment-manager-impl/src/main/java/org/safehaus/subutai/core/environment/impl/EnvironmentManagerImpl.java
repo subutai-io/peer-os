@@ -206,15 +206,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             destroyer.destroy( environment );
-            if ( environment.getContainers().isEmpty() )
-            {
-                environmentDAO.deleteInfo( ENVIRONMENT, environment.getId().toString() );
-            }
-            else
-            {
-                throw new EnvironmentDestroyException(
-                        String.format( "Not all containers destroyed in %s", environmentId.toString() ) );
-            }
+            environmentDAO.deleteInfo( ENVIRONMENT, environment.getId().toString() );
         }
         catch ( DestroyException e )
         {

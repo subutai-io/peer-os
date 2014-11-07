@@ -42,7 +42,7 @@ public class ContainerCreatorThread extends Observable implements Runnable
             Set<ContainerHost> containers = peerManager.getPeer( peerManager.getLocalPeer().getId() ).
                     createContainers( message.getTargetPeerId(), environmentId, message.getTemplates(),
                             message.getNumberOfNodes(), message.getStrategy(), null, message.getNodeGroupName() );
-            LOG.info( String.format( "Got %d containers for environment %s", containers.size(), environmentId ) );
+            LOG.info( String.format( "Received %d containers for environment %s", containers.size(), environmentId ) );
             setChanged();
             notifyObservers( containers );
         }
