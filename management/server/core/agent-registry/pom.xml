@@ -16,6 +16,7 @@
 
   <modules>
     <module>agent-registry-api</module>
+    <module>agent-registry-impl</module>
   </modules>
 
 </project>
