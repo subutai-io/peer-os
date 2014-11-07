@@ -1,4 +1,5 @@
 #!/bin/bash
+. /usr/share/subutai-cli/subutai/lib/net-ops
 
 function management_network_usage {
 echo -------------------------------------------------------------------------------
@@ -20,7 +21,8 @@ echo "        "subutai \[-qh\] management_network -b BRIDGENAME PRIORITY PACKAGE
 echo "        "Example Parameters:
 echo "        "BRIDGENAME = {br-int , br-tun} etc..
 echo "        "PRIORITY = {1-32768} between..
-echo "        "PACKAGETYPE = {normal, arp, ip, icmp, tcp, udp} etc..
+echo "        "PACKAGETYPE = {normal, arp, ip, icmp, tcp, udp} if package type is not provided by selecting these values
+echo "        "user should have provide with the tag with its value. For instance: dl_vlan=0xffff
 echo "        "NWSRC=10.10.10.0/24, NWDST=10.10.10.0/24 {optional}
 echo "        "INPORT=1 {optional}
 echo "        "ACTION = {normal, drop ,flood} etc..
@@ -48,6 +50,7 @@ echo
 echo Usage:   Delete a Open flow rule from a bridge                 
 echo "        "subutai \[-qh\] management_network -d BRIDGENAME MATCHCASE
 echo "        "subutai management_network -d br-tun dl_type=0x806
+echo "        "subutai management_network -d br-tun all 
 echo -------------------------------------------------------------------------------
 }
 
@@ -220,7 +223,7 @@ function management_network {
       
       if [ "$packageType" == "normal" ]; then
          ovs-ofctl add-flow $bridgeName "priority=$priority actions=$action"  
-      else
+      elif [[ "$packageType" == "ip"  ||  "$packageType" == "icmp"  ||  "$packageType" == "arp"  ||  "$packageType" == "tcp"  ||  "$packageType" == "udp" ]]; then
          #optional Parameter check
          if [ -z "$nwsrc" ]; then
             msg_error "nwsrc Parameter not provided. Aborting ..."
@@ -236,8 +239,11 @@ function management_network {
             msg_error "inport Parameter not provided. Aborting ..."
             show_usage "`management_network_usage`"
          fi
-
+  
          ovs-ofctl add-flow $bridgeName "priority=$priority,$packageType, in_port=$inport,nw_src=$nwsrc,nw_dst=$nwdst actions=$action"
+      else
+         echo $packageType
+         ovs-ofctl add-flow $bridgeName "priority=$priority,$packageType actions=$action"
       fi
       echo "One Blocking Flow rule is added to $bridgeName"	 
    fi
@@ -352,6 +358,7 @@ function management_network {
       bridgeName="$1"
       matchCase="$2"
       extra="$3"
+      local message
 
       if [ -z "$bridgeName" ]; then
          msg_error "brdigeName Parameter not provided. Aborting ..."
@@ -362,20 +369,25 @@ function management_network {
          msg_error "matchCase Parameter not provided. Aborting ..."
          show_usage "`management_network_usage`"
       fi
-      
-      net_check_bridgeName $bridgeName
-      
+  
       if [ "$extra" ]; then
          msg_error "extra Parameter provided. Aborting ..."
          show_usage "`management_network_usage`"
       fi
-      
-      ovs-ofctl del-flows $bridgeName $matchCase
-      echo "Founded flows deleted from $bridgeName"
+    
+      net_check_bridgeName $bridgeName
+     
+      if [ "$matchCase" == "all" ]; then
+         ovs-ofctl del-flows $bridgeName
+         message="All flows are deleted"
+         echo $message
+      else
+         message="Matched flows are deleted"
+         ovs-ofctl del-flows $bridgeName $matchCase
+         echo $message
+      fi
    fi
-
 }
-
 function management_network_description {
   echo "Create Tunnel between subutai peers"
   echo "List Opened Tunnels in subutai Host"
