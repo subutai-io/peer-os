@@ -40,6 +40,7 @@
     <module>messenger</module>
     <module>script-manager</module>
     <module>repository-manager</module>
+    <module>broker</module>
   </modules>
 
 </project>
