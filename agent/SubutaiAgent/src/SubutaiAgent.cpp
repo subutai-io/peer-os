@@ -277,7 +277,8 @@ int main(int argc,char *argv[],char *envp[])
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request Command:", command.getCommand()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request runAs:", command.getRunAs()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request timeout:", helper.toString(command.getTimeout())));
-                    // Check if this uuid belongs this FAI or one of child containers
+
+                    // Check if this uuid belongs the resource host or one of child containers
                     bool isLocal = true;
                     SubutaiContainer* target_container = cman.findContainerById(command.getUuid());
 
