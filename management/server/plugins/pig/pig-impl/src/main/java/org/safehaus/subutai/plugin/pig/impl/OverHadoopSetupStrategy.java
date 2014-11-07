@@ -13,10 +13,12 @@ import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +41,14 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
     @Override
     public ConfigBase setup() throws ClusterSetupException
     {
+        check();
+        configure();
+        return config;
+    }
 
+
+    private void check() throws ClusterSetupException
+    {
         if ( Strings.isNullOrEmpty( config.getHadoopClusterName() ) || CollectionUtil
                 .isCollectionEmpty( config.getNodes() ) )
         {
@@ -52,127 +61,100 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
                     String.format( "Cluster with name '%s' already exists\nInstallation aborted",
                             config.getClusterName() ) );
         }
-
-
-        // Check if node agent is connected
-        for ( Iterator<UUID> it = config.getNodes().iterator(); it.hasNext(); )
+        //check nodes are connected
+        Set<ContainerHost> nodes = environment.getHostsByIds( config.getNodes() );
+        for ( ContainerHost host : nodes )
         {
-            UUID containerUUID = it.next();
-
-            ContainerHost containerHost = environment.getContainerHostByUUID( containerUUID );
-
-            if (  containerHost.getHostname() == null )
+            if ( !host.isConnected() )
             {
-                trackerOperation.addLog(
-                        String.format( "Node %s is not connected. Omitting this node from installation",
-                                containerHost.getHostname() ) );
-                it.remove();
+                throw new ClusterSetupException(
+                        String.format( "Container %s is not connected", host.getHostname() ) );
             }
         }
-
-        if ( config.getNodes().isEmpty() )
+        //check hadoopcluster
+        HadoopClusterConfig hc = manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
+        if ( hc == null )
         {
-            throw new ClusterSetupException( "No nodes eligible for installation. Operation aborted" );
+            throw new ClusterSetupException( "Could not find Hadoop cluster " + config.getHadoopClusterName() );
+        }
+        if ( !hc.getAllNodes().containsAll( config.getNodes() ) )
+        {
+            throw new ClusterSetupException(
+                    "Not all nodes belong to Hadoop cluster " + config.getHadoopClusterName() );
         }
 
         trackerOperation.addLog( "Checking prerequisites..." );
 
-        // Check installed packages
-        trackerOperation.addLog( "Installing Pig..." );
-
-        Map<UUID, CommandResult> hostResult = new HashMap<>();
-        for ( ContainerHost host : environment.getContainers() )
+        RequestBuilder checkInstalledCommand = manager.getCommands().getCheckInstalledCommand();
+        for ( Iterator<ContainerHost> iterator = environment.getHostsByIds( config.getNodes() ).iterator(); iterator.hasNext(); )
         {
-                CommandResult result = executeCommand( host, Commands.checkCommand );
-                hostResult.put( host.getAgent().getUuid(), result );
-                if ( !result.hasSucceeded() )
-                {
-                    throw new ClusterSetupException( "Failed to check presence of installed packages\nInstallation aborted" );
-                }
-
-        }
-        for ( Iterator<UUID> it = config.getNodes().iterator(); it.hasNext(); )
-        {
-            UUID containerUUID = it.next();
-            CommandResult result = hostResult.get( containerUUID );
-            String hostName = environment.getContainerHostByUUID( containerUUID ).getHostname();
-
-            if ( result.getStdOut().contains( PigConfig.PRODUCT_PACKAGE ) )
+            final ContainerHost node = iterator.next();
+            try
             {
-                trackerOperation.addLog(
-                        String.format( "Node %s already has Pig installed. Omitting this node from installation",
-                                hostName ));
-                it.remove();
+                CommandResult result = node.execute( checkInstalledCommand );
+                if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
+                {
+                    trackerOperation.addLog(
+                            String.format( "Node %s already has Spark installed. Omitting this node from installation",
+                                    node.getHostname() ) );
+                    config.getNodes().remove( node.getId() );
+                    iterator.remove();
+                }
+                else if ( !result.getStdOut()
+                                 .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME.toLowerCase() ) )
+                {
+                    trackerOperation.addLog(
+                            String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
+                                    node.getHostname() ) );
+                    config.getNodes().remove( node.getId() );
+                    iterator.remove();
+                }
+            }
+            catch ( CommandException e )
+            {
+                throw new ClusterSetupException( "Failed to check presence of installed subutai packages" );
             }
         }
-
         if ( config.getNodes().isEmpty() )
         {
             throw new ClusterSetupException( "No nodes eligible for installation. Operation aborted" );
         }
-
-
-        for ( Iterator<UUID> it = config.getNodes().iterator(); it.hasNext(); )
-        {
-            UUID containerUUID = it.next();
-            ContainerHost host = environment.getContainerHostByUUID( containerUUID );
-            CommandResult result = executeCommand( host, Commands.installCommand );
-
-                if ( result.hasSucceeded() )
-                {
-                    trackerOperation.addLog( "Installation succeeded" );
-                    trackerOperation.addLog( "Updating db..." );
-                    config.setEnvironmentId( environment.getId() );
-                    manager.getPluginDao().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config );
-                }
-                else
-                {
-                    trackerOperation
-                            .addLogFailed( String.format( "Installation failed, %s", result.getStdErr() ) );
-                }
-            }
-        return config;
     }
-
-    private CommandResult executeCommand( ContainerHost containerHost, String command )
+    private void configure() throws ClusterSetupException
     {
-        CommandResult result = null;
-        try
+        trackerOperation.addLog( "Updating db..." );
+        //save to db
+        config.setEnvironmentId( environment.getId() );
+        manager.getPluginDao().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config );
+        trackerOperation.addLog( "Cluster info saved to DB\nInstalling Pig..." );
+        trackerOperation.addLog( "Installing Spark..." );
+        //install pig
+        RequestBuilder installCommand = manager.getCommands().getInstallCommand();
+        for ( ContainerHost node : environment.getHostsByIds( config.getNodes() ) )
         {
-            result = containerHost.execute( new RequestBuilder( command ) );
-        }
-        catch ( CommandException e )
-        {
-            LOG.error( "Could not execute command correctly. ", command );
-            e.printStackTrace();
-        }
-        return result;
-    }
-    private boolean executeCommandAll( Set<UUID> nodes, Environment environment, String command )
-    {
-        boolean result = true;
-
-        try
-        {
-            for ( Iterator<UUID> it = nodes.iterator(); it.hasNext(); )
+            try
             {
-                UUID containerUUID = it.next();
-                ContainerHost host = environment.getContainerHostByUUID( containerUUID );
-                CommandResult commandResult = host.execute( new RequestBuilder( command ) );
-                if( !commandResult.hasSucceeded())
-                {
-                    result = false;
-                    break;
-                }
+                processResult( node, node.execute( installCommand ) );
+            }
+            catch ( CommandException e )
+            {
+                throw new ClusterSetupException(
+                        String.format( "Error while installing Spark on container %s; %s", node.getHostname(),
+                                e.getMessage() ) );
             }
         }
-        catch ( CommandException e )
-        {
-            LOG.error( "Could not execute command correctly. ", command );
-            e.printStackTrace();
-        }
 
-        return result;
+        trackerOperation.addLog( "Configuring cluster..." );
+
+    }
+    public void processResult( ContainerHost host, CommandResult result ) throws ClusterSetupException
+    {
+
+        if ( !result.hasSucceeded() )
+        {
+            throw new ClusterSetupException( String.format( "Error on container %s: %s", host.getHostname(),
+                    result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
+        }
     }
 
 }

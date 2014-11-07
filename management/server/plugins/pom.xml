@@ -20,10 +20,11 @@
     <module>hadoop</module>
     <module>pig</module>
     <module>elasticsearch</module>
+    <module>spark</module>
 
     <!--
     <module>accumulo</module>
-    <module>solr</module>
+    <module>spark</module>
     <module>zookeeper</module>
     <module>mongodb</module>
     <module>flume</module>
@@ -32,7 +33,6 @@
     <module>oozie</module>
     <module>pig</module>
     <module>presto</module>
-    <module>spark</module>
     <module>shark</module>
     <module>sqoop</module>
     <module>lucene</module>

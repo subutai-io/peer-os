@@ -1,19 +1,13 @@
 package org.safehaus.subutai.plugin.spark.impl.handler;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
+import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
@@ -45,85 +39,61 @@ public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
     @Override
     public void run()
     {
-        TrackerOperation po = trackerOperation;
-        Environment env = null;
-        if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        try
         {
-
-            if ( hadoopConfig == null )
+            Environment env;
+            if ( config.getSetupType() == SetupType.WITH_HADOOP )
             {
-                po.addLogFailed( "No Hadoop configuration specified" );
-                return;
+
+                if ( hadoopConfig == null )
+                {
+                    throw new ClusterException( "No Hadoop configuration specified" );
+                }
+
+                hadoopConfig.setTemplateName( SparkClusterConfig.TEMPLATE_NAME );
+                try
+                {
+                    trackerOperation.addLog( "Building environment..." );
+                    EnvironmentBlueprint eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
+                    env = manager.getEnvironmentManager().buildEnvironment( eb );
+
+                    ClusterSetupStrategy s =
+                            manager.getHadoopManager().getClusterSetupStrategy( env, hadoopConfig, trackerOperation );
+                    s.setup();
+                }
+
+                catch ( ClusterSetupException | EnvironmentBuildException ex )
+                {
+                    throw new ClusterException( "Failed to build environment: " + ex.getMessage() );
+                }
+
+                trackerOperation.addLog( "Environment built successfully" );
+            }
+            else
+            {
+                env = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopConfig.getEnvironmentId() );
+                if ( env == null )
+                {
+                    throw new ClusterException( String.format( "Could not find environment of Hadoo cluster by id %s",
+                            hadoopConfig.getEnvironmentId() ) );
+                }
             }
 
-            po.addLog( "Preparing environment..." );
-            hadoopConfig.setTemplateName( SparkClusterConfig.TEMPLATE_NAME );
+            ClusterSetupStrategy s = manager.getClusterSetupStrategy( trackerOperation, config, env );
             try
             {
-                EnvironmentBuildTask eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
-                env = manager.getEnvironmentManager().buildEnvironment( eb );
-
-                ClusterSetupStrategy s = manager.getHadoopManager().getClusterSetupStrategy( po, hadoopConfig, env );
+                trackerOperation.addLog( "Installing cluster..." );
                 s.setup();
+                trackerOperation.addLogDone( "Installing cluster completed" );
             }
             catch ( ClusterSetupException ex )
             {
-                po.addLogFailed( "Failed to prepare environment: " + ex.getMessage() );
-                destroyNodes( env );
-                return;
+                throw new ClusterException( "Failed to setup cluster: " + ex.getMessage() );
             }
-            catch ( EnvironmentBuildException ex )
-            {
-                po.addLogFailed( "Failed to build environment: " + ex.getMessage() );
-                destroyNodes( env );
-                return;
-            }
-            po.addLog( "Environment preparation completed" );
         }
-
-        ClusterSetupStrategy s = manager.getClusterSetupStrategy( po, config, env );
-        try
+        catch ( ClusterException e )
         {
-            if ( s == null )
-            {
-                throw new ClusterSetupException( "No setup strategy" );
-            }
-
-            po.addLog( "Installing cluster..." );
-            s.setup();
-            po.addLogDone( "Installing cluster completed" );
-        }
-        catch ( ClusterSetupException ex )
-        {
-            po.addLogFailed( "Failed to setup cluster: " + ex.getMessage() );
-            destroyNodes( env );
-        }
-    }
-
-
-    void destroyNodes( Environment env )
-    {
-
-        if ( env == null || env.getContainers().isEmpty() )
-        {
-            return;
-        }
-
-        Set<Agent> set = new HashSet<>( env.getContainers().size() );
-        for ( EnvironmentContainer n : env.getContainers() )
-        {
-            set.add( n.getAgent() );
-        }
-
-        trackerOperation.addLog( "Destroying node(s)..." );
-        try
-        {
-            manager.getContainerManager().clonesDestroy( set );
-            trackerOperation.addLog( "Destroying node(s) completed" );
-        }
-        catch ( LxcDestroyException ex )
-        {
-            trackerOperation.addLog( "Failed to destroy node(s): " + ex.getMessage() );
+            trackerOperation.addLogFailed( String.format( "Could not start all nodes : %s", e.getMessage() ) );
         }
     }
 }

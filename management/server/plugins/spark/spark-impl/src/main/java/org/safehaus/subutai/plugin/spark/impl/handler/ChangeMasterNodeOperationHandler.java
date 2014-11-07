@@ -1,18 +1,19 @@
 package org.safehaus.subutai.plugin.spark.impl.handler;
 
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Set;
 
+import org.safehaus.subutai.common.exception.ClusterException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.util.StringUtil;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
+
+import com.google.common.collect.Sets;
 
 
 public class ChangeMasterNodeOperationHandler extends AbstractOperationHandler<SparkImpl>
@@ -36,137 +37,171 @@ public class ChangeMasterNodeOperationHandler extends AbstractOperationHandler<S
     @Override
     public void run()
     {
-        TrackerOperation po = trackerOperation;
-        final SparkClusterConfig config = manager.getCluster( clusterName );
-        if ( config == null )
+        try
         {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
-            return;
-        }
-
-        if ( manager.getAgentManager().getAgentByHostname( config.getMasterNode().getHostname() ) == null )
-        {
-            po.addLogFailed( String.format( "Master node %s is not connected. Operation aborted",
-                    config.getMasterNode().getHostname() ) );
-            return;
-        }
-
-        Agent newMaster = manager.getAgentManager().getAgentByHostname( newMasterHostname );
-        if ( newMaster == null )
-        {
-            po.addLogFailed(
-                    String.format( "Agent with hostname %s is not connected. Operation aborted", newMasterHostname ) );
-            return;
-        }
-
-        if ( newMaster.equals( config.getMasterNode() ) )
-        {
-            po.addLogFailed(
-                    String.format( "Node %s is already a master node. Operation aborted", newMasterHostname ) );
-            return;
-        }
-
-        //check if node is in the cluster
-        if ( !config.getAllNodes().contains( newMaster ) )
-        {
-            po.addLogFailed(
-                    String.format( "Node %s does not belong to this cluster. Operation aborted", newMasterHostname ) );
-            return;
-        }
-
-        po.addLog( "Stopping all nodes..." );
-        //stop all nodes
-        Command stopNodesCommand = manager.getCommands().getStopAllCommand( config.getMasterNode() );
-        manager.getCommandRunner().runCommand( stopNodesCommand );
-        if ( stopNodesCommand.hasSucceeded() )
-        {
-            po.addLog( "All nodes stopped\nClearing slaves on old master..." );
-            //clear slaves from old master
-            Command clearSlavesCommand = manager.getCommands().getClearSlavesCommand( config.getMasterNode() );
-            manager.getCommandRunner().runCommand( clearSlavesCommand );
-            if ( clearSlavesCommand.hasSucceeded() )
+            final SparkClusterConfig config = manager.getCluster( clusterName );
+            if ( config == null )
             {
-                po.addLog( "Slaves cleared successfully" );
+                throw new ClusterException( String.format( "Cluster with name %s does not exist", clusterName ) );
             }
-            else
+
+            Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+
+            if ( environment == null )
             {
-                po.addLog(
-                        String.format( "Clearing slaves failed, %s, skipping...", clearSlavesCommand.getAllErrors() ) );
+                throw new ClusterException(
+                        String.format( "Environment not found by id %s", config.getEnvironmentId() ) );
             }
+
+            ContainerHost master = environment.getContainerHostByUUID( config.getMasterNodeId() );
+
+            if ( master == null )
+            {
+                throw new ClusterException(
+                        String.format( "Master node not found in environment by id %s", config.getMasterNodeId() ) );
+            }
+
+            ContainerHost newMaster = environment.getContainerHostByHostname( newMasterHostname );
+
+            if ( newMaster == null )
+            {
+                throw new ClusterException(
+                        String.format( "Node not found in environment by name %s", newMasterHostname ) );
+            }
+
+            if ( newMaster.getId().equals( config.getMasterNodeId() ) )
+            {
+                throw new ClusterException( String.format( "Node %s is already a master node", newMasterHostname ) );
+            }
+
+
+            if ( !config.getAllNodesIds().contains( newMaster.getId() ) )
+            {
+                throw new ClusterException(
+                        String.format( "Node %s does not belong to this cluster", newMasterHostname ) );
+            }
+
+
+            Set<ContainerHost> allNodes = environment.getHostsByIds( config.getSlaveIds() );
+            allNodes.add( environment.getContainerHostByUUID( config.getMasterNodeId() ) );
+
+            for ( ContainerHost node : allNodes )
+            {
+                if ( !node.isConnected() )
+                {
+                    throw new ClusterException( String.format( "Node %s is not connected", node.getHostname() ) );
+                }
+            }
+
+
+            trackerOperation.addLog( "Stopping all nodes..." );
+            //stop all nodes
+            RequestBuilder stopNodesCommand = manager.getCommands().getStopAllCommand();
+
+            executeCommand( master, stopNodesCommand, false );
+
+            trackerOperation.addLog( "Clearing slaves on old master..." );
+
+            RequestBuilder clearSlavesCommand = manager.getCommands().getClearSlavesCommand();
+
+            executeCommand( master, clearSlavesCommand, true );
+
+
             //add slaves to new master, if keepSlave=true then master node is also added as slave
-            config.getSlaveNodes().add( config.getMasterNode() );
-            config.setMasterNode( newMaster );
+            config.getSlaveIds().add( master.getId() );
+            config.setMasterNodeId( newMaster.getId() );
+
             if ( keepSlave )
             {
-                config.getSlaveNodes().add( newMaster );
+                config.getSlaveIds().add( newMaster.getId() );
             }
             else
             {
-                config.getSlaveNodes().remove( newMaster );
+                config.getSlaveIds().remove( newMaster.getId() );
             }
-            po.addLog( "Adding nodes to new master..." );
-            Command addSlavesCommand =
-                    manager.getCommands().getAddSlavesCommand( config.getSlaveNodes(), config.getMasterNode() );
-            manager.getCommandRunner().runCommand( addSlavesCommand );
-            if ( addSlavesCommand.hasSucceeded() )
+
+            trackerOperation.addLog( "Adding nodes to new master..." );
+
+            Set<ContainerHost> slaves = environment.getHostsByIds( config.getSlaveIds() );
+            Set<String> slaveHostnames = Sets.newHashSet();
+            for ( ContainerHost slave : slaves )
             {
-                po.addLog( "Nodes added successfully\nSetting new master IP..." );
-                //modify master ip on all nodes
-                Command setMasterIPCommand =
-                        manager.getCommands().getSetMasterIPCommand( config.getMasterNode(), config.getAllNodes() );
-                manager.getCommandRunner().runCommand( setMasterIPCommand );
-                if ( setMasterIPCommand.hasSucceeded() )
-                {
-                    po.addLog( "Master IP set successfully\nStarting cluster..." );
-                    //start master & slaves
+                slaveHostnames.add( slave.getHostname() );
+            }
 
-                    Command startNodesCommand = manager.getCommands().getStartAllCommand( config.getMasterNode() );
-                    final AtomicInteger okCount = new AtomicInteger( 0 );
-                    manager.getCommandRunner().runCommand( startNodesCommand, new CommandCallback()
-                    {
+            RequestBuilder addSlavesCommand = manager.getCommands().getAddSlavesCommand( slaveHostnames );
 
-                        @Override
-                        public void onResponse( Response response, AgentResult agentResult, Command command )
-                        {
-                            okCount.set( StringUtil.countNumberOfOccurrences( agentResult.getStdOut(), "starting" ) );
+            executeCommand( newMaster, addSlavesCommand, false );
 
-                            if ( okCount.get() >= config.getAllNodes().size() )
-                            {
-                                stop();
-                            }
-                        }
-                    } );
 
-                    if ( okCount.get() >= config.getAllNodes().size() )
-                    {
-                        po.addLog( "Cluster started successfully" );
-                    }
-                    else
-                    {
-                        po.addLog( String.format( "Start of cluster failed, %s, skipping...",
-                                startNodesCommand.getAllErrors() ) );
-                    }
+            trackerOperation.addLog( "Setting new master IP..." );
 
-                    po.addLog( "Updating db..." );
-                    //update db
-                    manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, clusterName, config );
-                    po.addLogDone( "Cluster info updated in DB\nDone" );
-                }
-                else
-                {
-                    po.addLogFailed( String.format( "Failed to set master IP on all nodes, %s. Operation aborted",
-                            setMasterIPCommand.getAllErrors() ) );
-                }
+            //modify master ip on all nodes
+            RequestBuilder setMasterIPCommand = manager.getCommands().getSetMasterIPCommand( newMasterHostname );
+
+            for ( ContainerHost node : allNodes )
+            {
+                executeCommand( node, setMasterIPCommand, false );
+
+                trackerOperation.addLog( String.format( "IP is set on node: %s", node.getHostname() ) );
+            }
+
+
+            trackerOperation.addLog( "Starting cluster..." );
+            //start master & slaves
+
+            RequestBuilder startNodesCommand = manager.getCommands().getStartAllCommand();
+
+            executeCommand( newMaster, startNodesCommand, true );
+
+
+            trackerOperation.addLog( "Updating db..." );
+            //update db
+            manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, clusterName, config );
+            trackerOperation.addLogDone( "Cluster info updated in DB\nDone" );
+        }
+        catch ( ClusterException e )
+        {
+            trackerOperation.addLogFailed( String.format( "Failed to change master: %s", e.getMessage() ) );
+        }
+    }
+
+
+    public void executeCommand( ContainerHost host, RequestBuilder command, boolean skipError ) throws ClusterException
+    {
+
+        CommandResult result = null;
+        try
+        {
+            result = host.execute( command );
+        }
+        catch ( CommandException e )
+        {
+            if ( skipError )
+            {
+                trackerOperation
+                        .addLog( String.format( "Error on container %s: %s", host.getHostname(), e.getMessage() ) );
             }
             else
             {
-                po.addLogFailed( String.format( "Failed to add slaves to new master, %s. Operation aborted",
-                        addSlavesCommand.getAllErrors() ) );
+                throw new ClusterException( e );
+            }
+        }
+        if ( skipError )
+        {
+            if ( result != null && !result.hasSucceeded() )
+            {
+                trackerOperation.addLog( String.format( "Error on container %s: %s", host.getHostname(),
+                        result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
             }
         }
         else
         {
-            po.addLogFailed( String.format( "Failed to stop all nodes, %s", stopNodesCommand.getAllErrors() ) );
+            if ( !result.hasSucceeded() )
+            {
+                throw new ClusterException( String.format( "Error on container %s: %s", host.getHostname(),
+                        result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
+            }
         }
     }
 }

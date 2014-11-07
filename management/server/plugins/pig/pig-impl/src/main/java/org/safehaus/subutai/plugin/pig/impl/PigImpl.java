@@ -160,7 +160,26 @@ public class PigImpl implements Pig
     }
 
 
+    @Override
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final PigConfig config )
+    {
+        EnvironmentBlueprint blueprint = new EnvironmentBlueprint();
 
+        blueprint.setName( String.format( "%s-%s", config.getProductKey(), UUIDUtil.generateTimeBasedUUID() ) );
+        blueprint.setExchangeSshKeys( true );
+        blueprint.setLinkHosts( true );
+        blueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
+
+        NodeGroup ng = new NodeGroup();
+        ng.setName( "Default" );
+        ng.setNumberOfNodes( config.getNodes().size() ); // master +slaves
+        ng.setTemplateName( PigConfig.TEMPLATE_NAME );
+        ng.setPlacementStrategy( PlacementStrategy.MORE_RAM );
+        blueprint.setNodeGroups( Sets.newHashSet( ng ) );
+
+
+        return blueprint;
+    }
 
 
     @Override

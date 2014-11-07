@@ -4,38 +4,52 @@ package org.safehaus.subutai.plugin.spark.impl;
 import java.util.Set;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
+
+import com.google.common.collect.Sets;
 
 
 public class SetupHelper
 {
 
     private final SparkImpl manager;
-    private final SparkClusterConfig config;
+
     private final TrackerOperation po;
+    private ContainerHost master;
+    private Set<ContainerHost> slaves;
 
 
-    public SetupHelper( SparkImpl manager, SparkClusterConfig config, TrackerOperation po )
+    public SetupHelper( SparkImpl manager, SparkClusterConfig config, Environment environment, TrackerOperation po )
     {
         this.manager = manager;
-        this.config = config;
         this.po = po;
+        master = environment.getContainerHostByUUID( config.getMasterNodeId() );
+        slaves = environment.getHostsByIds( config.getSlaveIds() );
     }
 
 
-    public void configureMasterIP( Set<Agent> agents ) throws ClusterSetupException
+    public void configureMasterIP() throws ClusterSetupException
     {
         po.addLog( "Setting master IP..." );
 
-        Command cmd = manager.getCommands().getSetMasterIPCommand( config.getMasterNode(), agents );
-        manager.getCommandRunner().runCommand( cmd );
-
-        if ( !cmd.hasSucceeded() )
+        RequestBuilder request = manager.getCommands().getSetMasterIPCommand( master.getHostname() );
+        for ( ContainerHost host : slaves )
         {
-            throw new ClusterSetupException( "Setting master IP failed:" + cmd.getAllErrors() );
+
+            try
+            {
+                processResult( host, host.execute( request ) );
+            }
+            catch ( CommandException e )
+            {
+                throw new ClusterSetupException( e );
+            }
         }
 
         po.addLog( "Setting master IP succeeded" );
@@ -46,12 +60,22 @@ public class SetupHelper
     {
         po.addLog( "Registering slave(s)..." );
 
-        Command cmd = manager.getCommands().getAddSlavesCommand( config.getSlaveNodes(), config.getMasterNode() );
-        manager.getCommandRunner().runCommand( cmd );
+        Set<String> slaveHostnames = Sets.newHashSet();
 
-        if ( !cmd.hasSucceeded() )
+        for ( ContainerHost host : slaves )
         {
-            throw new ClusterSetupException( "Failed to register slave(s) with master: " + cmd.getAllErrors() );
+            slaveHostnames.add( host.getHostname() );
+        }
+
+        RequestBuilder request = manager.getCommands().getAddSlavesCommand( slaveHostnames );
+
+        try
+        {
+            processResult( master, master.execute( request ) );
+        }
+        catch ( CommandException e )
+        {
+            throw new ClusterSetupException( e );
         }
 
         po.addLog( "Slave(s) successfully registered" );
@@ -62,16 +86,28 @@ public class SetupHelper
     {
         po.addLog( "Starting cluster..." );
 
-        Command cmd = manager.getCommands().getStartAllCommand( config.getMasterNode() );
-        manager.getCommandRunner().runCommand( cmd );
+        RequestBuilder request = manager.getCommands().getStartAllCommand();
 
-        if ( cmd.hasSucceeded() )
+        try
         {
-            po.addLog( "Cluster started successfully\nDone" );
+            processResult( master, master.execute( request ) );
         }
-        else
+        catch ( CommandException e )
         {
-            throw new ClusterSetupException( "Failed to start cluster:" + cmd.getAllErrors() );
+            throw new ClusterSetupException( e );
+        }
+
+        po.addLog( "Cluster successfully started" );
+    }
+
+
+    public void processResult( ContainerHost host, CommandResult result ) throws ClusterSetupException
+    {
+
+        if ( !result.hasSucceeded() )
+        {
+            throw new ClusterSetupException( String.format( "Error on container %s: %s", host.getHostname(),
+                    result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
         }
     }
 }

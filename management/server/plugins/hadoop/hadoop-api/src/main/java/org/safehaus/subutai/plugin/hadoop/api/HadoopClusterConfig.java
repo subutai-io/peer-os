@@ -44,7 +44,10 @@ public class HadoopClusterConfig implements ConfigBase
     {
         List<NodeType> nodeRoles = new ArrayList<>();
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d35229e8c2ed11b0d8d790f7a71cdf93fec3cac7
         if ( clusterConfig.isNameNode( containerHost.getAgent().getUuid() ) )
         {
             nodeRoles.add( NodeType.NAMENODE );
@@ -129,6 +132,7 @@ public class HadoopClusterConfig implements ConfigBase
 
 
     public boolean isNameNode( UUID uuid )
+<<<<<<< HEAD
     {
         return getNameNode().equals( uuid );
     }
@@ -166,6 +170,45 @@ public class HadoopClusterConfig implements ConfigBase
 
     public boolean isSecondaryNameNode( UUID uuid )
     {
+=======
+    {
+        return getNameNode().equals( uuid );
+    }
+
+
+    public UUID getNameNode()
+    {
+        return nameNode;
+    }
+
+
+    public void setNameNode( UUID nameNode )
+    {
+        this.nameNode = nameNode;
+    }
+
+
+    public boolean isJobTracker( UUID uuid )
+    {
+        return getJobTracker().equals( uuid );
+    }
+
+
+    public UUID getJobTracker()
+    {
+        return jobTracker;
+    }
+
+
+    public void setJobTracker( UUID jobTracker )
+    {
+        this.jobTracker = jobTracker;
+    }
+
+
+    public boolean isSecondaryNameNode( UUID uuid )
+    {
+>>>>>>> d35229e8c2ed11b0d8d790f7a71cdf93fec3cac7
         return getSecondaryNameNode().equals( uuid );
     }
 
@@ -375,6 +418,7 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
+<<<<<<< HEAD
 
     public Set<UUID> getBlockedAgentUUIDs()
     {
@@ -387,6 +431,19 @@ public class HadoopClusterConfig implements ConfigBase
         return blockedAgents;
     }
 
+=======
+    public Set<UUID> getBlockedAgentUUIDs()
+    {
+        Set<UUID> blockedAgents = new HashSet<>();
+        for ( UUID uuid : getBlockedAgents() )
+        {
+            blockedAgents.add( uuid );
+        }
+        return blockedAgents;
+    }
+
+
+>>>>>>> d35229e8c2ed11b0d8d790f7a71cdf93fec3cac7
     public Set<UUID> getBlockedAgents()
     {
         return blockedAgents;

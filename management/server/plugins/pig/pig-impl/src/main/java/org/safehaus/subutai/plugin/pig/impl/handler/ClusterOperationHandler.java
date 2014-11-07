@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -102,53 +103,61 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl> i
     @Override
     public void setupCluster()
     {
-        TrackerOperation po = trackerOperation;
-        Environment env = null;
-
-        if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        try
         {
+            Environment env = null;
 
-            if ( hadoopConfig == null )
+            if ( config.getSetupType() == SetupType.WITH_HADOOP )
             {
-                po.addLogFailed( "No Hadoop configuration specified" );
-                return;
+
+                if ( hadoopConfig == null )
+                {
+                    trackerOperation.addLogFailed( "No Hadoop configuration specified" );
+                    return;
+                }
+                hadoopConfig.setTemplateName( PigConfig.TEMPLATE_NAME );
+                try
+                {
+                    trackerOperation.addLog( "Building environment..." );
+                    EnvironmentBlueprint eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
+                    env = manager.getEnvironmentManager().buildEnvironment( eb );
+                }
+                catch ( ClusterSetupException | EnvironmentBuildException ex )
+                {
+                    throw new ClusterException( "Failed to build environment: " + ex.getMessage() );
+                }
+
+                trackerOperation.addLog( "Environment built successfully" );
+            }
+            else
+            {
+                env = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopConfig.getEnvironmentId() );
+                if ( env == null )
+                {
+                    throw new ClusterException( String.format( "Could not find environment of Hadoop cluster by id %s",
+                            hadoopConfig.getEnvironmentId() ) );
+                }
             }
 
-            po.addLog( "Preparing environment..." );
-            hadoopConfig.setTemplateName( PigConfig.TEMPLATE_NAME );
+            ClusterSetupStrategy s = manager.getClusterSetupStrategy( env, config, trackerOperation );
             try
             {
-                EnvironmentBlueprint eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
-                env = manager.getEnvironmentManager().buildEnvironment( eb );
+                if ( s == null )
+                {
+                    throw new ClusterSetupException( "No setup strategy" );
+                }
+                trackerOperation.addLog( "Installing cluster..." );
+                s.setup();
+                trackerOperation.addLogDone( "Installing cluster completed" );
             }
             catch ( ClusterSetupException ex )
             {
-                po.addLogFailed( "Failed to prepare environment: " + ex.getMessage() );
-                return;
+                throw new ClusterException( "Failed to setup cluster: " + ex.getMessage() );
             }
-            catch ( EnvironmentBuildException ex )
-            {
-                po.addLogFailed( "Failed to build environment: " + ex.getMessage() );
-                return;
-            }
-            po.addLog( "Environment preparation completed" );
         }
-
-        ClusterSetupStrategy s = manager.getClusterSetupStrategy( env, config, po );
-
-        try
+        catch ( ClusterException e )
         {
-            if ( s == null )
-            {
-                throw new ClusterSetupException( "No setup strategy" );
-            }
-
-            s.setup();
-            po.addLogDone( "Done" );
-        }
-        catch ( ClusterSetupException ex )
-        {
-            po.addLogFailed( "Failed to setup cluster: " + ex.getMessage() );
+            trackerOperation.addLogFailed( String.format( "Could not start all nodes : %s", e.getMessage() ) );
         }
 
     }

@@ -5,9 +5,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -15,6 +18,7 @@ import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.SetupType;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
@@ -33,11 +37,14 @@ import com.vaadin.ui.VerticalLayout;
 public class ConfigurationStep extends Panel
 {
     private final Hadoop hadoop;
+    private final EnvironmentManager environmentManager;
+    private Environment hadoopEnvironment;
 
 
-    public ConfigurationStep( final Hadoop hadoop, final Wizard wizard )
+    public ConfigurationStep( final Hadoop hadoop, final Wizard wizard, final EnvironmentManager environmentManager )
     {
         this.hadoop = hadoop;
+        this.environmentManager = environmentManager;
 
         setSizeFull();
 
@@ -119,6 +126,16 @@ public class ConfigurationStep extends Panel
         hadoopClusters.setTextInputAllowed( false );
         hadoopClusters.setRequired( true );
         hadoopClusters.setNullSelectionAllowed( false );
+
+        select.setItemCaptionPropertyId( "hostname" );
+        select.setRows( 7 );
+        select.setMultiSelect( true );
+        select.setImmediate( true );
+        select.setLeftColumnCaption( "Available Nodes" );
+        select.setRightColumnCaption( "Selected Nodes" );
+        select.setWidth( 100, Unit.PERCENTAGE );
+        select.setRequired( true );
+
         hadoopClusters.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
@@ -127,8 +144,13 @@ public class ConfigurationStep extends Panel
                 if ( event.getProperty().getValue() != null )
                 {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
+                    hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
+                    Set<ContainerHost> hadoopNodes =
+                            hadoopEnvironment.getHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
+
                     select.setValue( null );
-                    select.setContainerDataSource( new BeanItemContainer<>( UUID.class, hadoopInfo.getAllNodes() ) );
+                    select
+                            .setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
                     config.getNodes().clear();
                 }
@@ -160,14 +182,7 @@ public class ConfigurationStep extends Panel
             hadoopClusters.setValue( clusters.iterator().next() );
         }
 
-        select.setItemCaptionPropertyId( "hostname" );
-        select.setRows( 7 );
-        select.setMultiSelect( true );
-        select.setImmediate( true );
-        select.setLeftColumnCaption( "Available Nodes" );
-        select.setRightColumnCaption( "Selected Nodes" );
-        select.setWidth( 100, Unit.PERCENTAGE );
-        select.setRequired( true );
+
         if ( config.getNodes() != null && !config.getNodes().isEmpty() )
         {
             select.setValue( config.getNodes() );
@@ -179,9 +194,9 @@ public class ConfigurationStep extends Panel
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Collection agentList = ( Collection ) event.getProperty().getValue();
+                    Collection nodeList = ( Collection ) event.getProperty().getValue();
                     config.getNodes().clear();
-                    config.getNodes().addAll( agentList );
+                    config.getNodes().addAll( nodeList );
                 }
             }
         } );

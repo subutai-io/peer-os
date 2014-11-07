@@ -1,13 +1,13 @@
 package org.safehaus.subutai.plugin.spark.impl.handler;
 
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import org.safehaus.subutai.common.exception.ClusterException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 
@@ -28,35 +28,53 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<SparkI
     public void run()
     {
 
-        SparkClusterConfig config = manager.getCluster( clusterName );
-        if ( config == null )
+        try
         {
-            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
-            return;
-        }
-
-        Command stopCommand = manager.getCommands().getStopAllCommand( config.getMasterNode() );
-        final AtomicBoolean ok = new AtomicBoolean();
-        manager.getCommandRunner().runCommand( stopCommand, new CommandCallback()
-        {
-            @Override
-            public void onResponse( Response response, AgentResult agentResult, Command command )
+            SparkClusterConfig config = manager.getCluster( clusterName );
+            if ( config == null )
             {
-                if ( agentResult.getStdOut().contains( "stopping" ) )
+                throw new ClusterException( String.format( "Cluster with name %s does not exist", clusterName ) );
+            }
+
+            Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+
+
+            if ( environment == null )
+            {
+                throw new ClusterException(
+                        String.format( "Environment not found by id %s", config.getEnvironmentId() ) );
+            }
+
+
+            ContainerHost master = environment.getContainerHostByUUID( config.getMasterNodeId() );
+
+            if ( master == null )
+            {
+                throw new ClusterException(
+                        String.format( "Master not found in environment by id %s", config.getMasterNodeId() ) );
+            }
+
+            RequestBuilder stopCommand = manager.getCommands().getStopAllCommand();
+
+            try
+            {
+                CommandResult result = master.execute( stopCommand );
+                if ( !result.hasSucceeded() )
                 {
-                    ok.set( true );
-                    stop();
+                    throw new ClusterException( String.format( "Could not start all nodes : %s",
+                            result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
                 }
             }
-        } );
+            catch ( CommandException e )
+            {
+                throw new ClusterException( e );
+            }
 
-        if ( ok.get() )
-        {
             trackerOperation.addLogDone( "All nodes are stopped successfully." );
         }
-        else
+        catch ( ClusterException e )
         {
-            trackerOperation.addLogFailed( "Could not stop all nodes !" );
+            trackerOperation.addLogFailed( String.format( "Could not stop all nodes: %s", e.getMessage() ) );
         }
     }
 }

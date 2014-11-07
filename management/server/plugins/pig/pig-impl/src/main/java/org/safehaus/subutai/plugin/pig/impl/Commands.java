@@ -22,31 +22,20 @@ public class Commands
     public static String uninstallCommand = "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME;
     public static String checkCommand = "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH;
 
-//    private final CommandRunnerBase commandRunnerBase;
-//
-//
-//    public Commands( CommandRunnerBase commandRunnerBase )
-//    {
-//        this.commandRunnerBase = commandRunnerBase;
-//    }
-//
-//
-//    public Command getInstallCommand( Set<Agent> agents )
-//    {
-//        return commandRunnerBase.createCommand(
-//                new RequestBuilder( INSTALL ).withTimeout( 900 ).withStdOutRedirection( OutputRedirection.NO ),
-//                agents );
-//    }
-//
-//
-//    public Command getUninstallCommand( Set<Agent> agents )
-//    {
-//        return commandRunnerBase.createCommand( new RequestBuilder( UNINSTALL ).withTimeout( 600 ), agents );
-//    }
-//
-//
-//    public Command getCheckInstalledCommand( Set<Agent> agents )
-//    {
-//        return commandRunnerBase.createCommand( new RequestBuilder( CHECK ), agents );
-//    }
+    public RequestBuilder getInstallCommand(  )
+    {
+        return new RequestBuilder( installCommand ).withTimeout( 900 );
+    }
+
+
+    public RequestBuilder getUninstallCommand(  )
+    {
+        return new RequestBuilder( uninstallCommand ).withTimeout( 600 );
+    }
+
+
+    public RequestBuilder getCheckInstalledCommand(  )
+    {
+        return new RequestBuilder( checkCommand );
+    }
 }

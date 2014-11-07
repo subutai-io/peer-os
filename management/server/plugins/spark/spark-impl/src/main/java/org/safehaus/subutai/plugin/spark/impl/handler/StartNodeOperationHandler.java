@@ -1,15 +1,13 @@
 package org.safehaus.subutai.plugin.spark.impl.handler;
 
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import org.safehaus.subutai.common.exception.ClusterException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 
@@ -17,91 +15,86 @@ import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 public class StartNodeOperationHandler extends AbstractOperationHandler<SparkImpl>
 {
 
-    private final String lxcHostname;
+    private final String hostname;
     private final boolean master;
 
 
-    public StartNodeOperationHandler( SparkImpl manager, String clusterName, String lxcHostname, boolean master )
+    public StartNodeOperationHandler( SparkImpl manager, String clusterName, String hostname, boolean master )
     {
         super( manager, clusterName );
-        this.lxcHostname = lxcHostname;
+        this.hostname = hostname;
         this.master = master;
         trackerOperation = manager.getTracker().createTrackerOperation( SparkClusterConfig.PRODUCT_KEY,
-                String.format( "Starting node %s in %s", lxcHostname, clusterName ) );
+                String.format( "Starting node %s in %s", hostname, clusterName ) );
     }
 
 
     @Override
     public void run()
     {
-        TrackerOperation po = trackerOperation;
 
-        SparkClusterConfig config = manager.getCluster( clusterName );
-        if ( config == null )
+        try
         {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
-            return;
-        }
-
-        Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( node == null )
-        {
-            po.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
-            return;
-        }
-
-        if ( !config.getAllNodes().contains( node ) )
-        {
-            po.addLogFailed( String.format( "Node %s does not belong to this cluster", lxcHostname ) );
-            return;
-        }
-
-        if ( master && !config.getMasterNode().equals( node ) )
-        {
-            po.addLogFailed( String.format( "Node %s is not a master node\nOperation aborted", node.getHostname() ) );
-            return;
-        }
-        else if ( !master && !config.getSlaveNodes().contains( node ) )
-        {
-            po.addLogFailed( String.format( "Node %s is not a slave node\nOperation aborted", node.getHostname() ) );
-            return;
-        }
-
-        po.addLog( String.format( "Starting %s on %s...", master ? "master" : "slave", node.getHostname() ) );
-
-        Command startCommand;
-        if ( master )
-        {
-            startCommand = manager.getCommands().getStartMasterCommand( node );
-        }
-        else
-        {
-            startCommand = manager.getCommands().getStartSlaveCommand( node );
-        }
-
-        final AtomicBoolean ok = new AtomicBoolean();
-        manager.getCommandRunner().runCommand( startCommand, new CommandCallback()
-        {
-
-            @Override
-            public void onResponse( Response response, AgentResult agentResult, Command command )
+            SparkClusterConfig config = manager.getCluster( clusterName );
+            if ( config == null )
             {
-                if ( agentResult.getStdOut().contains( "starting" ) )
+                throw new ClusterException( String.format( "Cluster with name %s does not exist", clusterName ) );
+            }
+
+            Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+
+
+            if ( environment == null )
+            {
+                throw new ClusterException(
+                        String.format( "Environment not found by id %s", config.getEnvironmentId() ) );
+            }
+
+
+            ContainerHost node = environment.getContainerHostByHostname( hostname );
+
+            if ( node == null )
+            {
+                throw new ClusterException( String.format( "Node not found in environment by name %s", hostname ) );
+            }
+
+            if ( !config.getAllNodesIds().contains( node.getId() ) )
+            {
+                throw new ClusterException( String.format( "Node %s does not belong to this cluster", hostname ) );
+            }
+
+            trackerOperation
+                    .addLog( String.format( "Starting %s on %s...", master ? "master" : "slave", node.getHostname() ) );
+
+            RequestBuilder startCommand;
+            if ( master )
+            {
+                startCommand = manager.getCommands().getStartMasterCommand();
+            }
+            else
+            {
+                startCommand = manager.getCommands().getStartSlaveCommand();
+            }
+
+            try
+            {
+                CommandResult result = node.execute( startCommand );
+                if ( !result.hasSucceeded() )
                 {
-                    ok.set( true );
-                    stop();
+                    throw new ClusterException( String.format( "Could not start node : %s",
+                            result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
                 }
             }
-        } );
+            catch ( CommandException e )
+            {
+                throw new ClusterException( e );
+            }
 
-        if ( ok.get() )
-        {
-            po.addLogDone( String.format( "Node %s started", node.getHostname() ) );
+            trackerOperation.addLogDone( String.format( "Node %s started", node.getHostname() ) );
         }
-        else
+        catch ( ClusterException e )
         {
-            po.addLogFailed(
-                    String.format( "Starting node %s failed, %s", node.getHostname(), startCommand.getAllErrors() ) );
+            trackerOperation.addLogFailed( String.format( "Starting node failed, %s", e.getMessage() ) );
         }
     }
 }

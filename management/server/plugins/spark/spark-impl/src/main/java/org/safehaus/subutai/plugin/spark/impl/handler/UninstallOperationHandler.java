@@ -1,11 +1,15 @@
 package org.safehaus.subutai.plugin.spark.impl.handler;
 
 
+import java.util.Set;
+
+import org.safehaus.subutai.common.exception.ClusterException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
@@ -25,83 +29,82 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SparkImp
     @Override
     public void run()
     {
-        TrackerOperation po = trackerOperation;
-        SparkClusterConfig config = manager.getCluster( clusterName );
-        if ( config == null )
-        {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
-            return;
-        }
-
-        for ( Agent node : config.getAllNodes() )
-        {
-            if ( manager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
-            {
-                po.addLogFailed( String.format( "Node %s is not connected\nOperation aborted", node.getHostname() ) );
-                return;
-            }
-        }
-
-        boolean ok = false;
-        if ( config.getSetupType() == SetupType.OVER_HADOOP )
-        {
-            ok = uninstall( config );
-        }
-        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
-        {
-            ok = destroyNodes( config );
-        }
-        else
-        {
-            po.addLog( "Undefined setup type" );
-        }
-
-        if ( ok )
-        {
-            po.addLog( "Updating db..." );
-            manager.getPluginDAO().deleteInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName() );
-            po.addLogDone( "Cluster info deleted from DB\nDone" );
-        }
-        else
-        {
-            po.addLogFailed( "Failed to destroy cluster" );
-        }
-    }
-
-
-    private boolean uninstall( SparkClusterConfig config )
-    {
-        TrackerOperation po = trackerOperation;
-        po.addLog( "Uninstalling Spark..." );
-
-        Command cmd = manager.getCommands().getUninstallCommand( config.getAllNodes() );
-        manager.getCommandRunner().runCommand( cmd );
-
-        if ( cmd.hasSucceeded() )
-        {
-            return true;
-        }
-
-        po.addLog( cmd.getAllErrors() );
-        po.addLogFailed( "Uninstallation failed" );
-        return false;
-    }
-
-
-    private boolean destroyNodes( SparkClusterConfig config )
-    {
-
-        trackerOperation.addLog( "Destroying node(s)..." );
         try
         {
-            manager.getContainerManager().clonesDestroy( config.getAllNodes() );
-            trackerOperation.addLogDone( "Destroying node(s) completed" );
-            return true;
+            SparkClusterConfig config = manager.getCluster( clusterName );
+            if ( config == null )
+            {
+                throw new ClusterException( String.format( "Cluster with name %s does not exist", clusterName ) );
+            }
+
+
+            Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+
+            if ( environment == null )
+            {
+                throw new ClusterException(
+                        String.format( "Environment not found by id %s", config.getEnvironmentId() ) );
+            }
+
+            Set<ContainerHost> allNodes = environment.getHostsByIds( config.getSlaveIds() );
+            allNodes.add( environment.getContainerHostByUUID( config.getMasterNodeId() ) );
+
+            for ( ContainerHost node : allNodes )
+            {
+                if ( !node.isConnected() )
+                {
+                    throw new ClusterException( String.format( "Node %s is not connected", node.getHostname() ) );
+                }
+            }
+
+
+            if ( config.getSetupType() == SetupType.OVER_HADOOP )
+            {
+                uninstall( allNodes );
+            }
+            else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+            {
+                destroyNodes( allNodes );
+            }
+
+            trackerOperation.addLogFailed( "Cluster uninstalled successfully" );
         }
-        catch ( LxcDestroyException ex )
+        catch ( ClusterException e )
         {
-            trackerOperation.addLogFailed( "Failed to destroy node(s): " + ex.getMessage() );
-            return false;
+            trackerOperation.addLogFailed( String.format( "Failed to uninstall cluster: %s", e.getMessage() ) );
         }
+    }
+
+
+    private void uninstall( Set<ContainerHost> allNodes ) throws ClusterException
+    {
+        trackerOperation.addLog( "Uninstalling Spark..." );
+
+        RequestBuilder uninstallCommand = manager.getCommands().getUninstallCommand();
+        for ( ContainerHost node : allNodes )
+        {
+            try
+            {
+                CommandResult result = node.execute( uninstallCommand );
+                if ( !result.hasSucceeded() )
+                {
+                    throw new ClusterException(
+                            String.format( "Could not uninstall Spark from node %s : %s", node.getHostname(),
+                                    result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
+                }
+            }
+            catch ( CommandException e )
+            {
+                throw new ClusterException( String.format( "Error uninstalling Spark on node %s", node.getHostname() ),
+                        e );
+            }
+        }
+    }
+
+
+    private void destroyNodes( Set<ContainerHost> allNodes ) throws ClusterException
+    {
+
+        //TODO add logic when Environment resize is implemented
     }
 }
