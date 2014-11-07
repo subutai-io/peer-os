@@ -9,12 +9,12 @@ package org.safehaus.subutai.core.command.impl;
 import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.command.api.command.AbstractCommand;
 import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
 
 import com.google.common.base.Preconditions;
 
@@ -40,7 +40,7 @@ public class CommandImpl extends AbstractCommand
         Preconditions.checkArgument( requestsCount > 0, "Request Count <= 0" );
 
         this.broadcastCommand = true;
-        this.commandUUID = UUIDUtil.generateTimeBasedUUID();
+        this.commandUUID = requestBuilder.getCommandId();
         this.requestsCount = requestsCount;
         this.timeout = requestBuilder.getTimeout();
 
@@ -64,7 +64,7 @@ public class CommandImpl extends AbstractCommand
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( agents ), "Agents are null or empty" );
 
         this.description = description;
-        this.commandUUID = UUIDUtil.generateTimeBasedUUID();
+        this.commandUUID = requestBuilder.getCommandId();
         this.requestsCount = agents.size();
         this.timeout = requestBuilder.getTimeout();
 

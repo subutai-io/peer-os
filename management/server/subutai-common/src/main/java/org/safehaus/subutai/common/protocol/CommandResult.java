@@ -1,23 +1,35 @@
 package org.safehaus.subutai.common.protocol;
 
 
+import java.util.UUID;
+
+
 /**
  * Command Result returned by Host.execute
  */
 public class CommandResult
 {
+    private final UUID commandId;
     private final Integer exitCode;
     private final String stdOut;
     private final String stdErr;
     private final CommandStatus status;
 
 
-    public CommandResult( final Integer exitCode, final String stdOut, final String stdErr, CommandStatus status )
+    public CommandResult( final UUID commandId, final Integer exitCode, final String stdOut, final String stdErr,
+                          CommandStatus status )
     {
+        this.commandId = commandId;
         this.exitCode = exitCode;
         this.stdOut = stdOut;
         this.stdErr = stdErr;
         this.status = status;
+    }
+
+
+    public UUID getCommandId()
+    {
+        return commandId;
     }
 
 

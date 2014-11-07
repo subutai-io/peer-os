@@ -28,7 +28,6 @@ public class TestCommand extends OsgiCommandSupport
     {
         this.messenger = messenger;
         this.peerManager = peerManager;
-
         final MyMessageListener listener = new MyMessageListener( "Test" );
         messenger.addMessageListener( listener );
     }

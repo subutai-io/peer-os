@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.peer.api;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 
@@ -17,9 +18,9 @@ public class ManagementHost extends SubutaiHost
     private Set<ResourceHost> resourceHosts = new HashSet();
 
 
-    public ManagementHost( final Agent agent )
+    public ManagementHost( final Agent agent, UUID peerId )
     {
-        super( agent );
+        super( agent, peerId );
     }
 
     //

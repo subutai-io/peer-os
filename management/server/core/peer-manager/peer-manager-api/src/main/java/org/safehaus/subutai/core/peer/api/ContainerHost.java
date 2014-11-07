@@ -19,9 +19,10 @@ public class ContainerHost extends SubutaiHost
     private ContainerState state = ContainerState.UNKNOWN;
 
 
-    public ContainerHost( final Agent agent )
+    public ContainerHost( final Agent agent, UUID peerId, UUID environmentId )
     {
-        super( agent );
+        super( agent, peerId );
+        this.environmentId = environmentId;
     }
 
 
