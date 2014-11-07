@@ -1,15 +1,17 @@
 package org.safehaus.subutai.core.broker.impl;
 
 
-import javax.jms.BytesMessage;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.jms.TextMessage;
 import javax.jms.Topic;
 
-import org.safehaus.subutai.core.broker.api.ByteMessageListener;
-import org.safehaus.subutai.core.broker.api.TextMessageListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,12 +23,21 @@ public class MessageRoutingListener implements MessageListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( MessageRoutingListener.class.getName() );
 
-    private final org.safehaus.subutai.core.broker.api.MessageListener listener;
+    private final Set<org.safehaus.subutai.core.broker.api.MessageListener> listeners = Collections
+            .newSetFromMap( new ConcurrentHashMap<org.safehaus.subutai.core.broker.api.MessageListener, Boolean>() );
+
+    private Executor executor = Executors.newCachedThreadPool();
 
 
-    public MessageRoutingListener( final org.safehaus.subutai.core.broker.api.MessageListener listener )
+    public void addListener( org.safehaus.subutai.core.broker.api.MessageListener listener )
     {
-        this.listener = listener;
+        listeners.add( listener );
+    }
+
+
+    public void removeListener( org.safehaus.subutai.core.broker.api.MessageListener listener )
+    {
+        listeners.remove( listener );
     }
 
 
@@ -38,23 +49,11 @@ public class MessageRoutingListener implements MessageListener
             //assume we are always using topics
             Topic destination = ( Topic ) message.getJMSDestination();
 
-            if ( listener.getTopic().name().equalsIgnoreCase( destination.getTopicName() ) )
+            for ( org.safehaus.subutai.core.broker.api.MessageListener listener : listeners )
             {
-                if ( message instanceof BytesMessage && listener instanceof ByteMessageListener )
+                if ( listener.getTopic().name().equalsIgnoreCase( destination.getTopicName() ) )
                 {
-                    BytesMessage msg = ( BytesMessage ) message;
-                    byte[] bytes = new byte[( int ) msg.getBodyLength()];
-                    msg.readBytes( bytes );
-                    ( ( ByteMessageListener ) listener ).onMessage( bytes );
-                }
-                else if ( message instanceof TextMessage && listener instanceof TextMessageListener )
-                {
-                    TextMessage msg = ( TextMessage ) message;
-                    ( ( TextMessageListener ) listener ).onMessage( msg.getText() );
-                }
-                else
-                {
-                    LOG.warn( String.format( "Message type %s and listener type %s didn't match", message, listener ) );
+                    notifyListener( listener, message );
                 }
             }
         }
@@ -62,5 +61,11 @@ public class MessageRoutingListener implements MessageListener
         {
             LOG.error( "Error in onMessage", e );
         }
+    }
+
+
+    private void notifyListener( org.safehaus.subutai.core.broker.api.MessageListener listener, Message message )
+    {
+        executor.execute( new MessageNotifier( listener, message ) );
     }
 }

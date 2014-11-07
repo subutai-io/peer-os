@@ -14,4 +14,6 @@ public interface Broker
     public void addByteMessageListener( ByteMessageListener listener ) throws BrokerException;
 
     public void addTextMessageListener( TextMessageListener listener ) throws BrokerException;
+
+    public void removeMessageListener( MessageListener listener );
 }

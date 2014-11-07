@@ -34,6 +34,7 @@ public class BrokerImpl implements Broker
 {
     private static final Logger LOG = LoggerFactory.getLogger( BrokerImpl.class.getName() );
 
+    private MessageRoutingListener messageRouter;
     private PooledConnectionFactory pool;
     private String brokerUrl;
     private int maxBrokerConnections;
@@ -51,6 +52,7 @@ public class BrokerImpl implements Broker
         this.maxBrokerConnections = maxBrokerConnections;
         this.isPersistent = isPersistent;
         this.messageTimeout = messageTimeout;
+        this.messageRouter = new MessageRoutingListener();
     }
 
 
@@ -79,7 +81,7 @@ public class BrokerImpl implements Broker
     {
         Preconditions.checkNotNull( listener );
 
-        addListener( listener );
+        messageRouter.addListener( listener );
     }
 
 
@@ -88,15 +90,23 @@ public class BrokerImpl implements Broker
     {
         Preconditions.checkNotNull( listener );
 
-        addListener( listener );
+        messageRouter.addListener( listener );
+    }
+
+
+    @Override
+    public void removeMessageListener( final MessageListener listener )
+    {
+        Preconditions.checkNotNull( listener );
+
+        messageRouter.removeListener( listener );
     }
 
 
     public void init() throws BrokerException
     {
         setupConnectionPool();
-        //TODO extract default listeners to relevant modules
-        setupDefaultListeners();
+        setupRouter();
     }
 
 
@@ -109,28 +119,23 @@ public class BrokerImpl implements Broker
     }
 
 
-    private void setupDefaultListeners() throws BrokerException
-    {
-        addListener( new HeartBeatListener() );
-        addListener( new ResponseListener() );
-        addListener( new InotifyListener() );
-    }
-
-
-    private void addListener( final MessageListener listener ) throws BrokerException
+    private void setupRouter() throws BrokerException
     {
         try
         {
-            Connection connection = pool.createConnection();
-            connection.start();
-            Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-            Destination topicDestination = session.createTopic( listener.getTopic().name() );
-            MessageConsumer consumer = session.createConsumer( topicDestination );
-            consumer.setMessageListener( new MessageRoutingListener( listener ) );
+            for ( Topic topic : Topic.values() )
+            {
+                Connection connection = pool.createConnection();
+                connection.start();
+                Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
+                Destination topicDestination = session.createTopic( topic.name() );
+                MessageConsumer consumer = session.createConsumer( topicDestination );
+                consumer.setMessageListener( messageRouter );
+            }
         }
         catch ( JMSException e )
         {
-            LOG.error( "Error in addListener", e );
+            LOG.error( "Error in setupRouter", e );
             throw new BrokerException( e );
         }
     }
@@ -138,7 +143,6 @@ public class BrokerImpl implements Broker
 
     private void setupConnectionPool()
     {
-        //pooled connection factory setup
         ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( brokerUrl );
         amqFactory.setCheckForDuplicates( true );
         pool = new PooledConnectionFactory( amqFactory );
