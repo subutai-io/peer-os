@@ -110,19 +110,6 @@ public class Environment
     }
 
 
-    public ContainerHost getContainerHostByHostname( final String hostname )
-    {
-        Iterator<ContainerHost> iterator = containers.iterator();
-        iterator.next();
-        while ( iterator.hasNext() ) {
-            ContainerHost containerHost = iterator.next();
-            if ( containerHost.getHostname().equals( hostname ) )
-                return containerHost;
-        }
-        return null;
-    }
-
-
     /*public void invoke( PeerCommandMessage commandMessage )
     {
         try
