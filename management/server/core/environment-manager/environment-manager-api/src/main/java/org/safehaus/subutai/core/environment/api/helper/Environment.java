@@ -90,4 +90,10 @@ public class Environment
     {
         this.containers.addAll( containerHosts );
     }
+
+
+    public void removeContainer( final ContainerHost containerHost )
+    {
+        this.containers.remove( containerHost );
+    }
 }

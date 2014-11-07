@@ -20,7 +20,6 @@ public class ContainerCreatorThread extends Observable implements Runnable
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( ContainerCreatorThread.class.getName() );
-    private EnvironmentBuilderImpl builder;
     private CloneContainersMessage message;
     private PeerManager peerManager;
     private UUID environmentId;
@@ -30,7 +29,6 @@ public class ContainerCreatorThread extends Observable implements Runnable
                                    final CloneContainersMessage message, final PeerManager peerManager )
     {
         this.environmentId = environmentId;
-        this.builder = environmentBuilder;
         this.message = message;
         this.peerManager = peerManager;
     }
@@ -45,12 +43,11 @@ public class ContainerCreatorThread extends Observable implements Runnable
                     createContainers( message.getTargetPeerId(), environmentId, message.getTemplates(),
                             message.getNumberOfNodes(), message.getStrategy(), null, message.getNodeGroupName() );
             LOG.info( String.format( "Got %d containers for environment %s", containers.size(), environmentId ) );
-            builder.update( this, containers );
+            notifyObservers( containers );
         }
         catch ( PeerException e )
         {
             LOG.error( e.getMessage(), e );
-            builder.update( this, e );
         }
     }
 }

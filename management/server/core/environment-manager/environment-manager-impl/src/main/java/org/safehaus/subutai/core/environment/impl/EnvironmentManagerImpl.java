@@ -40,8 +40,10 @@ import org.safehaus.subutai.core.environment.impl.builder.NodeGroup2PeerGroupBui
 import org.safehaus.subutai.core.environment.impl.builder.ProcessBuilderException;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.environment.BuildException;
+import org.safehaus.subutai.core.environment.impl.environment.DestroyException;
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentBuilderImpl;
+import org.safehaus.subutai.core.environment.impl.environment.EnvironmentDestoyerImpl;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -197,38 +199,24 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public boolean destroyEnvironment( final UUID uuid ) throws EnvironmentDestroyException
+    public boolean destroyEnvironment( final UUID environmentId ) throws EnvironmentDestroyException
     {
-        Environment environment = getEnvironmentByUUID( uuid );
-        int count = 0;
-        for ( ContainerHost container : environment.getContainers() )
+        Environment environment = getEnvironmentByUUID( environmentId );
+        EnvironmentDestoyerImpl destoyer = new EnvironmentDestoyerImpl();
+        try
         {
-            String ip = null;
-            try
+            destoyer.destroy( environment );
+            if ( environment.getContainers().isEmpty() )
             {
-                ip = container.getPeer().getPeerInfo().getIp();
-                container.dispose();
-                System.out.println( String.format( "Container %s destroyed.", container.getHostname() ) );
-                count++;
-            }
-            catch ( PeerException e )
-            {
-                LOG.error( String.format( "Could not destroy container %s on %s: %s", container.getHostname(), ip,
-                        e.toString() ) );
-                throw new EnvironmentDestroyException( e.getMessage() );
+                environmentDAO.deleteInfo( ENVIRONMENT, environment.getId().toString() );
             }
         }
-
-
-        if ( count == environment.getContainers().size() )
+        catch ( DestroyException e )
         {
-            return environmentDAO.deleteInfo( ENVIRONMENT, uuid.toString() );
+            LOG.error( e.getMessage(), e );
+            throw new EnvironmentDestroyException( e.getMessage() );
         }
-        else
-        {
-            throw new EnvironmentDestroyException( String.format( "Only %d out of %d containers destroyed.", count,
-                    environment.getContainers().size() ) );
-        }
+        return true;
     }
 
 

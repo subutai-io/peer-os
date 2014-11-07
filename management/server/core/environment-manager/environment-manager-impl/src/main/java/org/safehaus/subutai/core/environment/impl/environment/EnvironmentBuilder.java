@@ -17,12 +17,12 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 public interface EnvironmentBuilder
 {
 
-    public Environment build(final EnvironmentBlueprint blueprint, final EnvironmentBuildProcess process) throws BuildException;
+    public Environment build( final EnvironmentBlueprint blueprint, final EnvironmentBuildProcess process )
+            throws BuildException;
 
-    public void addNodeGroup(UUID environmentId, NodeGroup nodeGroup) throws BuildException;
+    public void addNodeGroup( UUID environmentId, NodeGroup nodeGroup ) throws BuildException;
 
-    public void addContainerToNodeGroup(CloneContainersMessage message);
+    public void addContainerToNodeGroup( CloneContainersMessage message );
 
     public void removeContainer( ContainerHost containerHost );
-
 }
