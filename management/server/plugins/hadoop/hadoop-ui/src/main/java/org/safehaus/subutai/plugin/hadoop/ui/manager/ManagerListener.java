@@ -27,9 +27,10 @@ import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.api.NodeOperationTask;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopNodeOperationTask;
 import org.safehaus.subutai.plugin.hadoop.ui.manager.components.CheckDecommissionStatusTask;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -405,8 +406,8 @@ public class ManagerListener
                 hadoopManager.enableProgressBar();
                 checkButton.setEnabled( false );
                 hadoopManager.getExecutorService().execute(
-                        new NodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                containerHost, OperationType.STATUS, new CompleteEvent()
+                        new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
+                                containerHost, OperationType.STATUS, NodeType.SECONDARY_NAMENODE, new CompleteEvent()
                         {
 
                             public void onComplete( NodeState state )
@@ -479,8 +480,8 @@ public class ManagerListener
                 {
                     startStopButton.setEnabled( false );
                     hadoopManager.getExecutorService().execute(
-                            new NodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                                   containerHost, OperationType.START, new CompleteEvent()
+                            new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
+                                    containerHost, OperationType.START, NodeType.JOBTRACKER, new CompleteEvent()
                             {
                                 public void onComplete( NodeState state )
                                 {
@@ -502,8 +503,8 @@ public class ManagerListener
                 {
                     startStopButton.setEnabled( false );
                     hadoopManager.getExecutorService().execute(
-                            new NodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                    containerHost, OperationType.STOP, new CompleteEvent()
+                            new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
+                                    containerHost, OperationType.STOP, NodeType.JOBTRACKER, new CompleteEvent()
                             {
                                 public void onComplete( NodeState state )
                                 {
@@ -540,8 +541,8 @@ public class ManagerListener
                 startStopButton.setEnabled( false );
                 checkButton.setEnabled( false );
                 hadoopManager.getExecutorService().execute(
-                        new NodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                containerHost, OperationType.STATUS, new CompleteEvent()
+                        new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
+                                containerHost, OperationType.STATUS, NodeType.JOBTRACKER, new CompleteEvent()
                         {
 
                             public void onComplete( NodeState state )
@@ -596,8 +597,8 @@ public class ManagerListener
                 checkButton.setEnabled( false );
                 startStopButton.setEnabled( false );
                 hadoopManager.getExecutorService().execute(
-                        new NodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                containerHost, OperationType.STATUS, new CompleteEvent()
+                        new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
+                                containerHost, OperationType.STATUS, NodeType.NAMENODE, new CompleteEvent()
                         {
                             public void onComplete( NodeState state )
                             {
@@ -649,8 +650,8 @@ public class ManagerListener
                 if ( !isRunning )
                 {
                     hadoopManager.getExecutorService().execute(
-                            new NodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                    containerHost, OperationType.START, new CompleteEvent()
+                            new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
+                                    containerHost, OperationType.START, NodeType.NAMENODE, new CompleteEvent()
                             {
 
                                 public void onComplete( NodeState state )
@@ -672,8 +673,8 @@ public class ManagerListener
                 else
                 {
                     hadoopManager.getExecutorService().execute(
-                            new NodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                    containerHost, OperationType.STOP, new CompleteEvent()
+                            new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
+                                    containerHost, OperationType.STOP, NodeType.NAMENODE, new CompleteEvent()
                             {
 
                                 public void onComplete( NodeState state )
@@ -743,8 +744,8 @@ public class ManagerListener
                 {
                     hadoopManager.enableProgressBar();
                     hadoopManager.getExecutorService().execute(
-                            new NodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                    containerHost, OperationType.STATUS, new CompleteEvent()
+                            new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
+                                    containerHost, OperationType.STATUS, NodeType.DATANODE, new CompleteEvent()
                             {
                                 public void onComplete( NodeState state )
                                 {
@@ -781,8 +782,8 @@ public class ManagerListener
                 {
                     hadoopManager.enableProgressBar();
                     hadoopManager.getExecutorService().execute(
-                            new NodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
-                                    containerHost, OperationType.STATUS, new CompleteEvent()
+                            new HadoopNodeOperationTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), clusterName,
+                                    containerHost, OperationType.STATUS, NodeType.TASKTRACKER, new CompleteEvent()
                             {
 
                                 public void onComplete( NodeState state )

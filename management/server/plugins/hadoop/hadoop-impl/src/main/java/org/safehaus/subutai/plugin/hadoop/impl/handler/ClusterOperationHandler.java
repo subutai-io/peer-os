@@ -18,9 +18,9 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyExc
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
 import org.slf4j.Logger;
@@ -87,8 +87,8 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
             case STATUS:
                 runOperationOnContainers( OperationType.STATUS );
                 break;
-            case DECOMISSION:
-                runOperationOnContainers( OperationType.DECOMISSION );
+            case DECOMISSION_STATUS:
+                runOperationOnContainers( OperationType.DECOMISSION_STATUS );
                 break;
         }
     }
@@ -147,9 +147,9 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                     }
                     logStatusResults( trackerOperation, result, nodeType );
                     break;
-                case DECOMISSION:
+                case DECOMISSION_STATUS:
                     result = namenode.execute( new RequestBuilder( Commands.getReportHadoopCommand() ) );
-                    logStatusResults( trackerOperation, result, null );
+                    logStatusResults( trackerOperation, result, NodeType.SLAVE_NODE );
                     break;
             }
         }
@@ -245,8 +245,8 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                             }
                         }
                         break;
-                    default:
-
+                    case SLAVE_NODE:
+//                        nodeState = this.getDecommissionStatus( result.getStdOut() );
                         trackerOperation.addLogDone( result.getStdOut() );
                         break;
                 }

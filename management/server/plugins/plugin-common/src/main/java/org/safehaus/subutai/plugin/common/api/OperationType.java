@@ -12,5 +12,5 @@ public enum OperationType
     UNINSTALL,
     EXCLUDE,
     INCLUDE,
-    DECOMISSION
+    DECOMISSION_STATUS
 }
