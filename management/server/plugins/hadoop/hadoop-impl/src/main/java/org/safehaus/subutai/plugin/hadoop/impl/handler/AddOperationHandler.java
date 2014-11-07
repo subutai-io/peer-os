@@ -6,7 +6,7 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
 
-public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl>
+public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl, HadoopClusterConfig>
 {
 
     private int nodeCount;

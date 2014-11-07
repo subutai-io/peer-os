@@ -23,7 +23,7 @@ import org.safehaus.subutai.plugin.hadoop.impl.Commands;
  *
  * TODO: add nodes and delete node operation should be implemented.
  */
-public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
+public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl, HadoopClusterConfig>
 {
 
     private String clusterName;

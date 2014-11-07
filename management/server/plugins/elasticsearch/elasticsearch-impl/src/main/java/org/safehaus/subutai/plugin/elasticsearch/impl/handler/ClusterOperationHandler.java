@@ -29,7 +29,7 @@ import com.google.common.base.Strings;
 /**
  * This class handles operations that are related to whole cluster.
  */
-public class ClusterOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
+public class ClusterOperationHandler extends AbstractOperationHandler<ElasticsearchImpl,ElasticsearchClusterConfiguration>
         implements ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
