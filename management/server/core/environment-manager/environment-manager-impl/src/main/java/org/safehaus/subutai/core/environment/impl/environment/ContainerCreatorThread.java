@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.environment.impl.environment;
 
 import java.util.Observable;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -19,14 +20,16 @@ public class ContainerCreatorThread extends Observable implements Runnable
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( ContainerCreatorThread.class.getName() );
-    EnvironmentBuilderImpl builder;
+    private EnvironmentBuilderImpl builder;
     private CloneContainersMessage message;
     private PeerManager peerManager;
+    private UUID environmentId;
 
 
-    public ContainerCreatorThread( final EnvironmentBuilderImpl environmentBuilder,
+    public ContainerCreatorThread( final EnvironmentBuilderImpl environmentBuilder, final UUID environmentId,
                                    final CloneContainersMessage message, final PeerManager peerManager )
     {
+        this.environmentId = environmentId;
         this.builder = environmentBuilder;
         this.message = message;
         this.peerManager = peerManager;
@@ -39,8 +42,9 @@ public class ContainerCreatorThread extends Observable implements Runnable
         try
         {
             Set<ContainerHost> containers = peerManager.getPeer( peerManager.getLocalPeer().getId() ).
-                    createContainers( message.getPeerId(), message.getEnvId(), message.getTemplates(),
+                    createContainers( message.getTargetPeerId(), environmentId, message.getTemplates(),
                             message.getNumberOfNodes(), message.getStrategy(), null, message.getNodeGroupName() );
+            LOG.info( String.format( "Got %d containers for environment %s", containers.size(), environmentId ) );
             builder.update( this, containers );
         }
         catch ( PeerException e )

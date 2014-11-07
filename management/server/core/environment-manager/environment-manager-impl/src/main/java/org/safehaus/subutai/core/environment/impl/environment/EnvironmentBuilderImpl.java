@@ -55,7 +55,7 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
         {
             CloneContainersMessage message = process.getMessageMap().get( key );
             ContainerCreatorThread creatorThread =
-                    new ContainerCreatorThread( this, message, manager.getPeerManager() );
+                    new ContainerCreatorThread( this, environment.getId(), message, manager.getPeerManager() );
             containersAmount = containersAmount + message.getNumberOfNodes();
             executorService.execute( creatorThread );
         }

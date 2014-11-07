@@ -39,10 +39,9 @@ public class Blueprint2PeerBuilder extends EnvironmentBuildProcessFactory
             for ( NodeGroup nodeGroup : groupSet )
             {
                 String key = data.getPeerId().toString() + "-" + nodeGroup.getTemplateName();
-                CloneContainersMessage ccm = new CloneContainersMessage( data.getPeerId() );
-                ccm.setEnvId( process.getId() );
+                CloneContainersMessage ccm = new CloneContainersMessage();
+                ccm.setTargetPeerId( data.getPeerId() );
                 ccm.setNodeGroupName( nodeGroup.getName() );
-                ccm.setTemplate( nodeGroup.getTemplateName() );
                 ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
                 ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );
                 List<Template> templates =

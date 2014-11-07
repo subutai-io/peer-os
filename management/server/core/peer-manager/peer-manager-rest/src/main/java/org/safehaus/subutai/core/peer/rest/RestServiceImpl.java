@@ -18,7 +18,6 @@ import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -97,13 +96,9 @@ public class RestServiceImpl implements RestService
     @Override
     public String getCreateContainersMsgJsonFormat()
     {
-        CloneContainersMessage ccm = new CloneContainersMessage( UUIDUtil.generateTimeBasedUUID() );
-        ccm.setEnvId( UUIDUtil.generateTimeBasedUUID() );
+        CloneContainersMessage ccm = new CloneContainersMessage();
         ccm.setStrategy( "ROUND_ROBIN" );
-        //        ccm.setEnvId( UUIDUtil.generateTimeBasedUUID() );
         ccm.setNumberOfNodes( 2 );
-        //        ccm.setPeerId( UUIDUtil.generateTimeBasedUUID() );
-        ccm.setTemplate( "master" );
         return GSON.toJson( ccm );
     }
 

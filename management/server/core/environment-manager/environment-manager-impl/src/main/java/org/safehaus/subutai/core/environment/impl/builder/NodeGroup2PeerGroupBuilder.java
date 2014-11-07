@@ -33,8 +33,7 @@ public class NodeGroup2PeerGroupBuilder extends EnvironmentBuildProcessFactory
 
 
     @Override
-    public EnvironmentBuildProcess prepareBuildProcess( final TopologyData topologyData )
-            throws ProcessBuilderException
+    public EnvironmentBuildProcess prepareBuildProcess( final TopologyData topologyData ) throws ProcessBuilderException
     {
         NodeGroup2PeerGroupData data = ( NodeGroup2PeerGroupData ) topologyData;
         EnvironmentBuildProcess process = new EnvironmentBuildProcess( data.getBlueprintId() );
@@ -50,10 +49,9 @@ public class NodeGroup2PeerGroupBuilder extends EnvironmentBuildProcessFactory
             {
                 UUID peerId = uuidList.get( randomInt( uuidList.size() ) );
                 String key = peerId.toString() + "-" + nodeGroup.getTemplateName();
-                CloneContainersMessage ccm = new CloneContainersMessage( peerId );
-                ccm.setEnvId( process.getId() );
+                CloneContainersMessage ccm = new CloneContainersMessage();
+                ccm.setTargetPeerId( peerId );
                 ccm.setNodeGroupName( nodeGroup.getName() );
-                ccm.setTemplate( nodeGroup.getTemplateName() );
                 ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
                 ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );
                 List<Template> templates =

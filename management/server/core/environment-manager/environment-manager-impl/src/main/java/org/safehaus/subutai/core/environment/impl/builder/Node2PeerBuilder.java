@@ -42,10 +42,10 @@ public class Node2PeerBuilder extends EnvironmentBuildProcessFactory
 
             if ( !process.getMessageMap().containsKey( key.toString() ) )
             {
-                CloneContainersMessage ccm = new CloneContainersMessage( peer.getId() );
-                ccm.setEnvId( process.getId() );
+                CloneContainersMessage ccm = new CloneContainersMessage();
+                ccm.setTargetPeerId( peer.getId() );
                 ccm.setNodeGroupName( nodeGroup.getName() );
-                ccm.setTemplate( nodeGroup.getTemplateName() );
+                ccm.setCriteria( null );
                 ccm.setNumberOfNodes( 1 );
                 ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );
                 List<Template> templates =
