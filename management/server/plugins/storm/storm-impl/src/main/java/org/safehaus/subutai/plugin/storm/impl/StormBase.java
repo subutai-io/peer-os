@@ -7,12 +7,9 @@ import java.util.concurrent.Executors;
 
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDao;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.storm.api.Storm;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.slf4j.Logger;
@@ -23,14 +20,11 @@ public abstract class StormBase implements Storm
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( StormImpl.class.getName() );
-    protected CommandRunner commandRunner;
-    protected AgentManager agentManager;
     protected Tracker tracker;
     protected Zookeeper zookeeperManager;
-    protected ContainerManager containerManager;
     protected EnvironmentManager environmentManager;
 
-    protected PluginDao pluginDao;
+    protected PluginDAO pluginDAO;
     protected ExecutorService executor;
     protected DataSource dataSource;
 
@@ -39,7 +33,7 @@ public abstract class StormBase implements Storm
     {
         try
         {
-            this.pluginDao = new PluginDao( dataSource );
+            this.pluginDAO = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
         {
@@ -53,30 +47,6 @@ public abstract class StormBase implements Storm
     public void destroy()
     {
         executor.shutdown();
-    }
-
-
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
-    public void setCommandRunner( CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
-    }
-
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
     }
 
 
@@ -104,18 +74,6 @@ public abstract class StormBase implements Storm
     }
 
 
-    public ContainerManager getContainerManager()
-    {
-        return containerManager;
-    }
-
-
-    public void setContainerManager( ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
-    }
-
-
     public EnvironmentManager getEnvironmentManager()
     {
         return environmentManager;
@@ -128,15 +86,15 @@ public abstract class StormBase implements Storm
     }
 
 
-    public PluginDao getPluginDao()
+    public PluginDAO getPluginDAO()
     {
-        return pluginDao;
+        return pluginDAO;
     }
 
 
-    public void setPluginDao( PluginDao pluginDao )
+    public void setPluginDAO( PluginDAO pluginDAO )
     {
-        this.pluginDao = pluginDao;
+        this.pluginDAO = pluginDAO;
     }
 
 

@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.environment.api.helper;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
@@ -84,4 +85,43 @@ public class Environment
     {
         return id;
     }
+
+
+    public ContainerHost getContainerHostByUUID( final UUID uuid ) {
+        Iterator<ContainerHost> iterator = containers.iterator();
+        while ( iterator.hasNext() ) {
+            ContainerHost containerHost = iterator.next();
+            if ( containerHost.getAgent().getUuid().equals( uuid ) )
+                return containerHost;
+        }
+        return null;
+    }
+
+
+    public ContainerHost getContainerHostByHostname( String hostname )
+    {
+        Iterator<ContainerHost> iterator = containers.iterator();
+        while ( iterator.hasNext() ) {
+            ContainerHost containerHost = iterator.next();
+            if ( containerHost.getHostname().equals( hostname ) )
+                return containerHost;
+        }
+        return null;
+    }
+
+
+    /*public void invoke( PeerCommandMessage commandMessage )
+    {
+        try
+        {
+            EnvironmentManager environmentManager = this.serviceLocator.getServiceNoCache( EnvironmentManager.class );
+            environmentManager.invoke( commandMessage );
+        }
+        catch ( NamingException e )
+        {
+            commandMessage.setProccessed( true );
+            commandMessage.setExceptionMessage( e.toString() );
+            //            commandMessage.setSuccess( false );
+        }
+    }*/
 }

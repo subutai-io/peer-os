@@ -18,6 +18,9 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -76,8 +79,8 @@ public class Manager
     private final Hadoop hadoop;
     private final Zookeeper zookeeper;
     private final CommandRunner commandRunner;
+    private final EnvironmentManager environmentManager;
     private final Tracker tracker;
-    private final AgentManager agentManager;
     private final ExecutorService executorService;
     private ZookeeperClusterConfig config;
 
@@ -90,7 +93,7 @@ public class Manager
         this.tracker = serviceLocator.getService( Tracker.class );
         this.zookeeper = serviceLocator.getService( Zookeeper.class );
         this.commandRunner = serviceLocator.getService( CommandRunner.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -358,7 +361,13 @@ public class Manager
 
     public void startAllNodes()
     {
-        for ( Agent agent : config.getNodes() )
+
+        Set<Agent> agentSet = new HashSet<>();
+        Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+        for ( UUID agentID : config.getNodes() ) {
+            agentSet.add( environment.getContainerHostByUUID( agentID ).getAgent() );
+        }
+        for ( Agent agent : agentSet )
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
@@ -381,7 +390,13 @@ public class Manager
 
     public void stopAllNodes()
     {
-        for ( Agent agent : config.getNodes() )
+        Set<Agent> agentSet = new HashSet<>();
+        Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+        for ( UUID agentID : config.getNodes() ) {
+            agentSet.add( environment.getContainerHostByUUID( agentID ).getAgent() );
+        }
+
+        for ( Agent agent : agentSet )
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
@@ -574,12 +589,12 @@ public class Manager
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION )
                                             .getValue();
-                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
+                    Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+                    ContainerHost containerHost = environment.getContainerHostByHostname( lxcHostname );
+                    if ( containerHost != null )
                     {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
-                                        agentManager );
+                                new TerminalWindow( Sets.newHashSet( containerHost ) );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
@@ -600,9 +615,10 @@ public class Manager
 
     private void refreshUI()
     {
+        Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
         if ( config != null )
         {
-            populateTable( nodesTable, config.getNodes() );
+            populateTable( nodesTable, environment.getContainers() );
         }
         else
         {
@@ -611,10 +627,10 @@ public class Manager
     }
 
 
-    private void populateTable( final Table table, Set<Agent> agents )
+    private void populateTable( final Table table, Set<ContainerHost> containerHosts )
     {
         table.removeAllItems();
-        for ( final Agent agent : agents )
+        for ( final ContainerHost containerHost : containerHosts )
         {
             final Label resultHolder = new Label();
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
@@ -622,10 +638,10 @@ public class Manager
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
 
-            checkBtn.setId( agent.getListIP().get( 0 ) + "-zookeeperCheck" );
-            startBtn.setId( agent.getListIP().get( 0 ) + "-zookeeperStart" );
-            stopBtn.setId( agent.getListIP().get( 0 ) + "-zookeeperStop" );
-            destroyBtn.setId( agent.getListIP().get( 0 ) + "-zookeeperDestroy" );
+            checkBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperCheck" );
+            startBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperStart" );
+            stopBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperStop" );
+            destroyBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperDestroy" );
 
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );
@@ -638,14 +654,14 @@ public class Manager
             PROGRESS_ICON.setVisible( false );
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), resultHolder, availableOperations
+                    containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ), resultHolder, availableOperations
             }, null );
 
 
-            addCheckButtonClickListener( agent, resultHolder, startBtn, stopBtn, destroyBtn, checkBtn );
-            addStartButtonClickListener( agent, startBtn, stopBtn, destroyBtn, checkBtn );
-            addStopButtonClickListener( agent, startBtn, stopBtn, destroyBtn, checkBtn );
-            addDestroyButtonClickListener( agent, destroyBtn );
+            addCheckButtonClickListener( containerHost, resultHolder, startBtn, stopBtn, destroyBtn, checkBtn );
+            addStartButtonClickListener( containerHost, startBtn, stopBtn, destroyBtn, checkBtn );
+            addStopButtonClickListener( containerHost, startBtn, stopBtn, destroyBtn, checkBtn );
+            addDestroyButtonClickListener( containerHost, destroyBtn );
         }
     }
 
@@ -668,7 +684,7 @@ public class Manager
     }
 
 
-    public void addDestroyButtonClickListener( final Agent agent, final Button... buttons )
+    public void addDestroyButtonClickListener( final ContainerHost containerHost, final Button... buttons )
     {
         getButton( DESTROY_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -676,13 +692,13 @@ public class Manager
             public void buttonClick( Button.ClickEvent event )
             {
                 ConfirmationDialog alert = new ConfirmationDialog(
-                        String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
+                        String.format( "Do you want to destroy the %s node?", containerHost.getHostname() ), "Yes", "No" );
                 alert.getOk().addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( Button.ClickEvent clickEvent )
                     {
-                        UUID trackID = zookeeper.destroyNode( config.getClusterName(), agent.getHostname() );
+                        UUID trackID = zookeeper.destroyNode( config.getClusterName(), containerHost.getHostname() );
                         ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                 ZookeeperClusterConfig.PRODUCT_KEY );
                         window.getWindow().addCloseListener( new Window.CloseListener()
@@ -734,7 +750,7 @@ public class Manager
     }
 
 
-    public void addStopButtonClickListener( final Agent agent, final Button... buttons )
+    public void addStopButtonClickListener( final ContainerHost containerHost, final Button... buttons )
     {
         getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -743,7 +759,7 @@ public class Manager
             {
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
-                executorService.execute( new StopTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(),
+                executorService.execute( new StopTask( zookeeper, tracker, config.getClusterName(), containerHost.getHostname(),
                         new CompleteEvent()
                         {
                             @Override
@@ -761,7 +777,7 @@ public class Manager
     }
 
 
-    public void addStartButtonClickListener( final Agent agent, final Button... buttons )
+    public void addStartButtonClickListener( final ContainerHost containerHost, final Button... buttons )
     {
         getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -771,7 +787,7 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StartTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(),
+                        new StartTask( zookeeper, tracker, config.getClusterName(), containerHost.getHostname(),
                                 new CompleteEvent()
                                 {
                                     @Override
@@ -789,7 +805,7 @@ public class Manager
     }
 
 
-    public void addCheckButtonClickListener( final Agent agent, final Label resultHolder, final Button... buttons )
+    public void addCheckButtonClickListener( final ContainerHost containerHost, final Label resultHolder, final Button... buttons )
     {
         getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -799,7 +815,7 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new CheckTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(),
+                        new CheckTask( zookeeper, tracker, config.getClusterName(), containerHost.getHostname(),
                                 new CompleteEvent()
                                 {
                                     public void onComplete( String result )
