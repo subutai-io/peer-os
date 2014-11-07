@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -48,7 +49,7 @@ public class SparkImpl extends SparkBase implements Spark
         Preconditions.checkNotNull( config, "Configuration is null" );
 
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, OperationType.INSTALL, null );
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL, null );
 
         executor.execute( operationHandler );
 
@@ -62,7 +63,7 @@ public class SparkImpl extends SparkBase implements Spark
 
         SparkClusterConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, OperationType.UNINSTALL, null );
+                new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL, null );
 
         executor.execute( operationHandler );
 
@@ -99,7 +100,7 @@ public class SparkImpl extends SparkBase implements Spark
         Preconditions.checkNotNull( hadoopConfig, "Hadoop Configuration is null" );
 
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, OperationType.INSTALL, hadoopConfig );
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL, hadoopConfig );
 
         executor.execute( operationHandler );
 
@@ -166,7 +167,7 @@ public class SparkImpl extends SparkBase implements Spark
     {
         SparkClusterConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, OperationType.START, null );
+                new ClusterOperationHandler( this, config, ClusterOperationType.START_ALL, null );
 
         executor.execute( operationHandler );
 
@@ -193,7 +194,7 @@ public class SparkImpl extends SparkBase implements Spark
     {
         SparkClusterConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, OperationType.STOP, null );
+                new ClusterOperationHandler( this, config, ClusterOperationType.STOP_ALL, null );
 
         executor.execute( operationHandler );
 

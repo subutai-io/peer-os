@@ -15,7 +15,7 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildExcep
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
@@ -29,14 +29,14 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
-    private OperationType operationType;
+    private ClusterOperationType operationType;
     private HadoopClusterConfig hadoopConfig;
     private Environment environment;
     private ContainerHost master;
 
 
     public ClusterOperationHandler( final SparkImpl manager, final SparkClusterConfig config,
-                                    final OperationType operationType, HadoopClusterConfig hadoopClusterConfig )
+                                    final ClusterOperationType operationType, HadoopClusterConfig hadoopClusterConfig )
     {
         super( manager, config );
         this.operationType = operationType;
@@ -47,23 +47,23 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
 
 
     @Override
-    public void runOperationOnContainers( final OperationType operationType )
+    public void runOperationOnContainers( final ClusterOperationType operationType )
     {
         switch ( operationType )
         {
             case INSTALL:
                 setupCluster();
                 break;
-            case DESTROY:
+            case UNINSTALL:
                 destroyCluster();
                 break;
-            case START:
+            case START_ALL:
                 startCluster();
                 break;
-            case STOP:
+            case STOP_ALL:
                 stopCluster();
                 break;
-            case STATUS:
+            case STATUS_ALL:
                 checkCluster();
                 break;
         }
