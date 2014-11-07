@@ -15,9 +15,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * Created by daralbaev on 09.04.14.
- */
 public class Wizard
 {
     private final VerticalLayout grid;

@@ -15,7 +15,7 @@ import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
-import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
+import org.safehaus.subutai.plugin.hadoop.impl.Commands;
 
 
 /**

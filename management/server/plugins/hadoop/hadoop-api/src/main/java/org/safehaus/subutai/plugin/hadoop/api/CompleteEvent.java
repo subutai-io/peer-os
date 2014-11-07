@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.hadoop.ui.manager.components;
+package org.safehaus.subutai.plugin.hadoop.api;
 
 
 public interface CompleteEvent

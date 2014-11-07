@@ -29,9 +29,9 @@ import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.hadoop.api.CheckDecommissionStatusTask;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopNodeOperationTask;
-import org.safehaus.subutai.plugin.hadoop.ui.manager.components.CheckDecommissionStatusTask;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.QuestionDialog;
@@ -855,7 +855,7 @@ public class ManagerListener
         hadoopManager.getExecutorService().execute(
                 new CheckDecommissionStatusTask( hadoopManager.getHadoop(), hadoopManager.getTracker(),
                         hadoopManager.getHadoopCluster(),
-                        new org.safehaus.subutai.plugin.hadoop.ui.manager.components.CompleteEvent()
+                        new org.safehaus.subutai.plugin.hadoop.api.CompleteEvent()
                         {
                             public void onComplete( String operationLog )
                             {
@@ -890,7 +890,7 @@ public class ManagerListener
         hadoopManager.getExecutorService().execute(
                 new CheckDecommissionStatusTask( hadoopManager.getHadoop(), hadoopManager.getTracker(),
                         hadoopManager.getHadoopCluster(),
-                        new org.safehaus.subutai.plugin.hadoop.ui.manager.components.CompleteEvent()
+                        new org.safehaus.subutai.plugin.hadoop.api.CompleteEvent()
                         {
                             public void onComplete( String operationLog )
                             {

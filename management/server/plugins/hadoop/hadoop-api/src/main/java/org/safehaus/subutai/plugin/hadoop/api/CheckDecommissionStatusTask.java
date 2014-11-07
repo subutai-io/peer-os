@@ -3,7 +3,7 @@
 * To change this template file, choose Tools | Templates
 * and open the template in the editor.
 */
-package org.safehaus.subutai.plugin.hadoop.ui.manager.components;
+package org.safehaus.subutai.plugin.hadoop.api;
 
 
 import java.util.UUID;
@@ -12,8 +12,6 @@ import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 
 /**
