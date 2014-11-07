@@ -19,7 +19,7 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildExcep
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.SetupType;
@@ -37,12 +37,12 @@ import com.google.common.base.Preconditions;
 public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl> implements ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
-    private OperationType operationType;
+    private ClusterOperationType operationType;
     private PigConfig config;
     private HadoopClusterConfig hadoopConfig;
     private ExecutorService executor = Executors.newCachedThreadPool();
     public ClusterOperationHandler( final PigImpl manager, final PigConfig config,
-                                    final OperationType operationType )
+                                    final ClusterOperationType operationType )
     {
         super( manager, config.getClusterName() );
         this.operationType = operationType;
@@ -92,9 +92,8 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl> i
         }
     }
 
-
     @Override
-    public void runOperationOnContainers( final OperationType operationType )
+    public void runOperationOnContainers( final ClusterOperationType clusterOperationType )
     {
 
     }

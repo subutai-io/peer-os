@@ -14,6 +14,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.pig.api.Pig;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.SetupType;
 
@@ -41,7 +42,7 @@ public class ConfigurationStep extends Panel
     private Environment hadoopEnvironment;
 
 
-    public ConfigurationStep( final Hadoop hadoop, final Wizard wizard, final EnvironmentManager environmentManager )
+    public ConfigurationStep( final Hadoop hadoop, final Wizard wizard, final EnvironmentManager environmentManager)
     {
         this.hadoop = hadoop;
         this.environmentManager = environmentManager;

@@ -27,7 +27,7 @@ import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -293,7 +293,7 @@ public class Manager
                 disableButtons( buttons );
                 executorService.execute(
                         new NodeOperationTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost,
-                                OperationType.STATUS, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                                NodeOperationType.STATUS, new org.safehaus.subutai.common.protocol.CompleteEvent()
                         {
                             public void onComplete( NodeState nodeState )
                             {
@@ -349,7 +349,7 @@ public class Manager
                 disableButtons( buttons );
                 executorService.execute(
                         new NodeOperationTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost,
-                                OperationType.STOP, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                                NodeOperationType.STOP, new org.safehaus.subutai.common.protocol.CompleteEvent()
                         {
                             @Override
                             public void onComplete( NodeState nodeState )
@@ -377,7 +377,7 @@ public class Manager
                 disableButtons( buttons );
                 executorService.execute(
                         new NodeOperationTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost,
-                                OperationType.START, new CompleteEvent()
+                                NodeOperationType.START, new CompleteEvent()
                         {
                             @Override
                             public void onComplete( NodeState nodeState )

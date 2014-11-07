@@ -4,6 +4,8 @@ package org.safehaus.subutai.plugin.solr.impl.handler;
 import java.util.Iterator;
 import java.util.UUID;
 
+import javax.xml.soap.Node;
+
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.CommandResult;
@@ -11,7 +13,7 @@ import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.Commands;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
@@ -24,11 +26,11 @@ public class NodeOperationHandler extends AbstractOperationHandler<SolrImpl>
 
     private String clusterName;
     private String hostName;
-    private OperationType operationType;
+    private NodeOperationType operationType;
 
 
     public NodeOperationHandler( final SolrImpl manager, final String clusterName, final String hostName,
-                                 OperationType operationType )
+                                 NodeOperationType operationType )
     {
         super( manager, clusterName );
         this.hostName = hostName;

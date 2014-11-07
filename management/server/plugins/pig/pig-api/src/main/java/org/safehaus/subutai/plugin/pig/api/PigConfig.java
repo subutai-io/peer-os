@@ -9,6 +9,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 
 
 public class PigConfig implements ConfigBase
@@ -34,6 +35,7 @@ public class PigConfig implements ConfigBase
     public PigConfig setClusterName( String clusterName )
     {
         this.clusterName = clusterName;
+        //hadoop.getCluster( hadoopClusterName );
         return this;
     }
 

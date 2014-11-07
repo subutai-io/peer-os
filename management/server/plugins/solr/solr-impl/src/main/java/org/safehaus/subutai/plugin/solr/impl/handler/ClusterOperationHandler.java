@@ -11,7 +11,6 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildExcep
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.common.api.*;
-import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import org.slf4j.Logger;
@@ -27,12 +26,12 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SolrImpl>
         implements ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
-    private OperationType operationType;
+    private ClusterOperationType operationType;
     private SolrClusterConfig config;
     private ExecutorService executor = Executors.newCachedThreadPool();
 
     public ClusterOperationHandler( final SolrImpl manager, final SolrClusterConfig config,
-                                    final OperationType operationType )
+                                    final ClusterOperationType operationType )
     {
         super( manager, config.getClusterName() );
         this.operationType = operationType;
@@ -43,7 +42,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SolrImpl>
 
 
     @Override
-    public void runOperationOnContainers( final OperationType operationType )
+    public void runOperationOnContainers( final ClusterOperationType operationType )
     {
 
     }
@@ -122,7 +121,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SolrImpl>
                     }
                 } );
                 break;
-            case DESTROY:
+            case UNINSTALL:
                 executor.execute( new Runnable()
                 {
                     public void run()

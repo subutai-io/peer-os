@@ -22,7 +22,8 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.handler.ClusterOperationHandler;
@@ -114,7 +115,7 @@ public class SolrImpl implements Solr
 
         Preconditions.checkNotNull( solrClusterConfig, "Configuration is null" );
 
-        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, solrClusterConfig, OperationType.INSTALL );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, solrClusterConfig, ClusterOperationType.INSTALL );
 
         executor.execute( operationHandler );
 
@@ -134,7 +135,7 @@ public class SolrImpl implements Solr
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( config.getClusterName() ), "Cluster name is null or empty" );
 
-        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, OperationType.DESTROY );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL );
 
         executor.execute( operationHandler );
 
@@ -177,7 +178,7 @@ public class SolrImpl implements Solr
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostName ), "Lxc hostname is null or empty" );
 
 
-        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, clusterName, hostName, OperationType.START );
+        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, clusterName, hostName, NodeOperationType.START );
 
         executor.execute( operationHandler );
 
@@ -191,7 +192,7 @@ public class SolrImpl implements Solr
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostName ), "Lxc hostname is null or empty" );
 
 
-        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, clusterName, hostName, OperationType.STOP );
+        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, clusterName, hostName, NodeOperationType.STOP );
 
         executor.execute( operationHandler );
 
@@ -205,7 +206,7 @@ public class SolrImpl implements Solr
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostName ), "Lxc hostname is null or empty" );
 
 
-        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, clusterName, hostName, OperationType.STATUS );
+        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, clusterName, hostName, NodeOperationType.STATUS );
 
         executor.execute( operationHandler );
 

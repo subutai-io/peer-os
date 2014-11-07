@@ -22,7 +22,8 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.pig.api.Pig;
@@ -49,9 +50,12 @@ public class PigImpl implements Pig
     private DataSource dataSource;
 
 
-    public PigImpl( DataSource dataSource )
+    public PigImpl( DataSource dataSource, final Tracker tracker, final EnvironmentManager environmentManager,
+                    final Hadoop hadoopManager )
     {
         this.dataSource = dataSource;
+        this.environmentManager = environmentManager;
+        this.hadoopManager = hadoopManager;
     }
 
 
@@ -137,7 +141,7 @@ public class PigImpl implements Pig
     @Override
     public UUID installCluster( final PigConfig config )
     {
-        ClusterOperationHandler operationHandler = new ClusterOperationHandler( this, config, OperationType.INSTALL );
+        ClusterOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -145,7 +149,7 @@ public class PigImpl implements Pig
     @Override
     public UUID installCluster( PigConfig config, HadoopClusterConfig hadoopConfig )
     {
-        ClusterOperationHandler operationHandler = new ClusterOperationHandler( this, config, OperationType.INSTALL );
+        ClusterOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
         operationHandler.setHadoopConfig( hadoopConfig );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
@@ -154,7 +158,7 @@ public class PigImpl implements Pig
     @Override
     public UUID uninstallCluster( final PigConfig config )
     {
-        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, OperationType.UNINSTALL );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -213,12 +217,12 @@ public class PigImpl implements Pig
         {
             return new OverHadoopSetupStrategy( this, config, po, env );
         }
-//        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
-//        {
-//            WithHadoopSetupStrategy s = new WithHadoopSetupStrategy( this, config, po );
-//            s.setEnvironment( env );
-//            return s;
-//        }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
+            WithHadoopSetupStrategy s = new WithHadoopSetupStrategy( this, config, po );
+            s.setEnvironment( env );
+            return s;
+        }
         return null;
     }
 

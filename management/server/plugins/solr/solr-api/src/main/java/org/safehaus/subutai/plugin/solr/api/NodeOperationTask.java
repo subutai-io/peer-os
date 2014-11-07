@@ -13,7 +13,7 @@ import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.common.impl.AbstractNodeOperationTask;
 
 
@@ -25,13 +25,13 @@ public class NodeOperationTask extends AbstractNodeOperationTask implements Runn
     private final CompleteEvent completeEvent;
     private final Solr solr;
     private final Tracker tracker;
-    private final OperationType operationType;
+    private final NodeOperationType operationType;
 
 
     public NodeOperationTask( Solr solr, Tracker tracker, String clusterName, ContainerHost containerHost,
-                              OperationType operationType, CompleteEvent completeEvent, UUID trackID )
+                              NodeOperationType operationType, CompleteEvent completeEvent, UUID trackID )
     {
-        super( tracker, operationType, solr.getCluster( clusterName ), completeEvent, trackID, containerHost );
+        super( tracker, solr.getCluster( clusterName ), completeEvent, trackID, containerHost );
         this.solr = solr;
         this.tracker = tracker;
         this.clusterName = clusterName;
