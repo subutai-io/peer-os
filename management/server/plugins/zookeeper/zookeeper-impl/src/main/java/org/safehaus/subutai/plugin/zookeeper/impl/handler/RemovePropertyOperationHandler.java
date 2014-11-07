@@ -61,8 +61,9 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Zoo
 
         trackerOperation.addLog( "Removing property..." );
 
-        Command removePropertyCommand =
-                manager.getCommands().getRemovePropertyCommand( fileName, propertyName, config.getNodes() );
+        String removePropertyCommand =
+                manager.getCommands().getRemovePropertyCommand( fileName, propertyName );
+
         manager.getCommandRunner().runCommand( removePropertyCommand );
 
         if ( removePropertyCommand.hasSucceeded() )

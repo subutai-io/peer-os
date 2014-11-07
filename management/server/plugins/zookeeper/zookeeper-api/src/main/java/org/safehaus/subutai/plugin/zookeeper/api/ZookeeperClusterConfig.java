@@ -22,7 +22,7 @@ public class ZookeeperClusterConfig implements ConfigBase
     private String templateName = PRODUCT_NAME;
     private String clusterName = "";
     private int numberOfNodes = 3;
-    private Set<ContainerHost> nodes;
+    private Set<UUID> nodes;
     private SetupType setupType;
     private String hadoopClusterName;
     private UUID environmentId;
@@ -120,13 +120,13 @@ public class ZookeeperClusterConfig implements ConfigBase
     }
 
 
-    public Set<ContainerHost> getNodes()
+    public Set<UUID> getNodes()
     {
         return nodes;
     }
 
 
-    public void setNodes( Set<ContainerHost> nodes )
+    public void setNodes( Set<UUID> nodes )
     {
         this.nodes = nodes;
     }
