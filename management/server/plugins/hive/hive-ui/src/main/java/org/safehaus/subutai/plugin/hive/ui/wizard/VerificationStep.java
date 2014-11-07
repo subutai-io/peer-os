@@ -45,10 +45,10 @@ public class VerificationStep extends Panel
         cfgView.addStringCfg( "Installation name", config.getClusterName() );
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            cfgView.addStringCfg( "Server node", config.getServer().getHostname() );
-            for ( Agent agent : config.getClients() )
+            cfgView.addStringCfg( "Server node", config.getServer().toString() );
+            for ( UUID agent : config.getClients() )
             {
-                cfgView.addStringCfg( "Node(s) to install", agent.getHostname() + "" );
+                cfgView.addStringCfg( "Node(s) to install", agent.toString() + "" );
             }
         }
         else if ( config.getSetupType() == SetupType.WITH_HADOOP )

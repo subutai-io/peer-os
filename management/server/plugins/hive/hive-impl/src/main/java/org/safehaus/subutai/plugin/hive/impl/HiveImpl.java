@@ -224,16 +224,16 @@ public class HiveImpl implements Hive
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( Environment env, HiveConfig config, TrackerOperation po )
     {
-        if ( config.getSetupType() == SetupType.OVER_HADOOP )
-        {
-            return new SetupStrategyOverHadoop( env, this, config, po );
-        }
-        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
-        {
-            SetupStrategyWithHadoop s = new SetupStrategyWithHadoop( env, this, config, po );
-            s.setEnvironment( env );
-            return s;
-        }
+//        if ( config.getSetupType() == SetupType.OVER_HADOOP )
+//        {
+//            return new SetupStrategyOverHadoop( env, this, config, po );
+//        }
+//        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+//        {
+//            SetupStrategyWithHadoop s = new SetupStrategyWithHadoop( env, this, config, po );
+//            s.setEnvironment( env );
+//            return s;
+//        }
         return null;
     }
 }

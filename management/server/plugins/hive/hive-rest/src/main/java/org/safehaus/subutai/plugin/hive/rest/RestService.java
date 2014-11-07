@@ -89,12 +89,14 @@ public class RestService
         config.setHadoopClusterName( hadoopClusterName );
 
         Agent serverAgent = agentManager.getAgentByHostname( server );
-        config.setServer( serverAgent );
+        // TODO fix here
+        config.setServer( serverAgent.getUuid() );
 
         for ( String client : clients.split( "," ) )
         {
             Agent agent = agentManager.getAgentByHostname( client );
-            config.getClients().add( agent );
+            // TODO fix here agent uuid
+            config.getClients().add( agent.getUuid() );
         }
 
         UUID uuid = hiveManager.installCluster( config );

@@ -182,7 +182,7 @@ public class NodeSelectionStep extends Panel
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                Agent hiveMaster = ( Agent ) event.getProperty().getValue();
+                UUID hiveMaster = ( UUID ) event.getProperty().getValue();
                 config.setServer( hiveMaster );
                 config.getClients().clear();
                 config.getClients().addAll( config.getHadoopNodes() );
@@ -199,10 +199,11 @@ public class NodeSelectionStep extends Panel
         List<UUID> slaves = hadoopInfo.getAllSlaveNodes();
         for ( UUID a : hadoopInfo.getAllNodes() )
         {
-            Environment environment = hive.get
+//            Environment environment = hive.ge
 
             serverNode.addItem( a );
-            String caption = a.getHostname();
+            // TODO
+            String caption = a.toString();
             if ( hadoopInfo.getJobTracker().equals( a ) )
             {
                 caption += " [Job tracker]";
