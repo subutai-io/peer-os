@@ -444,7 +444,8 @@ public class ResourceHost extends SubutaiHost
         }
         catch ( CommandException e )
         {
-            throw new ResourceHostException( String.format( "Could not execute script/command %s", command.script ),
+            throw new ResourceHostException(
+                    String.format( "Could not execute script/command %s", String.format( command.script, args ) ),
                     e.toString() );
         }
     }

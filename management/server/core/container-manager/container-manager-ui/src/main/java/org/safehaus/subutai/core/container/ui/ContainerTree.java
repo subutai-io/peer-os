@@ -115,7 +115,10 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
         }, 5, 30, TimeUnit.SECONDS );
         try
         {
-            tree.expandItem( localPeer.getManagementHost().getId() );
+            if ( localPeer.getManagementHost() != null )
+            {
+                tree.expandItem( localPeer.getManagementHost().getId() );
+            }
         }
         catch ( PeerException ignore )
         {

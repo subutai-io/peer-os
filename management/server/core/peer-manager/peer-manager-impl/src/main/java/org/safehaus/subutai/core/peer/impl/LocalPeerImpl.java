@@ -32,6 +32,7 @@ import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
+import org.safehaus.subutai.core.peer.api.BindHostException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.ContainerState;
 import org.safehaus.subutai.core.peer.api.Host;
@@ -344,7 +345,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public ContainerHost getContainerHostByName( String hostname ) throws PeerException
+    public ContainerHost getContainerHostByName( String hostname )
     {
         ContainerHost result = null;
         Iterator<ResourceHost> iterator = getResourceHosts().iterator();
@@ -414,7 +415,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
         }
         if ( result == null )
         {
-            throw new PeerException( "Could not bind host by id:" + id );
+            throw new BindHostException( id );
         }
         return result;
     }
@@ -469,7 +470,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     @Override
     public void destroyContainer( final ContainerHost containerHost ) throws PeerException
     {
-        Host result = getContainerHostByName( containerHost.getHostname() );
+        Host result = bindHost( containerHost.getId() );
         if ( result == null )
         {
             throw new PeerException( "Container Host not found." );
@@ -477,8 +478,6 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
         try
         {
-            //            containerManager.destroy( containerHost.getAgent().getParentHostName(),
-            // containerHost.getHostname() );
             ResourceHost resourceHost = getResourceHostByName( containerHost.getAgent().getParentHostName() );
             resourceHost.destroyContainerHost( containerHost );
             resourceHost.removeContainerHost( result );
@@ -620,18 +619,12 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             }
 
             // assume response from container host agent
-            ResourceHost resourceHost = getResourceHostByName( response.getParentHostName() );
-            if ( resourceHost == null )
-            {
-                return;
-            }
 
-            ContainerHost containerHost = resourceHost.getContainerHostByName( response.getHostname() );
+            ContainerHost containerHost = getContainerHostByName( response.getHostname() );
 
             if ( containerHost != null )
             {
                 containerHost.updateHeartbeat();
-                peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
             }
         }
     }
@@ -725,14 +718,17 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     @Override
     public void clean()
     {
-        if ( managementHost == null || managementHost.getId() == null )
+        if ( managementHost != null && managementHost.getId() != null )
         {
-            return;
+            peerDAO.deleteInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId().toString() );
+            managementHost = null;
         }
-        UUID id = managementHost.getId();
-        peerDAO.deleteInfo( SOURCE_MANAGEMENT_HOST, id.toString() );
-        managementHost = null;
-        peerDAO.deleteInfo( SOURCE_RESOURCE_HOST, id.toString() );
+
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            peerDAO.deleteInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString() );
+        }
+        resourceHosts.clear();
     }
 
 
