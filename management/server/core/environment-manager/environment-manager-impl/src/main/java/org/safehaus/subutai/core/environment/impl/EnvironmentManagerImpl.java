@@ -205,7 +205,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public boolean destroyEnvironment( final UUID environmentId ) throws EnvironmentDestroyException
     {
         Environment environment = getEnvironmentByUUID( environmentId );
-        destroyer =new EnvironmentDestroyerImpl();
+        destroyer = new EnvironmentDestroyerImpl();
         try
         {
             destroyer.destroy( environment );
