@@ -26,18 +26,6 @@ public interface RestService
     @Consumes(MediaType.TEXT_PLAIN)
     public PeerInfo registerPeer( @QueryParam("peer") String peer );
 
-
-    @GET
-    @Path("containers/format")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getCreateContainersMsgJsonFormat();
-
-
-    @GET
-    @Path("json")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getPeerJsonFormat();
-
     @GET
     @Path("id")
     @Produces("text/plain")
@@ -56,33 +44,28 @@ public interface RestService
     @POST
     @Path("container/destroy")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response destroyContainer( @FormParam("host") String host );
+    public Response destroyContainer( @FormParam("hostId") String host );
 
     @POST
     @Path("container/start")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response startContainer( @FormParam("host") String host );
+    public Response startContainer( @FormParam("hostId") String host );
 
     @POST
     @Path("container/stop")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response stopContainer( @FormParam("host") String host );
+    public Response stopContainer( @FormParam("hostId") String host );
 
     @POST
     @Path("container/isconnected")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response isContainerConnected( @FormParam("host") String host );
+    public Response isContainerConnected( @FormParam("hostId") String hostId );
 
 
     @POST
     @Path("template/get")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTemplate( @FormParam("templateName") String templateName );
-
-    @POST
-    @Path("execute")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response execute( @FormParam("requestBuilder") String requestBuilder, @FormParam("host") String host );
 
     @POST
     @Path("environment/containers")

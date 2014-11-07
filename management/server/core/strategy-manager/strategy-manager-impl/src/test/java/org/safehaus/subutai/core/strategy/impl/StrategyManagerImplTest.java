@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
+import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 
 import junit.framework.TestCase;
@@ -66,7 +67,7 @@ public class StrategyManagerImplTest
     public void testRoundRobinPlacementStrategy() throws StrategyException
     {
         strategyManager.registerStrategy( roundRobinPlacementStrategy );
-        Map<Agent, Integer> result = strategyManager
+        Map<ServerMetric, Integer> result = strategyManager
                 .getPlacementDistribution( MockUtils.getServerMetrics(), 3, roundRobinPlacementStrategy.getId(), null );
         assertNotNull( result );
         TestCase.assertEquals( 3, result.size() );

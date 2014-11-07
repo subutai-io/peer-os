@@ -8,7 +8,7 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
 
-public class RemoveNodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
+public class RemoveNodeOperationHandler extends AbstractOperationHandler<HadoopImpl, HadoopClusterConfig>
 {
 
     private String lxcHostName;

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 //import org.safehaus.subutai.common.protocol.Agent;
 
 
-public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl>
+public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl, CassandraClusterConfig>
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( StartClusterHandler.class.getName() );

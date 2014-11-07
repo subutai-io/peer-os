@@ -4,18 +4,22 @@ package org.safehaus.subutai.plugin.spark.ui.wizard;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
@@ -34,12 +38,15 @@ import com.vaadin.ui.VerticalLayout;
 public class ConfigurationStep extends Panel
 {
     private final Hadoop hadoop;
+    private final EnvironmentManager environmentManager;
+    private Environment hadoopEnvironment;
 
 
-    public ConfigurationStep( final Hadoop hadoop, final Wizard wizard )
+    public ConfigurationStep( final Hadoop hadoop, final EnvironmentManager environmentManager, final Wizard wizard )
     {
 
         this.hadoop = hadoop;
+        this.environmentManager = environmentManager;
         setSizeFull();
 
         GridLayout content = new GridLayout( 1, 4 );
@@ -170,15 +177,19 @@ public class ConfigurationStep extends Panel
             }
         }
 
+
         if ( hadoopClustersCombo.getValue() != null )
         {
             HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
             config.setHadoopClusterName( hadoopInfo.getClusterName() );
-            slaveNodesSelect.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
-            for ( Agent agent : hadoopInfo.getAllNodes() )
+            hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
+            Set<ContainerHost> hadoopNodes =
+                    hadoopEnvironment.getHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
+            slaveNodesSelect.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
+            for ( ContainerHost hadoopNode : hadoopNodes )
             {
-                masterNodeCombo.addItem( agent );
-                masterNodeCombo.setItemCaption( agent, agent.getHostname() );
+                masterNodeCombo.addItem( hadoopNode );
+                masterNodeCombo.setItemCaption( hadoopNode, hadoopNode.getHostname() );
             }
         }
 
@@ -190,19 +201,22 @@ public class ConfigurationStep extends Panel
                 if ( event.getProperty().getValue() != null )
                 {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
+                    hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
+                    Set<ContainerHost> hadoopNodes =
+                            hadoopEnvironment.getHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
                     slaveNodesSelect.setValue( null );
                     slaveNodesSelect
-                            .setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                            .setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
                     masterNodeCombo.setValue( null );
                     masterNodeCombo.removeAllItems();
-                    for ( Agent agent : hadoopInfo.getAllNodes() )
+                    for ( ContainerHost hadoopNode : hadoopNodes )
                     {
-                        masterNodeCombo.addItem( agent );
-                        masterNodeCombo.setItemCaption( agent, agent.getHostname() );
+                        masterNodeCombo.addItem( hadoopNode );
+                        masterNodeCombo.setItemCaption( hadoopNode, hadoopNode.getHostname() );
                     }
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
-                    config.setSlaveNodes( new HashSet<Agent>() );
-                    config.setMasterNode( null );
+                    config.getSlaveIds().clear();
+                    config.setMasterNodeId( null );
                 }
             }
         } );
@@ -214,21 +228,21 @@ public class ConfigurationStep extends Panel
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Agent master = ( Agent ) event.getProperty().getValue();
-                    config.setMasterNode( master );
+                    ContainerHost master = ( ContainerHost ) event.getProperty().getValue();
+                    config.setMasterNodeId( master.getId() );
 
                     //fill slave nodes without newly selected master node
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
-                    if ( config.getSlaveNodes() != null && !config.getSlaveNodes().isEmpty() )
-                    {
-                        config.getSlaveNodes().remove( master );
-                    }
-                    List<Agent> hadoopNodes = hadoopInfo.getAllNodes();
+                    config.getSlaveIds().remove( master.getId() );
+
+                    hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
+                    Set<ContainerHost> hadoopNodes =
+                            hadoopEnvironment.getHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
                     hadoopNodes.remove( master );
                     slaveNodesSelect.getContainerDataSource().removeAllItems();
-                    for ( Agent agent : hadoopNodes )
+                    for ( ContainerHost hadoopNode : hadoopNodes )
                     {
-                        slaveNodesSelect.getContainerDataSource().addItem( agent );
+                        slaveNodesSelect.getContainerDataSource().addItem( hadoopNode );
                     }
 
                     Collection ls = slaveNodesSelect.getListeners( Property.ValueChangeListener.class );
@@ -238,7 +252,8 @@ public class ConfigurationStep extends Panel
                     {
                         slaveNodesSelect.removeValueChangeListener( h );
                     }
-                    slaveNodesSelect.setValue( config.getSlaveNodes() );
+
+                    slaveNodesSelect.setValue( hadoopEnvironment.getHostsByIds( config.getSlaveIds() ) );
                     if ( h != null )
                     {
                         slaveNodesSelect.addValueChangeListener( h );
@@ -247,14 +262,14 @@ public class ConfigurationStep extends Panel
             }
         } );
 
-        if ( config.getMasterNode() != null )
+        if ( config.getMasterNodeId() != null )
         {
-            masterNodeCombo.setValue( config.getMasterNode() );
+            masterNodeCombo.setValue( hadoopEnvironment.getContainerHostByUUID( config.getMasterNodeId() ) );
         }
 
-        if ( !CollectionUtil.isCollectionEmpty( config.getSlaveNodes() ) )
+        if ( !CollectionUtil.isCollectionEmpty( config.getSlaveIds() ) )
         {
-            slaveNodesSelect.setValue( config.getSlaveNodes() );
+            slaveNodesSelect.setValue( hadoopEnvironment.getHostsByIds( config.getSlaveIds() ) );
         }
 
         slaveNodesSelect.addValueChangeListener( new Property.ValueChangeListener()
@@ -264,8 +279,14 @@ public class ConfigurationStep extends Panel
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Set<Agent> agentList = new HashSet<>( ( Collection<Agent> ) event.getProperty().getValue() );
-                    config.setSlaveNodes( agentList );
+                    Set<ContainerHost> nodes = ( Set<ContainerHost> ) event.getProperty().getValue();
+                    Set<UUID> slaveIds = Sets.newHashSet();
+                    for ( ContainerHost node : nodes )
+                    {
+                        slaveIds.add( node.getId() );
+                    }
+                    config.getSlaveIds().clear();
+                    config.getSlaveIds().addAll( slaveIds );
                 }
             }
         } );
@@ -368,11 +389,11 @@ public class ConfigurationStep extends Panel
             {
                 show( "Please, select Hadoop cluster" );
             }
-            else if ( config.getMasterNode() == null )
+            else if ( config.getMasterNodeId() == null )
             {
                 show( "Please, select master node" );
             }
-            else if ( CollectionUtil.isCollectionEmpty( config.getSlaveNodes() ) )
+            else if ( CollectionUtil.isCollectionEmpty( config.getSlaveIds() ) )
             {
                 show( "Please, select slave node(s)" );
             }
@@ -384,7 +405,7 @@ public class ConfigurationStep extends Panel
         else if ( config.getSetupType() == SetupType.WITH_HADOOP )
         {
             HadoopClusterConfig hc = wizard.getHadoopConfig();
-            if ( hc.getClusterName() == null || hc.getClusterName().isEmpty() )
+            if ( Strings.isNullOrEmpty( hc.getClusterName() ) )
             {
                 show( "Enter Hadoop cluster name" );
             }
@@ -396,7 +417,7 @@ public class ConfigurationStep extends Panel
             {
                 show( "Invalid replication factor" );
             }
-            else if ( hc.getDomainName() == null || hc.getDomainName().isEmpty() )
+            else if ( Strings.isNullOrEmpty( hc.getDomainName() ) )
             {
                 show( "Enter Hadoop domain name" );
             }

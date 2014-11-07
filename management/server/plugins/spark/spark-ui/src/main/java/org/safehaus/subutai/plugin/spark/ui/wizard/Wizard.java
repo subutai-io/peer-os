@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -20,11 +21,11 @@ public class Wizard
 {
 
     private final GridLayout grid;
-    private final ServiceLocator serviceLocator;
     private final ExecutorService executor;
     private final Tracker tracker;
     private final Hadoop hadoop;
     private final Spark spark;
+    private final EnvironmentManager environmentManager;
     private int step = 1;
     private SparkClusterConfig config = new SparkClusterConfig();
     private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
@@ -32,12 +33,12 @@ public class Wizard
 
     public Wizard( ExecutorService executor, ServiceLocator serviceLocator ) throws NamingException
     {
-        this.serviceLocator = serviceLocator;
         this.executor = executor;
 
         this.tracker = serviceLocator.getService( Tracker.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
         this.spark = serviceLocator.getService( Spark.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
@@ -60,12 +61,12 @@ public class Wizard
             }
             case 2:
             {
-                component = new ConfigurationStep( hadoop, this );
+                component = new ConfigurationStep( hadoop, environmentManager, this );
                 break;
             }
             case 3:
             {
-                component = new VerificationStep( tracker, spark, executor, this );
+                component = new VerificationStep( tracker, spark, executor, environmentManager, this );
                 break;
             }
             default:
