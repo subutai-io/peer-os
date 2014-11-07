@@ -14,9 +14,6 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * Created by daralbaev on 08.04.14.
- */
 public class HadoopComponent extends CustomComponent
 {
     private final Wizard wizard;

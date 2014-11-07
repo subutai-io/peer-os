@@ -18,11 +18,11 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyExc
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
-import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
+import org.safehaus.subutai.plugin.hadoop.impl.Commands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +87,9 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
             case STATUS:
                 runOperationOnContainers( OperationType.STATUS );
                 break;
+            case DECOMISSION_STATUS:
+                runOperationOnContainers( OperationType.DECOMISSION_STATUS );
+                break;
         }
     }
 
@@ -96,13 +99,11 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
     {
         try
         {
-            ContainerHost namenode = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
-                                            .getContainerHostByUUID( config.getNameNode() );
-            ContainerHost jobtracker = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
-                                              .getContainerHostByUUID( config.getJobTracker() );
-            ContainerHost secondaryNameNode =
-                    manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
-                           .getContainerHostByUUID( config.getSecondaryNameNode() );
+            Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+            ContainerHost namenode = environment.getContainerHostByUUID( config.getNameNode() );
+            ContainerHost jobtracker = environment.getContainerHostByUUID( config.getJobTracker() );
+            ContainerHost secondaryNameNode = environment.getContainerHostByUUID( config.getSecondaryNameNode() );
+
             CommandResult result = null;
             switch ( operationType )
             {
@@ -115,12 +116,6 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                         case JOBTRACKER:
                             result = jobtracker.execute( new RequestBuilder( Commands.getStartJobTrackerCommand() ) );
                             break;
-                        //                        case SECONDARY_NAMENODE:
-                        //                            break;
-                        //                        case DATANODE:
-                        //                            break;
-                        //                        case TASKTRACKER:
-                        //                            break;
                     }
                     logStatusResults( trackerOperation, result, nodeType );
                     break;
@@ -133,12 +128,6 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                         case JOBTRACKER:
                             result = jobtracker.execute( new RequestBuilder( Commands.getStopJobTrackerCommand() ) );
                             break;
-                        //                        case SECONDARY_NAMENODE:
-                        //                            break;
-                        //                        case DATANODE:
-                        //                            break;
-                        //                        case TASKTRACKER:
-                        //                            break;
                     }
                     logStatusResults( trackerOperation, result, nodeType );
                     break;
@@ -155,12 +144,12 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                             result = secondaryNameNode
                                     .execute( new RequestBuilder( Commands.getStatusNameNodeCommand() ) );
                             break;
-                        //                        case DATANODE:
-                        //                            break;
-                        //                        case TASKTRACKER:
-                        //                            break;
                     }
                     logStatusResults( trackerOperation, result, nodeType );
+                    break;
+                case DECOMISSION_STATUS:
+                    result = namenode.execute( new RequestBuilder( Commands.getReportHadoopCommand() ) );
+                    logStatusResults( trackerOperation, result, NodeType.SLAVE_NODE );
                     break;
             }
         }
@@ -182,7 +171,6 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
             {
                 switch ( nodeType )
                 {
-
                     case NAMENODE:
                         if ( status.contains( "NameNode" ) )
                         {
@@ -257,34 +245,10 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                             }
                         }
                         break;
-                    //                    case SLAVE_NODE:
-                    //                        if ( status.contains( "DataNode" ) )
-                    //                        {
-                    //                            String temp = status.replaceAll( "DataNode is ", "" );
-                    //                            if ( temp.toLowerCase().contains( "not" ) )
-                    //                            {
-                    //                                nodeState = NodeState.STOPPED;
-                    //                            }
-                    //                            else
-                    //                            {
-                    //                                nodeState = NodeState.RUNNING;
-                    //                            }
-                    //                            break;
-                    //                        }
-                    //                        else if ( status.contains( "TaskTracker" ) )
-                    //                        {
-                    //                            String temp = status.replaceAll( "TaskTracker is ", "" );
-                    //                            if ( temp.toLowerCase().contains( "not" ) )
-                    //                            {
-                    //                                nodeState = NodeState.STOPPED;
-                    //                            }
-                    //                            else
-                    //                            {
-                    //                                nodeState = NodeState.RUNNING;
-                    //                            }
-                    //                            break;
-                    //                        }
-                    //                        break;
+                    case SLAVE_NODE:
+//                        nodeState = this.getDecommissionStatus( result.getStdOut() );
+                        trackerOperation.addLogDone( result.getStdOut() );
+                        break;
                 }
             }
         }
