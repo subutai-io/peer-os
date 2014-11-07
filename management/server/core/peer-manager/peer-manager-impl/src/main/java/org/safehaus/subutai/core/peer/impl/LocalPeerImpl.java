@@ -45,6 +45,7 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
+import org.safehaus.subutai.core.peer.api.SubutaiInitException;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -52,6 +53,8 @@ import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -64,6 +67,8 @@ import com.google.common.collect.Sets;
  */
 public class LocalPeerImpl implements LocalPeer, ResponseListener
 {
+    private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
+
     private static final String SOURCE_MANAGEMENT_HOST = "MANAGEMENT_HOST";
     private static final String SOURCE_RESOURCE_HOST = "RESOURCE_HOST";
     private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60; // 5 min
@@ -598,6 +603,14 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                 {
                     managementHost = new ManagementHost( PeerUtils.buildAgent( response ), getId() );
                     managementHost.setParentAgent( NullAgent.getInstance() );
+                    try
+                    {
+                        managementHost.init();
+                    }
+                    catch ( SubutaiInitException e )
+                    {
+                        LOG.error( e.toString() );
+                    }
                 }
                 managementHost.updateHeartbeat();
                 peerDAO.saveInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId().toString(), managementHost );

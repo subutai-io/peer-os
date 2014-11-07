@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 
 
@@ -22,59 +23,33 @@ public class ManagementHost extends SubutaiHost
         super( agent, peerId );
     }
 
-    //
-    //    @Override
-    //    public boolean isConnected( final Host host )
-    //    {
-    //        //TODO: Implement resource host check
-    //        return true;
-    //    }
+
+    public void init() throws SubutaiInitException
+    {
+        try
+        {
+            createFlows();
+        }
+        catch ( CommandException e )
+        {
+            throw new SubutaiInitException( "Could not create network flows." );
+        }
+    }
 
 
-    //    public Set<ResourceHost> getResourceHosts()
-    //    {
-    //        return resourceHosts;
-    //    }
-    //
-    //
-    //    public void setResourceHosts( final Set<ResourceHost> resourceHosts )
-    //    {
-    //        this.resourceHosts = resourceHosts;
-    //    }
-    //
-
-    //    public ResourceHost getResourceHostByName( final String hostname )
-    //    {
-    //        return findResourceHostByName( hostname );
-    //    }
-    //
-    //
-    //    public void addResourceHost( final ResourceHost host )
-    //    {
-    //        if ( host == null )
-    //        {
-    //            throw new IllegalArgumentException( "Resource host could not be null." );
-    //        }
-    //        resourceHosts.add( host );
-    //    }
-    //
-    //
-    //    private ResourceHost findResourceHostByName( final String hostname )
-    //    {
-    //        ResourceHost result = null;
-    //        Iterator iterator = resourceHosts.iterator();
-    //
-    //        while ( result == null && iterator.hasNext() )
-    //        {
-    //            ResourceHost host = ( ResourceHost ) iterator.next();
-    //
-    //            if ( host.getHostname().equals( hostname ) )
-    //            {
-    //                result = host;
-    //            }
-    //        }
-    //        return result;
-    //    }
+    private void createFlows() throws CommandException
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append( "subutai management_network -b br-int 1 normal normal && " );
+        sb.append( "subutai management_network -b br-tun 1 normal normal && " );
+        sb.append( "subutai management_network -b br - tun 2500 arp drop 10.10 .10 .0 / 24 10.10 .10 .0 / 24 1 && " );
+        sb.append( "subutai management_network -b br - tun 2500 icmp drop 10.10 .10 .0 / 24 10.10 .10 .0 / 24 1" );
+        CommandResult commandResult = execute( new RequestBuilder( sb.toString() ) );
+        if ( !commandResult.hasSucceeded() )
+        {
+            throw new CommandException( "Flow commands fail." );
+        }
+    }
 
 
     public void addAptSource( final String host, final String ip ) throws PeerException
