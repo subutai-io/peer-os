@@ -232,8 +232,8 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     @Override
     public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
                                                 final List<Template> templates, final int quantity,
-                                                final String strategyId, final List<Criteria> criteria )
-            throws PeerException
+                                                final String strategyId, final List<Criteria> criteria,
+                                                String nodeGroupName ) throws PeerException
     {
         Set<ContainerHost> result = new HashSet<>();
         try
@@ -291,6 +291,8 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                 for ( String cloneName : clones )
                 {
                     ContainerHost containerHost =
+                            resourceHost.createContainer( creatorPeerId, environmentId, templates, cloneName );
+                    containerHost.setNodeGroupName( nodeGroupName );
                             resourceHost.createContainer( creatorPeerId, environmentId, templates, cloneName );
                     resourceHost.addContainerHost( containerHost );
                     result.add( containerHost );
