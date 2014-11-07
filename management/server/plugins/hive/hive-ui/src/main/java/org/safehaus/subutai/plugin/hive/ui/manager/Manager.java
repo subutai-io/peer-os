@@ -179,7 +179,7 @@ public class Manager
                     show( "Select cluster" );
                     return;
                 }
-                Set<Agent> set = new HashSet<>( config.getHadoopNodes() );
+                Set<UUID> set = new HashSet<>( config.getHadoopNodes() );
                 set.remove( config.getServer() );
                 set.removeAll( config.getClients() );
                 if ( set.isEmpty() )
@@ -187,18 +187,18 @@ public class Manager
                     show( "All nodes in Hadoop cluster have Hive installed" );
                     return;
                 }
-                AddNodeWindow w = new AddNodeWindow( hive, executorService, tracker, config, set );
-                contentRoot.getUI().addWindow( w );
-                w.addCloseListener( new Window.CloseListener()
-                {
-                    @Override
-                    public void windowClose( Window.CloseEvent closeEvent )
-                    {
-                        refreshClustersInfo();
-                        refreshUI();
-                        checkServer();
-                    }
-                } );
+//                AddNodeWindow w = new AddNodeWindow( hive, executorService, tracker, config, set );
+//                contentRoot.getUI().addWindow( w );
+//                w.addCloseListener( new Window.CloseListener()
+//                {
+//                    @Override
+//                    public void windowClose( Window.CloseEvent closeEvent )
+//                    {
+//                        refreshClustersInfo();
+//                        refreshUI();
+//                        checkServer();
+//                    }
+//                } );
             }
         } );
     }
@@ -312,26 +312,26 @@ public class Manager
 
     private void addClickListenerToTable( final Table table )
     {
-        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
-        {
-            @Override
-            public void itemClick( ItemClickEvent event )
-            {
-                String lxcHostname = ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                if ( lxcAgent != null )
-                {
-                    TerminalWindow terminal =
-                            new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
-                                    agentManager );
-                    contentRoot.getUI().addWindow( terminal.getWindow() );
-                }
-                else
-                {
-                    show( "Agent is not connected" );
-                }
-            }
-        } );
+//        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
+//        {
+//            @Override
+//            public void itemClick( ItemClickEvent event )
+//            {
+//                String lxcHostname = ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
+//                Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
+//                if ( lxcAgent != null )
+//                {
+//                    TerminalWindow terminal =
+//                            new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
+//                                    agentManager );
+//                    contentRoot.getUI().addWindow( terminal.getWindow() );
+//                }
+//                else
+//                {
+//                    show( "Agent is not connected" );
+//                }
+//            }
+//        } );
     }
 
 
@@ -345,10 +345,10 @@ public class Manager
     {
         if ( config != null )
         {
-            Set<Agent> cli_agents = new HashSet<>();
+            Set<UUID> cli_agents = new HashSet<>();
             cli_agents.add( config.getServer() );
-            populateTable( serverTable, cli_agents );
-            populateTable( clientsTable, config.getClients() );
+//            populateTable( serverTable, cli_agents );
+//            populateTable( clientsTable, config.getClients() );
         }
         else
         {

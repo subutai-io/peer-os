@@ -18,6 +18,7 @@
     <module>cassandra</module>
     <module>elasticsearch</module>
     <module>hadoop</module>
+    <module>hive</module>
     <!--<module>accumulo</module>
     <module>solr</module>
 
@@ -25,7 +26,6 @@
 
     <module>mongodb</module>
     <module>flume</module>
-    <module>hive</module>
 
     <module>storm</module>
     <module>presto</module>

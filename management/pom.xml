@@ -1091,7 +1091,7 @@
         <artifactId>hbase-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+-->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>hive-plugin-api</artifactId>
@@ -1117,7 +1117,7 @@
         <artifactId>hive-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+<!--
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>lucene-plugin-api</artifactId>

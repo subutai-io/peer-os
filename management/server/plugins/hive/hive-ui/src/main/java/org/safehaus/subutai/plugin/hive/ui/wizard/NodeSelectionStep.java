@@ -7,8 +7,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.Hive;
@@ -134,8 +136,8 @@ public class NodeSelectionStep extends Panel
                     config.setHadoopClusterName( hc.getClusterName() );
                     config.setHadoopNodes( new HashSet<>( hc.getAllNodes() ) );
 
-                    Agent selected = config.getServer() != null ? config.getServer() : hc.getNameNode();
-                    fillServerNodeComboBox( cmbServerNode, hc, selected );
+//                    Agent selected = config.getServer() != null ? config.getServer() : hc.getNameNode();
+//                    fillServerNodeComboBox( cmbServerNode, hc, selected );
                     filterNodes( cmbServerNode );
                 }
             }
@@ -194,9 +196,11 @@ public class NodeSelectionStep extends Panel
     private void fillServerNodeComboBox( ComboBox serverNode, HadoopClusterConfig hadoopInfo, Agent selected )
     {
         serverNode.removeAllItems();
-        List<Agent> slaves = hadoopInfo.getAllSlaveNodes();
-        for ( Agent a : hadoopInfo.getAllNodes() )
+        List<UUID> slaves = hadoopInfo.getAllSlaveNodes();
+        for ( UUID a : hadoopInfo.getAllNodes() )
         {
+            Environment environment = hive.get
+
             serverNode.addItem( a );
             String caption = a.getHostname();
             if ( hadoopInfo.getJobTracker().equals( a ) )
