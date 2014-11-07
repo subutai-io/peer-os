@@ -108,6 +108,7 @@ SubutaiConnection::~SubutaiConnection()
  */
 bool SubutaiConnection::sendMessage(string message, string topic)
 {
+    fflush(stdout);
     const  char * _message = message.c_str();
     if (topic.size() == 0) {
         topic = this->publishedTopic;
@@ -151,7 +152,9 @@ void SubutaiConnection::on_connect(int rc)
  */
 void SubutaiConnection::on_publish(int mid)
 {
+#if _DEBUG
     cout << " SubutaiConnection - Message (" << mid << ") succeed to be published " << endl;
+#endif
 }
 
 /**

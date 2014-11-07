@@ -79,7 +79,7 @@ void threadSend(message_queue *mq,SubutaiConnection *connection,SubutaiLogger* l
             mq->receive(&str[0], str.size(), recvd_size, priority);
             logMain->writeLog(7, logMain->setLogData("<SubutaiAgent>::<threadsend>",
                         "New message comes to messagequeue to be sent:", str));
-            connection->sendMessage(str.c_str());
+            connection->sendMessage(str.c_str(), "RESPONSE_TOPIC");
             str.clear();
         }
         message_queue::remove("message_queue");
@@ -273,16 +273,16 @@ int main(int argc,char *argv[],char *envp[])
      * sending registration message : For the new subutai agent arch. heartbeat will be used for registration.
      */
 
-/*
-    sendout = response.createRegistrationMessage(
-            environment.getAgentUuidValue(), environment.getAgentMacAddressValue(),
-            environment.getAgentHostnameValue(),environment.getAgentParentHostnameValue(),
-            environment.getAgentEnvironmentIdValue(),environment.getAgentIpValue());
-    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Registration Message:", sendout));
-    connection->sendMessage(sendout);
+    /*
+       sendout = response.createRegistrationMessage(
+       environment.getAgentUuidValue(), environment.getAgentMacAddressValue(),
+       environment.getAgentHostnameValue(),environment.getAgentParentHostnameValue(),
+       environment.getAgentEnvironmentIdValue(),environment.getAgentIpValue());
+       logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Registration Message:", sendout));
+       connection->sendMessage(sendout);
 
-    cman.registerAllContainers(connection);
-*/
+       cman.registerAllContainers(connection);
+       */
 
 
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Shared Memory MessageQueue is initializing.."));
@@ -343,19 +343,19 @@ int main(int argc,char *argv[],char *envp[])
         try
         {
             //In 30 second periods send heartbeat and in_queue responses.
-            if (currentProcess < ncores) {
+            //if (currentProcess == 0) {
                 timer.checkHeartBeatTimer(command);
                 timer.checkCommandQueueInfoTimer(command);
                 command.clear();
-            }
+            //}
             for (list<int>::iterator iter = pidList.begin(); iter != pidList.end();iter++) {
                 if (pidList.begin() != pidList.end()) {
                     int status;
-                    pid_t result = waitpid(*iter, &status,WNOHANG);
+                    pid_t result = waitpid(*iter, &status, WNOHANG);
                     if (result != 0) {
                         iter = pidList.erase(iter);
-                        currentProcess--;       string resp = response.createInQueueMessage(environment.getAgentUuidValue(), command.getCommandId());
-
+                        currentProcess--;       
+                        string resp = response.createInQueueMessage(environment.getAgentUuidValue(), command.getCommandId());
                     }
                 }
             }
@@ -406,10 +406,10 @@ int main(int argc,char *argv[],char *envp[])
                     if (command.getType() == "EXECUTE_REQUEST")	//execution request will be executed in other process.
                     {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Received Message to internal currentProcess!"));
-                            fstream file;	//opening commandQueue.txt
-                            file.open("/etc/subutai-agent/commandQueue.txt",fstream::in | fstream::out | fstream::app);
-                            file << input;
-                            file.close();
+                        fstream file;	//opening commandQueue.txt
+                        file.open("/etc/subutai-agent/commandQueue.txt",fstream::in | fstream::out | fstream::app);
+                        file << input;
+                        file.close();
                     } else if (command.getType()=="PS_REQUEST") {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","PS execution operation is starting.."));
                         SubutaiThread* subprocess = new SubutaiThread;
@@ -418,81 +418,71 @@ int main(int argc,char *argv[],char *envp[])
                         command.setWorkingDirectory("/");
                         subprocess->threadFunction(&messageQueue,&command,argv);
                         delete subprocess;
+                    } else if (command.getType() == "TERMINATE_REQUEST"){
+                        if(isLocal) {
+                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",toString(command.getPid())));
+                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID.."));
+                            if (command.getPid() > 0)
+                            {
+                                int retstatus = kill(command.getPid(),SIGKILL);
+                                if (retstatus == 0) //termination is successfully done
+                                {
+                                    string resp = response.createTerminateMessage(environment.getAgentUuidValue(),
+                                            command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
+                                    cout << "msg: " << resp << endl;
+                                    connection->sendMessage(resp);
+                                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
+                                }
+                                else if (retstatus == -1) //termination is failed
+                                { // ERROR FIELD NEEDS TO BE FILLED
+                                    string resp = response.createTerminateMessage(environment.getAgentUuidValue(),
+                                            command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
 
-                    }
-                    else if (command.getType() == "TERMINATE_REQUEST")
-                    {
-                    	if(isLocal)
-                    	{
+                                    cout << "err: " << resp << endl;
+                                    connection->sendMessage(resp);
+                                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", toString(command.getPid())));
+                                }
+                            }
+                            else
+                            {
+                                logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Irrelevant Terminate Request"));
+                            }
+                        } else {
+                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",toString(command.getPid())));
+                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on LXC.."));
+                            if (command.getPid() > 0) {
+                                vector<string> arg_set;
+                                arg_set.push_back("-9");
+                                arg_set.push_back(toString(command.getPid()));
 
-							logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",toString(command.getPid())));
-							logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID.."));
-							if (command.getPid() > 0)
-							{
-								int retstatus = kill(command.getPid(),SIGKILL);
-								if (retstatus == 0) //termination is successfully done
-								{
-									string resp = response.createTerminateMessage(environment.getAgentUuidValue(),
-											command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
-									cout << "msg: " << resp << endl;
-									connection->sendMessage(resp);
-									logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
-								}
-								else if (retstatus == -1) //termination is failed
-								{ // ERROR FIELD NEEDS TO BE FILLED
-									string resp = response.createTerminateMessage(environment.getAgentUuidValue(),
-											command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
+                                command.setCommand("/bin/kill");
+                                command.setArguments(arg_set);
 
-									cout << "err: " << resp << endl;
-									connection->sendMessage(resp);
-									logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", toString(command.getPid())));
-								}
-							}
-							else
-							{
-								logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Irrelevant Terminate Request"));
-							}
-                    	}
-                    	else
-                    	{
+                                ExecutionResult execResult = target_container->RunCommand(&command);
+                                int retstatus  = execResult.exit_code;
 
-
-                    		logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",toString(command.getPid())));
-                    		logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on LXC.."));
-                    		if (command.getPid() > 0)
-                    		{
-                    			vector<string> arg_set;
-                    			arg_set.push_back("-9");
-                    			arg_set.push_back(toString(command.getPid()));
-
-                    			command.setCommand("/bin/kill");
-                    			command.setArguments(arg_set);
-
-                    			ExecutionResult execResult = target_container->RunCommand(&command);
-                    			int retstatus  = execResult.exit_code;
-
-                    			if (retstatus == 0) //termination is successfully done
-                    			{
-                    				string resp = response.createTerminateMessage(target_container->getContainerIdValue(),
-                    								command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
-                    				cout << "msg: " << resp << endl;
-                    				connection->sendMessage(resp);
-                    				logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
-                    			}
-                    			else if (retstatus == -1) //termination is failed
-                    			{
-                    				string resp = response.createTerminateMessage(target_container->getContainerIdValue(),
-                    				command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
-                    				cout << "err: " << resp << endl;
-                    				connection->sendMessage(resp);
-                    				logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", toString(command.getPid())));
-                    			}
-                    		}
-                    		else
-                    		{
-                    			logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Irrelevant Terminate Request"));
-                    		}
-                    	}
+                                if (retstatus == 0) //termination is successfully done
+                                {
+                                    string resp = response.createTerminateMessage(target_container->getContainerIdValue(),
+                                            command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
+                                    cout << "msg: " << resp << endl;
+                                    connection->sendMessage(resp);
+                                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
+                                }
+                                else if (retstatus == -1) //termination is failed
+                                {
+                                    string resp = response.createTerminateMessage(target_container->getContainerIdValue(),
+                                            command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
+                                    cout << "err: " << resp << endl;
+                                    connection->sendMessage(resp);
+                                    logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", toString(command.getPid())));
+                                }
+                            }
+                            else
+                            {
+                                logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Irrelevant Terminate Request"));
+                            }
+                        }
                     }
                     else if (command.getType()=="INOTIFY_CREATE_REQUEST")
                     {

@@ -91,7 +91,8 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     dup2(fd[1], 1);
     char buffer[1000];
     ExecutionResult result;
-    fflush(stdout);fflush(stderr);
+    fflush(stdout);
+    fflush(stderr);
     close(fd[1]);
     result.exit_code = this->container->attach_run_wait(this->container, &opts, program.c_str(), _params);
     fflush(stdout);
@@ -109,10 +110,8 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
         }
     }
     if (result.exit_code == 0) {
-    	cout << "success " << command_output << endl;
         result.out = command_output;
     } else {
-    	cout << "err " << command_output << endl;
         result.err = command_output;
     }
     containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>","Program executed: ", program));
@@ -177,10 +176,10 @@ bool SubutaiContainer::getContainerId()
 {
     try
     {
-    	string uuidFile = "/var/lib/lxc/" + this->hostname + "/rootfs/etc/subutai-agent/uuid.txt";
-    	ifstream file(uuidFile.c_str());	//opening uuid.txt
-    	getline(file,this->id);
-    	file.close();
+        string uuidFile = "/var/lib/lxc/" + this->hostname + "/rootfs/etc/subutai-agent/uuid.txt";
+        ifstream file(uuidFile.c_str());	//opening uuid.txt
+        getline(file,this->id);
+        file.close();
 
         if (this->id.empty())		//if uuid is null or not reading successfully
         {
@@ -387,9 +386,9 @@ void SubutaiContainer::getContainerAllFields()
 {
     getContainerHostname();
     getContainerId();/*
-    if (command->getRunAs() != "" && checkUser(command->getRunAs())) {
-        opts.uid = getRunAsUserId(command->getRunAs());
-    }*/
+                        if (command->getRunAs() != "" && checkUser(command->getRunAs())) {
+                        opts.uid = getRunAsUserId(command->getRunAs());
+                        }*/
     getContainerMacAddress();
     getContainerParentHostname();
     getContainerIpAddress();

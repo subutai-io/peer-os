@@ -413,7 +413,7 @@ bool SubutaiThread::checkExecutionTimeout(unsigned int* startsec,bool* overflag,
             *overflag = false;
         }
         if (*count >= *exectimeout) { //timeout
-            this->getLogger().writeLog(4,this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "Timeout Occured!!"));
+            this->getLogger().writeLog(4, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "Timeout Occured!!"));
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "count:",toString(*count)));
             this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkTimeout> " "exectimeout:",toString(*exectimeout)));
             return true;	//timeout occured now
@@ -431,7 +431,7 @@ bool SubutaiThread::checkExecutionTimeout(unsigned int* startsec,bool* overflag,
  *  		   It also gets the process id of the execution.
  *  		   It manages the lifecycle of the threads and handles capturing and sending execution responses using these threads.
  */
-int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* command,int newpid, int* ret)
+int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* command, int newpid, int* ret)
 {
     /*
      *	Getting system pid of child process
@@ -440,7 +440,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
     int status;
     this->setPpid(newpid);
     pid_t result = waitpid(newpid, &status, WNOHANG);
-    this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Find pid start","current pid:",toString(newpid)));
+    this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Find pid start", "current pid:", toString(newpid)));
     while ((result = waitpid(newpid, &status, WNOHANG)) == 0) {
         string cmd;
         cmd = "pgrep -P " + toString(newpid);
@@ -462,10 +462,10 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
      */
     if (!checkCWD(command)) {
         this->setCWDERR(true);
-        string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
-                "Working Directory Does Not Exist on System","",command->getCommandId());
+        string message = this->getResponse().createResponseMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(), 1,
+                "Working Directory Does Not Exist on System", "", command->getCommandId());
         while (!messageQueue->try_send(message.data(), message.size(), 0));
-        this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
+        this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "CWD id not found on system..", "CWD:", command->getWorkingDirectory()));
         //problem about absolute path
     }
     if (!checkUID(command)) {
@@ -657,18 +657,15 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
                 this->getResponsecount(),"","",command->getCommandId());
         while (!messageQueue->try_send(message.data(), message.size(), 0));
         this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Process Last Message",message));
-        if (this->getPpid())
-        {
+        if (this->getPpid()) {
             this->getLogger().writeLog(7, logger.setLogData("<SubutaiThread::optionReadSend> " "Process will be killed.","pid:",toString(this->getPpid())));
-            kill(this->getPpid(),SIGKILL); //killing the process after timeout
-        }
-        else
-        {
+            kill(this->getPpid(), SIGKILL); //killing the process after timeout
+        } else {
             this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Process pid is not valid.","pid:",toString(this->getPpid())));
         }
     }
 
-    if ( this->getErrorStream().getReadResult() == 0 && this->getOutputStream().getReadResult() == 0 )
+    if (this->getErrorStream().getReadResult() == 0 && this->getOutputStream().getReadResult() == 0)
     {
         /*
          * Execute Done Response is sending..
@@ -703,7 +700,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue,SubutaiCommand* co
  */
 int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *command, char* argv[], SubutaiContainer* container)
 {
-    signal(SIGCHLD, SIG_IGN);	// when the child process done it will be raped by kernel. We do not allowed zombie processes.
+    //signal(SIGCHLD, SIG_IGN);	// when the child process done it will be raped by kernel. We do not allowed zombie processes.
     pid = fork();		// creating a child process
     if (pid == 0)		// child process is starting
     {
@@ -833,7 +830,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                     this->getOutputStream().closePipe(0);
                     logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Thread is Stopping!!","pid",toString(getpid())));
                     logger.closeLogFile();
-                    kill(getpid(),SIGKILL);		//killing child
+                    int kc = kill(getpid(), SIGKILL);		//killing child
                     return true; //thread successfully done its work.
                 }
                 catch(const std::exception& error)
