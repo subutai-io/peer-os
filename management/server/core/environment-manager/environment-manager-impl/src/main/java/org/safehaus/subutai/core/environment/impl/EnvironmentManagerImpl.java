@@ -327,6 +327,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             configureSshBetweenContainers( blueprint, environment.getContainers() );
             configureLinkingHostsBetweenContainers( blueprint, environment.getContainers() );
 
+            /*process.setProcessStatusEnum( ProcessStatusEnum.SUCCESSFUL );
+            saveBuildProcess( process );*/
+
             return environment;
         }
         catch ( EnvironmentPersistenceException | BuildException | EnvironmentConfigureException e )
