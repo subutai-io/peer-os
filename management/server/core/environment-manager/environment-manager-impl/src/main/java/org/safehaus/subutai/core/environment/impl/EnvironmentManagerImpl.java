@@ -43,6 +43,7 @@ import org.safehaus.subutai.core.environment.impl.environment.BuildException;
 import org.safehaus.subutai.core.environment.impl.environment.DestroyException;
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentBuilderImpl;
+import org.safehaus.subutai.core.environment.impl.environment.EnvironmentDestroyer;
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentDestroyerImpl;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -72,7 +73,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private static final String PROCESS = "PROCESS";
     private static final String BLUEPRINT = "BLUEPRINT";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private EnvironmentBuilder environmentBuilder;
+
     private PeerManager peerManager;
     private EnvironmentDAO environmentDAO;
     private TemplateRegistry templateRegistry;
@@ -128,7 +129,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         try
         {
-            environmentBuilder = new EnvironmentBuilderImpl( this );
             this.environmentDAO = new EnvironmentDAO( dataSource );
         }
         catch ( SQLException e )
@@ -198,14 +198,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    EnvironmentDestroyerImpl destroyer;
-
-
     @Override
     public boolean destroyEnvironment( final UUID environmentId ) throws EnvironmentDestroyException
     {
         Environment environment = getEnvironmentByUUID( environmentId );
-        destroyer = new EnvironmentDestroyerImpl();
+        EnvironmentDestroyer destroyer = new EnvironmentDestroyerImpl();
         try
         {
             destroyer.destroy( environment );
@@ -314,6 +311,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public Environment buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
     {
+        EnvironmentBuilder environmentBuilder = new EnvironmentBuilderImpl( this );
         try
         {
             EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBlueprintId() );

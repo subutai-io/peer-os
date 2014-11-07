@@ -27,7 +27,7 @@ public class EnvironmentDestroyerImpl implements EnvironmentDestroyer, Observer
 
     public EnvironmentDestroyerImpl()
     {
-        this.executorService = Executors.newSingleThreadExecutor();
+        this.executorService = Executors.newCachedThreadPool();
     }
 
 
@@ -39,6 +39,7 @@ public class EnvironmentDestroyerImpl implements EnvironmentDestroyer, Observer
         thread.addObserver( this );
         executorService.execute( thread );
 
+        executorService.shutdown();
         try
         {
             int timeout = environment.getContainerHosts().size() * approximateCloneTime;
