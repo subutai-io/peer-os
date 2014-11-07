@@ -17,7 +17,8 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildExcep
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
@@ -36,14 +37,14 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
         implements ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
-    private OperationType operationType;
+    private NodeOperationType operationType;
     private HadoopClusterConfig config;
     private NodeType nodeType;
     private ExecutorService executor = Executors.newCachedThreadPool();
 
 
     public ClusterOperationHandler( final HadoopImpl manager, final HadoopClusterConfig config,
-                                    final OperationType operationType, NodeType nodeType )
+                                    final NodeOperationType operationType, NodeType nodeType )
     {
         super( manager, config.getClusterName() );
         this.operationType = operationType;
@@ -78,25 +79,25 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
                 } );
                 break;
             case START:
-                runOperationOnContainers( OperationType.START );
+                runOperationOnContainers( NodeOperationType.START );
                 break;
             case STOP:
-                runOperationOnContainers( OperationType.STOP );
+                runOperationOnContainers( NodeOperationType.STOP );
                 break;
             case STATUS:
-                runOperationOnContainers( OperationType.STATUS );
+                runOperationOnContainers( NodeOperationType.STATUS );
                 break;
         }
     }
 
 
     @Override
-    public void runOperationOnContainers( OperationType operationType )
+    public void runOperationOnContainers( ClusterOperationType clusterOperationType )
     {
         try
         {
             CommandResult result = null;
-            switch ( operationType )
+            switch ( clusterOperationType )
             {
                 case START:
                     switch ( nodeType )

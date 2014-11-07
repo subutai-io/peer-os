@@ -11,5 +11,8 @@ public enum NodeType
     TASKTRACKER,
     DATANODE,
     SERVER,
-    CLIENT
+    CLIENT,
+    STORM_NIMBUS,
+    STORM_SUPERVISOR,
+    STORM_UI
 }

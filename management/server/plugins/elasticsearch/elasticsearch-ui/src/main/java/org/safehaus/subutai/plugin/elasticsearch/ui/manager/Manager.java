@@ -17,7 +17,7 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.api.NodeOperationTask;
@@ -351,7 +351,7 @@ public class Manager
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
                     new NodeOperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
-                            OperationType.START, new CompleteEvent()
+                            NodeOperationType.START, new CompleteEvent()
                     {
                         @Override
                         public void onComplete( NodeState nodeState )
@@ -377,7 +377,7 @@ public class Manager
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
                     new NodeOperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
-                            OperationType.STOP, new CompleteEvent()
+                            NodeOperationType.STOP, new CompleteEvent()
                     {
                         @Override
                         public void onComplete( NodeState nodeState )
@@ -688,7 +688,7 @@ public class Manager
                 disableButtons( buttons );
                 executorService.execute(
                         new NodeOperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
-                                OperationType.STOP, new CompleteEvent()
+                                NodeOperationType.STOP, new CompleteEvent()
                         {
                             @Override
                             public void onComplete( NodeState nodeState )
@@ -716,7 +716,7 @@ public class Manager
                 disableButtons( buttons );
                 executorService.execute(
                         new NodeOperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
-                                OperationType.START, new CompleteEvent()
+                                NodeOperationType.START, new CompleteEvent()
                         {
                             @Override
                             public void onComplete( NodeState nodeState )
@@ -745,7 +745,7 @@ public class Manager
                 disableButtons( buttons );
                 executorService.execute(
                         new NodeOperationTask( elasticsearch, tracker, config.getClusterName(), containerHost,
-                                OperationType.STATUS, new CompleteEvent()
+                                NodeOperationType.STATUS, new CompleteEvent()
                         {
                             public void onComplete( NodeState nodeState )
                             {

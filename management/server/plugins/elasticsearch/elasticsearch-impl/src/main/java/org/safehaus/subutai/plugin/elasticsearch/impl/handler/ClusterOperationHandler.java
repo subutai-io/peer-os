@@ -15,7 +15,8 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyExc
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
@@ -33,13 +34,13 @@ public class ClusterOperationHandler extends AbstractOperationHandler<Elasticsea
         implements ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
-    private OperationType operationType;
+    private ClusterOperationType operationType;
     private ElasticsearchClusterConfiguration config;
     private ExecutorService executor = Executors.newCachedThreadPool();
 
 
     public ClusterOperationHandler( final ElasticsearchImpl manager, final ElasticsearchClusterConfiguration config,
-                                    final OperationType operationType )
+                                    final ClusterOperationType operationType )
     {
         super( manager, config.getClusterName() );
         this.operationType = operationType;
@@ -63,7 +64,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<Elasticsea
                     }
                 } );
                 break;
-            case DESTROY:
+            case UNINSTALL:
                 executor.execute( new Runnable()
                 {
                     public void run()
@@ -72,39 +73,35 @@ public class ClusterOperationHandler extends AbstractOperationHandler<Elasticsea
                     }
                 } );
                 break;
-            case START:
-                runOperationOnContainers( OperationType.START );
-                break;
-            case STOP:
-                runOperationOnContainers( OperationType.STOP );
-                break;
-            case STATUS:
-                runOperationOnContainers( OperationType.STATUS );
+            case START_ALL:
+            case STOP_ALL:
+            case STATUS_ALL:
+                runOperationOnContainers( operationType );
                 break;
         }
     }
 
 
     @Override
-    public void runOperationOnContainers( OperationType operationType )
+    public void runOperationOnContainers( ClusterOperationType clusterOperationType )
     {
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
         CommandResult result = null;
-        switch ( operationType )
+        switch ( clusterOperationType )
         {
-            case START:
+            case START_ALL:
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     result = executeCommand( containerHost, Commands.startCommand );
                 }
                 break;
-            case STOP:
+            case STOP_ALL:
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     result = executeCommand( containerHost, Commands.stopCommand );
                 }
                 break;
-            case STATUS:
+            case STATUS_ALL:
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     result = executeCommand( containerHost, Commands.statusCommand );
