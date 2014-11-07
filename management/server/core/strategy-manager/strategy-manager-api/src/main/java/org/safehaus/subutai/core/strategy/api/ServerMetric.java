@@ -25,16 +25,30 @@ public class ServerMetric
     private int cpuLoadPercent;
     private int numOfProcessors;
     private int numOfLxcs;
+    private String hostname;
 
 
-    public ServerMetric( int freeHddMb, int freeRamMb, int cpuLoadPercent, int numOfProcessors,
+    public ServerMetric( String hostname, int freeHddMb, int freeRamMb, int cpuLoadPercent, int numOfProcessors,
                          Map<MetricType, Double> averageMetrics )
     {
+        this.hostname = hostname;
         this.freeHddMb = freeHddMb;
         this.freeRamMb = freeRamMb;
         this.cpuLoadPercent = cpuLoadPercent;
         this.numOfProcessors = numOfProcessors;
         this.averageMetrics = averageMetrics;
+    }
+
+
+    public String getHostname()
+    {
+        return hostname;
+    }
+
+
+    public void setHostname( final String hostname )
+    {
+        this.hostname = hostname;
     }
 
 

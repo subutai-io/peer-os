@@ -149,17 +149,10 @@ public class MonitorImpl implements Monitor
 
             for ( ContainerHost localContainer : localContainers )
             {
-                try
-                {
-                    //get container's resource host
-                    ResourceHost resourceHost =
-                            peerManager.getLocalPeer().getResourceHostByName( localContainer.getParentHostname() );
-                    getContainerMetrics( environmentId, resourceHost, localContainer, metrics );
-                }
-                catch ( PeerException e )
-                {
-                    LOG.error( "Error in getLocalContainerHostMetrics", e );
-                }
+                //get container's resource host
+                ResourceHost resourceHost =
+                        peerManager.getLocalPeer().getResourceHostByName( localContainer.getParentHostname() );
+                getContainerMetrics( environmentId, resourceHost, localContainer, metrics );
             }
         }
         catch ( PeerException e )
@@ -209,21 +202,14 @@ public class MonitorImpl implements Monitor
     public Set<ResourceHostMetric> getResourceHostMetrics() throws MonitorException
     {
         Set<ResourceHostMetric> metrics = new HashSet<>();
-        try
+        //obtain resource hosts
+        Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
+        //iterate resource hosts and get their metrics
+        for ( ResourceHost resourceHost : resourceHosts )
         {
-            //obtain resource hosts
-            Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
-            //iterate resource hosts and get their metrics
-            for ( ResourceHost resourceHost : resourceHosts )
-            {
-                getResourceMetrics( resourceHost, metrics );
-            }
+            getResourceMetrics( resourceHost, metrics );
         }
-        catch ( PeerException e )
-        {
-            LOG.error( "Error in getResourceHostMetrics", e );
-            throw new MonitorException( e );
-        }
+
 
         return metrics;
     }

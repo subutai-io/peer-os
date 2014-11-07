@@ -228,7 +228,7 @@ public class ResourceHost extends SubutaiHost
         }
         if ( parseOk )
         {
-            return new ServerMetric( freeHddMb, freeRamMb, ( int ) cpuLoadPercent, numOfProc, null );
+            return new ServerMetric( getHostname(), freeHddMb, freeRamMb, ( int ) cpuLoadPercent, numOfProc, null );
         }
         else
         {
@@ -444,7 +444,8 @@ public class ResourceHost extends SubutaiHost
         }
         catch ( CommandException e )
         {
-            throw new ResourceHostException( String.format( "Could not execute script/command %s", command.script ),
+            throw new ResourceHostException(
+                    String.format( "Could not execute script/command %s", String.format( command.script, args ) ),
                     e.toString() );
         }
     }
