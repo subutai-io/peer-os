@@ -53,9 +53,9 @@ SubutaiContainer::~SubutaiContainer()
  */
 void SubutaiContainer::clear()
 {
-	id = "";
-	macAddresses.clear();
-	ipAddress.clear();
+    id = "";
+    macAddresses.clear();
+    ipAddress.clear();
 }
 
 /**
@@ -78,12 +78,12 @@ string SubutaiContainer::RunProgram(string program, vector<string> params)
  * Returns ExecutionResult object including exit_code and stdout if success or stderr if fails.
  *
  */
-ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> params, bool return_result, lxc_attach_options_t opts) 
+ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> params, bool return_result, lxc_attach_options_t opts, bool captureOutput) 
 {
     containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Running program: ", program));
 
 
-     // get arguments list of the command which will be run on lxc
+    // get arguments list of the command which will be run on lxc
 
     char* _params[params.size() + 2];
     _params[0] = const_cast<char*>(program.c_str());
@@ -105,23 +105,26 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
 
 
     //   run command on LXC and read stdout into buffer.
-
     int fd[2];
     int _stdout = dup(1);
-    pipe(fd);
-    dup2(fd[1], 1);
-    char buffer[1000];
     ExecutionResult result;
-    fflush(stdout);
-    fflush(stderr);
-    close(fd[1]);
+    char buffer[1000];
+
+    if (captureOutput) {
+        pipe(fd);
+        dup2(fd[1], 1);
+        fflush(stdout);
+        fflush(stderr);
+        close(fd[1]);
+    }
     result.exit_code = this->container->attach_run_wait(this->container, &opts, program.c_str(), _params);
-    fflush(stdout);
-    close(fd[1]);
-    dup2(_stdout, 1);
-    close(_stdout);
-    string command_output;
-    while (1) {
+    if (captureOutput) {
+        fflush(stdout);
+        close(fd[1]);
+        dup2(_stdout, 1);
+        close(_stdout);
+        string command_output;
+        while (1) {
             ssize_t size = read(fd[0], buffer, 1000);
             if (size < 1000) {
                 buffer[size] = '\0';
@@ -130,15 +133,16 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
             } else {
                 command_output += buffer;
             }
-    }
+        }
 
 
-     //   get exit code, stdout and stderr.
+        //   get exit code, stdout and stderr.
 
-    if (result.exit_code == 0) {
-        result.out = command_output;
-    } else {
-        result.err = command_output;
+        if (result.exit_code == 0) {
+            result.out = command_output;
+        } else {
+            result.err = command_output;
+        }
     }
     containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>","Program executed: ", program));
     return result;
@@ -177,7 +181,7 @@ bool SubutaiContainer::isContainerFrozen()
  */
 void SubutaiContainer::UpdateUsersList() 
 { 
-	if(status != RUNNING) return ;
+    if(status != RUNNING) return ;
     this->_users.clear();
     vector<string> params;
     params.push_back("/etc/passwd");
@@ -239,38 +243,38 @@ bool SubutaiContainer::getContainerId()
  */
 bool SubutaiContainer::getContainerMacAddresses()
 {
-	macAddresses.clear();
+    macAddresses.clear();
     if (this->status != RUNNING) return false;
     try
-	{
-    	string s ;
-    	s.append("/bin/ls /var/lib/lxc/");  	s.append(hostname);   	s.append("/rootfs/sys/class/net/");
-    	char *command = new char[s.length() + 1];    	strcpy(command, s.c_str());
+    {
+        string s ;
+        s.append("/bin/ls /var/lib/lxc/");  	s.append(hostname);   	s.append("/rootfs/sys/class/net/");
+        char *command = new char[s.length() + 1];    	strcpy(command, s.c_str());
 
-    	vector<string> network_list = _helper.runAndSplit(command, "r", "\n");
-    	for (vector<string>::iterator it = network_list.begin(); it != network_list.end(); it++) {
+        vector<string> network_list = _helper.runAndSplit(command, "r", "\n");
+        for (vector<string>::iterator it = network_list.begin(); it != network_list.end(); it++) {
 
-    		string address_net;
-    	    string addressFile = "/var/lib/lxc/" + this->hostname + "/rootfs/sys/class/net/"+ (*it) +"/address";
-    	    ifstream file(addressFile.c_str());	//opening uuid.txt
+            string address_net;
+            string addressFile = "/var/lib/lxc/" + this->hostname + "/rootfs/sys/class/net/"+ (*it) +"/address";
+            ifstream file(addressFile.c_str());	//opening uuid.txt
 
-    	    getline(file,address_net);
-    		file.close();
+            getline(file,address_net);
+            file.close();
 
-    		if (address_net.empty()) {		//if mac is null or not reading successfully
-    			containerLogger->writeLog(3,containerLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read !!"));
-    			return false;
-    		}
+            if (address_net.empty()) {		//if mac is null or not reading successfully
+                containerLogger->writeLog(3,containerLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read !!"));
+                return false;
+            }
 
-    		macAddresses.insert(pair<string, string>((*it), address_net));
+            macAddresses.insert(pair<string, string>((*it), address_net));
 
-    		containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>", "Subutai Agent MacID for " + (*it) + ":", address_net));
-    		return true;
-    	}
-	} catch(const std::exception& error) {
-	        cout << error.what()<< endl;
-	}
-	return false;
+            containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>", "Subutai Agent MacID for " + (*it) + ":", address_net));
+            return true;
+        }
+    } catch(const std::exception& error) {
+        cout << error.what()<< endl;
+    }
+    return false;
 }
 
 
@@ -313,15 +317,15 @@ bool SubutaiContainer::getContainerIpAddress()
     int i = 0;
     if(interfaces != NULL)
     {
-		while (interfaces[i] != NULL) {
-			char** ips = this->container->get_ips(this->container, interfaces[i], "inet", 0);
-			int j = 0;
-			while (ips[j] != NULL) {
-				ipAddress.push_back(ips[j]);
-				j++;
-			}
-			i++;
-		}
+        while (interfaces[i] != NULL) {
+            char** ips = this->container->get_ips(this->container, interfaces[i], "inet", 0);
+            int j = 0;
+            while (ips[j] != NULL) {
+                ipAddress.push_back(ips[j]);
+                j++;
+            }
+            i++;
+        }
     }
     free(interfaces);
     if (ipAddress.size() > 0) {
@@ -365,7 +369,7 @@ lxc_container* SubutaiContainer::getLxcContainerValue()
  */
 string SubutaiContainer::getContainerMacAddressValue(string network)
 {
-	return macAddresses.find(network)->second;
+    return macAddresses.find(network)->second;
 }
 
 /**
@@ -381,7 +385,7 @@ vector<string> SubutaiContainer::getContainerIpValue()
  */
 void SubutaiContainer::getContainerAllFields()
 {
-	clear();
+    clear();
     getContainerId();
     getContainerMacAddresses();
     getContainerIpAddress();
@@ -410,7 +414,7 @@ ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command)
         } 
         args.push_back((*it));
     }
-    ExecutionResult res = RunProgram(program, args, true, opts);
+    ExecutionResult res = RunProgram(program, args, true, opts, false);
     return res;
 }
 
@@ -421,7 +425,7 @@ bool SubutaiContainer::checkCWD(string cwd)
 {
     vector<string> params;
     params.push_back(cwd);
-    ExecutionResult result = RunProgram("/bin/cd", params, true, LXC_ATTACH_OPTIONS_DEFAULT);    
+    ExecutionResult result = RunProgram("ls", params, true, LXC_ATTACH_OPTIONS_DEFAULT);    
     if (result.exit_code == 0) { 
         return true;
     } else {
@@ -515,7 +519,7 @@ vector<string> SubutaiContainer::ExplodeCommandArguments(SubutaiCommand* command
         result.push_back(command->getCommand().substr(p));
     }
     for(unsigned int i = 0; i < command->getArguments().size(); i++)
-    	result.push_back(command->getArguments()[i]);
+        result.push_back(command->getArguments()[i]);
 
     return result;
 }

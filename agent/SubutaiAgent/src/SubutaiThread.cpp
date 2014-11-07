@@ -799,16 +799,17 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                     //problem about UID
                 }
 
-                logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is starting!!", "pid", pidchldnumstr));
                 if (!container) {
+                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is starting!!", "pid", pidchldnumstr));
                     // Execute command
                     val = system(createExecString(command).c_str());
-                    close(ret[0]);
-                    write(ret[1], &val, sizeof(val));
-                    close(ret[1]);
                 } else {
-
+                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is starting!! on a container", "pid", pidchldnumstr));
+                    container->RunCommand(command);
                 }
+                close(ret[0]);
+                write(ret[1], &val, sizeof(val));
+                close(ret[1]);
 
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is done!!","pid",pidchldnumstr));
                 exit(EXIT_SUCCESS);

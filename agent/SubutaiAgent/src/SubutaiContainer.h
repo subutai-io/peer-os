@@ -92,7 +92,7 @@ class SubutaiContainer
         void getContainerAllFields();
         ExecutionResult RunCommand(SubutaiCommand* command);
         string RunProgram(string , vector<string>);
-        ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT);
+        ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT, bool captureOutput = true);
         void write();
         void clear();
         bool checkCWD(string cwd);

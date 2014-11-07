@@ -418,8 +418,11 @@ int main(int argc,char *argv[],char *envp[])
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Execute operation is starting.."));
                             SubutaiThread* subprocess = new SubutaiThread;
                             subprocess->getLogger().setLogLevel(logMain.getLogLevel());
-                            command.setUuid(environment.getAgentUuidValue()); /*command uuid should be set to agents uuid */
+                            //command.setUuid(environment.getAgentUuidValue()); /*command uuid should be set to agents uuid */
+                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","CONTAINER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", command.getUuid()));
                             SubutaiContainer* target_container = cman.findContainerById(command.getUuid());
+                            if (target_container)
+                                logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","CONTAINER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"));
                             pidList.push_back(subprocess->threadFunction(&messageQueue, &command, argv, target_container));
                             currentProcess++;
                             delete subprocess;
