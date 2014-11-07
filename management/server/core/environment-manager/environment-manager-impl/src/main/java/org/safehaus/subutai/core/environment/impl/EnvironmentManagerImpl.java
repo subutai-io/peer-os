@@ -43,7 +43,7 @@ import org.safehaus.subutai.core.environment.impl.environment.BuildException;
 import org.safehaus.subutai.core.environment.impl.environment.DestroyException;
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentBuilderImpl;
-import org.safehaus.subutai.core.environment.impl.environment.EnvironmentDestoyerImpl;
+import org.safehaus.subutai.core.environment.impl.environment.EnvironmentDestroyerImpl;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -198,14 +198,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    EnvironmentDestroyerImpl destroyer;
+
+
     @Override
     public boolean destroyEnvironment( final UUID environmentId ) throws EnvironmentDestroyException
     {
         Environment environment = getEnvironmentByUUID( environmentId );
-        EnvironmentDestoyerImpl destoyer = new EnvironmentDestoyerImpl();
+        destroyer =new EnvironmentDestroyerImpl();
         try
         {
-            destoyer.destroy( environment );
+            destroyer.destroy( environment );
             if ( environment.getContainers().isEmpty() )
             {
                 environmentDAO.deleteInfo( ENVIRONMENT, environment.getId().toString() );

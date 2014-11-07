@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by bahadyr on 11/7/14.
  */
-public class EnvironmentDestoyerImpl implements EnvironmentDestroyer, Observer
+public class EnvironmentDestroyerImpl implements EnvironmentDestroyer, Observer
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( ContainerCreatorThread.class.getName() );
@@ -25,7 +25,7 @@ public class EnvironmentDestoyerImpl implements EnvironmentDestroyer, Observer
     final int approximateCloneTime = 30; //Seconds
 
 
-    public EnvironmentDestoyerImpl()
+    public EnvironmentDestroyerImpl()
     {
         this.executorService = Executors.newSingleThreadExecutor();
     }

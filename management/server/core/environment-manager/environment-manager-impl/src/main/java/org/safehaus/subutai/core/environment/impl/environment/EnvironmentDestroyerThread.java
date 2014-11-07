@@ -30,16 +30,14 @@ public class EnvironmentDestroyerThread extends Observable implements Runnable
     {
         for ( ContainerHost container : environment.getContainers() )
         {
-            String ip = null;
             try
             {
-                ip = container.getPeer().getPeerInfo().getIp();
                 container.dispose();
                 notifyObservers( container );
             }
             catch ( PeerException e )
             {
-                LOG.error( String.format( "Could not destroy container %s on %s: %s", container.getHostname(), ip,
+                LOG.error( String.format( "Could not destroy container %s on %s: %s", container.getHostname(),
                         e.toString() ) );
             }
         }
