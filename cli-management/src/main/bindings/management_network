@@ -11,7 +11,7 @@ echo "        "subutai \[-qh\] management_network -l
 echo
 echo Usage:   Remove selected tunnnel from subutai management host
 echo "        "subutai \[-qh\] management_network -r TUNNELPORTNAME
-echo 
+echo "******************************************************************************"
 echo Usage:   Add a simple Open flow block rule to a bridge		
 echo "        "subutai \[-qh\] management_network -b BRIDGENAME PRIORITY PACKAGETYPE ACTION {NWSRC NWDST INPORT}  
 echo
@@ -26,15 +26,21 @@ echo "        "subutai \[-qh\] management_network -p BRIDGENAME
 echo
 echo Usage:   Delete a Open flow rule from a bridge                 
 echo "        "subutai \[-qh\] management_network -d BRIDGENAME MATCHCASE
-echo
+echo "*******************************************************************************"
 echo Usage:   Create a n2n Tunnel                 
-echo "        "subutai \[-qh\] management_network -N SUPERNODEIPADDRESS INTERFACENAME COMMUNITYNAME LOCALPEERIPADDRESS
+echo "        "subutai \[-qh\] management_network -N SUPERNODEIPADDRESS SUPERNODEPORT INTERFACENAME COMMUNITYNAME LOCALPEERIPADDRESS
 echo
 echo Usage:   List opened n2n Tunnels                 
 echo "        "subutai \[-qh\] management_network -L
 echo
 echo Usage:   Remove a n2n Tunnel                 
 echo "        "subutai \[-qh\] management_network -R INTERFACENAME
+echo "******************************************************************************"
+echo Usage:   Create a gateway tap device                 
+echo "        "subutai \[-qh\] management_network -T INTERFACENAME VLANIP/SUBNET VLANID
+echo
+echo Usage:   Delete a gateway tap device                 
+echo "        "subutai \[-qh\] management_network -D INTERFACENAME
 echo -------------------------------------------------------------------------------
 }
 
@@ -54,6 +60,11 @@ function management_network {
   local nwdst
   local nwsrc
   local matchCase
+  local supernodeIpAddress
+  local supernodePort
+  local interfaceName
+  local communityName
+  local localPeerIpAddress
   
   local createTunnel="false"
   local listTunnel="false"
@@ -66,10 +77,11 @@ function management_network {
   local createN2NTunnel="false"
   local listN2NTunnel="false"
   local removeN2NTunnel="false"
+  local createGateway="false"
+  local removeGateway="false"
   
-
   shift_amount=0;
-  while getopts ":clrbfspdNLR:" opt; do
+  while getopts ":clrbfspdNLRTD:" opt; do
      case $opt in
        c)
 	 createTunnel="true"	
@@ -110,8 +122,16 @@ function management_network {
          listN2NTunnel="true"
          shift
          ;;
-       $)
+       R)
          removeN2NTunnel="true"
+         shift
+         ;;
+       T)
+         createGateway="true"
+         shift
+         ;;
+       D)
+         removeGateway="true"
          shift
          ;;
        \?)
@@ -386,6 +406,54 @@ function management_network {
          echo $message
       fi
    fi
+   
+   if [ "true" == "$createN2NTunnel" ]; then
+      supernodeIpAddress="$1"
+      supernodePort="$2"
+      interfaceName="$3"
+      communityName="$4"
+      localPeerIpAddress="$5"
+      extra="$6"
+
+      if [ -z "$supernodeIpAddress" ]; then
+         msg_error "supernodeIpAddress Parameter not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+    
+      if [ -z "$supernodePort" ]; then
+         msg_error "supernodePort Parameter not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      if [ -z "$interfaceName" ]; then
+         msg_error "interfaceName Parameter not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      if [ -z "$communityName" ]; then
+         msg_error "communityName Parameter not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      if [ -z "$localPeerIpAddress" ]; then
+         msg_error "localPeerIpAddress Parameter not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      if [ "$extra" ]; then
+         msg_error "extra Parameter provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      net_check_N2N_IpAddress $supernodeIpAddress $localPeerIpAddress
+      net_check_portNumber $supernodePort
+      
+      edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -k secret -r -a $localPeerIpAddress
+      msg_info "New Com device is created: $interfaceName"
+      msg_info "New CommunityName is created: $communityName"
+     
+   fi
+
 }
 function management_network_description {
   echo "Create Tunnel between subutai peers"
