@@ -17,7 +17,7 @@
 
   <bean id="broker"
         class="org.safehaus.subutai.core.broker.impl.BrokerImpl"
-        init-method="init" destroy-method="dispose" scope="singleton">
+        init-method="init" destroy-method="dispose" scope="singleton" activation="eager">
     <argument value="${brokerUrl}" />
     <argument value="${maxBrokerConnections}" />
     <argument value="${isPersistent}" />

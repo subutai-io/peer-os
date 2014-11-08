@@ -36,12 +36,12 @@ public class ContainerRegistryImpl implements ContainerRegistry
     private static final int HOST_EXPIRATION = 60;
 
     private final Broker broker;
-    private final Set<HostListener> hostListeners =
-            Collections.newSetFromMap( new ConcurrentHashMap<HostListener, Boolean>() );
-    private final Executor notifier = Executors.newCachedThreadPool();
 
-    private HeartBeatListener heartBeatListener;
-    private Cache<UUID, HostInfo> hosts;
+    protected Set<HostListener> hostListeners =
+            Collections.newSetFromMap( new ConcurrentHashMap<HostListener, Boolean>() );
+    protected Executor notifier = Executors.newCachedThreadPool();
+    protected HeartBeatListener heartBeatListener;
+    protected Cache<UUID, HostInfo> hosts;
 
 
     public ContainerRegistryImpl( final Broker broker )
@@ -181,17 +181,18 @@ public class ContainerRegistryImpl implements ContainerRegistry
 
     public void init() throws ContainerRegistryException
     {
-        hosts = CacheBuilder.newBuilder().
-                expireAfterWrite( HOST_EXPIRATION, TimeUnit.SECONDS ).
-                                    build();
-
         try
         {
             broker.addByteMessageListener( heartBeatListener );
+
+            hosts = CacheBuilder.newBuilder().
+                    expireAfterWrite( HOST_EXPIRATION, TimeUnit.SECONDS ).
+                                        build();
         }
         catch ( BrokerException e )
         {
             LOG.error( "Error in init", e );
+            throw new ContainerRegistryException( e );
         }
     }
 
