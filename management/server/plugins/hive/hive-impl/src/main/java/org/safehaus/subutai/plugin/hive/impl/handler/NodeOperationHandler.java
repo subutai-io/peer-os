@@ -23,7 +23,7 @@ import com.google.common.base.Preconditions;
  *
  * TODO: add nodes and delete node operation should be implemented.
  */
-public class NodeOperationHandler extends AbstractOperationHandler<HiveImpl>
+public class NodeOperationHandler extends AbstractOperationHandler<HiveImpl, HiveConfig>
 {
 
     private String clusterName;
