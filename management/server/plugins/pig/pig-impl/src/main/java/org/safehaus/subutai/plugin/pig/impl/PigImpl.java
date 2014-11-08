@@ -48,10 +48,11 @@ public class PigImpl implements Pig
     private DataSource dataSource;
 
 
-    public PigImpl( DataSource dataSource, final Tracker tracker, final EnvironmentManager environmentManager,
+    public PigImpl( final DataSource dataSource, final Tracker tracker, final EnvironmentManager environmentManager,
                     final Hadoop hadoopManager )
     {
         this.dataSource = dataSource;
+        this.tracker = tracker;
         this.environmentManager = environmentManager;
         this.hadoopManager = hadoopManager;
     }

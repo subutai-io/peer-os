@@ -4,6 +4,7 @@ package org.safehaus.subutai.plugin.pig.ui.wizard;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -40,12 +41,14 @@ public class ConfigurationStep extends Panel
     private final Hadoop hadoop;
     private final EnvironmentManager environmentManager;
     private Environment hadoopEnvironment;
+    final Wizard wizard;
 
 
     public ConfigurationStep( final Hadoop hadoop, final Wizard wizard, final EnvironmentManager environmentManager)
     {
         this.hadoop = hadoop;
         this.environmentManager = environmentManager;
+        this.wizard = wizard;
 
         setSizeFull();
 
@@ -83,6 +86,7 @@ public class ConfigurationStep extends Panel
                 }
                 else
                 {
+                    wizard.setHadoopConfig( hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ) );
                     wizard.next();
                 }
             }
@@ -127,17 +131,25 @@ public class ConfigurationStep extends Panel
         hadoopClusters.setTextInputAllowed( false );
         hadoopClusters.setRequired( true );
         hadoopClusters.setNullSelectionAllowed( false );
-
-        select.setItemCaptionPropertyId( "hostname" );
-        select.setRows( 7 );
-        select.setMultiSelect( true );
-        select.setImmediate( true );
-        select.setLeftColumnCaption( "Available Nodes" );
-        select.setRightColumnCaption( "Selected Nodes" );
-        select.setWidth( 100, Unit.PERCENTAGE );
-        select.setRequired( true );
-
         hadoopClusters.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( final Property.ValueChangeEvent event )
+            {
+                if( event.getProperty().getValue() != null)
+                {
+                    HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
+                    config.setHadoopClusterName( hadoopInfo.getClusterName() );
+                    config.setHadoopNodes( hadoopInfo.getAllNodes() );
+                    hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
+                    Set<ContainerHost> hadoopNodes =
+                            hadoopEnvironment.getHostsByIds(  hadoopInfo.getAllNodes()  );
+                    select.setValue( null );
+                    select.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
+                }
+            }
+        } );
+        /*hadoopClusters.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( Property.ValueChangeEvent event )
@@ -153,11 +165,21 @@ public class ConfigurationStep extends Panel
                     select
                             .setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
+                    wizard.setHadoopConfig( hadoop.getCluster( hadoopInfo.getClusterName() ) );
                     config.setHadoopManager( hadoop );
-                    config.getNodes().clear();
+                    //config.getNodes().clear();
                 }
             }
-        } );
+        } );*/
+
+        select.setItemCaptionPropertyId( "hostname" );
+        select.setRows( 7 );
+        select.setMultiSelect( true );
+        select.setImmediate( true );
+        select.setLeftColumnCaption( "Available Nodes" );
+        select.setRightColumnCaption( "Selected Nodes" );
+        select.setWidth( 100, Unit.PERCENTAGE );
+        select.setRequired( true );
 
         Hadoop hadoopManager = hadoop;
         List<HadoopClusterConfig> clusters = hadoopManager.getClusters();
@@ -196,12 +218,18 @@ public class ConfigurationStep extends Panel
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Collection nodeList = ( Collection ) event.getProperty().getValue();
+                    Set<UUID> nodes = new HashSet<UUID>();
+                    Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
+                    for( ContainerHost host : nodeList)
+                    {
+                        nodes.add( host.getAgent().getUuid() );
+                    }
                     config.getNodes().clear();
-                    config.getNodes().addAll( nodeList );
+                    config.getNodes().addAll( nodes );
                 }
             }
         } );
+
 
         parent.addComponent( hadoopClusters );
         parent.addComponent( select );

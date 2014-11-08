@@ -17,7 +17,7 @@
   <bean id="pig-impl" scope="singleton" class="org.safehaus.subutai.plugin.pig.impl.PigImpl"
         init-method="init" destroy-method="destroy">
     <argument ref="dataSource" />
-    <property name="tracker" ref="tracker" />
+    <argument ref="tracker" />
     <argument ref="environmentManager" />
     <argument ref="hadoopManager" />
   </bean>

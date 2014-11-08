@@ -28,7 +28,7 @@ public class Wizard
     private final EnvironmentManager environmentManager;
     private int step = 1;
     private PigConfig config = new PigConfig();
-    private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
+    private HadoopClusterConfig hadoopConfig;
 
 
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
