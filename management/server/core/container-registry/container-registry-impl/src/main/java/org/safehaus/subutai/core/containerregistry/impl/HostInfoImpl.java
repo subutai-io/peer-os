@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.containerregistry.impl;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.containerregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.containerregistry.api.HostInfo;
 
@@ -56,7 +57,10 @@ public class HostInfoImpl implements HostInfo
     {
         Set<ContainerHostInfo> info = Sets.newHashSet();
 
-        info.addAll( containers );
+        if ( !CollectionUtil.isCollectionEmpty( containers ) )
+        {
+            info.addAll( containers );
+        }
 
         return info;
     }
