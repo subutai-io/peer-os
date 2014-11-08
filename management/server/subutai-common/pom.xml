@@ -71,34 +71,103 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.openjpa</groupId>
+      <artifactId>openjpa</artifactId>
+      <!-- set the version to be the same as the level in your runtime -->
+      <version>2.3.0</version>
+    </dependency>
 
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <version>1.4.181</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-jpa_2.0_spec</artifactId>
+      <version>1.1</version>
+    </dependency>
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
-      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.3.7</version>
+        <extensions>true</extensions>
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.common</Bundle-SymbolicName>
-            <Export-Package>
-              {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
-              org.apache.http;org.apache.http.*
+            <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
+            <Export-Package>{local-packages},{local-packages}.*;version=${project.version};-noimport:=true
             </Export-Package>
+            <Import-Package>*</Import-Package>
           </instructions>
         </configuration>
       </plugin>
+
+      <!--<plugin>-->
+      <!--<groupId>org.apache.openjpa</groupId>-->
+      <!--<artifactId>openjpa-maven-plugin</artifactId>-->
+      <!--<version>2.3.0</version>-->
+      <!--<configuration>-->
+      <!--<includes>**/protocol/Agent*.class</includes>-->
+      <!--&lt;!&ndash;<excludes>**/util/*.class</excludes>&ndash;&gt;-->
+      <!--<addDefaultConstructor>true</addDefaultConstructor>-->
+      <!--<enforcePropertyRestrictions>true</enforcePropertyRestrictions>-->
+      <!--</configuration>-->
+      <!--<executions>-->
+      <!--<execution>-->
+      <!--<id>enhancer</id>-->
+      <!--<phase>process-classes</phase>-->
+      <!--<goals>-->
+      <!--<goal>enhance</goal>-->
+      <!--</goals>-->
+      <!--</execution>-->
+      <!--</executions>-->
+      <!--<dependencies>-->
+      <!--<dependency>-->
+      <!--<groupId>org.apache.openjpa</groupId>-->
+      <!--<artifactId>openjpa</artifactId>-->
+      <!--<version>2.3.0</version>-->
+      <!--</dependency>-->
+      <!--</dependencies>-->
+      <!--</plugin>-->
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <configuration>
+              <target>
+                <!--<path id="enhance.path.ref">-->
+                <!--<fileset dir="${project.build.outputDirectory}">-->
+                <!--<include name="Agent.class" />-->
+                <!--</fileset>-->
+                <!--</path>-->
+                <!--<pathconvert property="enhance.files" refid="enhance.path.ref" pathsep=" " />-->
+                <java classname="org.apache.openjpa.enhance.PCEnhancer">
+                  <arg line="-p persistence.xml" />
+                  <!--<arg line="${enhance.files}" />-->
+                  <classpath>
+                    <path refid="maven.dependency.classpath" />
+                    <path refid="maven.compile.classpath" />
+                  </classpath>
+                </java>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
+
 </project>

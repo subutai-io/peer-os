@@ -21,7 +21,6 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
-import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import static org.mockito.Mockito.mock;
@@ -32,7 +31,7 @@ import static org.mockito.Mockito.when;
  * Created by bahadyr on 9/25/14.
  */
 @Ignore
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class EnvironmentManagerImplTest
 {
 
@@ -43,7 +42,7 @@ public class EnvironmentManagerImplTest
     @Mock
     EnvironmentDAO environmentDao;
     @Mock
-    NetworkManager networkManager;
+    SecurityManager securityManager;
     @Mock
     TemplateRegistry registry;
     @Mock
@@ -69,14 +68,14 @@ public class EnvironmentManagerImplTest
 
         Map<String, CloneContainersMessage> map = new HashMap<>();
         CloneContainersMessage ccm = mock( CloneContainersMessage.class );
-        when( ccm.isSuccess() ).thenReturn( true );
+
         Set<Agent> agents = new HashSet<>();
 
         Agent agent = mock( Agent.class );
         agent.setHostname( HOSTNAME );
         agents.add( agent );
 
-        when( ccm.getResult() ).thenReturn( agents );
+
         map.put( "key", ccm );
 
         when( ccm.getNumberOfNodes() ).thenReturn( agents.size() );

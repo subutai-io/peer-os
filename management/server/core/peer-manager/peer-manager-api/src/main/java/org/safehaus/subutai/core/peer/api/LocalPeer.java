@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.container.api.ContainerCreateException;
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
@@ -14,13 +13,15 @@ import org.safehaus.subutai.core.container.api.ContainerCreateException;
  */
 public interface LocalPeer extends Peer
 {
-    public ResourceHost getResourceHostByName( String hostname ) throws PeerException;
+    public Host bindHost( UUID id ) throws PeerException;
+
+    public ResourceHost getResourceHostByName( String hostname );
 
     public ContainerHost getContainerHostByName( String hostname ) throws PeerException;
 
     public ManagementHost getManagementHost() throws PeerException;
 
-    public Set<ResourceHost> getResourceHosts() throws PeerException;
+    public Set<ResourceHost> getResourceHosts();
 
     /**
      * Returns the templates list
@@ -34,6 +35,7 @@ public interface LocalPeer extends Peer
     public void clean();
 
     public ContainerHost createContainer( String hostName, String templateName, String cloneName, UUID envId )
-            throws ContainerCreateException;
+            throws PeerException;
 
+    Agent waitForAgent( String containerName, int timeout );
 }

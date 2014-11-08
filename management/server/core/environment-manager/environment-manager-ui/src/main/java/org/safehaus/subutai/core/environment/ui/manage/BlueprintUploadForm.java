@@ -7,6 +7,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 
 import com.google.gson.Gson;
@@ -17,7 +18,7 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class BlueprintUploadForm
 {
 
@@ -79,21 +80,30 @@ public class BlueprintUploadForm
         environmentBlueprint.setDomainName( "intra.lan" );
         environmentBlueprint.setExchangeSshKeys( true );
         environmentBlueprint.setLinkHosts( true );
-        environmentBlueprint.setName( "My environment" );
+        environmentBlueprint.setName( "My cassandra + master environment" );
 
         Set<NodeGroup> groups = new HashSet<>();
 
         NodeGroup nodeGroup1 = new NodeGroup();
         nodeGroup1.setDomainName( "intra.lan" );
-        nodeGroup1.setName( "Some name" );
+        nodeGroup1.setName( "Cassandra node group" );
         nodeGroup1.setLinkHosts( true );
         nodeGroup1.setExchangeSshKeys( true );
         nodeGroup1.setNumberOfNodes( 2 );
         nodeGroup1.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
-        nodeGroup1.setTemplateName( "master" );
+        nodeGroup1.setTemplateName( "cassandra" );
+
+        NodeGroup nodeGroup2 = new NodeGroup();
+        nodeGroup2.setDomainName( "intra.lan" );
+        nodeGroup2.setName( "Master node group" );
+        nodeGroup2.setLinkHosts( true );
+        nodeGroup2.setExchangeSshKeys( true );
+        nodeGroup2.setNumberOfNodes( 2 );
+        nodeGroup2.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        nodeGroup2.setTemplateName( "master" );
 
         groups.add( nodeGroup1 );
-        groups.add( nodeGroup1 );
+        groups.add( nodeGroup2 );
 
         environmentBlueprint.setNodeGroups( groups );
         return environmentBlueprint;
@@ -116,14 +126,14 @@ public class BlueprintUploadForm
         String content = textArea.getValue().trim();
         if ( content.length() > 0 )
         {
-            boolean result = managerUI.getEnvironmentManager().saveBlueprint( content );
-            if ( !result )
+            try
+            {
+                managerUI.getEnvironmentManager().saveBlueprint( content );
+                Notification.show( BLUEPRINT_SAVED );
+            }
+            catch ( EnvironmentManagerException e )
             {
                 Notification.show( ERROR_SAVING_BLUEPRINT );
-            }
-            else
-            {
-                Notification.show( BLUEPRINT_SAVED );
             }
         }
         else

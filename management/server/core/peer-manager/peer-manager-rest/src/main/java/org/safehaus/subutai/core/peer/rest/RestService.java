@@ -26,17 +26,10 @@ public interface RestService
     @Consumes(MediaType.TEXT_PLAIN)
     public PeerInfo registerPeer( @QueryParam("peer") String peer );
 
-
     @GET
-    @Path("containers/format")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getCreateContainersMsgJsonFormat();
-
-
-    @GET
-    @Path("json")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getPeerJsonFormat();
+    @Path("id")
+    @Produces("text/plain")
+    public String getId();
 
 
     @POST
@@ -46,38 +39,34 @@ public interface RestService
                                       @FormParam("environmentId") String environmentId,
                                       @FormParam("templates") String templates, @FormParam("quantity") int quantity,
                                       @FormParam("strategyId") String strategyId,
-                                      @FormParam("criteria") String criteria );
+                                      @FormParam("criteria") String criteria,
+                                      @FormParam( "nodeGroupName" ) String nodeGroupName );
 
     @POST
     @Path("container/destroy")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response destroyContainer( @FormParam("host") String host );
+    public Response destroyContainer( @FormParam("hostId") String host );
 
     @POST
     @Path("container/start")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response startContainer( @FormParam("host") String host );
+    public Response startContainer( @FormParam("hostId") String host );
 
     @POST
     @Path("container/stop")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response stopContainer( @FormParam("host") String host );
+    public Response stopContainer( @FormParam("hostId") String host );
 
     @POST
     @Path("container/isconnected")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response isContainerConnected( @FormParam("host") String host );
+    public Response isContainerConnected( @FormParam("hostId") String hostId );
 
 
     @POST
-    @Path( "template/get" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response getTemplate( @FormParam( "host" ) String host );
-
-    @POST
-    @Path("execute")
+    @Path("template/get")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response execute( @FormParam("requestBuilder") String requestBuilder, @FormParam("host") String host );
+    public Response getTemplate( @FormParam("templateName") String templateName );
 
     @POST
     @Path("environment/containers")

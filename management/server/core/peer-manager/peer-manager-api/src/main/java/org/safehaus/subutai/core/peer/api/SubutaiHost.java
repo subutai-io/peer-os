@@ -54,7 +54,7 @@ public abstract class SubutaiHost implements Host
     }
 
 
-    public Peer getPeer( UUID peerId ) throws PeerException
+    public Peer getPeer() throws PeerException
     {
         Peer result;
         try
@@ -88,7 +88,7 @@ public abstract class SubutaiHost implements Host
     {
         try
         {
-            Peer peer = getPeer( this.getPeerId() );
+            Peer peer = getPeer();
             return peer.execute( requestBuilder, this, callback );
         }
         catch ( PeerException e )
@@ -111,7 +111,7 @@ public abstract class SubutaiHost implements Host
     {
         try
         {
-            Peer peer = getPeer( this.getPeerId() );
+            Peer peer = getPeer();
             peer.executeAsync( requestBuilder, this, callback );
         }
         catch ( PeerException e )
@@ -169,7 +169,7 @@ public abstract class SubutaiHost implements Host
     {
         try
         {
-            Peer peer = getPeer( this.getPeerId() );
+            Peer peer = getPeer();
             return peer.isConnected( this );
         }
         catch ( PeerException e )
@@ -183,5 +183,35 @@ public abstract class SubutaiHost implements Host
     public long getLastHeartbeat()
     {
         return lastHeartbeat;
+    }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
+
+        final SubutaiHost that = ( SubutaiHost ) o;
+
+        if ( !agent.equals( that.agent ) )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return agent.hashCode();
     }
 }

@@ -1,15 +1,12 @@
 package org.safehaus.subutai.core.peer.api;
 
 
-import java.util.Iterator;
-import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
-
-import com.google.common.collect.Sets;
 
 
 /**
@@ -18,7 +15,7 @@ import com.google.common.collect.Sets;
 public class ManagementHost extends SubutaiHost
 {
     //    private static final String DEFAULT_MANAGEMENT_HOSTNAME = "management";
-    private Set<ResourceHost> resourceHosts = Sets.newHashSet();
+    //    private Set<ResourceHost> resourceHosts = Sets.newHashSet();
 
 
     public ManagementHost( final Agent agent, UUID peerId )
@@ -26,58 +23,32 @@ public class ManagementHost extends SubutaiHost
         super( agent, peerId );
     }
 
-    //
-    //    @Override
-    //    public boolean isConnected( final Host host )
-    //    {
-    //        //TODO: Implement resource host check
-    //        return true;
-    //    }
 
-
-    public Set<ResourceHost> getResourceHosts()
+    public void init() throws SubutaiInitException
     {
-        return resourceHosts;
-    }
-
-
-    public void setResourceHosts( final Set<ResourceHost> resourceHosts )
-    {
-        this.resourceHosts = resourceHosts;
-    }
-
-
-    public ResourceHost getResourceHostByName( final String hostname )
-    {
-        return findResourceHostByName( hostname );
-    }
-
-
-    public void addResourceHost( final ResourceHost host )
-    {
-        if ( host == null )
+        try
         {
-            throw new IllegalArgumentException( "Resource host could not be null." );
+            createFlows();
         }
-        resourceHosts.add( host );
+        catch ( CommandException e )
+        {
+            throw new SubutaiInitException( "Could not create network flows." );
+        }
     }
 
 
-    private ResourceHost findResourceHostByName( final String hostname )
+    private void createFlows() throws CommandException
     {
-        ResourceHost result = null;
-        Iterator iterator = resourceHosts.iterator();
-
-        while ( result == null && iterator.hasNext() )
+        StringBuilder sb = new StringBuilder();
+        sb.append( "subutai management_network -b br-int 1 normal normal && " );
+        sb.append( "subutai management_network -b br-tun 1 normal normal && " );
+        sb.append( "subutai management_network -b br - tun 2500 arp drop 10.10 .10 .0 / 24 10.10 .10 .0 / 24 1 && " );
+        sb.append( "subutai management_network -b br - tun 2500 icmp drop 10.10 .10 .0 / 24 10.10 .10 .0 / 24 1" );
+        CommandResult commandResult = execute( new RequestBuilder( sb.toString() ) );
+        if ( !commandResult.hasSucceeded() )
         {
-            ResourceHost host = ( ResourceHost ) iterator.next();
-
-            if ( host.getHostname().equals( hostname ) )
-            {
-                result = host;
-            }
+            throw new CommandException( "Flow commands fail." );
         }
-        return result;
     }
 
 
@@ -103,8 +74,9 @@ public class ManagementHost extends SubutaiHost
     public void removeAptSource( final String host, final String ip ) throws PeerException
     {
         String cmd = String.format( "sed -e 's,;\\s*[a-f0-9]\\{8\\}-[a-f0-9]\\{4\\}-[a-f0-9]\\{4\\}-[a-f0-9]\\{4" +
-                "\\}-[a-f0-9]\\{12\\}\\s*http:\\/\\/%s/ksks\\s*,,g'' apt-cacher.conf > apt-cacher.conf"
-                + ".new && mv apt-cacher.conf.new apt-cacher.conf && /etc/init.d/apt-cacher reload", ip );
+                        "\\}-[a-f0-9]\\{12\\}\\s*http:\\/\\/%s/ksks\\s*,,g' apt-cacher.conf > apt-cacher.conf"
+                        + ".new && mv apt-cacher.conf.new apt-cacher.conf && /etc/init.d/apt-cacher reload",
+                ip.replace( ".", "\\." ) );
 
         RequestBuilder rb = new RequestBuilder( cmd );
         rb.withCwd( "/etc/apt-cacher/" );

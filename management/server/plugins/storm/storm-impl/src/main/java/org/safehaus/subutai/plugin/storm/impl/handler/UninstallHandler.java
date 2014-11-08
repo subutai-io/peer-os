@@ -1,16 +1,17 @@
 package org.safehaus.subutai.plugin.storm.impl.handler;
 
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.storm.impl.CommandType;
 import org.safehaus.subutai.plugin.storm.impl.Commands;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
@@ -22,7 +23,7 @@ public class UninstallHandler extends AbstractHandler
     public UninstallHandler( StormImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        this.trackerOperation = manager.getTracker().createTrackerOperation( StormConfig.PRODUCT_NAME,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( StormClusterConfiguration.PRODUCT_NAME,
                 "Uninstall cluster " + clusterName );
     }
 
@@ -31,15 +32,18 @@ public class UninstallHandler extends AbstractHandler
     public void run()
     {
         TrackerOperation po = trackerOperation;
-        StormConfig config = manager.getCluster( clusterName );
+        StormClusterConfiguration config = manager.getCluster( clusterName );
         if ( config == null )
         {
             po.addLogFailed( "Cluster not found: " + clusterName );
             return;
         }
-        if ( !isNodeConnected( config.getNimbus().getHostname() ) )
+        if ( !isNodeConnected( config, config.getNimbus() ) )
         {
-            po.addLogFailed( String.format( "Master node %s is not connected", config.getNimbus().getHostname() ) );
+            Environment environment =
+                    manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+            ContainerHost nimbusHost = environment.getContainerHostByUUID( config.getNimbus() );
+            po.addLogFailed( String.format( "Master node %s is not connected", nimbusHost.getHostname() ) );
             return;
         }
         // check worker nodes
@@ -49,43 +53,47 @@ public class UninstallHandler extends AbstractHandler
             return;
         }
 
-        Set<Agent> nodes = new HashSet<>( config.getSupervisors() );
+        Set<UUID> nodes = new HashSet<>( config.getSupervisors() );
 
         if ( config.isExternalZookeeper() )
         {
             po.addLog( "Removing Storm from external Zookeeper node..." );
-            Command cmd = manager.getCommandRunner()
-                                 .createCommand( new RequestBuilder( Commands.make( CommandType.PURGE ) ),
-                                         new HashSet<>( Arrays.asList( config.getNimbus() ) ) );
-            manager.getCommandRunner().runCommand( cmd );
-            if ( cmd.hasSucceeded() )
+
+            Environment environment =
+                    manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+            ContainerHost nimbusHost = environment.getContainerHostByUUID( config.getNimbus() );
+            try
             {
-                po.addLog( "Storm successfully removed from nimbus node" );
+                CommandResult commandResult = nimbusHost.execute( new RequestBuilder( Commands.make( CommandType.PURGE ) ) );
+
+                if ( commandResult.hasSucceeded() )
+                {
+                    po.addLog( "Storm successfully removed from nimbus node" );
+                }
+                else
+                {
+                    po.addLog( "Failed to remove Storm from nimbus node" );
+                }
             }
-            else
+            catch ( CommandException e )
             {
-                po.addLog( "Failed to remove Storm from nimbus node" );
+                e.printStackTrace();
             }
+
+
         }
         else
         {
             nodes.add( config.getNimbus() );
         }
 
-        try
-        {
-            po.addLog( "Destroying container(s)..." );
-            manager.getContainerManager().clonesDestroy( nodes );
-            po.addLog( "Container(s) destroyed" );
+        //TODO destroy storm supervisor nodes
+        po.addLog( "Storm supervisor nodes are not destroyed since environment manager does not provide this functionality yet!" );
+//        po.addLog( "Destroying container(s)..." );
+//        manager.getContainerManager().clonesDestroy( nodes );
+//        po.addLog( "Container(s) destroyed" );
 
-            manager.getPluginDao().deleteInfo( StormConfig.PRODUCT_NAME, clusterName );
-            po.addLogDone( "Cluster info deleted" );
-        }
-        catch ( LxcDestroyException ex )
-        {
-            String m = "Failed to destroy node(s)";
-            po.addLog( m + ex.getMessage() );
-            manager.getLogger().error( m, ex );
-        }
+        manager.getPluginDAO().deleteInfo( StormClusterConfiguration.PRODUCT_NAME, clusterName );
+        po.addLogDone( "Cluster info deleted" );
     }
 }
