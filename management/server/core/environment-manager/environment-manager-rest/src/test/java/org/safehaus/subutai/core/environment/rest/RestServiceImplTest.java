@@ -1,4 +1,4 @@
-package org.safehaus.subutai.environment.rest;
+package org.safehaus.subutai.core.environment.rest;
 
 
 import org.junit.Before;
