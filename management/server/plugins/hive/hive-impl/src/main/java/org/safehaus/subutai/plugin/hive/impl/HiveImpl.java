@@ -19,12 +19,15 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
+import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.api.SetupType;
+import org.safehaus.subutai.plugin.hive.impl.handler.ClusterOperationHandler;
 import org.safehaus.subutai.plugin.hive.impl.handler.NodeOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,12 +112,11 @@ public class HiveImpl implements Hive
     }
 
 
+
+
     @Override
-    public UUID installCluster( HiveConfig config )
+    public UUID installCluster( final HiveConfig config )
     {
-//        AbstractOperationHandler h = new InstallHandler( this, config );
-//        executor.execute( h );
-//        return h.getTrackerId();
         return null;
     }
 
@@ -122,9 +124,9 @@ public class HiveImpl implements Hive
     @Override
     public UUID uninstallCluster( String clusterName )
     {
-//        AbstractOperationHandler h = new UninstallHandler( this, clusterName );
-//        executor.execute( h );
-//        return h.getTrackerId();
+        //        AbstractOperationHandler h = new UninstallHandler( this, clusterName );
+        //        executor.execute( h );
+        //        return h.getTrackerId();
         return null;
     }
 
@@ -143,16 +145,14 @@ public class HiveImpl implements Hive
     }
 
 
-
     @Override
-    public UUID installCluster( HiveConfig config, HadoopClusterConfig hc )
+    public UUID installCluster( HiveConfig config, HadoopClusterConfig hadoopClusterConfig )
     {
-//        InstallHandler h = new InstallHandler( this, config );
-//        h.setHadoopConfig( hc );
-//        executor.execute( h );
-//        return h.getTrackerId();
-        return null;
+        AbstractOperationHandler h = new ClusterOperationHandler( this, config, hadoopClusterConfig, ClusterOperationType.INSTALL );
+        executor.execute( h );
+        return h.getTrackerId();
     }
+
 
 
     @Override
@@ -185,9 +185,9 @@ public class HiveImpl implements Hive
     @Override
     public UUID restartNode( String clusterName, String hostname )
     {
-//        AbstractOperationHandler h = new RestartHandler( this, clusterName, hostname );
-//        executor.execute( h );
-//        return h.getTrackerId();
+        //        AbstractOperationHandler h = new RestartHandler( this, clusterName, hostname );
+        //        executor.execute( h );
+        //        return h.getTrackerId();
         return null;
     }
 
@@ -195,9 +195,9 @@ public class HiveImpl implements Hive
     @Override
     public UUID addNode( String clusterName, String hostname )
     {
-//        AbstractOperationHandler h = new AddNodeHandler( this, clusterName, hostname );
-//        executor.execute( h );
-//        return h.getTrackerId();
+        //        AbstractOperationHandler h = new AddNodeHandler( this, clusterName, hostname );
+        //        executor.execute( h );
+        //        return h.getTrackerId();
         return null;
     }
 
@@ -205,9 +205,9 @@ public class HiveImpl implements Hive
     @Override
     public UUID destroyNode( String clusterName, String hostname )
     {
-//        AbstractOperationHandler h = new DestroyNodeHandler( this, clusterName, hostname );
-//        executor.execute( h );
-//        return h.getTrackerId();
+        //        AbstractOperationHandler h = new DestroyNodeHandler( this, clusterName, hostname );
+        //        executor.execute( h );
+        //        return h.getTrackerId();
         return null;
     }
 
@@ -215,8 +215,8 @@ public class HiveImpl implements Hive
     @Override
     public Map<Agent, Boolean> isInstalled( Set<Agent> nodes )
     {
-//        CheckInstallHandler h = new CheckInstallHandler( this );
-//        return h.check( Product.HIVE, nodes );
+        //        CheckInstallHandler h = new CheckInstallHandler( this );
+        //        return h.check( Product.HIVE, nodes );
         return null;
     }
 
@@ -224,16 +224,16 @@ public class HiveImpl implements Hive
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( Environment env, HiveConfig config, TrackerOperation po )
     {
-//        if ( config.getSetupType() == SetupType.OVER_HADOOP )
-//        {
-//            return new SetupStrategyOverHadoop( env, this, config, po );
-//        }
-//        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
-//        {
-//            SetupStrategyWithHadoop s = new SetupStrategyWithHadoop( env, this, config, po );
-//            s.setEnvironment( env );
-//            return s;
-//        }
+        //        if ( config.getSetupType() == SetupType.OVER_HADOOP )
+        //        {
+        //            return new SetupStrategyOverHadoop( env, this, config, po );
+        //        }
+        //        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        //        {
+        //            SetupStrategyWithHadoop s = new SetupStrategyWithHadoop( env, this, config, po );
+        //            s.setEnvironment( env );
+        //            return s;
+        //        }
         return null;
     }
 }

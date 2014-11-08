@@ -10,6 +10,7 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
@@ -79,7 +80,7 @@ public class VerificationStep extends Panel
                 UUID trackId = null;
                 if ( config.getSetupType() == SetupType.OVER_HADOOP )
                 {
-                    trackId = hive.installCluster( config );
+                    trackId = hive.installCluster( config, hc);
                 }
                 else if ( config.getSetupType() == SetupType.WITH_HADOOP )
                 {

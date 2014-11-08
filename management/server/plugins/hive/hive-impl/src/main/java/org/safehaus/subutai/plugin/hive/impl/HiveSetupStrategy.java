@@ -6,6 +6,7 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.api.SetupType;
 
@@ -16,15 +17,18 @@ abstract class HiveSetupStrategy implements ClusterSetupStrategy
 {
     public final HiveImpl hiveManager;
     public final HiveConfig config;
+    public final HadoopClusterConfig hadoopClusterConfig;
     public final TrackerOperation trackerOperation;
     public final Environment environment;
 
 
     public HiveSetupStrategy( final Environment environment, HiveImpl manager,
-                              HiveConfig config, TrackerOperation trackerOperation )
+                              HiveConfig config, HadoopClusterConfig hadoopClusterConfig,
+                              TrackerOperation trackerOperation )
     {
         this.hiveManager = manager;
         this.config = config;
+        this.hadoopClusterConfig = hadoopClusterConfig;
         this.trackerOperation = trackerOperation;
         this.environment = environment;
     }
@@ -68,14 +72,15 @@ abstract class HiveSetupStrategy implements ClusterSetupStrategy
 //        config.setClients( clientNodes );
 
 
-        SetupStrategyOverHadoop setupStrategyOverHadoop = new SetupStrategyOverHadoop( environment, hiveManager, config, trackerOperation );
-        setupStrategyOverHadoop.setup();
-
-        trackerOperation.addLog( "Saving cluster information to database..." );
-        hiveManager.getPluginDAO()
-                            .saveInfo( HiveConfig.PRODUCT_KEY, config.getClusterName(), config );
-        trackerOperation.addLog( "Cluster information saved to database" );
-        return config;
+//        SetupStrategyOverHadoop setupStrategyOverHadoop = new SetupStrategyOverHadoop( environment, hiveManager, config, trackerOperation );
+//        setupStrategyOverHadoop.setup();
+//
+//        trackerOperation.addLog( "Saving cluster information to database..." );
+//        hiveManager.getPluginDAO()
+//                            .saveInfo( HiveConfig.PRODUCT_KEY, config.getClusterName(), config );
+//        trackerOperation.addLog( "Cluster information saved to database" );
+//        return config;
+        return null;
     }
 
     public void checkConfig() throws ClusterSetupException

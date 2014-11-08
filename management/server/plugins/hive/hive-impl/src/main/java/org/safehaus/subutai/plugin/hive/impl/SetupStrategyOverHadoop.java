@@ -19,12 +19,12 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 
 
-class SetupStrategyOverHadoop extends HiveSetupStrategy
+public class SetupStrategyOverHadoop extends HiveSetupStrategy
 {
 
-    public SetupStrategyOverHadoop( Environment environment, HiveImpl manager, HiveConfig config, TrackerOperation po )
+    public SetupStrategyOverHadoop( Environment environment, HiveImpl manager, HiveConfig config, HadoopClusterConfig hadoopClusterConfig, TrackerOperation po )
     {
-        super( environment, manager, config, po );
+        super( environment, manager, config, hadoopClusterConfig, po );
     }
 
 
@@ -34,19 +34,19 @@ class SetupStrategyOverHadoop extends HiveSetupStrategy
         checkConfig();
 
         //check if nodes are connected
-        ContainerHost server = environment.getContainerHostByUUID( config.getEnvironmentId() );
-        if ( ! server.isConnected() ){
-            throw new ClusterSetupException( "Server node is not connected " );
-        }
-        for ( UUID uuid : config.getClients() ){
-            ContainerHost host = environment.getContainerHostByUUID( uuid );
-            if ( ! host.isConnected() ){
-                throw new ClusterSetupException( String.format( "Node %s is not connected", host.getHostname() ) );
-            }
-        }
+        ContainerHost server = environment.getContainerHostByUUID( config.getServer() );
+//        if ( ! server.isConnected() ){
+//            throw new ClusterSetupException( "Server node is not connected " );
+//        }
+//        for ( UUID uuid : config.getClients() ){
+//            ContainerHost host = environment.getContainerHostByUUID( uuid );
+//            if ( ! host.isConnected() ){
+//                throw new ClusterSetupException( String.format( "Node %s is not connected", host.getHostname() ) );
+//            }
+//        }
 
-        HadoopClusterConfig hadoopConfig = ( HadoopClusterConfig ) hiveManager.getHadoopManager();
-        if ( hadoopConfig == null ){
+
+        if ( hadoopClusterConfig == null ){
             throw new ClusterSetupException( "Could not find Hadoop cluster " + config.getHadoopClusterName() );
         }
 
@@ -54,12 +54,12 @@ class SetupStrategyOverHadoop extends HiveSetupStrategy
         Set<UUID> allNodes = new HashSet<>( config.getClients() );
         allNodes.add( config.getServer() );
 
-        if ( !hadoopConfig.getAllNodes().containsAll( allNodes ) )
+        if ( !hadoopClusterConfig.getAllNodes().containsAll( allNodes ) )
         {
             throw new ClusterSetupException(
                     "Not all nodes belong to Hadoop cluster " + config.getHadoopClusterName() );
         }
-        config.setHadoopNodes( new HashSet<>( hadoopConfig.getAllNodes() ) );
+        config.setHadoopNodes( new HashSet<>( hadoopClusterConfig.getAllNodes() ) );
 
         // check if already installed
         for ( UUID uuid : config.getAllNodes() ){

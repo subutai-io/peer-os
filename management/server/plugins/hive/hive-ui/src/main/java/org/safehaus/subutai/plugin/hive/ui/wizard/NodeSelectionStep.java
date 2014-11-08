@@ -146,7 +146,7 @@ public class NodeSelectionStep extends Panel
                         .getContainerHostByUUID( config.getServer() ).getAgent();
                     }
                     else {
-                        selected = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() )
+                        selected = environmentManager.getEnvironmentByUUID( hc.getEnvironmentId() )
                                                      .getContainerHostByUUID( hc.getNameNode() ).getAgent();
                     }
 
@@ -213,9 +213,9 @@ public class NodeSelectionStep extends Panel
         List<UUID> slaves = hadoopInfo.getAllSlaveNodes();
         for ( UUID uuid : hadoopInfo.getAllNodes() )
         {
-            serverNode.addItem( getHost( config , uuid ).getHostname() );
+            serverNode.addItem( getHost( hadoopInfo , uuid ).getId() );
             // TODO
-            String caption =getHost( config , uuid ).getHostname();
+            String caption = getHost( hadoopInfo , uuid ).getHostname();
             if ( hadoopInfo.getJobTracker().equals( uuid ) )
             {
                 caption += " [JobTracker]";
@@ -232,7 +232,7 @@ public class NodeSelectionStep extends Panel
             {
                 caption += " [Slave Node]";
             }
-            serverNode.setItemCaption( uuid, caption );
+            serverNode.setItemCaption( getHost( hadoopInfo, uuid ).getId(), caption );
         }
         if ( selected != null )
         {
@@ -241,8 +241,8 @@ public class NodeSelectionStep extends Panel
     }
 
 
-    private ContainerHost getHost( HiveConfig hiveConfig, UUID uuid ){
-        return environmentManager.getEnvironmentByUUID( hiveConfig.getEnvironmentId() ).getContainerHostByUUID( uuid );
+    private ContainerHost getHost( HadoopClusterConfig config, UUID uuid ){
+        return environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHostByUUID( uuid );
     }
 
     private void filterNodes( final ComboBox serverNode )
@@ -369,6 +369,7 @@ public class NodeSelectionStep extends Panel
             }
             else
             {
+                wizard.setHadoopConfig( hadoop.getCluster( config.getHadoopClusterName() ) );
                 wizard.next();
             }
         }

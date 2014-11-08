@@ -28,7 +28,7 @@ public class Wizard
     private final Tracker tracker;
     private int step = 1;
     private HiveConfig config = new HiveConfig();
-    private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
+    private HadoopClusterConfig hadoopConfig;
 
 
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -120,5 +120,11 @@ public class Wizard
     public HadoopClusterConfig getHadoopConfig()
     {
         return hadoopConfig;
+    }
+
+
+    public void setHadoopConfig( final HadoopClusterConfig hadoopConfig )
+    {
+        this.hadoopConfig = hadoopConfig;
     }
 }
