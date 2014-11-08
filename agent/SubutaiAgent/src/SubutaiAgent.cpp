@@ -306,9 +306,20 @@ int main(int argc,char *argv[],char *envp[])
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","PS execution operation is starting.."));
                         SubutaiThread* subprocess = new SubutaiThread;
                         subprocess->getLogger().setLogLevel(logMain.getLogLevel());
+                        if (!target_container) {
                         command.setCommand("for i in `ps aux | grep '[s]h -c' | awk -F \" \" '{print $2}'`; do ps aux | grep `pgrep -P $i` | sed '/grep/d' ; done 2> /dev/null");
                         command.setWorkingDirectory("/");
+                        } else {
+                            string cmdline = "for i in `ps aux | grep '[s]h -c' | awk -F \" \" '{print $2}'`; do ps aux | grep `pgrep -P $i` | sed '/grep/d' ; done 2> /dev/null";
+                            target_container->PutToFile("/opt/psrun", cmdline);
+                            vector<string> chmod;
+                            chmod.push_back("+x");
+                            chmod.push_back("/opt/psrun");
+                            target_container->RunProgram("chmod", chmod);
+                            command.setCommand("/opt/psrun");
+                        }
                         subprocess->threadFunction(&messageQueue,&command,argv);
+
                         delete subprocess;
 
                     }
