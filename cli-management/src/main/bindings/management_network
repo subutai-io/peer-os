@@ -35,7 +35,7 @@ Usage:   List opened n2n Tunnels
         "subutai \[-qh\] management_network -L
 
 Usage:   Remove a n2n Tunnel                 
-        "subutai \[-qh\] management_network -R INTERFACENAME
+        "subutai \[-qh\] management_network -R COMMUNITYNAME INTERFACENAME
 ******************************************************************************
 Usage:   Create a gateway tap device                 
         "subutai \[-qh\] management_network -T INTERFACENAME VLANIP/SUBNET VLANID
@@ -455,7 +455,22 @@ function management_network {
      
    fi
 
-  if [ "true" == "$createGateway" ]; then
+   if [ "true" == "$listN2NTunnel" ]; then
+      result=`echo -e "ServerIP \t Port \t LocalInterface \t Community \t LocalPeerIP "`
+      echo $result
+      ps aux | awk 'BEGIN {FS="\n"; RS="";ORS=""}{x=1;y=1;while ( x<NF ){Array[x]=$x; x++;}for(i=0; i<NF;i++){if(Array[i] ~ /edge/){split(Array[i],a,"\edge\ -l ");split(a[2],b,"\ ");for (x in b){if( x == 7 ||  b[x] ~ /-/ );else if( b[x] ~ /:/ ){split(b[x],c,":");print c[1]"\t"c[2]"\t";}else{ print b[x]"\t";}}print "\n";}}}'
+   fi
+
+   if [ "true" == "$removeN2NTunnel" ]; then
+     kill -9 `ps aux | grep -e "-c $1" | grep -e "-d $2" | grep -v "\-\-color" | awk -F" " '{print $2}'` > /dev/null 2>&1
+     if [ "$?" != "0" ]; then
+       msg_error "Removing Tunnel Failed!"
+       show_usage "`management_network_usage`"
+     fi
+     msg_ok "N2N Tunnel Removed!"
+   fi
+
+   if [ "true" == "$createGateway" ]; then
       ipAdd="$1"
       vlanID=$2
       if [ -z "$ipAdd" ]; then
