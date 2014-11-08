@@ -122,9 +122,7 @@ string SubutaiThread::createExecString(SubutaiCommand *command)
  *
  */
 bool SubutaiThread::ExecuteCommand(SubutaiCommand* command, SubutaiContainer* container) {
-    cout << "in of exec" << endl;
     container->RunCommand(command);
-    cout << "in exec running" << endl;
 }
 
 /**
@@ -761,9 +759,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                 //executing the process on background
                 system(createExecString(command).c_str());
             } else {
-                cout << "in of not deamon" << endl;
                 container->RunCommand(command);
-                cout << "out of not deamon" << endl;
             }
             //parent returns with success if the daemon successfully send to process to background
             string message = this->getResponse().createExitMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(),
@@ -809,10 +805,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                     val = system(createExecString(command).c_str());
                 } else {
                     logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is starting!! on a container", "pid", pidchldnumstr));
-
-                    cout << "in of deamon" << endl;
                     container->RunCommand(command);
-                    cout << "out of deamon" << endl;
                 }
                 close(ret[0]);
                 write(ret[1], &val, sizeof(val));

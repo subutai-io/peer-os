@@ -68,40 +68,33 @@ class SubutaiContainer
         SubutaiContainer(SubutaiLogger*, lxc_container* cont);
         virtual ~SubutaiContainer(void);
         bool getContainerId();
-        bool getContainerMacAddresses();
-        bool getContainerHostname();
-        //bool getContainerParentHostname();
-        bool getContainerIpAddress();
         void tryLongCommand();
-        string getContainerIdValue();
-        string getContainerHostnameValue();
-        string getContainerMacAddressValue(string);
-        //string getContainerParentHostnameValue();
-        string getContainerConnectionUrlValue();
-        string getContainerConnectionPortValue();
-        string getContainerConnectionOptionsValue();
-        lxc_container* getLxcContainerValue();
-        vector<string> getContainerIpValue();
-        string getContainerStatus();
-        bool isContainerRunning();
-        bool isContainerStopped();
-        bool isContainerFrozen();
         void UpdateUsersList();
+        bool getContainerIpAddress();
+        void getContainerAllFields();
+        bool getContainerMacAddresses();
         void setContainerHostname(string);
         void setContainerStatus(containerStatus);
-        void getContainerAllFields();
-        ExecutionResult RunCommand(SubutaiCommand* command);
-        string RunProgram(string , vector<string>);
-        ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT, bool captureOutput = true);
         void write();
         void clear();
         bool checkCWD(string cwd);
         bool checkUser(string username);
         int getRunAsUserId(string username);
         void PutToFile(string filename, string text);
-        string findFullProgramPath(string program_name);
 
+        vector<string> getContainerIpValue();
+        lxc_container* getLxcContainerValue();
+        string getContainerStatus();
+        string getContainerIdValue();
+        string getContainerHostnameValue();
+        string getContainerMacAddressValue(string);
         string RunPsCommand();
+
+        string findFullProgramPath(string );
+        string RunProgram(string , vector<string>);
+        ExecutionResult RunCommand(SubutaiCommand* command);
+        ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT, bool captureOutput = true);
+
 
     protected:
         vector<string> ExplodeCommandArguments(SubutaiCommand* command);

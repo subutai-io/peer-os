@@ -43,11 +43,8 @@ class SubutaiHelper
 		vector<string> splitResult(string, char*);
 		vector<string> runAndSplit(char*, char*, char* );
 		string toString(int);
-    protected:
-
-    private:
-
 };
+
 #endif /* SUBUTAIHELPER_H_ */
 
 

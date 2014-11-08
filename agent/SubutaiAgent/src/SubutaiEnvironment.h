@@ -79,7 +79,6 @@ private:
 	string hostname;
 	string parentHostname;
 	string environmentId;
-	//int islxc;
 	vector<string> ipAddress;
 	SubutaiLogger*	environmentLogger;
 	SubutaiHelper _helper;

@@ -65,7 +65,6 @@ void SubutaiContainer::clear()
 string SubutaiContainer::RunProgram(string program, vector<string> params) 
 {
     ExecutionResult result = RunProgram(program, params, true, LXC_ATTACH_OPTIONS_DEFAULT);
-    //cout << result.out << endl;
     if (result.exit_code == 0) {
         return result.out;
     } else {
@@ -147,33 +146,6 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>","Program executed: ", program));
     cout << "result: " << result.out << endl;
     return result;
-}
-
-/**
- * return true if container is running, false otherwise
- */
-bool SubutaiContainer::isContainerRunning()
-{
-    if (this->status == RUNNING) return true;
-    return false;
-}
-
-/**
- * return true if container is stopped, false otherwise
- */
-bool SubutaiContainer::isContainerStopped()
-{
-    if (this->status == STOPPED) return true;
-    return false;
-}
-
-/**
- * return true if container is frozen, false otherwise
- */
-bool SubutaiContainer::isContainerFrozen()
-{
-    if (this->status == FROZEN) return true;
-    return false;
 }
 
 
@@ -396,13 +368,19 @@ void SubutaiContainer::getContainerAllFields()
 
 ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command) 
 {
+	// set default lxc attach options
     lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT;
+
+    // set working directory for lxc_attach
     if (command->getWorkingDirectory() != "" && checkCWD(command->getWorkingDirectory())) {
         opts.initial_cwd = const_cast<char*>(command->getWorkingDirectory().c_str());
     }
+
+    // set run as parameter
     if (command->getRunAs() != "" && checkUser(command->getRunAs())) {
         opts.uid = getRunAsUserId(command->getRunAs());
     }
+
     // Settings env variables
     list< pair<string, string> >::iterator it;
     int i = 0;
@@ -411,24 +389,18 @@ ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command)
         ss << it->first << "=" << it->second;
         strcpy(opts.extra_env_vars[i], ss.str().c_str());
     }
+
+    // divide program and arguments if all arguments are given in program field of command
     vector<string> pr = ExplodeCommandArguments(command);
-    bool hasProgram = false;
-    string program;
+    string program = pr[0];
     vector<string> args;
-    for (vector<string>::iterator it = pr.begin(); it != pr.end(); it++) {
-        if (!hasProgram) {
-            program = (*it);
-            hasProgram = true;
-            continue;
-        } 
+    for (vector<string>::iterator it = pr.begin()+1; it != pr.end(); it++) {
         args.push_back((*it));
     }
-    vector<string> full_args;
-    full_args.reserve(args.size() + command->getArguments().size());
-    full_args.insert(full_args.end(), args.begin(), args.end());
-    full_args.insert(full_args.end(), command->getArguments().begin(), command->getArguments().end());
+
+    // execute program on LXC
     ExecutionResult res = RunProgram(program, args, true, opts, false);
-    cout <<"result: " << res.out << endl;
+
     return res;
 }
 
@@ -451,7 +423,6 @@ bool SubutaiContainer::checkCWD(string cwd)
  * /details     Runs throught the list of userid:username pairs
  *              and check user existence
  */
-
 bool SubutaiContainer::checkUser(string username) 
 {
     if (_users.empty()) {
@@ -464,6 +435,7 @@ bool SubutaiContainer::checkUser(string username)
     } 
     return false;
 }
+
 
 /*
  * /details     Runs through the list of userid:username pairs
@@ -503,7 +475,7 @@ string SubutaiContainer::findFullProgramPath(string program_name)
     vector<string> args;
     args.push_back(program_name);
     string locations = RunProgram("whereis", args);
-    return locations; // TODO: Parse whereis output
+    return _helper.splitResult(program_name, "\n")[1];
 }
 
 /**
@@ -538,7 +510,7 @@ vector<string> SubutaiContainer::ExplodeCommandArguments(SubutaiCommand* command
 }
 
 /**
- * For testinf purpose
+ * For testing purpose
  *
  * Test if long commands with && can run or not:
  * It waits until all the commands run to return.
@@ -551,13 +523,3 @@ void SubutaiContainer::tryLongCommand() {
     cout << RunProgram("/bin/bash", args) << endl;
 }
 
-
-/*
-   void SubutaiContainer::registerContainer(SubutaiConnection* connection)
-   {
-   SubutaiResponsePack response;
-   getContainerAllFields();
-   string sendout = response.createRegistrationMessage(this->id, this->macAddress, this->hostname, this->parentHostname, "", this->ipAddress);
-   containerLogger->writeLog(7, containerLogger->setLogData("<SubutaiAgent>","Registration Message:", sendout));
-   connection->sendMessage(sendout);
-   }*/
