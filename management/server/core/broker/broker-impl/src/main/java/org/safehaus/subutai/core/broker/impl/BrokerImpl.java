@@ -34,8 +34,8 @@ public class BrokerImpl implements Broker
 {
     private static final Logger LOG = LoggerFactory.getLogger( BrokerImpl.class.getName() );
 
-    private MessageRoutingListener messageRouter;
-    private PooledConnectionFactory pool;
+    protected MessageRoutingListener messageRouter;
+    protected PooledConnectionFactory pool;
     private String brokerUrl;
     private int maxBrokerConnections;
     private boolean isPersistent;
@@ -47,6 +47,7 @@ public class BrokerImpl implements Broker
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( brokerUrl ), "Invalid broker URL" );
         Preconditions.checkArgument( maxBrokerConnections > 0, "Max broker connections number must be greater than 0" );
+        Preconditions.checkArgument( messageTimeout > 0, "Message timeout must be greater than 0" );
 
         this.brokerUrl = brokerUrl;
         this.maxBrokerConnections = maxBrokerConnections;
@@ -119,7 +120,7 @@ public class BrokerImpl implements Broker
     }
 
 
-    private void setupRouter() throws BrokerException
+    protected void setupRouter() throws BrokerException
     {
         try
         {
