@@ -293,7 +293,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                     ContainerHost containerHost =
                             resourceHost.createContainer( creatorPeerId, environmentId, templates, cloneName );
                     containerHost.setNodeGroupName( nodeGroupName );
-                            resourceHost.createContainer( creatorPeerId, environmentId, templates, cloneName );
+                    resourceHost.createContainer( creatorPeerId, environmentId, templates, cloneName );
                     resourceHost.addContainerHost( containerHost );
                     result.add( containerHost );
                     peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
@@ -503,12 +503,13 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public boolean isConnected( final Host host ) throws PeerException
+    public boolean isConnected( final Host aHost ) throws PeerException
     {
+        Host host = bindHost( aHost.getId() );
         if ( host instanceof ContainerHost )
         {
-            return ContainerState.RUNNING.equals( ( ( ContainerHost ) host ).getState() ) && checkHeartbeat(
-                    host.getLastHeartbeat() );
+            boolean b = checkHeartbeat( host.getLastHeartbeat() );
+            return ContainerState.RUNNING.equals( ( ( ContainerHost ) host ).getState() ) && b;
         }
         else
         {
@@ -648,19 +649,21 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host host )
+            throws PeerException, CommandException
     {
         return execute( requestBuilder, host, null );
     }
 
 
     @Override
-    public CommandResult execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
-            throws CommandException
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host aHost,
+                                  final CommandCallback callback ) throws PeerException, CommandException
     {
+        Host host = bindHost( aHost.getId() );
         if ( !host.isConnected() )
         {
-            throw new CommandException( "Host disconnected." );
+            throw new PeerException( "Host disconnected." );
         }
         Agent agent = host.getAgent();
         Command command = commandRunner.createCommand( requestBuilder, Sets.newHashSet( agent ) );
@@ -693,9 +696,10 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
-            throws CommandException
+    public void executeAsync( final RequestBuilder requestBuilder, final Host aHost, final CommandCallback callback )
+            throws PeerException, CommandException
     {
+        Host host = bindHost( aHost.getId() );
         if ( !host.isConnected() )
         {
             throw new CommandException( "Host disconnected." );
@@ -719,7 +723,8 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host )
+            throws PeerException, CommandException
     {
         executeAsync( requestBuilder, host, null );
     }
