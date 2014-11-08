@@ -235,10 +235,10 @@ int main(int argc,char *argv[],char *envp[])
             /*
              * In 30 second periods send heartbeat and in_queue responses.
              */
-                timer.checkHeartBeatTimer(command);
-                timer.checkCommandQueueInfoTimer(command);
-                command.clear();
-            for (list<int>::iterator iter = pidList.begin(); iter != pidList.end();iter++) {
+            timer.checkHeartBeatTimer(command);
+            timer.checkCommandQueueInfoTimer(command);
+            command.clear();
+            for (list<int>::iterator iter = pidList.begin(); iter != pidList.end(); iter++) {
                 if (pidList.begin() != pidList.end()) {
                     int status;
                     pid_t result = waitpid(*iter, &status, WNOHANG);
@@ -314,75 +314,75 @@ int main(int argc,char *argv[],char *envp[])
                     }
                     else if (command.getType() == "TERMINATE_REQUEST")
                     {
-                    	int retstatus; string resp;
-						logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",helper.toString(command.getPid())));
-						logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID.."));
+                        int retstatus; string resp;
+                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",helper.toString(command.getPid())));
+                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID.."));
 
-						if (command.getPid() > 0)
-						{
-							if( isLocal)
-							{
-								retstatus = kill(command.getPid(),SIGKILL);
-								resp = response.createTerminateMessage(environment.getAgentUuidValue(),
-										command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
-							}
-							else
-							{
-								command.setCommand("/bin/kill -9 " + helper.toString(command.getPid()) );
-								ExecutionResult execResult = target_container->RunCommand(&command);
-								retstatus  = execResult.exit_code;
+                        if (command.getPid() > 0)
+                        {
+                            if( isLocal)
+                            {
+                                retstatus = kill(command.getPid(),SIGKILL);
+                                resp = response.createTerminateMessage(environment.getAgentUuidValue(),
+                                        command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
+                            }
+                            else
+                            {
+                                command.setCommand("/bin/kill -9 " + helper.toString(command.getPid()) );
+                                ExecutionResult execResult = target_container->RunCommand(&command);
+                                retstatus  = execResult.exit_code;
 
-								resp = response.createTerminateMessage(target_container->getContainerIdValue(),
-										command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
-							}
+                                resp = response.createTerminateMessage(target_container->getContainerIdValue(),
+                                        command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
+                            }
 
-							cout << "msg: " << resp << endl;
-							connection->sendMessage(resp);
+                            cout << "msg: " << resp << endl;
+                            connection->sendMessage(resp);
 
-							if (retstatus == 0) //termination is successfully done
-								logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
-							else //termination is failed
-								logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", helper.toString(command.getPid())));
-						}
-						else
-						{
-							logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Irrelevant Terminate Request"));
-						}
+                            if (retstatus == 0) //termination is successfully done
+                                logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
+                            else //termination is failed
+                                logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", helper.toString(command.getPid())));
+                        }
+                        else
+                        {
+                            logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Irrelevant Terminate Request"));
+                        }
                     }/*
-                    else if (command.getType()=="INOTIFY_CREATE_REQUEST")
-                    {
+                        else if (command.getType()=="INOTIFY_CREATE_REQUEST")
+                        {
 
                         logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","executing INOTIFY_REQUEST.."));
                         for (unsigned int i=0; i<command.getWatchArguments().size();i++) {
-                            Watcher.addWatcher(command.getWatchArguments()[i]);
-                            logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","adding Watcher: ",
-                                        command.getWatchArguments()[i]));
+                        Watcher.addWatcher(command.getWatchArguments()[i]);
+                        logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","adding Watcher: ",
+                        command.getWatchArguments()[i]));
                         }
                         Watcher.stats();
                         sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(), response.getConfPoints());
                         connection->sendMessage(sendout);
                         Watcher.stats();
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));
-                    } else if (command.getType() == "INOTIFY_REMOVE_REQUEST") {
+                        } else if (command.getType() == "INOTIFY_REMOVE_REQUEST") {
                         logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "executing INOTIFY_CANCEL_REQUEST.."));
                         for (unsigned int i = 0; i < command.getWatchArguments().size(); i++) {
-                            Watcher.eraseWatcher(command.getWatchArguments()[i]);
-                            logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Erasing Watcher: ",
-                                        command.getWatchArguments()[i]));
+                        Watcher.eraseWatcher(command.getWatchArguments()[i]);
+                        logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Erasing Watcher: ",
+                        command.getWatchArguments()[i]));
                         }
                         Watcher.stats();
                         sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(), response.getConfPoints());
                         connection->sendMessage(sendout);
                         Watcher.stats();
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));
-                    } else if (command.getType() == "INOTIFY_LIST_REQUEST") {
+                        } else if (command.getType() == "INOTIFY_LIST_REQUEST") {
                         logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "executing INOTIFY_SHOW_REQUEST.."));
                         Watcher.stats();
                         sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(),response.getConfPoints());
                         connection->sendMessage(sendout);
                         Watcher.stats();
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));
-                    }*/
+                        }*/
                 } else {
                     logMain.writeLog(3, logMain.setLogData("<SubutaiAgent>","Failed to parsing JSON String: ", input));
                     if (input.size() >= 10000) {
