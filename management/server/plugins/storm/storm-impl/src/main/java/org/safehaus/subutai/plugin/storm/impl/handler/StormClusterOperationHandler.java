@@ -34,7 +34,7 @@ import com.google.common.base.Strings;
 /**
  * This class handles operations that are related to whole cluster.
  */
-public class StormClusterOperationHandler extends AbstractOperationHandler<StormImpl>
+public class StormClusterOperationHandler extends AbstractOperationHandler<StormImpl, StormClusterConfiguration>
         implements ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( StormClusterOperationHandler.class.getName() );

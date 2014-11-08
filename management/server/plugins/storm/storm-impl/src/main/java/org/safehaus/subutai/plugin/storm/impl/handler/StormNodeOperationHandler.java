@@ -27,7 +27,7 @@ import com.google.common.base.Preconditions;
  *
  * TODO: add nodes and delete node operation should be implemented.
  */
-public class StormNodeOperationHandler extends AbstractOperationHandler<StormImpl>
+public class StormNodeOperationHandler extends AbstractOperationHandler<StormImpl, StormClusterConfiguration>
 {
 
     private String clusterName;
