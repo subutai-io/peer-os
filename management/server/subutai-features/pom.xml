@@ -278,6 +278,17 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- broker -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>broker-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>broker-impl</artifactId>
+    </dependency>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- monitor -->
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -488,7 +499,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>elasticsearch-plugin-ui</artifactId>
     </dependency>
-
 
     <!-- HADOOP -->
     <dependency>
