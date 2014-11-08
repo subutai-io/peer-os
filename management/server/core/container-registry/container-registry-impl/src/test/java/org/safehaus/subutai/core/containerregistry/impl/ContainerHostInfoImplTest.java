@@ -18,11 +18,11 @@ public class ContainerHostInfoImplTest
 
     private static final String HOSTNAME = "container1";
     private static final UUID ID = UUID.randomUUID();
-    private static final ContainerHostState status = ContainerHostState.FROZEN;
+    private static final ContainerHostState CONTAINER_STATUS = ContainerHostState.FROZEN;
     private static final String IP = "127.0.0.1";
     private static final String INFO_JSON =
             String.format( "{ \"hostname\":\"%s\", \"id\":\"%s\", \"ips\" : [\"%s\"], \"status\":\"%s\" }", HOSTNAME,
-                    ID, IP, status );
+                    ID, IP, CONTAINER_STATUS );
 
 
     ContainerHostInfoImpl containerHostInfo;
@@ -41,7 +41,7 @@ public class ContainerHostInfoImplTest
         assertEquals( HOSTNAME, containerHostInfo.getHostname() );
         assertEquals( ID, containerHostInfo.getId() );
         assertEquals( IP, containerHostInfo.getIps().iterator().next() );
-        assertEquals( status, containerHostInfo.getStatus() );
+        assertEquals( CONTAINER_STATUS, containerHostInfo.getStatus() );
     }
 
 
@@ -53,7 +53,7 @@ public class ContainerHostInfoImplTest
         assertThat( toString, containsString( HOSTNAME ) );
         assertThat( toString, containsString( IP ) );
         assertThat( toString, containsString( ID.toString() ) );
-        assertThat( toString, containsString( status.name() ) );
+        assertThat( toString, containsString( CONTAINER_STATUS.name() ) );
     }
 }
 
