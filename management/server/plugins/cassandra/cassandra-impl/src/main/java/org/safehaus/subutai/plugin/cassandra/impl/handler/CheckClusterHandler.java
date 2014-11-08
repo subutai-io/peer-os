@@ -15,7 +15,7 @@ import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 
 
-public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
+public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl, CassandraClusterConfig>
 {
 
     private static final Logger LOG = Logger.getLogger( CheckClusterHandler.class.getName() );

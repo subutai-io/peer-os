@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl>
+public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl, CassandraClusterConfig>
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( StopClusterHandler.class.getName() );

@@ -17,8 +17,8 @@ import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeType;
-import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.common.ui.AddNodeWindow;
 import org.safehaus.subutai.plugin.common.ui.BaseManager;
 import org.safehaus.subutai.plugin.common.ui.OperationTask;
@@ -532,14 +532,14 @@ public class Manager extends BaseManager
                 checkButton.setEnabled( false );
                 Agent agent = getAgentByRow( row );
 
-                OperationType operationType;
+                NodeOperationType operationType;
                 if ( !isRunning )
                 {
-                    operationType = OperationType.Start;
+                    operationType = NodeOperationType.Start;
                 }
                 else
                 {
-                    operationType = OperationType.Stop;
+                    operationType = NodeOperationType.Stop;
                 }
                 executorService.execute(
                         new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
@@ -671,10 +671,10 @@ public class Manager extends BaseManager
                 checkButton.setEnabled( false );
                 Agent agent = getAgentByRow( row );
 
-                OperationType operationType;
+                NodeOperationType operationType;
                 if ( !isRunning )
                 {
-                    operationType = OperationType.Start;
+                    operationType = NodeOperationType.Start;
 
                     executorService.execute(
                             new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
@@ -706,10 +706,10 @@ public class Manager extends BaseManager
                 checkButton.setEnabled( false );
                 Agent agent = getAgentByRow( row );
 
-                OperationType operationType;
+                NodeOperationType operationType;
                 if ( !isRunning )
                 {
-                    operationType = OperationType.Stop;
+                    operationType = NodeOperationType.Stop;
 
                     executorService.execute(
                             new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
@@ -739,7 +739,7 @@ public class Manager extends BaseManager
                 checkButton.setEnabled( false );
                 Agent agent = getAgentByRow( row );
 
-                OperationType operationType = OperationType.Status;
+                NodeOperationType operationType = NodeOperationType.Status;
                 executorService.execute(
                         new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
                                 startStopCheckCompleteEvent( row ), null, agent ) );
