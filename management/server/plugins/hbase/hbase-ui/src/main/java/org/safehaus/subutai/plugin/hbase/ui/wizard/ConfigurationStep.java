@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
@@ -202,16 +203,16 @@ public class ConfigurationStep extends Panel
         {
             HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
             config.setHadoopClusterName( hadoopInfo.getClusterName() );
-            config.setHadoopNameNode( hadoopInfo.getNameNode().getHostname() );
+            config.setHadoopNameNode( hadoopInfo.getNameNode().toString() );
 
             /** fill all tables  */
-            regionServers.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
-            quorumPeers.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
-            backUpMasters.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
-            for ( Agent agent : hadoopInfo.getAllNodes() )
+            regionServers.setContainerDataSource( new BeanItemContainer<>( UUID.class, hadoopInfo.getAllNodes() ) );
+            quorumPeers.setContainerDataSource( new BeanItemContainer<>( UUID.class, hadoopInfo.getAllNodes() ) );
+            backUpMasters.setContainerDataSource( new BeanItemContainer<>( UUID.class, hadoopInfo.getAllNodes() ) );
+            for ( UUID agent : hadoopInfo.getAllNodes() )
             {
                 masterNodeCombo.addItem( agent );
-                masterNodeCombo.setItemCaption( agent, agent.getHostname() );
+                masterNodeCombo.setItemCaption( agent, agent.toString() );
             }
         }
 
@@ -225,27 +226,27 @@ public class ConfigurationStep extends Panel
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     regionServers.setValue( null );
                     regionServers
-                            .setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                            .setContainerDataSource( new BeanItemContainer<>( UUID.class, hadoopInfo.getAllNodes() ) );
 
                     quorumPeers.setValue( null );
                     quorumPeers
-                            .setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                            .setContainerDataSource( new BeanItemContainer<>( UUID.class, hadoopInfo.getAllNodes() ) );
 
                     backUpMasters.setValue( null );
                     backUpMasters
-                            .setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                            .setContainerDataSource( new BeanItemContainer<>( UUID.class, hadoopInfo.getAllNodes() ) );
 
                     masterNodeCombo.setValue( null );
                     masterNodeCombo.removeAllItems();
-                    for ( Agent agent : hadoopInfo.getAllNodes() )
+                    for ( UUID agent : hadoopInfo.getAllNodes() )
                     {
                         masterNodeCombo.addItem( agent );
-                        masterNodeCombo.setItemCaption( agent, agent.getHostname() );
+                        masterNodeCombo.setItemCaption( agent, agent.toString() );
                     }
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
-                    config.setRegionServers( new HashSet<Agent>() );
-                    config.setQuorumPeers( new HashSet<Agent>() );
-                    config.setBackupMasters( new HashSet<Agent>() );
+                    config.setRegionServers( new HashSet<UUID>() );
+                    config.setQuorumPeers( new HashSet<UUID>() );
+                    config.setBackupMasters( new HashSet<UUID>() );
                     config.setHbaseMaster( null );
                 }
             }
@@ -258,7 +259,7 @@ public class ConfigurationStep extends Panel
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Agent master = ( Agent ) event.getProperty().getValue();
+                    UUID master = ( UUID ) event.getProperty().getValue();
                     config.setHbaseMaster( master );
 
 
@@ -267,12 +268,12 @@ public class ConfigurationStep extends Panel
                     {
                         config.getBackupMasters().remove( master );
                     }
-                    List<Agent> hadoopNodes = hadoopInfo.getAllNodes();
+                    List<UUID> hadoopNodes = hadoopInfo.getAllNodes();
                     hadoopNodes.remove( master );
 
                     /** fill region servers table */
                     regionServers.getContainerDataSource().removeAllItems();
-                    for ( Agent agent : hadoopNodes )
+                    for ( UUID agent : hadoopNodes )
                     {
                         regionServers.getContainerDataSource().addItem( agent );
                     }
@@ -292,7 +293,7 @@ public class ConfigurationStep extends Panel
 
                     /** fill quorum peers servers table */
                     quorumPeers.getContainerDataSource().removeAllItems();
-                    for ( Agent agent : hadoopNodes )
+                    for ( UUID agent : hadoopNodes )
                     {
                         quorumPeers.getContainerDataSource().addItem( agent );
                     }
@@ -311,7 +312,7 @@ public class ConfigurationStep extends Panel
 
                     /** fill back up master servers table */
                     backUpMasters.getContainerDataSource().removeAllItems();
-                    for ( Agent agent : hadoopNodes )
+                    for ( UUID agent : hadoopNodes )
                     {
                         backUpMasters.getContainerDataSource().addItem( agent );
                     }
@@ -358,7 +359,7 @@ public class ConfigurationStep extends Panel
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Set<Agent> agentList = new HashSet<>( ( Collection<Agent> ) event.getProperty().getValue() );
+                    Set<UUID> agentList = new HashSet<>( ( Collection<UUID> ) event.getProperty().getValue() );
                     config.setRegionServers( agentList );
                 }
             }
@@ -371,7 +372,7 @@ public class ConfigurationStep extends Panel
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Set<Agent> agentList = new HashSet<>( ( Collection<Agent> ) event.getProperty().getValue() );
+                    Set<UUID> agentList = new HashSet<>( ( Collection<UUID> ) event.getProperty().getValue() );
                     config.setQuorumPeers( agentList );
                 }
             }
@@ -385,7 +386,7 @@ public class ConfigurationStep extends Panel
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Set<Agent> agentList = new HashSet<>( ( Collection<Agent> ) event.getProperty().getValue() );
+                    Set<UUID> agentList = new HashSet<>( ( Collection<UUID> ) event.getProperty().getValue() );
                     config.setBackupMasters( agentList );
                 }
             }
