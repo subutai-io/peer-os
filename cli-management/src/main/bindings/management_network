@@ -30,7 +30,7 @@ echo
 echo Usage:   Create a n2n Tunnel                 
 echo "        "subutai \[-qh\] management_network -N SUPERNODEIPADDRESS INTERFACENAME COMMUNITYNAME LOCALPEERIPADDRESS
 echo
-echo Usage:   List opened n2n Tunnel                 
+echo Usage:   List opened n2n Tunnels                 
 echo "        "subutai \[-qh\] management_network -L
 echo
 echo Usage:   Remove a n2n Tunnel                 
@@ -63,9 +63,13 @@ function management_network {
   local deleteFlow="false"
   local showFlow="false"
   local showPort="false"
+  local createN2NTunnel="false"
+  local listN2NTunnel="false"
+  local removeN2NTunnel="false"
+  
 
   shift_amount=0;
-  while getopts ":clrbfspd:" opt; do
+  while getopts ":clrbfspdNLR:" opt; do
      case $opt in
        c)
 	 createTunnel="true"	
@@ -98,7 +102,18 @@ function management_network {
          showPort="true"
          shift
          ;;
-
+       N)
+         createN2NTunnel="true"
+         shift
+         ;;
+       L)
+         listN2NTunnel="true"
+         shift
+         ;;
+       $)
+         removeN2NTunnel="true"
+         shift
+         ;;
        \?)
           msg_error "Unrecognized option -$OPTARG"
           show_usage "`management_network_usage`"
