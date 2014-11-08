@@ -126,4 +126,16 @@ public class Environment
         }
         return hosts;
     }
+
+
+    public void addContainers( final Set<ContainerHost> containerHosts )
+    {
+        this.containers.addAll( containerHosts );
+    }
+
+
+    public void removeContainer( final ContainerHost containerHost )
+    {
+        this.containers.remove( containerHost );
+    }
 }

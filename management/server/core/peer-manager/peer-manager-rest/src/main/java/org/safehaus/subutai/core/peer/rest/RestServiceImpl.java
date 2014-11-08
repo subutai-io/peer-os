@@ -176,7 +176,8 @@ public class RestServiceImpl implements RestService
 
     @Override
     public Response createContainers( final String ownerPeerId, final String environmentId, final String templates,
-                                      final int quantity, final String strategyId, final String criteria )
+                                      final int quantity, final String strategyId, final String criteria,
+                                      final String nodeGroupName )
     {
 
         //TODO: Implement criteria restoring
@@ -188,7 +189,7 @@ public class RestServiceImpl implements RestService
                     .createContainers( UUID.fromString( ownerPeerId ), UUID.fromString( environmentId ),
                             ( List<Template> ) JsonUtil.fromJson( templates, new TypeToken<List<Template>>()
                             {
-                            }.getType() ), quantity, strategyId, criteriaList );
+                            }.getType() ), quantity, strategyId, criteriaList, nodeGroupName );
             return Response.ok( JsonUtil.toJson( result ) ).build();
             //            return Response.ok().entity( result ).build();
         }
