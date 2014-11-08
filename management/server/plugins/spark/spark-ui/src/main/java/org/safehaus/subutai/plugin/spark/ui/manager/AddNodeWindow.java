@@ -5,9 +5,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
@@ -34,7 +34,7 @@ public class AddNodeWindow extends Window
 
 
     public AddNodeWindow( final Executor executor, final Spark spark, final Tracker tracker,
-                          final SparkClusterConfig config, Set<Agent> nodes )
+                          final SparkClusterConfig config, Set<ContainerHost> nodes )
     {
         super( "Add New Node" );
         setModal( true );
@@ -60,7 +60,7 @@ public class AddNodeWindow extends Window
         hadoopNodes.setNullSelectionAllowed( false );
         hadoopNodes.setRequired( true );
         hadoopNodes.setWidth( 200, Unit.PIXELS );
-        for ( Agent node : nodes )
+        for ( ContainerHost node : nodes )
         {
             hadoopNodes.addItem( node );
             hadoopNodes.setItemCaption( node, node.getHostname() );
@@ -96,8 +96,8 @@ public class AddNodeWindow extends Window
             {
                 addNodeBtn.setEnabled( false );
                 showProgress();
-                Agent agent = ( Agent ) hadoopNodes.getValue();
-                final UUID trackID = spark.addSlaveNode( config.getClusterName(), agent.getHostname() );
+                ContainerHost node = ( ContainerHost ) hadoopNodes.getValue();
+                final UUID trackID = spark.addSlaveNode( config.getClusterName(), node.getHostname() );
                 ok.setEnabled( false );
                 executor.execute( new Runnable()
                 {

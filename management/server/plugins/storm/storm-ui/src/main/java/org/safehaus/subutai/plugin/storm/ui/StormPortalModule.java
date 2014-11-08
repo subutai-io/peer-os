@@ -10,7 +10,7 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -46,14 +46,14 @@ public class StormPortalModule implements PortalModule
     @Override
     public String getId()
     {
-        return StormConfig.PRODUCT_NAME;
+        return StormClusterConfiguration.PRODUCT_NAME;
     }
 
 
     @Override
     public String getName()
     {
-        return StormConfig.PRODUCT_NAME;
+        return StormClusterConfiguration.PRODUCT_NAME;
     }
 
 
