@@ -20,8 +20,8 @@ public class MessageNotifier implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( MessageNotifier.class.getName() );
 
-    private MessageListener listener;
-    private Message message;
+    protected MessageListener listener;
+    protected Message message;
 
 
     public MessageNotifier( final MessageListener listener, final Message message )

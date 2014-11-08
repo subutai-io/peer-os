@@ -23,10 +23,10 @@ public class MessageRoutingListener implements MessageListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( MessageRoutingListener.class.getName() );
 
-    private final Set<org.safehaus.subutai.core.broker.api.MessageListener> listeners = Collections
+    protected Set<org.safehaus.subutai.core.broker.api.MessageListener> listeners = Collections
             .newSetFromMap( new ConcurrentHashMap<org.safehaus.subutai.core.broker.api.MessageListener, Boolean>() );
 
-    private Executor executor = Executors.newCachedThreadPool();
+    protected Executor notifier = Executors.newCachedThreadPool();
 
 
     public void addListener( org.safehaus.subutai.core.broker.api.MessageListener listener )
@@ -64,8 +64,8 @@ public class MessageRoutingListener implements MessageListener
     }
 
 
-    private void notifyListener( org.safehaus.subutai.core.broker.api.MessageListener listener, Message message )
+    protected void notifyListener( org.safehaus.subutai.core.broker.api.MessageListener listener, Message message )
     {
-        executor.execute( new MessageNotifier( listener, message ) );
+        notifier.execute( new MessageNotifier( listener, message ) );
     }
 }
