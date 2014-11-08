@@ -2,46 +2,48 @@
 . /usr/share/subutai-cli/subutai/lib/net-ops
 
 function management_network_usage {
-echo -------------------------------------------------------------------------------
-echo Usage:   Establish a tunnnel to a subutai peer whose address information provided
-echo "        "subutai \[-qh\] management_network -c TUNNELPORTNAME TUNNELIPADDRESS TUNNELTYPE
-echo
-echo Usage:   List tunnnels on subutai management host
-echo "        "subutai \[-qh\] management_network -l
-echo
-echo Usage:   Remove selected tunnnel from subutai management host
-echo "        "subutai \[-qh\] management_network -r TUNNELPORTNAME
-echo "******************************************************************************"
-echo Usage:   Add a simple Open flow block rule to a bridge		
-echo "        "subutai \[-qh\] management_network -b BRIDGENAME PRIORITY PACKAGETYPE ACTION {NWSRC NWDST INPORT}  
-echo
-echo Usage:   Add a simple open Flow forward rule to a bridge
-echo "        "subutai \[-qh\] management_network -f BRIDGENAME PRIORITY INPORT OUTPORT NWSRC NWDST ACTION
-echo 
-echo Usage:   Show flow table informations in a brdige                
-echo "        "subutai \[-qh\] management_network -s BRIDGENAME
-echo
-echo Usage:   Show ports informations in a brdige                
-echo "        "subutai \[-qh\] management_network -p BRIDGENAME
-echo
-echo Usage:   Delete a Open flow rule from a bridge                 
-echo "        "subutai \[-qh\] management_network -d BRIDGENAME MATCHCASE
-echo "*******************************************************************************"
-echo Usage:   Create a n2n Tunnel                 
-echo "        "subutai \[-qh\] management_network -N SUPERNODEIPADDRESS SUPERNODEPORT INTERFACENAME COMMUNITYNAME LOCALPEERIPADDRESS
-echo
-echo Usage:   List opened n2n Tunnels                 
-echo "        "subutai \[-qh\] management_network -L
-echo
-echo Usage:   Remove a n2n Tunnel                 
-echo "        "subutai \[-qh\] management_network -R INTERFACENAME
-echo "******************************************************************************"
-echo Usage:   Create a gateway tap device                 
-echo "        "subutai \[-qh\] management_network -T INTERFACENAME VLANIP/SUBNET VLANID
-echo
-echo Usage:   Delete a gateway tap device                 
-echo "        "subutai \[-qh\] management_network -D INTERFACENAME
-echo -------------------------------------------------------------------------------
+cat <<EOF
+-------------------------------------------------------------------------------
+Usage:   Establish a tunnnel to a subutai peer whose address information provided
+       "subutai \[-qh\] management_network -c TUNNELPORTNAME TUNNELIPADDRESS TUNNELTYPE
+
+Usage:   List tunnnels on subutai management host
+         "subutai \[-qh\] management_network -l
+
+Usage:   Remove selected tunnnel from subutai management host
+        "subutai \[-qh\] management_network -r TUNNELPORTNAME
+*******************************************************************************
+Usage:   Add a simple Open flow block rule to a bridge		
+        "subutai \[-qh\] management_network -b BRIDGENAME PRIORITY PACKAGETYPE ACTION {NWSRC NWDST INPORT}  
+
+Usage:   Add a simple open Flow forward rule to a bridge
+        "subutai \[-qh\] management_network -f BRIDGENAME PRIORITY INPORT OUTPORT NWSRC NWDST ACTION
+ 
+Usage:   Show flow table informations in a brdige                
+        "subutai \[-qh\] management_network -s BRIDGENAME
+
+Usage:   Show ports informations in a brdige                
+        "subutai \[-qh\] management_network -p BRIDGENAME
+
+Usage:   Delete a Open flow rule from a bridge                 
+        "subutai \[-qh\] management_network -d BRIDGENAME MATCHCASE
+*******************************************************************************
+Usage:   Create a n2n Tunnel                 
+        "subutai \[-qh\] management_network -N SUPERNODEIPADDRESS SUPERNODEPORT INTERFACENAME COMMUNITYNAME LOCALPEERIPADDRESS
+
+Usage:   List opened n2n Tunnels                 
+        "subutai \[-qh\] management_network -L
+
+Usage:   Remove a n2n Tunnel                 
+        "subutai \[-qh\] management_network -R INTERFACENAME
+******************************************************************************
+Usage:   Create a gateway tap device                 
+        "subutai \[-qh\] management_network -T INTERFACENAME VLANIP/SUBNET VLANID
+
+Usage:   Delete a gateway tap device                 
+        "subutai \[-qh\] management_network -D INTERFACENAME
+-------------------------------------------------------------------------------
+EOF
 }
 
 function management_network {
@@ -176,7 +178,7 @@ function management_network {
      ovs-vsctl --may-exist add-port br-tun $tunnelPortName
      ovs-vsctl set Interface $tunnelPortName type=$tunnelType options:key=flow \
      options:remote_ip=$tunnelIpAddress
-     echo "A port of $tunnelPortName is opened type=$tunnelType and IP=$tunnelIpAddress in br-tun bridge."
+     msg_info "A port of $tunnelPortName is opened type=$tunnelType and IP=$tunnelIpAddress in br-tun bridge."
    fi
    
    if [ "true" == "$listTunnel" ]; then
@@ -204,7 +206,7 @@ function management_network {
       net_check_tunnelPortName_exist $tunnelPortName
  
       ovs-vsctl del-port $tunnelPortName
-      echo "$tunnelPortName is deleted from br-tun."
+      msg_info "$tunnelPortName is deleted from br-tun."
    fi
 
    if [ "true" == "$addBlockFlow" ]; then
@@ -261,10 +263,9 @@ function management_network {
   
          ovs-ofctl add-flow $bridgeName "priority=$priority,$packageType, in_port=$inport,nw_src=$nwsrc,nw_dst=$nwdst actions=$action"
       else
-         echo $packageType
          ovs-ofctl add-flow $bridgeName "priority=$priority,$packageType actions=$action"
       fi
-      echo "One Blocking Flow rule is added to $bridgeName"	 
+      msg_info "One Blocking Flow rule is added to $bridgeName"	 
    fi
        
    if [ "true" == "$addForwardFlow" ]; then
@@ -323,7 +324,7 @@ function management_network {
       
          
       ovs-ofctl add-flow $bridgeName "priority=$priority, ip, in_port=$inport, nw_src=$nwsrc , nw_dst=$nwdst actions=$action:$outport"
-      echo "One Forwarding flow rule is added to $bridgeName"
+      msg_info "One Forwarding flow rule is added to $bridgeName"
    fi
 
    if [ "true" == "$showFlow" ]; then
@@ -399,11 +400,11 @@ function management_network {
       if [ "$matchCase" == "all" ]; then
          ovs-ofctl del-flows $bridgeName
          message="All flows are deleted"
-         echo $message
+         msg_info $message
       else
          message="Matched flows are deleted"
          ovs-ofctl del-flows $bridgeName $matchCase
-         echo $message
+         msg_info $message
       fi
    fi
    
@@ -452,6 +453,42 @@ function management_network {
       msg_info "New Com device is created: $interfaceName"
       msg_info "New CommunityName is created: $communityName"
      
+   fi
+
+  if [ "true" == "$createGateway" ]; then
+      ipAdd="$1"
+      vlanID=$2
+      if [ -z "$ipAdd" ]; then
+         msg_error "Ip Address has not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      if [ -z "$vlanID" ]; then
+         msg_error "VLAN ID has not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      ovs-vsctl add-br br-$vlanID
+      ifconfig  br-$vlanID 192.168.1.1/24
+      ovs-vsctl add-port br-$vlanID "$vlanID"toint
+      ovs-vsctl set interface "$vlanID"toint type=patch
+      ovs-vsctl set interface "$vlanID"toint options:peer=intto"$vlanID"
+      ovs-vsctl add-port br-int intto"$vlanID"
+      ovs-vsctl set interface intto"$vlanID" type=patch
+      ovs-vsctl set interface intto"$vlanID" options:peer="$vlanID"toint
+      ovs-vsctl set port br-$vlanID tag=$vlanID 
+      msg_info "Gateway created for $vlanID"
+   fi
+
+   if [ "true" == "$removeGateway" ]; then
+      vlanID="$1"
+      if [ -z "$vlanID" ]; then
+         msg_error "VLAN ID has not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+      ovs-vsctl del-br br-$vlanID
+      ovs-vsctl del-port br-int into$vlanID
+      msg_info "Gateway removed for $vlanID"
    fi
 
 }
