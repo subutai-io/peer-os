@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.util.UUID;
+
 import javax.sql.DataSource;
 
 import org.junit.Before;
