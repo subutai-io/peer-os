@@ -5,52 +5,36 @@ function management_network_usage {
 echo -------------------------------------------------------------------------------
 echo Usage:   Establish a tunnnel to a subutai peer whose address information provided
 echo "        "subutai \[-qh\] management_network -c TUNNELPORTNAME TUNNELIPADDRESS TUNNELTYPE
-echo "        "Example Create Operation
-echo "        "subutai management_network -c tunnel1 172.16.1.134 vxlan
 echo
 echo Usage:   List tunnnels on subutai management host
 echo "        "subutai \[-qh\] management_network -l
 echo
 echo Usage:   Remove selected tunnnel from subutai management host
 echo "        "subutai \[-qh\] management_network -r TUNNELPORTNAME
-echo "        "Example Remove Operation
-echo "        "subutai management_network -r tunnel1
 echo 
 echo Usage:   Add a simple Open flow block rule to a bridge		
 echo "        "subutai \[-qh\] management_network -b BRIDGENAME PRIORITY PACKAGETYPE ACTION {NWSRC NWDST INPORT}  
-echo "        "Example Parameters:
-echo "        "BRIDGENAME = {br-int , br-tun} etc..
-echo "        "PRIORITY = {1-32768} between..
-echo "        "PACKAGETYPE = {normal, arp, ip, icmp, tcp, udp} if package type is not provided by selecting these values
-echo "        "user should have provide with the tag with its value. For instance: dl_vlan=0xffff
-echo "        "NWSRC=10.10.10.0/24, NWDST=10.10.10.0/24 {optional}
-echo "        "INPORT=1 {optional}
-echo "        "ACTION = {normal, drop ,flood} etc..
-echo "        "subutai management_network -b br-tun 1 normal normal
 echo
 echo Usage:   Add a simple open Flow forward rule to a bridge
 echo "        "subutai \[-qh\] management_network -f BRIDGENAME PRIORITY INPORT OUTPORT NWSRC NWDST ACTION
-echo "        "Example Parameters:
-echo "        "BRIDGENAME = {br-int , br-tun} etc..
-echo "        "PRIORITY = {1-32768} between..
-echo "        "INPORT=1
-echo "        "OUTPORT=2
-echo "        "NWSRC=10.10.10.0/24, NWDST=10.10.10.0/24
-echo "        "ACTION = {normal, drop ,flood} etc..
-echo "        "subutai management_network -f br-tun 500 2 5 10.10.10.0/24 10.10.10.5 output
 echo 
 echo Usage:   Show flow table informations in a brdige                
 echo "        "subutai \[-qh\] management_network -s BRIDGENAME
-echo "        "subutai management_network -s br-tun
 echo
 echo Usage:   Show ports informations in a brdige                
 echo "        "subutai \[-qh\] management_network -p BRIDGENAME
-echo "        "subutai management_network -p br-tun
 echo
 echo Usage:   Delete a Open flow rule from a bridge                 
 echo "        "subutai \[-qh\] management_network -d BRIDGENAME MATCHCASE
-echo "        "subutai management_network -d br-tun dl_type=0x806
-echo "        "subutai management_network -d br-tun all 
+echo
+echo Usage:   Create a n2n Tunnel                 
+echo "        "subutai \[-qh\] management_network -N SUPERNODEIPADDRESS INTERFACENAME COMMUNITYNAME LOCALPEERIPADDRESS
+echo
+echo Usage:   List opened n2n Tunnel                 
+echo "        "subutai \[-qh\] management_network -L
+echo
+echo Usage:   Remove a n2n Tunnel                 
+echo "        "subutai \[-qh\] management_network -R INTERFACENAME
 echo -------------------------------------------------------------------------------
 }
 
