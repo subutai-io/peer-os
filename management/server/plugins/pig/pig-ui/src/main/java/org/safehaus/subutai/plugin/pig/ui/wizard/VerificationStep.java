@@ -84,7 +84,7 @@ public class VerificationStep extends Panel
 
                 if ( config.getSetupType() == SetupType.OVER_HADOOP )
                 {
-                    trackId = pig.installCluster( config );
+                    trackId = pig.installCluster( config, wizard.getHadoopConfig() );
                 }
                 else if ( config.getSetupType() == SetupType.WITH_HADOOP )
                 {

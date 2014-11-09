@@ -1,11 +1,5 @@
 package org.safehaus.subutai.plugin.pig.impl;
 
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
@@ -61,16 +55,16 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
                     String.format( "Cluster with name '%s' already exists\nInstallation aborted",
                             config.getClusterName() ) );
         }
-        //check nodes are connected
-        Set<ContainerHost> nodes = environment.getHostsByIds( config.getNodes() );
-        for ( ContainerHost host : nodes )
-        {
-            if ( !host.isConnected() )
-            {
-                throw new ClusterSetupException(
-                        String.format( "Container %s is not connected", host.getHostname() ) );
-            }
-        }
+      //check nodes are connected
+//        Set<ContainerHost> nodes = environment.getHostsByIds( config.getNodes() );
+//        for ( ContainerHost host : nodes )
+//        {
+//            if ( !host.isConnected() )
+//            {
+//                throw new ClusterSetupException(
+//                        String.format( "Container %s is not connected", host.getHostname() ) );
+//            }
+//        }
         //check hadoopcluster
         HadoopClusterConfig hc = manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
         if ( hc == null )
@@ -85,29 +79,27 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
 
         trackerOperation.addLog( "Checking prerequisites..." );
 
-        RequestBuilder checkInstalledCommand = manager.getCommands().getCheckInstalledCommand();
-        for ( Iterator<ContainerHost> iterator = environment.getHostsByIds( config.getNodes() ).iterator(); iterator.hasNext(); )
+        RequestBuilder checkInstalledCommand = new RequestBuilder( Commands.checkCommand );
+        for( UUID uuid : config.getNodes())
         {
-            final ContainerHost node = iterator.next();
+            ContainerHost node = environment.getContainerHostByUUID( uuid );
             try
             {
                 CommandResult result = node.execute( checkInstalledCommand );
                 if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
                 {
                     trackerOperation.addLog(
-                            String.format( "Node %s already has Spark installed. Omitting this node from installation",
+                            String.format( "Node %s already has Pig installed. Omitting this node from installation",
                                     node.getHostname() ) );
                     config.getNodes().remove( node.getId() );
-                    iterator.remove();
                 }
                 else if ( !result.getStdOut()
-                                 .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME.toLowerCase() ) )
+                        .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME.toLowerCase() ) )
                 {
                     trackerOperation.addLog(
                             String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
                                     node.getHostname() ) );
                     config.getNodes().remove( node.getId() );
-                    iterator.remove();
                 }
             }
             catch ( CommandException e )
@@ -127,9 +119,9 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
         config.setEnvironmentId( environment.getId() );
         manager.getPluginDao().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config );
         trackerOperation.addLog( "Cluster info saved to DB\nInstalling Pig..." );
-        trackerOperation.addLog( "Installing Spark..." );
-        //install pig
-        RequestBuilder installCommand = manager.getCommands().getInstallCommand();
+        //install pig,
+        //timeout?
+        RequestBuilder installCommand = new RequestBuilder( Commands.installCommand );
         for ( ContainerHost node : environment.getHostsByIds( config.getNodes() ) )
         {
             try
@@ -139,7 +131,7 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
             catch ( CommandException e )
             {
                 throw new ClusterSetupException(
-                        String.format( "Error while installing Spark on container %s; %s", node.getHostname(),
+                        String.format( "Error while installing Pig on container %s; %s", node.getHostname(),
                                 e.getMessage() ) );
             }
         }

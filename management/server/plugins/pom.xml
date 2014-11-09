@@ -21,7 +21,9 @@
     <module>spark</module>
     <module>solr</module>
     <module>pig</module>
+
     <!--
+     <module>lucene</module>
     <module>accumulo</module>
     <module>spark</module>
     <module>zookeeper</module>

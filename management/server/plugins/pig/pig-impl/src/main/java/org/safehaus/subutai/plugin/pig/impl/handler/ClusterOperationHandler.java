@@ -44,7 +44,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, P
     public ClusterOperationHandler( final PigImpl manager, final PigConfig config,
                                     final ClusterOperationType operationType )
     {
-        super( manager, config.getClusterName() );
+        super( manager, config );
         this.operationType = operationType;
         this.config = config;
         trackerOperation = manager.getTracker().createTrackerOperation( PigConfig.PRODUCT_KEY,
