@@ -1436,9 +1436,7 @@
          <artifactId>jetty-plugin-ui</artifactId>
          <version>${project.version}</version>
        </dependency>
-
-
-
+       -->
        <dependency>
          <groupId>${project.groupId}</groupId>
          <artifactId>flume-plugin-api</artifactId>
@@ -1464,7 +1462,7 @@
          <artifactId>flume-plugin-ui</artifactId>
          <version>${project.version}</version>
        </dependency>
-
+<!--
        <dependency>
          <groupId>${project.groupId}</groupId>
          <artifactId>hbase-plugin-api</artifactId>

@@ -10,5 +10,6 @@ public enum NodeOperationType
     DESTROY,
     EXCLUDE,
     INCLUDE,
-    DECOMISSION_STATUS
+    DECOMISSION_STATUS,
+    SERVICE_STATUS
 }

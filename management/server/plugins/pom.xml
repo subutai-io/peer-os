@@ -22,17 +22,15 @@
     <module>solr</module>
     <module>pig</module>
     <module>lucene</module>
-
+    <module>flume</module>
     <!--
      <module>lucene</module>
     <module>accumulo</module>
     <module>spark</module>
     <module>zookeeper</module>
-
     <module>mongodb</module>
     <module>flume</module>
     <module>hive</module>
-
     <module>storm</module>
     <module>oozie</module>
     <module>pig</module>

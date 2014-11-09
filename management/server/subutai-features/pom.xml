@@ -683,7 +683,7 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>mongodb-plugin-ui</artifactId>
               </dependency>
-
+              -->
               <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>flume-plugin-api</artifactId>
@@ -704,7 +704,7 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>flume-plugin-ui</artifactId>
               </dependency>
-
+              <!--
               <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>hive-plugin-api</artifactId>

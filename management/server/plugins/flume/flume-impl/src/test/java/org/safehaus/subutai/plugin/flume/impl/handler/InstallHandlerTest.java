@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.api.SetupType;
@@ -33,7 +34,7 @@ public class InstallHandlerTest
     @Test( expected = NullPointerException.class )
     public void testWithNullConfig()
     {
-        handler = new InstallHandler( mock, null );
+        handler = new ClusterOperationHandler( mock, null, ClusterOperationType.INSTALL );
         handler.run();
     }
 
@@ -44,7 +45,7 @@ public class InstallHandlerTest
         FlumeConfig config = new FlumeConfig();
         config.setSetupType( SetupType.OVER_HADOOP );
         config.setClusterName( "test-cluster" );
-        handler = new InstallHandler( mock, config );
+        handler = new ClusterOperationHandler( mock, config, ClusterOperationType.INSTALL );
         handler.run();
 
         TrackerOperation po = handler.getTrackerOperation();
@@ -59,10 +60,10 @@ public class InstallHandlerTest
         FlumeConfig config = new FlumeConfig();
         config.setSetupType( SetupType.OVER_HADOOP );
         config.setClusterName( "test-cluster" );
-        config.setNodes( new HashSet<>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
+        //config.setNodes( new HashSet<>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
 
         mock.setConfig( config );
-        handler = new InstallHandler( mock, config );
+        handler = new ClusterOperationHandler( mock, config, ClusterOperationType.INSTALL );
         handler.run();
 
         TrackerOperation po = handler.getTrackerOperation();

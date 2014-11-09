@@ -25,7 +25,7 @@ public class AddEnvironmentContainerNodeHandlerTest
     public void setUp()
     {
         mock = new FlumeImplMock();
-        handler = new AddNodeHandler( mock, "test-cluster", "test-host" );
+        //handler = new AddNodeHandler( mock, "test-cluster", "test-host" );
     }
 
 
@@ -45,7 +45,7 @@ public class AddEnvironmentContainerNodeHandlerTest
     {
         FlumeConfig config = new FlumeConfig();
         config.setSetupType( SetupType.OVER_HADOOP );
-        mock.setConfig( config );
+        //mock.setConfig( config );
         handler.run();
 
         TrackerOperation po = handler.getTrackerOperation();

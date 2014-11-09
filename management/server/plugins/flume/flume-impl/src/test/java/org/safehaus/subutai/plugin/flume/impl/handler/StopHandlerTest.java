@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.impl.handler.mock.FlumeImplMock;
 
@@ -22,7 +23,7 @@ public class StopHandlerTest
     public void setUp()
     {
         mock = new FlumeImplMock();
-        handler = new StopHandler( mock, "test-cluster", "test-host" );
+        handler = new NodeOperationHandler( mock, "test-cluster", "test-host", NodeOperationType.STOP);
     }
 
 

@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.pig.ui.manager;
 
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;

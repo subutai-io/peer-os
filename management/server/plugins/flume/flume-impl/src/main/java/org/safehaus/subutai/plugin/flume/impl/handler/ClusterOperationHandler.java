@@ -1,19 +1,10 @@
-package org.safehaus.subutai.plugin.pig.impl.handler;
+package org.safehaus.subutai.plugin.flume.impl.handler;
 
-
-import java.util.Iterator;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.google.common.base.Preconditions;
 import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.CommandResult;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.protocol.*;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
@@ -21,35 +12,35 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
+import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.flume.api.SetupType;
+import org.safehaus.subutai.plugin.flume.impl.CommandType;
+import org.safehaus.subutai.plugin.flume.impl.Commands;
+import org.safehaus.subutai.plugin.flume.impl.FlumeImpl;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.pig.api.PigConfig;
-import org.safehaus.subutai.plugin.pig.api.SetupType;
-import org.safehaus.subutai.plugin.pig.impl.Commands;
-import org.safehaus.subutai.plugin.pig.impl.PigImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
- * Created by ebru on 05.11.2014.
+ * Created by ebru on 09.11.2014.
  */
-public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, PigConfig> implements ClusterOperationHandlerInterface
-{
-    private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
+public class ClusterOperationHandler extends AbstractOperationHandler<FlumeImpl, FlumeConfig> implements ClusterOperationHandlerInterface {
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterOperationHandler.class.getName());
     private ClusterOperationType operationType;
-    private PigConfig config;
+    private FlumeConfig config;
     private HadoopClusterConfig hadoopConfig;
     private ExecutorService executor = Executors.newCachedThreadPool();
 
-    public ClusterOperationHandler( final PigImpl manager, final PigConfig config,
-                                    final ClusterOperationType operationType )
-    {
-        super( manager, config );
+    public ClusterOperationHandler(final FlumeImpl manager,final FlumeConfig config,
+                                   final ClusterOperationType operationType ) {
+        super(manager, config);
         this.operationType = operationType;
         this.config = config;
-        trackerOperation = manager.getTracker().createTrackerOperation( PigConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( FlumeConfig.PRODUCT_KEY,
                 String.format( "Creating %s tracker object...", clusterName ) );
     }
 
@@ -59,50 +50,12 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, P
     }
 
     @Override
-    public void run()
-    {
-        Preconditions.checkNotNull( config, "Configuration is null !!!" );
-        switch ( operationType )
-        {
-            case INSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
-                        setupCluster();
-                    }
-                } );
-                break;
-            case DESTROY:
-                if ( config.getSetupType() == SetupType.OVER_HADOOP )
-                {
-                    uninstallCluster();
-                }
-                else if ( config.getSetupType() == SetupType.WITH_HADOOP )
-                {
-                    executor.execute( new Runnable()
-                    {
-                        public void run()
-                        {
-                            destroyCluster();
-                        }
-                    } );
-                }
-
-                break;
-        }
-    }
-
-    @Override
-    public void runOperationOnContainers( final ClusterOperationType clusterOperationType )
-    {
+    public void runOperationOnContainers(ClusterOperationType clusterOperationType) {
 
     }
 
-
     @Override
-    public void setupCluster()
-    {
+    public void setupCluster() {
         try
         {
             Environment env = null;
@@ -115,7 +68,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, P
                     trackerOperation.addLogFailed( "No Hadoop configuration specified" );
                     return;
                 }
-                hadoopConfig.setTemplateName( PigConfig.TEMPLATE_NAME );
+                hadoopConfig.setTemplateName( FlumeConfig.TEMPLATE_NAME );
                 try
                 {
                     trackerOperation.addLog( "Building environment..." );
@@ -160,13 +113,12 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, P
             trackerOperation.addLogFailed( String.format( "Could not start all nodes : %s", e.getMessage() ) );
         }
 
+
     }
 
-
     @Override
-    public void destroyCluster()
-    {
-        PigConfig config = manager.getCluster( clusterName );
+    public void destroyCluster() {
+        FlumeConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
             trackerOperation.addLogFailed(
@@ -178,7 +130,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, P
         {
             trackerOperation.addLog( "Destroying environment..." );
             manager.getEnvironmentManager().destroyEnvironment( config.getEnvironmentId() );
-            manager.getPluginDao().deleteInfo( PigConfig.PRODUCT_KEY, config.getClusterName() );
+            manager.getPluginDao().deleteInfo( FlumeConfig.PRODUCT_KEY, config.getClusterName() );
             trackerOperation.addLogDone( "Cluster destroyed" );
         }
         catch ( EnvironmentDestroyException e )
@@ -189,9 +141,44 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, P
 
     }
 
-    public void uninstallCluster(){
+    @Override
+    public void run() {
+        Preconditions.checkNotNull(config, "Configuration is null !!!");
+        switch ( operationType )
+        {
+            case INSTALL:
+                executor.execute( new Runnable()
+                {
+                    public void run()
+                    {
+                        setupCluster();
+                    }
+                } );
+                break;
+            case DESTROY:
+                if ( config.getSetupType() == SetupType.OVER_HADOOP )
+                {
+                    uninstallCluster();
+                }
+                else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+                {
+                    executor.execute( new Runnable()
+                    {
+                        public void run()
+                        {
+                            destroyCluster();
+                        }
+                    } );
+                }
+
+                break;
+        }
+
+    }
+
+    private void uninstallCluster() {
         TrackerOperation po = trackerOperation;
-        po.addLog( "Uninstalling Pig..." );
+        po.addLog( "Uninstalling Flume..." );
 
         for ( UUID uuid : config.getNodes() )
         {
@@ -199,7 +186,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, P
             CommandResult result = null;
             try
             {
-                result = containerHost.execute( new RequestBuilder( Commands.uninstallCommand ) );
+                result = containerHost.execute( new RequestBuilder(Commands.make(CommandType.PURGE) ) );
                 if ( !result.hasSucceeded() )
                 {
                     po.addLog( result.getStdErr() );
@@ -213,7 +200,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, P
             }
         }
         po.addLog( "Updating db..." );
-        manager.getPluginDao().deleteInfo( PigConfig.PRODUCT_KEY, config.getClusterName() );
+        manager.getPluginDao().deleteInfo( FlumeConfig.PRODUCT_KEY, config.getClusterName() );
         po.addLogDone( "Cluster info deleted from DB\nDone" );
     }
 }
