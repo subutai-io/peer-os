@@ -240,7 +240,7 @@ public class Manager
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
 
-                            UUID trackID = pig.uninstallCluster( config.getClusterName() );
+                            UUID trackID = pig.uninstallCluster( config );
 
                             ProgressWindow window =
                                     new ProgressWindow( executorService, tracker, trackID, PigConfig.PRODUCT_KEY );

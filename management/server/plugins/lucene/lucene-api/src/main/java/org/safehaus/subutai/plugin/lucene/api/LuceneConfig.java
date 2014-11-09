@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.lucene.api;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
@@ -18,8 +19,9 @@ public class LuceneConfig implements ConfigBase
     private String clusterName = "";
     private SetupType setupType;
     private String hadoopClusterName;
-    private Set<Agent> nodes = new HashSet<>();
-    private Set<Agent> hadoopNodes = new HashSet<>();
+    private Set<UUID> nodes = new HashSet<>();
+    private Set<UUID> hadoopNodes = new HashSet<>();
+    private UUID environmentId;
 
 
     public String getClusterName()
@@ -49,13 +51,13 @@ public class LuceneConfig implements ConfigBase
     }
 
 
-    public Set<Agent> getNodes()
+    public Set<UUID> getNodes()
     {
         return nodes;
     }
 
 
-    public void setNodes( Set<Agent> nodes )
+    public void setNodes( Set<UUID> nodes )
     {
         this.nodes = nodes;
     }
@@ -93,14 +95,25 @@ public class LuceneConfig implements ConfigBase
     }
 
 
-    public Set<Agent> getHadoopNodes()
+    public Set<UUID> getHadoopNodes()
     {
         return hadoopNodes;
     }
 
 
-    public void setHadoopNodes( final Set<Agent> hadoopNodes )
+    public void setHadoopNodes( final Set<UUID> hadoopNodes )
     {
         this.hadoopNodes = hadoopNodes;
+    }
+
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
     }
 }

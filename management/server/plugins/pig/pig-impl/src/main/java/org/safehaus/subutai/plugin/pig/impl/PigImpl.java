@@ -155,7 +155,7 @@ public class PigImpl implements Pig
     @Override
     public UUID uninstallCluster( final PigConfig config )
     {
-        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.DESTROY );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }

@@ -22,7 +22,6 @@ public class PigConfig implements ConfigBase
     private String hadoopClusterName;
     private Set<UUID> nodes = new HashSet<>();
     private Set<UUID> hadoopNodes = new HashSet<>();
-    private Hadoop hadoopManager;
     private UUID environmentId;
 
 
@@ -37,16 +36,6 @@ public class PigConfig implements ConfigBase
         this.clusterName = clusterName;
         return this;
     }
-
-    public void setHadoopManager(Hadoop hadoopManager)
-    {
-        this.hadoopManager = hadoopManager;
-    }
-    public HadoopClusterConfig getHadoopConfig()
-    {
-        return hadoopManager.getCluster( hadoopClusterName );
-    }
-
 
     @Override
     public String getProductName()

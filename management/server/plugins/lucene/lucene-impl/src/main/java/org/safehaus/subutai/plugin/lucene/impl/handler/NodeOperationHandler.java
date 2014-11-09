@@ -1,31 +1,25 @@
-package org.safehaus.subutai.plugin.pig.impl.handler;
+package org.safehaus.subutai.plugin.lucene.impl.handler;
 
-
-import java.util.Iterator;
-
-import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.CommandResult;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
-import org.safehaus.subutai.plugin.pig.api.Pig;
-import org.safehaus.subutai.plugin.pig.api.PigConfig;
-import org.safehaus.subutai.plugin.pig.impl.Commands;
-import org.safehaus.subutai.plugin.pig.impl.PigImpl;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
+import org.safehaus.subutai.plugin.lucene.impl.LuceneImpl;
 
+import java.util.Iterator;
 
 /**
- * Created by ebru on 06.11.2014.
+ * Created by ebru on 09.11.2014.
  */
-public class NodeOperationHandler extends AbstractOperationHandler<PigImpl, PigConfig>
-{
+public class NodeOperationHandler extends AbstractOperationHandler<LuceneImpl, LuceneConfig> {
+
     private String clusterName;
     private String hostname;
     private NodeOperationType operationType;
 
-    public NodeOperationHandler( final PigImpl manager, final PigConfig config, final String hostname,
+    public NodeOperationHandler( final LuceneImpl manager, final LuceneConfig config, final String hostname,
                                  NodeOperationType operationType )
     {
         super( manager, config );
@@ -33,15 +27,15 @@ public class NodeOperationHandler extends AbstractOperationHandler<PigImpl, PigC
         this.clusterName = clusterName;
         this.operationType = operationType;
         this.trackerOperation = manager.getTracker()
-                                       .createTrackerOperation( PigConfig.PRODUCT_KEY,
-                                               String.format( "Creating %s tracker object...", clusterName ) );
+                .createTrackerOperation( LuceneConfig.PRODUCT_KEY,
+                        String.format( "Creating %s tracker object...", clusterName ) );
     }
 
 
     @Override
     public void run()
     {
-        PigConfig config = manager.getCluster( clusterName );
+        LuceneConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
             trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
@@ -67,13 +61,14 @@ public class NodeOperationHandler extends AbstractOperationHandler<PigImpl, PigC
         }
 
 
-            CommandResult result = null;
-            switch ( operationType )
-            {
-                // TODO add and destroy node
-            }
+        CommandResult result = null;
+        switch ( operationType )
+        {
+            // TODO add and destroy node
+        }
 
 
 
     }
+
 }

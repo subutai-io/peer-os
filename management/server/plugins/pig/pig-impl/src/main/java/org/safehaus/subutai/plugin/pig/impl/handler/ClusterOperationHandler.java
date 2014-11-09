@@ -16,6 +16,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
@@ -41,6 +42,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, P
     private PigConfig config;
     private HadoopClusterConfig hadoopConfig;
     private ExecutorService executor = Executors.newCachedThreadPool();
+
     public ClusterOperationHandler( final PigImpl manager, final PigConfig config,
                                     final ClusterOperationType operationType )
     {
@@ -71,23 +73,28 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, P
                     }
                 } );
                 break;
-            case UNINSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
-                        uninstallCluster();
-                    }
-                } );
-                break;
             case DESTROY:
-                executor.execute( new Runnable()
+                if ( config.getSetupType() == SetupType.OVER_HADOOP )
                 {
-                    public void run()
+                    executor.execute( new Runnable()
                     {
-                        destroyCluster();
-                    }
-                } );
+                        public void run()
+                        {
+                            uninstallCluster();
+                        }
+                    } );
+                }
+                else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+                {
+                    executor.execute( new Runnable()
+                    {
+                        public void run()
+                        {
+                            destroyCluster();
+                        }
+                    } );
+                }
+
                 break;
         }
     }
@@ -165,28 +172,36 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, P
     @Override
     public void destroyCluster()
     {
-        trackerOperation.addLog( "Destroying node(s)..." );
-//                try
-//                {
-//                    manager.getContainerManager().clonesDestroy( config.getNodes() );
-//                    trackerOperation.addLog( "Destroying node(s) completed" );
-//                }
-//                catch ( LxcDestroyException ex )
-//                {
-//                    trackerOperation.addLog( "Failed to destroy node(s): " + ex.getMessage() );
-//                }
+        PigConfig config = manager.getCluster( clusterName );
+        if ( config == null )
+        {
+            trackerOperation.addLogFailed(
+                    String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
+            return;
+        }
+
+        try
+        {
+            trackerOperation.addLog( "Destroying environment..." );
+            manager.getEnvironmentManager().destroyEnvironment( config.getEnvironmentId() );
+            manager.getPluginDao().deleteInfo( PigConfig.PRODUCT_KEY, config.getClusterName() );
+            trackerOperation.addLogDone( "Cluster destroyed" );
+        }
+        catch ( EnvironmentDestroyException e )
+        {
+            trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
+            LOG.error( e.getMessage(), e );
+        }
 
     }
 
-    public boolean uninstallCluster(){
+    public void uninstallCluster(){
         TrackerOperation po = trackerOperation;
         po.addLog( "Uninstalling Pig..." );
 
-        for ( Iterator<UUID> it = config.getNodes().iterator(); it.hasNext(); )
+        for ( UUID uuid : config.getNodes() )
         {
-            UUID containerUUID = it.next();
-            ContainerHost containerHost = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHostByUUID( containerUUID );
-
+            ContainerHost containerHost = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHostByUUID( uuid );
             CommandResult result = null;
             try
             {
@@ -195,7 +210,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, P
                 {
                     po.addLog( result.getStdErr() );
                     po.addLogFailed( "Uninstallation failed" );
-                    return false;
+                    return;
                 }
             }
             catch ( CommandException e )
@@ -203,6 +218,8 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, P
                 LOG.error( e.getMessage(), e );
             }
         }
-        return true;
+        po.addLog( "Updating db..." );
+        manager.getPluginDao().deleteInfo( PigConfig.PRODUCT_KEY, config.getClusterName() );
+        po.addLogDone( "Cluster info deleted from DB\nDone" );
     }
 }

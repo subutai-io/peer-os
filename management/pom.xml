@@ -1115,7 +1115,7 @@
         <artifactId>hive-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+-->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>lucene-plugin-api</artifactId>
@@ -1142,7 +1142,7 @@
         <artifactId>lucene-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+<!--
               <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>mahout-plugin-api</artifactId>
