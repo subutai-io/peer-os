@@ -494,7 +494,7 @@ function management_network {
       ovs-vsctl set port br-$vlanID tag=$vlanID 
       ovs-ofctl add-flow br-$vlanID "priority=2500,ip,nw_src=10.10.10.0/24 actions=drop"
       ovs-ofctl add-flow br-int "priority=2500,ip,nw_src=10.10.10.0/24,nw_dst=$ipAdd actions=drop"
-      ovs-ofctl add-flow br-vlanID "priority=2600,ip,nw_src=10.10.10.1 actions=normal"
+      ovs-ofctl add-flow br-$vlanID "priority=2600,ip,nw_src=10.10.10.1 actions=normal"
       ovs-ofctl add-flow br-int "priority=2600,ip,nw_src=10.10.10.1,nw_dst=$ipAdd actions=normal"
       msg_info "Gateway created for $vlanID"
    fi
