@@ -9,8 +9,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
@@ -29,11 +29,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class RepositoryManagerImplTest
 {
     private static final String ARGUMENT = "argument";
     private static final String LIST_OUTPUT = "subutai-repo-hbase - Subutai Repository Package";
+    private static final String PACKAGE_INFO = "Some package info";
     @Mock
     PeerManager peerManager;
 
@@ -184,5 +185,17 @@ public class RepositoryManagerImplTest
         Set<PackageInfo> packageList = repositoryManager.listPackages( ARGUMENT );
 
         assertFalse( packageList.isEmpty() );
+    }
+
+
+    @Test
+    public void testGetPackageInfo() throws Exception
+    {
+
+        when( result.getStdOut() ).thenReturn( PACKAGE_INFO );
+
+        String packageInfo = repositoryManager.getPackageInfo( ARGUMENT );
+
+        assertEquals( PACKAGE_INFO, packageInfo );
     }
 }
