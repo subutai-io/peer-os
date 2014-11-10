@@ -484,7 +484,7 @@ function management_network {
       fi
 
       ovs-vsctl add-br br-$vlanID
-      ifconfig  br-$vlanID 192.168.1.1/24
+      ifconfig  br-$vlanID $ipAdd
       ovs-vsctl add-port br-$vlanID "$vlanID"toint
       ovs-vsctl set interface "$vlanID"toint type=patch
       ovs-vsctl set interface "$vlanID"toint options:peer=intto"$vlanID"
@@ -492,6 +492,10 @@ function management_network {
       ovs-vsctl set interface intto"$vlanID" type=patch
       ovs-vsctl set interface intto"$vlanID" options:peer="$vlanID"toint
       ovs-vsctl set port br-$vlanID tag=$vlanID 
+      ovs-ofctl add-flow br-$vlanID "priority=2500,ip,nw_src=10.10.10.0/24 actions=drop"
+      ovs-ofctl add-flow br-int "priority=2500,ip,nw_src=10.10.10.0/24,nw_dst=$ipAdd actions=drop"
+      ovs-ofctl add-flow br-vlanID "priority=2600,ip,nw_src=10.10.10.1 actions=normal"
+      ovs-ofctl add-flow br-int "priority=2600,ip,nw_src=10.10.10.1,nw_dst=$ipAdd actions=normal"
       msg_info "Gateway created for $vlanID"
    fi
 
