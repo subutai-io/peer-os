@@ -13,7 +13,7 @@ import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.exception.DaoException;
-import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;

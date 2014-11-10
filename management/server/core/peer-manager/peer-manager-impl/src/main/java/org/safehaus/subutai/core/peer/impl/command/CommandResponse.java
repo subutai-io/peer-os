@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.peer.impl.command;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.protocol.Response;
 
 

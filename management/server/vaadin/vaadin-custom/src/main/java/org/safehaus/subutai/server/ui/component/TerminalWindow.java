@@ -9,7 +9,7 @@ package org.safehaus.subutai.server.ui.component;
 import java.util.Set;
 
 import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 

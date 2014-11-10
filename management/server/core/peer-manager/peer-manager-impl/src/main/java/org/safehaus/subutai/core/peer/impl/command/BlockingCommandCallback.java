@@ -3,8 +3,8 @@ package org.safehaus.subutai.core.peer.impl.command;
 
 import java.util.concurrent.Semaphore;
 
-import org.safehaus.subutai.common.protocol.CommandCallback;
-import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.protocol.Response;
 
 
