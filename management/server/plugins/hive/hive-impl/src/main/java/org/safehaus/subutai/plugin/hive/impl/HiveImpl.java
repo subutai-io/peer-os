@@ -10,10 +10,7 @@ import java.util.concurrent.Executors;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
@@ -117,13 +114,6 @@ public class HiveImpl implements Hive
 
 
     @Override
-    public UUID uninstallCluster( final String clusterName )
-    {
-        return null;
-    }
-
-
-    @Override
     public List<HiveConfig> getClusters()
     {
         return pluginDAO.getInfo( HiveConfig.PRODUCT_KEY, HiveConfig.class );
@@ -138,8 +128,9 @@ public class HiveImpl implements Hive
 
 
     @Override
-    public UUID installCluster( HiveConfig config, HadoopClusterConfig hadoopClusterConfig )
+    public UUID installCluster( HiveConfig config, String hadoopClusterName )
     {
+        HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( hadoopClusterName );
         AbstractOperationHandler h =
                 new ClusterOperationHandler( this, config, hadoopClusterConfig, ClusterOperationType.INSTALL );
         executor.execute( h );
@@ -148,9 +139,10 @@ public class HiveImpl implements Hive
 
 
     @Override
-    public UUID uninstallCluster( final String clusterName, final HadoopClusterConfig hadoopClusterConfig )
+    public UUID uninstallCluster( final String hiveClusterName )
     {
-        HiveConfig config = getCluster( clusterName );
+        HiveConfig config = getCluster( hiveClusterName );
+        HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( config.getHadoopClusterName() );
         AbstractOperationHandler h =
                 new ClusterOperationHandler( this, config, hadoopClusterConfig, ClusterOperationType.UNINSTALL );
         executor.execute( h );
@@ -215,28 +207,12 @@ public class HiveImpl implements Hive
 
 
     @Override
-    public boolean isInstalled( HadoopClusterConfig config, String hostname )
+    public boolean isInstalled( String clusterName, String hostname )
     {
-        ContainerHost containerHost = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() )
-                                                        .getContainerHostByHostname( hostname );
+        ContainerHost containerHost =
+                environmentManager.getEnvironmentByUUID( hadoopManager.getCluster( clusterName ).getEnvironmentId() )
+                                  .getContainerHostByHostname( hostname );
         CheckInstallHandler h = new CheckInstallHandler( containerHost );
         return h.check();
-    }
-
-
-    @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, HiveConfig config, TrackerOperation po )
-    {
-        //        if ( config.getSetupType() == SetupType.OVER_HADOOP )
-        //        {
-        //            return new SetupStrategyOverHadoop( env, this, config, po );
-        //        }
-        //        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
-        //        {
-        //            SetupStrategyWithHadoop s = new SetupStrategyWithHadoop( env, this, config, po );
-        //            s.setEnvironment( env );
-        //            return s;
-        //        }
-        return null;
     }
 }

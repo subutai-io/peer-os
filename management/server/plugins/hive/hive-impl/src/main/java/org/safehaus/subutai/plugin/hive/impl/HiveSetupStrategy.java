@@ -54,33 +54,6 @@ abstract class HiveSetupStrategy implements ClusterSetupStrategy
             throw new ClusterSetupException( String.format( "Environment needs to have %d nodes but has only %d nodes",
                     config.getNumberOfNodes(), environment.getContainers().size() ) );
         }
-
-        //        Set<UUID> allNodes = new HashSet<>();
-        //        for ( ContainerHost environmentContainer : environment.getContainers() )
-        //        {
-        //            allNodes.add( environmentContainer.getAgent().getUuid() );
-        //        }
-        //
-        //        Iterator iterator = allNodes.iterator();
-        //        config.setServer( ( UUID ) iterator.next() );
-        //
-        //        Set<UUID> clientNodes = new HashSet<>();
-        //        for ( int i=0; i<config.getNumberOfNodes()-1; i++ ){
-        //
-        //            clientNodes.add( ( UUID ) iterator.next() );
-        //        }
-        //        config.setClients( clientNodes );
-
-
-        //        SetupStrategyOverHadoop setupStrategyOverHadoop = new SetupStrategyOverHadoop( environment,
-        // hiveManager, config, trackerOperation );
-        //        setupStrategyOverHadoop.setup();
-        //
-        //        trackerOperation.addLog( "Saving cluster information to database..." );
-        //        hiveManager.getPluginDAO()
-        //                            .saveInfo( HiveConfig.PRODUCT_KEY, config.getClusterName(), config );
-        //        trackerOperation.addLog( "Cluster information saved to database" );
-        //        return config;
         return null;
     }
 
@@ -96,8 +69,8 @@ abstract class HiveSetupStrategy implements ClusterSetupStrategy
 
         if ( hiveManager.getCluster( config.getClusterName() ) != null )
         {
-            throw new ClusterSetupException(
-                    message + String.format( "Sqoop installation already exists: %s", config.getClusterName() ) );
+            throw new ClusterSetupException( message + String
+                    .format( HiveConfig.PRODUCT_KEY + " installation already exists: %s", config.getClusterName() ) );
         }
 
         if ( config.getSetupType() == SetupType.OVER_HADOOP )

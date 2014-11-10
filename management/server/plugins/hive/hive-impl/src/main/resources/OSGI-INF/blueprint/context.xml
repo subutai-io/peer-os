@@ -7,12 +7,14 @@
     <property name="password" value="" />
   </bean>
 
+  <reference id="hadoopManager" interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
   <reference id="tracker" interface="org.safehaus.subutai.core.tracker.api.Tracker" />
   <reference id="environmentManager" interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
   <bean id="hive-impl" scope="singleton" class="org.safehaus.subutai.plugin.hive.impl.HiveImpl"
         init-method="init" destroy-method="destroy">
     <argument ref="dataSource" />
+    <property name="hadoopManager" ref="hadoopManager" />
     <property name="tracker" ref="tracker" />
     <property name="environmentManager" ref="environmentManager" />
   </bean>

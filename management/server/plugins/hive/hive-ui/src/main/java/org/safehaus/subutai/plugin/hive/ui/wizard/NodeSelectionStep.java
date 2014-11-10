@@ -152,7 +152,7 @@ public class NodeSelectionStep extends Panel
                     }
                     fillServerNodeComboBox( config, cmbServerNode, hc, selected );
                     filterNodes( cmbServerNode, hc );
-                    // TODO if all nodes are filetered, than notify user
+                    // TODO if all nodes are filtered, than notify user
                 }
             }
         } );
@@ -262,7 +262,7 @@ public class NodeSelectionStep extends Panel
                     ContainerHost host =
                             environmentManager.getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() )
                                               .getContainerHostByUUID( uuid );
-                    boolean isInstalled = hive.isInstalled( hadoopClusterConfig, host.getHostname() );
+                    boolean isInstalled = hive.isInstalled( hadoopClusterConfig.getClusterName(), host.getHostname() );
                     if ( isInstalled )
                     {
                         serverNode.removeItem( uuid );

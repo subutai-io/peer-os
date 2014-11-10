@@ -143,7 +143,7 @@ public class RestService
         {
         }
 
-        UUID trackId = hiveManager.installCluster( config, hc );
+        UUID trackId = hiveManager.installCluster( config, hc.getClusterName() );
 
         String operationId = JsonUtil.toJson( OPERATION_ID, trackId );
         return Response.status( Response.Status.CREATED ).entity( operationId ).build();

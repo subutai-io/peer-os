@@ -243,8 +243,7 @@ public class Manager
     private void destroyClusterHandler()
     {
         hadoop.getCluster( config.getClusterName() );
-        UUID trackID =
-                hive.uninstallCluster( config.getClusterName(), hadoop.getCluster( config.getHadoopClusterName() ) );
+        UUID trackID = hive.uninstallCluster( config.getClusterName() );
 
         ProgressWindow window = new ProgressWindow( executorService, tracker, trackID, HiveConfig.PRODUCT_KEY );
         window.getWindow().addCloseListener( new Window.CloseListener()

@@ -78,11 +78,11 @@ public class VerificationStep extends Panel
                 UUID trackId = null;
                 if ( config.getSetupType() == SetupType.OVER_HADOOP )
                 {
-                    trackId = hive.installCluster( config, hc );
+                    trackId = hive.installCluster( config, hc.getClusterName() );
                 }
                 else if ( config.getSetupType() == SetupType.WITH_HADOOP )
                 {
-                    trackId = hive.installCluster( config, hc );
+                    trackId = hive.installCluster( config, hc.getClusterName() );
                 }
                 ProgressWindow window = new ProgressWindow( executorService, tracker, trackId, HiveConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
