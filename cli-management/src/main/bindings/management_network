@@ -458,7 +458,7 @@ function management_network {
    if [ "true" == "$listN2NTunnel" ]; then
       result=`echo -e "ServerIP \t Port \t LocalInterface \t Community \t LocalPeerIP "`
       echo $result
-      ps aux | awk 'BEGIN {FS="\n"; RS="";ORS=""}{x=1;y=1;while ( x<NF ){Array[x]=$x; x++;}for(i=0; i<NF;i++){if(Array[i] ~ /edge/){split(Array[i],a,"\edge\ -l ");split(a[2],b,"\ ");for (x in b){if( x == 7 ||  b[x] ~ /-/ );else if( b[x] ~ /:/ ){split(b[x],c,":");print c[1]"\t"c[2]"\t";}else{ print b[x]"\t";}}print "\n";}}}'
+      ps aux | awk 'BEGIN {FS="\n"; RS="";ORS=""}{x=1;y=1;while ( x<NF ){Array[x]=$x; x++;}for(i=0; i<NF;i++){if(Array[i] ~ /awk /){;}else if(Array[i] ~ /edge/){split(Array[i],a,"\edge\ -l ");split(a[2],b,"\ ");for (x in b){if( x == 7 ||  b[x] ~ /-/ );else if( b[x] ~ /:/ ){split(b[x],c,":");print c[1]"\t"c[2]"\t";}else{ print b[x]"\t";}}print "\n";}}}'
    fi
 
    if [ "true" == "$removeN2NTunnel" ]; then
