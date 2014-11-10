@@ -3,9 +3,7 @@ package org.safehaus.subutai.plugin.hive.impl;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -28,30 +26,33 @@ public class ClusterConfiguration implements ClusterConfigurationInterface
     }
 
 
-    public void configureCluster( final ConfigBase config, Environment environment ) throws ClusterConfigurationException
+    public void configureCluster( final ConfigBase config, Environment environment )
+            throws ClusterConfigurationException
     {
         HiveConfig hiveConfig = ( HiveConfig ) config;
         ContainerHost server = environment.getContainerHostByUUID( ( ( HiveConfig ) config ).getServer() );
 
         // configure hive server
         po.addLog( "Configuring server node: " + server.getHostname() );
-        executeCommand( server, Commands.configureClient( server  ) );
+        executeCommand( server, Commands.configureClient( server ) );
 
 
         for ( ContainerHost containerHost : environment.getContainers() )
         {
-            if ( ! containerHost.getId().equals( server.getId() ) ){
+            if ( !containerHost.getId().equals( server.getId() ) )
+            {
                 po.addLog( "Configuring client node : " + containerHost.getHostname() );
                 executeCommand( containerHost, Commands.configureClient( containerHost ) );
             }
         }
         hiveConfig.setEnvironmentId( environment.getId() );
-        manager.getPluginDAO()
-               .saveInfo( HiveConfig.PRODUCT_KEY, config.getClusterName(), config );
+        manager.getPluginDAO().saveInfo( HiveConfig.PRODUCT_KEY, config.getClusterName(), config );
         po.addLogDone( HiveConfig.PRODUCT_KEY + " cluster data saved into database" );
     }
 
-    public void executeCommand( ContainerHost host, String command ){
+
+    public void executeCommand( ContainerHost host, String command )
+    {
         try
         {
             host.execute( new RequestBuilder( command ) );

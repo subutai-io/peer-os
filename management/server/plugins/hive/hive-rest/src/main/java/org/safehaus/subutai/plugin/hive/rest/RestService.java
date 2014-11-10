@@ -178,7 +178,7 @@ public class RestService
     public Response destroyNode( @PathParam( "clusterName" ) String clusterName,
                                  @PathParam( "hostname" ) String hostname )
     {
-        UUID uuid = hiveManager.destroyNode( clusterName, hostname );
+        UUID uuid = hiveManager.uninstallNode( clusterName, hostname );
 
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();

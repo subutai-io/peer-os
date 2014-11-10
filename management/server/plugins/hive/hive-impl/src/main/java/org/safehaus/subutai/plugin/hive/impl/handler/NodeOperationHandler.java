@@ -7,6 +7,7 @@ import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -34,13 +35,12 @@ public class NodeOperationHandler extends AbstractOperationHandler<HiveImpl, Hiv
     public NodeOperationHandler( final HiveImpl manager, final String clusterName, final String hostname,
                                  NodeOperationType operationType )
     {
-        super( manager, clusterName );
+        super( manager, manager.getCluster( clusterName ) );
         this.hostname = hostname;
         this.clusterName = clusterName;
         this.operationType = operationType;
-        this.trackerOperation = manager.getTracker()
-                                       .createTrackerOperation( HiveConfig.PRODUCT_KEY,
-                                               String.format( "Creating %s tracker object...", clusterName ) );
+        this.trackerOperation = manager.getTracker().createTrackerOperation( HiveConfig.PRODUCT_KEY,
+                String.format( "Creating %s tracker object...", clusterName ) );
     }
 
 
@@ -86,6 +86,12 @@ public class NodeOperationHandler extends AbstractOperationHandler<HiveImpl, Hiv
                 case STATUS:
                     result = host.execute( new RequestBuilder( Commands.statusCommand ) );
                     break;
+                case UNINSTALL:
+                    result = uninstallProductOnNode( host );
+                    break;
+                case INSTALL:
+                    result = installProductOnNode( host );
+                    break;
             }
             logResults( trackerOperation, result );
         }
@@ -99,7 +105,6 @@ public class NodeOperationHandler extends AbstractOperationHandler<HiveImpl, Hiv
     public static void logResults( TrackerOperation po, CommandResult result )
     {
         Preconditions.checkNotNull( result );
-        StringBuilder log = new StringBuilder();
         String status = "UNKNOWN";
         if ( result.getExitCode() == 0 )
         {
@@ -107,13 +112,63 @@ public class NodeOperationHandler extends AbstractOperationHandler<HiveImpl, Hiv
         }
         else if ( result.getExitCode() == 768 )
         {
-            status = "elasticsearch is not running";
+            status = "Hive Thrift Server is not running";
         }
-        else
+        po.addLogDone( status );
+    }
+
+
+    private CommandResult installProductOnNode( ContainerHost host )
+    {
+        CommandResult result = null;
+        try
         {
-            status = result.getStdOut();
+            result = host.execute( new RequestBuilder(
+                    Commands.installCommand + Common.PACKAGE_PREFIX + HiveConfig.PRODUCT_KEY.toLowerCase() ) );
+            if ( result.hasSucceeded() )
+            {
+                config.getClients().add( host.getId() );
+                manager.getPluginDAO().saveInfo( HiveConfig.PRODUCT_KEY, config.getClusterName(), config );
+                trackerOperation.addLog(
+                        HiveConfig.PRODUCT_KEY + " is installed on node " + host.getHostname() + " successfully." );
+            }
+            else
+            {
+                trackerOperation.addLogFailed( "Could not install " + HiveConfig.PRODUCT_KEY + " to node " + hostname );
+            }
         }
-        log.append( String.format( "%s", status ) );
-        po.addLogDone( log.toString() );
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+    private CommandResult uninstallProductOnNode( ContainerHost host )
+    {
+        CommandResult result = null;
+        try
+        {
+            result = host.execute( new RequestBuilder(
+                    Commands.uninstallCommand + Common.PACKAGE_PREFIX + HiveConfig.PRODUCT_KEY.toLowerCase() ) );
+            if ( result.hasSucceeded() )
+            {
+                config.getClients().remove( host.getId() );
+                manager.getPluginDAO().saveInfo( HiveConfig.PRODUCT_KEY, config.getClusterName(), config );
+                trackerOperation.addLog(
+                        HiveConfig.PRODUCT_KEY + " is uninstalled from node " + host.getHostname() + " successfully." );
+            }
+            else
+            {
+                trackerOperation
+                        .addLogFailed( "Could not uninstall " + HiveConfig.PRODUCT_KEY + " from node " + hostname );
+            }
+        }
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
+        }
+        return result;
     }
 }

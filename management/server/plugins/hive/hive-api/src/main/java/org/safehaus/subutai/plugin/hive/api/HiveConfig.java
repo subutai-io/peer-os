@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
 
@@ -25,6 +24,12 @@ public class HiveConfig implements ConfigBase
     private UUID environmentId;
 
 
+    public static String getTemplateName()
+    {
+        return TEMPLATE_NAME;
+    }
+
+
     public SetupType getSetupType()
     {
         return setupType;
@@ -34,12 +39,6 @@ public class HiveConfig implements ConfigBase
     public void setSetupType( SetupType setupType )
     {
         this.setupType = setupType;
-    }
-
-
-    public static String getTemplateName()
-    {
-        return TEMPLATE_NAME;
     }
 
 
@@ -54,7 +53,9 @@ public class HiveConfig implements ConfigBase
         this.environmentId = environmentId;
     }
 
-    public int getNumberOfNodes(){
+
+    public int getNumberOfNodes()
+    {
         return clients.size() + 1;
     }
 

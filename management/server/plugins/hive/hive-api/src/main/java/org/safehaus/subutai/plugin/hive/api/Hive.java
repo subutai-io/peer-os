@@ -1,11 +1,8 @@
 package org.safehaus.subutai.plugin.hive.api;
 
 
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
@@ -18,6 +15,8 @@ public interface Hive extends ApiBase<HiveConfig>
 
     public UUID installCluster( HiveConfig config, HadoopClusterConfig hc );
 
+    public UUID uninstallCluster( String clusterName, HadoopClusterConfig hc );
+
     public UUID statusCheck( String clusterName, String hostname );
 
     public UUID startNode( String clusterName, String hostname );
@@ -28,9 +27,9 @@ public interface Hive extends ApiBase<HiveConfig>
 
     public UUID addNode( String clusterName, String hostname );
 
-    public UUID destroyNode( String clusterName, String hostname );
+    public UUID uninstallNode( String clusterName, String hostname );
 
-    public Map<Agent, Boolean> isInstalled( Set<Agent> nodes );
+    public boolean isInstalled( HadoopClusterConfig hadoopClusterConfig, String hostname );
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment env, HiveConfig config, TrackerOperation po );
 }

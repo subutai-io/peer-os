@@ -5,10 +5,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 
@@ -35,7 +36,8 @@ class AddNodeWindow extends Window
 
 
     public AddNodeWindow( final Hive hive, final ExecutorService executorService, final Tracker tracker,
-                          final HiveConfig config, Set<Agent> nodes )
+                          final HiveConfig config, final HadoopClusterConfig hadoopClusterConfig,
+                          Set<ContainerHost> nodes )
     {
         super( "Add New Node" );
         setModal( true );
@@ -61,7 +63,7 @@ class AddNodeWindow extends Window
         hadoopNodes.setNullSelectionAllowed( false );
         hadoopNodes.setRequired( true );
         hadoopNodes.setWidth( 60, Unit.PERCENTAGE );
-        for ( Agent node : nodes )
+        for ( ContainerHost node : nodes )
         {
             hadoopNodes.addItem( node );
             hadoopNodes.setItemCaption( node, node.getHostname() );
@@ -98,11 +100,10 @@ class AddNodeWindow extends Window
             {
                 addNodeBtn.setEnabled( false );
                 showProgress();
-                Agent agent = ( Agent ) hadoopNodes.getValue();
-                final UUID trackID = hive.addNode( config.getClusterName(), agent.getHostname() );
+                ContainerHost containerHost = ( ContainerHost ) hadoopNodes.getValue();
+                final UUID trackID = hive.addNode( config.getClusterName(), containerHost.getHostname() );
                 executorService.execute( new Runnable()
                 {
-
                     public void run()
                     {
                         while ( track )

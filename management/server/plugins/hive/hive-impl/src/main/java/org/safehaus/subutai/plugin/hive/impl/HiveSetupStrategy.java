@@ -22,9 +22,8 @@ abstract class HiveSetupStrategy implements ClusterSetupStrategy
     public final Environment environment;
 
 
-    public HiveSetupStrategy( final Environment environment, HiveImpl manager,
-                              HiveConfig config, HadoopClusterConfig hadoopClusterConfig,
-                              TrackerOperation trackerOperation )
+    public HiveSetupStrategy( final Environment environment, HiveImpl manager, HiveConfig config,
+                              HadoopClusterConfig hadoopClusterConfig, TrackerOperation trackerOperation )
     {
         this.hiveManager = manager;
         this.config = config;
@@ -32,6 +31,7 @@ abstract class HiveSetupStrategy implements ClusterSetupStrategy
         this.trackerOperation = trackerOperation;
         this.environment = environment;
     }
+
 
     @Override
     public ConfigBase setup() throws ClusterSetupException
@@ -55,33 +55,35 @@ abstract class HiveSetupStrategy implements ClusterSetupStrategy
                     config.getNumberOfNodes(), environment.getContainers().size() ) );
         }
 
-//        Set<UUID> allNodes = new HashSet<>();
-//        for ( ContainerHost environmentContainer : environment.getContainers() )
-//        {
-//            allNodes.add( environmentContainer.getAgent().getUuid() );
-//        }
-//
-//        Iterator iterator = allNodes.iterator();
-//        config.setServer( ( UUID ) iterator.next() );
-//
-//        Set<UUID> clientNodes = new HashSet<>();
-//        for ( int i=0; i<config.getNumberOfNodes()-1; i++ ){
-//
-//            clientNodes.add( ( UUID ) iterator.next() );
-//        }
-//        config.setClients( clientNodes );
+        //        Set<UUID> allNodes = new HashSet<>();
+        //        for ( ContainerHost environmentContainer : environment.getContainers() )
+        //        {
+        //            allNodes.add( environmentContainer.getAgent().getUuid() );
+        //        }
+        //
+        //        Iterator iterator = allNodes.iterator();
+        //        config.setServer( ( UUID ) iterator.next() );
+        //
+        //        Set<UUID> clientNodes = new HashSet<>();
+        //        for ( int i=0; i<config.getNumberOfNodes()-1; i++ ){
+        //
+        //            clientNodes.add( ( UUID ) iterator.next() );
+        //        }
+        //        config.setClients( clientNodes );
 
 
-//        SetupStrategyOverHadoop setupStrategyOverHadoop = new SetupStrategyOverHadoop( environment, hiveManager, config, trackerOperation );
-//        setupStrategyOverHadoop.setup();
-//
-//        trackerOperation.addLog( "Saving cluster information to database..." );
-//        hiveManager.getPluginDAO()
-//                            .saveInfo( HiveConfig.PRODUCT_KEY, config.getClusterName(), config );
-//        trackerOperation.addLog( "Cluster information saved to database" );
-//        return config;
+        //        SetupStrategyOverHadoop setupStrategyOverHadoop = new SetupStrategyOverHadoop( environment,
+        // hiveManager, config, trackerOperation );
+        //        setupStrategyOverHadoop.setup();
+        //
+        //        trackerOperation.addLog( "Saving cluster information to database..." );
+        //        hiveManager.getPluginDAO()
+        //                            .saveInfo( HiveConfig.PRODUCT_KEY, config.getClusterName(), config );
+        //        trackerOperation.addLog( "Cluster information saved to database" );
+        //        return config;
         return null;
     }
+
 
     public void checkConfig() throws ClusterSetupException
     {
@@ -110,5 +112,4 @@ abstract class HiveSetupStrategy implements ClusterSetupStrategy
             }
         }
     }
-
 }

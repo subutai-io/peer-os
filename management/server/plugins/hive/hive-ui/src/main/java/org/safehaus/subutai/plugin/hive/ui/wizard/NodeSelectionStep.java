@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -40,8 +39,8 @@ public class NodeSelectionStep extends Panel
     private EnvironmentManager environmentManager;
 
 
-    public NodeSelectionStep( final Hive hive, final Hadoop hadoop,
-                              final EnvironmentManager environmentManager, final Wizard wizard )
+    public NodeSelectionStep( final Hive hive, final Hadoop hadoop, final EnvironmentManager environmentManager,
+                              final Wizard wizard )
     {
 
         this.hive = hive;
@@ -141,18 +140,19 @@ public class NodeSelectionStep extends Panel
                     config.setHadoopNodes( new HashSet<>( hc.getAllNodes() ) );
 
                     Agent selected = null;
-                    if ( config.getServer() != null ){
+                    if ( config.getServer() != null )
+                    {
                         selected = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() )
-                        .getContainerHostByUUID( config.getServer() ).getAgent();
+                                                     .getContainerHostByUUID( config.getServer() ).getAgent();
                     }
-                    else {
+                    else
+                    {
                         selected = environmentManager.getEnvironmentByUUID( hc.getEnvironmentId() )
                                                      .getContainerHostByUUID( hc.getNameNode() ).getAgent();
                     }
-
-//                    Agent selected = config.getServer() != null ? config.getServer() : hc.getNameNode();
                     fillServerNodeComboBox( config, cmbServerNode, hc, selected );
-                    filterNodes( cmbServerNode );
+                    filterNodes( cmbServerNode, hc );
+                    // TODO if all nodes are filetered, than notify user
                 }
             }
         } );
@@ -207,15 +207,16 @@ public class NodeSelectionStep extends Panel
     }
 
 
-    private void fillServerNodeComboBox( HiveConfig config, ComboBox serverNode, HadoopClusterConfig hadoopInfo, Agent selected )
+    private void fillServerNodeComboBox( HiveConfig config, ComboBox serverNode, HadoopClusterConfig hadoopInfo,
+                                         Agent selected )
     {
         serverNode.removeAllItems();
         List<UUID> slaves = hadoopInfo.getAllSlaveNodes();
         for ( UUID uuid : hadoopInfo.getAllNodes() )
         {
-            serverNode.addItem( getHost( hadoopInfo , uuid ).getId() );
+            serverNode.addItem( getHost( hadoopInfo, uuid ).getId() );
             // TODO
-            String caption = getHost( hadoopInfo , uuid ).getHostname();
+            String caption = getHost( hadoopInfo, uuid ).getHostname();
             if ( hadoopInfo.getJobTracker().equals( uuid ) )
             {
                 caption += " [JobTracker]";
@@ -241,29 +242,34 @@ public class NodeSelectionStep extends Panel
     }
 
 
-    private ContainerHost getHost( HadoopClusterConfig config, UUID uuid ){
+    private ContainerHost getHost( HadoopClusterConfig config, UUID uuid )
+    {
         return environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHostByUUID( uuid );
     }
 
-    private void filterNodes( final ComboBox serverNode )
+
+    private void filterNodes( final ComboBox serverNode, final HadoopClusterConfig hadoopClusterConfig )
     {
-        Collection<Agent> items = ( Collection<Agent> ) serverNode.getItemIds();
-        final Set<Agent> set = new HashSet<>( items );
-        new Thread( new Runnable()
+        Collection<UUID> items = ( Collection<UUID> ) serverNode.getItemIds();
+        final Set<UUID> set = new HashSet<>( items );
+        for ( final UUID uuid : set )
         {
-            @Override
-            public void run()
+            new Thread( new Runnable()
             {
-                Map<Agent, Boolean> map = hive.isInstalled( set );
-                for ( Map.Entry<Agent, Boolean> e : map.entrySet() )
+                @Override
+                public void run()
                 {
-                    if ( e.getValue() )
+                    ContainerHost host =
+                            environmentManager.getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() )
+                                              .getContainerHostByUUID( uuid );
+                    boolean isInstalled = hive.isInstalled( hadoopClusterConfig, host.getHostname() );
+                    if ( isInstalled )
                     {
-                        serverNode.removeItem( e.getKey() );
+                        serverNode.removeItem( uuid );
                     }
                 }
-            }
-        } ).start();
+            } ).start();
+        }
     }
 
 

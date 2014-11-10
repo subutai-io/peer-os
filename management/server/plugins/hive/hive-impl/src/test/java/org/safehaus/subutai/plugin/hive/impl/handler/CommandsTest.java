@@ -63,10 +63,10 @@
 //    @Test
 //    public void testAddHivePoperty()
 //    {
-//        String s = Commands.addHivePoperty( "add", "file.xml", "property", null );
+//        String s = Commands.addHiveProperty( "add", "file.xml", "property", null );
 //        Assert.assertNotNull( s );
 //
-//        s = Commands.addHivePoperty( "add", "file.xml", "property", "value" );
+//        s = Commands.addHiveProperty( "add", "file.xml", "property", "value" );
 //        Assert.assertNotNull( s );
 //    }
 //}

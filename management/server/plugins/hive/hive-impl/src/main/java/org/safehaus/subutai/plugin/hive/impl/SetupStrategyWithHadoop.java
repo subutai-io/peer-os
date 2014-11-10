@@ -20,7 +20,8 @@
 //    Environment environment;
 //
 //
-//    public SetupStrategyWithHadoop( Environment environment, HiveImpl manager, HiveConfig config, TrackerOperation po )
+//    public SetupStrategyWithHadoop( Environment environment, HiveImpl manager, HiveConfig config,
+// TrackerOperation po )
 //    {
 //        super( environment, manager, config, po );
 //    }

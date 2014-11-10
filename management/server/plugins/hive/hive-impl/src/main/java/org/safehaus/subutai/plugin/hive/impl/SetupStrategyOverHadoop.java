@@ -10,9 +10,9 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -22,7 +22,8 @@ import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 public class SetupStrategyOverHadoop extends HiveSetupStrategy
 {
 
-    public SetupStrategyOverHadoop( Environment environment, HiveImpl manager, HiveConfig config, HadoopClusterConfig hadoopClusterConfig, TrackerOperation po )
+    public SetupStrategyOverHadoop( Environment environment, HiveImpl manager, HiveConfig config,
+                                    HadoopClusterConfig hadoopClusterConfig, TrackerOperation po )
     {
         super( environment, manager, config, hadoopClusterConfig, po );
     }
@@ -35,18 +36,22 @@ public class SetupStrategyOverHadoop extends HiveSetupStrategy
 
         //check if nodes are connected
         ContainerHost server = environment.getContainerHostByUUID( config.getServer() );
-//        if ( ! server.isConnected() ){
-//            throw new ClusterSetupException( "Server node is not connected " );
-//        }
-//        for ( UUID uuid : config.getClients() ){
-//            ContainerHost host = environment.getContainerHostByUUID( uuid );
-//            if ( ! host.isConnected() ){
-//                throw new ClusterSetupException( String.format( "Node %s is not connected", host.getHostname() ) );
-//            }
-//        }
+        if ( !server.isConnected() )
+        {
+            throw new ClusterSetupException( "Server node is not connected " );
+        }
+        for ( UUID uuid : config.getClients() )
+        {
+            ContainerHost host = environment.getContainerHostByUUID( uuid );
+            if ( !host.isConnected() )
+            {
+                throw new ClusterSetupException( String.format( "Node %s is not connected", host.getHostname() ) );
+            }
+        }
 
 
-        if ( hadoopClusterConfig == null ){
+        if ( hadoopClusterConfig == null )
+        {
             throw new ClusterSetupException( "Could not find Hadoop cluster " + config.getHadoopClusterName() );
         }
 
@@ -61,36 +66,6 @@ public class SetupStrategyOverHadoop extends HiveSetupStrategy
         }
         config.setHadoopNodes( new HashSet<>( hadoopClusterConfig.getAllNodes() ) );
 
-        // check if already installed
-        for ( UUID uuid : config.getAllNodes() ){
-            ContainerHost host = environment.getContainerHostByUUID( uuid );
-            CommandResult result = null;
-            try
-            {
-                result = host.execute( new RequestBuilder( Commands.checkIfInstalled ) );
-                if ( result.getStdOut().contains( Product.HIVE.getPackageName() ) )
-                {
-                    throw new ClusterSetupException(
-                            String.format( "Node %s already has Hive installed", host.getHostname() ) );
-                }
-                else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) )
-                {
-                    throw new ClusterSetupException(
-                            String.format( "Node %s has no Hadoop installation.", host.getHostname() ) );
-                }
-                else if ( host.getAgent().getUuid().equals( config.getServer() ) )
-                {
-                    if ( result.getStdOut().contains( Product.DERBY.getPackageName() ) )
-                    {
-                        throw new ClusterSetupException( "Server node already has Derby installed" );
-                    }
-                }
-            }
-            catch ( CommandException e )
-            {
-                e.printStackTrace();
-            }
-        }
 
         // installation of server
         trackerOperation.addLog( "Installing server..." );
@@ -98,29 +73,44 @@ public class SetupStrategyOverHadoop extends HiveSetupStrategy
         {
             try
             {
-                server.execute( new RequestBuilder( Commands.installCommand + Product.HIVE ) );
-                server.execute( new RequestBuilder( Commands.installCommand + Product.DERBY ) );
+                if ( !checkIfProductIsInstalled( server, HiveConfig.PRODUCT_KEY.toLowerCase() ) )
+                {
+                    server.execute( new RequestBuilder(
+                            Commands.installCommand + Common.PACKAGE_PREFIX + Product.HIVE.toString().toLowerCase() ) );
+                }
+                if ( !checkIfProductIsInstalled( server, Product.DERBY.toString().toLowerCase() ) )
+                {
+                    server.execute( new RequestBuilder(
+                            Commands.installCommand + Common.PACKAGE_PREFIX + Product.DERBY.toString()
+                                                                                           .toLowerCase() ) );
+                }
             }
             catch ( CommandException e )
             {
                 throw new ClusterSetupException( String.format( "Failed to install %s on server node", p.toString() ) );
             }
-
         }
         trackerOperation.addLog( "Server installation completed" );
 
 
+        // installation of clients
         trackerOperation.addLog( "Installing clients..." );
-        for ( UUID uuid : config.getClients() ){
+        for ( UUID uuid : config.getClients() )
+        {
             ContainerHost client = environment.getContainerHostByUUID( uuid );
             try
             {
-                client.execute( new RequestBuilder( Commands.installCommand + Product.HIVE ) );
-                trackerOperation.addLog( Product.HIVE.name() + " is installed on " + client.getHostname() );
+                if ( !checkIfProductIsInstalled( client, HiveConfig.PRODUCT_KEY.toLowerCase() ) )
+                {
+                    client.execute( new RequestBuilder(
+                            Commands.installCommand + Common.PACKAGE_PREFIX + Product.HIVE.toString().toLowerCase() ) );
+                    trackerOperation.addLog( Product.HIVE.name() + " is installed on " + client.getHostname() );
+                }
             }
             catch ( CommandException e )
             {
-                throw new ClusterSetupException( String.format( "Failed to install %s on server node", Product.HIVE.toString() ) );
+                throw new ClusterSetupException(
+                        String.format( "Failed to install %s on server node", Product.HIVE.toString() ) );
             }
         }
 
@@ -135,5 +125,24 @@ public class SetupStrategyOverHadoop extends HiveSetupStrategy
 
 
         return config;
+    }
+
+
+    private boolean checkIfProductIsInstalled( ContainerHost containerHost, String productName )
+    {
+        boolean isHiveInstalled = false;
+        try
+        {
+            CommandResult result = containerHost.execute( new RequestBuilder( Commands.checkIfInstalled ) );
+            if ( result.getStdOut().contains( productName ) )
+            {
+                isHiveInstalled = true;
+            }
+        }
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
+        }
+        return isHiveInstalled;
     }
 }
