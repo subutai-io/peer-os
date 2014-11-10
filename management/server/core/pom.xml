@@ -42,6 +42,7 @@
     <module>repository-manager</module>
     <module>broker</module>
     <module>container-registry</module>
+    <module>command-executor</module>
   </modules>
 
 </project>
