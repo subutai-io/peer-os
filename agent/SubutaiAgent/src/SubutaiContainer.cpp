@@ -90,9 +90,9 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     vector<string>::iterator it;
     int i = 1;
     for (it = params.begin(); it != params.end(); it++) {
-        _params[i] = const_cast<char*>((*it).c_str());
-        i++;
-    }
+		_params[i] = const_cast<char*>((*it).c_str());
+		i++;
+	}
     _params[i] = NULL;
 
     // DEBUG
@@ -223,38 +223,42 @@ bool SubutaiContainer::getContainerId()
  */
 bool SubutaiContainer::getContainerMacAddresses()
 {
+
     macAddresses.clear();
     if (this->status != RUNNING) return false;
-    try
+
+    vector<string> v;
+    string result = RunProgram("ifconfig", v);
+    vector<string> lines = _helper.splitResult(result, "\n");
+
+    for (vector<string>::iterator it = lines.begin(); it != lines.end(); it++)
     {
-        string s ;
-        s.append("/bin/ls /var/lib/lxc/");  	s.append(hostname);   	s.append("/rootfs/sys/class/net/");
-        char *command = new char[s.length() + 1];    	strcpy(command, s.c_str());
+    	vector<string> splitted = _helper.splitResult((*it), " ");
 
-        vector<string> network_list = _helper.runAndSplit(command, "r", "\n");
-        for (vector<string>::iterator it = network_list.begin(); it != network_list.end(); it++) {
+    	if(splitted.size() > 0)
+    	{
+			string nic = splitted[0], address = "";
+			bool found = false;
 
-            string address_net;
-            string addressFile = "/var/lib/lxc/" + this->hostname + "/rootfs/sys/class/net/"+ (*it) +"/address";
-            ifstream file(addressFile.c_str());	//opening uuid.txt
+			for (vector<string>::iterator it_s = splitted.begin(); it_s != splitted.end(); it_s++)
+			{
+				if(found)
+				{
+					address = *it_s; break;
+				}
+				if(!strcmp((*it_s).c_str(), "HWaddr")) found = true;
+			}
 
-            getline(file,address_net);
-            file.close();
-
-            if (address_net.empty()) {		//if mac is null or not reading successfully
-                containerLogger->writeLog(3,containerLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read !!"));
-                return false;
-            }
-
-            macAddresses.insert(pair<string, string>((*it), address_net));
-
-            containerLogger->writeLog(6,containerLogger->setLogData("<SubutaiAgent>", "Subutai Agent MacID for " + (*it) + ":", address_net));
-            return true;
-        }
-    } catch(const std::exception& error) {
-        cout << error.what()<< endl;
+			if(found)
+			{
+				//cout << "inserting " << nic << " " << address << endl;
+				macAddresses.insert(pair<string, string>(nic, address));
+			}
+    	}
     }
-    return false;
+
+    //cout << "going out " << endl;
+    return true;
 }
 
 
