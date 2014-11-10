@@ -30,7 +30,7 @@ public abstract class MessageListener
     public abstract void onMessage( Message message );
 
 
-    public String getRecipient()
+    public final String getRecipient()
     {
         return recipient;
     }
