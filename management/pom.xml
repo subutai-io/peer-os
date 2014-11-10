@@ -916,7 +916,6 @@
         <version>${project.version}</version>
       </dependency>
 
-
       <!-- HADOOP -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1169,7 +1168,8 @@
         <artifactId>mahout-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+         -->
+      <!-- MONGODB   -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>mongodb-plugin-api</artifactId>
@@ -1196,6 +1196,7 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!--
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>pig-plugin-api</artifactId>

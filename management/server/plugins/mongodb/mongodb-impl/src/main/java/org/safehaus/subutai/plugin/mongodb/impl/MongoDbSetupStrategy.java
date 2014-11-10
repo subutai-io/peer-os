@@ -19,7 +19,8 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.common.CommandType;
@@ -112,15 +113,22 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
                             environment.getContainers().size() ) );
         }
 
-        Set<Agent> mongoAgents = new HashSet<>();
-        Set<EnvironmentContainer> mongoEnvironmentContainers = new HashSet<>();
-        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
+        Set<ContainerHost> mongoAgents = new HashSet<>();
+        Set<ContainerHost> mongoEnvironmentContainers = new HashSet<>();
+        for ( ContainerHost environmentContainer : environment.getContainers() )
         {
-            if ( environmentContainer.getTemplate().getProducts()
-                                     .contains( Common.PACKAGE_PREFIX + MongoClusterConfig.PRODUCT_NAME ) )
+            try
             {
-                mongoAgents.add( environmentContainer.getAgent() );
-                mongoEnvironmentContainers.add( environmentContainer );
+                if ( environmentContainer.getTemplate().getProducts()
+                                         .contains( Common.PACKAGE_PREFIX + MongoClusterConfig.PRODUCT_NAME ) )
+                {
+                    mongoAgents.add( environmentContainer );
+                    mongoEnvironmentContainers.add( environmentContainer );
+                }
+            }
+            catch ( PeerException e )
+            {
+                throw new ClusterSetupException( e.toString() );
             }
         }
 
@@ -131,22 +139,22 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
                     totalNodesRequired, mongoAgents.size() ) );
         }
 
-        Set<Agent> configServers = new HashSet<>();
-        Set<Agent> routers = new HashSet<>();
-        Set<Agent> dataNodes = new HashSet<>();
-        for ( EnvironmentContainer environmentContainer : mongoEnvironmentContainers )
+        Set<ContainerHost> configServers = new HashSet<>();
+        Set<ContainerHost> routers = new HashSet<>();
+        Set<ContainerHost> dataNodes = new HashSet<>();
+        for ( ContainerHost environmentContainer : mongoEnvironmentContainers )
         {
             if ( NodeType.CONFIG_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
-                configServers.add( environmentContainer.getAgent() );
+                configServers.add( environmentContainer );
             }
             else if ( NodeType.ROUTER_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
-                routers.add( environmentContainer.getAgent() );
+                routers.add( environmentContainer );
             }
             else if ( NodeType.DATA_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
-                dataNodes.add( environmentContainer.getAgent() );
+                dataNodes.add( environmentContainer );
             }
         }
 
@@ -158,7 +166,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
         {
             //take necessary number of nodes at random
             int numNeededMore = config.getNumberOfConfigServers() - configServers.size();
-            Iterator<Agent> it = mongoAgents.iterator();
+            Iterator<ContainerHost> it = mongoAgents.iterator();
             for ( int i = 0; i < numNeededMore; i++ )
             {
                 configServers.add( it.next() );
@@ -170,7 +178,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
         {
             //take necessary number of nodes at random
             int numNeededMore = config.getNumberOfRouters() - routers.size();
-            Iterator<Agent> it = mongoAgents.iterator();
+            Iterator<ContainerHost> it = mongoAgents.iterator();
             for ( int i = 0; i < numNeededMore; i++ )
             {
                 routers.add( it.next() );
@@ -182,7 +190,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
         {
             //take necessary number of nodes at random
             int numNeededMore = config.getNumberOfDataNodes() - dataNodes.size();
-            Iterator<Agent> it = mongoAgents.iterator();
+            Iterator<ContainerHost> it = mongoAgents.iterator();
             for ( int i = 0; i < numNeededMore; i++ )
             {
                 dataNodes.add( it.next() );

@@ -18,6 +18,7 @@
     <module>cassandra</module>
     <module>elasticsearch</module>
     <module>hadoop</module>
+    <module>mongodb</module>
     <!--<module>accumulo</module>
     <module>solr</module>
 
