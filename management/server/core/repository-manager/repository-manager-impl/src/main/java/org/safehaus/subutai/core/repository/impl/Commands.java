@@ -31,4 +31,10 @@ public class Commands
     {
         return new RequestBuilder( String.format( "subutai package_manager extract %s", packageName ) );
     }
+
+
+    public RequestBuilder getPackageInfoCommand( String packageName )
+    {
+        return new RequestBuilder( String.format( "subutai package_manager info %s", packageName ) );
+    }
 }

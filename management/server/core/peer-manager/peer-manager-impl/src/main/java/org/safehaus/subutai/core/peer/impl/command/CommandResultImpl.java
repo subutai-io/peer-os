@@ -1,10 +1,14 @@
-package org.safehaus.subutai.common.protocol;
+package org.safehaus.subutai.core.peer.impl.command;
+
+
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.CommandStatus;
 
 
 /**
  * Command Result returned by Host.execute
  */
-public class CommandResult
+public class CommandResultImpl implements CommandResult
 {
     private final Integer exitCode;
     private final String stdOut;
@@ -12,7 +16,7 @@ public class CommandResult
     private final CommandStatus status;
 
 
-    public CommandResult( final Integer exitCode, final String stdOut, final String stdErr, CommandStatus status )
+    public CommandResultImpl( final Integer exitCode, final String stdOut, final String stdErr, CommandStatus status )
     {
         this.exitCode = exitCode;
         this.stdOut = stdOut;

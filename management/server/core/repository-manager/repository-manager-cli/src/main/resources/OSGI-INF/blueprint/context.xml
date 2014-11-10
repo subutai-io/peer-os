@@ -31,5 +31,12 @@
       </action>
     </command>
   </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="repo/info">
+      <action class="org.safehaus.subutai.core.repository.cli.PackageInfoCommand">
+        <argument ref="repositoryManager" />
+      </action>
+    </command>
+  </command-bundle>
 
 </blueprint>

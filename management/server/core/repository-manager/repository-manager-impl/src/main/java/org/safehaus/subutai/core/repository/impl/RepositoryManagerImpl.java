@@ -4,8 +4,8 @@ package org.safehaus.subutai.core.repository.impl;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -119,5 +119,14 @@ public class RepositoryManagerImpl implements RepositoryManager
         }
 
         return packages;
+    }
+
+
+    @Override
+    public String getPackageInfo( final String packageName ) throws RepositoryException
+    {
+        CommandResult result = executeCommand( commands.getPackageInfoCommand( packageName ) );
+
+        return result.getStdOut();
     }
 }
