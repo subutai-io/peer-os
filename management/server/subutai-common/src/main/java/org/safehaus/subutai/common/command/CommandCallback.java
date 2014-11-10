@@ -6,5 +6,21 @@ package org.safehaus.subutai.common.command;
  */
 public abstract class CommandCallback
 {
-    public abstract void onResponse( org.safehaus.subutai.common.protocol.Response response, CommandResult commandResult );
+    private volatile boolean stopped;
+
+
+    public final void stop()
+    {
+        stopped = true;
+    }
+
+
+    public final boolean isStopped()
+    {
+        return stopped;
+    }
+
+
+    public abstract void onResponse( org.safehaus.subutai.common.protocol.Response response,
+                                     CommandResult commandResult );
 }

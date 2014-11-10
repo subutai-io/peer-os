@@ -1,9 +1,9 @@
 package org.safehaus.subutai.core.peer.impl.command;
 
 
-import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Payload;
@@ -54,7 +54,8 @@ public class CommandRequestListener extends RequestListener
                                 {
                                     sourcePeer.sendRequest(
                                             new CommandResponse( commandRequest.getRequestId(), response,
-                                                    commandResult ), RecipientType.COMMAND_RESPONSE.name(),
+                                                    ( CommandResultImpl ) commandResult ),
+                                            RecipientType.COMMAND_RESPONSE.name(),
                                             Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT );
                                 }
                                 catch ( PeerException e )

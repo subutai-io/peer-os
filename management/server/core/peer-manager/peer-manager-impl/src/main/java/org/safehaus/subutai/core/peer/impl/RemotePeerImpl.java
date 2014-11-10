@@ -6,10 +6,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
-import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandStatus;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
@@ -26,6 +26,7 @@ import org.safehaus.subutai.core.peer.api.RemotePeer;
 import org.safehaus.subutai.core.peer.impl.command.BlockingCommandCallback;
 import org.safehaus.subutai.core.peer.impl.command.CommandRequest;
 import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
+import org.safehaus.subutai.core.peer.impl.command.CommandResultImpl;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequest;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequest;
@@ -222,7 +223,7 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( commandResult == null )
         {
-            commandResult = new CommandResult( null, null, null, CommandStatus.TIMEOUT );
+            commandResult = new CommandResultImpl( null, null, null, CommandStatus.TIMEOUT );
         }
 
         return commandResult;
