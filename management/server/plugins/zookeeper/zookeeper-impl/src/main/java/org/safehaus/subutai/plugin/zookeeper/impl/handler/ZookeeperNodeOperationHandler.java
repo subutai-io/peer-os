@@ -79,7 +79,7 @@ public class ZookeeperNodeOperationHandler extends AbstractOperationHandler<Zook
                     break;
                 case STATUS:
                     commandResultList.add( containerHost.execute( new RequestBuilder(
-                            new Commands().getStopCommand()) ) );
+                            new Commands().getStatusCommand()) ) );
                     break;
             }
             logResults( trackerOperation, commandResultList );
@@ -96,18 +96,6 @@ public class ZookeeperNodeOperationHandler extends AbstractOperationHandler<Zook
         Preconditions.checkNotNull( commandResultList );
         for ( CommandResult commandResult : commandResultList )
             po.addLog( commandResult.getStdOut() );
-        String finishMessage = String.format( "%s operation on %s finished", operationType );
-        switch ( po.getState() )
-        {
-            case SUCCEEDED:
-                po.addLogDone( finishMessage );
-                break;
-            case FAILED:
-                po.addLogFailed( finishMessage );
-                break;
-            default:
-                po.addLogDone( String.format( "Still running %s operations on %s", operationType ) );
-                break;
-        }
+        po.addLogDone( "" );
     }
 }

@@ -38,13 +38,11 @@ public class ClusterConfiguration
     }
 
 
-    public void configureCluster( final ZookeeperClusterConfig config ) throws ClusterConfigurationException
+    public void configureCluster( final ZookeeperClusterConfig config, Environment environment ) throws ClusterConfigurationException
     {
 
         po.addLog( "Configuring cluster..." );
 
-        Environment environment =
-                manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
 
         String configureClusterCommand;
         Set<UUID> nodeUUIDs = config.getNodes();
@@ -55,7 +53,7 @@ public class ClusterConfiguration
         List<CommandResult> commandsResultList = new ArrayList<>();
         while( iterator.hasNext() ) {
             ContainerHost zookeeperNode = environment.getContainerHostByUUID( iterator.next().getId() );
-            configureClusterCommand = manager.getCommands().getConfigureClusterCommand(
+            configureClusterCommand = Commands.getConfigureClusterCommand(
                     prepareConfiguration( containerHosts ), ConfigParams.CONFIG_FILE_PATH.getParamValue(), ++nodeNumber );
             CommandResult commandResult = null;
             try
@@ -82,7 +80,6 @@ public class ClusterConfiguration
             po.addLog( "Cluster configured\nRestarting cluster..." );
             //restart all other nodes with new configuration
             String restartCommand = manager.getCommands().getRestartCommand( );
-            final AtomicInteger count = new AtomicInteger();
             commandsResultList = new ArrayList<>();
             while( iterator.hasNext() ) {
                 ContainerHost zookeeperNode = environment.getContainerHostByUUID( iterator.next().getId() );
@@ -101,7 +98,7 @@ public class ClusterConfiguration
                 commandsResultList.add( commandResult );
             }
 
-            if ( count.get() == config.getNodes().size() )
+            if ( getFailedCommandResults( commandsResultList ).size() == 0 )
             {
                 po.addLog( "Cluster successfully restarted" );
             }
@@ -149,5 +146,16 @@ public class ClusterConfiguration
 
 
         return zooCfgFile;
+    }
+
+
+    public List<CommandResult> getFailedCommandResults( final List<CommandResult> commandResultList )
+    {
+        List<CommandResult> failedCommands = new ArrayList<>();
+        for ( CommandResult commandResult : commandResultList ) {
+            if ( ! commandResult.hasSucceeded() )
+                failedCommands.add( commandResult );
+        }
+        return failedCommands;
     }
 }

@@ -618,15 +618,30 @@ public class Manager
 
     private void refreshUI()
     {
-        Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
         if ( config != null )
         {
-            populateTable( nodesTable, environment.getContainers() );
+            Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+
+            populateTable( nodesTable, getZookeeperNodes( environment.getContainers() ) );
         }
         else
         {
             nodesTable.removeAllItems();
         }
+    }
+
+
+    private Set<ContainerHost> getZookeeperNodes( final Set<ContainerHost> containerHosts )
+    {
+            Set<ContainerHost> list = new HashSet<>();
+            for ( ContainerHost containerHost : containerHosts )
+            {
+                if ( config.getNodes().contains( containerHost.getAgent().getUuid() ) )
+                {
+                    list.add( containerHost );
+                }
+            }
+            return list;
     }
 
 
@@ -724,19 +739,19 @@ public class Manager
 
     public void refreshClustersInfo()
     {
-        List<ZookeeperClusterConfig> mongoClusterInfos = zookeeper.getClusters();
+        List<ZookeeperClusterConfig> zookeeperClusterConfigs = zookeeper.getClusters();
         ZookeeperClusterConfig clusterInfo = ( ZookeeperClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( mongoClusterInfos != null && !mongoClusterInfos.isEmpty() )
+        if ( zookeeperClusterConfigs != null && !zookeeperClusterConfigs.isEmpty() )
         {
-            for ( ZookeeperClusterConfig mongoClusterInfo : mongoClusterInfos )
+            for ( ZookeeperClusterConfig zookeeperClusterConfig : zookeeperClusterConfigs )
             {
-                clusterCombo.addItem( mongoClusterInfo );
-                clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
+                clusterCombo.addItem( zookeeperClusterConfig );
+                clusterCombo.setItemCaption( zookeeperClusterConfig, zookeeperClusterConfig.getClusterName() );
             }
             if ( clusterInfo != null )
             {
-                for ( ZookeeperClusterConfig mongoClusterInfo : mongoClusterInfos )
+                for ( ZookeeperClusterConfig mongoClusterInfo : zookeeperClusterConfigs )
                 {
                     if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
                     {
@@ -747,7 +762,7 @@ public class Manager
             }
             else
             {
-                clusterCombo.setValue( mongoClusterInfos.iterator().next() );
+                clusterCombo.setValue( zookeeperClusterConfigs.iterator().next() );
             }
         }
     }

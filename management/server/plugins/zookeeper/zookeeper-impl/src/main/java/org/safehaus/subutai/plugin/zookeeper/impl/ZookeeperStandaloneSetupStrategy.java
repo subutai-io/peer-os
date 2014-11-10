@@ -118,7 +118,7 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy
         try
         {
 
-            new ClusterConfiguration( zookeeperManager, po ).configureCluster( zookeeperClusterConfig );
+            new ClusterConfiguration( zookeeperManager, po ).configureCluster( zookeeperClusterConfig, environment );
         }
         catch ( ClusterConfigurationException ex )
         {
@@ -126,6 +126,8 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy
         }
 
         po.addLog( "Saving cluster information to database..." );
+
+        zookeeperClusterConfig.setEnvironmentId( environment.getId() );
 
         zookeeperManager.getPluginDAO()
                         .saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, zookeeperClusterConfig.getClusterName(),

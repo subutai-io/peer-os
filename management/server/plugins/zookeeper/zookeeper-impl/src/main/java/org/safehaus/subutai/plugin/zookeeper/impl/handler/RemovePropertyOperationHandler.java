@@ -106,17 +106,17 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Zoo
                     e.printStackTrace();
                 }
             }
-            if ( getFailedCommandResults( commandResultList ).size() == 0 ) {
                 trackerOperation.addLogDone( String.format( "Cluster %s restarted succesfully", clusterName ) );
-            }
-            else  {
-                trackerOperation.addLogFailed( String.format( "Cluster %s could not restarted succesfully", clusterName ) );
-            }
         }
         else
         {
+            StringBuilder stringBuilder = new StringBuilder();
+            for ( CommandResult commandResult : getFailedCommandResults( commandResultList ) )
+            {
+                stringBuilder.append( commandResult.getStdErr() );
+            }
             trackerOperation.addLogFailed(
-                    String.format( "Removing property failed, %s", commandResultList.get( 0 ).getStdOut() ) );
+                    String.format( "Removing property failed: %s", stringBuilder.toString() ) );
         }
     }
 

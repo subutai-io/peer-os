@@ -54,9 +54,9 @@ public class VerificationStep extends Panel
         }
         else if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP )
         {
-            Environment zookeeperEnvironment =
-                    environmentManager.getEnvironmentByUUID( wizard.getConfig().getEnvironmentId() );
-            Set<ContainerHost> zookeeperNodes = zookeeperEnvironment.getHostsByIds( wizard.getConfig().getNodes() );
+            Environment hadoopEnvironment =
+                    environmentManager.getEnvironmentByUUID( wizard.getHadoopClusterConfig().getEnvironmentId() );
+            Set<ContainerHost> zookeeperNodes = hadoopEnvironment.getHostsByIds( wizard.getConfig().getNodes() );
             cfgView.addStringCfg( "Hadoop cluster name", wizard.getConfig().getHadoopClusterName() );
             for ( ContainerHost node : zookeeperNodes )
             {

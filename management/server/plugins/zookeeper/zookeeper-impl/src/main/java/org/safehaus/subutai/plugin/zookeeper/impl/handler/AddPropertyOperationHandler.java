@@ -19,8 +19,8 @@ import com.google.common.base.Strings;
 
 
 /**
-* Handles ZK config property addition
-*/
+ * Handles ZK config property addition
+ */
 public class AddPropertyOperationHandler extends AbstractOperationHandler<ZookeeperImpl, ZookeeperClusterConfig>
 {
     private final String fileName;
@@ -83,12 +83,19 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Zookee
             trackerOperation.addLog( "Property added successfully\nRestarting cluster..." );
 
             String restartCommand = manager.getCommands().getRestartCommand();
+
             commandResultList = runCommandOnContainers( restartCommand, zookeeperNodes );
+            trackerOperation.addLogDone( "Restarting cluster finished..." );
         }
         else
         {
-            trackerOperation
-                    .addLogFailed( String.format( "Adding property failed: %s", getFailedCommandResults( commandResultList )) );
+            StringBuilder stringBuilder = new StringBuilder();
+            for ( CommandResult commandResult : getFailedCommandResults( commandResultList ) )
+            {
+                stringBuilder.append( commandResult.getStdErr() );
+            }
+            trackerOperation.addLogFailed(
+                    String.format( "Removing property failed: %s", stringBuilder.toString() ) );
         }
     }
 

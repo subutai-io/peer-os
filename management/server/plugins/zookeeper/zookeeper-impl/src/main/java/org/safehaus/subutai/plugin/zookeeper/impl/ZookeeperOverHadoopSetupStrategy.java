@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 import com.google.common.base.Preconditions;
@@ -32,7 +33,7 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy
     private final ZookeeperClusterConfig zookeeperClusterConfig;
     private final TrackerOperation po;
     private final ZookeeperImpl manager;
-    private final Environment environment;
+    private Environment environment;
 
 
 
@@ -43,7 +44,6 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy
         Preconditions.checkNotNull( zookeeperClusterConfig, "Cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );
         Preconditions.checkNotNull( zookeeperManager, "ZK manager is null" );
-        Preconditions.checkNotNull( environment, "Zookeeper environment is null" );
 
         this.zookeeperClusterConfig = zookeeperClusterConfig;
         this.po = po;
@@ -67,6 +67,11 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy
                     String.format( "Cluster with name '%s' already exists", zookeeperClusterConfig.getClusterName() ) );
         }
 
+        if ( zookeeperClusterConfig.getSetupType() == SetupType.OVER_HADOOP ) {
+            environment = manager.getEnvironmentManager().getEnvironmentByUUID(
+                    manager.getHadoopManager().getCluster( zookeeperClusterConfig
+                            .getHadoopClusterName() ).getEnvironmentId() );
+        }
         Set<ContainerHost> zookeeperNodes = environment.getHostsByIds( zookeeperClusterConfig.getNodes() );
         //check if node agent is connected
         for ( ContainerHost node : zookeeperNodes )
@@ -134,7 +139,7 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy
 
             try
             {
-                new ClusterConfiguration( manager, po ).configureCluster( zookeeperClusterConfig );
+                new ClusterConfiguration( manager, po ).configureCluster( zookeeperClusterConfig, environment );
             }
             catch ( ClusterConfigurationException e )
             {
@@ -143,6 +148,9 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy
 
             po.addLog( "Saving cluster information to database..." );
 
+
+            zookeeperClusterConfig.setEnvironmentId( environment.getId() );
+
             manager.getPluginDAO()
                             .saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, zookeeperClusterConfig.getClusterName(),
                                     zookeeperClusterConfig );
@@ -150,8 +158,14 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy
         }
         else
         {
+            StringBuilder stringBuilder = new StringBuilder();
+            for ( CommandResult commandResult : getFailedCommandResults( commandResultList ) )
+            {
+                stringBuilder.append( commandResult.getStdErr() );
+            }
+
             throw new ClusterSetupException(
-                    String.format( "Installation failed, %s", commandResultList ) );
+                    String.format( "Installation failed, %s", stringBuilder ) );
         }
 
         return zookeeperClusterConfig;
@@ -164,7 +178,7 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy
         for ( ContainerHost containerHost : zookeeperNodes ) {
             try
             {
-                commandResults.add( containerHost.execute( new RequestBuilder( command ) ) );
+                commandResults.add( containerHost.execute( new RequestBuilder( command ).withTimeout( 1800 ) ) );
             }
             catch ( CommandException e )
             {

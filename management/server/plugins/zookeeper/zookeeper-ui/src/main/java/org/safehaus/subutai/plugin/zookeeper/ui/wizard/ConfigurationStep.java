@@ -198,6 +198,7 @@ public class ConfigurationStep extends Panel
             if ( hadoopClustersCombo.getValue() != null )
             {
                 wizard.getConfig().setHadoopClusterName( hadoopInfo.getClusterName() );
+                wizard.setHadoopClusterConfig( hadoopInfo );
 
                 hadoopNodesSelect
                         .setContainerDataSource(

@@ -20,6 +20,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
@@ -46,10 +47,9 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
     public ZookeeperClusterOperationHandler( final ZookeeperImpl manager, final ZookeeperClusterConfig config,
                                              final ClusterOperationType operationType )
     {
-        super( manager, config.getClusterName() );
+        super( manager, config );
         this.operationType = operationType;
         this.zookeeperClusterConfig = config;
-        this.hadoopClusterConfig = hadoopClusterConfig;
         trackerOperation = manager.getTracker().createTrackerOperation( config.getProductKey(),
                 String.format( "Creating %s tracker object...", clusterName ) );
     }
@@ -63,6 +63,7 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
         super( manager, zookeeperClusterConfig.getClusterName() );
         this.operationType = operationType;
         this.zookeeperClusterConfig = zookeeperClusterConfig;
+        this.hadoopClusterConfig = hadoopClusterConfig;
         trackerOperation = manager.getTracker().createTrackerOperation( zookeeperClusterConfig.getProductKey(),
                 String.format( "Creating %s tracker object...", clusterName ) );
     }
@@ -161,8 +162,12 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
 
         try
         {
-            Environment env = manager.getEnvironmentManager()
-                                     .buildEnvironment( manager.getDefaultEnvironmentBlueprint( zookeeperClusterConfig ) );
+            Environment env = null;
+            if ( config.getSetupType() != SetupType.OVER_HADOOP ) {
+                 env = manager.getEnvironmentManager()
+                              .buildEnvironment( manager.getDefaultEnvironmentBlueprint( zookeeperClusterConfig ) );
+            }
+
 
             ClusterSetupStrategy clusterSetupStrategy =
                     manager.getClusterSetupStrategy( env, zookeeperClusterConfig, trackerOperation );
@@ -210,18 +215,7 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
         Preconditions.checkNotNull( commandResultList );
         for ( CommandResult commandResult : commandResultList )
             po.addLog( commandResult.getStdOut() );
-        String finishMessage = String.format( "%s operation finished", operationType );
-        switch ( po.getState() )
-        {
-            case SUCCEEDED:
-                po.addLogDone( finishMessage );
-                break;
-            case FAILED:
-                po.addLogFailed( finishMessage );
-                break;
-            default:
-                po.addLogDone( String.format( "Still running %s operations on %s", operationType ) );
-                break;
-        }
+        po.addLogDone( "" );
     }
+
 }
