@@ -7,6 +7,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 
 import com.google.gson.Gson;
@@ -17,7 +18,7 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class BlueprintUploadForm
 {
 
@@ -125,14 +126,14 @@ public class BlueprintUploadForm
         String content = textArea.getValue().trim();
         if ( content.length() > 0 )
         {
-            boolean result = managerUI.getEnvironmentManager().saveBlueprint( content );
-            if ( !result )
+            try
+            {
+                managerUI.getEnvironmentManager().saveBlueprint( content );
+                Notification.show( BLUEPRINT_SAVED );
+            }
+            catch ( EnvironmentManagerException e )
             {
                 Notification.show( ERROR_SAVING_BLUEPRINT );
-            }
-            else
-            {
-                Notification.show( BLUEPRINT_SAVED );
             }
         }
         else

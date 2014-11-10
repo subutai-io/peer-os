@@ -45,6 +45,7 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
+import org.safehaus.subutai.core.peer.api.SubutaiHost;
 import org.safehaus.subutai.core.peer.api.SubutaiInitException;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
@@ -231,8 +232,8 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     @Override
     public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
                                                 final List<Template> templates, final int quantity,
-                                                final String strategyId, final List<Criteria> criteria )
-            throws PeerException
+                                                final String strategyId, final List<Criteria> criteria,
+                                                String nodeGroupName ) throws PeerException
     {
         Set<ContainerHost> result = new HashSet<>();
         try
@@ -291,6 +292,8 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                 {
                     ContainerHost containerHost =
                             resourceHost.createContainer( creatorPeerId, environmentId, templates, cloneName );
+                    containerHost.setNodeGroupName( nodeGroupName );
+                    resourceHost.createContainer( creatorPeerId, environmentId, templates, cloneName );
                     resourceHost.addContainerHost( containerHost );
                     result.add( containerHost );
                     peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
@@ -398,7 +401,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     {
         Host result = null;
         ManagementHost managementHost = getManagementHost();
-        if ( managementHost.getId().equals( id ) )
+        if ( managementHost != null && managementHost.getId().equals( id ) )
         {
             result = managementHost;
         }
@@ -500,12 +503,13 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public boolean isConnected( final Host host ) throws PeerException
+    public boolean isConnected( final Host aHost ) throws PeerException
     {
+        Host host = bindHost( aHost.getId() );
         if ( host instanceof ContainerHost )
         {
-            return ContainerState.RUNNING.equals( ( ( ContainerHost ) host ).getState() ) && checkHeartbeat(
-                    host.getLastHeartbeat() );
+            boolean b = checkHeartbeat( host.getLastHeartbeat() );
+            return ContainerState.RUNNING.equals( ( ( ContainerHost ) host ).getState() ) && b;
         }
         else
         {
@@ -631,32 +635,35 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                 return;
             }
 
-            // assume response from container host agent
-
-            ContainerHost containerHost = getContainerHostByName( response.getHostname() );
-
-            if ( containerHost != null )
+            try
             {
-                containerHost.updateHeartbeat();
+                SubutaiHost host = ( SubutaiHost ) bindHost( response.getUuid() );
+                host.updateHeartbeat();
+            }
+            catch ( PeerException p )
+            {
+                LOG.warn( p.toString() );
             }
         }
     }
 
 
     @Override
-    public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host host )
+            throws PeerException, CommandException
     {
         return execute( requestBuilder, host, null );
     }
 
 
     @Override
-    public CommandResult execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
-            throws CommandException
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host aHost,
+                                  final CommandCallback callback ) throws PeerException, CommandException
     {
+        Host host = bindHost( aHost.getId() );
         if ( !host.isConnected() )
         {
-            throw new CommandException( "Host disconnected." );
+            throw new PeerException( "Host disconnected." );
         }
         Agent agent = host.getAgent();
         Command command = commandRunner.createCommand( requestBuilder, Sets.newHashSet( agent ) );
@@ -689,9 +696,10 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
-            throws CommandException
+    public void executeAsync( final RequestBuilder requestBuilder, final Host aHost, final CommandCallback callback )
+            throws PeerException, CommandException
     {
+        Host host = bindHost( aHost.getId() );
         if ( !host.isConnected() )
         {
             throw new CommandException( "Host disconnected." );
@@ -715,7 +723,8 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host )
+            throws PeerException, CommandException
     {
         executeAsync( requestBuilder, host, null );
     }

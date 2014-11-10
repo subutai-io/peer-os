@@ -31,7 +31,7 @@ public interface Peer
     public Set<ContainerHost> getContainerHostsByEnvironmentId( UUID environmentId ) throws PeerException;
 
     public Set<ContainerHost> createContainers( UUID creatorPeerId, UUID environmentId, List<Template> templates,
-                                                int quantity, String strategyId, List<Criteria> criteria )
+                                                int quantity, String strategyId, List<Criteria> criteria, String nodeGroupName )
             throws PeerException;
 
     public void startContainer( ContainerHost containerHost ) throws PeerException;
@@ -42,15 +42,16 @@ public interface Peer
 
     public boolean isConnected( Host host ) throws PeerException;
 
-    public CommandResult execute( RequestBuilder requestBuilder, Host host ) throws CommandException;
+    public CommandResult execute( RequestBuilder requestBuilder, Host host ) throws CommandException, PeerException;
 
     public CommandResult execute( RequestBuilder requestBuilder, Host host, CommandCallback callback )
-            throws CommandException;
+            throws CommandException, PeerException;
 
     public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
-            throws CommandException;
+            throws CommandException, PeerException;
 
-    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException;
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException,
+            PeerException;
 
     public boolean isLocal();
 

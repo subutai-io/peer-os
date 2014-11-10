@@ -23,7 +23,7 @@ import com.google.common.base.Preconditions;
  *
  * TODO: add nodes and delete node operation should be implemented.
  */
-public class NodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
+public class NodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl, ElasticsearchClusterConfiguration>
 {
 
     private String clusterName;
