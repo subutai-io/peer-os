@@ -21,8 +21,9 @@
     <module>storm</module>
     <module>spark</module>
     <module>zookeeper</module>
-
+    <module>hbase</module>
     <!--<module>accumulo</module>
+    <module>oozie</module>
     <module>solr</module>
 
 
@@ -37,9 +38,7 @@
     <module>sqoop</module>
     <module>lucene</module>
     <module>pig</module>
-    <module>hbase</module>
     <module>mahout</module>
-    <module>oozie</module>
     <module>hipi</module>
     <module>nutch</module>
     <module>plugin-common</module>

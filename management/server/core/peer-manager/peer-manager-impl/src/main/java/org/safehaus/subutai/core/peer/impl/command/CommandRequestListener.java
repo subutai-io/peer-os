@@ -34,7 +34,7 @@ public class CommandRequestListener extends RequestListener
 
 
     @Override
-    public Object onRequest( final Payload payload )
+    public Object onRequest( final Payload payload ) throws PeerException
     {
         final CommandRequest commandRequest = payload.getMessage( CommandRequest.class );
 
