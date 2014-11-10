@@ -28,9 +28,16 @@ public class BlockingCommandCallback extends CommandCallback
         if ( callback != null )
         {
             callback.onResponse( response, commandResult );
+
+            if ( callback.isStopped() )
+            {
+                stop();
+            }
         }
+
         this.commandResult = commandResult;
-        if ( commandResult.hasCompleted() || commandResult.hasTimedOut() )
+
+        if ( commandResult.hasCompleted() || commandResult.hasTimedOut() || isStopped() )
         {
             completionSemaphore.release();
         }

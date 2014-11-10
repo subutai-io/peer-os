@@ -675,6 +675,10 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                     callback.onResponse( response,
                             new CommandResultImpl( agentResult.getExitCode(), agentResult.getStdOut(),
                                     agentResult.getStdErr(), command.getCommandStatus() ) );
+                    if ( callback.isStopped() )
+                    {
+                        stop();
+                    }
                 }
             }
         } );
@@ -713,6 +717,10 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                     callback.onResponse( response,
                             new CommandResultImpl( agentResult.getExitCode(), agentResult.getStdOut(),
                                     agentResult.getStdErr(), command.getCommandStatus() ) );
+                    if ( callback.isStopped() )
+                    {
+                        stop();
+                    }
                 }
             }
         } );

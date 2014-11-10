@@ -63,6 +63,11 @@ public class CommandResponseListener extends RequestListener
             if ( callback != null )
             {
                 callback.onResponse( commandResponse.getResponse(), commandResponse.getCommandResult() );
+
+                if ( callback.isStopped() )
+                {
+                    callbacks.remove( commandResponse.getRequestId() );
+                }
             }
         }
         else
