@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -31,15 +32,16 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
     private final StormClusterConfiguration config;
     private final Environment environment;
     private final TrackerOperation po;
-
+    private final EnvironmentManager environmentManager;
 
     public StormSetupStrategyDefault( StormImpl manager, StormClusterConfiguration config, Environment environment,
-                                      TrackerOperation po )
+                                      TrackerOperation po, EnvironmentManager environmentManager )
     {
         this.manager = manager;
         this.config = config;
         this.environment = environment;
         this.po = po;
+        this.environmentManager = environmentManager;
     }
 
 
@@ -217,7 +219,9 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
             if ( zk_config != null )
             {
                 StringBuilder sb = new StringBuilder();
-                for ( ContainerHost containerHost : zk_config.getNodes() )
+                Environment zookeeperEnvironment = environmentManager.getEnvironmentByUUID( zk_config.getEnvironmentId() );
+                Set<ContainerHost> zookeeperNodes = zookeeperEnvironment.getHostsByIds( zk_config.getNodes() );
+                for ( ContainerHost containerHost : zookeeperNodes )
                 {
                     if ( sb.length() > 0 )
                     {

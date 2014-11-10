@@ -3,7 +3,10 @@ package org.safehaus.subutai.plugin.storm.ui.wizard;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
@@ -27,7 +30,8 @@ import com.vaadin.ui.VerticalLayout;
 public class NodeSelectionStep extends Panel
 {
 
-    public NodeSelectionStep( final Zookeeper zookeeper, final Wizard wizard )
+    public NodeSelectionStep( final Zookeeper zookeeper, final Wizard wizard,
+                              final EnvironmentManager environmentManager )
     {
 
         setSizeFull();
@@ -70,8 +74,12 @@ public class NodeSelectionStep extends Panel
                     masterNodeCombo.removeAllItems();
                     if ( e.getProperty().getValue() != null )
                     {
-                        ZookeeperClusterConfig zk = ( ZookeeperClusterConfig ) e.getProperty().getValue();
-                        for ( ContainerHost containerHost : zk.getNodes() )
+                        ZookeeperClusterConfig zookeeperClusterConfig = ( ZookeeperClusterConfig ) e.getProperty().getValue();
+                        Environment zookeeperEnvironment =
+                                environmentManager.getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
+                        Set<ContainerHost> zookeeperNodes =
+                                zookeeperEnvironment.getHostsByIds( zookeeperClusterConfig.getNodes() );
+                        for ( ContainerHost containerHost : zookeeperNodes )
                         {
                             masterNodeCombo.addItem( containerHost );
                             masterNodeCombo.setItemCaption( containerHost, containerHost.getHostname() );
@@ -82,7 +90,7 @@ public class NodeSelectionStep extends Panel
                             masterNodeCombo.setValue( wizard.getConfig().getNimbus() );
                         }
 
-                        wizard.getConfig().setZookeeperClusterName( zk.getClusterName() );
+                        wizard.getConfig().setZookeeperClusterName( zookeeperClusterConfig.getClusterName() );
                     }
                 }
             } );

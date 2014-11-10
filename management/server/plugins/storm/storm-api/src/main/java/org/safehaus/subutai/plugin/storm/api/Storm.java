@@ -8,6 +8,7 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 
 
 public interface Storm extends ApiBase<StormClusterConfiguration>

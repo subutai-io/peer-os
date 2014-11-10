@@ -59,7 +59,7 @@ public class Wizard
             }
             case 2:
             {
-                component = new NodeSelectionStep( zookeeper, this );
+                component = new NodeSelectionStep( zookeeper, this, environmentManager );
                 break;
             }
             case 3:

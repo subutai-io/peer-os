@@ -37,15 +37,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>command-runner-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>tracker-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>agent-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -56,6 +48,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>zookeeper-plugin-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>plugin-common</artifactId>
     </dependency>
   </dependencies>
 

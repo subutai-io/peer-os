@@ -36,7 +36,7 @@ public class StormNodeOperationHandler extends AbstractOperationHandler<StormImp
 
 
     public StormNodeOperationHandler( final StormImpl manager, final String clusterName, final String hostname,
-                                      NodeOperationType operationType, NodeType nodeType )
+                                      NodeOperationType operationType )
     {
         super( manager, clusterName );
         this.hostname = hostname;

@@ -15,15 +15,11 @@ import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
-import org.safehaus.subutai.plugin.storm.impl.handler.AddNodeHandler;
-import org.safehaus.subutai.plugin.storm.impl.handler.DestroyNodeHandler;
-import org.safehaus.subutai.plugin.storm.impl.handler.InstallHandler;
-import org.safehaus.subutai.plugin.storm.impl.handler.RestartHandler;
-import org.safehaus.subutai.plugin.storm.impl.handler.StartHandler;
-import org.safehaus.subutai.plugin.storm.impl.handler.StatusHandler;
-import org.safehaus.subutai.plugin.storm.impl.handler.StopHandler;
-import org.safehaus.subutai.plugin.storm.impl.handler.UninstallHandler;
+import org.safehaus.subutai.plugin.storm.impl.handler.StormClusterOperationHandler;
+import org.safehaus.subutai.plugin.storm.impl.handler.StormNodeOperationHandler;
 
 
 public class StormImpl extends StormBase
@@ -38,7 +34,7 @@ public class StormImpl extends StormBase
     @Override
     public UUID installCluster( StormClusterConfiguration config )
     {
-        AbstractOperationHandler h = new InstallHandler( this, config );
+        AbstractOperationHandler h = new StormClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
         executor.execute( h );
         return h.getTrackerId();
     }
@@ -47,7 +43,7 @@ public class StormImpl extends StormBase
     @Override
     public UUID uninstallCluster( String clusterName )
     {
-        AbstractOperationHandler h = new UninstallHandler( this, clusterName );
+        AbstractOperationHandler h = new StormClusterOperationHandler( this, getCluster( clusterName ), ClusterOperationType.UNINSTALL );
         executor.execute( h );
         return h.getTrackerId();
     }
@@ -77,7 +73,8 @@ public class StormImpl extends StormBase
     @Override
     public UUID checkNode( String clusterName, String hostname )
     {
-        AbstractOperationHandler h = new StatusHandler( this, clusterName, hostname );
+        AbstractOperationHandler h = new StormNodeOperationHandler( this, clusterName, hostname,
+                NodeOperationType.STATUS );
         executor.execute( h );
         return h.getTrackerId();
     }
@@ -86,7 +83,8 @@ public class StormImpl extends StormBase
     @Override
     public UUID startNode( String clusterName, String hostname )
     {
-        AbstractOperationHandler h = new StartHandler( this, clusterName, hostname );
+        AbstractOperationHandler h = new StormNodeOperationHandler( this, clusterName, hostname,
+                NodeOperationType.START );
         executor.execute( h );
         return h.getTrackerId();
     }
@@ -95,7 +93,8 @@ public class StormImpl extends StormBase
     @Override
     public UUID stopNode( String clusterName, String hostname )
     {
-        AbstractOperationHandler h = new StopHandler( this, clusterName, hostname );
+        AbstractOperationHandler h = new StormNodeOperationHandler( this, clusterName, hostname,
+                NodeOperationType.STOP );
         executor.execute( h );
         return h.getTrackerId();
     }
@@ -104,7 +103,8 @@ public class StormImpl extends StormBase
     @Override
     public UUID restartNode( String clusterName, String hostname )
     {
-        AbstractOperationHandler h = new RestartHandler( this, clusterName, hostname );
+        AbstractOperationHandler h = new StormNodeOperationHandler( this, clusterName, hostname,
+                NodeOperationType.RESTART );
         executor.execute( h );
         return h.getTrackerId();
     }
@@ -113,18 +113,20 @@ public class StormImpl extends StormBase
     @Override
     public UUID addNode( String clusterName )
     {
-        AbstractOperationHandler h = new AddNodeHandler( this, clusterName );
-        executor.execute( h );
-        return h.getTrackerId();
+        return null;
+//        AbstractOperationHandler h = new AddNodeHandler( this, clusterName );
+//        executor.execute( h );
+//        return h.getTrackerId();
     }
 
 
     @Override
     public UUID destroyNode( String clusterName, String hostname )
     {
-        AbstractOperationHandler h = new DestroyNodeHandler( this, clusterName, hostname );
-        executor.execute( h );
-        return h.getTrackerId();
+        return null;
+//        AbstractOperationHandler h = new DestroyNodeHandler( this, clusterName, hostname );
+//        executor.execute( h );
+//        return h.getTrackerId();
     }
 
 
@@ -165,6 +167,6 @@ public class StormImpl extends StormBase
                                                          TrackerOperation po )
     {
 
-        return new StormSetupStrategyDefault( this, config, environment, po );
+        return new StormSetupStrategyDefault( this, config, environment, po, environmentManager );
     }
 }
