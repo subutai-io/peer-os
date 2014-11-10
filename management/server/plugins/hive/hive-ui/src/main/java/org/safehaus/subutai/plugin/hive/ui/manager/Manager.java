@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.hive.ui.manager;
 
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -23,9 +24,12 @@ import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.api.HiveNodeOperationTask;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
+import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
@@ -320,27 +324,28 @@ public class Manager
 
     private void addClickListenerToTable( final Table table )
     {
-        //        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
-        //        {
-        //            @Override
-        //            public void itemClick( ItemClickEvent event )
-        //            {
-        //                String lxcHostname = ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host"
-        // ).getValue();
-        //                Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-        //                if ( lxcAgent != null )
-        //                {
-        //                    TerminalWindow terminal =
-        //                            new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
-        //                                    agentManager );
-        //                    contentRoot.getUI().addWindow( terminal.getWindow() );
-        //                }
-        //                else
-        //                {
-        //                    show( "Agent is not connected" );
-        //                }
-        //            }
-        //        } );
+        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
+        {
+            @Override
+            public void itemClick( ItemClickEvent event )
+            {
+                String containerId =
+                        ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION )
+                                        .getValue();
+                ContainerHost containerHost =
+                        environmentManager.getEnvironmentByUUID( hadoop.getCluster( config.getHadoopClusterName() ).getEnvironmentId() ).getContainerHostByHostname( containerId );
+
+                if ( containerHost != null )
+                {
+                    TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( containerHost ) );
+                    contentRoot.getUI().addWindow( terminal.getWindow() );
+                }
+                else
+                {
+                    show( "Agent is not connected" );
+                }
+            }
+        } );
     }
 
 
