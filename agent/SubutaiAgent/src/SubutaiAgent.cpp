@@ -359,42 +359,51 @@ int main(int argc,char *argv[],char *envp[])
                         {
                             logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Irrelevant Terminate Request"));
                         }
-                    }/*
-                        else if (command.getType()=="INOTIFY_CREATE_REQUEST")
-                        {
+                    }
+                    else if (command.getType()=="SET_INOTIFY_REQUEST")
+                    {
+                    	string preArg = "";
+                    	if(target_container) preArg = "/var/lib/lxc/" + target_container->getContainerHostnameValue() + "/rootfs";
 
-                        logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","executing INOTIFY_REQUEST.."));
+                    	logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","executing INOTIFY_REQUEST.."));
                         for (unsigned int i=0; i<command.getWatchArguments().size();i++) {
-                        Watcher.addWatcher(command.getWatchArguments()[i]);
-                        logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","adding Watcher: ",
-                        command.getWatchArguments()[i]));
+                        	Watcher.addWatcher(preArg + command.getWatchArguments()[i]);
+                        	logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","adding Watcher: ",
+                        			preArg + command.getWatchArguments()[i]));
                         }
                         Watcher.stats();
-                        sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(), response.getConfPoints());
-                        connection->sendMessage(sendout);
-                        Watcher.stats();
+                        //sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(), response.getConfPoints());
+                        //connection->sendMessage(sendout);
+                        //Watcher.stats();
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));
-                        } else if (command.getType() == "INOTIFY_REMOVE_REQUEST") {
+                     }
+                     else if (command.getType() == "UNSET_INOTIFY_REQUEST")
+                     {
+                    	 string preArg = "";
+                    	 if(target_container) preArg = "/var/lib/lxc/" + target_container->getContainerHostnameValue() + "/rootfs";
+
                         logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "executing INOTIFY_CANCEL_REQUEST.."));
                         for (unsigned int i = 0; i < command.getWatchArguments().size(); i++) {
-                        Watcher.eraseWatcher(command.getWatchArguments()[i]);
-                        logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Erasing Watcher: ",
-                        command.getWatchArguments()[i]));
+                        	Watcher.eraseWatcher(preArg + command.getWatchArguments()[i]);
+                        	logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Erasing Watcher: ",
+                        			preArg + command.getWatchArguments()[i]));
                         }
                         Watcher.stats();
-                        sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(), response.getConfPoints());
-                        connection->sendMessage(sendout);
-                        Watcher.stats();
+                        //sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(), response.getConfPoints());
+                        //connection->sendMessage(sendout);
+                        //Watcher.stats();
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));
-                        } else if (command.getType() == "INOTIFY_LIST_REQUEST") {
+                    }
+                    else if (command.getType() == "INOTIFY_LIST_REQUEST") {
                         logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "executing INOTIFY_SHOW_REQUEST.."));
                         Watcher.stats();
                         sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(),response.getConfPoints());
                         connection->sendMessage(sendout);
                         Watcher.stats();
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));
-                        }*/
-                } else {
+                    }
+                }
+                else {
                     logMain.writeLog(3, logMain.setLogData("<SubutaiAgent>","Failed to parsing JSON String: ", input));
                     if (input.size() >= 10000) {
                         connection->sendMessage(response.createResponseMessage(environment.getAgentUuidValue(), 9999999,
@@ -411,7 +420,7 @@ int main(int argc,char *argv[],char *envp[])
                                     command.getRequestSequenceNumber(),2,
                                     command.getCommandId(),1));
                     }
-                }
+              }
             } else {
                 if (currentProcess < ncores) {
                     ifstream file2("/etc/subutai-agent/commandQueue.txt");

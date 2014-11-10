@@ -189,9 +189,9 @@ bool SubutaiCommand::deserialize(string& input)
         string arg1;
         arg1.clear();
         watchArgs.clear();
-        for(unsigned int index=0; index < root["request"]["confPoints"].size(); index++)	//set arguments
+        for(unsigned int index=0; index < root["request"]["configPoints"].size(); index++)	//set arguments
         {
-            arg1 =  root["request"]["confPoints"][index].asString();
+            arg1 =  root["request"]["configPoints"][index].asString();
             this->getWatchArguments().push_back(arg1);
         }
 

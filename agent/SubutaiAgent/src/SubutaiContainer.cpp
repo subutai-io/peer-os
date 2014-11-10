@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/stat.h>
 #include <iostream>
 
 using namespace std;
@@ -144,7 +145,6 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
         }
     }
     containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>","Program executed: ", program));
-    cout << "result: " << result.out << endl;
     return result;
 }
 
@@ -174,8 +174,6 @@ void SubutaiContainer::UpdateUsersList()
         uid   = atoi(line.substr(found_second+1, found_third).c_str());
 
         this->_users.insert(make_pair(uid, uname));
-        //cout << " user: " <<  uid << " " << uname << endl;
-
     }
 }
 /**
@@ -186,7 +184,8 @@ bool SubutaiContainer::getContainerId()
 {
     try
     {
-        string uuidFile = "/var/lib/lxc/" + this->hostname + "/rootfs/etc/subutai-agent/uuid.txt";
+    	string path = "/var/lib/lxc/" + this->hostname + "/rootfs/etc/subutai-agent/";
+        string uuidFile = path + "uuid.txt";
         ifstream file(uuidFile.c_str());	//opening uuid.txt
         getline(file,this->id);
         file.close();
@@ -197,11 +196,19 @@ bool SubutaiContainer::getContainerId()
             boost::uuids::uuid u = gen();
             const std::string tmp = boost::lexical_cast<std::string>(u);
             this->id = tmp;
+
+            struct stat sb;
+            if (!(stat(path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)))
+            {
+            	int status = mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH);
+            	if(status != 0) containerLogger->writeLog(1,containerLogger->setLogData("<SubutaiContainer>","\"subutai-agent\" folder cannot be created under /etc/"));
+            }
+
             ofstream file(uuidFile.c_str());
             file << this->id;
             file.close();
 
-            containerLogger->writeLog(1,containerLogger->setLogData("<SubutaiAgent>","Subutai Agent UUID: ",this->id));
+            containerLogger->writeLog(1,containerLogger->setLogData("<SubutaiContainer>","Subutai Agent UUID: ",this->id));
             return false;
         }
         return true;
