@@ -127,15 +127,15 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
                                                 final List<Template> templates, final int quantity,
-                                                final String strategyId, final List<Criteria> criteria, String nodeGroupName )
-            throws PeerException
+                                                final String strategyId, final List<Criteria> criteria,
+                                                String nodeGroupName ) throws PeerException
     {
         try
         {
             //send create request
             CreateContainerRequest request =
-                    new CreateContainerRequest( creatorPeerId, environmentId, templates, quantity, strategyId,
-                            criteria, nodeGroupName );
+                    new CreateContainerRequest( creatorPeerId, environmentId, templates, quantity, strategyId, criteria,
+                            nodeGroupName );
 
             CreateContainerResponse response = sendRequest( request, RecipientType.CONTAINER_CREATE_REQUEST.name(),
                     Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainerResponse.class );
@@ -217,8 +217,6 @@ public class RemotePeerImpl implements RemotePeer
         BlockingCommandCallback blockingCommandCallback = new BlockingCommandCallback( callback );
 
         executeAsync( requestBuilder, host, blockingCommandCallback, blockingCommandCallback.getCompletionSemaphore() );
-
-        blockingCommandCallback.waitCompletion();
 
         CommandResult commandResult = blockingCommandCallback.getCommandResult();
 

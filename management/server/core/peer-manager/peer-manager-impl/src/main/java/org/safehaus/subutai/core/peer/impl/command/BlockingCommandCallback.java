@@ -45,12 +45,6 @@ public class BlockingCommandCallback extends CommandCallback
 
     public CommandResult getCommandResult()
     {
-        return commandResult;
-    }
-
-
-    public void waitCompletion()
-    {
         try
         {
             completionSemaphore.acquire();
@@ -59,5 +53,6 @@ public class BlockingCommandCallback extends CommandCallback
         {
             //ignore
         }
+        return commandResult;
     }
 }
