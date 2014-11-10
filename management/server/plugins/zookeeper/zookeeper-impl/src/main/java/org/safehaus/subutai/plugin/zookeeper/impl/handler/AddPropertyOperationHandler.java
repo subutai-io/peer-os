@@ -1,14 +1,17 @@
 package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 
@@ -16,9 +19,9 @@ import com.google.common.base.Strings;
 
 
 /**
- * Handles ZK config property addition
- */
-public class AddPropertyOperationHandler extends AbstractOperationHandler<ZookeeperImpl>
+* Handles ZK config property addition
+*/
+public class AddPropertyOperationHandler extends AbstractOperationHandler<ZookeeperImpl, ZookeeperClusterConfig>
 {
     private final String fileName;
     private final String propertyName;
@@ -63,45 +66,59 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Zookee
 
         trackerOperation.addLog( "Adding property..." );
 
-        Command addPropertyCommand =
-                manager.getCommands().getAddPropertyCommand( fileName, propertyName, propertyValue, config.getNodes() );
-        manager.getCommandRunner().runCommand( addPropertyCommand );
 
-        if ( addPropertyCommand.hasSucceeded() )
+        Environment zookeeperEnvironment = manager.getEnvironmentManager().
+                getEnvironmentByUUID( config.getEnvironmentId() );
+        Set<ContainerHost> zookeeperNodes = zookeeperEnvironment.getHostsByIds( config.getNodes() );
+
+
+        String addPropertyCommand =
+                manager.getCommands().getAddPropertyCommand( fileName, propertyName, propertyValue );
+
+
+        List<CommandResult> commandResultList = runCommandOnContainers( addPropertyCommand, zookeeperNodes );
+
+        if ( getFailedCommandResults( commandResultList ).size() == 0 )
         {
             trackerOperation.addLog( "Property added successfully\nRestarting cluster..." );
 
-            Command restartCommand = manager.getCommands().getRestartCommand( config.getNodes() );
-            final AtomicInteger count = new AtomicInteger();
-            manager.getCommandRunner().runCommand( restartCommand, new CommandCallback()
-            {
-                @Override
-                public void onResponse( Response response, AgentResult agentResult, Command command )
-                {
-                    if ( agentResult.getStdOut().contains( "STARTED" ) )
-                    {
-                        if ( count.incrementAndGet() == config.getNodes().size() )
-                        {
-                            stop();
-                        }
-                    }
-                }
-            } );
-
-            if ( count.get() == config.getNodes().size() )
-            {
-                trackerOperation.addLogDone( "Cluster successfully restarted" );
-            }
-            else
-            {
-                trackerOperation.addLogFailed(
-                        String.format( "Failed to restart cluster, %s", restartCommand.getAllErrors() ) );
-            }
+            String restartCommand = manager.getCommands().getRestartCommand();
+            commandResultList = runCommandOnContainers( restartCommand, zookeeperNodes );
         }
         else
         {
             trackerOperation
-                    .addLogFailed( String.format( "Adding property failed, %s", addPropertyCommand.getAllErrors() ) );
+                    .addLogFailed( String.format( "Adding property failed: %s", getFailedCommandResults( commandResultList )) );
         }
     }
+
+
+    private List<CommandResult> runCommandOnContainers( String command, final Set<ContainerHost> zookeeperNodes )
+    {
+        List<CommandResult> commandResults = new ArrayList<>();
+        for ( ContainerHost containerHost : zookeeperNodes ) {
+            try
+            {
+                commandResults.add( containerHost.execute( new RequestBuilder( command ) ) );
+            }
+            catch ( CommandException e )
+            {
+                e.printStackTrace();
+            }
+        }
+        return commandResults;
+    }
+
+
+
+    public List<CommandResult> getFailedCommandResults( final List<CommandResult> commandResultList )
+    {
+        List<CommandResult> failedCommands = new ArrayList<>();
+        for ( CommandResult commandResult : commandResultList ) {
+            if ( ! commandResult.hasSucceeded() )
+                failedCommands.add( commandResult );
+        }
+        return failedCommands;
+    }
+
 }

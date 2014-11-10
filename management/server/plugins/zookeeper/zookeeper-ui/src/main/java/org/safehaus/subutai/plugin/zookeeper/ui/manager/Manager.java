@@ -14,9 +14,7 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -362,12 +360,12 @@ public class Manager
     public void startAllNodes()
     {
 
-        Set<Agent> agentSet = new HashSet<>();
+        Set<ContainerHost> containerHosts = new HashSet<>();
         Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
         for ( UUID agentID : config.getNodes() ) {
-            agentSet.add( environment.getContainerHostByUUID( agentID ).getAgent() );
+            containerHosts.add( environment.getContainerHostByUUID( agentID ) );
         }
-        for ( Agent agent : agentSet )
+        for ( ContainerHost agent : containerHosts )
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
@@ -390,13 +388,13 @@ public class Manager
 
     public void stopAllNodes()
     {
-        Set<Agent> agentSet = new HashSet<>();
+        Set<ContainerHost> containerHosts = new HashSet<>();
         Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
         for ( UUID agentID : config.getNodes() ) {
-            agentSet.add( environment.getContainerHostByUUID( agentID ).getAgent() );
+            containerHosts.add( environment.getContainerHostByUUID( agentID ) );
         }
 
-        for ( Agent agent : agentSet )
+        for ( ContainerHost agent : containerHosts )
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
@@ -520,11 +518,16 @@ public class Manager
                     else if ( config.getSetupType() == SetupType.OVER_HADOOP
                             || config.getSetupType() == SetupType.WITH_HADOOP )
                     {
-                        HadoopClusterConfig info = hadoop.getCluster( config.getHadoopClusterName() );
+                        HadoopClusterConfig hadoopClusterConfig = hadoop.getCluster( config.getHadoopClusterName() );
 
-                        if ( info != null )
+                        if ( hadoopClusterConfig != null )
                         {
-                            Set<Agent> nodes = new HashSet<>( info.getAllNodes() );
+                            Environment hadoopEnvironment =
+                                    environmentManager.getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
+                            Set<UUID> hadoopNodeIDs = new HashSet<UUID>( hadoopClusterConfig.getAllNodes() );
+                            Set<ContainerHost> hadoopNodes = hadoopEnvironment.getHostsByIds( hadoopNodeIDs );
+                            Set<ContainerHost> nodes = new HashSet<>( );
+                            nodes.addAll( hadoopNodes );
                             nodes.removeAll( config.getNodes() );
                             if ( !nodes.isEmpty() )
                             {
@@ -547,7 +550,7 @@ public class Manager
                         }
                         else
                         {
-                            show( "Hadoop cluster info not found" );
+                            show( "Hadoop cluster hadoopClusterConfig not found" );
                         }
                     }
                 }

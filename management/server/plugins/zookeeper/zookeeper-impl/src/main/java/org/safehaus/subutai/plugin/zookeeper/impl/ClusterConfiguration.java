@@ -10,15 +10,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -52,14 +47,16 @@ public class ClusterConfiguration
                 manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
 
         String configureClusterCommand;
-        Iterator<ContainerHost> iterator = config.getNodes().iterator();
+        Set<UUID> nodeUUIDs = config.getNodes();
+        Set<ContainerHost> containerHosts = environment.getHostsByIds( nodeUUIDs );
+        Iterator<ContainerHost> iterator = containerHosts.iterator();
 
         int nodeNumber=0;
         List<CommandResult> commandsResultList = new ArrayList<>();
         while( iterator.hasNext() ) {
             ContainerHost zookeeperNode = environment.getContainerHostByUUID( iterator.next().getId() );
             configureClusterCommand = manager.getCommands().getConfigureClusterCommand(
-                    prepareConfiguration( config.getNodes() ), ConfigParams.CONFIG_FILE_PATH.getParamValue(), ++nodeNumber );
+                    prepareConfiguration( containerHosts ), ConfigParams.CONFIG_FILE_PATH.getParamValue(), ++nodeNumber );
             CommandResult commandResult = null;
             try
             {
@@ -86,12 +83,11 @@ public class ClusterConfiguration
             //restart all other nodes with new configuration
             String restartCommand = manager.getCommands().getRestartCommand( );
             final AtomicInteger count = new AtomicInteger();
-            iterator = config.getNodes().iterator();
             commandsResultList = new ArrayList<>();
             while( iterator.hasNext() ) {
                 ContainerHost zookeeperNode = environment.getContainerHostByUUID( iterator.next().getId() );
                 configureClusterCommand = manager.getCommands().getConfigureClusterCommand(
-                        prepareConfiguration( config.getNodes() ), ConfigParams.CONFIG_FILE_PATH.getParamValue(), ++nodeNumber );
+                        prepareConfiguration( containerHosts ), ConfigParams.CONFIG_FILE_PATH.getParamValue(), ++nodeNumber );
                 CommandResult commandResult = null;
                 try
                 {
