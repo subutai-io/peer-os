@@ -1,11 +1,14 @@
 package org.safehaus.subutai.core.environment.impl.environment;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -39,15 +42,23 @@ public class ContainerCreatorThread extends Observable implements Runnable
     {
         try
         {
+            List<Criteria> criteriaList = new ArrayList<>();
+            if ( message.getStrategy().getCriteria() != null )
+            {
+                criteriaList.addAll( message.getStrategy().getCriteria() );
+            }
+
             Set<ContainerHost> containers = peerManager.getPeer( peerManager.getLocalPeer().getId() ).
                     createContainers( message.getTargetPeerId(), environmentId, message.getTemplates(),
-                            message.getNumberOfNodes(), message.getStrategy(), null, message.getNodeGroupName() );
+                            message.getNumberOfNodes(), message.getStrategy().getStrategyId(), criteriaList,
+                            message.getNodeGroupName() );
             LOG.info( String.format( "Received %d containers for environment %s", containers.size(), environmentId ) );
             setChanged();
             notifyObservers( containers );
         }
         catch ( PeerException e )
         {
+            notifyObservers( e );
             LOG.error( e.getMessage(), e );
         }
     }

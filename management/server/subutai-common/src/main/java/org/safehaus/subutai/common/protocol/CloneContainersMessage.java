@@ -12,7 +12,7 @@ import java.util.UUID;
 public class CloneContainersMessage
 {
     private int numberOfNodes;
-    private String Strategy;
+    private PlacementStrategy strategy;
     private List<String> criteria;
     private List<Template> templates = new ArrayList();
     private String nodeGroupName;
@@ -56,15 +56,15 @@ public class CloneContainersMessage
     }
 
 
-    public String getStrategy()
+    public PlacementStrategy getStrategy()
     {
-        return Strategy;
+        return strategy;
     }
 
 
-    public void setStrategy( final String strategy )
+    public void setStrategy( final PlacementStrategy strategy )
     {
-        Strategy = strategy;
+        this.strategy = strategy;
     }
 
 
@@ -85,7 +85,7 @@ public class CloneContainersMessage
     {
         return "CloneContainersMessage{" +
                 ", numberOfNodes=" + numberOfNodes +
-                ", Strategy='" + Strategy + '\'' +
+                ", Strategy='" + strategy + '\'' +
                 ", criteria=" + criteria +
                 ", templates=" + templates +
                 '}';

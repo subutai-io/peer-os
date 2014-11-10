@@ -20,7 +20,7 @@ import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 /**
  * Handles destroy mongo node operation
  */
-public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
+public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoImpl, MongoClusterConfig>
 {
     private final TrackerOperation po;
     private final String lxcHostname;

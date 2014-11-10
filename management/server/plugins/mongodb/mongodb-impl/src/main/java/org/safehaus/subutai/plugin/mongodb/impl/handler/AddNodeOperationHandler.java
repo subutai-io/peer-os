@@ -35,7 +35,7 @@ import org.safehaus.subutai.plugin.mongodb.impl.MongoRouterNodeImpl;
 /**
  * Handles add mongo node operation
  */
-public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
+public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl, MongoClusterConfig>
 {
     private final TrackerOperation po;
     private final NodeType nodeType;
@@ -89,7 +89,9 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
             templates.add( localPeer.getTemplate( config.getTemplateName() ) );
             Set<ContainerHost> containerHosts = localPeer
                     .createContainers( localPeer.getId(), config.getEnvironmentId(), templates, 1,
-                            MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( nodeType ).name(), null );
+                            MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( nodeType ).getStrategyId(),
+                            MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( nodeType ).getCriteriaAsList(),
+                            "mongoNodeGroup" );
 
             if ( containerHosts.size() != 1 )
             {

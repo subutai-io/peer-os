@@ -4,19 +4,17 @@ package org.safehaus.subutai.common.protocol;
 /**
  * Class for holding container placement strategy criteria.
  */
-public class Criteria
+public class Criteria<T>
 {
     private String id;
-    // title for displaying in UI
-    private String title;
     // Value of criteria. Usually boolean.
-    private Object value;
+    private T value;
 
 
-    public Criteria( String id, String title, Object value )
+    public Criteria( String id, /*String title, */T value )
     {
         this.id = id;
-        this.title = title;
+//        this.title = title;
         this.value = value;
     }
 
@@ -32,26 +30,26 @@ public class Criteria
         this.id = id;
     }
 
+//
+//    public String getTitle()
+//    {
+//        return title;
+//    }
+//
+//
+//    public void setTitle( String title )
+//    {
+//        this.title = title;
+//    }
 
-    public String getTitle()
-    {
-        return title;
-    }
 
-
-    public void setTitle( String title )
-    {
-        this.title = title;
-    }
-
-
-    public Object getValue()
+    public T getValue()
     {
         return value;
     }
 
 
-    public void setValue( Object value )
+    public void setValue( T value )
     {
         this.value = value;
     }

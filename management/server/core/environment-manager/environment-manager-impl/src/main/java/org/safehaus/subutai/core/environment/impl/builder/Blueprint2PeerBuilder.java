@@ -43,7 +43,7 @@ public class Blueprint2PeerBuilder extends EnvironmentBuildProcessFactory
                 ccm.setTargetPeerId( data.getPeerId() );
                 ccm.setNodeGroupName( nodeGroup.getName() );
                 ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
-                ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );
+                ccm.setStrategy( nodeGroup.getPlacementStrategy() );
                 List<Template> templates =
                         fetchRequiredTemplates( environmentManager.getPeerManager().getLocalPeer().getId(),
                                 nodeGroup.getTemplateName() );

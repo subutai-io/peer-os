@@ -47,7 +47,7 @@ public class Node2PeerBuilder extends EnvironmentBuildProcessFactory
                 ccm.setNodeGroupName( nodeGroup.getName() );
                 ccm.setCriteria( null );
                 ccm.setNumberOfNodes( 1 );
-                ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );
+                ccm.setStrategy( nodeGroup.getPlacementStrategy() );
                 List<Template> templates =
                         fetchRequiredTemplates( environmentManager.getPeerManager().getLocalPeer().getId(),
                                 nodeGroup.getTemplateName() );

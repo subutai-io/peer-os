@@ -28,7 +28,7 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
 
     public static PlacementStrategy getNodePlacementStrategy()
     {
-        return PlacementStrategy.ROUND_ROBIN;
+        return new PlacementStrategy( "ROUND_ROBIN" );
     }
 
 

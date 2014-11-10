@@ -9,11 +9,11 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.container.api.ContainerEvent;
 import org.safehaus.subutai.core.container.api.ContainerEventListener;
 import org.safehaus.subutai.core.container.api.ContainerManager;
-import org.safehaus.subutai.core.strategy.api.Criteria;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
@@ -72,7 +72,7 @@ public class CloneMany extends OsgiCommandSupport implements ContainerEventListe
 
             for ( String c : arr )
             {
-                criteria.add( new Criteria( c, c, true ) );
+                criteria.add( new Criteria( c, true ) );
             }
         }
         return criteria;
