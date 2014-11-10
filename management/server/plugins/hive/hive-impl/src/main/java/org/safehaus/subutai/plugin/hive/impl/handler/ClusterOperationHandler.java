@@ -19,7 +19,6 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.impl.Commands;
 import org.safehaus.subutai.plugin.hive.impl.HiveImpl;
-import org.safehaus.subutai.plugin.hive.impl.Product;
 import org.safehaus.subutai.plugin.hive.impl.SetupStrategyOverHadoop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -175,9 +174,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HiveImpl, 
                     host.execute( new RequestBuilder(
                             Commands.uninstallCommand + Common.PACKAGE_PREFIX + HiveConfig.PRODUCT_KEY
                                     .toLowerCase() ) );
-                    host.execute( new RequestBuilder(
-                            Commands.uninstallCommand + Common.PACKAGE_PREFIX + Product.DERBY.toString()
-                                                                                             .toLowerCase() ) );
+                    host.execute( new RequestBuilder( Commands.uninstallCommand + Common.PACKAGE_PREFIX + "derby" ) );
                 }
                 else
                 {

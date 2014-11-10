@@ -114,6 +114,18 @@ public class HiveImpl implements Hive
 
 
     @Override
+    public UUID uninstallCluster( final String hiveClusterName )
+    {
+        HiveConfig config = getCluster( hiveClusterName );
+        HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( config.getHadoopClusterName() );
+        AbstractOperationHandler h =
+                new ClusterOperationHandler( this, config, hadoopClusterConfig, ClusterOperationType.UNINSTALL );
+        executor.execute( h );
+        return h.getTrackerId();
+    }
+
+
+    @Override
     public List<HiveConfig> getClusters()
     {
         return pluginDAO.getInfo( HiveConfig.PRODUCT_KEY, HiveConfig.class );
@@ -139,12 +151,9 @@ public class HiveImpl implements Hive
 
 
     @Override
-    public UUID uninstallCluster( final String hiveClusterName )
+    public UUID addNode( String clusterName, String hostname )
     {
-        HiveConfig config = getCluster( hiveClusterName );
-        HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( config.getHadoopClusterName() );
-        AbstractOperationHandler h =
-                new ClusterOperationHandler( this, config, hadoopClusterConfig, ClusterOperationType.UNINSTALL );
+        AbstractOperationHandler h = new NodeOperationHandler( this, clusterName, hostname, NodeOperationType.INSTALL );
         executor.execute( h );
         return h.getTrackerId();
     }
@@ -180,17 +189,7 @@ public class HiveImpl implements Hive
     @Override
     public UUID restartNode( String clusterName, String hostname )
     {
-        //        AbstractOperationHandler h = new RestartHandler( this, clusterName, hostname );
-        //        executor.execute( h );
-        //        return h.getTrackerId();
-        return null;
-    }
-
-
-    @Override
-    public UUID addNode( String clusterName, String hostname )
-    {
-        AbstractOperationHandler h = new NodeOperationHandler( this, clusterName, hostname, NodeOperationType.INSTALL );
+        AbstractOperationHandler h = new NodeOperationHandler( this, clusterName, hostname, NodeOperationType.RESTART );
         executor.execute( h );
         return h.getTrackerId();
     }

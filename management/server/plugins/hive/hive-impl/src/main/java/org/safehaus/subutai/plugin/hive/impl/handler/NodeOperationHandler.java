@@ -86,6 +86,9 @@ public class NodeOperationHandler extends AbstractOperationHandler<HiveImpl, Hiv
                 case STATUS:
                     result = host.execute( new RequestBuilder( Commands.statusCommand ) );
                     break;
+                case RESTART:
+                    result = host.execute( new RequestBuilder( Commands.restartCommand ) );
+                    break;
                 case UNINSTALL:
                     result = uninstallProductOnNode( host );
                     break;

@@ -69,27 +69,23 @@ public class SetupStrategyOverHadoop extends HiveSetupStrategy
 
         // installation of server
         trackerOperation.addLog( "Installing server..." );
-        for ( Product p : new Product[] { Product.HIVE, Product.DERBY } )
+        try
         {
-            try
+            if ( !checkIfProductIsInstalled( server, HiveConfig.PRODUCT_KEY.toLowerCase() ) )
             {
-                if ( !checkIfProductIsInstalled( server, HiveConfig.PRODUCT_KEY.toLowerCase() ) )
-                {
-                    server.execute( new RequestBuilder(
-                            Commands.installCommand + Common.PACKAGE_PREFIX + Product.HIVE.toString().toLowerCase() ) );
-                }
-                if ( !checkIfProductIsInstalled( server, Product.DERBY.toString().toLowerCase() ) )
-                {
-                    server.execute( new RequestBuilder(
-                            Commands.installCommand + Common.PACKAGE_PREFIX + Product.DERBY.toString()
-                                                                                           .toLowerCase() ) );
-                }
+                server.execute( new RequestBuilder(
+                        Commands.installCommand + Common.PACKAGE_PREFIX + HiveConfig.PRODUCT_KEY.toLowerCase() ) );
             }
-            catch ( CommandException e )
+            if ( !checkIfProductIsInstalled( server, "derby" ) )
             {
-                throw new ClusterSetupException( String.format( "Failed to install %s on server node", p.toString() ) );
+                server.execute( new RequestBuilder( Commands.installCommand + Common.PACKAGE_PREFIX + "derby" ) );
             }
         }
+        catch ( CommandException e )
+        {
+            throw new ClusterSetupException( String.format( "Failed to install derby on server node !!! " ) );
+        }
+
         trackerOperation.addLog( "Server installation completed" );
 
 
@@ -103,14 +99,14 @@ public class SetupStrategyOverHadoop extends HiveSetupStrategy
                 if ( !checkIfProductIsInstalled( client, HiveConfig.PRODUCT_KEY.toLowerCase() ) )
                 {
                     client.execute( new RequestBuilder(
-                            Commands.installCommand + Common.PACKAGE_PREFIX + Product.HIVE.toString().toLowerCase() ) );
-                    trackerOperation.addLog( Product.HIVE.name() + " is installed on " + client.getHostname() );
+                            Commands.installCommand + Common.PACKAGE_PREFIX + HiveConfig.PRODUCT_KEY.toLowerCase() ) );
+                    trackerOperation.addLog( HiveConfig.PRODUCT_KEY + " is installed on " + client.getHostname() );
                 }
             }
             catch ( CommandException e )
             {
                 throw new ClusterSetupException(
-                        String.format( "Failed to install %s on server node", Product.HIVE.toString() ) );
+                        String.format( "Failed to install %s on server node", HiveConfig.PRODUCT_KEY ) );
             }
         }
 

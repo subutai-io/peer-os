@@ -11,8 +11,6 @@ public interface Hive extends ApiBase<HiveConfig>
 
     public UUID installCluster( HiveConfig config, String hadoopClusterName );
 
-    public UUID uninstallCluster( String hiveClusterName );
-
     public UUID addNode( String hiveClusterName, String hostname );
 
     public UUID statusCheck( String hiveClusterName, String hostname );

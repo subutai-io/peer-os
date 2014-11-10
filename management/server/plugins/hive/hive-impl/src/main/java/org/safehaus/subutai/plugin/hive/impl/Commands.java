@@ -7,7 +7,6 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 public class Commands
 {
-
     public static final String EXEC_PROFILE = ". /etc/profile";
 
     public static final String installCommand = "apt-get --force-yes --assume-yes install ";
@@ -16,12 +15,11 @@ public class Commands
 
     public static final String startCommand = "service hive-thrift start";
 
-
     public static final String stopCommand = "service hive-thrift stop";
 
+    public static final String restartCommand = "service hive-thrift restart";
 
     public static final String statusCommand = "service hive-thrift status";
-
 
     public static final String checkIfInstalled = "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH;
 
