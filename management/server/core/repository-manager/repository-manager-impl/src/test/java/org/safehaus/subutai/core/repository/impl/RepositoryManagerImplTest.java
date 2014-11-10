@@ -10,7 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;

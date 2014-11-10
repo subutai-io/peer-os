@@ -5,7 +5,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
-import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;

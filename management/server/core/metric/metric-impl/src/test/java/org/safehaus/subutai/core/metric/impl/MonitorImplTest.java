@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;

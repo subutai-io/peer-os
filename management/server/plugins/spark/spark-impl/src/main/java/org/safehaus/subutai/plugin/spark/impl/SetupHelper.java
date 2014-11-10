@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.spark.impl;
 import java.util.Set;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;

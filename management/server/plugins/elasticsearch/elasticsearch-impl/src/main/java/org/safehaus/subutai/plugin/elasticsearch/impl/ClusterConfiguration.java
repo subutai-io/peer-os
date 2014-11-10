@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.elasticsearch.impl;
 
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
-import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.protocol.RequestBuilder;

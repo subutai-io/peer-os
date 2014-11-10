@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 
 import java.util.Iterator;
 
-import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;

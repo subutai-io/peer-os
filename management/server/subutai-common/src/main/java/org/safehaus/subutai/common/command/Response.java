@@ -1,6 +1,7 @@
 package org.safehaus.subutai.common.command;
 
 
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -24,4 +25,6 @@ public interface Response
     public String getStdErr();
 
     public int getExitCode();
+
+    public Set<String> getConfigPoints();
 }
