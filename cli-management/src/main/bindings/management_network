@@ -506,7 +506,7 @@ function management_network {
          show_usage "`management_network_usage`"
       fi
       ovs-vsctl del-br br-$vlanID
-      ovs-vsctl del-port br-int into$vlanID
+      ovs-vsctl del-port br-int intto$vlanID
       msg_info "Gateway removed for $vlanID"
    fi
 
