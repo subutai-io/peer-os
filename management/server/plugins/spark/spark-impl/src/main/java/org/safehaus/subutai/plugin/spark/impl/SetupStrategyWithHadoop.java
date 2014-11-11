@@ -1,6 +1,7 @@
 package org.safehaus.subutai.plugin.spark.impl;
 
 
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
@@ -41,9 +42,16 @@ public class SetupStrategyWithHadoop implements ClusterSetupStrategy
     @Override
     public ConfigBase setup() throws ClusterSetupException
     {
+        check();
+        configure();
+        return config;
+    }
+
+
+    private void check() throws ClusterSetupException
+    {
         try
         {
-
             if ( manager.getCluster( config.getClusterName() ) != null )
             {
                 throw new ClusterSetupException( "Cluster already exists: " + config.getClusterName() );
@@ -93,20 +101,28 @@ public class SetupStrategyWithHadoop implements ClusterSetupStrategy
             {
                 throw new ClusterSetupException( "Environment has no slave nodes" );
             }
-
-
-            po.addLog( "Saving cluster info..." );
-            manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-            po.addLog( "Cluster info saved to DB" );
-
-            SetupHelper helper = new SetupHelper( manager, config, environment, po );
-            helper.configureMasterIP();
-            helper.registerSlaves();
-            helper.startCluster();
-
-            return config;
         }
         catch ( PeerException e )
+        {
+            throw new ClusterSetupException( e );
+        }
+    }
+
+
+    private void configure() throws ClusterSetupException
+    {
+
+        po.addLog( "Saving cluster info..." );
+        manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        po.addLog( "Cluster info saved to DB" );
+
+        ClusterConfiguration configuration = new ClusterConfiguration( manager, po );
+
+        try
+        {
+            configuration.configureCluster( config, environment );
+        }
+        catch ( ClusterConfigurationException e )
         {
             throw new ClusterSetupException( e );
         }

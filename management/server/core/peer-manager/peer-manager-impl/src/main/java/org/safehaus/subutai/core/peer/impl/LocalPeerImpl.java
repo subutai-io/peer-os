@@ -13,15 +13,18 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.enums.ResponseType;
-import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CommandCallback;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.CommandStatus;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.NullAgent;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.protocol.Template;
@@ -50,6 +53,8 @@ import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.peer.api.SubutaiHost;
 import org.safehaus.subutai.core.peer.api.SubutaiInitException;
+import org.safehaus.subutai.core.peer.impl.command.CommandResultImpl;
+import org.safehaus.subutai.core.peer.impl.command.TempResponseConverter;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -547,13 +552,13 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
 
 
     @Override
-    public boolean isConnected( final Host aHost ) throws PeerException
+    public boolean isConnected( final Host ahost ) throws PeerException
     {
-        Host host = bindHost( aHost.getId() );
+        Host host = bindHost( ahost.getId() );
         if ( host instanceof ContainerHost )
         {
-            boolean b = checkHeartbeat( host.getLastHeartbeat() );
-            return ContainerState.RUNNING.equals( ( ( ContainerHost ) host ).getState() ) && b;
+            return ContainerState.RUNNING.equals( ( ( ContainerHost ) host ).getState() ) && checkHeartbeat(
+                    host.getLastHeartbeat() );
         }
         else
         {
@@ -693,21 +698,19 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
 
 
     @Override
-    public CommandResult execute( final RequestBuilder requestBuilder, final Host host )
-            throws PeerException, CommandException
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
         return execute( requestBuilder, host, null );
     }
 
 
     @Override
-    public CommandResult execute( final RequestBuilder requestBuilder, final Host aHost,
-                                  final CommandCallback callback ) throws PeerException, CommandException
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+            throws CommandException
     {
-        Host host = bindHost( aHost.getId() );
         if ( !host.isConnected() )
         {
-            throw new PeerException( "Host disconnected." );
+            throw new CommandException( "Host disconnected." );
         }
         Agent agent = host.getAgent();
         Command command = commandRunner.createCommand( requestBuilder, Sets.newHashSet( agent ) );
@@ -718,9 +721,14 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
             {
                 if ( callback != null )
                 {
-                    callback.onResponse( response,
-                            new CommandResult( agentResult.getExitCode(), agentResult.getStdOut(),
+                    //TODO after migration to command executor pass response without conversion
+                    callback.onResponse( TempResponseConverter.convertResponse( response ),
+                            new CommandResultImpl( agentResult.getExitCode(), agentResult.getStdOut(),
                                     agentResult.getStdErr(), command.getCommandStatus() ) );
+                    if ( callback.isStopped() )
+                    {
+                        stop();
+                    }
                 }
             }
         } );
@@ -729,21 +737,20 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
 
         if ( agentResult != null )
         {
-            return new CommandResult( agentResult.getExitCode(), agentResult.getStdOut(), agentResult.getStdErr(),
+            return new CommandResultImpl( agentResult.getExitCode(), agentResult.getStdOut(), agentResult.getStdErr(),
                     command.getCommandStatus() );
         }
         else
         {
-            return new CommandResult( null, null, null, CommandStatus.TIMEOUT );
+            return new CommandResultImpl( null, null, null, CommandStatus.TIMEOUT );
         }
     }
 
 
     @Override
-    public void executeAsync( final RequestBuilder requestBuilder, final Host aHost, final CommandCallback callback )
-            throws PeerException, CommandException
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+            throws CommandException
     {
-        Host host = bindHost( aHost.getId() );
         if ( !host.isConnected() )
         {
             throw new CommandException( "Host disconnected." );
@@ -757,9 +764,14 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
             {
                 if ( callback != null )
                 {
-                    callback.onResponse( response,
-                            new CommandResult( agentResult.getExitCode(), agentResult.getStdOut(),
+                    //TODO after migration to command executor pass response without conversion
+                    callback.onResponse( TempResponseConverter.convertResponse( response ),
+                            new CommandResultImpl( agentResult.getExitCode(), agentResult.getStdOut(),
                                     agentResult.getStdErr(), command.getCommandStatus() ) );
+                    if ( callback.isStopped() )
+                    {
+                        stop();
+                    }
                 }
             }
         } );
@@ -767,8 +779,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
 
 
     @Override
-    public void executeAsync( final RequestBuilder requestBuilder, final Host host )
-            throws PeerException, CommandException
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
         executeAsync( requestBuilder, host, null );
     }

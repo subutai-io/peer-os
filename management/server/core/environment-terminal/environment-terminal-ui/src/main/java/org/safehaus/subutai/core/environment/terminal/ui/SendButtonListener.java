@@ -4,12 +4,12 @@ package org.safehaus.subutai.core.environment.terminal.ui;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.enums.ResponseType;
-import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.protocol.CommandCallback;
-import org.safehaus.subutai.common.protocol.CommandResult;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.Response;
+import org.safehaus.subutai.common.command.ResponseType;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.NumUtil;
@@ -131,7 +131,7 @@ public class SendButtonListener implements Button.ClickListener
                     @Override
                     public void onResponse( final Response response, final CommandResult commandResult )
                     {
-                        displayResponse( response );
+                        displayResponse( response, commandResult );
                     }
                 } );
             }
@@ -151,7 +151,7 @@ public class SendButtonListener implements Button.ClickListener
         }
 
 
-        private void displayResponse( Response response )
+        private void displayResponse( Response response, CommandResult commandResult )
         {
             StringBuilder out = new StringBuilder();
             if ( !Strings.isNullOrEmpty( response.getStdOut() ) )
@@ -162,13 +162,13 @@ public class SendButtonListener implements Button.ClickListener
             {
                 out.append( response.getStdErr() ).append( "\n" );
             }
-            if ( response.isFinal() )
+            if ( commandResult.hasCompleted() || commandResult.hasTimedOut() )
             {
-                if ( response.getType() == ResponseType.EXECUTE_RESPONSE_DONE && response.getExitCode() != 0 )
+                if ( response.getType() == ResponseType.EXECUTE_RESPONSE && response.getExitCode() != 0 )
                 {
                     out.append( "Exit code: " ).append( response.getExitCode() ).append( "\n\n" );
                 }
-                else if ( response.getType() != ResponseType.EXECUTE_RESPONSE_DONE )
+                else if ( response.getType() != ResponseType.EXECUTE_RESPONSE )
                 {
                     out.append( response.getType() ).append( "\n\n" );
                 }

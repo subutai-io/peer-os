@@ -18,9 +18,8 @@
 
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
-  <!--
-    <reference id="containerManager" interface="org.safehaus.subutai.core.container.api.ContainerManager" />
-  -->
+
+  <reference id="commandExecutor" interface="org.safehaus.subutai.core.executor.api.CommandExecutor" />
 
   <reference id="templateRegistry" interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
 
@@ -39,6 +38,7 @@
     <property name="communicationManager" ref="communicationManager" />
     <property name="strategyManager" ref="strategyManager" />
     <property name="quotaManager" ref="quotaManager" />
+    <property name="commandExecutor" ref="commandExecutor" />
 
     <argument ref="dataSource" />
     <argument ref="messenger" />

@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.protocol.CommandCallback;
-import org.safehaus.subutai.common.protocol.CommandResult;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.common.protocol.Criteria;

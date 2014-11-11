@@ -27,12 +27,12 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>command-runner-api</artifactId>
     </dependency>
-    <!--
+
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>container-manager-api</artifactId>
+      <artifactId>command-executor-api</artifactId>
     </dependency>
-    -->
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>template-registry-api</artifactId>
