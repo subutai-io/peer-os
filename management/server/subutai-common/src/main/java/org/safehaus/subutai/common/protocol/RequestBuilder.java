@@ -289,7 +289,7 @@ public class RequestBuilder
     }
 
 
-    public org.safehaus.subutai.common.command.Request build( UUID id )
+    public org.safehaus.subutai.common.command.Request build2( UUID id )
     {
         //TODO pass proper arguments after migration to new agent
         return new RequestImpl( org.safehaus.subutai.common.command.RequestType.EXECUTE_REQUEST, id, cwd, command,

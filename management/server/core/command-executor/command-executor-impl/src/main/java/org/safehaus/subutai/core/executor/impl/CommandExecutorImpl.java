@@ -9,8 +9,8 @@ import org.safehaus.subutai.common.command.Request;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.broker.api.Broker;
 import org.safehaus.subutai.core.broker.api.BrokerException;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +68,7 @@ public class CommandExecutorImpl implements CommandExecutor
         Preconditions.checkNotNull( hostId, "Invalid host id" );
         Preconditions.checkNotNull( requestBuilder, "Invalid request builder" );
 
-        Request request = requestBuilder.build( hostId );
-
-
+        Request request = requestBuilder.build2( hostId );
     }
 
 
