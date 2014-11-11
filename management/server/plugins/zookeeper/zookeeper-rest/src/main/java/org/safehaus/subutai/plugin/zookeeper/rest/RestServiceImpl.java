@@ -32,6 +32,13 @@ public class RestServiceImpl implements RestService
         return environmentManager;
     }
 
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
+    }
+
+
     public void setZookeeperManager( Zookeeper zookeeperManager )
     {
         this.zookeeperManager = zookeeperManager;

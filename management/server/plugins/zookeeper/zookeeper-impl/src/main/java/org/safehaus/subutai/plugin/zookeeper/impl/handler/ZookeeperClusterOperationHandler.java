@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -22,6 +23,7 @@ import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.impl.ClusterConfiguration;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 import org.slf4j.Logger;
@@ -40,11 +42,12 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
     private static final Logger LOG = LoggerFactory.getLogger( ZookeeperClusterOperationHandler.class.getName() );
     private ClusterOperationType operationType;
     private ZookeeperClusterConfig zookeeperClusterConfig;
-    private HadoopClusterConfig hadoopClusterConfig;
+    private String hostName;
     private ExecutorService executor = Executors.newCachedThreadPool();
 
 
-    public ZookeeperClusterOperationHandler( final ZookeeperImpl manager, final ZookeeperClusterConfig config,
+    public ZookeeperClusterOperationHandler( final ZookeeperImpl manager,
+                                             final ZookeeperClusterConfig config,
                                              final ClusterOperationType operationType )
     {
         super( manager, config );
@@ -57,13 +60,13 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
 
     public ZookeeperClusterOperationHandler( final ZookeeperImpl manager,
                                              final ZookeeperClusterConfig zookeeperClusterConfig,
-                                             final HadoopClusterConfig hadoopClusterConfig,
+                                             final String hostName,
                                              final ClusterOperationType operationType )
     {
-        super( manager, zookeeperClusterConfig.getClusterName() );
+        super( manager, zookeeperClusterConfig );
         this.operationType = operationType;
         this.zookeeperClusterConfig = zookeeperClusterConfig;
-        this.hadoopClusterConfig = hadoopClusterConfig;
+        this.hostName = hostName;
         trackerOperation = manager.getTracker().createTrackerOperation( zookeeperClusterConfig.getProductKey(),
                 String.format( "Creating %s tracker object...", clusterName ) );
     }
@@ -91,6 +94,12 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
                         destroyCluster();
                     }
                 } );
+                break;
+            case START_ALL:
+            case STOP_ALL:
+            case STATUS_ALL:
+            case ADD:
+                runOperationOnContainers( operationType );
                 break;
         }
     }
@@ -124,8 +133,26 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
                             new Commands().getStatusCommand() ) );
                 }
                 break;
+            case ADD:
+                if ( zookeeperClusterConfig.getSetupType() == SetupType.OVER_HADOOP )
+                    commandResultList.addAll( addNode( hostName ) );
+                else if ( zookeeperClusterConfig.getSetupType() == SetupType.STANDALONE )
+                    commandResultList.addAll( addNode() );
+                else {
+                    trackerOperation.addLogFailed( "Not supported SetupType" );
+                    return;
+                }
+                break;
         }
         logResults( trackerOperation, commandResultList );
+    }
+
+
+    private List<CommandResult> addNode()
+    {
+        List<CommandResult> commandResultList = new ArrayList<>();
+        trackerOperation.addLogDone( "Adding node on standalone Zookeeper cluster is not supported yet!" );
+        return commandResultList;
     }
 
 
@@ -229,6 +256,34 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
         }
     }
 
+
+    public List<CommandResult> addNode ( String hostName ) {
+        List<CommandResult> commandResultList = new ArrayList<>();
+        Environment zookeeperEnvironment = manager.getEnvironmentManager().
+                getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
+        HadoopClusterConfig hadoopCluster = manager.getHadoopManager().
+                getCluster( zookeeperClusterConfig.getHadoopClusterName() );
+        Environment hadoopEnvironment = manager.getEnvironmentManager().
+                getEnvironmentByUUID( hadoopCluster.getEnvironmentId() );
+        try
+        {
+            ContainerHost newNode = hadoopEnvironment.getContainerHostByHostname( hostName );
+            commandResultList.add( executeCommand( newNode,
+                    Commands.getInstallCommand() ) );
+            zookeeperClusterConfig.getNodes().add( newNode.getId() );
+            new ClusterConfiguration( manager, trackerOperation ).configureCluster( zookeeperClusterConfig,
+                    zookeeperEnvironment );
+            trackerOperation.addLog( "Updating cluster information..." );
+            manager.getPluginDAO()
+                   .saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, zookeeperClusterConfig.getClusterName(),
+                           zookeeperClusterConfig );
+        }
+        catch ( ClusterConfigurationException e )
+        {
+            e.printStackTrace();
+        }
+        return commandResultList;
+    }
 
     public void logResults( TrackerOperation po, List<CommandResult> commandResultList )
     {

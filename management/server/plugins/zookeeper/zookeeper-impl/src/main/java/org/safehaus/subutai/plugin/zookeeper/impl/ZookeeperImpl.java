@@ -22,7 +22,6 @@ import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -219,12 +218,12 @@ public class ZookeeperImpl implements Zookeeper
     public UUID addNode( String clusterName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        ZookeeperClusterConfig zookeeperClusterConfig = getCluster( clusterName );
 
-        return null;
-        //TODO add this functionality when environment builder has this functionality
-//        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName );
-//        executor.execute( operationHandler );
-//        return operationHandler.getTrackerId();
+        AbstractOperationHandler operationHandler = new ZookeeperClusterOperationHandler( this, zookeeperClusterConfig,
+                ClusterOperationType.ADD );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
@@ -232,12 +231,11 @@ public class ZookeeperImpl implements Zookeeper
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostname ), "Lxc hostname is null or empty" );
-
-        return null;
-        //TODO add this functionality when environment builder has this functionality
-//        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
-//        executor.execute( operationHandler );
-//        return operationHandler.getTrackerId();
+        ZookeeperClusterConfig zookeeperClusterConfig = getCluster( clusterName );
+        AbstractOperationHandler operationHandler = new ZookeeperClusterOperationHandler( this, zookeeperClusterConfig,
+                lxcHostname, ClusterOperationType.ADD );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
