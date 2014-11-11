@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.Request;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.broker.api.Broker;
 import org.safehaus.subutai.core.broker.api.BrokerException;
@@ -64,6 +65,11 @@ public class CommandExecutorImpl implements CommandExecutor
     @Override
     public void executeAsync( final UUID hostId, final RequestBuilder requestBuilder, final CommandCallback callback )
     {
+        Preconditions.checkNotNull( hostId, "Invalid host id" );
+        Preconditions.checkNotNull( requestBuilder, "Invalid request builder" );
+
+        Request request = requestBuilder.build( hostId );
+
 
     }
 

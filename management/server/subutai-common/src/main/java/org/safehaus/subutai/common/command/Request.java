@@ -31,5 +31,5 @@ public interface Request
 
     public String getRunAs();
 
-    public int getTimeout();
+    public Integer getTimeout();
 }
