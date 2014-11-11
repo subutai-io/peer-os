@@ -215,7 +215,7 @@ int main(int argc,char *argv[],char *envp[])
      */
     SubutaiWatch Watcher(connection, &response, &logMain);
     Watcher.initialize(20000);
-    logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "The Watcher is initializing.."));
+    logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Watcher is initializing.."));
 
     /*
      * initializing timer for periodical operations
@@ -227,6 +227,7 @@ int main(int argc,char *argv[],char *envp[])
      * Send initial heartbeat for registration of resource host and container nodes attached to this host.
      */
     timer.sendHeartBeat();
+    logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Sending first heartbeat.."));
     //cman.getRunningContainers()[0].tryLongCommand();
     while(true)
     {
@@ -327,33 +328,32 @@ int main(int argc,char *argv[],char *envp[])
                     {
                         int retstatus; string resp;
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Termination request ID:",helper.toString(command.getPid())));
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID.."));
 
                         if (command.getPid() > 0)
                         {
                             if( isLocal)
                             {
+                            	logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on resource host: " + command.getPid()));
                                 retstatus = kill(command.getPid(),SIGKILL);
                                 resp = response.createTerminateMessage(environment.getAgentUuidValue(),
                                         command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
                             }
                             else
                             {
+                            	logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on container node: " + command.getPid()));
+
                                 command.setCommand("/bin/kill -9 " + helper.toString(command.getPid()) );
                                 ExecutionResult execResult = target_container->RunCommand(&command);
                                 retstatus  = execResult.exit_code;
 
                                 resp = response.createTerminateMessage(target_container->getContainerIdValue(),
                                         command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
+
                             }
 
-                            cout << "msg: " << resp << endl;
                             connection->sendMessage(resp);
+                        	logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate response: " + resp));
 
-                            if (retstatus == 0) //termination is successfully done
-                                logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate success Response:", resp));
-                            else //termination is failed
-                                logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Terminate Fail Response! Received PID:", helper.toString(command.getPid())));
                         }
                         else
                         {
@@ -365,34 +365,28 @@ int main(int argc,char *argv[],char *envp[])
                     	string preArg = "";
                     	if(target_container) preArg = "/var/lib/lxc/" + target_container->getContainerHostnameValue() + "/rootfs";
 
-                    	logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","executing INOTIFY_REQUEST.."));
+                    	logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","executing SET_INOTIFY_REQUEST.."));
                         for (unsigned int i=0; i<command.getWatchArguments().size();i++) {
                         	Watcher.addWatcher(preArg + command.getWatchArguments()[i]);
                         	logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>","adding Watcher: ",
                         			preArg + command.getWatchArguments()[i]));
                         }
                         Watcher.stats();
-                        //sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(), response.getConfPoints());
-                        //connection->sendMessage(sendout);
                         Watcher.stats();
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));
                      }
                      else if (command.getType() == "UNSET_INOTIFY_REQUEST")
                      {
                     	 string preArg = "";
                     	 if(target_container) preArg = "/var/lib/lxc/" + target_container->getContainerHostnameValue() + "/rootfs";
 
-                        logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "executing INOTIFY_CANCEL_REQUEST.."));
-                        for (unsigned int i = 0; i < command.getWatchArguments().size(); i++) {
+                         logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "executing INOTIFY_CANCEL_REQUEST.."));
+                         for (unsigned int i = 0; i < command.getWatchArguments().size(); i++) {
                         	Watcher.eraseWatcher(preArg + command.getWatchArguments()[i]);
                         	logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Erasing Watcher: ",
                         			preArg + command.getWatchArguments()[i]));
                         }
                         Watcher.stats();
-                        //sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(), response.getConfPoints());
-                        //connection->sendMessage(sendout);
                         Watcher.stats();
-                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));
                     }
                     else if (command.getType() == "INOTIFY_LIST_REQUEST") {
                         logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "executing INOTIFY_SHOW_REQUEST.."));
