@@ -3,6 +3,8 @@ package org.safehaus.subutai.core.hostregistry.impl;
 
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -10,6 +12,8 @@ import org.safehaus.subutai.core.hostregistry.api.HostListener;
  */
 public class HostNotifier implements Runnable
 {
+    private static final Logger LOG = LoggerFactory.getLogger( HostNotifier.class.getName() );
+
     private HostListener listener;
     private HostInfo info;
 
@@ -24,6 +28,13 @@ public class HostNotifier implements Runnable
     @Override
     public void run()
     {
-        listener.onHeartbeat( info );
+        try
+        {
+            listener.onHeartbeat( info );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in run", e );
+        }
     }
 }

@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;

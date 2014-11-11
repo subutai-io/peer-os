@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.protocol.NullAgent;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.util.ServiceLocator;
 
 import com.google.common.base.Preconditions;

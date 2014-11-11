@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 
 
 /**
