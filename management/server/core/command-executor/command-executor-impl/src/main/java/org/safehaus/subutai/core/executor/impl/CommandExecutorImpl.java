@@ -26,17 +26,15 @@ public class CommandExecutorImpl implements CommandExecutor
     private static final Logger LOG = LoggerFactory.getLogger( CommandExecutorImpl.class.getName() );
 
     private final Broker broker;
-    private final HostRegistry hostRegistry;
     private CommandProcessor commandProcessor;
 
 
     public CommandExecutorImpl( final Broker broker, final HostRegistry hostRegistry )
     {
         Preconditions.checkNotNull( broker, "Broker is null" );
-        Preconditions.checkNotNull( hostRegistry, "Container Registry is null" );
+        Preconditions.checkNotNull( hostRegistry, "Host Registry is null" );
 
         this.broker = broker;
-        this.hostRegistry = hostRegistry;
         this.commandProcessor = new CommandProcessor( broker, hostRegistry );
     }
 
@@ -44,7 +42,7 @@ public class CommandExecutorImpl implements CommandExecutor
     @Override
     public CommandResult execute( final UUID hostId, final RequestBuilder requestBuilder ) throws CommandException
     {
-        return null;
+        return execute( hostId, requestBuilder, new DummyCallback() );
     }
 
 
@@ -52,14 +50,22 @@ public class CommandExecutorImpl implements CommandExecutor
     public CommandResult execute( final UUID hostId, final RequestBuilder requestBuilder,
                                   final CommandCallback callback ) throws CommandException
     {
-        return null;
+        Preconditions.checkNotNull( hostId, "Invalid host id" );
+        Preconditions.checkNotNull( requestBuilder, "Invalid request builder" );
+        Preconditions.checkNotNull( requestBuilder, "Invalid callback" );
+
+        Request request = requestBuilder.build2( hostId );
+
+        commandProcessor.execute( request, callback );
+
+        return commandProcessor.getResult( request.getCommandId() );
     }
 
 
     @Override
     public void executeAsync( final UUID hostId, final RequestBuilder requestBuilder ) throws CommandException
     {
-
+        executeAsync( hostId, requestBuilder, new DummyCallback() );
     }
 
 
@@ -69,9 +75,9 @@ public class CommandExecutorImpl implements CommandExecutor
     {
         Preconditions.checkNotNull( hostId, "Invalid host id" );
         Preconditions.checkNotNull( requestBuilder, "Invalid request builder" );
+        Preconditions.checkNotNull( requestBuilder, "Invalid callback" );
 
-        Request request = requestBuilder.build2( hostId );
-        commandProcessor.execute( request, callback );
+        commandProcessor.execute( requestBuilder.build2( hostId ), callback );
     }
 
 

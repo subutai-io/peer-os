@@ -42,6 +42,7 @@ public class CommandProcess
 
         this.commandProcessor = commandProcessor;
         this.callback = callback;
+
         stdOut = new StringBuilder();
         stdErr = new StringBuilder();
         status = CommandStatus.NEW;
@@ -57,7 +58,7 @@ public class CommandProcess
         }
         catch ( InterruptedException e )
         {
-            //ignore
+            LOG.error( "ignore", e );
         }
 
         return getResult();
