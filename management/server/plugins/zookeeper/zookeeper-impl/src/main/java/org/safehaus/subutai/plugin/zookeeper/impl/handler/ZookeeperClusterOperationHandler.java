@@ -54,7 +54,7 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
         this.operationType = operationType;
         this.zookeeperClusterConfig = config;
         trackerOperation = manager.getTracker().createTrackerOperation( config.getProductKey(),
-                String.format( "Creating %s tracker object...", clusterName ) );
+                String.format( "Running %s operaion on %s...", operationType , clusterName ) );
     }
 
 
@@ -68,7 +68,7 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
         this.zookeeperClusterConfig = zookeeperClusterConfig;
         this.hostName = hostName;
         trackerOperation = manager.getTracker().createTrackerOperation( zookeeperClusterConfig.getProductKey(),
-                String.format( "Creating %s tracker object...", clusterName ) );
+                String.format( "Running %s operation on %s...", operationType , clusterName ) );
     }
 
 

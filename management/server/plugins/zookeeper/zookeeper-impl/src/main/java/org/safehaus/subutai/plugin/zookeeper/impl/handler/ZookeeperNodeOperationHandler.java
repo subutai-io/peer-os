@@ -39,9 +39,8 @@ public class ZookeeperNodeOperationHandler extends AbstractOperationHandler<Zook
         this.hostname = hostname;
         this.clusterName = clusterName;
         this.operationType = operationType;
-        this.trackerOperation = manager.getTracker()
-                                       .createTrackerOperation( ZookeeperClusterConfig.PRODUCT_NAME,
-                                               String.format( "Creating %s tracker object...", clusterName ) );
+        this.trackerOperation = manager.getTracker().createTrackerOperation( ZookeeperClusterConfig.PRODUCT_NAME,
+                String.format( "Running %s operaion on %s...", operationType, hostname ) );
     }
 
 
