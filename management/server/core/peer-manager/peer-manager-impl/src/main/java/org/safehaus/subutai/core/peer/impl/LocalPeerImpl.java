@@ -179,21 +179,21 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
                 .createContainer( this, getId(), envId, Lists.newArrayList( getTemplate( templateName ) ), cloneName,
                         "custom" );
 
-        Set<ContainerHost> containerhosts = waitAndReturnContainersByEnvironment( envId, 1 );
+        Set<ContainerHost> containerHosts = waitContainerHosts( envId, envId.toString(), 1 );
 
-        return containerhosts.iterator().next();
+        return containerHosts.iterator().next();
         //        resourceHost.addContainerHost( containerHost );
         //        peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
         //        return containerHost;
     }
 
 
-    private Set<ContainerHost> waitAndReturnContainersByEnvironment( UUID environmentId, int quantity )
+    private Set<ContainerHost> waitContainerHosts( UUID environmentId, String nodeGroup, int quantity )
             throws PeerException
     {
 
         Set<ContainerHost> result = new HashSet<>();
-        long threshold = System.currentTimeMillis() + 30 * quantity * 1000;
+        long threshold = System.currentTimeMillis() + 60 * quantity * 1000;
         while ( result.size() != quantity && threshold - System.currentTimeMillis() > 0 )
         {
             try
@@ -203,7 +203,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
             catch ( InterruptedException ignore )
             {
             }
-            result = getContainerHostsByEnvironmentId( environmentId );
+            result = getContainerHostsByEnvironmentIdAndNodeGroupName( environmentId, nodeGroup );
         }
         if ( result.size() != quantity )
         {
@@ -269,6 +269,9 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
                                                 final String strategyId, final List<Criteria> criteria,
                                                 String nodeGroupName ) throws PeerException
     {
+        LOG.info( String.format( "=============> Received: %s %d %s", nodeGroupName, quantity,
+                creatorPeerId.toString() ) );
+
         Set<ContainerHost> result = new HashSet<>();
         try
         {
@@ -324,12 +327,14 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
                 ResourceHost resourceHost = getResourceHostByName( rh.getHostname() );
                 for ( String cloneName : clones )
                 {
+                    LOG.info(
+                            String.format( "+++++++++++++++++++++> Ordered: %s on %s", cloneName, rh.getHostname() ) );
                     resourceHost
                             .createContainer( this, creatorPeerId, environmentId, templates, cloneName, nodeGroupName );
                 }
             }
 
-            return waitAndReturnContainersByEnvironment( environmentId, quantity );
+            return waitContainerHosts( environmentId, nodeGroupName, quantity );
         }
         catch ( Exception e )
         {
@@ -437,6 +442,26 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
             result.addAll( resourceHost.getContainerHostsByEnvironmentId( environmentId ) );
+        }
+        return result;
+    }
+
+
+    private Set<ContainerHost> getContainerHostsByEnvironmentIdAndNodeGroupName( final UUID environmentId,
+                                                                                 String nodeGroupName )
+            throws PeerException
+    {
+        Set<ContainerHost> result = new HashSet<>();
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            Set<ContainerHost> containerHosts = resourceHost.getContainerHostsByEnvironmentId( environmentId );
+            for ( ContainerHost containerHost : containerHosts )
+            {
+                if ( nodeGroupName.equals( containerHost.getNodeGroupName() ) )
+                {
+                    result.add( containerHost );
+                }
+            }
         }
         return result;
     }
