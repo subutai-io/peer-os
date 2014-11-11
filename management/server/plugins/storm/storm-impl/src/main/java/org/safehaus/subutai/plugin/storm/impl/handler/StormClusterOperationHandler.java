@@ -217,18 +217,22 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
         Preconditions.checkNotNull( commandResultList );
         for ( CommandResult commandResult : commandResultList )
             po.addLog( commandResult.getStdOut() );
-        String finishMessage = String.format( "%s operation finished", operationType );
-        switch ( po.getState() )
-        {
-            case SUCCEEDED:
-                po.addLogDone( finishMessage );
-                break;
-            case FAILED:
-                po.addLogFailed( finishMessage );
-                break;
-            default:
-                po.addLogDone( String.format( "Still running %s operations on %s", operationType ) );
-                break;
+        if ( getFailedCommandResults( commandResultList ).size() == 0 ) {
+            po.addLogDone( "" );
         }
+        else {
+            po.addLogFailed( "" );
+        }
+    }
+
+
+    public List<CommandResult> getFailedCommandResults( final List<CommandResult> commandResultList )
+    {
+        List<CommandResult> failedCommands = new ArrayList<>();
+        for ( CommandResult commandResult : commandResultList ) {
+            if ( ! commandResult.hasSucceeded() )
+                failedCommands.add( commandResult );
+        }
+        return failedCommands;
     }
 }
