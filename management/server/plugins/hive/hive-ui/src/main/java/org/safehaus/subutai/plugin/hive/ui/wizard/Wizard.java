@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -23,10 +24,11 @@ public class Wizard
     private final Hive hive;
     private final Hadoop hadoop;
     private final ExecutorService executorService;
+    private final EnvironmentManager environmentManager;
     private final Tracker tracker;
     private int step = 1;
     private HiveConfig config = new HiveConfig();
-    private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
+    private HadoopClusterConfig hadoopConfig;
 
 
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -36,6 +38,7 @@ public class Wizard
         this.hadoop = serviceLocator.getService( Hadoop.class );
         this.tracker = serviceLocator.getService( Tracker.class );
         this.hive = serviceLocator.getService( Hive.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
@@ -58,12 +61,12 @@ public class Wizard
             }
             case 2:
             {
-                component = new NodeSelectionStep( hive, hadoop, this );
+                component = new NodeSelectionStep( hive, hadoop, environmentManager, this );
                 break;
             }
             case 3:
             {
-                component = new VerificationStep( hive, executorService, tracker, this );
+                component = new VerificationStep( hive, executorService, tracker, environmentManager, this );
                 break;
             }
             default:
@@ -117,5 +120,11 @@ public class Wizard
     public HadoopClusterConfig getHadoopConfig()
     {
         return hadoopConfig;
+    }
+
+
+    public void setHadoopConfig( final HadoopClusterConfig hadoopConfig )
+    {
+        this.hadoopConfig = hadoopConfig;
     }
 }

@@ -19,6 +19,7 @@
     <module>elasticsearch</module>
     <module>hadoop</module>
     <module>mongodb</module>
+    <module>hive</module>
     <module>spark</module>
     <module>hbase</module>
     <!--<module>accumulo</module>
@@ -29,7 +30,6 @@
 
     <module>mongodb</module>
     <module>flume</module>
-    <module>hive</module>
 
     <module>storm</module>
     <module>presto</module>
