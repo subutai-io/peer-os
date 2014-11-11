@@ -82,59 +82,59 @@ public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy
                     accumuloClusterConfig.getZookeeperClusterName() ) );
         }
 
-        //get ZK nodes with Hadoop installed from environment
-        Set<Agent> accumuloAgents = new HashSet<>();
-        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
-        {
-            if ( environmentContainer.getTemplate().getProducts()
-                                     .contains( Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME )
-                    && environmentContainer.getTemplate().getProducts()
-                                           .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) )
-            {
-                accumuloAgents.add( environmentContainer.getAgent() );
-            }
-        }
-
-        int numberOfNeededAccumuloNodes =
-                AccumuloClusterConfig.DEFAULT_ACCUMULO_MASTER_NODES_QUANTITY + accumuloClusterConfig
-                        .getNumberOfTracers() + accumuloClusterConfig.getNumberOfSlaves();
-
-        if ( numberOfNeededAccumuloNodes > accumuloAgents.size() )
-        {
-            throw new ClusterSetupException( String.format(
-                    "Number of needed Accumulo nodes (%d) exceeds number of available nodes with Hadoop installed (%d)",
-                    numberOfNeededAccumuloNodes, accumuloAgents.size() ) );
-        }
-
-        Set<Agent> accumuloTracerNodes = new HashSet<>();
-        Set<Agent> accumuloSlaveNodes = new HashSet<>();
-
-        Iterator<Agent> agentIterator = accumuloAgents.iterator();
-
-        accumuloClusterConfig.setMasterNode( agentIterator.next() );
-        accumuloClusterConfig.setGcNode( agentIterator.next() );
-        accumuloClusterConfig.setMonitor( agentIterator.next() );
-        for ( int i = 0; i < accumuloClusterConfig.getNumberOfTracers(); i++ )
-        {
-            accumuloTracerNodes.add( agentIterator.next() );
-        }
-        for ( int i = 0; i < accumuloClusterConfig.getNumberOfSlaves(); i++ )
-        {
-            accumuloSlaveNodes.add( agentIterator.next() );
-        }
-
-        accumuloClusterConfig.setTracers( accumuloTracerNodes );
-        accumuloClusterConfig.setSlaves( accumuloSlaveNodes );
-
-        try
-        {
-            new ClusterConfiguration( po, accumuloManager )
-                    .configureCluster( accumuloClusterConfig, zookeeperClusterConfig );
-        }
-        catch ( ClusterConfigurationException e )
-        {
-            throw new ClusterSetupException( e.getMessage() );
-        }
+//        //get ZK nodes with Hadoop installed from environment
+//        Set<Agent> accumuloAgents = new HashSet<>();
+//        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
+//        {
+//            if ( environmentContainer.getTemplate().getProducts()
+//                                     .contains( Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME )
+//                    && environmentContainer.getTemplate().getProducts()
+//                                           .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) )
+//            {
+//                accumuloAgents.add( environmentContainer.getAgent() );
+//            }
+//        }
+//
+//        int numberOfNeededAccumuloNodes =
+//                AccumuloClusterConfig.DEFAULT_ACCUMULO_MASTER_NODES_QUANTITY + accumuloClusterConfig
+//                        .getNumberOfTracers() + accumuloClusterConfig.getNumberOfSlaves();
+//
+//        if ( numberOfNeededAccumuloNodes > accumuloAgents.size() )
+//        {
+//            throw new ClusterSetupException( String.format(
+//                    "Number of needed Accumulo nodes (%d) exceeds number of available nodes with Hadoop installed (%d)",
+//                    numberOfNeededAccumuloNodes, accumuloAgents.size() ) );
+//        }
+//
+//        Set<Agent> accumuloTracerNodes = new HashSet<>();
+//        Set<Agent> accumuloSlaveNodes = new HashSet<>();
+//
+//        Iterator<Agent> agentIterator = accumuloAgents.iterator();
+//
+//        accumuloClusterConfig.setMasterNode( agentIterator.next() );
+//        accumuloClusterConfig.setGcNode( agentIterator.next() );
+//        accumuloClusterConfig.setMonitor( agentIterator.next() );
+//        for ( int i = 0; i < accumuloClusterConfig.getNumberOfTracers(); i++ )
+//        {
+//            accumuloTracerNodes.add( agentIterator.next() );
+//        }
+//        for ( int i = 0; i < accumuloClusterConfig.getNumberOfSlaves(); i++ )
+//        {
+//            accumuloSlaveNodes.add( agentIterator.next() );
+//        }
+//
+//        accumuloClusterConfig.setTracers( accumuloTracerNodes );
+//        accumuloClusterConfig.setSlaves( accumuloSlaveNodes );
+//
+//        try
+//        {
+//            new ClusterConfiguration( po, accumuloManager )
+//                    .configureCluster( accumuloClusterConfig, zookeeperClusterConfig );
+//        }
+//        catch ( ClusterConfigurationException e )
+//        {
+//            throw new ClusterSetupException( e.getMessage() );
+//        }
 
 
         return accumuloClusterConfig;

@@ -55,17 +55,17 @@ public class VerificationStep extends Panel
 
         if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP_N_ZK )
         {
-            cfgView.addStringCfg( "Master node", wizard.getConfig().getMasterNode().getHostname() );
-            cfgView.addStringCfg( "GC node", wizard.getConfig().getGcNode().getHostname() );
-            cfgView.addStringCfg( "Monitor node", wizard.getConfig().getMonitor().getHostname() );
-            for ( Agent agent : wizard.getConfig().getTracers() )
-            {
-                cfgView.addStringCfg( "Tracers", agent.getHostname() );
-            }
-            for ( Agent agent : wizard.getConfig().getSlaves() )
-            {
-                cfgView.addStringCfg( "Slaves", agent.getHostname() );
-            }
+//            cfgView.addStringCfg( "Master node", wizard.getConfig().getMasterNode().getHostname() );
+//            cfgView.addStringCfg( "GC node", wizard.getConfig().getGcNode().getHostname() );
+//            cfgView.addStringCfg( "Monitor node", wizard.getConfig().getMonitor().getHostname() );
+//            for ( Agent agent : wizard.getConfig().getTracers() )
+//            {
+//                cfgView.addStringCfg( "Tracers", agent.getHostname() );
+//            }
+//            for ( Agent agent : wizard.getConfig().getSlaves() )
+//            {
+//                cfgView.addStringCfg( "Slaves", agent.getHostname() );
+//            }
         }
         else
         {

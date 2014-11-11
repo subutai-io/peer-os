@@ -87,9 +87,7 @@ public class Manager
     private final Accumulo accumulo;
     private final Hadoop hadoop;
     private final Tracker tracker;
-    private final AgentManager agentManager;
     private final ExecutorService executorService;
-    private final CommandRunner commandRunner;
     private ComboBox clusterCombo;
     private AccumuloClusterConfig accumuloClusterConfig;
     private Button refreshClustersBtn, checkAllBtn, startClusterBtn, stopClusterBtn, destroyClusterBtn, addTracerBtn,
@@ -103,8 +101,6 @@ public class Manager
         this.accumulo = serviceLocator.getService( Accumulo.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
         this.tracker = serviceLocator.getService( Tracker.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -320,51 +316,51 @@ public class Manager
     {
         addTabletServerButton = new Button( ADD_SLAVE_BUTTON_CAPTION );
         addTabletServerButton.setId( "addTabletServer" );
-        addTabletServerButton.addClickListener( new Button.ClickListener()
-        {
-
-            @Override
-            public void buttonClick( Button.ClickEvent event )
-            {
-                if ( accumuloClusterConfig != null )
-                {
-
-                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( accumuloClusterConfig.getClusterName() );
-                    if ( hadoopConfig != null )
-                    {
-                        Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
-                        availableNodes.removeAll( accumuloClusterConfig.getSlaves() );
-                        if ( availableNodes.isEmpty() )
-                        {
-                            Notification.show( "All Hadoop nodes already have slaves installed" );
-                            return;
-                        }
-
-                        AddNodeWindow addNodeWindow =
-                                new AddNodeWindow( accumulo, executorService, tracker, accumuloClusterConfig,
-                                        availableNodes, NodeType.Logger );
-                        contentRoot.getUI().addWindow( addNodeWindow );
-                        addNodeWindow.addCloseListener( new Window.CloseListener()
-                        {
-                            @Override
-                            public void windowClose( Window.CloseEvent closeEvent )
-                            {
-                                refreshClustersInfo();
-                            }
-                        } );
-                    }
-                    else
-                    {
-                        Notification.show( String
-                                .format( "Hadoop cluster %s not found", accumuloClusterConfig.getClusterName() ) );
-                    }
-                }
-                else
-                {
-                    Notification.show( "Please, select cluster" );
-                }
-            }
-        } );
+//        addTabletServerButton.addClickListener( new Button.ClickListener()
+//        {
+//
+//            @Override
+//            public void buttonClick( Button.ClickEvent event )
+//            {
+//                if ( accumuloClusterConfig != null )
+//                {
+//
+//                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( accumuloClusterConfig.getClusterName() );
+//                    if ( hadoopConfig != null )
+//                    {
+//                        Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
+//                        availableNodes.removeAll( accumuloClusterConfig.getSlaves() );
+//                        if ( availableNodes.isEmpty() )
+//                        {
+//                            Notification.show( "All Hadoop nodes already have slaves installed" );
+//                            return;
+//                        }
+//
+//                        AddNodeWindow addNodeWindow =
+//                                new AddNodeWindow( accumulo, executorService, tracker, accumuloClusterConfig,
+//                                        availableNodes, NodeType.Logger );
+//                        contentRoot.getUI().addWindow( addNodeWindow );
+//                        addNodeWindow.addCloseListener( new Window.CloseListener()
+//                        {
+//                            @Override
+//                            public void windowClose( Window.CloseEvent closeEvent )
+//                            {
+//                                refreshClustersInfo();
+//                            }
+//                        } );
+//                    }
+//                    else
+//                    {
+//                        Notification.show( String
+//                                .format( "Hadoop cluster %s not found", accumuloClusterConfig.getClusterName() ) );
+//                    }
+//                }
+//                else
+//                {
+//                    Notification.show( "Please, select cluster" );
+//                }
+//            }
+//        } );
         return addTabletServerButton;
     }
 
@@ -373,52 +369,52 @@ public class Manager
     {
         addTracerBtn = new Button( ADD_TRACER_BUTTON_CAPTION );
         addTracerBtn.setId( "addTracer" );
-        addTracerBtn.addClickListener( new Button.ClickListener()
-        {
-
-            @Override
-            public void buttonClick( Button.ClickEvent event )
-            {
-                if ( accumuloClusterConfig != null )
-                {
-
-                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( accumuloClusterConfig.getClusterName() );
-
-                    if ( hadoopConfig != null )
-                    {
-                        Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
-                        availableNodes.removeAll( accumuloClusterConfig.getTracers() );
-                        if ( availableNodes.isEmpty() )
-                        {
-                            Notification.show( "All Hadoop nodes already have tracers installed" );
-                            return;
-                        }
-
-                        AddNodeWindow addNodeWindow =
-                                new AddNodeWindow( accumulo, executorService, tracker, accumuloClusterConfig,
-                                        availableNodes, NodeType.Tracer );
-                        contentRoot.getUI().addWindow( addNodeWindow );
-                        addNodeWindow.addCloseListener( new Window.CloseListener()
-                        {
-                            @Override
-                            public void windowClose( Window.CloseEvent closeEvent )
-                            {
-                                refreshClustersInfo();
-                            }
-                        } );
-                    }
-                    else
-                    {
-                        Notification.show( String
-                                .format( "Hadoop cluster %s not found", accumuloClusterConfig.getClusterName() ) );
-                    }
-                }
-                else
-                {
-                    Notification.show( "Please, select cluster" );
-                }
-            }
-        } );
+//        addTracerBtn.addClickListener( new Button.ClickListener()
+//        {
+//
+//            @Override
+//            public void buttonClick( Button.ClickEvent event )
+//            {
+//                if ( accumuloClusterConfig != null )
+//                {
+//
+//                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( accumuloClusterConfig.getClusterName() );
+//
+//                    if ( hadoopConfig != null )
+//                    {
+//                        Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
+//                        availableNodes.removeAll( accumuloClusterConfig.getTracers() );
+//                        if ( availableNodes.isEmpty() )
+//                        {
+//                            Notification.show( "All Hadoop nodes already have tracers installed" );
+//                            return;
+//                        }
+//
+//                        AddNodeWindow addNodeWindow =
+//                                new AddNodeWindow( accumulo, executorService, tracker, accumuloClusterConfig,
+//                                        availableNodes, NodeType.Tracer );
+//                        contentRoot.getUI().addWindow( addNodeWindow );
+//                        addNodeWindow.addCloseListener( new Window.CloseListener()
+//                        {
+//                            @Override
+//                            public void windowClose( Window.CloseEvent closeEvent )
+//                            {
+//                                refreshClustersInfo();
+//                            }
+//                        } );
+//                    }
+//                    else
+//                    {
+//                        Notification.show( String
+//                                .format( "Hadoop cluster %s not found", accumuloClusterConfig.getClusterName() ) );
+//                    }
+//                }
+//                else
+//                {
+//                    Notification.show( "Please, select cluster" );
+//                }
+//            }
+//        } );
         return addTracerBtn;
     }
 
@@ -598,30 +594,30 @@ public class Manager
 
     private void addClickListenerToTable( final Table table )
     {
-        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
-        {
-            @Override
-            public void itemClick( ItemClickEvent event )
-            {
-                if ( event.isDoubleClick() )
-                {
-                    String lxcHostname =
-                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
-                    {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
-                                        agentManager );
-                        table.getUI().addWindow( terminal.getWindow() );
-                    }
-                    else
-                    {
-                        Notification.show( "Agent is not connected" );
-                    }
-                }
-            }
-        } );
+//        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
+//        {
+//            @Override
+//            public void itemClick( ItemClickEvent event )
+//            {
+//                if ( event.isDoubleClick() )
+//                {
+//                    String lxcHostname =
+//                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
+//                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
+//                    if ( lxcAgent != null )
+//                    {
+//                        TerminalWindow terminal =
+//                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
+//                                        agentManager );
+//                        table.getUI().addWindow( terminal.getWindow() );
+//                    }
+//                    else
+//                    {
+//                        Notification.show( "Agent is not connected" );
+//                    }
+//                }
+//            }
+//        } );
     }
 
 
@@ -629,13 +625,13 @@ public class Manager
     {
         if ( accumuloClusterConfig != null )
         {
-            populateTable( slavesTable, new ArrayList<>( accumuloClusterConfig.getSlaves() ), false );
-            populateTable( tracersTable, new ArrayList<>( accumuloClusterConfig.getTracers() ), false );
-            List<Agent> masters = new ArrayList<>();
-            masters.add( accumuloClusterConfig.getMasterNode() );
-            masters.add( accumuloClusterConfig.getGcNode() );
-            masters.add( accumuloClusterConfig.getMonitor() );
-            populateTable( mastersTable, masters, true );
+//            populateTable( slavesTable, new ArrayList<>( accumuloClusterConfig.getSlaves() ), false );
+//            populateTable( tracersTable, new ArrayList<>( accumuloClusterConfig.getTracers() ), false );
+//            List<Agent> masters = new ArrayList<>();
+//            masters.add( accumuloClusterConfig.getMasterNode() );
+//            masters.add( accumuloClusterConfig.getGcNode() );
+//            masters.add( accumuloClusterConfig.getMonitor() );
+//            populateTable( mastersTable, masters, true );
         }
         else
         {
@@ -838,23 +834,23 @@ public class Manager
     private String findNodeRoles( Agent node )
     {
         StringBuilder sb = new StringBuilder();
-        if ( accumuloClusterConfig.getMasterNode().equals( node ) )
+        if ( accumuloClusterConfig.getMasterNode().equals( node.getUuid() ) )
         {
             sb.append( NodeType.Master.name() ).append( ", " );
         }
-        if ( accumuloClusterConfig.getGcNode() == node )
+        if ( accumuloClusterConfig.getGcNode() == node.getUuid() )
         {
             sb.append( NodeType.GC.name() ).append( ", " );
         }
-        if ( accumuloClusterConfig.getMonitor().equals( node ) )
+        if ( accumuloClusterConfig.getMonitor().equals( node.getUuid() ) )
         {
             sb.append( NodeType.Monitor.name() ).append( ", " );
         }
-        if ( accumuloClusterConfig.getTracers().contains( node ) )
+        if ( accumuloClusterConfig.getTracers().contains( node.getUuid() ) )
         {
             sb.append( NodeType.Tracer.name() ).append( ", " );
         }
-        if ( accumuloClusterConfig.getSlaves().contains( node ) )
+        if ( accumuloClusterConfig.getSlaves().contains( node.getUuid() ) )
         {
             sb.append( NodeType.Tablet_Server.name() ).append( ", " );
         }

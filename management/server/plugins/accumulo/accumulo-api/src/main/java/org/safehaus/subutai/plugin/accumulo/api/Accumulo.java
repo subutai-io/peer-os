@@ -18,8 +18,8 @@ public interface Accumulo extends ApiBase<AccumuloClusterConfig>
 {
 
     public UUID installCluster( final AccumuloClusterConfig accumuloClusterConfig,
-                                final HadoopClusterConfig hadoopClusterConfig,
-                                final ZookeeperClusterConfig zookeeperClusterConfig );
+                                final String hadoopClusterName,
+                                final String zookeeperClusterName );
 
     public UUID startCluster( String clusterName );
 

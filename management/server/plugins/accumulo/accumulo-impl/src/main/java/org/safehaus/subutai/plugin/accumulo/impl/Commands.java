@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.accumulo.impl;
 
 
@@ -25,6 +20,23 @@ public class Commands
 
     private static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME.toLowerCase();
     private final CommandRunnerBase commandRunner;
+
+
+    public static final String EXEC_PROFILE = ". /etc/profile";
+
+    public static final String installCommand = "apt-get --force-yes --assume-yes install ";
+
+    public static final String uninstallCommand = "apt-get --force-yes --assume-yes purge ";
+
+    public static final String startCommand = "/etc/init.d/accumulo start";
+
+    public static final String stopCommand = "/etc/init.d/accumulo stop";
+
+    public static final String restartCommand = "service hive-thrift restart";
+
+    public static final String statusCommand = "service hive-thrift status";
+
+    public static final String checkIfInstalled = "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH;
 
 
     public Commands( CommandRunnerBase commandRunner )
@@ -90,85 +102,52 @@ public class Commands
     }
 
 
-    public Command getAddMasterCommand( Set<Agent> nodes, Agent masterNode )
+    public static String getAddMasterCommand( String hostname )
     {
-        return commandRunner.createCommand( new RequestBuilder( String.format(
-                ". /etc/profile && accumuloMastersConf.sh masters clear && accumuloMastersConf.sh masters add %s",
-                masterNode.getHostname() ) ), nodes );
+        return ". /etc/profile && accumuloMastersConf.sh masters clear && accumuloMastersConf.sh masters add " + hostname;
     }
 
 
-    public Command getAddTracersCommand( Set<Agent> nodes, Set<Agent> tracerNodes )
+    public static String getAddTracersCommand( String serializedHostNames )
     {
-        StringBuilder tracersSpaceSeparated = new StringBuilder();
-        for ( Agent tracer : tracerNodes )
-        {
-            tracersSpaceSeparated.append( tracer.getHostname() ).append( " " );
-        }
-        return commandRunner.createCommand( new RequestBuilder( String.format(
-                ". /etc/profile && accumuloMastersConf.sh tracers clear && accumuloMastersConf.sh tracers add %s",
-                tracersSpaceSeparated ) ), nodes );
+        return ". /etc/profile && accumuloMastersConf.sh tracers clear && accumuloMastersConf.sh tracers add " + serializedHostNames;
     }
 
 
-    public Command getClearTracerCommand( Set<Agent> nodes, Agent tracerNode )
+    public static String getClearTracerCommand( String hostname )
     {
-        return commandRunner.createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && accumuloMastersConf.sh tracers clear %s",
-                        tracerNode.getHostname() ) ), nodes );
+        return ". /etc/profile && accumuloMastersConf.sh tracers clear " + hostname;
     }
 
 
-    public Command getAddGCCommand( Set<Agent> nodes, Agent gcNode )
+    public static String getAddGCCommand( String hostname )
     {
-        return commandRunner.createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && accumuloMastersConf.sh gc clear && accumuloMastersConf.sh gc add %s",
-                        gcNode.getHostname() ) ), nodes );
+        return  ". /etc/profile && accumuloMastersConf.sh gc clear && accumuloMastersConf.sh gc add " + hostname;
     }
 
 
-    public Command getAddMonitorCommand( Set<Agent> nodes, Agent monitor )
+    public static String getAddMonitorCommand( String hostname )
     {
-        return commandRunner.createCommand( new RequestBuilder( String.format(
-                ". /etc/profile && accumuloMastersConf.sh monitor clear && accumuloMastersConf.sh monitor add %s",
-                monitor.getHostname() ) ), nodes );
+        return ". /etc/profile && accumuloMastersConf.sh monitor clear && accumuloMastersConf.sh monitor add " + hostname;
     }
 
 
-    public Command getAddSlavesCommand( Set<Agent> nodes, Set<Agent> slaveNodes )
+    public static String getAddSlavesCommand( String serializedHostNames )
     {
-        StringBuilder slavesSpaceSeparated = new StringBuilder();
-        for ( Agent tracer : slaveNodes )
-        {
-            slavesSpaceSeparated.append( tracer.getHostname() ).append( " " );
-        }
-        return commandRunner.createCommand( new RequestBuilder( String.format(
-                ". /etc/profile && accumuloSlavesConf.sh slaves clear && accumuloSlavesConf.sh slaves add %s",
-                slavesSpaceSeparated ) ), nodes );
+        return ". /etc/profile && accumuloSlavesConf.sh slaves clear && accumuloSlavesConf.sh slaves add %s" + serializedHostNames;
     }
 
 
-    public Command getClearSlaveCommand( Set<Agent> nodes, Agent slaveNode )
+    public static String getClearSlaveCommand( String hostname )
     {
-        return commandRunner.createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && accumuloSlavesConf.sh slaves clear %s",
-                                slaveNode.getHostname() ) ), nodes );
+        return ". /etc/profile && accumuloSlavesConf.sh slaves clear " + hostname;
     }
 
 
-    public Command getBindZKClusterCommand( Set<Agent> nodes, Set<Agent> zkNodes )
+    public static String getBindZKClusterCommand( String zkNodesCommaSeparated )
     {
-        StringBuilder zkNodesCommaSeparated = new StringBuilder();
-        for ( Agent zkNode : zkNodes )
-        {
-            zkNodesCommaSeparated.append( zkNode.getHostname() ).append( ":2181," );
-        }
-
-        zkNodesCommaSeparated.delete( zkNodesCommaSeparated.length() - 1, zkNodesCommaSeparated.length() );
-        return commandRunner.createCommand( new RequestBuilder( String.format(
-                ". /etc/profile && accumulo-conf.sh remove accumulo-site.xml instance.zookeeper.host && "
-                        + "accumulo-conf.sh add accumulo-site.xml instance.zookeeper.host %s",
-                zkNodesCommaSeparated ) ), nodes );
+        return ". /etc/profile && accumulo-conf.sh remove accumulo-site.xml instance.zookeeper.host && "
+                        + "accumulo-conf.sh add accumulo-site.xml instance.zookeeper.host " + zkNodesCommaSeparated;
     }
 
 
@@ -188,11 +167,9 @@ public class Commands
     }
 
 
-    public Command getInitCommand( String instanceName, String password, Agent agent )
+    public static String getInitCommand( String instanceName, String password )
     {
-        return commandRunner.createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && accumulo-init.sh %s %s", instanceName, password ) ),
-                Sets.newHashSet( agent ) );
+        return ". /etc/profile && accumulo-init.sh " + instanceName  + " " + password;
     }
 
 

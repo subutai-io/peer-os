@@ -1,15 +1,21 @@
 package org.safehaus.subutai.plugin.accumulo.impl;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -26,21 +32,25 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy
 
 
     private final AccumuloImpl accumuloManager;
-    private final TrackerOperation po;
+    private final TrackerOperation trackerOperation;
     private final AccumuloClusterConfig accumuloClusterConfig;
+    private final HadoopClusterConfig hadoopClusterConfig;
+    private final Environment environment;
 
 
-    public AccumuloOverZkNHadoopSetupStrategy( final AccumuloClusterConfig accumuloClusterConfig,
-                                               final TrackerOperation po, final AccumuloImpl accumuloManager )
+    public AccumuloOverZkNHadoopSetupStrategy( final Environment environment, final AccumuloClusterConfig accumuloClusterConfig,
+                                               final HadoopClusterConfig hadoopClusterConfig,
+                                               final TrackerOperation trackerOperation, final AccumuloImpl accumuloManager )
     {
-
         Preconditions.checkNotNull( accumuloClusterConfig, "Accumulo cluster config is null" );
-        Preconditions.checkNotNull( po, "Product operation tracker is null" );
+        Preconditions.checkNotNull( trackerOperation, "Product operation tracker is null" );
         Preconditions.checkNotNull( accumuloManager, "Accumulo manager is null" );
 
-        this.po = po;
+        this.trackerOperation = trackerOperation;
         this.accumuloClusterConfig = accumuloClusterConfig;
+        this.hadoopClusterConfig = hadoopClusterConfig;
         this.accumuloManager = accumuloManager;
+        this.environment = environment;
     }
 
 
@@ -48,11 +58,11 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy
     public AccumuloClusterConfig setup() throws ClusterSetupException
     {
         if ( accumuloClusterConfig.getMasterNode() == null || accumuloClusterConfig.getGcNode() == null
-                || accumuloClusterConfig.getMonitor() == null || Strings
-                .isNullOrEmpty( accumuloClusterConfig.getClusterName() ) || CollectionUtil
-                .isCollectionEmpty( accumuloClusterConfig.getTracers() ) || CollectionUtil
-                .isCollectionEmpty( accumuloClusterConfig.getSlaves() ) || Strings
-                .isNullOrEmpty( accumuloClusterConfig.getInstanceName() ) ||
+                || accumuloClusterConfig.getMonitor() == null ||
+                Strings.isNullOrEmpty( accumuloClusterConfig.getClusterName() ) ||
+                CollectionUtil.isCollectionEmpty( accumuloClusterConfig.getTracers() ) ||
+                CollectionUtil.isCollectionEmpty( accumuloClusterConfig.getSlaves() ) ||
+                Strings.isNullOrEmpty( accumuloClusterConfig.getInstanceName() ) ||
                 Strings.isNullOrEmpty( accumuloClusterConfig.getPassword() ) )
         {
             throw new ClusterSetupException( "Malformed configuration" );
@@ -82,7 +92,7 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy
         }
 
 
-        if ( !hadoopClusterConfig.getAllNodes().containsAll( accumuloClusterConfig.getAllNodes() ) )
+        if ( ! hadoopClusterConfig.getAllNodes().containsAll( accumuloClusterConfig.getAllNodes() ) )
         {
             throw new ClusterSetupException( String.format( "Not all supplied nodes belong to Hadoop cluster %s",
                     hadoopClusterConfig.getClusterName() ) );
@@ -96,62 +106,67 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy
             accumuloManager.getZkManager().startNode( zookeeperClusterConfig.getClusterName(), node.getHostname() );
         }
 
-        po.addLog( "Checking prerequisites..." );
 
-        //check installed subutai packages
-        Command checkInstalledCommand =
-                accumuloManager.getCommands().getCheckInstalledCommand( accumuloClusterConfig.getAllNodes() );
-        accumuloManager.getCommandRunner().runCommand( checkInstalledCommand );
+        trackerOperation.addLog( "Installing Accumulo..." );
 
-        if ( !checkInstalledCommand.hasCompleted() )
+        for ( UUID uuid : accumuloClusterConfig.getAllNodes() )
         {
-            throw new ClusterSetupException( "Failed to check presence of installed subutai packages" );
-        }
-
-        for ( Agent node : accumuloClusterConfig.getAllNodes() )
-        {
-            AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
-
-            if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME ) )
+            CommandResult commandResult = null;
+            ContainerHost host = environment.getContainerHostByUUID( uuid );
+            if ( !checkIfProductIsInstalled( host, HadoopClusterConfig.PRODUCT_NAME ) )
+            {
+                if ( !checkIfProductIsInstalled( host, AccumuloClusterConfig.PRODUCT_NAME ) )
+                {
+                    try
+                    {
+                        commandResult = host.execute( new RequestBuilder(
+                                Commands.installCommand + Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_KEY
+                                        .toLowerCase() ) );
+                    }
+                    catch ( CommandException e )
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                else
+                {
+                    trackerOperation
+                            .addLog( String.format( "Node %s already has Accumulo installed", host.getHostname() ) );
+                }
+            }
+            else
             {
                 throw new ClusterSetupException(
-                        String.format( "Node %s already has Accumulo installed", node.getHostname() ) );
-            }
-            else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) )
-            {
-                throw new ClusterSetupException(
-                        String.format( "Node %s has no Hadoop installation", node.getHostname() ) );
+                        String.format( "Node %s has no Hadoop installation", host.getHostname() ) );
             }
         }
 
-
-        po.addLog( "Installing Accumulo..." );
-
-        //install
-        Command installCommand = accumuloManager.getCommands().getInstallCommand( accumuloClusterConfig.getAllNodes() );
-        accumuloManager.getCommandRunner().runCommand( installCommand );
-
-        if ( installCommand.hasSucceeded() )
+        try
         {
-            po.addLog( "Installation succeeded" );
-
-            try
-            {
-                new ClusterConfiguration( po, accumuloManager )
-                        .configureCluster( accumuloClusterConfig, zookeeperClusterConfig );
-            }
-            catch ( ClusterConfigurationException e )
-            {
-                throw new ClusterSetupException( e.getMessage() );
-            }
+            new ClusterConfiguration( accumuloManager, trackerOperation ).configureCluster( environment, accumuloClusterConfig, zookeeperClusterConfig );
         }
-        else
+        catch ( ClusterConfigurationException e )
         {
-            throw new ClusterSetupException(
-                    String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+            throw new ClusterSetupException( e.getMessage() );
         }
-
-
         return accumuloClusterConfig;
+    }
+
+    private boolean checkIfProductIsInstalled( ContainerHost containerHost, String productName )
+    {
+        boolean isInstalled = false;
+        try
+        {
+            CommandResult result = containerHost.execute( new RequestBuilder( Commands.checkIfInstalled ) );
+            if ( result.getStdOut().toLowerCase().contains( productName.toLowerCase() ) )
+            {
+                isInstalled = true;
+            }
+        }
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
+        }
+        return isInstalled;
     }
 }

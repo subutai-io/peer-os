@@ -172,11 +172,11 @@ public class ConfigurationStep extends Panel
 
                 wizard.getConfig().setHadoopClusterName( hadoopInfo.getClusterName() );
 
-                setComboDS( masterNodeCombo, hadoopInfo.getAllNodes() );
-                setComboDS( gcNodeCombo, hadoopInfo.getAllNodes() );
-                setComboDS( monitorNodeCombo, hadoopInfo.getAllNodes() );
-                setTwinSelectDS( tracersSelect, hadoopInfo.getAllNodes() );
-                setTwinSelectDS( slavesSelect, hadoopInfo.getAllNodes() );
+//                setComboDS( masterNodeCombo, hadoopInfo.getAllNodes() );
+//                setComboDS( gcNodeCombo, hadoopInfo.getAllNodes() );
+//                setComboDS( monitorNodeCombo, hadoopInfo.getAllNodes() );
+//                setTwinSelectDS( tracersSelect, hadoopInfo.getAllNodes() );
+//                setTwinSelectDS( slavesSelect, hadoopInfo.getAllNodes() );
             }
 
             //on hadoop cluster change reset all controls and config
@@ -189,11 +189,11 @@ public class ConfigurationStep extends Panel
                     {
                         HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                         //reset relevant controls
-                        setComboDS( masterNodeCombo, hadoopInfo.getAllNodes() );
-                        setComboDS( gcNodeCombo, hadoopInfo.getAllNodes() );
-                        setComboDS( monitorNodeCombo, hadoopInfo.getAllNodes() );
-                        setTwinSelectDS( tracersSelect, hadoopInfo.getAllNodes() );
-                        setTwinSelectDS( slavesSelect, hadoopInfo.getAllNodes() );
+//                        setComboDS( masterNodeCombo, hadoopInfo.getAllNodes() );
+//                        setComboDS( gcNodeCombo, hadoopInfo.getAllNodes() );
+//                        setComboDS( monitorNodeCombo, hadoopInfo.getAllNodes() );
+//                        setTwinSelectDS( tracersSelect, hadoopInfo.getAllNodes() );
+//                        setTwinSelectDS( slavesSelect, hadoopInfo.getAllNodes() );
                         //reset relevant properties
                         wizard.getConfig().setMasterNode( null );
                         wizard.getConfig().setGcNode( null );
@@ -229,22 +229,22 @@ public class ConfigurationStep extends Panel
                 {
                     if ( event.getProperty().getValue() != null )
                     {
-                        Agent masterNode = ( Agent ) event.getProperty().getValue();
-                        wizard.getConfig().setMasterNode( masterNode );
-                        HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
-                        List<Agent> hadoopNodes = hadoopInfo.getAllNodes();
-                        hadoopNodes.remove( masterNode );
-                        gcNodeCombo.removeValueChangeListener( gcNodeComboChangeListener );
-                        setComboDS( gcNodeCombo, hadoopNodes );
-                        if ( !masterNode.equals( wizard.getConfig().getGcNode() ) )
-                        {
-                            gcNodeCombo.setValue( wizard.getConfig().getGcNode() );
-                        }
-                        else
-                        {
-                            wizard.getConfig().setGcNode( null );
-                        }
-                        gcNodeCombo.addValueChangeListener( gcNodeComboChangeListener );
+//                        Agent masterNode = ( Agent ) event.getProperty().getValue();
+//                        wizard.getConfig().setMasterNode( masterNode );
+//                        HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
+//                        List<Agent> hadoopNodes = hadoopInfo.getAllNodes();
+//                        hadoopNodes.remove( masterNode );
+//                        gcNodeCombo.removeValueChangeListener( gcNodeComboChangeListener );
+//                        setComboDS( gcNodeCombo, hadoopNodes );
+//                        if ( !masterNode.equals( wizard.getConfig().getGcNode() ) )
+//                        {
+//                            gcNodeCombo.setValue( wizard.getConfig().getGcNode() );
+//                        }
+//                        else
+//                        {
+//                            wizard.getConfig().setGcNode( null );
+//                        }
+//                        gcNodeCombo.addValueChangeListener( gcNodeComboChangeListener );
                     }
                 }
             };
@@ -257,39 +257,39 @@ public class ConfigurationStep extends Panel
                 {
                     if ( event.getProperty().getValue() != null )
                     {
-                        Agent gcNode = ( Agent ) event.getProperty().getValue();
-                        wizard.getConfig().setGcNode( gcNode );
-                        HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
-                        List<Agent> hadoopNodes = hadoopInfo.getAllNodes();
-                        hadoopNodes.remove( gcNode );
-                        masterNodeCombo.removeValueChangeListener( masterNodeComboChangeListener );
-                        setComboDS( masterNodeCombo, hadoopNodes );
-                        if ( !gcNode.equals( wizard.getConfig().getMasterNode() ) )
-                        {
-                            masterNodeCombo.setValue( wizard.getConfig().getMasterNode() );
-                        }
-                        else
-                        {
-                            wizard.getConfig().setMasterNode( null );
-                        }
-                        masterNodeCombo.addValueChangeListener( masterNodeComboChangeListener );
+//                        Agent gcNode = ( Agent ) event.getProperty().getValue();
+//                        wizard.getConfig().setGcNode( gcNode );
+//                        HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
+//                        List<Agent> hadoopNodes = hadoopInfo.getAllNodes();
+//                        hadoopNodes.remove( gcNode );
+//                        masterNodeCombo.removeValueChangeListener( masterNodeComboChangeListener );
+//                        setComboDS( masterNodeCombo, hadoopNodes );
+//                        if ( !gcNode.equals( wizard.getConfig().getMasterNode() ) )
+//                        {
+//                            masterNodeCombo.setValue( wizard.getConfig().getMasterNode() );
+//                        }
+//                        else
+//                        {
+//                            wizard.getConfig().setMasterNode( null );
+//                        }
+//                        masterNodeCombo.addValueChangeListener( masterNodeComboChangeListener );
                     }
                 }
             };
             gcNodeCombo.addValueChangeListener( gcNodeComboChangeListener );
             //add value change handler
-            monitorNodeCombo.addValueChangeListener( new Property.ValueChangeListener()
-            {
-                @Override
-                public void valueChange( Property.ValueChangeEvent event )
-                {
-                    if ( event.getProperty().getValue() != null )
-                    {
-                        Agent monitor = ( Agent ) event.getProperty().getValue();
-                        wizard.getConfig().setMonitor( monitor );
-                    }
-                }
-            } );
+//            monitorNodeCombo.addValueChangeListener( new Property.ValueChangeListener()
+//            {
+//                @Override
+//                public void valueChange( Property.ValueChangeEvent event )
+//                {
+//                    if ( event.getProperty().getValue() != null )
+//                    {
+//                        Agent monitor = ( Agent ) event.getProperty().getValue();
+//                        wizard.getConfig().setMonitor( monitor );
+//                    }
+//                }
+//            } );
 
             //restore tracers if back button is pressed
             if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getTracers() ) )
@@ -334,32 +334,32 @@ public class ConfigurationStep extends Panel
             } );
 
 
-            //add value change handler
-            tracersSelect.addValueChangeListener( new Property.ValueChangeListener()
-            {
-
-                public void valueChange( Property.ValueChangeEvent event )
-                {
-                    if ( event.getProperty().getValue() != null )
-                    {
-                        Set<Agent> agentList = new HashSet( ( Collection ) event.getProperty().getValue() );
-                        wizard.getConfig().setTracers( agentList );
-                    }
-                }
-            } );
-            //add value change handler
-            slavesSelect.addValueChangeListener( new Property.ValueChangeListener()
-            {
-
-                public void valueChange( Property.ValueChangeEvent event )
-                {
-                    if ( event.getProperty().getValue() != null )
-                    {
-                        Set<Agent> agentList = new HashSet( ( Collection ) event.getProperty().getValue() );
-                        wizard.getConfig().setSlaves( agentList );
-                    }
-                }
-            } );
+//            //add value change handler
+//            tracersSelect.addValueChangeListener( new Property.ValueChangeListener()
+//            {
+//
+//                public void valueChange( Property.ValueChangeEvent event )
+//                {
+//                    if ( event.getProperty().getValue() != null )
+//                    {
+//                        Set<Agent> agentList = new HashSet( ( Collection ) event.getProperty().getValue() );
+//                        wizard.getConfig().setTracers( agentList );
+//                    }
+//                }
+//            } );
+//            //add value change handler
+//            slavesSelect.addValueChangeListener( new Property.ValueChangeListener()
+//            {
+//
+//                public void valueChange( Property.ValueChangeEvent event )
+//                {
+//                    if ( event.getProperty().getValue() != null )
+//                    {
+//                        Set<Agent> agentList = new HashSet( ( Collection ) event.getProperty().getValue() );
+//                        wizard.getConfig().setSlaves( agentList );
+//                    }
+//                }
+//            } );
 
             Button next = new Button( "Next" );
             next.setId( "confNext2" );

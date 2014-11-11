@@ -70,9 +70,9 @@ public class RestServiceImpl implements RestService
         expandedConfig.setClusterName( trimmedAccumuloConfig.getClusterName() );
         expandedConfig.setInstanceName( trimmedAccumuloConfig.getInstanceName() );
         expandedConfig.setPassword( trimmedAccumuloConfig.getPassword() );
-        expandedConfig.setMasterNode( agentManager.getAgentByHostname( trimmedAccumuloConfig.getMasterNode() ) );
-        expandedConfig.setGcNode( agentManager.getAgentByHostname( trimmedAccumuloConfig.getGcNode() ) );
-        expandedConfig.setMonitor( agentManager.getAgentByHostname( trimmedAccumuloConfig.getMonitor() ) );
+//        expandedConfig.setMasterNode( agentManager.getAgentByHostname( trimmedAccumuloConfig.getMasterNode() ) );
+//        expandedConfig.setGcNode( agentManager.getAgentByHostname( trimmedAccumuloConfig.getGcNode() ) );
+//        expandedConfig.setMonitor( agentManager.getAgentByHostname( trimmedAccumuloConfig.getMonitor() ) );
 
         Set<Agent> tracers = new HashSet<>();
         Set<Agent> slaves = new HashSet<>();
@@ -85,8 +85,8 @@ public class RestServiceImpl implements RestService
             slaves.add( agentManager.getAgentByHostname( slave ) );
         }
 
-        expandedConfig.setTracers( tracers );
-        expandedConfig.setSlaves( slaves );
+//        expandedConfig.setTracers( tracers );
+//        expandedConfig.setSlaves( slaves );
 
         String operationId = wrapUUID( accumuloManager.installCluster( expandedConfig ) );
         return Response.status( Response.Status.CREATED ).entity( operationId ).build();
