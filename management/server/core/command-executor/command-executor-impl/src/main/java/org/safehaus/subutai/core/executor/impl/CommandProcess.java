@@ -23,7 +23,7 @@ import com.google.common.base.Strings;
  */
 public class CommandProcess
 {
-    protected static final Logger LOG = LoggerFactory.getLogger( CommandProcess.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CommandProcess.class.getName() );
 
     private CommandCallback callback;
     private StringBuilder stdOut;
@@ -37,8 +37,8 @@ public class CommandProcess
 
     public CommandProcess( final CommandProcessor commandProcessor, final CommandCallback callback )
     {
-        Preconditions.checkNotNull( commandProcessor, "Command processor is null" );
-        Preconditions.checkNotNull( callback, "Callback is null" );
+        Preconditions.checkNotNull( commandProcessor );
+        Preconditions.checkNotNull( callback );
 
         this.commandProcessor = commandProcessor;
         this.callback = callback;
@@ -80,31 +80,7 @@ public class CommandProcess
 
     public void processResponse( final Response response )
     {
-        executor.execute( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                appendResponse( response );
-
-                try
-                {
-                    callback.onResponse( response, getResult() );
-
-                    if ( isCompleted() )
-                    {
-                        //remove process from command processor
-                        commandProcessor.remove( response.getCommandId() );
-                        //stop process
-                        stop();
-                    }
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( "Error notifying callback", e );
-                }
-            }
-        } );
+        executor.execute( new ResponseProcessor( response, this, commandProcessor ) );
     }
 
 
@@ -121,13 +97,13 @@ public class CommandProcess
     }
 
 
-    private boolean isCompleted()
+    protected boolean isCompleted()
     {
         return callback.isStopped() || getResult().hasCompleted();
     }
 
 
-    private void appendResponse( Response response )
+    protected void appendResponse( Response response )
     {
         if ( response != null )
         {
@@ -159,7 +135,13 @@ public class CommandProcess
     }
 
 
-    private CommandResult getResult()
+    protected CommandCallback getCallback()
+    {
+        return callback;
+    }
+
+
+    protected CommandResult getResult()
     {
         return new CommandResultImpl( exitCode, stdOut.toString(), stdErr.toString(), status );
     }

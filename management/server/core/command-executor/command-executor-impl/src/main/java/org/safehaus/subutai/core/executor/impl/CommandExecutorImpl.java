@@ -31,8 +31,8 @@ public class CommandExecutorImpl implements CommandExecutor
 
     public CommandExecutorImpl( final Broker broker, final HostRegistry hostRegistry )
     {
-        Preconditions.checkNotNull( broker, "Broker is null" );
-        Preconditions.checkNotNull( hostRegistry, "Host Registry is null" );
+        Preconditions.checkNotNull( broker );
+        Preconditions.checkNotNull( hostRegistry);
 
         this.broker = broker;
         this.commandProcessor = new CommandProcessor( broker, hostRegistry );

@@ -3,7 +3,6 @@ package org.safehaus.subutai.core.executor.impl;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.cache.EntryExpiryCallback;
 import org.safehaus.subutai.common.cache.ExpiringCache;
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
@@ -30,6 +29,7 @@ import com.google.common.base.Preconditions;
 public class CommandProcessor implements ByteMessageListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
+
     private ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
     private int inactiveCommandDropTimeout = Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC;
     private final Broker broker;
@@ -38,8 +38,8 @@ public class CommandProcessor implements ByteMessageListener
 
     public CommandProcessor( final Broker broker, final HostRegistry hostRegistry )
     {
-        Preconditions.checkNotNull( broker, "Broker is null" );
-        Preconditions.checkNotNull( hostRegistry, "Host Registry is null" );
+        Preconditions.checkNotNull( broker);
+        Preconditions.checkNotNull( hostRegistry);
 
         this.broker = broker;
         this.hostRegistry = hostRegistry;
@@ -56,32 +56,16 @@ public class CommandProcessor implements ByteMessageListener
     public void execute( final Request request, CommandCallback callback ) throws CommandException
     {
         //find target host
-        HostInfo targetHost = hostRegistry.getHostInfoById( request.getId() );
-        if ( targetHost == null )
-        {
-            ContainerHostInfo containerHostInfo = hostRegistry.getContainerInfoById( request.getId() );
-            if ( containerHostInfo != null )
-            {
-                targetHost = hostRegistry.getParentByChild( containerHostInfo );
-            }
-        }
+        HostInfo targetHost = getTargetHost( request.getId() );
         if ( targetHost == null )
         {
             throw new CommandException( "Host is not connected" );
         }
 
+        //create command process
         CommandProcess commandProcess = new CommandProcess( this, callback );
-        //cache process
         boolean queued = commands.put( request.getCommandId(), commandProcess, inactiveCommandDropTimeout * 1000,
-                new EntryExpiryCallback<CommandProcess>()
-                {
-                    @Override
-                    public void onEntryExpiry( final CommandProcess process )
-                    {
-                        //stop process
-                        process.stop();
-                    }
-                } );
+                new CommandProcessExpiryCallback() );
         if ( !queued )
         {
             throw new CommandException( "This command is already queued for execution" );
@@ -105,6 +89,21 @@ public class CommandProcessor implements ByteMessageListener
     }
 
 
+    private HostInfo getTargetHost( UUID hostId )
+    {
+        HostInfo targetHost = hostRegistry.getHostInfoById( hostId );
+        if ( targetHost == null )
+        {
+            ContainerHostInfo containerHostInfo = hostRegistry.getContainerInfoById( hostId );
+            if ( containerHostInfo != null )
+            {
+                targetHost = hostRegistry.getParentByChild( containerHostInfo );
+            }
+        }
+        return targetHost;
+    }
+
+
     protected void remove( UUID commandId )
     {
         Preconditions.checkNotNull( commandId );
@@ -115,7 +114,7 @@ public class CommandProcessor implements ByteMessageListener
 
     public CommandResult getResult( UUID commandId ) throws CommandException
     {
-        Preconditions.checkNotNull( commandId, "Command id is null" );
+        Preconditions.checkNotNull( commandId );
 
         CommandProcess commandProcess = commands.get( commandId );
         if ( commandProcess != null )
