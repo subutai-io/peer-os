@@ -115,7 +115,10 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
         }, 5, 30, TimeUnit.SECONDS );
         try
         {
-            tree.expandItem( localPeer.getManagementHost().getId() );
+            if ( localPeer.getManagementHost() != null )
+            {
+                tree.expandItem( localPeer.getManagementHost().getId() );
+            }
         }
         catch ( PeerException ignore )
         {
@@ -142,7 +145,7 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
                 managementHostItem.getItemProperty( "value" ).setValue( managementHost );
                 tree.setItemCaption( managementHost.getId(),
                         String.format( localPeer.getPeerInfo().getName(), localPeer.getPeerInfo().getId() ) );
-                for ( ResourceHost rh : managementHost.getResourceHosts() )
+                for ( ResourceHost rh : localPeer.getResourceHosts() )
                 {
                     Item resourceHostItem = container.addItem( rh.getId() );
                     tree.setItemCaption( rh.getId(), rh.getHostname() );

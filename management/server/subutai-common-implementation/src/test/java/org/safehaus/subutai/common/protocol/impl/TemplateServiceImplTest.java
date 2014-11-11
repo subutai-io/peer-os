@@ -19,9 +19,9 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 
@@ -123,8 +123,7 @@ public class TemplateServiceImplTest
         templateServiceImpl.removeTemplate( template );
         savedTemplate = templateServiceImpl.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
         LOGGER.warn( "\n\n\n\nGetting template from database" );
-        LOGGER.warn( savedTemplate.toString() );
-        assertNotNull( savedTemplate );
+        assertNull( savedTemplate );
     }
 
 

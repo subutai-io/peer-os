@@ -39,6 +39,10 @@
     <module>metric</module>
     <module>messenger</module>
     <module>script-manager</module>
+    <module>repository-manager</module>
+    <module>broker</module>
+    <module>host-registry</module>
+    <module>command-executor</module>
   </modules>
 
 </project>

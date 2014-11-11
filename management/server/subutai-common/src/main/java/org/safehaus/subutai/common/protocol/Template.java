@@ -14,6 +14,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -86,6 +87,7 @@ public class Template
     @Expose
     private String subutaiGitUuid;
 
+    @Lob
     //contents of packages manifest file
     private String packagesManifest;
 
@@ -98,7 +100,7 @@ public class Template
 
     //children of template, this property is calculated upon need and is null by default (see REST API for calculation)
     @Expose
-    @OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL }, orphanRemoval = true)
+    @OneToMany( fetch = FetchType.EAGER, cascade = { CascadeType.ALL }, orphanRemoval = true )
     private List<Template> children;
 
     //subutai products present only in this template excluding all subutai products present in the whole ancestry

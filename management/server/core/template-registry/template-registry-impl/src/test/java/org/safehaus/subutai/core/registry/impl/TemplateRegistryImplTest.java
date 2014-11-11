@@ -106,7 +106,7 @@ public class TemplateRegistryImplTest
     @Test( expected = RegistryException.class )
     public void testRegisterTemplateException() throws Exception
     {
-        Mockito.doThrow( new DaoException( null ) ).when( templateService ).saveTemplate( any( Template.class ) );
+        Mockito.doThrow( new DaoException( "" ) ).when( templateService ).saveTemplate( any( Template.class ) );
 
         templateRegistry.registerTemplate( TestUtils.CONFIG_FILE, TestUtils.PACKAGES_MANIFEST, TestUtils.MD_5_SUM );
     }
@@ -152,7 +152,7 @@ public class TemplateRegistryImplTest
     {
         when( templateService.getTemplateByName( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
                 .thenReturn( TestUtils.getParentTemplate() );
-        Mockito.doThrow( new DaoException( null ) ).when( templateService ).removeTemplate( any( Template.class ) );
+        Mockito.doThrow( new DaoException( "" ) ).when( templateService ).removeTemplate( any( Template.class ) );
 
         templateRegistry.unregisterTemplate( TestUtils.TEMPLATE_NAME );
     }
@@ -203,7 +203,7 @@ public class TemplateRegistryImplTest
     @Test
     public void testGetTemplateException() throws Exception
     {
-        Mockito.doThrow( new DaoException( null ) ).when( templateService )
+        Mockito.doThrow( new DaoException( "" ) ).when( templateService )
                .getTemplateByName( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH );
 
         assertNull( templateRegistry.getTemplate( TestUtils.TEMPLATE_NAME ) );
@@ -225,7 +225,7 @@ public class TemplateRegistryImplTest
     @Test
     public void testGetChildTemplatesException() throws Exception
     {
-        Mockito.doThrow( new DaoException( null ) ).when( templateService )
+        Mockito.doThrow( new DaoException( "" ) ).when( templateService )
                .getChildTemplates( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH );
 
         List<Template> children = templateRegistry.getChildTemplates( TestUtils.TEMPLATE_NAME );
@@ -344,7 +344,7 @@ public class TemplateRegistryImplTest
     {
         Template template = TestUtils.getParentTemplate();
         when( templateService.getTemplateByName( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) ).thenReturn( template );
-        Mockito.doThrow( new DaoException( null ) ).when( templateService ).saveTemplate( template );
+        Mockito.doThrow( new DaoException( "" ) ).when( templateService ).saveTemplate( template );
 
         templateRegistry.updateTemplateUsage( "hostname", TestUtils.TEMPLATE_NAME, true );
     }
@@ -392,7 +392,7 @@ public class TemplateRegistryImplTest
     @Test( expected = RegistryException.class )
     public void testRegisterTemplate2Exception() throws Exception
     {
-        Mockito.doThrow( new DaoException( null ) ).when( templateService )
+        Mockito.doThrow( new DaoException( "" ) ).when( templateService )
                .saveTemplate( TestUtils.getChildTemplate() );
 
         templateRegistry.registerTemplate( TestUtils.getChildTemplate() );

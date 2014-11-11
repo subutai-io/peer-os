@@ -11,9 +11,9 @@ import java.util.concurrent.Executors;
 
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.exception.DaoException;
-import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -149,17 +149,10 @@ public class MonitorImpl implements Monitor
 
             for ( ContainerHost localContainer : localContainers )
             {
-                try
-                {
-                    //get container's resource host
-                    ResourceHost resourceHost =
-                            peerManager.getLocalPeer().getResourceHostByName( localContainer.getParentHostname() );
-                    getContainerMetrics( environmentId, resourceHost, localContainer, metrics );
-                }
-                catch ( PeerException e )
-                {
-                    LOG.error( "Error in getLocalContainerHostMetrics", e );
-                }
+                //get container's resource host
+                ResourceHost resourceHost =
+                        peerManager.getLocalPeer().getResourceHostByName( localContainer.getParentHostname() );
+                getContainerMetrics( environmentId, resourceHost, localContainer, metrics );
             }
         }
         catch ( PeerException e )
@@ -209,21 +202,14 @@ public class MonitorImpl implements Monitor
     public Set<ResourceHostMetric> getResourceHostMetrics() throws MonitorException
     {
         Set<ResourceHostMetric> metrics = new HashSet<>();
-        try
+        //obtain resource hosts
+        Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
+        //iterate resource hosts and get their metrics
+        for ( ResourceHost resourceHost : resourceHosts )
         {
-            //obtain resource hosts
-            Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
-            //iterate resource hosts and get their metrics
-            for ( ResourceHost resourceHost : resourceHosts )
-            {
-                getResourceMetrics( resourceHost, metrics );
-            }
+            getResourceMetrics( resourceHost, metrics );
         }
-        catch ( PeerException e )
-        {
-            LOG.error( "Error in getResourceHostMetrics", e );
-            throw new MonitorException( e );
-        }
+
 
         return metrics;
     }
@@ -321,22 +307,25 @@ public class MonitorImpl implements Monitor
             //find associated container host
             ContainerHost containerHost =
                     peerManager.getLocalPeer().getContainerHostByName( containerHostMetric.getHost() );
-            //set metric's environment id for future reference on the receiving end
-            containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
-
-            //find container's owner peer
-            Peer ownerPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
-
-            //if container is "owned" by local peer, alert local peer
-            if ( ownerPeer.isLocal() )
+            if ( containerHost != null )
             {
-                alertThresholdExcess( containerHostMetric );
-            }
-            //send metric to owner peer
-            else
-            {
-                ownerPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
-                        Constants.ALERT_TIMEOUT );
+                //set metric's environment id for future reference on the receiving end
+                containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
+
+                //find container's owner peer
+                Peer ownerPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
+
+                //if container is "owned" by local peer, alert local peer
+                if ( ownerPeer.isLocal() )
+                {
+                    alertThresholdExcess( containerHostMetric );
+                }
+                //send metric to owner peer
+                else
+                {
+                    ownerPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
+                            Constants.ALERT_TIMEOUT );
+                }
             }
         }
         catch ( PeerException | JsonSyntaxException e )

@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.metric.impl;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 
 import static org.junit.Assert.assertEquals;
 

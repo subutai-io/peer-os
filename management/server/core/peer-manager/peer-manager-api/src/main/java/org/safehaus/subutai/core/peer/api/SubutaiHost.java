@@ -1,18 +1,16 @@
 package org.safehaus.subutai.core.peer.api;
 
 
-import java.util.List;
 import java.util.UUID;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.CommandCallback;
-import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.protocol.NullAgent;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.util.ServiceLocator;
 
 import com.google.common.base.Preconditions;
@@ -188,5 +186,32 @@ public abstract class SubutaiHost implements Host
     }
 
 
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
 
+        final SubutaiHost that = ( SubutaiHost ) o;
+
+        if ( !agent.equals( that.agent ) )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return agent.hashCode();
+    }
 }

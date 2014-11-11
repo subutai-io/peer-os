@@ -8,7 +8,8 @@ import java.util.Map;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.core.environment.api.TopologyEnum;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
+import org.safehaus.subutai.core.environment.api.topology.Node2PeerData;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.Peer;
 
@@ -191,8 +192,15 @@ public class Node2PeerWizard extends Window
                 if ( !topology.isEmpty() || containerToPeerTable.getItemIds().size() != topology.size() )
                 {
                     Map<Object, NodeGroup> map = getNodeGroupMap();
-                    managerUI.getEnvironmentManager()
-                             .saveBuildProcess( blueprint.getId(), topology, map, TopologyEnum.NODE_2_PEER );
+                    Node2PeerData data = new Node2PeerData( blueprint.getId(), topology, map );
+                    try
+                    {
+                        managerUI.getEnvironmentManager().saveBuildProcess( data );
+                    }
+                    catch ( EnvironmentManagerException e )
+                    {
+                        Notification.show( e.getMessage() );
+                    }
                 }
                 else
                 {

@@ -10,13 +10,12 @@ import javax.sql.DataSource;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.storm.impl.handler.AddNodeHandler;
 import org.safehaus.subutai.plugin.storm.impl.handler.DestroyNodeHandler;
 import org.safehaus.subutai.plugin.storm.impl.handler.InstallHandler;
@@ -37,7 +36,7 @@ public class StormImpl extends StormBase
 
 
     @Override
-    public UUID installCluster( StormConfig config )
+    public UUID installCluster( StormClusterConfiguration config )
     {
         AbstractOperationHandler h = new InstallHandler( this, config );
         executor.execute( h );
@@ -55,16 +54,16 @@ public class StormImpl extends StormBase
 
 
     @Override
-    public List<StormConfig> getClusters()
+    public List<StormClusterConfiguration> getClusters()
     {
-        return pluginDao.getInfo( StormConfig.PRODUCT_NAME, StormConfig.class );
+        return pluginDAO.getInfo( StormClusterConfiguration.PRODUCT_NAME, StormClusterConfiguration.class );
     }
 
 
     @Override
-    public StormConfig getCluster( String clusterName )
+    public StormClusterConfiguration getCluster( String clusterName )
     {
-        return pluginDao.getInfo( StormConfig.PRODUCT_NAME, clusterName, StormConfig.class );
+        return pluginDAO.getInfo( StormClusterConfiguration.PRODUCT_NAME, clusterName, StormClusterConfiguration.class );
     }
 
 
@@ -76,7 +75,7 @@ public class StormImpl extends StormBase
 
 
     @Override
-    public UUID statusCheck( String clusterName, String hostname )
+    public UUID checkNode( String clusterName, String hostname )
     {
         AbstractOperationHandler h = new StatusHandler( this, clusterName, hostname );
         executor.execute( h );
@@ -130,14 +129,12 @@ public class StormImpl extends StormBase
 
 
     @Override
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( StormConfig config )
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( StormClusterConfiguration config )
     {
 
-        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
-
-        EnvironmentBlueprint eb = new EnvironmentBlueprint();
-        eb.setName( StormConfig.PRODUCT_NAME + UUIDUtil.generateTimeBasedUUID() );
-        eb.setNodeGroups( new HashSet<NodeGroup>() );
+        EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
+        environmentBlueprint.setName( StormClusterConfiguration.PRODUCT_NAME + UUIDUtil.generateTimeBasedUUID() );
+        environmentBlueprint.setNodeGroups( new HashSet<NodeGroup>() );
 
         // no need to create new container for nimbus node if external Zookeeper
         // instance is used as nimbus node
@@ -146,26 +143,25 @@ public class StormImpl extends StormBase
             NodeGroup nimbus = new NodeGroup();
             nimbus.setName( StormService.NIMBUS.toString() );
             nimbus.setNumberOfNodes( 1 );
-            nimbus.setTemplateName( StormConfig.TEMPLATE_NAME_NIMBUS );
+            nimbus.setTemplateName( StormClusterConfiguration.TEMPLATE_NAME );
             nimbus.setPlacementStrategy( PlacementStrategy.MORE_RAM );
-            eb.getNodeGroups().add( nimbus );
+            environmentBlueprint.getNodeGroups().add( nimbus );
         }
 
         NodeGroup workers = new NodeGroup();
         workers.setName( StormService.SUPERVISOR.toString() );
         workers.setNumberOfNodes( config.getSupervisorsCount() );
-        workers.setTemplateName( StormConfig.TEMPLATE_NAME_WORKER );
+        workers.setTemplateName( StormClusterConfiguration.TEMPLATE_NAME );
         workers.setPlacementStrategy( PlacementStrategy.MORE_RAM );
-        eb.getNodeGroups().add( workers );
+        environmentBlueprint.getNodeGroups().add( workers );
 
-        environmentBuildTask.setEnvironmentBlueprint( eb );
 
-        return environmentBuildTask;
+        return environmentBlueprint;
     }
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, StormConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, StormClusterConfiguration config,
                                                          TrackerOperation po )
     {
 
