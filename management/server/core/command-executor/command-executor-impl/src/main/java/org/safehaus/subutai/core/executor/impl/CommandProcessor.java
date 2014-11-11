@@ -24,7 +24,7 @@ import com.google.common.base.Preconditions;
 
 
 /**
- * Listens to command responses
+ * Executes commands and processes responses
  */
 public class CommandProcessor implements ByteMessageListener
 {

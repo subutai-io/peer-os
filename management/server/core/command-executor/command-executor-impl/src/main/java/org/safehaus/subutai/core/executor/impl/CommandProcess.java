@@ -19,7 +19,7 @@ import com.google.common.base.Strings;
 
 
 /**
- * Holds command data while command is in process
+ * Represents a single command process, Encapsulates command results
  */
 public class CommandProcess
 {
