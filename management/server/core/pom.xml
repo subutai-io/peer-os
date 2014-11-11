@@ -41,7 +41,7 @@
     <module>script-manager</module>
     <module>repository-manager</module>
     <module>broker</module>
-    <module>container-registry</module>
+    <module>host-registry</module>
     <module>command-executor</module>
   </modules>
 

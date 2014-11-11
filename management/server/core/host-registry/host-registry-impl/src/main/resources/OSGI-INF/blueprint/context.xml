@@ -4,16 +4,13 @@
 
   <reference id="broker" availability="mandatory"
              interface="org.safehaus.subutai.core.broker.api.Broker" />
-  <reference id="hostRegistry" availability="mandatory"
-             interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
 
-  <bean id="executor"
-        class="org.safehaus.subutai.core.executor.impl.CommandExecutorImpl"
+  <bean id="containerRegistry"
+        class="org.safehaus.subutai.core.hostregistry.impl.HostRegistryImpl"
         init-method="init" destroy-method="dispose" scope="singleton" activation="eager">
     <argument ref="broker" />
-    <argument ref="hostRegistry" />
   </bean>
 
-  <service ref="executor" interface="org.safehaus.subutai.core.executor.api.CommandExecutor" />
+  <service ref="containerRegistry" interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
 
 </blueprint>

@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.broker.api.Broker;
 import org.safehaus.subutai.core.broker.api.BrokerException;
-import org.safehaus.subutai.core.containerregistry.api.ContainerRegistry;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,17 +24,17 @@ public class CommandExecutorImpl implements CommandExecutor
     private static final Logger LOG = LoggerFactory.getLogger( CommandExecutorImpl.class.getName() );
 
     private final Broker broker;
-    private final ContainerRegistry containerRegistry;
+    private final HostRegistry hostRegistry;
     private CommandResponseListener responseListener;
 
 
-    public CommandExecutorImpl( final Broker broker, final ContainerRegistry containerRegistry )
+    public CommandExecutorImpl( final Broker broker, final HostRegistry hostRegistry )
     {
         Preconditions.checkNotNull( broker, "Broker is null" );
-        Preconditions.checkNotNull( containerRegistry, "Container Registry is null" );
+        Preconditions.checkNotNull( hostRegistry, "Container Registry is null" );
 
         this.broker = broker;
-        this.containerRegistry = containerRegistry;
+        this.hostRegistry = hostRegistry;
         this.responseListener = new CommandResponseListener();
     }
 

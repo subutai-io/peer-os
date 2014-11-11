@@ -372,12 +372,12 @@
       <!-- container registry -->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>container-registry-api</artifactId>
+        <artifactId>host-registry-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>container-registry-impl</artifactId>
+        <artifactId>host-registry-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
 
