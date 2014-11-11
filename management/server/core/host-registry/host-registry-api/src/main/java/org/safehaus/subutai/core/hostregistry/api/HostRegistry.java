@@ -25,4 +25,6 @@ public interface HostRegistry
     public void addHostListener( HostListener listener );
 
     public void removeHostListener( HostListener listener );
+
+    public HostInfo getParentByChild( ContainerHostInfo containerHostInfo );
 }
