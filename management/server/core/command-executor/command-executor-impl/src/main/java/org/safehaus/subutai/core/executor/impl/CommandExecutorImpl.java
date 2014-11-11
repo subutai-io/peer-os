@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.executor.impl;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.Request;
 import org.safehaus.subutai.common.command.RequestBuilder;
@@ -26,7 +27,7 @@ public class CommandExecutorImpl implements CommandExecutor
 
     private final Broker broker;
     private final HostRegistry hostRegistry;
-    private CommandResponseListener responseListener;
+    private CommandProcessor commandProcessor;
 
 
     public CommandExecutorImpl( final Broker broker, final HostRegistry hostRegistry )
@@ -36,12 +37,12 @@ public class CommandExecutorImpl implements CommandExecutor
 
         this.broker = broker;
         this.hostRegistry = hostRegistry;
-        this.responseListener = new CommandResponseListener();
+        this.commandProcessor = new CommandProcessor( broker, hostRegistry );
     }
 
 
     @Override
-    public CommandResult execute( final UUID hostId, final RequestBuilder requestBuilder )
+    public CommandResult execute( final UUID hostId, final RequestBuilder requestBuilder ) throws CommandException
     {
         return null;
     }
@@ -49,14 +50,14 @@ public class CommandExecutorImpl implements CommandExecutor
 
     @Override
     public CommandResult execute( final UUID hostId, final RequestBuilder requestBuilder,
-                                  final CommandCallback callback )
+                                  final CommandCallback callback ) throws CommandException
     {
         return null;
     }
 
 
     @Override
-    public void executeAsync( final UUID hostId, final RequestBuilder requestBuilder )
+    public void executeAsync( final UUID hostId, final RequestBuilder requestBuilder ) throws CommandException
     {
 
     }
@@ -64,11 +65,13 @@ public class CommandExecutorImpl implements CommandExecutor
 
     @Override
     public void executeAsync( final UUID hostId, final RequestBuilder requestBuilder, final CommandCallback callback )
+            throws CommandException
     {
         Preconditions.checkNotNull( hostId, "Invalid host id" );
         Preconditions.checkNotNull( requestBuilder, "Invalid request builder" );
 
         Request request = requestBuilder.build2( hostId );
+        commandProcessor.execute( request, callback );
     }
 
 
@@ -76,7 +79,7 @@ public class CommandExecutorImpl implements CommandExecutor
     {
         try
         {
-            broker.addByteMessageListener( responseListener );
+            broker.addByteMessageListener( commandProcessor );
         }
         catch ( BrokerException e )
         {
@@ -88,6 +91,6 @@ public class CommandExecutorImpl implements CommandExecutor
 
     public void dispose()
     {
-        broker.removeMessageListener( responseListener );
+        broker.removeMessageListener( commandProcessor );
     }
 }

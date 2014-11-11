@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.safehaus.subutai.common.command.Response;
 import org.safehaus.subutai.common.command.ResponseType;
 
+import com.google.common.base.Objects;
+
 
 /**
  * Represents response to command from host
@@ -84,5 +86,15 @@ public class ResponseImpl implements Response
     public Set<String> getConfigPoints()
     {
         return configPoints;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return Objects.toStringHelper( this ).add( "type", type ).add( "id", id ).add( "commandId", commandId )
+                      .add( "pid", pid ).add( "responseNumber", responseNumber ).add( "stdOut", stdOut )
+                      .add( "stdErr", stdErr ).add( "exitCode", exitCode ).add( "configPoints", configPoints )
+                      .toString();
     }
 }
