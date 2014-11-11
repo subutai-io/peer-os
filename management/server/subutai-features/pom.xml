@@ -500,6 +500,7 @@
       <artifactId>elasticsearch-plugin-ui</artifactId>
     </dependency>
 
+
     <!-- HADOOP -->
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -521,6 +522,27 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>hadoop-plugin-ui</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hbase-plugin-api</artifactId>
+    </dependency>
+    <!--<dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hbase-plugin-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hbase-plugin-cli</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hbase-plugin-rest</artifactId>
+    </dependency>-->
+    <!--<dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hbase-plugin-ui</artifactId>
+    </dependency>-->
 
     <!--
     <dependency>
