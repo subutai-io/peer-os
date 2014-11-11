@@ -7,7 +7,6 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.hostregistry.impl.HostInfoImpl;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 
@@ -28,7 +27,7 @@ public class HostInfoImplTest
     private static final String CONTAINER_IP = "127.0.0.1";
     private static final ContainerHostState CONTAINER_STATUS = ContainerHostState.FROZEN;
     private static final String INFO_JSON = String.format(
-            "{\"type\":\"HEARTBEAT\", \"hostname\":\"%s\", \"id\":\"%s\", \"ips\" : [\"%s\"],\"macAddress\": \"%s\", "
+            "{\"type\":\"HEARTBEAT\", \"hostname\":\"%s\", \"id\":\"%s\", \"ips\" : [\"%s\"],\"macs\": [\"%s\"], "
                     + "\"containers\": [{ \"hostname\":\"%s\", \"id\":\"%s\", \"ips\" : [\"%s\"], " +
                     "\"status\":\"%s\" }]}", HOST_HOSTNAME, HOST_ID, HOST_IP, HOST_MAC_ADDRESS, CONTAINER_HOSTNAME,
             CONTAINER_ID, CONTAINER_IP, CONTAINER_STATUS );
@@ -49,7 +48,7 @@ public class HostInfoImplTest
         assertEquals( HOST_HOSTNAME, hostInfo.getHostname() );
         assertEquals( HOST_ID, hostInfo.getId() );
         assertEquals( HOST_IP, hostInfo.getIps().iterator().next() );
-        assertEquals( HOST_MAC_ADDRESS, hostInfo.getMacAddress() );
+        assertEquals( HOST_MAC_ADDRESS, hostInfo.getMacs().iterator().next() );
     }
 
 

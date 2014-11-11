@@ -20,7 +20,7 @@ public interface HostInfo
     public Set<String> getIps();
 
 
-    public String getMacAddress();
+    public Set<String> getMacs();
 
 
     public Set<ContainerHostInfo> getContainers();
