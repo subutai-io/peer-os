@@ -11,9 +11,7 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -36,7 +34,7 @@ import com.google.common.base.Strings;
 /**
  * This class handles operations that are related to whole cluster.
  */
-public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<ZookeeperImpl, ZookeeperClusterConfig>
+public class ZookeeperClusterOperationHandler extends AbstractPluginOperationHandler<ZookeeperImpl, ZookeeperClusterConfig>
         implements ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( ZookeeperClusterOperationHandler.class.getName() );
@@ -54,7 +52,7 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
         this.operationType = operationType;
         this.zookeeperClusterConfig = config;
         trackerOperation = manager.getTracker().createTrackerOperation( config.getProductKey(),
-                String.format( "Running %s operaion on %s...", operationType , clusterName ) );
+                String.format( "Running %s operation on %s...", operationType , clusterName ) );
     }
 
 
@@ -156,22 +154,6 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
     }
 
 
-    private CommandResult executeCommand( ContainerHost containerHost, String command )
-    {
-        CommandResult result = null;
-        try
-        {
-            result = containerHost.execute( new RequestBuilder( command ) );
-        }
-        catch ( CommandException e )
-        {
-            LOG.error( "Could not execute command correctly. ", command );
-            e.printStackTrace();
-        }
-        return result;
-    }
-
-
     @Override
     public void setupCluster()
     {
@@ -268,8 +250,17 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
         try
         {
             ContainerHost newNode = hadoopEnvironment.getContainerHostByHostname( hostName );
-            commandResultList.add( executeCommand( newNode,
-                    Commands.getInstallCommand() ) );
+            String command = Commands.getInstallCommand();
+            if ( ! newNode.isConnected() ) {
+                trackerOperation.addLogFailed( String.format( "Host %s is not connected. Aborting", hostName ) );
+                return commandResultList;
+            }
+            CommandResult commandResult = executeCommand( newNode, command );
+            commandResultList.add( commandResult );
+            if ( ! commandResult.hasSucceeded() ) {
+                trackerOperation.addLogFailed( String.format( "Command %s failed on %s", command, hostName ) );
+                return commandResultList;
+            }
             zookeeperClusterConfig.getNodes().add( newNode.getId() );
             new ClusterConfiguration( manager, trackerOperation ).configureCluster( zookeeperClusterConfig,
                     zookeeperEnvironment );
@@ -283,14 +274,6 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
             e.printStackTrace();
         }
         return commandResultList;
-    }
-
-    public void logResults( TrackerOperation po, List<CommandResult> commandResultList )
-    {
-        Preconditions.checkNotNull( commandResultList );
-        for ( CommandResult commandResult : commandResultList )
-            po.addLog( commandResult.getStdOut() );
-        po.addLogDone( "" );
     }
 
 }

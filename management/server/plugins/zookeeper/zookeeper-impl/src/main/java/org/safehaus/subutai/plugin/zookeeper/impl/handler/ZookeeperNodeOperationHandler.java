@@ -7,8 +7,6 @@ import java.util.List;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
@@ -16,15 +14,13 @@ import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 
-import com.google.common.base.Preconditions;
-
 
 /**
  * This class handles operations that are related to just one node.
  *
  * TODO: add nodes and delete node operation should be implemented.
  */
-public class ZookeeperNodeOperationHandler extends AbstractOperationHandler<ZookeeperImpl, ZookeeperClusterConfig>
+public class ZookeeperNodeOperationHandler extends AbstractPluginOperationHandler<ZookeeperImpl, ZookeeperClusterConfig>
 {
 
     private String clusterName;
@@ -35,6 +31,7 @@ public class ZookeeperNodeOperationHandler extends AbstractOperationHandler<Zook
     public ZookeeperNodeOperationHandler( final ZookeeperImpl manager, final String clusterName, final String hostname,
                                           NodeOperationType operationType )
     {
+
         super( manager, clusterName );
         this.hostname = hostname;
         this.clusterName = clusterName;
@@ -97,14 +94,5 @@ public class ZookeeperNodeOperationHandler extends AbstractOperationHandler<Zook
         {
             trackerOperation.addLogFailed( String.format( "Command failed, %s", e.getMessage() ) );
         }
-    }
-
-
-    public void logResults( TrackerOperation po, List<CommandResult> commandResultList )
-    {
-        Preconditions.checkNotNull( commandResultList );
-        for ( CommandResult commandResult : commandResultList )
-            po.addLog( commandResult.getStdOut() );
-        po.addLogDone( "" );
     }
 }
