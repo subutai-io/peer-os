@@ -1,16 +1,20 @@
 package org.safehaus.subutai.core.strategy.impl;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.safehaus.subutai.core.monitor.api.MetricType;
-import org.safehaus.subutai.core.strategy.api.Criteria;
-import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.safehaus.subutai.common.protocol.Criteria;
+import org.safehaus.subutai.core.monitor.api.MetricType;
+import org.safehaus.subutai.core.strategy.api.CriteriaDef;
+import org.safehaus.subutai.core.strategy.api.ServerMetric;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -42,9 +46,9 @@ public class BestServerStrategyTest {
 
     @Test
     public void testGetCriteria() throws Exception {
-        List<Criteria> result = bestServerStrategy.getCriteria();
+        List<CriteriaDef> result = bestServerStrategy.getCriteriaDef();
         assertEquals(3,result.size());
-        assertNotNull(bestServerStrategy.getCriteria());
+        assertNotNull(bestServerStrategy.getCriteriaDef());
     }
 
 
