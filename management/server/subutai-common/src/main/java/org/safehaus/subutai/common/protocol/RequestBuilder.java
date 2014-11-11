@@ -9,7 +9,6 @@ package org.safehaus.subutai.common.protocol;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
@@ -19,7 +18,6 @@ import org.safehaus.subutai.common.util.NumUtil;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -293,7 +291,7 @@ public class RequestBuilder
     {
         //TODO pass proper arguments after migration to new agent
         return new RequestImpl( org.safehaus.subutai.common.command.RequestType.EXECUTE_REQUEST, id, cwd, command,
-                Sets.newHashSet( cmdArgs ), envVars, org.safehaus.subutai.common.command.OutputRedirection.RETURN,
+                cmdArgs, envVars, org.safehaus.subutai.common.command.OutputRedirection.RETURN,
                 org.safehaus.subutai.common.command.OutputRedirection.RETURN, runAs, timeout );
     }
 
@@ -396,7 +394,7 @@ public class RequestBuilder
         private UUID commandId;
         private String workingDirectory;
         private String command;
-        private Set<String> args;
+        private List<String> args;
         private Map<String, String> environment;
         private org.safehaus.subutai.common.command.OutputRedirection stdOut;
         private org.safehaus.subutai.common.command.OutputRedirection stdErr;
@@ -405,7 +403,7 @@ public class RequestBuilder
 
 
         RequestImpl( final org.safehaus.subutai.common.command.RequestType type, final UUID id,
-                     final String workingDirectory, final String command, final Set<String> args,
+                     final String workingDirectory, final String command, final List<String> args,
                      final Map<String, String> environment,
                      final org.safehaus.subutai.common.command.OutputRedirection stdOut,
                      final org.safehaus.subutai.common.command.OutputRedirection stdErr, final String runAs,
@@ -461,7 +459,7 @@ public class RequestBuilder
 
 
         @Override
-        public Set<String> getArgs()
+        public List<String> getArgs()
         {
             return args;
         }
