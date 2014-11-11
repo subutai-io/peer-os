@@ -18,15 +18,17 @@
     <module>cassandra</module>
     <module>elasticsearch</module>
     <module>hadoop</module>
+    <module>hive</module>
     <module>spark</module>
+    <module>hbase</module>
     <!--<module>accumulo</module>
+    <module>oozie</module>
     <module>solr</module>
 
     <module>zookeeper</module>
 
     <module>mongodb</module>
     <module>flume</module>
-    <module>hive</module>
 
     <module>storm</module>
     <module>presto</module>
@@ -34,9 +36,7 @@
     <module>sqoop</module>
     <module>lucene</module>
     <module>pig</module>
-    <module>hbase</module>
     <module>mahout</module>
-    <module>oozie</module>
     <module>hipi</module>
     <module>nutch</module>
     <module>plugin-common</module>

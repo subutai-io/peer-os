@@ -1,96 +1,88 @@
 package org.safehaus.subutai.plugin.hive.impl;
 
 
-import java.util.Arrays;
-import java.util.HashSet;
-
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.api.SetupType;
+
+import com.google.common.base.Strings;
 
 
 abstract class HiveSetupStrategy implements ClusterSetupStrategy
 {
+    public final HiveImpl hiveManager;
+    public final HiveConfig config;
+    public final HadoopClusterConfig hadoopClusterConfig;
+    public final TrackerOperation trackerOperation;
+    public final Environment environment;
 
-    final HiveImpl manager;
-    final HiveConfig config;
-    final TrackerOperation po;
 
-
-    public HiveSetupStrategy( HiveImpl manager, HiveConfig config, TrackerOperation po )
+    public HiveSetupStrategy( final Environment environment, HiveImpl manager, HiveConfig config,
+                              HadoopClusterConfig hadoopClusterConfig, TrackerOperation trackerOperation )
     {
-        this.manager = manager;
+        this.hiveManager = manager;
         this.config = config;
-        this.po = po;
+        this.hadoopClusterConfig = hadoopClusterConfig;
+        this.trackerOperation = trackerOperation;
+        this.environment = environment;
+    }
+
+
+    @Override
+    public ConfigBase setup() throws ClusterSetupException
+    {
+        if ( Strings.isNullOrEmpty( config.getClusterName() ) ||
+                Strings.isNullOrEmpty( HiveConfig.getTemplateName() ) ||
+                config.getNumberOfNodes() <= 0 )
+        {
+            throw new ClusterSetupException( "Malformed configuration" );
+        }
+
+        if ( hiveManager.getCluster( config.getClusterName() ) != null )
+        {
+            throw new ClusterSetupException(
+                    String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
+        }
+
+        if ( environment.getContainers().size() < config.getNumberOfNodes() )
+        {
+            throw new ClusterSetupException( String.format( "Environment needs to have %d nodes but has only %d nodes",
+                    config.getNumberOfNodes(), environment.getContainers().size() ) );
+        }
+        return null;
     }
 
 
     public void checkConfig() throws ClusterSetupException
     {
-
-        String m = "Invalid configuration: ";
+        String message = "Invalid configuration: ";
 
         if ( config.getClusterName() == null || config.getClusterName().isEmpty() )
         {
-            throw new ClusterSetupException( m + "name is not specified" );
+            throw new ClusterSetupException( message + "name is not specified" );
         }
 
-        if ( manager.getCluster( config.getClusterName() ) != null )
+        if ( hiveManager.getCluster( config.getClusterName() ) != null )
         {
-            throw new ClusterSetupException(
-                    m + String.format( "Sqoop installation already exists: %s", config.getClusterName() ) );
+            throw new ClusterSetupException( message + String
+                    .format( HiveConfig.PRODUCT_KEY + " installation already exists: %s", config.getClusterName() ) );
         }
 
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
             if ( config.getServer() == null )
             {
-                throw new ClusterSetupException( m + "Server node not specified" );
+                throw new ClusterSetupException( message + "Server node not specified" );
             }
             if ( config.getClients() == null || config.getClients().isEmpty() )
             {
-                throw new ClusterSetupException( m + "Target nodes not specified" );
+                throw new ClusterSetupException( message + "Target nodes not specified" );
             }
-        }
-    }
-
-
-    void configureServer() throws ClusterSetupException
-    {
-        po.addLog( "Configuring server..." );
-        String s = Commands.configureHiveServer( config.getServer().getListIP().get( 0 ) );
-        Command cmd = manager.getCommandRunner().createCommand( new RequestBuilder( s ),
-                new HashSet<>( Arrays.asList( config.getServer() ) ) );
-        manager.getCommandRunner().runCommand( cmd );
-        if ( cmd.hasSucceeded() )
-        {
-            po.addLog( "Server successfully configured" );
-        }
-        else
-        {
-            throw new ClusterSetupException( "Failed to configure Hive server: " + cmd.getAllErrors() );
-        }
-    }
-
-
-    void configureClients() throws ClusterSetupException
-    {
-        po.addLog( "Configuring clients..." );
-        String s = Commands.configureClient( config.getServer() );
-        Command cmd = manager.getCommandRunner().createCommand( new RequestBuilder( s ), config.getClients() );
-        manager.getCommandRunner().runCommand( cmd );
-
-        if ( cmd.hasSucceeded() )
-        {
-            po.addLog( "Clients successfully configured" );
-        }
-        else
-        {
-            throw new ClusterSetupException( "Failed to configure clients: " + cmd.getAllErrors() );
         }
     }
 }
