@@ -21,6 +21,5 @@ public abstract class CommandCallback
     }
 
 
-    public abstract void onResponse( org.safehaus.subutai.common.protocol.Response response,
-                                     CommandResult commandResult );
+    public abstract void onResponse( Response response, CommandResult commandResult );
 }

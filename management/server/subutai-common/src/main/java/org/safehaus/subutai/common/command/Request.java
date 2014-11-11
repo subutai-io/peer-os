@@ -1,8 +1,8 @@
 package org.safehaus.subutai.common.command;
 
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 
@@ -21,7 +21,7 @@ public interface Request
 
     public String getCommand();
 
-    public Set<String> getArgs();
+    public List<String> getArgs();
 
     public Map<String, String> getEnvironment();
 
@@ -31,5 +31,5 @@ public interface Request
 
     public String getRunAs();
 
-    public int getTimeout();
+    public Integer getTimeout();
 }

@@ -13,5 +13,5 @@ public enum ResponseType
     AGENT_DISCONNECT,
     IN_QUEUE,
     INOTIFY_ACTION_RESPONSE,
-    INOTIFY_LIST_RESPONSE
+    ResponseType, INOTIFY_LIST_RESPONSE
 }

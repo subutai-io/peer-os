@@ -14,10 +14,10 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.enums.ResponseType;
-import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.NullAgent;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
@@ -48,6 +48,7 @@ import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.peer.api.SubutaiHost;
 import org.safehaus.subutai.core.peer.api.SubutaiInitException;
 import org.safehaus.subutai.core.peer.impl.command.CommandResultImpl;
+import org.safehaus.subutai.core.peer.impl.command.TempResponseConverter;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -504,8 +505,9 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public boolean isConnected( final Host host ) throws PeerException
+    public boolean isConnected( final Host ahost ) throws PeerException
     {
+        Host host = bindHost( ahost.getId() );
         if ( host instanceof ContainerHost )
         {
             return ContainerState.RUNNING.equals( ( ( ContainerHost ) host ).getState() ) && checkHeartbeat(
@@ -672,7 +674,8 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             {
                 if ( callback != null )
                 {
-                    callback.onResponse( response,
+                    //TODO after migration to command executor pass response without conversion
+                    callback.onResponse( TempResponseConverter.convertResponse( response ),
                             new CommandResultImpl( agentResult.getExitCode(), agentResult.getStdOut(),
                                     agentResult.getStdErr(), command.getCommandStatus() ) );
                     if ( callback.isStopped() )
@@ -714,7 +717,8 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
             {
                 if ( callback != null )
                 {
-                    callback.onResponse( response,
+                    //TODO after migration to command executor pass response without conversion
+                    callback.onResponse( TempResponseConverter.convertResponse( response ),
                             new CommandResultImpl( agentResult.getExitCode(), agentResult.getStdOut(),
                                     agentResult.getStdErr(), command.getCommandStatus() ) );
                     if ( callback.isStopped() )

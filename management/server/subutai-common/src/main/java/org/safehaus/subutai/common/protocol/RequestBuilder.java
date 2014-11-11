@@ -287,6 +287,15 @@ public class RequestBuilder
     }
 
 
+    public org.safehaus.subutai.common.command.Request build2( UUID id )
+    {
+        //TODO pass proper arguments after migration to new agent
+        return new RequestImpl( org.safehaus.subutai.common.command.RequestType.EXECUTE_REQUEST, id, cwd, command,
+                cmdArgs, envVars, org.safehaus.subutai.common.command.OutputRedirection.RETURN,
+                org.safehaus.subutai.common.command.OutputRedirection.RETURN, runAs, timeout );
+    }
+
+
     @Override
     public boolean equals( final Object o )
     {
@@ -375,5 +384,119 @@ public class RequestBuilder
         result = 31 * result + pid;
         result = 31 * result + ( confPoints != null ? Arrays.hashCode( confPoints ) : 0 );
         return result;
+    }
+
+
+    static class RequestImpl implements org.safehaus.subutai.common.command.Request
+    {
+        private org.safehaus.subutai.common.command.RequestType type;
+        private UUID id;
+        private UUID commandId;
+        private String workingDirectory;
+        private String command;
+        private List<String> args;
+        private Map<String, String> environment;
+        private org.safehaus.subutai.common.command.OutputRedirection stdOut;
+        private org.safehaus.subutai.common.command.OutputRedirection stdErr;
+        private String runAs;
+        private Integer timeout;
+
+
+        RequestImpl( final org.safehaus.subutai.common.command.RequestType type, final UUID id,
+                     final String workingDirectory, final String command, final List<String> args,
+                     final Map<String, String> environment,
+                     final org.safehaus.subutai.common.command.OutputRedirection stdOut,
+                     final org.safehaus.subutai.common.command.OutputRedirection stdErr, final String runAs,
+                     final Integer timeout )
+        {
+            this.type = type;
+            this.id = id;
+            this.commandId = UUID.randomUUID();
+            this.workingDirectory = workingDirectory;
+            this.command = command;
+            this.args = args;
+            this.environment = environment;
+            this.stdOut = stdOut;
+            this.stdErr = stdErr;
+            this.runAs = runAs;
+            this.timeout = timeout;
+        }
+
+
+        @Override
+        public org.safehaus.subutai.common.command.RequestType getType()
+        {
+            return type;
+        }
+
+
+        @Override
+        public UUID getId()
+        {
+            return id;
+        }
+
+
+        @Override
+        public UUID getCommandId()
+        {
+            return commandId;
+        }
+
+
+        @Override
+        public String getWorkingDirectory()
+        {
+            return workingDirectory;
+        }
+
+
+        @Override
+        public String getCommand()
+        {
+            return command;
+        }
+
+
+        @Override
+        public List<String> getArgs()
+        {
+            return args;
+        }
+
+
+        @Override
+        public Map<String, String> getEnvironment()
+        {
+            return environment;
+        }
+
+
+        @Override
+        public org.safehaus.subutai.common.command.OutputRedirection getStdOut()
+        {
+            return stdOut;
+        }
+
+
+        @Override
+        public org.safehaus.subutai.common.command.OutputRedirection getStdErr()
+        {
+            return stdErr;
+        }
+
+
+        @Override
+        public String getRunAs()
+        {
+            return runAs;
+        }
+
+
+        @Override
+        public Integer getTimeout()
+        {
+            return timeout;
+        }
     }
 }
