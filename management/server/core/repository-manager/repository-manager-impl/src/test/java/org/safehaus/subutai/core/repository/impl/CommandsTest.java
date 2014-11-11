@@ -47,4 +47,11 @@ public class CommandsTest
         assertEquals( new RequestBuilder( String.format( "subutai package_manager list %s", ARGUMENT ) ),
                 commands.getListPackagesCommand( ARGUMENT ) );
     }
+    @Test
+    public void testGetPackageInfoCommand() throws Exception
+    {
+
+        assertEquals( new RequestBuilder( String.format( "subutai package_manager info %s", ARGUMENT ) ),
+                commands.getPackageInfoCommand( ARGUMENT ) );
+    }
 }

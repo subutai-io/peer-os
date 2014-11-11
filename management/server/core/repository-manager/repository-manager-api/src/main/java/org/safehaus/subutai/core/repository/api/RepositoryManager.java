@@ -48,4 +48,16 @@ public interface RepositoryManager
      * @throws RepositoryException - thrown if some error occurs during search
      */
     public Set<PackageInfo> listPackages( String term ) throws RepositoryException;
+
+
+    /**
+     * Returns detailed information about the specified package
+     *
+     * @param packageName - name of package
+     *
+     * @return - string containing package details
+     *
+     * @throws RepositoryException - thrown if some error occurs
+     */
+    public String getPackageInfo( String packageName ) throws RepositoryException;
 }

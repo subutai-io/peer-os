@@ -1,8 +1,8 @@
-package org.safehaus.subutai.common.exception;
+package org.safehaus.subutai.common.command;
 
 
 /**
- * Exception which might be thrown by Command.execute call
+ * Exception which might be thrown by CommandExecutor.execute call variations
  */
 public class CommandException extends Exception
 {
