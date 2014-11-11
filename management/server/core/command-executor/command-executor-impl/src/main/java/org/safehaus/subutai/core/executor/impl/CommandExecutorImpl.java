@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.executor.impl;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.Request;
 import org.safehaus.subutai.common.command.RequestBuilder;
@@ -19,56 +20,66 @@ import com.google.common.base.Preconditions;
 
 /**
  * Implementation of CommandExecutor
+ *
+ * TODO refactor RequestBuilder and its build method after migration to new agent
  */
 public class CommandExecutorImpl implements CommandExecutor
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandExecutorImpl.class.getName() );
 
     private final Broker broker;
-    private final HostRegistry hostRegistry;
-    private CommandResponseListener responseListener;
+    private CommandProcessor commandProcessor;
 
 
     public CommandExecutorImpl( final Broker broker, final HostRegistry hostRegistry )
     {
-        Preconditions.checkNotNull( broker, "Broker is null" );
-        Preconditions.checkNotNull( hostRegistry, "Container Registry is null" );
+        Preconditions.checkNotNull( broker );
+        Preconditions.checkNotNull( hostRegistry );
 
         this.broker = broker;
-        this.hostRegistry = hostRegistry;
-        this.responseListener = new CommandResponseListener();
+        this.commandProcessor = new CommandProcessor( broker, hostRegistry );
     }
 
 
     @Override
-    public CommandResult execute( final UUID hostId, final RequestBuilder requestBuilder )
+    public CommandResult execute( final UUID hostId, final RequestBuilder requestBuilder ) throws CommandException
     {
-        return null;
+        return execute( hostId, requestBuilder, new DummyCallback() );
     }
 
 
     @Override
     public CommandResult execute( final UUID hostId, final RequestBuilder requestBuilder,
-                                  final CommandCallback callback )
+                                  final CommandCallback callback ) throws CommandException
     {
-        return null;
+        Preconditions.checkNotNull( hostId, "Invalid host id" );
+        Preconditions.checkNotNull( requestBuilder, "Invalid request builder" );
+        Preconditions.checkNotNull( requestBuilder, "Invalid callback" );
+
+        Request request = requestBuilder.build2( hostId );
+
+        commandProcessor.execute( request, callback );
+
+        return commandProcessor.getResult( request.getCommandId() );
     }
 
 
     @Override
-    public void executeAsync( final UUID hostId, final RequestBuilder requestBuilder )
+    public void executeAsync( final UUID hostId, final RequestBuilder requestBuilder ) throws CommandException
     {
-
+        executeAsync( hostId, requestBuilder, new DummyCallback() );
     }
 
 
     @Override
     public void executeAsync( final UUID hostId, final RequestBuilder requestBuilder, final CommandCallback callback )
+            throws CommandException
     {
         Preconditions.checkNotNull( hostId, "Invalid host id" );
         Preconditions.checkNotNull( requestBuilder, "Invalid request builder" );
+        Preconditions.checkNotNull( requestBuilder, "Invalid callback" );
 
-        Request request = requestBuilder.build2( hostId );
+        commandProcessor.execute( requestBuilder.build2( hostId ), callback );
     }
 
 
@@ -76,7 +87,7 @@ public class CommandExecutorImpl implements CommandExecutor
     {
         try
         {
-            broker.addByteMessageListener( responseListener );
+            broker.addByteMessageListener( commandProcessor );
         }
         catch ( BrokerException e )
         {
@@ -88,6 +99,6 @@ public class CommandExecutorImpl implements CommandExecutor
 
     public void dispose()
     {
-        broker.removeMessageListener( responseListener );
+        broker.removeMessageListener( commandProcessor );
     }
 }

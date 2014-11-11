@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.executor.api;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 
@@ -13,11 +14,13 @@ import org.safehaus.subutai.common.command.RequestBuilder;
  */
 public interface CommandExecutor
 {
-    public CommandResult execute( UUID hostId, RequestBuilder requestBuilder );
+    public CommandResult execute( UUID hostId, RequestBuilder requestBuilder ) throws CommandException;
 
-    public CommandResult execute( UUID hostId, RequestBuilder requestBuilder, CommandCallback callback );
+    public CommandResult execute( UUID hostId, RequestBuilder requestBuilder, CommandCallback callback )
+            throws CommandException;
 
-    public void executeAsync( UUID hostId, RequestBuilder requestBuilder );
+    public void executeAsync( UUID hostId, RequestBuilder requestBuilder ) throws CommandException;
 
-    public void executeAsync( UUID hostId, RequestBuilder requestBuilder, CommandCallback callback );
+    public void executeAsync( UUID hostId, RequestBuilder requestBuilder, CommandCallback callback )
+            throws CommandException;
 }

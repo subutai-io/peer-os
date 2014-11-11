@@ -12,10 +12,10 @@ import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.core.broker.api.Broker;
 import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistryException;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,6 +144,26 @@ public class HostRegistryImpl implements HostRegistry
     public Set<HostInfo> getHostsInfo()
     {
         return Sets.newHashSet( hosts.asMap().values() );
+    }
+
+
+    @Override
+    public HostInfo getParentByChild( final ContainerHostInfo containerHostInfo )
+    {
+        Preconditions.checkNotNull( containerHostInfo, "Container host info is null" );
+
+        for ( HostInfo hostInfo : hosts.asMap().values() )
+        {
+            for ( ContainerHostInfo containerHostInfo1 : hostInfo.getContainers() )
+            {
+                if ( containerHostInfo.getId().equals( containerHostInfo1.getId() ) )
+                {
+                    return hostInfo;
+                }
+            }
+        }
+
+        return null;
     }
 
 

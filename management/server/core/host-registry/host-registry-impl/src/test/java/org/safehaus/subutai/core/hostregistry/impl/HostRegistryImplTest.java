@@ -16,9 +16,9 @@ import org.safehaus.subutai.core.broker.api.Broker;
 import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.broker.api.ByteMessageListener;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostRegistryException;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistryException;
 
 import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
@@ -167,6 +167,19 @@ public class HostRegistryImplTest
 
         assertFalse( info.isEmpty() );
         assertTrue( info.contains( hostInfo ) );
+    }
+
+
+    @Test
+    public void testGetParentByChild() throws Exception
+    {
+        HostInfo existingHost = registry.getParentByChild( containerHostInfo );
+        ContainerHostInfo containerHostInfo1 = mock( ContainerHostInfo.class );
+        when(containerHostInfo1.getId()).thenReturn( UUID.randomUUID() );
+        HostInfo nonExistingHost = registry.getParentByChild( containerHostInfo1 );
+
+        assertNotNull( existingHost );
+        assertNull( nonExistingHost );
     }
 
 

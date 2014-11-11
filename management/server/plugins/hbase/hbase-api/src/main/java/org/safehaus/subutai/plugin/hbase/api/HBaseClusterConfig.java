@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -27,12 +26,12 @@ public class HBaseClusterConfig implements ConfigBase
     private String hadoopNameNode;
 
     private String hadoopClusterName;
-    private Agent hbaseMaster;
-    private Set<Agent> hadoopNodes = Sets.newHashSet();
-    private Set<Agent> regionServers = Sets.newHashSet();
-    private Set<Agent> quorumPeers = Sets.newHashSet();
-    private Set<Agent> backupMasters = Sets.newHashSet();
-    private Set<Agent> allNodes = Sets.newHashSet();
+    private UUID hbaseMaster;
+    private Set<UUID> hadoopNodes = Sets.newHashSet();
+    private Set<UUID> regionServers = Sets.newHashSet();
+    private Set<UUID> quorumPeers = Sets.newHashSet();
+    private Set<UUID> backupMasters = Sets.newHashSet();
+    private Set<UUID> allNodes = Sets.newHashSet();
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private SetupType setupType;
 
@@ -126,13 +125,13 @@ public class HBaseClusterConfig implements ConfigBase
     }
 
 
-    public Set<Agent> getHadoopNodes()
+    public Set<UUID> getHadoopNodes()
     {
         return hadoopNodes;
     }
 
 
-    public void setHadoopNodes( Set<Agent> hadoopNodes )
+    public void setHadoopNodes( Set<UUID> hadoopNodes )
     {
         this.hadoopNodes = hadoopNodes;
     }
@@ -194,23 +193,23 @@ public class HBaseClusterConfig implements ConfigBase
     }
 
 
-    public Set<Agent> getAllNodes()
+    public Set<UUID> getAllNodes()
     {
-        final Set<Agent> allNodes = new HashSet<>();
+        final Set<UUID> allNodes = new HashSet<>();
 
         allNodes.add( getHbaseMaster() );
 
-        for ( Agent agent : getRegionServers() )
+        for ( UUID agent : getRegionServers() )
         {
             allNodes.add( agent );
         }
 
-        for ( Agent agent : getQuorumPeers() )
+        for ( UUID agent : getQuorumPeers() )
         {
             allNodes.add( agent );
         }
 
-        for ( Agent agent : getBackupMasters() )
+        for ( UUID agent : getBackupMasters() )
         {
             allNodes.add( agent );
         }
@@ -218,49 +217,49 @@ public class HBaseClusterConfig implements ConfigBase
     }
 
 
-    public Agent getHbaseMaster()
+    public UUID getHbaseMaster()
     {
         return hbaseMaster;
     }
 
 
-    public void setHbaseMaster( Agent hbaseMaster )
+    public void setHbaseMaster( UUID hbaseMaster )
     {
         this.hbaseMaster = hbaseMaster;
     }
 
 
-    public Set<Agent> getRegionServers()
+    public Set<UUID> getRegionServers()
     {
         return regionServers;
     }
 
 
-    public void setRegionServers( Set<Agent> regionServers )
+    public void setRegionServers( Set<UUID> regionServers )
     {
         this.regionServers = regionServers;
     }
 
 
-    public Set<Agent> getQuorumPeers()
+    public Set<UUID> getQuorumPeers()
     {
         return quorumPeers;
     }
 
 
-    public void setQuorumPeers( Set<Agent> quorumPeers )
+    public void setQuorumPeers( Set<UUID> quorumPeers )
     {
         this.quorumPeers = quorumPeers;
     }
 
 
-    public Set<Agent> getBackupMasters()
+    public Set<UUID> getBackupMasters()
     {
         return backupMasters;
     }
 
 
-    public void setBackupMasters( Set<Agent> backupMasters )
+    public void setBackupMasters( Set<UUID> backupMasters )
     {
         this.backupMasters = backupMasters;
     }

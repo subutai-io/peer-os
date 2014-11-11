@@ -1077,6 +1077,32 @@
         <version>${project.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hbase-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <!--<dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hbase-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hbase-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hbase-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>-->
+      <!--<dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hbase-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>-->
+
       <!--
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1103,33 +1129,7 @@
         <artifactId>flume-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hbase-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hbase-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hbase-plugin-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hbase-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hbase-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
+-->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>hive-plugin-api</artifactId>
@@ -1155,7 +1155,7 @@
         <artifactId>hive-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+<!--
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>lucene-plugin-api</artifactId>

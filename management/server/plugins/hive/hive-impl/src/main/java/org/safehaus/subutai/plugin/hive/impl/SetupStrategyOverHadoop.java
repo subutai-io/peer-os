@@ -1,141 +1,144 @@
 package org.safehaus.subutai.plugin.hive.impl;
 
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 
 
-class SetupStrategyOverHadoop extends HiveSetupStrategy
+public class SetupStrategyOverHadoop extends HiveSetupStrategy
 {
 
-    public SetupStrategyOverHadoop( HiveImpl manager, HiveConfig config, TrackerOperation po )
+    public SetupStrategyOverHadoop( Environment environment, HiveImpl manager, HiveConfig config,
+                                    HadoopClusterConfig hadoopClusterConfig, TrackerOperation po )
     {
-        super( manager, config, po );
+        super( environment, manager, config, hadoopClusterConfig, po );
     }
 
 
     @Override
     public ConfigBase setup() throws ClusterSetupException
     {
-
         checkConfig();
 
         //check if nodes are connected
-        String serverHostname = config.getServer().getHostname();
-        if ( manager.agentManager.getAgentByHostname( serverHostname ) == null )
+        ContainerHost server = environment.getContainerHostByUUID( config.getServer() );
+        if ( !server.isConnected() )
         {
             throw new ClusterSetupException( "Server node is not connected " );
         }
-        for ( Agent a : config.getClients() )
+        for ( UUID uuid : config.getClients() )
         {
-            if ( manager.agentManager.getAgentByHostname( a.getHostname() ) == null )
+            ContainerHost host = environment.getContainerHostByUUID( uuid );
+            if ( !host.isConnected() )
             {
-                throw new ClusterSetupException( String.format( "Node %s is not connected", a.getHostname() ) );
+                throw new ClusterSetupException( String.format( "Node %s is not connected", host.getHostname() ) );
             }
         }
 
-        HadoopClusterConfig hc = manager.hadoopManager.getCluster( config.getHadoopClusterName() );
-        if ( hc == null )
+
+        if ( hadoopClusterConfig == null )
         {
             throw new ClusterSetupException( "Could not find Hadoop cluster " + config.getHadoopClusterName() );
         }
 
-        Set<Agent> allNodes = new HashSet<>( config.getClients() );
+
+        Set<UUID> allNodes = new HashSet<>( config.getClients() );
         allNodes.add( config.getServer() );
 
-        if ( !hc.getAllNodes().containsAll( allNodes ) )
+        if ( !hadoopClusterConfig.getAllNodes().containsAll( allNodes ) )
         {
             throw new ClusterSetupException(
                     "Not all nodes belong to Hadoop cluster " + config.getHadoopClusterName() );
         }
-        config.setHadoopNodes( new HashSet<>( hc.getAllNodes() ) );
+        config.setHadoopNodes( new HashSet<>( hadoopClusterConfig.getAllNodes() ) );
 
-        // check if already installed
-        String s = Commands.make( CommandType.LIST, Product.HIVE );
-        Command cmd = manager.getCommandRunner().createCommand( new RequestBuilder( s ), allNodes );
-        manager.getCommandRunner().runCommand( cmd );
-
-        if ( !cmd.hasCompleted() )
-        {
-            String m = "Failed to check installed packages";
-            po.addLog( m );
-            throw new ClusterSetupException( m + ": " + cmd.getAllErrors() );
-        }
-
-        String hadoop_pack = Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME;
-        for ( Agent a : allNodes )
-        {
-            AgentResult res = cmd.getResults().get( a.getUuid() );
-
-            if ( res.getStdOut().contains( Product.HIVE.getPackageName() ) )
-            {
-                throw new ClusterSetupException(
-                        String.format( "Node %s already has Hive installed", a.getHostname() ) );
-            }
-            else if ( !res.getStdOut().contains( hadoop_pack ) )
-            {
-                throw new ClusterSetupException(
-                        String.format( "Node %s has no Hadoop installation.", a.getHostname() ) );
-            }
-            else if ( a.equals( config.getServer() ) )
-            {
-                if ( res.getStdOut().contains( Product.DERBY.getPackageName() ) )
-                {
-                    throw new ClusterSetupException( "Server node already has Derby installed" );
-                }
-            }
-        }
 
         // installation of server
-        po.addLog( "Installing server..." );
-        for ( Product p : new Product[] { Product.HIVE, Product.DERBY } )
+        trackerOperation.addLog( "Installing server..." );
+        try
         {
-            s = Commands.make( CommandType.INSTALL, p );
-            cmd = manager.commandRunner.createCommand( new RequestBuilder( s ).withTimeout( 1200 ),
-                    new HashSet<>( Arrays.asList( config.getServer() ) ) );
-            manager.commandRunner.runCommand( cmd );
-            if ( !cmd.hasSucceeded() )
+            if ( !checkIfProductIsInstalled( server, HiveConfig.PRODUCT_KEY.toLowerCase() ) )
             {
-                throw new ClusterSetupException( String.format( "Failed to install %s on server node", p.toString() ) );
+                server.execute( new RequestBuilder(
+                        Commands.installCommand + Common.PACKAGE_PREFIX + HiveConfig.PRODUCT_KEY.toLowerCase() ) );
+            }
+            if ( !checkIfProductIsInstalled( server, "derby" ) )
+            {
+                server.execute( new RequestBuilder( Commands.installCommand + Common.PACKAGE_PREFIX + "derby" ) );
             }
         }
-        po.addLog( "Server installation completed" );
-
-        // configure Hive server
-        configureServer();
-
-        po.addLog( "Installing clients..." );
-        s = Commands.make( CommandType.INSTALL, Product.HIVE );
-        cmd = manager.getCommandRunner()
-                     .createCommand( new RequestBuilder( s ).withTimeout( 1200 ), config.getClients() );
-        manager.getCommandRunner().runCommand( cmd );
-
-        if ( cmd.hasSucceeded() )
+        catch ( CommandException e )
         {
-            po.addLog( "Installation completed" );
-            configureClients();
+            throw new ClusterSetupException( String.format( "Failed to install derby on server node !!! " ) );
+        }
 
-            po.addLog( "Saving to db..." );
-            manager.getPluginDao().saveInfo( HiveConfig.PRODUCT_KEY, config.getClusterName(), config );
-            po.addLog( "Cluster info successfully saved" );
-        }
-        else
+        trackerOperation.addLog( "Server installation completed" );
+
+
+        // installation of clients
+        trackerOperation.addLog( "Installing clients..." );
+        for ( UUID uuid : config.getClients() )
         {
-            throw new ClusterSetupException( "Installation failed: " + cmd.getAllErrors() );
+            ContainerHost client = environment.getContainerHostByUUID( uuid );
+            try
+            {
+                if ( !checkIfProductIsInstalled( client, HiveConfig.PRODUCT_KEY.toLowerCase() ) )
+                {
+                    client.execute( new RequestBuilder(
+                            Commands.installCommand + Common.PACKAGE_PREFIX + HiveConfig.PRODUCT_KEY.toLowerCase() ) );
+                    trackerOperation.addLog( HiveConfig.PRODUCT_KEY + " is installed on " + client.getHostname() );
+                }
+            }
+            catch ( CommandException e )
+            {
+                throw new ClusterSetupException(
+                        String.format( "Failed to install %s on server node", HiveConfig.PRODUCT_KEY ) );
+            }
         }
+
+        try
+        {
+            new ClusterConfiguration( hiveManager, trackerOperation ).configureCluster( config, environment );
+        }
+        catch ( ClusterConfigurationException e )
+        {
+            throw new ClusterSetupException( e.getMessage() );
+        }
+
 
         return config;
+    }
+
+
+    private boolean checkIfProductIsInstalled( ContainerHost containerHost, String productName )
+    {
+        boolean isHiveInstalled = false;
+        try
+        {
+            CommandResult result = containerHost.execute( new RequestBuilder( Commands.checkIfInstalled ) );
+            if ( result.getStdOut().contains( productName ) )
+            {
+                isHiveInstalled = true;
+            }
+        }
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
+        }
+        return isHiveInstalled;
     }
 }
