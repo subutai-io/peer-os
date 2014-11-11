@@ -4,12 +4,13 @@ package org.safehaus.subutai.plugin.spark.impl;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.CollectionUtil;
@@ -167,28 +168,46 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
         manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
         po.addLog( "Cluster info saved to DB\nInstalling Spark..." );
 
-        SetupHelper helper = new SetupHelper( manager, config, environment, po );
         po.addLog( "Installing Spark..." );
         //install spark
         RequestBuilder installCommand = manager.getCommands().getInstallCommand();
         for ( ContainerHost node : allNodes )
         {
-            try
-            {
-                helper.processResult( node, node.execute( installCommand ) );
-            }
-            catch ( CommandException e )
-            {
-                throw new ClusterSetupException(
-                        String.format( "Error while installing Spark on container %s; %s", node.getHostname(),
-                                e.getMessage() ) );
-            }
+            executeCommand( node, installCommand );
         }
 
         po.addLog( "Configuring cluster..." );
 
-        helper.configureMasterIP();
-        helper.registerSlaves();
-        helper.startCluster();
+        ClusterConfiguration configuration = new ClusterConfiguration( manager, po );
+
+        try
+        {
+            configuration.configureCluster( config, environment );
+        }
+        catch ( ClusterConfigurationException e )
+        {
+            throw new ClusterSetupException( e );
+        }
+    }
+
+
+    public CommandResult executeCommand( ContainerHost host, RequestBuilder command ) throws ClusterSetupException
+    {
+
+        CommandResult result;
+        try
+        {
+            result = host.execute( command );
+        }
+        catch ( CommandException e )
+        {
+            throw new ClusterSetupException( e );
+        }
+        if ( !result.hasSucceeded() )
+        {
+            throw new ClusterSetupException( String.format( "Error on container %s: %s", host.getHostname(),
+                    result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
+        }
+        return result;
     }
 }

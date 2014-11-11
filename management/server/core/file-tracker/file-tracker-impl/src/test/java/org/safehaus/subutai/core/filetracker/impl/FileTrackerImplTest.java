@@ -7,17 +7,11 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.enums.ResponseType;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
-import org.safehaus.subutai.core.filetracker.api.FileTrackerException;
-import org.safehaus.subutai.core.peer.api.ManagementHost;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

@@ -29,7 +29,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
-import org.safehaus.subutai.common.protocol.CommandStatus;
+import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 
 import com.google.common.collect.Sets;

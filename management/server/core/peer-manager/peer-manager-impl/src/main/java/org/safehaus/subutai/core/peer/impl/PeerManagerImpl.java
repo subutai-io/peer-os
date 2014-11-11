@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
+import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -54,6 +55,7 @@ public class PeerManagerImpl implements PeerManager
     private TemplateRegistry templateRegistry;
     private DataSource dataSource;
     private CommunicationManager communicationManager;
+    private CommandExecutor commandExecutor;
     private LocalPeer localPeer;
     private StrategyManager strategyManager;
     private PeerInfo peerInfo;
@@ -126,6 +128,12 @@ public class PeerManagerImpl implements PeerManager
     public void setCommunicationManager( final CommunicationManager communicationManager )
     {
         this.communicationManager = communicationManager;
+    }
+
+
+    public void setCommandExecutor( final CommandExecutor commandExecutor )
+    {
+        this.commandExecutor = commandExecutor;
     }
 
 
