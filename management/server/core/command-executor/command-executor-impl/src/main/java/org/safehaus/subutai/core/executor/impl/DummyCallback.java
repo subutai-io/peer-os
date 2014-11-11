@@ -14,6 +14,6 @@ public class DummyCallback extends CommandCallback
     @Override
     public void onResponse( final Response response, final CommandResult commandResult )
     {
-
+        //dummy callback
     }
 }
