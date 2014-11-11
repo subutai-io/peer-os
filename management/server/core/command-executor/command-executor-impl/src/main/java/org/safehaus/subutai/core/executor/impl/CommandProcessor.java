@@ -29,17 +29,16 @@ import com.google.common.base.Preconditions;
 public class CommandProcessor implements ByteMessageListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
-
-    private ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
-    private int inactiveCommandDropTimeout = Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC;
     private final Broker broker;
     private final HostRegistry hostRegistry;
+
+    protected ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
 
 
     public CommandProcessor( final Broker broker, final HostRegistry hostRegistry )
     {
-        Preconditions.checkNotNull( broker);
-        Preconditions.checkNotNull( hostRegistry);
+        Preconditions.checkNotNull( broker );
+        Preconditions.checkNotNull( hostRegistry );
 
         this.broker = broker;
         this.hostRegistry = hostRegistry;
@@ -64,8 +63,9 @@ public class CommandProcessor implements ByteMessageListener
 
         //create command process
         CommandProcess commandProcess = new CommandProcess( this, callback );
-        boolean queued = commands.put( request.getCommandId(), commandProcess, inactiveCommandDropTimeout * 1000,
-                new CommandProcessExpiryCallback() );
+        boolean queued =
+                commands.put( request.getCommandId(), commandProcess, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000,
+                        new CommandProcessExpiryCallback() );
         if ( !queued )
         {
             throw new CommandException( "This command is already queued for execution" );
@@ -86,29 +86,6 @@ public class CommandProcessor implements ByteMessageListener
 
             throw new CommandException( e );
         }
-    }
-
-
-    private HostInfo getTargetHost( UUID hostId )
-    {
-        HostInfo targetHost = hostRegistry.getHostInfoById( hostId );
-        if ( targetHost == null )
-        {
-            ContainerHostInfo containerHostInfo = hostRegistry.getContainerInfoById( hostId );
-            if ( containerHostInfo != null )
-            {
-                targetHost = hostRegistry.getParentByChild( containerHostInfo );
-            }
-        }
-        return targetHost;
-    }
-
-
-    protected void remove( UUID commandId )
-    {
-        Preconditions.checkNotNull( commandId );
-
-        commands.remove( commandId );
     }
 
 
@@ -154,5 +131,28 @@ public class CommandProcessor implements ByteMessageListener
         {
             LOG.error( "Error processing response", e );
         }
+    }
+
+
+    protected HostInfo getTargetHost( UUID hostId )
+    {
+        HostInfo targetHost = hostRegistry.getHostInfoById( hostId );
+        if ( targetHost == null )
+        {
+            ContainerHostInfo containerHostInfo = hostRegistry.getContainerInfoById( hostId );
+            if ( containerHostInfo != null )
+            {
+                targetHost = hostRegistry.getParentByChild( containerHostInfo );
+            }
+        }
+        return targetHost;
+    }
+
+
+    protected void remove( UUID commandId )
+    {
+        Preconditions.checkNotNull( commandId );
+
+        commands.remove( commandId );
     }
 }
