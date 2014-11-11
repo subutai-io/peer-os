@@ -17,18 +17,17 @@ import javax.sql.DataSource;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDao;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
@@ -59,12 +58,13 @@ public class MongoImpl implements Mongo
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private Tracker tracker;
-    private ContainerManager containerManager;
+    //    private ContainerManager containerManager;
     private EnvironmentManager environmentManager;
     private ExecutorService executor;
     private Commands commands;
-    private PluginDao pluginDAO;
+    private PluginDAO pluginDAO;
     private DataSource dataSource;
+    private PeerManager peerManager;
 
 
     public MongoImpl( DataSource dataSource )
@@ -79,7 +79,7 @@ public class MongoImpl implements Mongo
     }
 
 
-    public PluginDao getPluginDAO()
+    public PluginDAO getPluginDAO()
     {
         return pluginDAO;
     }
@@ -91,10 +91,21 @@ public class MongoImpl implements Mongo
     }
 
 
-    public ContainerManager getContainerManager()
+    public PeerManager getPeerManager()
     {
-        return containerManager;
+        return peerManager;
     }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
+    }
+
+    //    public ContainerManager getContainerManager()
+    //    {
+    //        return containerManager;
+    //    }
 
 
     public CommandRunner getCommandRunner()
@@ -133,10 +144,10 @@ public class MongoImpl implements Mongo
     }
 
 
-    public void setContainerManager( final ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
-    }
+    //    public void setContainerManager( final ContainerManager containerManager )
+    //    {
+    //        this.containerManager = containerManager;
+    //    }
 
 
     public void setEnvironmentManager( final EnvironmentManager environmentManager )
@@ -161,7 +172,7 @@ public class MongoImpl implements Mongo
     {
         try
         {
-            this.pluginDAO = new PluginDao( dataSource );
+            this.pluginDAO = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
         {
@@ -311,10 +322,10 @@ public class MongoImpl implements Mongo
 
 
     @Override
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( MongoClusterConfig config )
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( MongoClusterConfig config )
     {
         Preconditions.checkNotNull( config, "Mongo cluster config is null" );
-        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+        //        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint
@@ -348,7 +359,7 @@ public class MongoImpl implements Mongo
 
         environmentBlueprint.setNodeGroups( Sets.newHashSet( cfgServersGroup, routersGroup, dataNodesGroup ) );
 
-        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
-        return environmentBuildTask;
+        //        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
+        return environmentBlueprint;
     }
 }

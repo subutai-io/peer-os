@@ -38,4 +38,6 @@ public interface LocalPeer extends Peer
             throws PeerException;
 
     Agent waitForAgent( String containerName, int timeout );
+
+    public void onPeerEvent( PeerEvent event );
 }

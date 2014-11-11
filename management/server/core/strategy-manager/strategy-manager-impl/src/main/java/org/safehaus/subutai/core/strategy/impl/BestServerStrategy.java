@@ -1,11 +1,17 @@
 package org.safehaus.subutai.core.strategy.impl;
 
 
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.safehaus.subutai.common.protocol.Criteria;
+import org.safehaus.subutai.core.strategy.api.CriteriaDef;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
-
-import java.util.*;
 
 
 public class BestServerStrategy extends RoundRobinStrategy
@@ -30,7 +36,6 @@ public class BestServerStrategy extends RoundRobinStrategy
     @Override
     protected List<ServerMetric> sortServers( List<ServerMetric> serverMetrics ) throws StrategyException
     {
-        //TODO
         // using each strategy criteria, grade servers one by one
         Map<ServerMetric, Integer> grades = new HashMap<>();
         for ( ServerMetric a : serverMetrics )
@@ -50,6 +55,7 @@ public class BestServerStrategy extends RoundRobinStrategy
         List<Map.Entry<ServerMetric, Integer>> ls = new ArrayList<>( grades.entrySet() );
         Collections.sort( ls, new Comparator<Map.Entry>()
         {
+
             @Override
             public int compare( Map.Entry o1, Map.Entry o2 )
             {
@@ -110,14 +116,14 @@ public class BestServerStrategy extends RoundRobinStrategy
 
 
     @Override
-    public List<Criteria> getCriteria()
+    public List<CriteriaDef> getCriteriaDef()
     {
-        List<Criteria> list = new ArrayList<Criteria>();
-        Criteria c = new Criteria( "MORE_HDD", "More HDD", false);
+        List<CriteriaDef> list = new ArrayList<>();
+        CriteriaDef c = new CriteriaDef( "MORE_HDD", "More HDD", Boolean.valueOf( false ) );
         list.add( c );
-        c = new Criteria( "MORE_RAM", "More RAM", false);
+        c = new CriteriaDef( "MORE_RAM", "More RAM", Boolean.valueOf( false ) );
         list.add( c );
-        c = new Criteria( "MORE_CPU", "More CPU", false);
+        c = new CriteriaDef( "MORE_CPU", "More CPU", Boolean.valueOf( false ) );
         list.add( c );
 
         return Collections.unmodifiableList( list );
