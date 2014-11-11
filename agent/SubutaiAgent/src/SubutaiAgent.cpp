@@ -374,7 +374,7 @@ int main(int argc,char *argv[],char *envp[])
                         Watcher.stats();
                         //sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(), response.getConfPoints());
                         //connection->sendMessage(sendout);
-                        //Watcher.stats();
+                        Watcher.stats();
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));
                      }
                      else if (command.getType() == "UNSET_INOTIFY_REQUEST")
@@ -391,7 +391,7 @@ int main(int argc,char *argv[],char *envp[])
                         Watcher.stats();
                         //sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(), response.getConfPoints());
                         //connection->sendMessage(sendout);
-                        //Watcher.stats();
+                        Watcher.stats();
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));
                     }
                     else if (command.getType() == "INOTIFY_LIST_REQUEST") {

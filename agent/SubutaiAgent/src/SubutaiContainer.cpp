@@ -250,14 +250,10 @@ bool SubutaiContainer::getContainerMacAddresses()
 			}
 
 			if(found)
-			{
-				//cout << "inserting " << nic << " " << address << endl;
 				macAddresses.insert(pair<string, string>(nic, address));
-			}
     	}
     }
 
-    //cout << "going out " << endl;
     return true;
 }
 

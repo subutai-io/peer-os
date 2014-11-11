@@ -71,7 +71,7 @@ bool SubutaiContainerManager::isContainerStopped(string container_name)
 }
 
 /**
- * \details 	Check if container with the name given is froxen
+ * \details 	Check if container with the name given is frozen
  */
 bool SubutaiContainerManager::isContainerFrozen(string container_name)
 {
