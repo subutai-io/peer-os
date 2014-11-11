@@ -53,7 +53,7 @@ public class NodeGroup2PeerGroupBuilder extends EnvironmentBuildProcessFactory
                 ccm.setTargetPeerId( peerId );
                 ccm.setNodeGroupName( nodeGroup.getName() );
                 ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
-                ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );
+                ccm.setStrategy( nodeGroup.getPlacementStrategy() );
                 List<Template> templates =
                         fetchRequiredTemplates( environmentManager.getPeerManager().getLocalPeer().getId(),
                                 nodeGroup.getTemplateName() );
