@@ -3,7 +3,6 @@ package org.safehaus.subutai.plugin.solr.impl.handler;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -15,7 +14,6 @@ import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Preconditions;
 
 
@@ -84,8 +82,6 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SolrImpl, 
             trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
-
-
         try
         {
             trackerOperation.addLog( "Destroying environment..." );
