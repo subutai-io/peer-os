@@ -20,7 +20,7 @@ public class HostInfoImpl implements HostInfo
     UUID id;
     String hostname;
     Set<String> ips;
-    String macAddress;
+    Set<String> macs;
     Set<ContainerHostInfoImpl> containers;
 
 
@@ -46,9 +46,9 @@ public class HostInfoImpl implements HostInfo
 
 
     @Override
-    public String getMacAddress()
+    public Set<String> getMacs()
     {
-        return macAddress;
+        return macs;
     }
 
 
@@ -70,6 +70,6 @@ public class HostInfoImpl implements HostInfo
     public String toString()
     {
         return Objects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname ).add( "ips", ips )
-                      .add( "macAddress", macAddress ).add( "containers", containers ).toString();
+                      .add( "macAddress", macs ).add( "containers", containers ).toString();
     }
 }
