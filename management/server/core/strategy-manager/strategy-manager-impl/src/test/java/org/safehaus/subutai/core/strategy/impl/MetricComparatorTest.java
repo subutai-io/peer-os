@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 
 public class MetricComparatorTest {
@@ -40,10 +39,5 @@ public class MetricComparatorTest {
     public void testGetValueFreeRamMb() throws Exception {
         ServerMetric serverMetric = mock(ServerMetric.class);
         assertEquals(serverMetric.getFreeRamMb(),metricComparator.getValue(serverMetric));
-    }
-
-    @Test
-    public void testIsLessBetter() throws Exception {
-        assertFalse(metricComparator.isLessBetter());
     }
 }

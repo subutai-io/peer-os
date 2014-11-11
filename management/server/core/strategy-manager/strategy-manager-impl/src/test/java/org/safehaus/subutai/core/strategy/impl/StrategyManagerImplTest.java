@@ -5,14 +5,18 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
+import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 /**
@@ -89,5 +93,31 @@ public class StrategyManagerImplTest
         assertNotNull( result );
 
         strategyManager.unregisterStrategy( roundRobinPlacementStrategy );
+    }
+
+    @Test
+    public void testFindStategyById() throws Exception {
+        strategyManager.registerStrategy( roundRobinPlacementStrategy );
+        ContainerPlacementStrategy containerPlacementStrategy;
+        assertNotNull(strategyManager.findStrategyById("ROUND_ROBIN"));
+        assertEquals(roundRobinPlacementStrategy,strategyManager.findStrategyById("ROUND_ROBIN"));
+    }
+
+    @Test
+    public void testGetPlacementDistribution() throws Exception {
+        strategyManager.registerStrategy( roundRobinPlacementStrategy );
+        ServerMetric serverMetric = mock( ServerMetric.class );
+        ServerMetric serverMetric1 = mock( ServerMetric.class );
+        List<ServerMetric> serverMetrics = new ArrayList(  );
+        serverMetrics.add( serverMetric );
+        serverMetrics.add( serverMetric1 );
+        when(serverMetric.getHostname()).thenReturn( "Server Metric" );
+        when(serverMetric1.getHostname()).thenReturn( "Server Metric1" );
+
+        List<Criteria> criterias = mock(ArrayList.class);
+        Map<ServerMetric, Integer> result = strategyManager.getPlacementDistribution(serverMetrics,1,"ROUND_ROBIN",criterias);
+        assertNotNull(result);
+
+        ContainerPlacementStrategy containerPlacementStrategy = mock(ContainerPlacementStrategy.class);
     }
 }

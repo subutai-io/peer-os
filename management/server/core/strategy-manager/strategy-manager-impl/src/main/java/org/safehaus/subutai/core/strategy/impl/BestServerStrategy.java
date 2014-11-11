@@ -30,6 +30,7 @@ public class BestServerStrategy extends RoundRobinStrategy
     @Override
     protected List<ServerMetric> sortServers( List<ServerMetric> serverMetrics ) throws StrategyException
     {
+        //TODO
         // using each strategy criteria, grade servers one by one
         Map<ServerMetric, Integer> grades = new HashMap<>();
         for ( ServerMetric a : serverMetrics )
