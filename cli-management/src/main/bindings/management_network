@@ -456,7 +456,7 @@ function management_network {
    fi
 
    if [ "true" == "$listN2NTunnel" ]; then
-      result=`echo -e "ServerIP \t Port \t LocalInterface \t Community \t LocalPeerIP "`
+      result=`echo -e "LocalPeerIP \t ServerIP \t Port \t LocalInterface \t Community"`
       echo $result
       ps aux | awk 'BEGIN {FS="\n"; RS="";ORS=""}{x=1;y=1;while ( x<NF ){Array[x]=$x; x++;}for(i=0; i<NF;i++){if(Array[i] ~ /awk /){;}else if(Array[i] ~ /edge/){split(Array[i],a,"\edge\ -l ");split(a[2],b,"\ ");for (x in b){if( x == 7 ||  b[x] ~ /-/ );else if( b[x] ~ /:/ ){split(b[x],c,":");print c[1]"\t"c[2]"\t";}else{ print b[x]"\t";}}print "\n";}}}'
    fi
@@ -512,11 +512,16 @@ function management_network {
 
 }
 function management_network_description {
-  echo "Create Tunnel between subutai peers"
+  echo "Create a Tunnel between subutai peers"
   echo "List Opened Tunnels in subutai Host"
-  echo "Remove a tunnel from subutai Host"
-  echo "Add Block/Forwarding Flow rules "
-  echo "Show Bridge Flow Rules"
-  echo "Show Bridge Port informations"
-  echo "Delete Bridge Flow Rules" 
+  echo "Remove a Tunnel from subutai Host"
+  echo "Add a Block/Forwarding Flow rules "
+  echo "Show a Bridge Flow Rules"
+  echo "Show a Bridge Port informations"
+  echo "Delete a Bridge Flow Rules"
+  echo "Create a N2N tunnel"
+  echo "List N2N tunnels"
+  echo "Remove a N2N tunnel"
+  echo "Add a Tennant Gateway"
+  echo "Remove a Tennant Gateway" 
 }
