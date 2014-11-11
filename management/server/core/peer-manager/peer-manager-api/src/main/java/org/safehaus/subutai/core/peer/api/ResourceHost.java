@@ -332,23 +332,23 @@ public class ResourceHost extends SubutaiHost
             throws PeerException
     {
         Template template = templates.get( templates.size() - 1 );
-        boolean cloneResult = false;
-        try
-        {
-            cloneResult = run( Command.CLONE, template.getTemplateName(), containerName, environmentId.toString() );
-        }
-        catch ( ResourceHostException ignore )
-        {
-
-        }
-
-        if ( cloneResult )
-        {
-            return waitAgentAndCreateContainerHost( containerName, template.getTemplateName(), environmentId,
-                    creatorPeerId );
-        }
+//        boolean cloneResult = false;
+//        try
+//        {
+//            cloneResult = run( Command.CLONE, template.getTemplateName(), containerName, environmentId.toString() );
+//        }
+//        catch ( ResourceHostException ignore )
+//        {
+//
+//        }
+//
+//        if ( cloneResult )
+//        {
+//            return waitAgentAndCreateContainerHost( containerName, template.getTemplateName(), environmentId,
+//                    creatorPeerId );
+//        }
         prepareTemplates( templates );
-        cloneResult = run( Command.CLONE, template.getTemplateName(), containerName, environmentId.toString() );
+        boolean cloneResult = run( Command.CLONE, template.getTemplateName(), containerName, environmentId.toString() );
         if ( cloneResult )
         {
             return waitAgentAndCreateContainerHost( containerName, template.getTemplateName(), environmentId,

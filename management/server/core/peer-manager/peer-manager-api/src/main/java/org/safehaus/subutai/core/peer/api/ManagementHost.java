@@ -26,14 +26,14 @@ public class ManagementHost extends SubutaiHost
 
     public void init() throws SubutaiInitException
     {
-        try
-        {
-            createFlows();
-        }
-        catch ( CommandException e )
-        {
-            throw new SubutaiInitException( "Could not create network flows." );
-        }
+//        try
+//        {
+//            createFlows();
+//        }
+//        catch ( CommandException e )
+//        {
+//            throw new SubutaiInitException( "Could not create network flows." );
+//        }
     }
 
 
