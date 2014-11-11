@@ -139,48 +139,49 @@ public class Manager
 
     public void addClickListenerToAddNodeButton()
     {
-//        addNodeBtn.addClickListener( new Button.ClickListener()
-//        {
-//            @Override
-//            public void buttonClick( Button.ClickEvent clickEvent )
-//            {
-//                if ( config != null )
-//                {
-//                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( config.getHadoopClusterName() );
-//                    if ( hadoopConfig != null )
-//                    {
-//                        Set<Agent> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
-//                        nodes.removeAll( config.getNodes() );
-//                        if ( !nodes.isEmpty() )
-//                        {
-//                            AddNodeWindow addNodeWindow =
-//                                    new AddNodeWindow( lucene, tracker, executorService, config, nodes );
-//                            contentRoot.getUI().addWindow( addNodeWindow );
-//                            addNodeWindow.addCloseListener( new Window.CloseListener()
-//                            {
-//                                @Override
-//                                public void windowClose( Window.CloseEvent closeEvent )
-//                                {
-//                                    refreshClustersInfo();
-//                                }
-//                            } );
-//                        }
-//                        else
-//                        {
-//                            show( "All nodes in corresponding Hadoop cluster have Lucene installed" );
-//                        }
-//                    }
-//                    else
-//                    {
-//                        show( "Hadoop cluster info not found" );
-//                    }
-//                }
-//                else
-//                {
-//                    show( "Please, select cluster" );
-//                }
-//            }
-//        } );
+        addNodeBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config != null )
+                {
+                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( config.getHadoopClusterName() );
+                    if ( hadoopConfig != null )
+                    {
+                        Set<UUID> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
+                        nodes.removeAll( config.getNodes() );
+                        if ( !nodes.isEmpty() )
+                        {
+                            Set<ContainerHost> hosts = environmentManager.getEnvironmentByUUID( hadoopConfig.getEnvironmentId() ).getHostsByIds( nodes );
+                            AddNodeWindow addNodeWindow =
+                                    new AddNodeWindow( lucene, tracker, executorService, config, hosts  );
+                            contentRoot.getUI().addWindow( addNodeWindow );
+                            addNodeWindow.addCloseListener( new Window.CloseListener()
+                            {
+                                @Override
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
+                                    refreshClustersInfo();
+                                }
+                            } );
+                        }
+                        else
+                        {
+                            show( "All nodes in corresponding Hadoop cluster have Lucene installed" );
+                        }
+                    }
+                    else
+                    {
+                        show( "Hadoop cluster info not found" );
+                    }
+                }
+                else
+                {
+                    show( "Please, select cluster" );
+                }
+            }
+        } );
     }
 
 
@@ -349,7 +350,7 @@ public class Manager
                     @Override
                     public void buttonClick( Button.ClickEvent clickEvent )
                     {
-                        UUID trackID = lucene.destroyNode( config.getClusterName(), host.getHostname() );
+                        UUID trackID = lucene.uninstallNode( config.getClusterName(), host.getHostname() );
                         ProgressWindow window =
                                 new ProgressWindow( executorService, tracker, trackID, LuceneConfig.PRODUCT_KEY );
                         window.getWindow().addCloseListener( new Window.CloseListener()

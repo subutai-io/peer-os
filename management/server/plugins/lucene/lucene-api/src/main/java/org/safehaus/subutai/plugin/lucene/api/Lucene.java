@@ -18,7 +18,7 @@ public interface Lucene extends ApiBase<LuceneConfig>
 
     public UUID addNode( String clusterName, String lxcHostname );
 
-    public UUID destroyNode( String clusterName, String lxcHostname );
+    public UUID uninstallNode( String clusterName, String lxcHostname );
 
     public UUID uninstallCluster( LuceneConfig config );
 

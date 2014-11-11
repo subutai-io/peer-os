@@ -1,11 +1,15 @@
 package org.safehaus.subutai.plugin.lucene.impl.handler;
 
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
+import org.safehaus.subutai.plugin.lucene.impl.Commands;
 import org.safehaus.subutai.plugin.lucene.impl.LuceneImpl;
 
 import java.util.Iterator;
@@ -19,10 +23,10 @@ public class NodeOperationHandler extends AbstractOperationHandler<LuceneImpl, L
     private String hostname;
     private NodeOperationType operationType;
 
-    public NodeOperationHandler( final LuceneImpl manager, final LuceneConfig config, final String hostname,
+    public NodeOperationHandler( final LuceneImpl manager, String clusterName, final String hostname,
                                  NodeOperationType operationType )
     {
-        super( manager, config );
+        super( manager, manager.getCluster( clusterName ) );
         this.hostname = hostname;
         this.clusterName = clusterName;
         this.operationType = operationType;
@@ -64,11 +68,68 @@ public class NodeOperationHandler extends AbstractOperationHandler<LuceneImpl, L
         CommandResult result = null;
         switch ( operationType )
         {
-            // TODO add and destroy node
+            case INSTALL:
+                result = installProductOnNode( host );
+                break;
+            case UNINSTALL:
+                result = uninstallProductOnNode( host );
         }
 
 
 
+    }
+    private CommandResult installProductOnNode( ContainerHost host )
+    {
+        CommandResult result = null;
+        try
+        {
+            result = host.execute( new RequestBuilder(
+                    Commands.installCommand ) );
+            if ( result.hasSucceeded() )
+            {
+                config.getNodes().add( host.getId() );
+                manager.getPluginDao().saveInfo( LuceneConfig.PRODUCT_KEY, config.getClusterName(), config );
+                trackerOperation.addLog(
+                        LuceneConfig.PRODUCT_KEY + " is installed on node " + host.getHostname() + " successfully." );
+            }
+            else
+            {
+                trackerOperation.addLogFailed( "Could not install " + LuceneConfig.PRODUCT_KEY + " to node " + hostname );
+            }
+        }
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+    private CommandResult uninstallProductOnNode( ContainerHost host )
+    {
+        CommandResult result = null;
+        try
+        {
+            result = host.execute( new RequestBuilder(
+                    Commands.uninstallCommand ) );
+            if ( result.hasSucceeded() )
+            {
+                config.getNodes().remove( host.getId() );
+                manager.getPluginDao().saveInfo( LuceneConfig.PRODUCT_KEY, config.getClusterName(), config );
+                trackerOperation.addLog(
+                        LuceneConfig.PRODUCT_KEY + " is uninstalled from node " + host.getHostname() + " successfully." );
+            }
+            else
+            {
+                trackerOperation
+                        .addLogFailed( "Could not uninstall " + LuceneConfig.PRODUCT_KEY + " from node " + hostname );
+            }
+        }
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
+        }
+        return result;
     }
 
 }

@@ -19,12 +19,14 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
 import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.SetupType;
 import org.safehaus.subutai.plugin.lucene.impl.handler.ClusterOperationHandler;
+import org.safehaus.subutai.plugin.lucene.impl.handler.NodeOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,22 +176,18 @@ public class LuceneImpl implements Lucene
     @Override
     public UUID addNode( final String clusterName, final String lxcHostname )
     {
-        // TODO
-        /*AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();*/
-        return null;
+        AbstractOperationHandler h = new NodeOperationHandler( this, clusterName, lxcHostname, NodeOperationType.INSTALL );
+        executor.execute( h );
+        return h.getTrackerId();
     }
 
 
     @Override
-    public UUID destroyNode( final String clusterName, final String lxcHostname )
+    public UUID uninstallNode( final String clusterName, final String lxcHostname )
     {
-        // TODO
-        /*AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();*/
-        return null;
+        AbstractOperationHandler h = new NodeOperationHandler( this, clusterName, lxcHostname, NodeOperationType.UNINSTALL );
+        executor.execute( h );
+        return h.getTrackerId();
     }
 
     @Override
