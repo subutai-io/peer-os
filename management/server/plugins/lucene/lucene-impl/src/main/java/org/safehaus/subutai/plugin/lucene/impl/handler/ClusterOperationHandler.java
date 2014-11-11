@@ -172,13 +172,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<LuceneImpl
             case DESTROY:
                 if ( config.getSetupType() == SetupType.OVER_HADOOP )
                 {
-                    executor.execute( new Runnable()
-                    {
-                        public void run()
-                        {
-                            uninstallCluster();
-                        }
-                    } );
+                    uninstallCluster();
                 }
                 else if ( config.getSetupType() == SetupType.WITH_HADOOP )
                 {

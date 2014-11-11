@@ -51,12 +51,12 @@ class OverHadoopSetupStrategy extends FlumeSetupStrategy
         //install pig,
         //timeout?
         String s = Commands.make( CommandType.INSTALL );
-        RequestBuilder installCommand = new RequestBuilder( s ).withTimeout( 1800 );
+        //RequestBuilder installCommand = new RequestBuilder( s ).withTimeout( 1800 );
         for ( ContainerHost node : environment.getHostsByIds( config.getNodes() ) )
         {
             try
             {
-                processResult( node, node.execute( installCommand ) );
+                node.execute(new RequestBuilder( s ).withTimeout( 600 ));
             }
             catch ( CommandException e )
             {

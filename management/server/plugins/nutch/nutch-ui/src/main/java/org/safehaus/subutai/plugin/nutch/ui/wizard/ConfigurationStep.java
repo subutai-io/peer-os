@@ -4,9 +4,15 @@ package org.safehaus.subutai.plugin.nutch.ui.wizard;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.nutch.api.NutchConfig;
@@ -31,12 +37,17 @@ import com.vaadin.ui.VerticalLayout;
 public class ConfigurationStep extends Panel
 {
     private final Hadoop hadoop;
+    private final EnvironmentManager environmentManager;
+    private Environment hadoopEnvironment;
+    final Wizard wizard;
 
 
-    public ConfigurationStep( final Hadoop hadoop, final Wizard wizard )
+    public ConfigurationStep( final Hadoop hadoop, final Wizard wizard, final EnvironmentManager environmentManager )
     {
 
         this.hadoop = hadoop;
+        this.environmentManager = environmentManager;
+        this.wizard = wizard;
 
         setSizeFull();
 
@@ -74,6 +85,7 @@ public class ConfigurationStep extends Panel
                 }
                 else
                 {
+                    wizard.setHadoopConfig( hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ) );
                     wizard.next();
                 }
             }
@@ -125,8 +137,13 @@ public class ConfigurationStep extends Panel
                 if ( event.getProperty().getValue() != null )
                 {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
+                    config.setHadoopClusterName( hadoopInfo.getClusterName() );
+                    config.setHadoopNodes( hadoopInfo.getAllNodes() );
+                    hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
+                    Set<ContainerHost> hadoopNodes =
+                            hadoopEnvironment.getHostsByIds(  hadoopInfo.getAllNodes()  );
                     select.setValue( null );
-                    select.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                    select.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
                     config.getNodes().clear();
                 }
@@ -177,9 +194,14 @@ public class ConfigurationStep extends Panel
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Collection agentList = ( Collection ) event.getProperty().getValue();
+                    Set<UUID> nodes = new HashSet<UUID>();
+                    Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
+                    for( ContainerHost host : nodeList)
+                    {
+                        nodes.add( host.getAgent().getUuid() );
+                    }
                     config.getNodes().clear();
-                    config.getNodes().addAll( agentList );
+                    config.getNodes().addAll( nodes );
                 }
             }
         } );

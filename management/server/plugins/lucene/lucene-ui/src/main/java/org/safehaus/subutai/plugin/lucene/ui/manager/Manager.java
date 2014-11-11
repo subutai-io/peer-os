@@ -201,7 +201,7 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = lucene.uninstallCluster( config.getClusterName() );
+                            UUID trackID = lucene.uninstallCluster( config );
                             ProgressWindow window =
                                     new ProgressWindow( executorService, tracker, trackID, LuceneConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()

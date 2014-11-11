@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -24,9 +25,10 @@ public class Wizard
     private final Hadoop hadoop;
     private final Nutch nutch;
     private final Tracker tracker;
+    private final EnvironmentManager environmentManager;
     private int step = 1;
     private NutchConfig config = new NutchConfig();
-    private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
+    private HadoopClusterConfig hadoopConfig;
 
 
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -36,6 +38,7 @@ public class Wizard
         this.nutch = serviceLocator.getService( Nutch.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
         this.tracker = serviceLocator.getService( Tracker.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
@@ -58,12 +61,12 @@ public class Wizard
             }
             case 2:
             {
-                component = new ConfigurationStep( hadoop, this );
+                component = new ConfigurationStep( hadoop, this, environmentManager );
                 break;
             }
             case 3:
             {
-                component = new VerificationStep( nutch, executorService, tracker, this );
+                component = new VerificationStep( nutch, executorService, tracker, environmentManager, this );
                 break;
             }
             default:

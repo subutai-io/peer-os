@@ -51,10 +51,6 @@ public class FlumeImpl implements Flume
         this.environmentManager = environmentManager;
         this.hadoopManager = hadoopManager;
     }
-    public FlumeImpl( final DataSource dataSource )
-    {
-        this.dataSource = dataSource;
-    }
 
     public Tracker getTracker()
     {
@@ -158,6 +154,7 @@ public class FlumeImpl implements Flume
     public UUID installCluster( FlumeConfig config, HadoopClusterConfig hadoopConfig )
     {
         ClusterOperationHandler h = new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
+        h.setHadoopConfig( hadoopConfig );
         executor.execute( h );
         return h.getTrackerId();
     }

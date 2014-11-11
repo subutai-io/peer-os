@@ -126,7 +126,7 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy
             ContainerHost node = environment.getContainerHostByUUID( uuid );
             try
             {
-                processResult( node, node.execute(new RequestBuilder( Commands.installCommand ).withTimeout( 600 )));
+                node.execute(new RequestBuilder( Commands.installCommand ).withTimeout( 600 ));
             }
             catch ( CommandException e )
             {

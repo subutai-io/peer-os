@@ -18,12 +18,13 @@
     <module>cassandra</module>
     <module>elasticsearch</module>
     <module>hadoop</module>
-    <module>spark</module>
     <module>solr</module>
     <module>pig</module>
     <module>lucene</module>
     <module>flume</module>
-    <!--
+    <module>nutch</module>
+    <!--<module>accumulo</module>
+    <module>oozie</module>
      <module>lucene</module>
     <module>accumulo</module>
     <module>spark</module>
@@ -41,7 +42,6 @@
     <module>hbase</module>
     <module>mahout</module>
     <module>hipi</module>
-    <module>nutch</module>
     <module>plugin-common</module>
     <module>jetty</module>
     -->

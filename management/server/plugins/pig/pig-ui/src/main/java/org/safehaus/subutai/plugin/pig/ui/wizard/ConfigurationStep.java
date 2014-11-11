@@ -146,6 +146,8 @@ public class ConfigurationStep extends Panel
                             hadoopEnvironment.getHostsByIds(  hadoopInfo.getAllNodes()  );
                     select.setValue( null );
                     select.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
+                    config.setHadoopClusterName( hadoopInfo.getClusterName() );
+                    config.getNodes().clear();
                 }
             }
         } );

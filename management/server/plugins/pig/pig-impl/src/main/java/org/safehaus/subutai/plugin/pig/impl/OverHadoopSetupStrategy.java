@@ -120,13 +120,11 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
         manager.getPluginDao().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config );
         trackerOperation.addLog( "Cluster info saved to DB\nInstalling Pig..." );
         //install pig,
-        //timeout?
-        RequestBuilder installCommand = new RequestBuilder( Commands.installCommand );
         for ( ContainerHost node : environment.getHostsByIds( config.getNodes() ) )
         {
             try
             {
-                processResult( node, node.execute( installCommand ) );
+                node.execute(new RequestBuilder( Commands.installCommand ).withTimeout( 600 ));
             }
             catch ( CommandException e )
             {

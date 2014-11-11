@@ -7,15 +7,13 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+;
 
 
 public class PigConfig implements ConfigBase
 {
     public static final String TEMPLATE_NAME = "hadooppig";
     public static final String PRODUCT_KEY = "Pig";
-    public static final String PRODUCT_PACKAGE = ( Common.PACKAGE_PREFIX + PRODUCT_KEY ).toLowerCase();
 
     private String clusterName = "";
     private SetupType setupType;
