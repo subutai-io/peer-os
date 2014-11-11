@@ -81,6 +81,16 @@ public class ZookeeperNodeOperationHandler extends AbstractOperationHandler<Zook
                     commandResultList.add( containerHost.execute( new RequestBuilder(
                             new Commands().getStatusCommand()) ) );
                     break;
+                case DESTROY:
+                    commandResultList.add( containerHost.execute( new RequestBuilder(
+                    Commands.getUninstallCommand() ) ) );
+                    boolean isRemoved = config.getNodes().remove( containerHost.getId() );
+                    if ( isRemoved ) {
+                        manager.getPluginDAO().deleteInfo( config.getProductKey(), config.getClusterName() );
+                        manager.getPluginDAO()
+                               .saveInfo( config.getProductKey(), config.getClusterName(), config );
+                    }
+                    break;
             }
             logResults( trackerOperation, commandResultList );
         }

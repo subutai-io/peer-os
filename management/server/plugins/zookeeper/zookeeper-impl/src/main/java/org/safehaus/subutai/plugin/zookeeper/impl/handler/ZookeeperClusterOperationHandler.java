@@ -106,8 +106,8 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
             case START_ALL:
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
-                        commandResultList.add( executeCommand( containerHost,
-                                new Commands().getStartCommand() ) );
+                    commandResultList.add( executeCommand( containerHost,
+                            new Commands().getStartCommand() ) );
                 }
                 break;
             case STOP_ALL:
@@ -164,8 +164,8 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
         {
             Environment env = null;
             if ( config.getSetupType() != SetupType.OVER_HADOOP ) {
-                 env = manager.getEnvironmentManager()
-                              .buildEnvironment( manager.getDefaultEnvironmentBlueprint( zookeeperClusterConfig ) );
+                env = manager.getEnvironmentManager()
+                             .buildEnvironment( manager.getDefaultEnvironmentBlueprint( zookeeperClusterConfig ) );
             }
 
 
@@ -197,8 +197,24 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
 
         try
         {
-            trackerOperation.addLog( "Destroying environment..." );
-            manager.getEnvironmentManager().destroyEnvironment( config.getEnvironmentId() );
+            if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+                List<CommandResult> commandResultList = new ArrayList<CommandResult>(  );
+
+                trackerOperation.addLog( "Uninstalling zookeeper on hadoop nodes" );
+                Environment zookeeperEnvironment =
+                        manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+                for ( ContainerHost containerHost : zookeeperEnvironment.getHostsByIds( config.getNodes() ) ) {
+                    commandResultList.add( containerHost.execute( new RequestBuilder (
+                            Commands.getUninstallCommand() ) ) );
+                }
+                logResults( trackerOperation, commandResultList );
+
+            }
+            else {
+                trackerOperation.addLog( "Destroying environment..." );
+                manager.getEnvironmentManager().destroyEnvironment( config.getEnvironmentId() );
+            }
+
             manager.getPluginDAO().deleteInfo( config.getProductKey(), config.getClusterName() );
             trackerOperation.addLogDone( "Cluster destroyed" );
         }
@@ -206,6 +222,10 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
         {
             trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
             LOG.error( e.getMessage(), e );
+        }
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
         }
     }
 
