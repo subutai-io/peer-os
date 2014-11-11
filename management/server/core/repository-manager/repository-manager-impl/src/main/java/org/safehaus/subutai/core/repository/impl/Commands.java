@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.repository.impl;
 
 
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 
 
 /**

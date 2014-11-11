@@ -53,7 +53,7 @@ public class MessageNotifier implements Runnable
                 LOG.warn( String.format( "Message type %s and listener type %s didn't match", message, listener ) );
             }
         }
-        catch ( JMSException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in onMessage", e );
         }
