@@ -16,9 +16,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.plugin.storm.api.Storm;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 
@@ -29,12 +28,13 @@ public class RestService
     private static final String OPERATION_ID = "OPERATION_ID";
 
     private Storm stormManager;
-    private AgentManager agentManager;
+
+    private EnvironmentManager environmentManager;
 
 
-    public void setAgentManager( AgentManager agentManager )
+    public EnvironmentManager getEnvironmentManager()
     {
-        this.agentManager = agentManager;
+        return environmentManager;
     }
 
 
@@ -91,8 +91,8 @@ public class RestService
         config.setExternalZookeeper( externalZookeeper );
         config.setZookeeperClusterName( zookeeperClusterName );
 
-        Agent nimbusAgent = agentManager.getAgentByHostname( nimbus );
-        config.setNimbus( nimbusAgent );
+//        Agent nimbusAgent = agentManager.getAgentByHostname( nimbus );
+//        config.setNimbus( nimbusAgent );
 
         try
         {
@@ -155,7 +155,7 @@ public class RestService
     public Response statusCheck( @PathParam( "clusterName" ) String clusterName,
                                  @PathParam( "hostname" ) String hostname )
     {
-        UUID uuid = stormManager.statusCheck( clusterName, hostname );
+        UUID uuid = stormManager.checkNode( clusterName, hostname );
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }

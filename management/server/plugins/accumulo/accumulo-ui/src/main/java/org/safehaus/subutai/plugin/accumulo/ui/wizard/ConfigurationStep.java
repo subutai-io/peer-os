@@ -7,13 +7,14 @@ package org.safehaus.subutai.plugin.accumulo.ui.wizard;
 
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.accumulo.api.SetupType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -24,6 +25,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Range;
+import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.Sizeable;
@@ -44,10 +46,20 @@ public class ConfigurationStep extends Panel
 {
     private Property.ValueChangeListener masterNodeComboChangeListener;
     private Property.ValueChangeListener gcNodeComboChangeListener;
+    private EnvironmentManager environmentManager;
+    private Wizard wizard;
+    private Hadoop hadoop;
+    private Zookeeper zookeeper;
 
 
-    public ConfigurationStep( final Hadoop hadoop, final Zookeeper zookeeper, final Wizard wizard )
+    public ConfigurationStep( final Hadoop hadoop, final Zookeeper zookeeper,
+                              final EnvironmentManager environmentManager, final Wizard wizard )
     {
+
+        this.environmentManager = environmentManager;
+        this.wizard = wizard;
+        this.hadoop = hadoop;
+        this.zookeeper = zookeeper;
 
         List<Integer> nodesCountRange =
                 ContiguousSet.create( Range.closed( 1, 50 ), DiscreteDomain.integers() ).asList();
@@ -165,18 +177,18 @@ public class ConfigurationStep extends Panel
             }
 
 
-            //fill selection controls with hadoop nodes
+            // fill selection controls with hadoop nodes
             if ( hadoopClustersCombo.getValue() != null )
             {
                 HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
 
                 wizard.getConfig().setHadoopClusterName( hadoopInfo.getClusterName() );
 
-//                setComboDS( masterNodeCombo, hadoopInfo.getAllNodes() );
-//                setComboDS( gcNodeCombo, hadoopInfo.getAllNodes() );
-//                setComboDS( monitorNodeCombo, hadoopInfo.getAllNodes() );
-//                setTwinSelectDS( tracersSelect, hadoopInfo.getAllNodes() );
-//                setTwinSelectDS( slavesSelect, hadoopInfo.getAllNodes() );
+                setComboDS( masterNodeCombo, hadoopInfo.getAllNodes() );
+                setComboDS( gcNodeCombo, hadoopInfo.getAllNodes() );
+                setComboDS( monitorNodeCombo, hadoopInfo.getAllNodes() );
+                setTwinSelectDS( tracersSelect, getSlaveContainerHosts( Sets.newHashSet( hadoopInfo.getAllNodes() ) ) );
+                setTwinSelectDS( slavesSelect, getSlaveContainerHosts( Sets.newHashSet( hadoopInfo.getAllNodes() ) ) );
             }
 
             //on hadoop cluster change reset all controls and config
@@ -189,11 +201,12 @@ public class ConfigurationStep extends Panel
                     {
                         HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                         //reset relevant controls
-//                        setComboDS( masterNodeCombo, hadoopInfo.getAllNodes() );
-//                        setComboDS( gcNodeCombo, hadoopInfo.getAllNodes() );
-//                        setComboDS( monitorNodeCombo, hadoopInfo.getAllNodes() );
-//                        setTwinSelectDS( tracersSelect, hadoopInfo.getAllNodes() );
-//                        setTwinSelectDS( slavesSelect, hadoopInfo.getAllNodes() );
+                        setComboDS( masterNodeCombo, hadoopInfo.getAllNodes() );
+                        setComboDS( gcNodeCombo, hadoopInfo.getAllNodes() );
+                        setComboDS( monitorNodeCombo, hadoopInfo.getAllNodes() );
+
+                        setTwinSelectDS( tracersSelect, getSlaveContainerHosts( Sets.newHashSet( hadoopInfo.getAllNodes() ) ) );
+                        setTwinSelectDS( slavesSelect, getSlaveContainerHosts( Sets.newHashSet( hadoopInfo.getAllNodes() ) ) );
                         //reset relevant properties
                         wizard.getConfig().setMasterNode( null );
                         wizard.getConfig().setGcNode( null );
@@ -224,27 +237,26 @@ public class ConfigurationStep extends Panel
             //add value change handler
             masterNodeComboChangeListener = new Property.ValueChangeListener()
             {
-
                 public void valueChange( Property.ValueChangeEvent event )
                 {
                     if ( event.getProperty().getValue() != null )
                     {
-//                        Agent masterNode = ( Agent ) event.getProperty().getValue();
-//                        wizard.getConfig().setMasterNode( masterNode );
-//                        HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
-//                        List<Agent> hadoopNodes = hadoopInfo.getAllNodes();
-//                        hadoopNodes.remove( masterNode );
-//                        gcNodeCombo.removeValueChangeListener( gcNodeComboChangeListener );
-//                        setComboDS( gcNodeCombo, hadoopNodes );
-//                        if ( !masterNode.equals( wizard.getConfig().getGcNode() ) )
-//                        {
-//                            gcNodeCombo.setValue( wizard.getConfig().getGcNode() );
-//                        }
-//                        else
-//                        {
-//                            wizard.getConfig().setGcNode( null );
-//                        }
-//                        gcNodeCombo.addValueChangeListener( gcNodeComboChangeListener );
+                        UUID masterNode = ( UUID) event.getProperty().getValue();
+                        wizard.getConfig().setMasterNode( masterNode );
+                        HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
+                        List<UUID> hadoopNodes = hadoopInfo.getAllNodes();
+                        hadoopNodes.remove( masterNode );
+                        gcNodeCombo.removeValueChangeListener( gcNodeComboChangeListener );
+                        setComboDS( gcNodeCombo, hadoopNodes );
+                        if ( !masterNode.equals( wizard.getConfig().getGcNode() ) )
+                        {
+                            gcNodeCombo.setValue( wizard.getConfig().getGcNode() );
+                        }
+                        else
+                        {
+                            wizard.getConfig().setGcNode( null );
+                        }
+                        gcNodeCombo.addValueChangeListener( gcNodeComboChangeListener );
                     }
                 }
             };
@@ -257,39 +269,39 @@ public class ConfigurationStep extends Panel
                 {
                     if ( event.getProperty().getValue() != null )
                     {
-//                        Agent gcNode = ( Agent ) event.getProperty().getValue();
-//                        wizard.getConfig().setGcNode( gcNode );
-//                        HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
-//                        List<Agent> hadoopNodes = hadoopInfo.getAllNodes();
-//                        hadoopNodes.remove( gcNode );
-//                        masterNodeCombo.removeValueChangeListener( masterNodeComboChangeListener );
-//                        setComboDS( masterNodeCombo, hadoopNodes );
-//                        if ( !gcNode.equals( wizard.getConfig().getMasterNode() ) )
-//                        {
-//                            masterNodeCombo.setValue( wizard.getConfig().getMasterNode() );
-//                        }
-//                        else
-//                        {
-//                            wizard.getConfig().setMasterNode( null );
-//                        }
-//                        masterNodeCombo.addValueChangeListener( masterNodeComboChangeListener );
+                        UUID gcNode = ( UUID ) event.getProperty().getValue();
+                        wizard.getConfig().setGcNode( gcNode );
+                        HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
+                        List<UUID> hadoopNodes = hadoopInfo.getAllNodes();
+                        hadoopNodes.remove( gcNode );
+                        masterNodeCombo.removeValueChangeListener( masterNodeComboChangeListener );
+                        setComboDS( masterNodeCombo, hadoopNodes );
+                        if ( !gcNode.equals( wizard.getConfig().getMasterNode() ) )
+                        {
+                            masterNodeCombo.setValue( wizard.getConfig().getMasterNode() );
+                        }
+                        else
+                        {
+                            wizard.getConfig().setMasterNode( null );
+                        }
+                        masterNodeCombo.addValueChangeListener( masterNodeComboChangeListener );
                     }
                 }
             };
             gcNodeCombo.addValueChangeListener( gcNodeComboChangeListener );
             //add value change handler
-//            monitorNodeCombo.addValueChangeListener( new Property.ValueChangeListener()
-//            {
-//                @Override
-//                public void valueChange( Property.ValueChangeEvent event )
-//                {
-//                    if ( event.getProperty().getValue() != null )
-//                    {
-//                        Agent monitor = ( Agent ) event.getProperty().getValue();
-//                        wizard.getConfig().setMonitor( monitor );
-//                    }
-//                }
-//            } );
+            monitorNodeCombo.addValueChangeListener( new Property.ValueChangeListener()
+            {
+                @Override
+                public void valueChange( Property.ValueChangeEvent event )
+                {
+                    if ( event.getProperty().getValue() != null )
+                    {
+                        UUID monitor = ( UUID ) event.getProperty().getValue();
+                        wizard.getConfig().setMonitor( monitor );
+                    }
+                }
+            } );
 
             //restore tracers if back button is pressed
             if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getTracers() ) )
@@ -334,32 +346,42 @@ public class ConfigurationStep extends Panel
             } );
 
 
-//            //add value change handler
-//            tracersSelect.addValueChangeListener( new Property.ValueChangeListener()
-//            {
-//
-//                public void valueChange( Property.ValueChangeEvent event )
-//                {
-//                    if ( event.getProperty().getValue() != null )
-//                    {
-//                        Set<Agent> agentList = new HashSet( ( Collection ) event.getProperty().getValue() );
-//                        wizard.getConfig().setTracers( agentList );
-//                    }
-//                }
-//            } );
-//            //add value change handler
-//            slavesSelect.addValueChangeListener( new Property.ValueChangeListener()
-//            {
-//
-//                public void valueChange( Property.ValueChangeEvent event )
-//                {
-//                    if ( event.getProperty().getValue() != null )
-//                    {
-//                        Set<Agent> agentList = new HashSet( ( Collection ) event.getProperty().getValue() );
-//                        wizard.getConfig().setSlaves( agentList );
-//                    }
-//                }
-//            } );
+            //add value change handler
+            tracersSelect.addValueChangeListener( new Property.ValueChangeListener()
+            {
+
+                public void valueChange( Property.ValueChangeEvent event )
+                {
+                    if ( event.getProperty().getValue() != null )
+                    {
+                        Set<UUID> nodes = new HashSet<UUID>();
+                        Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
+                        for( ContainerHost host : nodeList)
+                        {
+                            nodes.add( host.getAgent().getUuid() );
+                        }
+                        wizard.getConfig().setTracers( nodes );
+
+                    }
+                }
+            } );
+            //add value change handler
+            slavesSelect.addValueChangeListener( new Property.ValueChangeListener()
+            {
+                public void valueChange( Property.ValueChangeEvent event )
+                {
+                    if ( event.getProperty().getValue() != null )
+                    {
+                        Set<UUID> nodes = new HashSet<UUID>();
+                        Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
+                        for( ContainerHost host : nodeList)
+                        {
+                            nodes.add( host.getAgent().getUuid() );
+                        }
+                        wizard.getConfig().setSlaves( nodes );
+                    }
+                }
+            } );
 
             Button next = new Button( "Next" );
             next.setId( "confNext2" );
@@ -547,7 +569,6 @@ public class ConfigurationStep extends Panel
 
 
             //Zookeeper settings
-
 
             final TextField zkClusterNameTxtFld = new TextField( "Enter Zookeeper cluster name" );
             zkClusterNameTxtFld.setId( "zkClusterNameTxtFld" );
@@ -786,7 +807,22 @@ public class ConfigurationStep extends Panel
         }
     }
 
+    private Set<UUID> getIDsOfContainerList( Set<ContainerHost> containerHosts ){
+        Set<UUID> set = new HashSet<>();
+        for ( ContainerHost containerHost : containerHosts ){
+            set.add( containerHost.getId() );
+        }
+        return set;
+    }
 
+    private Set<ContainerHost> getSlaveContainerHosts( Set<UUID> slaves ){
+        Set<ContainerHost> set = new HashSet<>();
+        for ( UUID uuid : slaves ){
+            set.add( environmentManager.getEnvironmentByUUID( hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ).getEnvironmentId() ).getContainerHostByUUID( uuid ) );
+
+        }
+        return set;
+    }
     public static ComboBox getCombo( String title )
     {
         ComboBox combo = new ComboBox( title );
@@ -824,22 +860,27 @@ public class ConfigurationStep extends Panel
     }
 
 
-    private void setComboDS( ComboBox target, List<Agent> agents )
+    private void setComboDS( ComboBox target, List<UUID> agents )
     {
         target.removeAllItems();
         target.setValue( null );
-        for ( Agent agent : agents )
+        for ( UUID agent : agents )
         {
-            target.addItem( agent );
-            target.setItemCaption( agent, agent.getHostname() );
+            ContainerHost host = getHost( agent );
+            target.addItem( host.getId() );
+            target.setItemCaption( host.getId(), host.getHostname() );
         }
     }
 
+    private ContainerHost getHost( UUID uuid ){
+        return environmentManager.getEnvironmentByUUID( hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ).getEnvironmentId() ).getContainerHostByUUID(  uuid );
+    }
 
-    private void setTwinSelectDS( TwinColSelect target, List<Agent> agents )
+
+    private void setTwinSelectDS( TwinColSelect target, Set<ContainerHost> containerHosts )
     {
         target.setValue( null );
-        target.setContainerDataSource( new BeanItemContainer<>( Agent.class, agents ) );
+        target.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, containerHosts ) );
     }
 
 

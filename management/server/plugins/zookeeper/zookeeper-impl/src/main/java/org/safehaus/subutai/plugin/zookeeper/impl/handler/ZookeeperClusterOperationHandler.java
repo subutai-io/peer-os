@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.storm.impl.handler;
+package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 
 
 import java.util.ArrayList;
@@ -19,11 +19,11 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
-import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
-import org.safehaus.subutai.plugin.storm.impl.CommandType;
-import org.safehaus.subutai.plugin.storm.impl.Commands;
-import org.safehaus.subutai.plugin.storm.impl.StormImpl;
-import org.safehaus.subutai.plugin.storm.impl.StormService;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
+import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,30 +34,44 @@ import com.google.common.base.Strings;
 /**
  * This class handles operations that are related to whole cluster.
  */
-public class StormClusterOperationHandler extends AbstractOperationHandler<StormImpl, StormClusterConfiguration>
+public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<ZookeeperImpl, ZookeeperClusterConfig>
         implements ClusterOperationHandlerInterface
 {
-    private static final Logger LOG = LoggerFactory.getLogger( StormClusterOperationHandler.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ZookeeperClusterOperationHandler.class.getName() );
     private ClusterOperationType operationType;
-    private StormClusterConfiguration config;
+    private ZookeeperClusterConfig zookeeperClusterConfig;
+    private HadoopClusterConfig hadoopClusterConfig;
     private ExecutorService executor = Executors.newCachedThreadPool();
 
 
-    public StormClusterOperationHandler( final StormImpl manager,
-                                         final StormClusterConfiguration config,
-                                         final ClusterOperationType operationType )
+    public ZookeeperClusterOperationHandler( final ZookeeperImpl manager, final ZookeeperClusterConfig config,
+                                             final ClusterOperationType operationType )
     {
-        super( manager, config.getClusterName() );
+        super( manager, config );
         this.operationType = operationType;
-        this.config = config;
+        this.zookeeperClusterConfig = config;
         trackerOperation = manager.getTracker().createTrackerOperation( config.getProductKey(),
+                String.format( "Creating %s tracker object...", clusterName ) );
+    }
+
+
+    public ZookeeperClusterOperationHandler( final ZookeeperImpl manager,
+                                             final ZookeeperClusterConfig zookeeperClusterConfig,
+                                             final HadoopClusterConfig hadoopClusterConfig,
+                                             final ClusterOperationType operationType )
+    {
+        super( manager, zookeeperClusterConfig.getClusterName() );
+        this.operationType = operationType;
+        this.zookeeperClusterConfig = zookeeperClusterConfig;
+        this.hadoopClusterConfig = hadoopClusterConfig;
+        trackerOperation = manager.getTracker().createTrackerOperation( zookeeperClusterConfig.getProductKey(),
                 String.format( "Creating %s tracker object...", clusterName ) );
     }
 
 
     public void run()
     {
-        Preconditions.checkNotNull( config, "Configuration is null !!!" );
+        Preconditions.checkNotNull( zookeeperClusterConfig, "Configuration is null !!!" );
         switch ( operationType )
         {
             case INSTALL:
@@ -85,50 +99,29 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
     @Override
     public void runOperationOnContainers( ClusterOperationType clusterOperationType )
     {
-        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
         List<CommandResult> commandResultList = new ArrayList<CommandResult>(  );
         switch ( clusterOperationType )
         {
             case START_ALL:
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
-                    if ( config.getNimbus().equals( containerHost.getId() ) ) {
-                        commandResultList.add( executeCommand( containerHost,
-                                Commands.make( CommandType.START, StormService.NIMBUS ) ) );
-                        commandResultList.add( executeCommand( containerHost, Commands
-                                .make( CommandType.START, StormService.UI ) ) );
-                    }
-                    else if ( config.getSupervisors().equals( containerHost.getId() ) )
-                        commandResultList.add( executeCommand( containerHost, Commands
-                                .make( CommandType.START, StormService.SUPERVISOR ) ) );
+                    commandResultList.add( executeCommand( containerHost,
+                            new Commands().getStartCommand() ) );
                 }
                 break;
             case STOP_ALL:
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
-                    if ( config.getNimbus().equals( containerHost.getId() ) ) {
-                        commandResultList.add( executeCommand( containerHost, Commands
-                                .make( CommandType.STOP, StormService.NIMBUS ) ) );
-                        commandResultList.add( executeCommand( containerHost, Commands
-                                .make( CommandType.STOP, StormService.UI ) ) );
-                    }
-                    else if ( config.getSupervisors().equals( containerHost.getId() ) )
-                        commandResultList.add( executeCommand( containerHost, Commands
-                                .make( CommandType.STOP, StormService.SUPERVISOR ) ) );
+                    commandResultList.add( executeCommand( containerHost,
+                            new Commands().getStopCommand() ) );
                 }
                 break;
             case STATUS_ALL:
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
-                    if ( config.getNimbus().equals( containerHost.getId() ) ) {
-                        commandResultList.add( executeCommand( containerHost, Commands
-                                .make( CommandType.STATUS, StormService.NIMBUS ) ) );
-                        commandResultList.add( executeCommand( containerHost, Commands
-                                .make( CommandType.STATUS, StormService.UI ) ) );
-                    }
-                    else if ( config.getSupervisors().equals( containerHost.getId() ) )
-                        commandResultList.add( executeCommand( containerHost, Commands
-                                .make( CommandType.STATUS, StormService.SUPERVISOR ) ) );
+                    commandResultList.add( executeCommand( containerHost,
+                            new Commands().getStatusCommand() ) );
                 }
                 break;
         }
@@ -155,7 +148,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
     @Override
     public void setupCluster()
     {
-        if ( Strings.isNullOrEmpty( config.getClusterName() ) )
+        if ( Strings.isNullOrEmpty( zookeeperClusterConfig.getClusterName() ) )
         {
             trackerOperation.addLogFailed( "Malformed configuration" );
             return;
@@ -169,11 +162,15 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
 
         try
         {
-            Environment env = manager.getEnvironmentManager()
-                                     .buildEnvironment( manager.getDefaultEnvironmentBlueprint( config ) );
+            Environment env = null;
+            if ( config.getSetupType() != SetupType.OVER_HADOOP ) {
+                env = manager.getEnvironmentManager()
+                             .buildEnvironment( manager.getDefaultEnvironmentBlueprint( zookeeperClusterConfig ) );
+            }
+
 
             ClusterSetupStrategy clusterSetupStrategy =
-                    manager.getClusterSetupStrategy( env, config, trackerOperation );
+                    manager.getClusterSetupStrategy( env, zookeeperClusterConfig, trackerOperation );
             clusterSetupStrategy.setup();
 
             trackerOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
@@ -181,7 +178,8 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
         catch ( EnvironmentBuildException | ClusterSetupException e )
         {
             trackerOperation.addLogFailed(
-                    String.format( "Failed to setup %s cluster %s : %s", config.getProductKey(), clusterName, e.getMessage() ) );
+                    String.format( "Failed to setup %s cluster %s : %s", zookeeperClusterConfig.getProductKey(), clusterName,
+                            e.getMessage() ) );
         }
     }
 
@@ -189,7 +187,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
     @Override
     public void destroyCluster()
     {
-        StormClusterConfiguration config = manager.getCluster( clusterName );
+        ZookeeperClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
             trackerOperation.addLogFailed(
@@ -199,8 +197,24 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
 
         try
         {
-            trackerOperation.addLog( "Destroying environment..." );
-            manager.getEnvironmentManager().destroyEnvironment( config.getEnvironmentId() );
+            if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+                List<CommandResult> commandResultList = new ArrayList<CommandResult>(  );
+
+                trackerOperation.addLog( "Uninstalling zookeeper on hadoop nodes" );
+                Environment zookeeperEnvironment =
+                        manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+                for ( ContainerHost containerHost : zookeeperEnvironment.getHostsByIds( config.getNodes() ) ) {
+                    commandResultList.add( containerHost.execute( new RequestBuilder (
+                            Commands.getUninstallCommand() ) ) );
+                }
+                logResults( trackerOperation, commandResultList );
+
+            }
+            else {
+                trackerOperation.addLog( "Destroying environment..." );
+                manager.getEnvironmentManager().destroyEnvironment( config.getEnvironmentId() );
+            }
+
             manager.getPluginDAO().deleteInfo( config.getProductKey(), config.getClusterName() );
             trackerOperation.addLogDone( "Cluster destroyed" );
         }
@@ -208,6 +222,10 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
         {
             trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
             LOG.error( e.getMessage(), e );
+        }
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
         }
     }
 
@@ -217,18 +235,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
         Preconditions.checkNotNull( commandResultList );
         for ( CommandResult commandResult : commandResultList )
             po.addLog( commandResult.getStdOut() );
-        String finishMessage = String.format( "%s operation finished", operationType );
-        switch ( po.getState() )
-        {
-            case SUCCEEDED:
-                po.addLogDone( finishMessage );
-                break;
-            case FAILED:
-                po.addLogFailed( finishMessage );
-                break;
-            default:
-                po.addLogDone( String.format( "Still running %s operations on %s", operationType ) );
-                break;
-        }
+        po.addLogDone( "" );
     }
+
 }

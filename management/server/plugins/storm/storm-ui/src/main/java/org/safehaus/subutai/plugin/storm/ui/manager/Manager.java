@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.ServiceLocator;
@@ -18,6 +17,7 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.storm.api.Storm;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
@@ -275,7 +275,7 @@ public class Manager
 
         table.removeAllItems();
 
-        for ( final ContainerHost uuid : containerHosts )
+        for ( final ContainerHost containerHost : containerHosts )
         {
             final Button checkBtn = new Button( "Check" );
             checkBtn.addStyleName( "default" );
@@ -298,7 +298,7 @@ public class Manager
             icon.setVisible( false );
 
             final List<java.io.Serializable> items = new ArrayList<>();
-            items.add( uuid.getHostname() );
+            items.add( containerHost.getHostname() );
             items.add( checkBtn );
             items.add( startBtn );
             items.add( stopBtn );
@@ -314,14 +314,14 @@ public class Manager
                     {
 
                         ConfirmationDialog alert = new ConfirmationDialog(
-                                String.format( "Do you want to destroy the %s node?", uuid.getHostname() ), "Yes",
+                                String.format( "Do you want to destroy the %s node?", containerHost.getHostname() ), "Yes",
                                 "No" );
                         alert.getOk().addClickListener( new Button.ClickListener()
                         {
                             @Override
                             public void buttonClick( Button.ClickEvent clickEvent )
                             {
-                                UUID trackID = storm.destroyNode( config.getClusterName(), uuid.getHostname() );
+                                UUID trackID = storm.destroyNode( config.getClusterName(), containerHost.getHostname() );
                                 ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                         StormClusterConfiguration.PRODUCT_NAME );
                                 window.getWindow().addCloseListener( new Window.CloseListener()
@@ -357,7 +357,7 @@ public class Manager
                             ( ( Button ) e ).setEnabled( false );
                         }
                     }
-                    final UUID trackId = storm.checkNode( config.getClusterName(), uuid.getHostname() );
+                    final UUID trackId = storm.checkNode( config.getClusterName(), containerHost.getHostname() );
                     executorService.execute( new Runnable()
                     {
 
@@ -398,7 +398,7 @@ public class Manager
                             ( ( Button ) e ).setEnabled( false );
                         }
                     }
-                    final UUID trackId = storm.startNode( config.getClusterName(), uuid.getHostname() );
+                    final UUID trackId = storm.startNode( config.getClusterName(), containerHost.getHostname() );
 
                     executorService.execute( new Runnable()
                     {
@@ -440,7 +440,7 @@ public class Manager
                             ( ( Button ) e ).setEnabled( false );
                         }
                     }
-                    final UUID trackId = storm.stopNode( config.getClusterName(), uuid.getHostname() );
+                    final UUID trackId = storm.stopNode( config.getClusterName(), containerHost.getHostname() );
 
                     executorService.execute( new Runnable()
                     {
@@ -482,7 +482,7 @@ public class Manager
                             ( ( Button ) e ).setEnabled( false );
                         }
                     }
-                    final UUID trackId = storm.restartNode( config.getClusterName(), uuid.getHostname() );
+                    final UUID trackId = storm.restartNode( config.getClusterName(), containerHost.getHostname() );
 
                     executorService.execute( new Runnable()
                     {

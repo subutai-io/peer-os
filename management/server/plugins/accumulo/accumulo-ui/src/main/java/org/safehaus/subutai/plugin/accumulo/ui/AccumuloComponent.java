@@ -57,6 +57,6 @@ public class AccumuloComponent extends CustomComponent
         verticalLayout.addComponent( sheet );
         setCompositionRoot( verticalLayout );
 
-        manager.refreshClustersInfo();
+//        manager.refreshClustersInfo();
     }
 }

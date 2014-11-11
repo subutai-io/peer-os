@@ -99,12 +99,12 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy
         }
 
         // start hadoop and zk clusters
-        accumuloManager.getHadoopManager().startNameNode( hadoopClusterConfig );
+//        accumuloManager.getHadoopManager().startNameNode( hadoopClusterConfig );
 
-        for ( Agent node : zookeeperClusterConfig.getNodes() )
-        {
-            accumuloManager.getZkManager().startNode( zookeeperClusterConfig.getClusterName(), node.getHostname() );
-        }
+//        for ( UUID node : zookeeperClusterConfig.getNodes() )
+//        {
+//            accumuloManager.getZkManager().startNode( zookeeperClusterConfig.getClusterName(), environment.getContainerHostByUUID( node ).getHostname() );
+//        }
 
 
         trackerOperation.addLog( "Installing Accumulo..." );

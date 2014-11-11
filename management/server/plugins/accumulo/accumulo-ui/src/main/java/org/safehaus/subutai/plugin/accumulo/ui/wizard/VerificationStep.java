@@ -6,14 +6,20 @@
 package org.safehaus.subutai.plugin.accumulo.ui.wizard;
 
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.SetupType;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
 import com.vaadin.shared.ui.label.ContentMode;
@@ -25,14 +31,11 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 
 
-/**
- * @author dilshat
- */
 public class VerificationStep extends Panel
 {
 
-    public VerificationStep( final Accumulo accumulo, final ExecutorService executorService, final Tracker tracker,
-                             final Wizard wizard )
+    public VerificationStep( final Accumulo accumulo, final Hadoop hadoop, final ExecutorService executorService, final Tracker tracker,
+                             EnvironmentManager environmentManager, final Wizard wizard )
     {
 
         setSizeFull();
@@ -55,17 +58,24 @@ public class VerificationStep extends Panel
 
         if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP_N_ZK )
         {
-//            cfgView.addStringCfg( "Master node", wizard.getConfig().getMasterNode().getHostname() );
-//            cfgView.addStringCfg( "GC node", wizard.getConfig().getGcNode().getHostname() );
-//            cfgView.addStringCfg( "Monitor node", wizard.getConfig().getMonitor().getHostname() );
-//            for ( Agent agent : wizard.getConfig().getTracers() )
-//            {
-//                cfgView.addStringCfg( "Tracers", agent.getHostname() );
-//            }
-//            for ( Agent agent : wizard.getConfig().getSlaves() )
-//            {
-//                cfgView.addStringCfg( "Slaves", agent.getHostname() );
-//            }
+            Environment hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ).getEnvironmentId() );
+            ContainerHost master = hadoopEnvironment.getContainerHostByUUID( wizard.getConfig().getMasterNode() );
+            ContainerHost gc = hadoopEnvironment.getContainerHostByUUID( wizard.getConfig().getGcNode() );
+            ContainerHost monitor = hadoopEnvironment.getContainerHostByUUID( wizard.getConfig().getMonitor() );
+            Set<ContainerHost> tracers = hadoopEnvironment.getHostsByIds( wizard.getConfig().getTracers() );
+            Set<ContainerHost> slaves = hadoopEnvironment.getHostsByIds( wizard.getConfig().getSlaves() );
+
+            cfgView.addStringCfg( "Master node", master.getHostname() );
+            cfgView.addStringCfg( "GC node", gc.getHostname() );
+            cfgView.addStringCfg( "Monitor node", monitor.getHostname() );
+            for ( ContainerHost containerHost : tracers )
+            {
+                cfgView.addStringCfg( "Tracers", containerHost.getHostname() );
+            }
+            for ( ContainerHost containerHost : slaves )
+            {
+                cfgView.addStringCfg( "Slaves", containerHost.getHostname() );
+            }
         }
         else
         {
@@ -86,10 +96,17 @@ public class VerificationStep extends Panel
             @Override
             public void buttonClick( Button.ClickEvent event )
             {
-                UUID trackID = wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP_N_ZK ?
-                               accumulo.installCluster( wizard.getConfig() ) :
-                               accumulo.installCluster( wizard.getConfig(), wizard.getHadoopClusterConfig(),
-                                       wizard.getZookeeperClusterConfig() );
+                UUID trackID;
+                if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP_N_ZK )
+                {
+                    trackID = accumulo.installCluster( wizard.getConfig(),
+                                                       wizard.getConfig().getHadoopClusterName(),
+                                                       wizard.getConfig().getZookeeperClusterName() );
+                }
+                else
+                {
+                    trackID = accumulo.installCluster( wizard.getConfig() );
+                }
                 ProgressWindow window =
                         new ProgressWindow( executorService, tracker, trackID, AccumuloClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()

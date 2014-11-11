@@ -3,15 +3,16 @@ package org.safehaus.subutai.plugin.zookeeper.impl;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 import com.google.common.base.Preconditions;
@@ -69,29 +70,39 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy
         }
 
 
-        Set<Agent> zkAgents = new HashSet<>();
-        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
+        Set<ContainerHost> zookeeperNodes = new HashSet<>();
+        for ( ContainerHost containerHost : environment.getContainers() )
         {
-            if ( environmentContainer.getTemplate().getProducts()
-                                     .contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) )
+            try
             {
-                zkAgents.add( environmentContainer.getAgent() );
+                if ( containerHost.getTemplate().getProducts()
+                                         .contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) )
+                {
+                    zookeeperNodes.add( containerHost );
+                }
+            }
+            catch ( PeerException e )
+            {
+                e.printStackTrace();
             }
         }
 
-        if ( zkAgents.size() < zookeeperClusterConfig.getNumberOfNodes() )
+        if ( zookeeperNodes.size() < zookeeperClusterConfig.getNumberOfNodes() )
         {
             throw new ClusterSetupException( String.format(
                     "Environment needs to have %d nodes with ZK installed but has only %d nodes with ZK installed",
-                    zookeeperClusterConfig.getNumberOfNodes(), zkAgents.size() ) );
+                    zookeeperClusterConfig.getNumberOfNodes(), zookeeperNodes.size() ) );
         }
 
-        zookeeperClusterConfig.setNodes( zkAgents );
+        Set<UUID> zookeeperIDs = new HashSet<>();
+        for ( ContainerHost containerHost : zookeeperNodes )
+            zookeeperIDs.add( containerHost.getId() );
+        zookeeperClusterConfig.setNodes( zookeeperIDs );
 
         //check if node agent is connected
-        for ( Agent node : zookeeperClusterConfig.getNodes() )
+        for ( ContainerHost node : zookeeperNodes )
         {
-            if ( zookeeperManager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
+            if ( environment.getContainerHostByHostname( node.getHostname() ) == null )
             {
                 throw new ClusterSetupException( String.format( "Node %s is not connected", node.getHostname() ) );
             }
@@ -100,7 +111,7 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy
         //configure ZK cluster
         try
         {
-            new ClusterConfiguration( zookeeperManager, po ).configureCluster( zookeeperClusterConfig );
+            new ClusterConfiguration( zookeeperManager, po ).configureCluster( zookeeperClusterConfig, environment );
         }
         catch ( ClusterConfigurationException e )
         {
@@ -108,6 +119,8 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy
         }
 
         po.addLog( "Saving cluster information to database..." );
+
+        zookeeperClusterConfig.setEnvironmentId( environment.getId() );
 
         zookeeperManager.getPluginDAO()
                         .saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, zookeeperClusterConfig.getClusterName(),

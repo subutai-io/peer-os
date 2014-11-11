@@ -19,18 +19,26 @@
     <module>elasticsearch</module>
     <module>hadoop</module>
     <module>hive</module>
+    <module>storm</module>
     <module>spark</module>
+    <module>zookeeper</module>
     <module>hbase</module>
     <module>accumulo</module>
     <!--<module>oozie</module>
     <module>solr</module>
 
-    <module>zookeeper</module>
 
+
+    <module>accumulo</module>
+    <module>solr</module>
     <module>mongodb</module>
     <module>flume</module>
+<<<<<<< HEAD
 
     <module>storm</module>
+=======
+    <module>hive</module>
+>>>>>>> migrate-storm-to-container-manager
     <module>presto</module>
     <module>shark</module>
     <module>sqoop</module>

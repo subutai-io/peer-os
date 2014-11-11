@@ -44,161 +44,36 @@ public class ClusterConfiguration
 
         po.addLog( "Configuring cluster..." );
         ContainerHost master = getHost( environment, accumuloClusterConfig.getMasterNode() );
-        ContainerHost gc = getHost( environment, accumuloClusterConfig.getGcNode() );
-        ContainerHost monitor = getHost( environment, accumuloClusterConfig.getMonitor() );
 
-
-        // configure cluster
+        /** configure cluster */
         for ( UUID uuid : accumuloClusterConfig.getAllNodes() ){
             ContainerHost host = getHost( environment, uuid );
+
+            // configure master node
             executeCommand( host, Commands.getAddMasterCommand( host.getHostname() ) );
+
+            // configure GC node
             executeCommand( host, Commands.getAddGCCommand( host.getHostname() ) );
+
+            // configure monitor node
             executeCommand( host, Commands.getAddMonitorCommand( host.getHostname() ) );
+
+            // configure tracers
             executeCommand( host, Commands.getAddTracersCommand( serializeSlaveNodeNames( environment, accumuloClusterConfig.getSlaves() ) ) );
+
+            // configure slaves
             executeCommand( host, Commands.getAddSlavesCommand( serializeSlaveNodeNames( environment, accumuloClusterConfig.getSlaves() ) ) );
 
-//            executeCommand( host, Commands.getBindZKClusterCommand( serializeZKNodeNames( environment, zookeeperClusterConfig.getNodes() )  ) );
-
             // configure zookeeper
+            executeCommand( host, Commands.getBindZKClusterCommand( serializeZKNodeNames( environment, zookeeperClusterConfig.getNodes() )  ) );
 
             // init accumulo instance
             executeCommand( master, Commands.getInitCommand( accumuloClusterConfig.getInstanceName(), accumuloClusterConfig.getPassword() ) );
+
+            // start cluster
+            executeCommand( master, Commands.startCommand );
+
         }
-
-        // configure gc
-
-
-        // configure monitor
-
-
-
-        // configure tracers
-
-
-        // configure slaves
-
-
-        // start cluster
-
-//        Command setMasterCommand = accumuloManager.getCommands()
-//                                                  .getAddMasterCommand( accumuloClusterConfig.getAllNodes(),
-//                                                          accumuloClusterConfig.getMasterNode() );
-//        accumuloManager.getCommandRunner().runCommand( setMasterCommand );
-//
-//        if ( setMasterCommand.hasSucceeded() )
-//        {
-//            po.addLog( "Setting master node succeeded\nSetting GC node..." );
-//            Command setGCNodeCommand = accumuloManager.getCommands()
-//                                                      .getAddGCCommand( accumuloClusterConfig.getAllNodes(),
-//                                                              accumuloClusterConfig.getGcNode() );
-//            accumuloManager.getCommandRunner().runCommand( setGCNodeCommand );
-//            if ( setGCNodeCommand.hasSucceeded() )
-//            {
-//                po.addLog( "Setting GC node succeeded\nSetting monitor node..." );
-//
-//                Command setMonitorCommand = accumuloManager.getCommands()
-//                                                           .getAddMonitorCommand( accumuloClusterConfig.getAllNodes(),
-//                                                                   accumuloClusterConfig.getMonitor() );
-//                accumuloManager.getCommandRunner().runCommand( setMonitorCommand );
-//
-//                if ( setMonitorCommand.hasSucceeded() )
-//                {
-//                    po.addLog( "Setting monitor node succeeded\nSetting tracers..." );
-//
-//                    Command setTracersCommand = accumuloManager.getCommands().getAddTracersCommand(
-//                            accumuloClusterConfig.getAllNodes(), accumuloClusterConfig.getTracers() );
-//                    accumuloManager.getCommandRunner().runCommand( setTracersCommand );
-//
-//                    if ( setTracersCommand.hasSucceeded() )
-//                    {
-//                        po.addLog( "Setting tracers succeeded\nSetting slaves..." );
-//
-//                        Command setSlavesCommand = accumuloManager.getCommands().getAddSlavesCommand(
-//                                accumuloClusterConfig.getAllNodes(), accumuloClusterConfig.getSlaves() );
-//                        accumuloManager.getCommandRunner().runCommand( setSlavesCommand );
-//
-//                        if ( setSlavesCommand.hasSucceeded() )
-//                        {
-//                            po.addLog( "Setting slaves succeeded\nSetting ZK cluster..." );
-//
-//                            Command setZkClusterCommand = accumuloManager.getCommands().getBindZKClusterCommand(
-//                                    accumuloClusterConfig.getAllNodes(), zookeeperClusterConfig.getNodes() );
-//                            accumuloManager.getCommandRunner().runCommand( setZkClusterCommand );
-//
-//                            if ( setZkClusterCommand.hasSucceeded() )
-//                            {
-//                                po.addLog( "Setting ZK cluster succeeded\nInitializing cluster with HDFS..." );
-//
-//                                Command initCommand = accumuloManager.getCommands().getInitCommand(
-//                                        accumuloClusterConfig.getInstanceName(), accumuloClusterConfig.getPassword(),
-//                                        accumuloClusterConfig.getMasterNode() );
-//                                accumuloManager.getCommandRunner().runCommand( initCommand );
-//
-//                                if ( initCommand.hasSucceeded() )
-//                                {
-//                                    po.addLog( "Initialization succeeded\nStarting cluster..." );
-//
-//                                    Command startClusterCommand = accumuloManager.getCommands().getStartCommand(
-//                                            accumuloClusterConfig.getMasterNode() );
-//                                    accumuloManager.getCommandRunner().runCommand( startClusterCommand );
-//
-//                                    if ( startClusterCommand.hasSucceeded() )
-//                                    {
-//                                        po.addLog( "Cluster started successfully" );
-//                                    }
-//                                    else
-//                                    {
-//                                        po.addLog( String.format( "Starting cluster failed, %s, skipping...",
-//                                                startClusterCommand.getAllErrors() ) );
-//                                    }
-//
-//                                    po.addLog( "Updating information in database..." );
-//                                    accumuloManager.getPluginDAO().saveInfo( AccumuloClusterConfig.PRODUCT_KEY,
-//                                            accumuloClusterConfig.getClusterName(), accumuloClusterConfig );
-//
-//                                    po.addLog( "Updated information in database" );
-//                                }
-//                                else
-//                                {
-//                                    throw new ClusterConfigurationException(
-//                                            String.format( "Initialization failed, %s", initCommand.getAllErrors() ) );
-//                                }
-//                            }
-//                            else
-//                            {
-//                                throw new ClusterConfigurationException( String.format( "Setting ZK cluster failed, %s",
-//                                        setZkClusterCommand.getAllErrors() ) );
-//                            }
-//                        }
-//                        else
-//                        {
-//                            throw new ClusterConfigurationException(
-//                                    String.format( "Setting slaves failed, %s", setSlavesCommand.getAllErrors() ) );
-//                        }
-//                    }
-//                    else
-//                    {
-//                        throw new ClusterConfigurationException(
-//                                String.format( "Setting tracers failed, %s", setTracersCommand.getAllErrors() ) );
-//                    }
-//                }
-//                else
-//                {
-//                    throw new ClusterConfigurationException(
-//                            String.format( "Setting monitor failed, %s", setMonitorCommand.getAllErrors() ) );
-//                }
-//            }
-//            else
-//            {
-//                throw new ClusterConfigurationException(
-//                        String.format( "Setting gc node failed, %s", setGCNodeCommand.getAllErrors() ) );
-//            }
-//        }
-//        else
-//        {
-//            throw new ClusterConfigurationException(
-//                    String.format( "Setting master node failed, %s", setMasterCommand.getAllErrors() ) );
-//        }
     }
 
     private String serializeSlaveNodeNames( Environment environment, Set<UUID> slaveNodes )
@@ -211,6 +86,7 @@ public class ClusterConfiguration
         return slavesSpaceSeparated.toString();
     }
 
+
     private String serializeZKNodeNames( Environment environment, Set<UUID> zkNodes ){
         StringBuilder zkNodesCommaSeparated = new StringBuilder();
         for ( UUID zkNode : zkNodes )
@@ -220,6 +96,7 @@ public class ClusterConfiguration
         zkNodesCommaSeparated.delete( zkNodesCommaSeparated.length() - 1, zkNodesCommaSeparated.length() );
         return zkNodesCommaSeparated.toString();
     }
+
 
     private void executeCommand( ContainerHost host, String commnad ){
         try

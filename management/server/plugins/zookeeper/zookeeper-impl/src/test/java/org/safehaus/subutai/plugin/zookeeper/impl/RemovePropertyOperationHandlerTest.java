@@ -14,11 +14,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class UninstallOperationHandlerTest
+public class RemovePropertyOperationHandlerTest
 {
     @Test
     public void testWithoutCluster()
     {
+        //TODO enable this test
 //        ZookeeperImpl zookeeperMock = mock( ZookeeperImpl.class );
 //        when( zookeeperMock.getHadoopManager() ).thenReturn( mock( Hadoop.class ) );
 //        when( zookeeperMock.getAgentManager() ).thenReturn( mock( AgentManager.class ) );
@@ -27,8 +28,10 @@ public class UninstallOperationHandlerTest
 //        when( zookeeperMock.getContainerManager() ).thenReturn( mock( ContainerManager.class ) );
 //        when( zookeeperMock.getHadoopManager() ).thenReturn( mock( Hadoop.class ) );
 //        when( zookeeperMock.getCluster( anyString() ) ).thenReturn( null );
-//        AbstractOperationHandler operationHandler = new UninstallOperationHandler( zookeeperMock, "test-cluster" );
+//        AbstractOperationHandler operationHandler =
+//                new RemovePropertyOperationHandler( zookeeperMock, "test-cluster", "test-file", "test-property" );
 //        operationHandler.run();
+//
 //        assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not exist" ) );
 //        assertEquals( operationHandler.getTrackerOperation().getState(), OperationState.FAILED );
     }
