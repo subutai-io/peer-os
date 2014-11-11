@@ -246,12 +246,10 @@ public class ZookeeperImpl implements Zookeeper
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostName ), "Lxc hostname is null or empty" );
 
-        return null;
-        //TODO add this functionality when environment builder has this functionality
-
-//        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostName );
-//        executor.execute( operationHandler );
-//        return operationHandler.getTrackerId();
+        AbstractOperationHandler operationHandler = new ZookeeperNodeOperationHandler( this, clusterName,
+                lxcHostName, NodeOperationType.DESTROY );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 

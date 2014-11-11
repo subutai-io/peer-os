@@ -6,12 +6,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
