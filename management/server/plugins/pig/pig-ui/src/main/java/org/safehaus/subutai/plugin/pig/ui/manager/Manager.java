@@ -1,10 +1,7 @@
 package org.safehaus.subutai.plugin.pig.ui.manager;
 
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
@@ -15,8 +12,10 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.pig.api.Pig;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
+import org.safehaus.subutai.plugin.pig.api.SetupType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -150,74 +149,75 @@ public class Manager
 
     public void addClickListenerToAddNodeButton()
     {
-//        addNodeBtn.addClickListener( new Button.ClickListener()
-//        {
-//            @Override
-//            public void buttonClick( Button.ClickEvent clickEvent )
-//            {
-//                if ( config == null )
-//                {
-//                    show( "Please, select cluster" );
-//                }
-//                else
-//                {
-//                    if ( config.getSetupType() == SetupType.OVER_HADOOP )
-//                    {
-//                        String hn = config.getHadoopClusterName();
-//                        if ( hn == null || hn.isEmpty() )
-//                        {
-//                            show( "Undefined Hadoop cluster name" );
-//                            return;
-//                        }
-//                        HadoopClusterConfig info = hadoop.getCluster( hn );
-//                        if ( info != null )
-//                        {
-//                            HashSet<ContainerHost> nodes = new HashSet<>( info.getAllNodes() );
-//                            nodes.removeAll( config.getNodes() );
-//                            if ( !nodes.isEmpty() )
-//                            {
-//                                AddNodeWindow addNodeWindow =
-//                                        new AddNodeWindow( pig, executorService, tracker, config, nodes );
-//                                contentRoot.getUI().addWindow( addNodeWindow );
-//                                addNodeWindow.addCloseListener( new Window.CloseListener()
-//                                {
-//                                    @Override
-//                                    public void windowClose( Window.CloseEvent closeEvent )
-//                                    {
-//                                        refreshClustersInfo();
-//                                    }
-//                                } );
-//                            }
-//                            else
-//                            {
-//                                show( "All nodes in corresponding Hadoop cluster have Presto installed" );
-//                            }
-//                        }
-//                        else
-//                        {
-//                            show( "Hadoop cluster info not found" );
-//                        }
-//                    }
-//                    else if ( config.getSetupType() == SetupType.WITH_HADOOP )
-//                    {
-//                        ConfirmationDialog d = new ConfirmationDialog( "Add node to cluster", "OK", "Cancel" );
-//                        d.getOk().addClickListener( new Button.ClickListener()
-//                        {
-//
-//                            @Override
-//                            public void buttonClick( Button.ClickEvent event )
-//                            {
-//                                UUID trackId = pig.addNode( config.getClusterName(), null );
-//                                ProgressWindow w =
-//                                        new ProgressWindow( executorService, tracker, trackId, PigConfig.PRODUCT_KEY );
-//                                contentRoot.getUI().addWindow( w.getWindow() );
-//                            }
-//                        } );
-//                        contentRoot.getUI().addWindow( d.getAlert() );
-//                    }
-//                }
-//            }
-//        } );
+        addNodeBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
+                    show( "Please, select cluster" );
+                }
+                else
+                {
+                    if ( config.getSetupType() == SetupType.OVER_HADOOP )
+                    {
+                        String hn = config.getHadoopClusterName();
+                        if ( hn == null || hn.isEmpty() )
+                        {
+                            show( "Undefined Hadoop cluster name" );
+                            return;
+                        }
+                        HadoopClusterConfig info = hadoop.getCluster( hn );
+                        if ( info != null )
+                        {
+                            Set<UUID> nodes = new HashSet<UUID>( info.getAllNodes() );
+                            nodes.removeAll( config.getNodes() );
+                            if ( !nodes.isEmpty() )
+                            {
+                                Set<ContainerHost> hosts = environmentManager.getEnvironmentByUUID( info.getEnvironmentId() ).getHostsByIds( nodes );
+                                AddNodeWindow addNodeWindow =
+                                        new AddNodeWindow( pig, tracker, executorService, config, hosts );
+                                contentRoot.getUI().addWindow( addNodeWindow );
+                                addNodeWindow.addCloseListener( new Window.CloseListener()
+                                {
+                                    @Override
+                                    public void windowClose( Window.CloseEvent closeEvent )
+                                    {
+                                        refreshClustersInfo();
+                                    }
+                                } );
+                            }
+                            else
+                            {
+                                show( "All nodes in corresponding Hadoop cluster have Presto installed" );
+                            }
+                        }
+                        else
+                        {
+                            show( "Hadoop cluster info not found" );
+                        }
+                    }
+                    else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+                    {
+                        ConfirmationDialog d = new ConfirmationDialog( "Add node to cluster", "OK", "Cancel" );
+                        d.getOk().addClickListener( new Button.ClickListener()
+                        {
+
+                            @Override
+                            public void buttonClick( Button.ClickEvent event )
+                            {
+                                UUID trackId = pig.addNode( config.getClusterName(), null );
+                                ProgressWindow w =
+                                        new ProgressWindow( executorService, tracker, trackId, PigConfig.PRODUCT_KEY );
+                                contentRoot.getUI().addWindow( w.getWindow() );
+                            }
+                        } );
+                        contentRoot.getUI().addWindow( d.getAlert() );
+                    }
+                }
+            }
+        } );
     }
 
 

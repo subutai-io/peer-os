@@ -111,53 +111,54 @@ public class Manager
 
     private void getAddNodeButton( HorizontalLayout controlsContent )
     {
-//        Button addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
-//        addNodeBtn.setId( "FluAddNodeBtn" );
-//        addNodeBtn.addStyleName( "default" );
-//        addNodeBtn.addClickListener( new Button.ClickListener()
-//        {
-//            @Override
-//            public void buttonClick( Button.ClickEvent clickEvent )
-//            {
-//                if ( config != null )
-//                {
-//                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( config.getHadoopClusterName() );
-//                    if ( hadoopConfig != null )
-//                    {
-//                        Set<UUID> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
-//                        nodes.removeAll( config.getNodes() );
-//                        if ( !nodes.isEmpty() )
-//                        {
-//                            AddNodeWindow addNodeWindow =
-//                                    new AddNodeWindow( flume, executorService, tracker, config, nodes );
-//                            contentRoot.getUI().addWindow( addNodeWindow );
-//                            addNodeWindow.addCloseListener( new Window.CloseListener()
-//                            {
-//                                @Override
-//                                public void windowClose( Window.CloseEvent closeEvent )
-//                                {
-//                                    refreshClustersInfo();
-//                                }
-//                            } );
-//                        }
-//                        else
-//                        {
-//                            show( "All nodes in corresponding Hadoop cluster have Lucene installed" );
-//                        }
-//                    }
-//                    else
-//                    {
-//                        show( "Hadoop cluster info not found" );
-//                    }
-//                }
-//                else
-//                {
-//                    show( "Please, select cluster" );
-//                }
-//            }
-//        } );
+        Button addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
+        addNodeBtn.setId( "FluAddNodeBtn" );
+        addNodeBtn.addStyleName( "default" );
+        addNodeBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config != null )
+                {
+                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( config.getHadoopClusterName() );
+                    if ( hadoopConfig != null )
+                    {
+                        Set<UUID> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
+                        nodes.removeAll( config.getNodes() );
+                        if ( !nodes.isEmpty() )
+                        {
+                            Set<ContainerHost> hosts = environmentManager.getEnvironmentByUUID( hadoopConfig.getEnvironmentId() ).getHostsByIds( nodes );
+                            AddNodeWindow addNodeWindow =
+                                    new AddNodeWindow( flume, tracker, executorService, config, hosts );
+                            contentRoot.getUI().addWindow( addNodeWindow );
+                            addNodeWindow.addCloseListener( new Window.CloseListener()
+                            {
+                                @Override
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
+                                    refreshClustersInfo();
+                                }
+                            } );
+                        }
+                        else
+                        {
+                            show( "All nodes in corresponding Hadoop cluster have Lucene installed" );
+                        }
+                    }
+                    else
+                    {
+                        show( "Hadoop cluster info not found" );
+                    }
+                }
+                else
+                {
+                    show( "Please, select cluster" );
+                }
+            }
+        } );
 
-//        controlsContent.addComponent( addNodeBtn );
+        controlsContent.addComponent( addNodeBtn );
     }
 
 

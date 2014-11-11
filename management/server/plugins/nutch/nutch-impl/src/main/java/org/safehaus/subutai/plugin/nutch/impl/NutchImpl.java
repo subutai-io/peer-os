@@ -22,12 +22,14 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.nutch.api.Nutch;
 import org.safehaus.subutai.plugin.nutch.api.NutchConfig;
 import org.safehaus.subutai.plugin.nutch.api.SetupType;
 import org.safehaus.subutai.plugin.nutch.impl.handler.ClusterOperationHandler;
+import org.safehaus.subutai.plugin.nutch.impl.handler.NodeOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,20 +173,18 @@ public class NutchImpl implements Nutch
     @Override
     public UUID addNode( final String clusterName, final String lxcHostname )
     {
-        /*AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
+        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, clusterName, lxcHostname, NodeOperationType.INSTALL );
         executor.execute( operationHandler );
-        return operationHandler.getTrackerId();*/
-        return null;
+        return operationHandler.getTrackerId();
     }
 
 
     @Override
     public UUID destroyNode( final String clusterName, final String lxcHostname )
     {
-        /*AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
+        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, clusterName, lxcHostname, NodeOperationType.UNINSTALL );
         executor.execute( operationHandler );
-        return operationHandler.getTrackerId();*/
-        return null;
+        return operationHandler.getTrackerId();
     }
 
 

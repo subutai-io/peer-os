@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.flume.api.Flume;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
@@ -33,8 +34,8 @@ public class AddNodeWindow extends Window
     private volatile boolean track = true;
 
 
-    public AddNodeWindow( final Flume flume, final ExecutorService executorService, final Tracker tracker,
-                          final FlumeConfig config, Set<Agent> nodes )
+    public AddNodeWindow( final Flume flume, final Tracker tracker, final ExecutorService executorService,
+                          final FlumeConfig config, Set<ContainerHost> nodes )
     {
         super( "Add New Node" );
         setModal( true );
@@ -60,7 +61,7 @@ public class AddNodeWindow extends Window
         hadoopNodes.setNullSelectionAllowed( false );
         hadoopNodes.setRequired( true );
         hadoopNodes.setWidth( 200, Unit.PIXELS );
-        for ( Agent node : nodes )
+        for ( ContainerHost node : nodes )
         {
             hadoopNodes.addItem( node );
             hadoopNodes.setItemCaption( node, node.getHostname() );
@@ -84,8 +85,8 @@ public class AddNodeWindow extends Window
             {
                 addNodeBtn.setEnabled( false );
                 showProgress();
-                Agent agent = ( Agent ) hadoopNodes.getValue();
-                final UUID trackID = flume.addNode( config.getClusterName(), agent.getHostname() );
+                ContainerHost host = ( ContainerHost ) hadoopNodes.getValue();
+                final UUID trackID = flume.addNode( config.getClusterName(), host.getHostname() );
 
                 ok.setEnabled( false );
                 executorService.execute( new Runnable()

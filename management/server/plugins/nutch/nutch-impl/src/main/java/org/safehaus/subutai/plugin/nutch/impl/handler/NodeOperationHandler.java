@@ -1,7 +1,4 @@
-package org.safehaus.subutai.plugin.pig.impl.handler;
-
-
-import java.util.Iterator;
+package org.safehaus.subutai.plugin.nutch.impl.handler;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
@@ -10,38 +7,34 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
-import org.safehaus.subutai.plugin.pig.api.Pig;
-import org.safehaus.subutai.plugin.pig.api.PigConfig;
-import org.safehaus.subutai.plugin.pig.impl.Commands;
-import org.safehaus.subutai.plugin.pig.impl.PigImpl;
+import org.safehaus.subutai.plugin.nutch.api.NutchConfig;
+import org.safehaus.subutai.plugin.nutch.impl.Commands;
+import org.safehaus.subutai.plugin.nutch.impl.NutchImpl;
 
+import java.util.Iterator;
 
 /**
- * Created by ebru on 06.11.2014.
+ * Created by ebru on 12.11.2014.
  */
-public class NodeOperationHandler extends AbstractOperationHandler<PigImpl, PigConfig>
-{
+public class NodeOperationHandler extends AbstractOperationHandler<NutchImpl, NutchConfig> {
     private String clusterName;
     private String hostname;
     private NodeOperationType operationType;
 
-    public NodeOperationHandler( final PigImpl manager, String clusterName, final String hostname,
-                                 NodeOperationType operationType )
-    {
-        super( manager, manager.getCluster( clusterName ) );
+    public NodeOperationHandler(final NutchImpl manager, String clusterName, final String hostname,
+                                NodeOperationType operationType ) {
+        super(manager, manager.getCluster( clusterName ));
         this.hostname = hostname;
         this.clusterName = clusterName;
         this.operationType = operationType;
         this.trackerOperation = manager.getTracker()
-                                       .createTrackerOperation( PigConfig.PRODUCT_KEY,
-                                               String.format( "Creating %s tracker object...", clusterName ) );
+                .createTrackerOperation( NutchConfig.PRODUCT_KEY,
+                        String.format( "Creating %s tracker object...", clusterName ) );
     }
 
-
     @Override
-    public void run()
-    {
-        PigConfig config = manager.getCluster( clusterName );
+    public void run() {
+        NutchConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
             trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
@@ -67,37 +60,35 @@ public class NodeOperationHandler extends AbstractOperationHandler<PigImpl, PigC
         }
 
 
-            CommandResult result = null;
-            switch ( operationType )
-            {
-                case INSTALL:
-                    result = installProductOnNode( host );
-                    break;
-                case UNINSTALL:
-                    result = uninstallProductOnNode( host );
-                    break;
-            }
-
-
+        CommandResult result = null;
+        switch ( operationType )
+        {
+            case INSTALL:
+                result = installProductOnNode( host );
+                break;
+            case UNINSTALL:
+                result = uninstallProductOnNode( host );
+                break;
+        }
 
     }
-    private CommandResult installProductOnNode( ContainerHost host )
-    {
+
+    private CommandResult installProductOnNode(ContainerHost host) {
         CommandResult result = null;
         try
         {
             result = host.execute( new RequestBuilder(
-                    Commands.installCommand ).withTimeout( 600 ) );
+                    Commands.INSTALL ).withTimeout( 600 ) );
             if ( result.hasSucceeded() )
             {
                 config.getNodes().add( host.getId() );
-                manager.getPluginDao().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config );
+                manager.getPluginDao().saveInfo( NutchConfig.PRODUCT_KEY, config.getClusterName(), config );
                 trackerOperation.addLogDone(
-                        PigConfig.PRODUCT_KEY + " is installed on node " + host.getHostname() + " successfully." );
+                        NutchConfig.PRODUCT_KEY + " is installed on node " + host.getHostname() + " successfully." );
             }
             else
             {
-                trackerOperation.addLogFailed( "Could not install " + PigConfig.PRODUCT_KEY + " to node " + hostname );
+                trackerOperation.addLogFailed( "Could not install " + NutchConfig.PRODUCT_KEY + " to node " + hostname );
             }
         }
         catch ( CommandException e )
@@ -106,26 +97,24 @@ public class NodeOperationHandler extends AbstractOperationHandler<PigImpl, PigC
         }
         return result;
     }
-
-
     private CommandResult uninstallProductOnNode( ContainerHost host )
     {
         CommandResult result = null;
         try
         {
             result = host.execute( new RequestBuilder(
-                    Commands.uninstallCommand ).withTimeout( 600 ) );
+                    Commands.UNINSTALL ).withTimeout( 600 ) );
             if ( result.hasSucceeded() )
             {
                 config.getNodes().remove( host.getId() );
-                manager.getPluginDao().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config );
+                manager.getPluginDao().saveInfo( NutchConfig.PRODUCT_KEY, config.getClusterName(), config );
                 trackerOperation.addLogDone(
-                        PigConfig.PRODUCT_KEY + " is uninstalled from node " + host.getHostname() + " successfully." );
+                        NutchConfig.PRODUCT_KEY + " is uninstalled from node " + host.getHostname() + " successfully." );
             }
             else
             {
                 trackerOperation
-                        .addLogFailed( "Could not uninstall " + PigConfig.PRODUCT_KEY + " from node " + hostname );
+                        .addLogFailed( "Could not uninstall " + NutchConfig.PRODUCT_KEY + " from node " + hostname );
             }
         }
         catch ( CommandException e )
@@ -134,5 +123,4 @@ public class NodeOperationHandler extends AbstractOperationHandler<PigImpl, PigC
         }
         return result;
     }
-
 }

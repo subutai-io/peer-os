@@ -144,48 +144,49 @@ public class Manager
 
     public void addClickListenerToAddNodeButton()
     {
-//        addNodeBtn.addClickListener( new Button.ClickListener()
-//        {
-//            @Override
-//            public void buttonClick( Button.ClickEvent clickEvent )
-//            {
-//                if ( config != null )
-//                {
-//                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( config.getHadoopClusterName() );
-//                    if ( hadoopConfig != null )
-//                    {
-//                        Set<UUID> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
-//                        nodes.removeAll( config.getNodes() );
-//                        if ( !nodes.isEmpty() )
-//                        {
-//                            AddNodeWindow addNodeWindow =
-//                                    new AddNodeWindow( nutch, tracker, executorService, config, nodes );
-//                            contentRoot.getUI().addWindow( addNodeWindow );
-//                            addNodeWindow.addCloseListener( new Window.CloseListener()
-//                            {
-//                                @Override
-//                                public void windowClose( Window.CloseEvent closeEvent )
-//                                {
-//                                    refreshClustersInfo();
-//                                }
-//                            } );
-//                        }
-//                        else
-//                        {
-//                            show( "All nodes in corresponding Hadoop cluster have Nutch installed" );
-//                        }
-//                    }
-//                    else
-//                    {
-//                        show( "Hadoop cluster info not found" );
-//                    }
-//                }
-//                else
-//                {
-//                    show( "Please, select cluster" );
-//                }
-//            }
-//        } );
+        addNodeBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config != null )
+                {
+                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( config.getHadoopClusterName() );
+                    if ( hadoopConfig != null )
+                    {
+                        Set<UUID> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
+                        nodes.removeAll( config.getNodes() );
+                        if ( !nodes.isEmpty() )
+                        {
+                            Set<ContainerHost> hosts = environmentManager.getEnvironmentByUUID( hadoopConfig.getEnvironmentId() ).getHostsByIds( nodes );
+                            AddNodeWindow addNodeWindow =
+                                    new AddNodeWindow( nutch, tracker, executorService, config, hosts );
+                            contentRoot.getUI().addWindow( addNodeWindow );
+                            addNodeWindow.addCloseListener( new Window.CloseListener()
+                            {
+                                @Override
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
+                                    refreshClustersInfo();
+                                }
+                            } );
+                        }
+                        else
+                        {
+                            show( "All nodes in corresponding Hadoop cluster have Nutch installed" );
+                        }
+                    }
+                    else
+                    {
+                        show( "Hadoop cluster info not found" );
+                    }
+                }
+                else
+                {
+                    show( "Please, select cluster" );
+                }
+            }
+        } );
     }
 
 

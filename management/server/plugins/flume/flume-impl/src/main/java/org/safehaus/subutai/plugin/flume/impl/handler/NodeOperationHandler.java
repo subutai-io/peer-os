@@ -76,11 +76,70 @@ public class NodeOperationHandler extends AbstractOperationHandler<FlumeImpl, Fl
                 case STATUS:
                     result = host.execute(new RequestBuilder(Commands.make(CommandType.STATUS)));
                     break;
+                case INSTALL:
+                    result = installProductOnNode( host );
+                    break;
+                case UNINSTALL:
+                    result = uninstallProductOnNode( host );
+                    break;
             }
             logStatusResults(trackerOperation, result);
         } catch (CommandException e) {
             trackerOperation.addLogFailed(String.format("Command failed, %s", e.getMessage()));
         }
+    }
+    private CommandResult installProductOnNode( ContainerHost host )
+    {
+        CommandResult result = null;
+        try
+        {
+            result = host.execute( new RequestBuilder(
+                    Commands.make( CommandType.INSTALL) ).withTimeout( 600 ) );
+            if ( result.hasSucceeded() )
+            {
+                config.getNodes().add( host.getId() );
+                manager.getPluginDao().saveInfo( FlumeConfig.PRODUCT_KEY, config.getClusterName(), config );
+                trackerOperation.addLog(
+                        FlumeConfig.PRODUCT_KEY + " is installed on node " + host.getHostname() + " successfully." );
+            }
+            else
+            {
+                trackerOperation.addLogFailed( "Could not install " + FlumeConfig.PRODUCT_KEY + " to node " + host.getHostname() );
+            }
+        }
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+    private CommandResult uninstallProductOnNode( ContainerHost host )
+    {
+        CommandResult result = null;
+        try
+        {
+            result = host.execute( new RequestBuilder(
+                    Commands.make( CommandType.PURGE ) ).withTimeout( 600 ) );
+            if ( result.hasSucceeded() )
+            {
+                config.getNodes().remove( host.getId() );
+                manager.getPluginDao().saveInfo( FlumeConfig.PRODUCT_KEY, config.getClusterName(), config );
+                trackerOperation.addLog(
+                        FlumeConfig.PRODUCT_KEY + " is uninstalled from node " + host.getHostname() + " successfully." );
+            }
+            else
+            {
+                trackerOperation
+                        .addLogFailed( "Could not uninstall " + FlumeConfig.PRODUCT_KEY + " from node " + host.getHostname() );
+            }
+        }
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
+        }
+        return result;
     }
     public static void logStatusResults( TrackerOperation po, CommandResult result )
     {

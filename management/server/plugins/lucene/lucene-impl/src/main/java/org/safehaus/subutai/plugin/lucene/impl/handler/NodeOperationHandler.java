@@ -72,6 +72,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<LuceneImpl, L
                 break;
             case UNINSTALL:
                 result = uninstallProductOnNode( host );
+                break;
         }
 
 
@@ -83,12 +84,12 @@ public class NodeOperationHandler extends AbstractOperationHandler<LuceneImpl, L
         try
         {
             result = host.execute( new RequestBuilder(
-                    Commands.installCommand ) );
+                    Commands.installCommand ).withTimeout( 600 ) );
             if ( result.hasSucceeded() )
             {
                 config.getNodes().add( host.getId() );
                 manager.getPluginDao().saveInfo( LuceneConfig.PRODUCT_KEY, config.getClusterName(), config );
-                trackerOperation.addLog(
+                trackerOperation.addLogDone(
                         LuceneConfig.PRODUCT_KEY + " is installed on node " + host.getHostname() + " successfully." );
             }
             else
@@ -110,12 +111,12 @@ public class NodeOperationHandler extends AbstractOperationHandler<LuceneImpl, L
         try
         {
             result = host.execute( new RequestBuilder(
-                    Commands.uninstallCommand ) );
+                    Commands.uninstallCommand ).withTimeout( 600 ) );
             if ( result.hasSucceeded() )
             {
                 config.getNodes().remove( host.getId() );
                 manager.getPluginDao().saveInfo( LuceneConfig.PRODUCT_KEY, config.getClusterName(), config );
-                trackerOperation.addLog(
+                trackerOperation.addLogDone(
                         LuceneConfig.PRODUCT_KEY + " is uninstalled from node " + host.getHostname() + " successfully." );
             }
             else

@@ -20,6 +20,7 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
+import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.flume.api.Flume;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.api.SetupType;
@@ -199,20 +200,18 @@ public class FlumeImpl implements Flume
     @Override
     public UUID addNode( final String clusterName, final String hostname )
     {
-        /*AbstractOperationHandler h = new AddNodeHandler( this, clusterName, hostname );
+        AbstractOperationHandler h = new NodeOperationHandler( this, clusterName, hostname, NodeOperationType.INSTALL );
         executor.execute( h );
-        return h.getTrackerId();*/
-        return null;
+        return h.getTrackerId();
     }
 
 
     @Override
     public UUID destroyNode( final String clusterName, final String hostname )
     {
-        /*AbstractOperationHandler h = new DestroyNodeHandler( this, clusterName, hostname );
+        AbstractOperationHandler h = new NodeOperationHandler( this, clusterName, hostname, NodeOperationType.UNINSTALL);
         executor.execute( h );
-        return h.getTrackerId();*/
-        return null;
+        return h.getTrackerId();
     }
 
     @Override

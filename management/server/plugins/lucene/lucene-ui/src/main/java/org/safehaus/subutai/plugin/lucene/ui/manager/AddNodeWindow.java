@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -37,6 +36,7 @@ public class AddNodeWindow extends Window
     private final TextArea outputTxtArea;
     private final Label indicator;
     private volatile boolean track = true;
+    Button ok;
 
 
     public AddNodeWindow( final Lucene lucene, final Tracker tracker, final ExecutorService executorService,
@@ -80,7 +80,7 @@ public class AddNodeWindow extends Window
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
-        final Button ok = new Button( "Ok" );
+        ok = new Button( "Ok" );
         ok.setId( "btnOk" );
         ok.addStyleName( "default" );
         ok.addClickListener( new Button.ClickListener()
@@ -103,7 +103,7 @@ public class AddNodeWindow extends Window
                 showProgress();
                 ContainerHost host = ( ContainerHost ) hadoopNodes.getValue();
                 final UUID trackID = lucene.addNode( config.getClusterName(), host.getHostname() );
-                ok.setEnabled( false );
+                //ok.setEnabled( false );
                 executorService.execute( new Runnable()
                 {
 
@@ -119,7 +119,7 @@ public class AddNodeWindow extends Window
                                 if ( po.getState() != OperationState.RUNNING )
                                 {
                                     hideProgress();
-                                    ok.setEnabled( true );
+                                    //ok.setEnabled( true );
                                     break;
                                 }
                             }
@@ -174,6 +174,7 @@ public class AddNodeWindow extends Window
     private void showProgress()
     {
         indicator.setVisible( true );
+        ok.setEnabled( false );
     }
 
 
@@ -190,6 +191,7 @@ public class AddNodeWindow extends Window
     private void hideProgress()
     {
         indicator.setVisible( false );
+        ok.setEnabled( true );
     }
 
 
