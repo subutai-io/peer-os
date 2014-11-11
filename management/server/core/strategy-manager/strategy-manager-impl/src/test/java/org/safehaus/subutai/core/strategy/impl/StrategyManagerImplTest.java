@@ -1,17 +1,15 @@
 package org.safehaus.subutai.core.strategy.impl;
 
 
-import java.util.List;
-import java.util.Map;
-
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 
-import junit.framework.TestCase;
+import java.util.List;
+import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
@@ -37,15 +35,19 @@ public class StrategyManagerImplTest
 
 
     @Test
-    public void testRegisterUnregisterStrategy()
+    public void testRegisterStrategy()
     {
         strategyManager.registerStrategy( defaultContainerPlacementStrategy );
         List<ContainerPlacementStrategy> strategies = strategyManager.getPlacementStrategies();
 
         assertNotNull( strategies );
         assertEquals( 1, strategies.size() );
+    }
 
+    @Test
+    public void testUnregisterStrategy() {
         strategyManager.unregisterStrategy( defaultContainerPlacementStrategy );
+        List<ContainerPlacementStrategy> strategies;
 
         strategies = strategyManager.getPlacementStrategies();
         assertNotNull( strategies );

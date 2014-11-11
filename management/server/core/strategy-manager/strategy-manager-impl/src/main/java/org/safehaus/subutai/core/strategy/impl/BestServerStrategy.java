@@ -49,7 +49,6 @@ public class BestServerStrategy extends RoundRobinStrategy
         List<Map.Entry<ServerMetric, Integer>> ls = new ArrayList<>( grades.entrySet() );
         Collections.sort( ls, new Comparator<Map.Entry>()
         {
-
             @Override
             public int compare( Map.Entry o1, Map.Entry o2 )
             {

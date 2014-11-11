@@ -4,7 +4,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * Created by ermek on 10/9/14.
@@ -41,7 +45,13 @@ public class BestServerStrategyTest {
 
     @Test
     public void testSortServers() throws Exception {
+        ServerMetric serverMetric = mock( ServerMetric.class );
+        ServerMetric serverMetric1 = mock( ServerMetric.class );
+        List<ServerMetric> serverMetrics = new ArrayList(  );
+        serverMetrics.add( serverMetric );
+        serverMetrics.add( serverMetric1 );
+        List<ServerMetric> server = mock(List.class);
 
+//        bestServerStrategy.sortServers(serverMetrics);
     }
-
 }
