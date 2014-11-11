@@ -78,6 +78,7 @@ void threadSend(message_queue *mq,SubutaiConnection *connection,SubutaiLogger* l
 	}
 	catch(interprocess_exception &ex)
 	{
+
 		message_queue::remove("message_queue");
 		std::cout << ex.what() << std::endl;
 		logMain->writeLog(3,logMain->setLogData("<SubutaiAgent>::<threadsend>","New exception Handled:",ex.what()));

@@ -9,6 +9,7 @@ target
 *.mk
 *.a
 *.deb
+*~
 agent/agent/KiskisAgent/Debug/*
 agent/agent/KiskisAgent/Release/*
 

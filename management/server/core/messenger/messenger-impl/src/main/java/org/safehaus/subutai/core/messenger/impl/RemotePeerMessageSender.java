@@ -49,8 +49,7 @@ public class RemotePeerMessageSender implements Callable<Boolean>
                 params.put( "envelope", JsonUtil.toJson( envelope ) );
 
                 String targetPeerIP = targetPeer.getPeerInfo().getIp();
-                //TODO use targetPeer to obtain peer port once it is implemented
-                int targetPeerPort = 8181;
+                int targetPeerPort = targetPeer.getPeerInfo().getPort();
 
                 restUtil.request( RestUtil.RequestType.POST,
                         String.format( "http://%s:%d/cxf/messenger/message", targetPeerIP, targetPeerPort ), params );

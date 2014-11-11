@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.security.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.core.peer.api.ContainerHost;

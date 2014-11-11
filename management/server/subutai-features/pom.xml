@@ -49,7 +49,7 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- agent-hiveManager -->
+    <!-- agent-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
@@ -68,7 +68,7 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- apt-repository-hiveManager -->
+    <!-- apt-repository-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>apt-repository-api</artifactId>
@@ -83,16 +83,6 @@
       <artifactId>apt-repository-cli</artifactId>
     </dependency>
 
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- command-dispatcher -->
-    <!--<dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>command-dispatcher-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>command-dispatcher-impl</artifactId>
-    </dependency>-->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- command-runner -->
     <dependency>
@@ -109,7 +99,7 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- communication-hiveManager -->
+    <!-- communication-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>communication-manager-api</artifactId>
@@ -135,26 +125,14 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- configuration-hiveManager -->
+    <!-- configuration-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>configuration-manager-api</artifactId>
     </dependency>
-    <!--<dependency>-->
-    <!--<groupId>${project.groupId}</groupId>-->
-    <!--<artifactId>configuration-hiveManager-impl</artifactId>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-    <!--<groupId>${project.groupId}</groupId>-->
-    <!--<artifactId>configuration-hiveManager-cli</artifactId>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-    <!--<groupId>${project.groupId}</groupId>-->
-    <!--<artifactId>configuration-hiveManager-ui</artifactId>-->
-    <!--</dependency>-->
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- container-hiveManager -->
+    <!-- container-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>container-manager-api</artifactId>
@@ -173,7 +151,7 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- environment-hiveManager -->
+    <!-- environment-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>environment-manager-api</artifactId>
@@ -214,7 +192,7 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- git-hiveManager -->
+    <!-- git-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>git-manager-api</artifactId>
@@ -229,7 +207,7 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- lxc-quota-hiveManager -->
+    <!-- lxc-quota-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>lxc-quota-manager-api</artifactId>
@@ -255,7 +233,7 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- script-hiveManager -->
+    <!-- script-manager -->
 
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -263,7 +241,7 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- repository hiveManager -->
+    <!-- repository manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>repository-manager-api</artifactId>
@@ -275,6 +253,39 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>repository-manager-cli</artifactId>
+    </dependency>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- broker -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>broker-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>broker-impl</artifactId>
+    </dependency>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- container registry -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>host-registry-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>host-registry-impl</artifactId>
+    </dependency>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- command-executor -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>command-executor-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>command-executor-impl</artifactId>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -301,7 +312,7 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- security-hiveManager -->
+    <!-- security-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>security-manager-api</artifactId>
@@ -314,7 +325,7 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- network-hiveManager -->
+    <!-- network-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>network-manager-api</artifactId>
@@ -327,7 +338,7 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- peer-hiveManager -->
+    <!-- peer-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>peer-manager-api</artifactId>
@@ -349,7 +360,7 @@
       <artifactId>peer-manager-rest</artifactId>
     </dependency>
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- strategy-hiveManager -->
+    <!-- strategy-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>strategy-manager-api</artifactId>
@@ -360,7 +371,7 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- template-hiveManager -->
+    <!-- template-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>template-manager-api</artifactId>
@@ -488,6 +499,7 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>elasticsearch-plugin-ui</artifactId>
     </dependency>
+
 
     <!-- HADOOP -->
     <dependency>
@@ -658,7 +670,7 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>flume-plugin-ui</artifactId>
     </dependency>
--->
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hive-plugin-api</artifactId>
@@ -679,8 +691,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>hive-plugin-ui</artifactId>
     </dependency>
-
-    <!--
 
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -823,6 +833,29 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>pig-plugin-ui</artifactId>
+    </dependency>
+
+
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hbase-plugin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hbase-plugin-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hbase-plugin-cli</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hbase-plugin-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hbase-plugin-ui</artifactId>
     </dependency>
 
     <dependency>
