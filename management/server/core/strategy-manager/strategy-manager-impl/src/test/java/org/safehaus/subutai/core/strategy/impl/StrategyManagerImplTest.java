@@ -4,8 +4,8 @@ package org.safehaus.subutai.core.strategy.impl;
 import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
-import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 

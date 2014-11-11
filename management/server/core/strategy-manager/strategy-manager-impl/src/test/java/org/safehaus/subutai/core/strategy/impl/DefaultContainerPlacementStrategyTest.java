@@ -1,15 +1,16 @@
 package org.safehaus.subutai.core.strategy.impl;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.safehaus.subutai.core.monitor.api.MetricType;
-import org.safehaus.subutai.core.strategy.api.Criteria;
-import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.safehaus.subutai.common.protocol.Criteria;
+import org.safehaus.subutai.core.monitor.api.MetricType;
+import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;

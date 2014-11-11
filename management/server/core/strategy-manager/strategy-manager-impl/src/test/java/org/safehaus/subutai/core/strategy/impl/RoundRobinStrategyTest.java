@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.strategy.impl;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
 import java.util.ArrayList;
