@@ -53,6 +53,10 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
         for ( String key : process.getMessageMap().keySet() )
         {
             CloneContainersMessage message = process.getMessageMap().get( key );
+            if ( message.getTemplates().isEmpty() )
+            {
+                throw new BuildException( "No templates assigned" );
+            }
             ContainerCreatorThread creatorThread =
                     new ContainerCreatorThread( this, environment.getId(), message, manager.getPeerManager() );
             creatorThread.addObserver( this );
