@@ -20,6 +20,8 @@ import com.google.common.base.Preconditions;
 
 /**
  * Implementation of CommandExecutor
+ *
+ * TODO refactor RequestBuilder and its build method after migration to new agent
  */
 public class CommandExecutorImpl implements CommandExecutor
 {
@@ -32,7 +34,7 @@ public class CommandExecutorImpl implements CommandExecutor
     public CommandExecutorImpl( final Broker broker, final HostRegistry hostRegistry )
     {
         Preconditions.checkNotNull( broker );
-        Preconditions.checkNotNull( hostRegistry);
+        Preconditions.checkNotNull( hostRegistry );
 
         this.broker = broker;
         this.commandProcessor = new CommandProcessor( broker, hostRegistry );
