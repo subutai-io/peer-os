@@ -140,7 +140,7 @@ void SubutaiResponse::serialize(string& output)
     }
     if(!(this->getconfigPoint().empty()))
     {
-        root["response"]["configPoint"] = this->getconfigPoint();
+        root["response"]["configPoints"] = this->getconfigPoint();
     }
     if(!(this->getDateTime().empty()))
     {

@@ -114,15 +114,19 @@ void SubutaiTimer::sendHeartBeat()
      * Refresh new agent ip address set for each heartbeat message
      */
     environment->getAgentIpAddress();
+    /*
+     * Update each field of container nodes and set for each heartbeat message
+     */
     containerManager->updateContainerLists();
+
     response->setIps(environment->getAgentIpValue());
     response->setHostname(environment->getAgentHostnameValue());
     response->setMacAddress(environment->getAgentMacAddressValue("eth0"));
     response->setContainerSet(containerManager->getAllContainers());
     string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue(), environment->getAgentMacAddressValue("eth0"));
     connection->sendMessage(resp, "HEARTBEAT_TOPIC");
+
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat:", resp));
-    cout << resp << endl;
 }
 
 bool SubutaiTimer::checkHeartBeatTimer(SubutaiCommand command)
@@ -155,13 +159,6 @@ bool SubutaiTimer::checkCommandQueueInfoTimer(SubutaiCommand command)
             {
                 if (command.deserialize(queueElement))
                 {
-                    /*
-                     *         "type":"IN_QUEUE",
-
-                     "id":"56b0ac88-5140-4a32-8691-916d75d62f1c"
-
-                     "commandId":"c6cd5988-ceac-11e3-82b2-ebd389e743a3"
-                     */
                     string resp = response->createInQueueMessage(environment->getAgentUuidValue(), command.getCommandId());
                     connection->sendMessage(resp);
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "IN_QUEUE Response:", resp));
