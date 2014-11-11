@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.common.protocol;
+package org.safehaus.subutai.common.command;
 
 
 import java.util.Arrays;
@@ -278,10 +278,10 @@ public class RequestBuilder
      * @param agentUUID - target agent UUID
      * @param taskUUID - command UUID
      */
-    public Request build( UUID agentUUID, UUID taskUUID )
+    public org.safehaus.subutai.common.protocol.Request build( UUID agentUUID, UUID taskUUID )
     {
 
-        return new Request( SOURCE, type, agentUUID, taskUUID, REQUEST_SEQUENCE_NUMBER, cwd, command, outputRedirection,
+        return new org.safehaus.subutai.common.protocol.Request( SOURCE, type, agentUUID, taskUUID, REQUEST_SEQUENCE_NUMBER, cwd, command, outputRedirection,
                 errRedirection, stdOutPath, stdErrPath, runAs, cmdArgs, envVars, pid, timeout )
                 .setConfPoints( confPoints );
     }

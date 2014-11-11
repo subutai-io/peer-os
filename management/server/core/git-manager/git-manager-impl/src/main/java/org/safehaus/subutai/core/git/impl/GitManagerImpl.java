@@ -15,7 +15,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.git.api.GitBranch;
 import org.safehaus.subutai.core.git.api.GitChangedFile;
 import org.safehaus.subutai.core.git.api.GitCommand;
