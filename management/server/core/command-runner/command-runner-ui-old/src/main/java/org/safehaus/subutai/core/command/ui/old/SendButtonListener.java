@@ -16,8 +16,8 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
-import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

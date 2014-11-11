@@ -9,8 +9,8 @@ package org.safehaus.subutai.core.command.api.command;
 import java.util.Map;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.protocol.CommandStatus;
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandStatus;
 
 
 /**
