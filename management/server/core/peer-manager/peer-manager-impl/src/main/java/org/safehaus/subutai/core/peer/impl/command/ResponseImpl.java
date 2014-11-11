@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.executor.impl;
+package org.safehaus.subutai.core.peer.impl.command;
 
 
 import java.util.Set;
@@ -22,6 +22,22 @@ public class ResponseImpl implements Response
     private String stdErr;
     private Integer exitCode;
     private Set<String> configPoints;
+
+
+    public ResponseImpl( final ResponseType type, final UUID id, final UUID commandId, final Integer pid,
+                         final Integer responseNumber, final String stdOut, final String stdErr, final Integer exitCode,
+                         final Set<String> configPoints )
+    {
+        this.type = type;
+        this.id = id;
+        this.commandId = commandId;
+        this.pid = pid;
+        this.responseNumber = responseNumber;
+        this.stdOut = stdOut;
+        this.stdErr = stdErr;
+        this.exitCode = exitCode;
+        this.configPoints = configPoints;
+    }
 
 
     @Override

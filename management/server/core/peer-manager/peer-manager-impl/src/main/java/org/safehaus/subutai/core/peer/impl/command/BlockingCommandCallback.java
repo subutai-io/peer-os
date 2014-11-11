@@ -5,7 +5,7 @@ import java.util.concurrent.Semaphore;
 
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.command.Response;
 
 
 public class BlockingCommandCallback extends CommandCallback
