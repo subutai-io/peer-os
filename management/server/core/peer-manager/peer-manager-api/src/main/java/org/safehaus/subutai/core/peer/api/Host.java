@@ -5,13 +5,12 @@ import java.io.Serializable;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.exception.SubutaiException;
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.SubutaiException;
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
