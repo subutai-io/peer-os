@@ -15,10 +15,6 @@ import org.safehaus.subutai.plugin.common.api.NodeType;
 
 public interface Accumulo extends ApiBase<AccumuloClusterConfig>
 {
-
-    //    public UUID installCluster( final AccumuloClusterConfig accumuloClusterConfig, final String hadoopClusterName,
-    //                                final String zookeeperClusterName );
-    //
     public UUID startCluster( String clusterName );
 
     public UUID stopCluster( String clusterName );
