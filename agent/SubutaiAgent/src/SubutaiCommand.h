@@ -33,6 +33,9 @@
 #include <cstdlib>
 #include <sstream>
 #include <list>
+#if USE_PROTOBUF
+#include "Message.pb.h"
+#endif
 using namespace std;
 using std::stringstream;
 using std::string;

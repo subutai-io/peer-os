@@ -80,6 +80,87 @@ bool SubutaiCommand::deserialize(string& input)
 {
 #if USE_PROTOBUF
     // Protobuffers implementation
+    Subutai::Request request;
+    if (request.ParseFromString(input)) {
+        if (request.has_type()) {
+            switch (request.type()) {
+                case Subutai::Request::EXECUTE_REQUEST:
+                   this->setType("EXECUTE_REQUEST"); 
+                   break;
+                case Subutai::Request::TERMINATE_REQUEST:
+                   this->setType("TERMINATE_REQUEST"); 
+                   break;
+                case Subutai::Request::PS_REQUEST:
+                   this->setType("PS_REQUEST"); 
+                   break;
+                case Subutai::Request::SET_INOTIFY_REQUEST:
+                   this->setType("SET_INOTIFY_REQUEST"); 
+                   break;
+                case Subutai::Request::UNSET_INOTIFY_REQUEST:
+                   this->setType("UNSET_INOTIFY_REQUEST"); 
+                   break;
+                case Subutai::Request::LIST_INOTIFY_REQUEST:
+                   this->setType("LIST_INOTIFY_REQUEST"); 
+                   break;
+                default:
+                   break;
+            }
+        } 
+        if (request.has_id()) {
+            this->setUuid(request.id());
+        }
+        if (request.has_commandid()) {
+            this->setCommandId(request.commandid());
+        }
+        if (request.has_workingdirectory()) {
+            this->setWorkingDirectory(request.workingdirectory());
+        }
+        if (request.has_command()) {
+            this->setCommand(request.command());
+        }
+        vector<string> args;
+        for (int i = 0; i < request.args_size(); i++) {
+            args.push_back(request.args(i));
+        }
+        for (int i = 0; i < request.environment_size(); i++) {
+            const Subutai::Request::env& rEnvironment = request.environment(i);
+            pair<string, string> env_vars;
+            env_vars.first = rEnvironment.key();
+            env_vars.second = rEnvironment.value();
+            this->environment.push_back(env_vars);
+        } 
+        if (request.has_stdout()) {
+            switch (request.stdout()) {
+                case Subutai::Request::NO:
+                    this->setStandardOutput("NO");
+                    break;
+                default:
+                    this->setStandardOutput("RETURN");
+                    break;
+            }
+        }
+        if (request.has_stderr()) {
+            switch (request.stderr()) {
+                case Subutai::Request::NO:
+                    this->setStandardError("NO");
+                    break;
+                default:
+                    this->setStandardError("RETURN");
+                    break;
+            }
+        }
+        if (request.has_runas()) {
+            this->setRunAs(request.runas());
+        }
+        if (request.has_timeout()) {
+            this->setTimeout(request.timeout());
+        }
+        if (request.has_isdaemon()) {
+            this->setIsDaemon(request.isdaemon());
+        }
+    } else {
+        return false;
+    }
 #else
     //Deserialize a Json String to Command instance
     Json::Reader reader;								//return true Deserialize operation is successfully done

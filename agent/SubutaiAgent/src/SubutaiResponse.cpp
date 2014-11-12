@@ -78,6 +78,91 @@ void SubutaiResponse::clear()
  */
 void SubutaiResponse::serialize(string& output)
 {
+#if USE_PROTOBUF
+    Subutai::Response response;
+    if (!this->getType().empty()) {
+        if (this->getType() == "HEARTBEAT") {
+            response.set_type(Subutai::Response::HEARTBEAT);
+        } else if (this->getType() == "EXECUTE_RESPONSE") {
+            response.set_type(Subutai::Response::EXECUTE_RESPONSE);
+        } else if (this->getType() == "EXECUTE_TIMEOUT") {
+            response.set_type(Subutai::Response::EXECUTE_RESPONSE);
+        } else if (this->getType() == "IN_QUEUE") {
+            response.set_type(Subutai::Response::IN_QUEUE);
+        } else if (this->getType() == "TERMINATE_RESPONSE") {
+            response.set_type(Subutai::Response::TERMINATE_RESPONSE);
+        } else if (this->getType() == "PS_RESPONSE") { 
+            response.set_type(Subutai::Response::PS_RESPONSE);
+        } else if (this->getType() == "SET_INOTIFY_RESPONSE") {
+            response.set_type(Subutai::Response::SET_INOTIFY_RESPONSE);
+        } else if (this->getType() == "UNSET_INOTIFY_RESPONSE") {
+            response.set_type(Subutai::Response::UNSET_INOTIFY_RESPONSE);
+        } else if (this->getType() == "LIST_INOTIFY_RESPONSE") {
+            response.set_type(Subutai::Response::LIST_INOTIFY_RESPONSE);
+        } else if (this->getType() == "INOTIFY_EVENT") {
+            response.set_type(Subutai::Response::INOTIFY_EVENT);
+        }
+    }
+    if (!this->getHostname().empty()) {
+        response.set_hostname(this->getHostname());
+    }
+    if (!this->getUuid().empty()) {
+        response.set_id(this->getUuid());
+    }
+    if (this->containers.size() > 0) {
+        for (vector<SubutaiContainer>::iterator it = this->containers.begin(); it != this->containers.end(); it++) {
+        /*  root["response"]["containers"][index]["hostname"]	= this->containers[index].getContainerHostnameValue();
+        root["response"]["containers"][index]["id"]		= this->containers[index].getContainerIdValue();
+        root["response"]["containers"][index]["status"]		= this->containers[index].getContainerStatus();
+        vector<string> ipValues	=	this->containers[index].getContainerIpValue();
+        
+        for(unsigned int i=0; i < ipValues.size(); i++) {
+            root["response"]["containers"][index]["ips"][i]=ipValues[i];
+        }*/
+            Subutai::Response::Container* cont = response.add_containers();
+            cont->set_hostname((*it).getContainerHostnameValue());
+            cont->set_id((*it).getContainerIdValue());
+            if ((*it).getContainerStatus() == "RUNNING") {
+                cont->set_status(Subutai::Response::RUNNING);
+            } else if ((*it).getContainerStatus() == "FREEZED") {
+                cont->set_status(Subutai::Response::FREEZED);
+            } else if ((*it).getContainerStatus() == "STOPPED") {
+                cont->set_status(Subutai::Response::STOPPED);
+            }
+            vector<string> ipValues = (*it).getContainerIpValue();
+            for (unsigned int i = 0; i < ipValues.size(); i++) {
+            }
+        }
+    }
+    if (this->ips.size() > 0) {
+        for (vector<string>::iterator it = this->ips.begin(); it != this->ips.end(); it++) {
+            string* ip = response.add_ips();
+        }   
+        // TODO: Add ips and macs after Ceren implement em
+    }
+    if (!this->getCommandId().empty()) {
+        response.set_commandid(this->getCommandId());
+    }
+    if (this->getPid() >= 0) {
+        response.set_pid(this->getPid());
+    }
+    if (this->getResponseSequenceNumber() >= 0) {
+        response.set_responsenumber(this->getResponseSequenceNumber());
+    }
+    if (!this->getStandardOutput().empty()) {
+        response.set_stdout(this->getStandardOutput());
+    }
+    if (!this->getStandardError().empty()) {
+        response.set_stderr(this->getStandardError());
+    }
+    if (this->getExitCode() >= 0) {
+        response.set_exitcode(this->getExitCode());
+    }
+    if (this->getConfPoints().size() > 0) {
+        
+    }
+
+#else
     Json::Value environment;
     Json::Value root;
     Json::FastWriter writer;
@@ -167,6 +252,7 @@ void SubutaiResponse::serialize(string& output)
         }
     }
     output = writer.write(root);
+#endif
 }
 
 /**
@@ -177,6 +263,51 @@ void SubutaiResponse::serialize(string& output)
  */
 void SubutaiResponse::serializeDone(string& output)
 {			//Serialize a Done Response  to a Json String
+#if USE_PROTOBUF
+    Subutai::Response response;
+    if (!this->getType().empty()) {
+        if (this->getType() == "HEARTBEAT") {
+            response.set_type(Subutai::Response::HEARTBEAT);
+        } else if (this->getType() == "EXECUTE_RESPONSE") {
+            response.set_type(Subutai::Response::EXECUTE_RESPONSE);
+        } else if (this->getType() == "EXECUTE_TIMEOUT") {
+            response.set_type(Subutai::Response::EXECUTE_RESPONSE);
+        } else if (this->getType() == "IN_QUEUE") {
+            response.set_type(Subutai::Response::IN_QUEUE);
+        } else if (this->getType() == "TERMINATE_RESPONSE") {
+            response.set_type(Subutai::Response::TERMINATE_RESPONSE);
+        } else if (this->getType() == "PS_RESPONSE") { 
+            response.set_type(Subutai::Response::PS_RESPONSE);
+        } else if (this->getType() == "SET_INOTIFY_RESPONSE") {
+            response.set_type(Subutai::Response::SET_INOTIFY_RESPONSE);
+        } else if (this->getType() == "UNSET_INOTIFY_RESPONSE") {
+            response.set_type(Subutai::Response::UNSET_INOTIFY_RESPONSE);
+        } else if (this->getType() == "LIST_INOTIFY_RESPONSE") {
+            response.set_type(Subutai::Response::LIST_INOTIFY_RESPONSE);
+        } else if (this->getType() == "INOTIFY_EVENT") {
+            response.set_type(Subutai::Response::INOTIFY_EVENT);
+        }
+    }
+    if (!this->getUuid().empty()) {
+        response.set_id(this->getUuid());
+    }
+    if (!this->getCommandId().empty()) {
+        response.set_commandid(this->getCommandId());
+    }
+    if (this->getPid() >= 0) {
+        response.set_pid(this->getPid());
+    }
+    if (this->getResponseSequenceNumber() >= 0) {
+        response.set_responsenumber(this->getResponseSequenceNumber());
+    }
+    if (this->getExitCode() >= 0) {
+        response.set_exitcode(this->getExitCode());
+    }
+    if (this->getConfPoints().size() > 0) {
+        
+    }
+
+#else
     Json::Value environment;
     Json::Value root;
     Json::FastWriter writer;
@@ -212,6 +343,7 @@ void SubutaiResponse::serializeDone(string& output)
         root["response"]["commandId"] = this->getCommandId();
     }
     output = writer.write(root);	//Json Response Done string is created
+#endif
 }
 
 /**

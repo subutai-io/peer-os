@@ -31,6 +31,7 @@
 #include <string>
 #include <fstream>
 #include "SubutaiContainer.h"
+#include "Message.pb.h"
 using namespace std;
 using std::stringstream;
 using std::string;
