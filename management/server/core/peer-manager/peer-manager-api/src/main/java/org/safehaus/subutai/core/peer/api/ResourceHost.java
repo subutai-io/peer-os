@@ -16,9 +16,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
@@ -394,6 +394,8 @@ public class ResourceHost extends SubutaiHost
                 {
                     ContainerHost containerHost = create( creatorPeerId, environmentId, templates, containerName );
                     containerHost.setNodeGroupName( nodeGroupName );
+                    containerHost.setPeerId( localPeer.getId() );
+                    containerHost.setEnvironmentId( environmentId );
                     localPeer.onPeerEvent( new PeerEvent( PeerEventType.CONTAINER_CREATE_SUCCESS, containerHost ) );
                 }
                 catch ( Exception e )

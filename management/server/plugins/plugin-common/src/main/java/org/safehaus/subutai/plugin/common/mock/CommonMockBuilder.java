@@ -29,7 +29,6 @@ public class CommonMockBuilder
     public static Agent createAgent()
     {
         return new Agent( UUIDUtil.generateTimeBasedUUID(), "127.0.0.1", "", "00:00:00:00",
-                Arrays.asList( "127.0.0.1", "127.0.0.1" ), true, "transportId", UUIDUtil.generateTimeBasedUUID(),
-                UUIDUtil.generateTimeBasedUUID() );
+                Arrays.asList( "127.0.0.1", "127.0.0.1" ), true, "transportId" );
     }
 }
