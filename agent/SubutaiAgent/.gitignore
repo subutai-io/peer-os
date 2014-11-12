@@ -1,3 +1,5 @@
 /Debug
 /src/Makefile
 /src/agent
+/bin/*
+Makefile

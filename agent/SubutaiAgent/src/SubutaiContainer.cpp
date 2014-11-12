@@ -432,6 +432,49 @@ ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command)
     return res;
 }
 
+ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) 
+{
+    containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Running daemon. "));
+	// set default lxc attach options
+    lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT;
+
+    // set working directory for lxc_attach
+    if (command->getWorkingDirectory() != "" && checkCWD(command->getWorkingDirectory())) {
+        containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "change working directory.."));
+        opts.initial_cwd = const_cast<char*>(command->getWorkingDirectory().c_str());
+    }
+
+    // set run as parameter
+    if (command->getRunAs() != "" && checkUser(command->getRunAs())) {
+        containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "change user running command by.."));
+        opts.uid = getRunAsUserId(command->getRunAs());
+    }
+
+    // Settings env variables
+    list< pair<string, string> >::iterator it;
+    int i = 0;
+    for (it = command->getEnvironment().begin(); it != command->getEnvironment().end(); it++, i++) {
+        stringstream ss;
+        ss << it->first << "=" << it->second;
+        strcpy(opts.extra_env_vars[i], ss.str().c_str());
+        containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "set environment " + ss.str()));
+    }
+
+    // divide program and arguments if all arguments are given in program field of command
+    vector<string> pr = ExplodeCommandArguments(command);
+    string program = "subutai-run";
+    vector<string> args;
+    args.push_back("'");
+    for (vector<string>::iterator it = pr.begin(); it != pr.end(); it++) {
+        args.push_back((*it));
+    }
+    args.push_back("'");
+    args.push_back(command->getCommandId());
+
+    // execute program on LXC
+    ExecutionResult res = RunProgram(program, args, true, opts, false);
+    return res;
+}
 
 // We need to check if CWD is exist because in LXC API - if cwd does not
 // exist CWD will become root directory
