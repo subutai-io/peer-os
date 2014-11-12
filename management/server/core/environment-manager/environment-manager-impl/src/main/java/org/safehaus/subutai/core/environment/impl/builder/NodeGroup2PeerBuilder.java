@@ -47,6 +47,12 @@ public class NodeGroup2PeerBuilder extends EnvironmentBuildProcessFactory
                 List<Template> templates =
                         fetchRequiredTemplates( environmentManager.getPeerManager().getLocalPeer().getId(),
                                 nodeGroup.getTemplateName() );
+
+                if ( templates.isEmpty() )
+                {
+                    throw new ProcessBuilderException( "No templates provided" );
+                }
+
                 ccm.setTemplates( templates );
                 process.putCloneContainerMessage( key, ccm );
             }
