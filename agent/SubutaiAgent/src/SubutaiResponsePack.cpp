@@ -244,3 +244,32 @@ string SubutaiResponsePack::createInotifyShowMessage(string uuid, string command
 	this->serialize(sendout);
 	return sendout;
 }
+
+
+
+/**
+ *  \details   This method sets Inotify message which show notifications are enabled.
+ */
+string SubutaiResponsePack::setInotifyResponse(string uuid, string commandId)
+{
+	clear();
+	this->setType("SET_INOTIFY_RESPONSE");
+	this->setUuid(uuid);
+    this->setCommandId(commandId);
+	this->serialize(sendout);
+	return sendout;
+}
+
+
+/**
+ *  \details   This method sets Inotify message which show notifications are enabled.
+ */
+string SubutaiResponsePack::unsetInotifyResponse(string uuid, string commandId)
+{
+	clear();
+	this->setType("UNSET_INOTIFY_RESPONSE");
+	this->setUuid(uuid);
+    this->setCommandId(commandId);
+	this->serialize(sendout);
+	return sendout;
+}

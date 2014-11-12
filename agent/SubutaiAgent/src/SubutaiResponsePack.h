@@ -40,6 +40,8 @@ public:
 	string createTimeoutMessage(string,int,int,int,string,string,string);
 	string createInotifyMessage(string,string,string,string);
 	string createInotifyShowMessage(string, string, vector<string>);
+	string setInotifyResponse(string, string);
+	string unsetInotifyResponse(string, string);
 private:
 	string sendout;
 };

@@ -371,7 +371,7 @@ bool SubutaiWatch::checkNotification()
 						setNewDirectory(getCurrentDirectory() + "/" + event->name);
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								getNewDirectory(),getModificationTime(getNewDirectory(),false),"Create_Folder");
-						watchConnection->sendMessage(sendout);
+						watchConnection->sendMessage(sendout, "INOTIFY_TOPIC");
 						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
@@ -381,7 +381,7 @@ bool SubutaiWatch::checkNotification()
 						string newFile = getCurrentDirectory() + "/" + event->name;
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								newFile,getModificationTime(newFile,false),"Create_File");
-						watchConnection->sendMessage(sendout);
+						watchConnection->sendMessage(sendout, "INOTIFY_TOPIC");
 						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
@@ -397,7 +397,7 @@ bool SubutaiWatch::checkNotification()
 						setNewDirectory(getCurrentDirectory() + "/" + event->name);
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								getNewDirectory(),getModificationTime(getNewDirectory(),true),"Delete_Folder");
-						watchConnection->sendMessage(sendout);
+						watchConnection->sendMessage(sendout, "INOTIFY_TOPIC");
 						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
@@ -407,7 +407,7 @@ bool SubutaiWatch::checkNotification()
 						string newFile = getCurrentDirectory() + "/" + event->name;
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								newFile,getModificationTime(newFile,true),"Delete_File");
-						watchConnection->sendMessage(sendout);
+						watchConnection->sendMessage(sendout, "INOTIFY_TOPIC");
 						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
@@ -428,7 +428,7 @@ bool SubutaiWatch::checkNotification()
 						string modFile = getCurrentDirectory() + "/" + event->name;
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								modFile,getModificationTime(modFile,false),"Modify_file");
-						watchConnection->sendMessage(sendout);
+						watchConnection->sendMessage(sendout, "INOTIFY_TOPIC");
 						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
@@ -444,7 +444,7 @@ bool SubutaiWatch::checkNotification()
 						string modFile = getCurrentDirectory() + "/" + event->name;
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								modFile,getModificationTime(modFile,false),"Modify_Permission_Folder");
-						watchConnection->sendMessage(sendout);
+						watchConnection->sendMessage(sendout, "INOTIFY_TOPIC");
 						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
@@ -454,7 +454,7 @@ bool SubutaiWatch::checkNotification()
 						string modFile = getCurrentDirectory() + "/" + event->name;
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								modFile,getModificationTime(modFile,false),"Modify_Permission_File");
-						watchConnection->sendMessage(sendout);
+						watchConnection->sendMessage(sendout, "INOTIFY_TOPIC");
 						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
