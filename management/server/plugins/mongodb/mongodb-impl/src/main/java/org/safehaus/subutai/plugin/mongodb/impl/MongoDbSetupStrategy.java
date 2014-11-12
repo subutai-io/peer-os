@@ -10,6 +10,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -123,8 +124,8 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
         {
             try
             {
-                if ( container.getTemplate().getProducts()
-                              .contains( Common.PACKAGE_PREFIX + MongoClusterConfig.PRODUCT_NAME ) )
+                Template t = container.getTemplate();
+                if ( t.getProducts().contains( Common.PACKAGE_PREFIX + MongoClusterConfig.PRODUCT_NAME ) )
                 {
                     mongoContainers.add( container );
                     mongoEnvironmentContainers.add( container );
