@@ -143,6 +143,7 @@ function destroy {
     msg_info "    - \"$snap\" snapshot destroyed"
   done
 
+  destroy_monitor $clone
   ovs_port_name=$(ovs_get_port_name $clone)
   # (6) lxc-destroy the clone
   lxc-destroy -n $clone -f
