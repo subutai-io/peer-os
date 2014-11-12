@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.ProcessStatusEnum;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
@@ -188,9 +190,18 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 environmentsButton.click();
             }
         } );
-        environmentsTable.addItem( new Object[] {
-                process.getBlueprintId().toString(), icon, viewButton, processButton, destroyButton
-        }, process.getId() );
+        try
+        {
+            EnvironmentBlueprint blueprint =
+                    module.getEnvironmentManager().getEnvironmentBlueprint( process.getBlueprintId() );
+            environmentsTable.addItem( new Object[] {
+                    blueprint.getName(), icon, viewButton, processButton, destroyButton
+            }, process.getId() );
+        }
+        catch ( EnvironmentManagerException e )
+        {
+            Notification.show( e.getMessage() );
+        }
     }
 
 
