@@ -829,7 +829,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                     this->getErrorStream().closePipe(1);
                     this->getOutputStream().closePipe(1);
                     logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend is starting!!","pid",helper.toString(getpid())));
-                    optionReadSend(messageQueue,command,newpid,ret);
+                    optionReadSend(messageQueue, command, newpid, ret);
                     logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend has finished!!","pid",helper.toString(getpid())));
                     this->getErrorStream().closePipe(0);
                     this->getOutputStream().closePipe(0);

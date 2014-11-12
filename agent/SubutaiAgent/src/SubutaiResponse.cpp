@@ -127,17 +127,17 @@ void SubutaiResponse::serialize(string& output)
             } else if ((*it).getContainerStatus() == "STOPPED") {
                 cont->set_status(Subutai::Response::STOPPED);
             }
-            vector<string> ipValues = (*it).getContainerIpValue();
+            /*vector<string> ipValues = (*it).getContainerIpValue();
             for (unsigned int i = 0; i < ipValues.size(); i++) {
-            }
+            }*/
         }
     }
-    if (this->ips.size() > 0) {
+    /*  if (this->getIpValue().size() > 0) {
         for (vector<string>::iterator it = this->ips.begin(); it != this->ips.end(); it++) {
             string* ip = response.add_ips();
         }   
         // TODO: Add ips and macs after Ceren implement em
-    }
+    }*/
     if (!this->getCommandId().empty()) {
         response.set_commandid(this->getCommandId());
     }
