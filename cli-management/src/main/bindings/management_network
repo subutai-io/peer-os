@@ -2,56 +2,48 @@
 . /usr/share/subutai-cli/subutai/lib/net-ops
 
 function management_network_usage {
-echo -------------------------------------------------------------------------------
-echo Usage:   Establish a tunnnel to a subutai peer whose address information provided
-echo "        "subutai \[-qh\] management_network -c TUNNELPORTNAME TUNNELIPADDRESS TUNNELTYPE
-echo "        "Example Create Operation
-echo "        "subutai management_network -c tunnel1 172.16.1.134 vxlan
-echo
-echo Usage:   List tunnnels on subutai management host
-echo "        "subutai \[-qh\] management_network -l
-echo
-echo Usage:   Remove selected tunnnel from subutai management host
-echo "        "subutai \[-qh\] management_network -r TUNNELPORTNAME
-echo "        "Example Remove Operation
-echo "        "subutai management_network -r tunnel1
-echo 
-echo Usage:   Add a simple Open flow block rule to a bridge		
-echo "        "subutai \[-qh\] management_network -b BRIDGENAME PRIORITY PACKAGETYPE ACTION {NWSRC NWDST INPORT}  
-echo "        "Example Parameters:
-echo "        "BRIDGENAME = {br-int , br-tun} etc..
-echo "        "PRIORITY = {1-32768} between..
-echo "        "PACKAGETYPE = {normal, arp, ip, icmp, tcp, udp} if package type is not provided by selecting these values
-echo "        "user should have provide with the tag with its value. For instance: dl_vlan=0xffff
-echo "        "NWSRC=10.10.10.0/24, NWDST=10.10.10.0/24 {optional}
-echo "        "INPORT=1 {optional}
-echo "        "ACTION = {normal, drop ,flood} etc..
-echo "        "subutai management_network -b br-tun 1 normal normal
-echo
-echo Usage:   Add a simple open Flow forward rule to a bridge
-echo "        "subutai \[-qh\] management_network -f BRIDGENAME PRIORITY INPORT OUTPORT NWSRC NWDST ACTION
-echo "        "Example Parameters:
-echo "        "BRIDGENAME = {br-int , br-tun} etc..
-echo "        "PRIORITY = {1-32768} between..
-echo "        "INPORT=1
-echo "        "OUTPORT=2
-echo "        "NWSRC=10.10.10.0/24, NWDST=10.10.10.0/24
-echo "        "ACTION = {normal, drop ,flood} etc..
-echo "        "subutai management_network -f br-tun 500 2 5 10.10.10.0/24 10.10.10.5 output
-echo 
-echo Usage:   Show flow table informations in a brdige                
-echo "        "subutai \[-qh\] management_network -s BRIDGENAME
-echo "        "subutai management_network -s br-tun
-echo
-echo Usage:   Show ports informations in a brdige                
-echo "        "subutai \[-qh\] management_network -p BRIDGENAME
-echo "        "subutai management_network -p br-tun
-echo
-echo Usage:   Delete a Open flow rule from a bridge                 
-echo "        "subutai \[-qh\] management_network -d BRIDGENAME MATCHCASE
-echo "        "subutai management_network -d br-tun dl_type=0x806
-echo "        "subutai management_network -d br-tun all 
-echo -------------------------------------------------------------------------------
+cat <<EOF
+-------------------------------------------------------------------------------
+Usage:   Establish a tunnnel to a subutai peer whose address information provided
+       "subutai \[-qh\] management_network -c TUNNELPORTNAME TUNNELIPADDRESS TUNNELTYPE
+
+Usage:   List tunnnels on subutai management host
+         "subutai \[-qh\] management_network -l
+
+Usage:   Remove selected tunnnel from subutai management host
+        "subutai \[-qh\] management_network -r TUNNELPORTNAME
+*******************************************************************************
+Usage:   Add a simple Open flow block rule to a bridge		
+        "subutai \[-qh\] management_network -b BRIDGENAME PRIORITY PACKAGETYPE ACTION {NWSRC NWDST INPORT}  
+
+Usage:   Add a simple open Flow forward rule to a bridge
+        "subutai \[-qh\] management_network -f BRIDGENAME PRIORITY INPORT OUTPORT NWSRC NWDST ACTION
+ 
+Usage:   Show flow table informations in a brdige                
+        "subutai \[-qh\] management_network -s BRIDGENAME
+
+Usage:   Show ports informations in a brdige                
+        "subutai \[-qh\] management_network -p BRIDGENAME
+
+Usage:   Delete a Open flow rule from a bridge                 
+        "subutai \[-qh\] management_network -d BRIDGENAME MATCHCASE
+*******************************************************************************
+Usage:   Create a n2n Tunnel                 
+        "subutai \[-qh\] management_network -N SUPERNODEIPADDRESS SUPERNODEPORT INTERFACENAME COMMUNITYNAME LOCALPEERIPADDRESS
+
+Usage:   List opened n2n Tunnels                 
+        "subutai \[-qh\] management_network -L
+
+Usage:   Remove a n2n Tunnel                 
+        "subutai \[-qh\] management_network -R COMMUNITYNAME INTERFACENAME
+******************************************************************************
+Usage:   Create a gateway tap device                 
+        "subutai \[-qh\] management_network -T INTERFACENAME VLANIP/SUBNET VLANID
+
+Usage:   Delete a gateway tap device                 
+        "subutai \[-qh\] management_network -D INTERFACENAME
+-------------------------------------------------------------------------------
+EOF
 }
 
 function management_network {
@@ -70,6 +62,11 @@ function management_network {
   local nwdst
   local nwsrc
   local matchCase
+  local supernodeIpAddress
+  local supernodePort
+  local interfaceName
+  local communityName
+  local localPeerIpAddress
   
   local createTunnel="false"
   local listTunnel="false"
@@ -79,9 +76,14 @@ function management_network {
   local deleteFlow="false"
   local showFlow="false"
   local showPort="false"
-
+  local createN2NTunnel="false"
+  local listN2NTunnel="false"
+  local removeN2NTunnel="false"
+  local createGateway="false"
+  local removeGateway="false"
+  
   shift_amount=0;
-  while getopts ":clrbfspd:" opt; do
+  while getopts ":clrbfspdNLRTD:" opt; do
      case $opt in
        c)
 	 createTunnel="true"	
@@ -114,7 +116,26 @@ function management_network {
          showPort="true"
          shift
          ;;
-
+       N)
+         createN2NTunnel="true"
+         shift
+         ;;
+       L)
+         listN2NTunnel="true"
+         shift
+         ;;
+       R)
+         removeN2NTunnel="true"
+         shift
+         ;;
+       T)
+         createGateway="true"
+         shift
+         ;;
+       D)
+         removeGateway="true"
+         shift
+         ;;
        \?)
           msg_error "Unrecognized option -$OPTARG"
           show_usage "`management_network_usage`"
@@ -157,7 +178,7 @@ function management_network {
      ovs-vsctl --may-exist add-port br-tun $tunnelPortName
      ovs-vsctl set Interface $tunnelPortName type=$tunnelType options:key=flow \
      options:remote_ip=$tunnelIpAddress
-     echo "A port of $tunnelPortName is opened type=$tunnelType and IP=$tunnelIpAddress in br-tun bridge."
+     msg_info "A port of $tunnelPortName is opened type=$tunnelType and IP=$tunnelIpAddress in br-tun bridge."
    fi
    
    if [ "true" == "$listTunnel" ]; then
@@ -185,7 +206,7 @@ function management_network {
       net_check_tunnelPortName_exist $tunnelPortName
  
       ovs-vsctl del-port $tunnelPortName
-      echo "$tunnelPortName is deleted from br-tun."
+      msg_info "$tunnelPortName is deleted from br-tun."
    fi
 
    if [ "true" == "$addBlockFlow" ]; then
@@ -242,10 +263,9 @@ function management_network {
   
          ovs-ofctl add-flow $bridgeName "priority=$priority,$packageType, in_port=$inport,nw_src=$nwsrc,nw_dst=$nwdst actions=$action"
       else
-         echo $packageType
          ovs-ofctl add-flow $bridgeName "priority=$priority,$packageType actions=$action"
       fi
-      echo "One Blocking Flow rule is added to $bridgeName"	 
+      msg_info "One Blocking Flow rule is added to $bridgeName"	 
    fi
        
    if [ "true" == "$addForwardFlow" ]; then
@@ -304,7 +324,7 @@ function management_network {
       
          
       ovs-ofctl add-flow $bridgeName "priority=$priority, ip, in_port=$inport, nw_src=$nwsrc , nw_dst=$nwdst actions=$action:$outport"
-      echo "One Forwarding flow rule is added to $bridgeName"
+      msg_info "One Forwarding flow rule is added to $bridgeName"
    fi
 
    if [ "true" == "$showFlow" ]; then
@@ -380,20 +400,128 @@ function management_network {
       if [ "$matchCase" == "all" ]; then
          ovs-ofctl del-flows $bridgeName
          message="All flows are deleted"
-         echo $message
+         msg_info $message
       else
          message="Matched flows are deleted"
          ovs-ofctl del-flows $bridgeName $matchCase
-         echo $message
+         msg_info $message
       fi
    fi
+   
+   if [ "true" == "$createN2NTunnel" ]; then
+      supernodeIpAddress="$1"
+      supernodePort="$2"
+      interfaceName="$3"
+      communityName="$4"
+      localPeerIpAddress="$5"
+      extra="$6"
+
+      if [ -z "$supernodeIpAddress" ]; then
+         msg_error "supernodeIpAddress Parameter not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+    
+      if [ -z "$supernodePort" ]; then
+         msg_error "supernodePort Parameter not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      if [ -z "$interfaceName" ]; then
+         msg_error "interfaceName Parameter not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      if [ -z "$communityName" ]; then
+         msg_error "communityName Parameter not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      if [ -z "$localPeerIpAddress" ]; then
+         msg_error "localPeerIpAddress Parameter not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      if [ "$extra" ]; then
+         msg_error "extra Parameter provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      net_check_N2N_IpAddress $supernodeIpAddress $localPeerIpAddress
+      net_check_portNumber $supernodePort
+      
+      edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -k secret -r -a $localPeerIpAddress
+      msg_info "New Com device is created: $interfaceName"
+      msg_info "New CommunityName is created: $communityName"
+     
+   fi
+
+   if [ "true" == "$listN2NTunnel" ]; then
+      result=`echo -e "LocalPeerIP \t ServerIP \t Port \t LocalInterface \t Community"`
+      echo $result
+      ps aux | awk 'BEGIN {FS="\n"; RS="";ORS=""}{x=1;y=1;while ( x<NF ){Array[x]=$x; x++;}for(i=0; i<NF;i++){if(Array[i] ~ /awk /){;}else if(Array[i] ~ /edge/){split(Array[i],a,"\edge\ -l ");split(a[2],b,"\ ");for (x in b){if( x == 7 ||  b[x] ~ /-/ );else if( b[x] ~ /:/ ){split(b[x],c,":");print c[1]"\t"c[2]"\t";}else{ print b[x]"\t";}}print "\n";}}}'
+   fi
+
+   if [ "true" == "$removeN2NTunnel" ]; then
+     kill -9 `ps aux | grep -e "-c $1" | grep -e "-d $2" | grep -v "\-\-color" | awk -F" " '{print $2}'` > /dev/null 2>&1
+     if [ "$?" != "0" ]; then
+       msg_error "Removing Tunnel Failed!"
+       show_usage "`management_network_usage`"
+     fi
+     msg_ok "N2N Tunnel Removed!"
+   fi
+
+   if [ "true" == "$createGateway" ]; then
+      ipAdd="$1"
+      vlanID=$2
+      if [ -z "$ipAdd" ]; then
+         msg_error "Ip Address has not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      if [ -z "$vlanID" ]; then
+         msg_error "VLAN ID has not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+
+      ovs-vsctl add-br br-$vlanID
+      ifconfig  br-$vlanID $ipAdd
+      ovs-vsctl add-port br-$vlanID "$vlanID"toint
+      ovs-vsctl set interface "$vlanID"toint type=patch
+      ovs-vsctl set interface "$vlanID"toint options:peer=intto"$vlanID"
+      ovs-vsctl add-port br-int intto"$vlanID"
+      ovs-vsctl set interface intto"$vlanID" type=patch
+      ovs-vsctl set interface intto"$vlanID" options:peer="$vlanID"toint
+      ovs-vsctl set port br-$vlanID tag=$vlanID 
+      ovs-ofctl add-flow br-$vlanID "priority=2500,ip,nw_src=10.10.10.0/24 actions=drop"
+      ovs-ofctl add-flow br-int "priority=2500,ip,nw_src=10.10.10.0/24,nw_dst=$ipAdd actions=drop"
+      ovs-ofctl add-flow br-$vlanID "priority=2600,ip,nw_src=10.10.10.1 actions=normal"
+      ovs-ofctl add-flow br-int "priority=2600,ip,nw_src=10.10.10.1,nw_dst=$ipAdd actions=normal"
+      msg_info "Gateway created for $vlanID"
+   fi
+
+   if [ "true" == "$removeGateway" ]; then
+      vlanID="$1"
+      if [ -z "$vlanID" ]; then
+         msg_error "VLAN ID has not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+      ovs-vsctl del-br br-$vlanID
+      ovs-vsctl del-port br-int intto$vlanID
+      msg_info "Gateway removed for $vlanID"
+   fi
+
 }
 function management_network_description {
-  echo "Create Tunnel between subutai peers"
+  echo "Create a Tunnel between subutai peers"
   echo "List Opened Tunnels in subutai Host"
-  echo "Remove a tunnel from subutai Host"
-  echo "Add Block/Forwarding Flow rules "
-  echo "Show Bridge Flow Rules"
-  echo "Show Bridge Port informations"
-  echo "Delete Bridge Flow Rules" 
+  echo "Remove a Tunnel from subutai Host"
+  echo "Add a Block/Forwarding Flow rules "
+  echo "Show a Bridge Flow Rules"
+  echo "Show a Bridge Port informations"
+  echo "Delete a Bridge Flow Rules"
+  echo "Create a N2N tunnel"
+  echo "List N2N tunnels"
+  echo "Remove a N2N tunnel"
+  echo "Add a Tennant Gateway"
+  echo "Remove a Tennant Gateway" 
 }
