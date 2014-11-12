@@ -30,6 +30,4 @@ public interface Accumulo extends ApiBase<AccumuloClusterConfig>
     public UUID removeProperty( String clusterName, String propertyName );
 
     public EnvironmentBuildTask getDefaultEnvironmentBlueprint( AccumuloClusterConfig config );
-
-    UUID configureEnvironmentCluster( AccumuloClusterConfig config );
 }

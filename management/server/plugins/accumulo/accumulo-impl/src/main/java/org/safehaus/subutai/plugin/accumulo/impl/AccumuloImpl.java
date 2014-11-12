@@ -10,16 +10,13 @@ import java.util.concurrent.Executors;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
@@ -336,34 +333,5 @@ public class AccumuloImpl implements Accumulo
         environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
 
         return environmentBuildTask;
-    }
-
-
-    public UUID configureEnvironmentCluster( final AccumuloClusterConfig config )
-    {
-        //        Preconditions.checkNotNull( config, "Configuration is null" );
-        //        AbstractOperationHandler operationHandler = new ConfigureEnvironmentClusterHandler( this, config );
-        //        executor.execute( operationHandler );
-        //        return operationHandler.getTrackerId();
-        return null;
-    }
-
-
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment,
-                                                         AccumuloClusterConfig accumuloClusterConfig,
-                                                         TrackerOperation po )
-    {
-        //        Preconditions.checkNotNull( accumuloClusterConfig, "Accumulo cluster config is null" );
-        //        Preconditions.checkNotNull( po, "Product operation is null" );
-        //
-        //        if ( accumuloClusterConfig.getSetupType() == SetupType.OVER_HADOOP_N_ZK )
-        //        {
-        //            return new AccumuloOverZkNHadoopSetupStrategy( accumuloClusterConfig, po, this );
-        //        }
-        //        else
-        //        {
-        //            return new AccumuloWithZkNHadoopSetupStrategy( environment, accumuloClusterConfig, po, this );
-        //        }
-        return null;
     }
 }

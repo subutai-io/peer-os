@@ -251,14 +251,16 @@ public class ConfigurationStep extends Panel
                         gcNodeCombo.removeValueChangeListener( gcNodeComboChangeListener );
                         setComboDS( gcNodeCombo, hadoopNodes );
                         // TODO: we need to edit here if we do not want master machine has some other roles such as GC, Monitor
-                        //                        if ( !masterNode.equals( wizard.getConfig().getGcNode() ) )
-                        //                        {
-                        //                            gcNodeCombo.setValue( wizard.getConfig().getGcNode() );
-                        //                        }
-                        //                        else
-                        //                        {
-                        //                            wizard.getConfig().setGcNode( null );
-                        //                        }
+                        /*
+                        if ( !masterNode.equals( wizard.getConfig().getGcNode() ) )
+                        {
+                            gcNodeCombo.setValue( wizard.getConfig().getGcNode() );
+                        }
+                        else
+                        {
+                            wizard.getConfig().setGcNode( null );
+                        }
+                        */
                         gcNodeCombo.addValueChangeListener( gcNodeComboChangeListener );
                     }
                 }
@@ -279,15 +281,17 @@ public class ConfigurationStep extends Panel
                         //                        hadoopNodes.remove( gcNode );
                         masterNodeCombo.removeValueChangeListener( masterNodeComboChangeListener );
                         // TODO: we need to edit here if we do not want master machine has some other roles such as GC, Monitor
-                        //                        setComboDS( masterNodeCombo, hadoopNodes );
-                        //                        if ( !gcNode.equals( wizard.getConfig().getMasterNode() ) )
-                        //                        {
-                        //                            masterNodeCombo.setValue( wizard.getConfig().getMasterNode() );
-                        //                        }
-                        //                        else
-                        //                        {
-                        //                            wizard.getConfig().setMasterNode( null );
-                        //                        }
+                        /*
+                        setComboDS( masterNodeCombo, hadoopNodes );
+                        if ( !gcNode.equals( wizard.getConfig().getMasterNode() ) )
+                        {
+                            masterNodeCombo.setValue( wizard.getConfig().getMasterNode() );
+                        }
+                        else
+                        {
+                            wizard.getConfig().setMasterNode( null );
+                        }
+                        */
                         masterNodeCombo.addValueChangeListener( masterNodeComboChangeListener );
                     }
                 }
@@ -892,16 +896,5 @@ public class ConfigurationStep extends Panel
     private void show( String notification )
     {
         Notification.show( notification );
-    }
-
-
-    private Set<UUID> getIDsOfContainerList( Set<ContainerHost> containerHosts )
-    {
-        Set<UUID> set = new HashSet<>();
-        for ( ContainerHost containerHost : containerHosts )
-        {
-            set.add( containerHost.getId() );
-        }
-        return set;
     }
 }
