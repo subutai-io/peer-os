@@ -307,6 +307,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBlueprintId() );
+            if ( blueprint == null )
+            {
+                throw new EnvironmentBuildException( "Blueprint not found..." );
+            }
             Environment environment = environmentBuilder.build( blueprint, process );
             saveEnvironment( environment );
 
