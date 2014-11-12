@@ -162,7 +162,7 @@ void SubutaiResponse::serialize(string& output)
     for(unsigned int index = 0; index < this->getConfPoints().size(); index++) {
         if (this->getType() == "INOTIFY_LIST_RESPONSE") {
             root["response"]["configPoints"][index]=this->getConfPoints()[index];
-        } else if (this->getType() == "INOTIFY_ACTION_RESPONSE") {
+        } else if (this->getType() == "INOTIFY_EVENT") {
             root["response"]["configPoint"][index]=this->getConfPoints()[index];
         }
     }

@@ -40,7 +40,7 @@ public:
 	string createHeartBeatMessage(string,string,string);
 	string createTimeoutMessage(string,int,int,int,string,string,string);
 	string createInotifyMessage(string,string,string,string);
-	string createInotifyShowMessage(string,vector<string>);
+	string createInotifyShowMessage(string, string, vector<string>);
 private:
 	string sendout;
 };
