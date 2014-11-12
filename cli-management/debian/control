@@ -8,6 +8,6 @@ Homepage: http://www.safehaus.org
 
 Package: subutai-cli-management
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, openvswitch-common, n2n, n2n-edge, n2n-supernode
 Conflicts: subutai-cli
 Description: Describe what this subutai cli net dev package is for

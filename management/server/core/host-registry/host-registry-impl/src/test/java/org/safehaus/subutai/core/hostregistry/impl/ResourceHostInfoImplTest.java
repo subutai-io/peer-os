@@ -16,29 +16,35 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 
-public class HostInfoImplTest
+public class ResourceHostInfoImplTest
 {
     private static final String HOST_HOSTNAME = "host";
     private static final UUID HOST_ID = UUID.randomUUID();
     private static final String HOST_IP = "127.0.0.2";
+    private static final String HOST_INTERFACE = "eth0";
     private static final String HOST_MAC_ADDRESS = "0c:8b:fd:c0:ea:fe";
     private static final String CONTAINER_HOSTNAME = "container";
     private static final UUID CONTAINER_ID = UUID.randomUUID();
     private static final String CONTAINER_IP = "127.0.0.1";
+    private static final String CONTAINER_INTERFACE = "eth0";
+    private static final String CONTAINER_MAC_ADDRESS = "0c:8b:fd:c0:ea:fe";
     private static final ContainerHostState CONTAINER_STATUS = ContainerHostState.FROZEN;
-    private static final String INFO_JSON = String.format(
-            "{\"type\":\"HEARTBEAT\", \"hostname\":\"%s\", \"id\":\"%s\", \"ips\" : [\"%s\"],\"macs\": [\"%s\"], "
-                    + "\"containers\": [{ \"hostname\":\"%s\", \"id\":\"%s\", \"ips\" : [\"%s\"], " +
-                    "\"status\":\"%s\" }]}", HOST_HOSTNAME, HOST_ID, HOST_IP, HOST_MAC_ADDRESS, CONTAINER_HOSTNAME,
-            CONTAINER_ID, CONTAINER_IP, CONTAINER_STATUS );
+    private static final String INFO_JSON =
+            String.format( "{\"type\":\"HEARTBEAT\", \"hostname\":\"%s\", \"id\":\"%s\", " +
+                            "\"interfaces\" : [{ \"interfaceName\":\"%s\", \"ip\":\"%s\",\"mac\":\"%s\"}], "
+                            + "\"containers\": [{ \"hostname\":\"%s\", \"id\":\"%s\", " +
+                            "\"interfaces\" : [{ \"interfaceName\":\"%s\", \"ip\":\"%s\",\"mac\":\"%s\"}], " +
+                            "\"status\":\"%s\" }]}", HOST_HOSTNAME, HOST_ID, HOST_INTERFACE, HOST_IP, HOST_MAC_ADDRESS,
+                    CONTAINER_HOSTNAME, CONTAINER_ID, CONTAINER_INTERFACE, CONTAINER_IP, CONTAINER_MAC_ADDRESS,
+                    CONTAINER_STATUS );
 
-    HostInfoImpl hostInfo;
+    ResourceHostInfoImpl hostInfo;
 
 
     @Before
     public void setUp() throws Exception
     {
-        hostInfo = JsonUtil.fromJson( INFO_JSON, HostInfoImpl.class );
+        hostInfo = JsonUtil.fromJson( INFO_JSON, ResourceHostInfoImpl.class );
     }
 
 
@@ -47,8 +53,7 @@ public class HostInfoImplTest
     {
         assertEquals( HOST_HOSTNAME, hostInfo.getHostname() );
         assertEquals( HOST_ID, hostInfo.getId() );
-        assertEquals( HOST_IP, hostInfo.getIps().iterator().next() );
-        assertEquals( HOST_MAC_ADDRESS, hostInfo.getMacs().iterator().next() );
+        assertEquals( HOST_IP, hostInfo.getInterfaces().iterator().next().getIp());
     }
 
 
@@ -63,7 +68,6 @@ public class HostInfoImplTest
 
         assertEquals( CONTAINER_HOSTNAME, containerHostInfo.getHostname() );
         assertEquals( CONTAINER_ID, containerHostInfo.getId() );
-        assertEquals( CONTAINER_IP, containerHostInfo.getIps().iterator().next() );
         assertEquals( CONTAINER_STATUS, containerHostInfo.getStatus() );
     }
 

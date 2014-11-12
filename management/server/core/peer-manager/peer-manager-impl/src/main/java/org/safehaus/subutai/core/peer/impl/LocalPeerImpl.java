@@ -351,9 +351,16 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
         {
             case CONTAINER_CREATE_SUCCESS:
                 ContainerHost containerHost = ( ContainerHost ) event.getObject();
-                ResourceHost resourceHost = getResourceHostByName( containerHost.getParentHostname() );
-                resourceHost.addContainerHost( containerHost );
-                peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
+                try
+                {
+                    ResourceHost resourceHost = getResourceHostByName( containerHost.getParentHostname() );
+                    resourceHost.addContainerHost( containerHost );
+                    peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
+                }
+                catch ( PeerException e )
+                {
+                    LOG.error( "Error in onPeerEvent", e );
+                }
                 break;
         }
     }
@@ -404,7 +411,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
 
 
     @Override
-    public ContainerHost getContainerHostByName( String hostname )
+    public ContainerHost getContainerHostByName( String hostname ) throws PeerException
     {
         ContainerHost result = null;
         Iterator<ResourceHost> iterator = getResourceHosts().iterator();
@@ -412,12 +419,16 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
         {
             result = iterator.next().getContainerHostByName( hostname );
         }
+        if ( result == null )
+        {
+            throw new PeerException( "Container host not found" );
+        }
         return result;
     }
 
 
     @Override
-    public ResourceHost getResourceHostByName( String hostname )
+    public ResourceHost getResourceHostByName( String hostname ) throws PeerException
     {
         ResourceHost result = null;
         Iterator iterator = getResourceHosts().iterator();
@@ -430,6 +441,10 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
             {
                 result = host;
             }
+        }
+        if ( result == null )
+        {
+            throw new PeerException( "Resource host not found" );
         }
         return result;
     }
@@ -626,6 +641,10 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
     @Override
     public ManagementHost getManagementHost() throws PeerException
     {
+        if ( managementHost == null )
+        {
+            throw new PeerException( "Management host not found" );
+        }
         return managementHost;
     }
 
@@ -694,8 +713,12 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
 
             if ( response.getHostname().startsWith( "py" ) )
             {
-                ResourceHost host = getResourceHostByName( response.getHostname() );
-                if ( host == null )
+                ResourceHost host;
+                try
+                {
+                    host = getResourceHostByName( response.getHostname() );
+                }
+                catch ( PeerException e )
                 {
                     host = new ResourceHost( PeerUtils.buildAgent( response ), getId() );
                     host.setParentAgent( NullAgent.getInstance() );

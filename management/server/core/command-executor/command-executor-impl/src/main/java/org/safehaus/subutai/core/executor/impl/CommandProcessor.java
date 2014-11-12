@@ -15,8 +15,9 @@ import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.broker.api.ByteMessageListener;
 import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,10 +56,14 @@ public class CommandProcessor implements ByteMessageListener
     public void execute( final Request request, CommandCallback callback ) throws CommandException
     {
         //find target host
-        HostInfo targetHost = getTargetHost( request.getId() );
-        if ( targetHost == null )
+        ResourceHostInfo targetHost;
+        try
         {
-            throw new CommandException( "Host is not connected" );
+            targetHost = getTargetHost( request.getId() );
+        }
+        catch ( HostDisconnectedException e )
+        {
+            throw new CommandException( e );
         }
 
         //create command process
@@ -134,17 +139,20 @@ public class CommandProcessor implements ByteMessageListener
     }
 
 
-    protected HostInfo getTargetHost( UUID hostId )
+    protected ResourceHostInfo getTargetHost( UUID hostId ) throws HostDisconnectedException
     {
-        HostInfo targetHost = hostRegistry.getHostInfoById( hostId );
-        if ( targetHost == null )
+        ResourceHostInfo targetHost;
+
+        try
         {
-            ContainerHostInfo containerHostInfo = hostRegistry.getContainerInfoById( hostId );
-            if ( containerHostInfo != null )
-            {
-                targetHost = hostRegistry.getParentByChild( containerHostInfo );
-            }
+            targetHost = hostRegistry.getResourceHostInfoById( hostId );
         }
+        catch ( HostDisconnectedException e )
+        {
+            ContainerHostInfo containerHostInfo = hostRegistry.getContainerHostInfoById( hostId );
+            targetHost = hostRegistry.getResourceHostByContainerHost( containerHostInfo );
+        }
+
         return targetHost;
     }
 

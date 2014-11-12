@@ -17,7 +17,7 @@ public class NetworkManagerImplTest
     @Before
     public void setUp()
     {
-        networkManager = new NetworkManagerImpl();
+
     }
 
 

@@ -6,22 +6,22 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.Interface;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 
 
 /**
- * Implementation of ContainerHostInfo
+ * Implementation of ResourceHostInfo
  */
-public class ContainerHostInfoImpl implements ContainerHostInfo
+public class ResourceHostInfoImpl implements ResourceHostInfo
 {
-    private UUID id;
-    private String hostname;
-    private Set<InterfaceImpl> interfaces;
-    private ContainerHostState status;
+    UUID id;
+    String hostname;
+    Set<InterfaceImpl> interfaces;
+    Set<ContainerHostInfoImpl> containers;
 
 
     @Override
@@ -51,9 +51,16 @@ public class ContainerHostInfoImpl implements ContainerHostInfo
 
 
     @Override
-    public ContainerHostState getStatus()
+    public Set<ContainerHostInfo> getContainers()
     {
-        return status;
+        Set<ContainerHostInfo> result = Sets.newHashSet();
+
+        if ( !CollectionUtil.isCollectionEmpty( containers ) )
+        {
+            result.addAll( containers );
+        }
+
+        return result;
     }
 
 
@@ -61,6 +68,6 @@ public class ContainerHostInfoImpl implements ContainerHostInfo
     public String toString()
     {
         return Objects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
-                      .add( "interfaces", interfaces ).add( "status", status ).toString();
+                      .add( "interfaces", interfaces ).add( "containers", containers ).toString();
     }
 }
