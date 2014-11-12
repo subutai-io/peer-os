@@ -105,7 +105,8 @@ public class NodeOperationHandler extends AbstractOperationHandler<AccumuloImpl,
                     result = installProductOnNode( host, nodeType );
                     break;
             }
-            logResults( trackerOperation, result );
+            assert result != null;
+            trackerOperation.addLogDone( result.getStdOut() );
         }
         catch ( CommandException e )
         {
@@ -114,20 +115,20 @@ public class NodeOperationHandler extends AbstractOperationHandler<AccumuloImpl,
     }
 
 
-    public static void logResults( TrackerOperation po, CommandResult result )
-    {
-        Preconditions.checkNotNull( result );
-        String status = "UNKNOWN";
-        if ( result.getExitCode() == 0 )
-        {
-            status = result.getStdOut();
-        }
-        else if ( result.getExitCode() == 768 )
-        {
-            status = "Hive Thrift Server is not running";
-        }
-        po.addLogDone( status );
-    }
+//    public static void logResults( TrackerOperation po, CommandResult result )
+//    {
+//        Preconditions.checkNotNull( result );
+//        String status = "UNKNOWN";
+//        if ( result.getExitCode() == 0 )
+//        {
+//            status = result.getStdOut();
+//        }
+//        else if ( result.getExitCode() == 768 )
+//        {
+//            status = "Hive Thrift Server is not running";
+//        }
+//        po.addLogDone( status );
+//    }
 
 
     private CommandResult installProductOnNode( ContainerHost host, NodeType nodeType )

@@ -250,6 +250,7 @@ public class ConfigurationStep extends Panel
                         //                        hadoopNodes.remove( masterNode );
                         gcNodeCombo.removeValueChangeListener( gcNodeComboChangeListener );
                         setComboDS( gcNodeCombo, hadoopNodes );
+                        // TODO: we need to edit here if we do not want master machine has some other roles such as GC, Monitor
                         //                        if ( !masterNode.equals( wizard.getConfig().getGcNode() ) )
                         //                        {
                         //                            gcNodeCombo.setValue( wizard.getConfig().getGcNode() );
@@ -277,6 +278,7 @@ public class ConfigurationStep extends Panel
                         List<UUID> hadoopNodes = hadoopInfo.getAllNodes();
                         //                        hadoopNodes.remove( gcNode );
                         masterNodeCombo.removeValueChangeListener( masterNodeComboChangeListener );
+                        // TODO: we need to edit here if we do not want master machine has some other roles such as GC, Monitor
                         //                        setComboDS( masterNodeCombo, hadoopNodes );
                         //                        if ( !gcNode.equals( wizard.getConfig().getMasterNode() ) )
                         //                        {
