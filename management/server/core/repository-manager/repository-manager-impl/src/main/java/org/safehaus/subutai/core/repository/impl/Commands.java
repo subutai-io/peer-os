@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.repository.impl;
 
 
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 
 
 /**
@@ -30,5 +30,11 @@ public class Commands
     public RequestBuilder getExtractPackageCommand( String packageName )
     {
         return new RequestBuilder( String.format( "subutai package_manager extract %s", packageName ) );
+    }
+
+
+    public RequestBuilder getPackageInfoCommand( String packageName )
+    {
+        return new RequestBuilder( String.format( "subutai package_manager info %s", packageName ) );
     }
 }

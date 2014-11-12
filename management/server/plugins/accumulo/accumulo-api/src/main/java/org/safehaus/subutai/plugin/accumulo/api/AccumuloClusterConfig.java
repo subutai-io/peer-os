@@ -42,6 +42,12 @@ public class AccumuloClusterConfig implements ConfigBase
     }
 
 
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
+    }
+
+
     public String getTemplateName()
     {
         return templateName;

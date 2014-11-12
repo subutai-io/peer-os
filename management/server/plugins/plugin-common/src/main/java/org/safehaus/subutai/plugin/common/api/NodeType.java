@@ -14,5 +14,13 @@ public enum NodeType
     CLIENT,
     STORM_NIMBUS,
     STORM_SUPERVISOR,
-    STORM_UI
+    STORM_UI,
+
+    /** accumulo node types   */
+    ACCUMULO_MASTER,
+    ACCUMULO_GC,
+    ACCUMULO_TRACER,
+    ACCUMULO_MONITOR,
+    ACCUMULO_TABLET_SERVER,
+    ACCUMULO_LOGGER
 }

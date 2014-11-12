@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.repository.impl;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 
 import static org.junit.Assert.assertEquals;
 
@@ -46,5 +46,12 @@ public class CommandsTest
 
         assertEquals( new RequestBuilder( String.format( "subutai package_manager list %s", ARGUMENT ) ),
                 commands.getListPackagesCommand( ARGUMENT ) );
+    }
+    @Test
+    public void testGetPackageInfoCommand() throws Exception
+    {
+
+        assertEquals( new RequestBuilder( String.format( "subutai package_manager info %s", ARGUMENT ) ),
+                commands.getPackageInfoCommand( ARGUMENT ) );
     }
 }

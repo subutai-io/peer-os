@@ -10,13 +10,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
-import org.safehaus.subutai.plugin.accumulo.api.NodeType;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
@@ -40,7 +40,8 @@ public class AddNodeWindow extends Window
 
 
     public AddNodeWindow( final Accumulo accumulo, final ExecutorService executorService, final Tracker tracker,
-                          final AccumuloClusterConfig accumuloClusterConfig, Set<Agent> nodes, final NodeType nodeType )
+                          final AccumuloClusterConfig accumuloClusterConfig, Set<ContainerHost> nodes,
+                          final NodeType nodeType )
     {
         super( "Add New Node" );
         setModal( true );
@@ -66,7 +67,7 @@ public class AddNodeWindow extends Window
         hadoopNodes.setNullSelectionAllowed( false );
         hadoopNodes.setRequired( true );
         hadoopNodes.setWidth( 200, Unit.PIXELS );
-        for ( Agent node : nodes )
+        for ( ContainerHost node : nodes )
         {
             hadoopNodes.addItem( node );
             hadoopNodes.setItemCaption( node, node.getHostname() );
@@ -79,20 +80,22 @@ public class AddNodeWindow extends Window
         addNodeBtn.setId( "AddSelectedNode" );
         topContent.addComponent( addNodeBtn );
 
+        final Button ok = new Button( "Ok" );
+
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
-
             @Override
             public void buttonClick( Button.ClickEvent event )
             {
                 addNodeBtn.setEnabled( false );
+                ok.setEnabled( false );
                 showProgress();
-                Agent agent = ( Agent ) hadoopNodes.getValue();
+                ContainerHost containerHost = ( ContainerHost ) hadoopNodes.getValue();
                 final UUID trackID =
-                        accumulo.addNode( accumuloClusterConfig.getClusterName(), agent.getHostname(), nodeType );
+                        accumulo.addNode( accumuloClusterConfig.getClusterName(), containerHost.getHostname(),
+                                nodeType );
                 executorService.execute( new Runnable()
                 {
-
                     public void run()
                     {
                         while ( track )
@@ -106,6 +109,7 @@ public class AddNodeWindow extends Window
                                 if ( po.getState() != OperationState.RUNNING )
                                 {
                                     hideProgress();
+                                    ok.setEnabled( true );
                                     break;
                                 }
                             }
@@ -145,12 +149,11 @@ public class AddNodeWindow extends Window
         indicator.setWidth( 50, Unit.PIXELS );
         indicator.setVisible( false );
 
-        Button ok = new Button( "Ok" );
+
         ok.setId( "btnOk" );
         ok.setStyleName( "default" );
         ok.addClickListener( new Button.ClickListener()
         {
-
             @Override
             public void buttonClick( Button.ClickEvent event )
             {

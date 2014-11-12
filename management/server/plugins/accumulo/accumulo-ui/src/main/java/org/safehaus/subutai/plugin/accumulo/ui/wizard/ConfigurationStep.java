@@ -205,8 +205,10 @@ public class ConfigurationStep extends Panel
                         setComboDS( gcNodeCombo, hadoopInfo.getAllNodes() );
                         setComboDS( monitorNodeCombo, hadoopInfo.getAllNodes() );
 
-                        setTwinSelectDS( tracersSelect, getSlaveContainerHosts( Sets.newHashSet( hadoopInfo.getAllNodes() ) ) );
-                        setTwinSelectDS( slavesSelect, getSlaveContainerHosts( Sets.newHashSet( hadoopInfo.getAllNodes() ) ) );
+                        setTwinSelectDS( tracersSelect,
+                                getSlaveContainerHosts( Sets.newHashSet( hadoopInfo.getAllNodes() ) ) );
+                        setTwinSelectDS( slavesSelect,
+                                getSlaveContainerHosts( Sets.newHashSet( hadoopInfo.getAllNodes() ) ) );
                         //reset relevant properties
                         wizard.getConfig().setMasterNode( null );
                         wizard.getConfig().setGcNode( null );
@@ -241,21 +243,21 @@ public class ConfigurationStep extends Panel
                 {
                     if ( event.getProperty().getValue() != null )
                     {
-                        UUID masterNode = ( UUID) event.getProperty().getValue();
+                        UUID masterNode = ( UUID ) event.getProperty().getValue();
                         wizard.getConfig().setMasterNode( masterNode );
                         HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
                         List<UUID> hadoopNodes = hadoopInfo.getAllNodes();
-                        hadoopNodes.remove( masterNode );
+                        //                        hadoopNodes.remove( masterNode );
                         gcNodeCombo.removeValueChangeListener( gcNodeComboChangeListener );
                         setComboDS( gcNodeCombo, hadoopNodes );
-                        if ( !masterNode.equals( wizard.getConfig().getGcNode() ) )
-                        {
-                            gcNodeCombo.setValue( wizard.getConfig().getGcNode() );
-                        }
-                        else
-                        {
-                            wizard.getConfig().setGcNode( null );
-                        }
+                        //                        if ( !masterNode.equals( wizard.getConfig().getGcNode() ) )
+                        //                        {
+                        //                            gcNodeCombo.setValue( wizard.getConfig().getGcNode() );
+                        //                        }
+                        //                        else
+                        //                        {
+                        //                            wizard.getConfig().setGcNode( null );
+                        //                        }
                         gcNodeCombo.addValueChangeListener( gcNodeComboChangeListener );
                     }
                 }
@@ -273,17 +275,17 @@ public class ConfigurationStep extends Panel
                         wizard.getConfig().setGcNode( gcNode );
                         HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
                         List<UUID> hadoopNodes = hadoopInfo.getAllNodes();
-                        hadoopNodes.remove( gcNode );
+                        //                        hadoopNodes.remove( gcNode );
                         masterNodeCombo.removeValueChangeListener( masterNodeComboChangeListener );
-                        setComboDS( masterNodeCombo, hadoopNodes );
-                        if ( !gcNode.equals( wizard.getConfig().getMasterNode() ) )
-                        {
-                            masterNodeCombo.setValue( wizard.getConfig().getMasterNode() );
-                        }
-                        else
-                        {
-                            wizard.getConfig().setMasterNode( null );
-                        }
+                        //                        setComboDS( masterNodeCombo, hadoopNodes );
+                        //                        if ( !gcNode.equals( wizard.getConfig().getMasterNode() ) )
+                        //                        {
+                        //                            masterNodeCombo.setValue( wizard.getConfig().getMasterNode() );
+                        //                        }
+                        //                        else
+                        //                        {
+                        //                            wizard.getConfig().setMasterNode( null );
+                        //                        }
                         masterNodeCombo.addValueChangeListener( masterNodeComboChangeListener );
                     }
                 }
@@ -356,12 +358,11 @@ public class ConfigurationStep extends Panel
                     {
                         Set<UUID> nodes = new HashSet<UUID>();
                         Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
-                        for( ContainerHost host : nodeList)
+                        for ( ContainerHost host : nodeList )
                         {
                             nodes.add( host.getAgent().getUuid() );
                         }
                         wizard.getConfig().setTracers( nodes );
-
                     }
                 }
             } );
@@ -374,7 +375,7 @@ public class ConfigurationStep extends Panel
                     {
                         Set<UUID> nodes = new HashSet<UUID>();
                         Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
-                        for( ContainerHost host : nodeList)
+                        for ( ContainerHost host : nodeList )
                         {
                             nodes.add( host.getAgent().getUuid() );
                         }
@@ -807,22 +808,20 @@ public class ConfigurationStep extends Panel
         }
     }
 
-    private Set<UUID> getIDsOfContainerList( Set<ContainerHost> containerHosts ){
-        Set<UUID> set = new HashSet<>();
-        for ( ContainerHost containerHost : containerHosts ){
-            set.add( containerHost.getId() );
-        }
-        return set;
-    }
 
-    private Set<ContainerHost> getSlaveContainerHosts( Set<UUID> slaves ){
+    private Set<ContainerHost> getSlaveContainerHosts( Set<UUID> slaves )
+    {
         Set<ContainerHost> set = new HashSet<>();
-        for ( UUID uuid : slaves ){
-            set.add( environmentManager.getEnvironmentByUUID( hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ).getEnvironmentId() ).getContainerHostByUUID( uuid ) );
-
+        for ( UUID uuid : slaves )
+        {
+            set.add( environmentManager.getEnvironmentByUUID(
+                    hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ).getEnvironmentId() )
+                                       .getContainerHostByUUID( uuid ) );
         }
         return set;
     }
+
+
     public static ComboBox getCombo( String title )
     {
         ComboBox combo = new ComboBox( title );
@@ -872,8 +871,12 @@ public class ConfigurationStep extends Panel
         }
     }
 
-    private ContainerHost getHost( UUID uuid ){
-        return environmentManager.getEnvironmentByUUID( hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ).getEnvironmentId() ).getContainerHostByUUID(  uuid );
+
+    private ContainerHost getHost( UUID uuid )
+    {
+        return environmentManager.getEnvironmentByUUID(
+                hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ).getEnvironmentId() )
+                                 .getContainerHostByUUID( uuid );
     }
 
 
@@ -887,5 +890,16 @@ public class ConfigurationStep extends Panel
     private void show( String notification )
     {
         Notification.show( notification );
+    }
+
+
+    private Set<UUID> getIDsOfContainerList( Set<ContainerHost> containerHosts )
+    {
+        Set<UUID> set = new HashSet<>();
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            set.add( containerHost.getId() );
+        }
+        return set;
     }
 }

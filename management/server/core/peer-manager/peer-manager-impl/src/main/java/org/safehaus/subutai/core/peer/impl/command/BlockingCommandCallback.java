@@ -3,9 +3,9 @@ package org.safehaus.subutai.core.peer.impl.command;
 
 import java.util.concurrent.Semaphore;
 
-import org.safehaus.subutai.common.protocol.CommandCallback;
-import org.safehaus.subutai.common.protocol.CommandResult;
-import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.Response;
 
 
 public class BlockingCommandCallback extends CommandCallback
@@ -28,9 +28,16 @@ public class BlockingCommandCallback extends CommandCallback
         if ( callback != null )
         {
             callback.onResponse( response, commandResult );
+
+            if ( callback.isStopped() )
+            {
+                stop();
+            }
         }
+
         this.commandResult = commandResult;
-        if ( commandResult.hasCompleted() || commandResult.hasTimedOut() )
+
+        if ( commandResult.hasCompleted() || commandResult.hasTimedOut() || isStopped() )
         {
             completionSemaphore.release();
         }
@@ -45,12 +52,6 @@ public class BlockingCommandCallback extends CommandCallback
 
     public CommandResult getCommandResult()
     {
-        return commandResult;
-    }
-
-
-    public void waitCompletion()
-    {
         try
         {
             completionSemaphore.acquire();
@@ -59,5 +60,6 @@ public class BlockingCommandCallback extends CommandCallback
         {
             //ignore
         }
+        return commandResult;
     }
 }

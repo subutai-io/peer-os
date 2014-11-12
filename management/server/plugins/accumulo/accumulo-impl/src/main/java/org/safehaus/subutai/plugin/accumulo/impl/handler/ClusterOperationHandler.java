@@ -5,12 +5,12 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.CommandResult;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-
 
 
 /**
@@ -43,7 +42,8 @@ public class ClusterOperationHandler extends AbstractOperationHandler<AccumuloIm
 
 
     public ClusterOperationHandler( final AccumuloImpl manager, final AccumuloClusterConfig config,
-                                    final HadoopClusterConfig hadoopConfig, final ZookeeperClusterConfig zookeeperClusterConfig,
+                                    final HadoopClusterConfig hadoopConfig,
+                                    final ZookeeperClusterConfig zookeeperClusterConfig,
                                     final ClusterOperationType operationType )
     {
         super( manager, config );
@@ -79,7 +79,9 @@ public class ClusterOperationHandler extends AbstractOperationHandler<AccumuloIm
                 } );
                 break;
             case START_ALL:
+                runOperationOnContainers( operationType );
             case STOP_ALL:
+                runOperationOnContainers( operationType );
             case STATUS_ALL:
                 runOperationOnContainers( operationType );
                 break;
@@ -92,56 +94,37 @@ public class ClusterOperationHandler extends AbstractOperationHandler<AccumuloIm
     {
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
         CommandResult result = null;
+        ContainerHost containerHost = environment.getContainerHostByUUID( config.getMasterNode() );
         switch ( clusterOperationType )
         {
             case START_ALL:
-                for ( ContainerHost containerHost : environment.getContainers() )
-                {
-                    result = executeCommand( containerHost, Commands.startCommand );
-                }
+                result = executeCommand( containerHost, Commands.startCommand );
                 break;
             case STOP_ALL:
-                for ( ContainerHost containerHost : environment.getContainers() )
-                {
-                    result = executeCommand( containerHost, Commands.stopCommand );
-                }
+                result = executeCommand( containerHost, Commands.stopCommand );
                 break;
             case STATUS_ALL:
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost host : environment.getContainers() )
                 {
-                    result = executeCommand( containerHost, Commands.statusCommand );
+                    result = executeCommand( host, Commands.statusCommand );
                 }
                 break;
         }
-        NodeOperationHandler.logResults( trackerOperation, result );
-    }
-
-
-    private CommandResult executeCommand( ContainerHost containerHost, String command )
-    {
-        CommandResult result = null;
-        try
+        assert result != null;
+        if ( result.hasSucceeded() )
         {
-            result = containerHost.execute( new RequestBuilder( command ) );
+            trackerOperation.addLogDone( "" );
         }
-        catch ( CommandException e )
-        {
-            LOG.error( "Could not execute command correctly. ", command );
-            e.printStackTrace();
-        }
-        return result;
     }
 
 
     @Override
     public void setupCluster()
     {
-
         Environment environment =
                 manager.getEnvironmentManager().getEnvironmentByUUID( hadoopConfig.getEnvironmentId() );
         AccumuloOverZkNHadoopSetupStrategy setupStrategyOverHadoop =
                 new AccumuloOverZkNHadoopSetupStrategy( environment, config, hadoopConfig, trackerOperation, manager );
-
         try
         {
             setupStrategyOverHadoop.setup();
@@ -168,41 +151,58 @@ public class ClusterOperationHandler extends AbstractOperationHandler<AccumuloIm
         {
             ContainerHost host = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopConfig.getEnvironmentId() )
                                         .getContainerHostByUUID( uuid );
-            CommandResult result = null;
-//            try
-//            {
-//                if ( uuid.equals( config.getServer() ) )
-//                {
-//                    host.execute( new RequestBuilder(
-//                            Commands.uninstallCommand + Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_KEY
-//                                    .toLowerCase() ) );
-//                    host.execute( new RequestBuilder( Commands.uninstallCommand + Common.PACKAGE_PREFIX + "derby" ) );
-//                }
-//                else
-//                {
-//                    host.execute( new RequestBuilder(
-//                            Commands.uninstallCommand + Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_KEY
-//                                    .toLowerCase() ) );
-//                }
-//                result = host.execute( new RequestBuilder( Commands.uninstallCommand ) );
-//                if ( result.hasSucceeded() )
-//                {
-//                    config.getClients().remove( host.getId() );
-//                    trackerOperation.addLog( AccumuloClusterConfig.PRODUCT_KEY + " is uninstalled from node " + host.getHostname()
-//                            + " successfully." );
-//                }
-//                else
-//                {
-//                    trackerOperation.addLogFailed(
-//                            "Could not uninstall " + AccumuloClusterConfig.PRODUCT_KEY + " from node " + host.getHostname() );
-//                }
-//            }
-//            catch ( CommandException e )
-//            {
-//                e.printStackTrace();
-//            }
+            CommandResult result;
+            try
+            {
+                result = host.execute( new RequestBuilder(
+                        Commands.uninstallCommand + Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_KEY
+                                .toLowerCase() ) );
+                if ( result.hasSucceeded() )
+                {
+                    trackerOperation.addLog(
+                            AccumuloClusterConfig.PRODUCT_KEY + " is uninstalled from node " + host.getHostname()
+                                    + " successfully." );
+                }
+                else
+                {
+                    trackerOperation.addLogFailed(
+                            "Could not uninstall " + AccumuloClusterConfig.PRODUCT_KEY + " from node " + host
+                                    .getHostname() );
+                }
+            }
+            catch ( CommandException e )
+            {
+                e.printStackTrace();
+            }
+        }
+        ContainerHost namenode = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopConfig.getEnvironmentId() )
+                                        .getContainerHostByUUID( hadoopConfig.getNameNode() );
+        CommandResult result = executeCommand( namenode, Commands.getRemoveAccumuloFromHFDSCommand() );
+        if ( result.hasSucceeded() )
+        {
+            trackerOperation.addLog( AccumuloClusterConfig.PRODUCT_KEY + " cluster info removed from HDFS." );
+        }
+        else
+        {
+            trackerOperation.addLogFailed( "Failed to remove " + config.getClusterName() + " cluster info from DB." );
         }
         manager.getPluginDAO().deleteInfo( AccumuloClusterConfig.PRODUCT_KEY, config.getClusterName() );
-        trackerOperation.addLogDone( "Hive is uninstalled from all nodes" );
+        trackerOperation.addLogDone( AccumuloClusterConfig.PRODUCT_KEY + " is uninstalled from all nodes" );
+    }
+
+
+    private CommandResult executeCommand( ContainerHost containerHost, String command )
+    {
+        CommandResult result = null;
+        try
+        {
+            result = containerHost.execute( new RequestBuilder( command ) );
+        }
+        catch ( CommandException e )
+        {
+            LOG.error( "Could not execute command correctly. ", command );
+            e.printStackTrace();
+        }
+        return result;
     }
 }

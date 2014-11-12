@@ -19,7 +19,7 @@
     <module>elasticsearch</module>
     <module>hadoop</module>
     <module>hive</module>
-    <module>storm</module>
+    <!--<module>storm</module>-->
     <module>spark</module>
     <module>zookeeper</module>
     <module>hbase</module>

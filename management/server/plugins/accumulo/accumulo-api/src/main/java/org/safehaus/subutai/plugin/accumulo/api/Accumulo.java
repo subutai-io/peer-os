@@ -10,17 +10,15 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 
 
 public interface Accumulo extends ApiBase<AccumuloClusterConfig>
 {
 
-    public UUID installCluster( final AccumuloClusterConfig accumuloClusterConfig,
-                                final String hadoopClusterName,
-                                final String zookeeperClusterName );
-
+    //    public UUID installCluster( final AccumuloClusterConfig accumuloClusterConfig, final String hadoopClusterName,
+    //                                final String zookeeperClusterName );
+    //
     public UUID startCluster( String clusterName );
 
     public UUID stopCluster( String clusterName );

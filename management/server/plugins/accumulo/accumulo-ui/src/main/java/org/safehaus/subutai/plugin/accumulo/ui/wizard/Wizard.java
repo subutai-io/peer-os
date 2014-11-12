@@ -74,7 +74,8 @@ public class Wizard
             }
             case 3:
             {
-                component = new VerificationStep( accumulo, hadoop, executorService, tracker, environmentManager, this );
+                component =
+                        new VerificationStep( accumulo, hadoop, executorService, tracker, environmentManager, this );
                 break;
             }
             default:
