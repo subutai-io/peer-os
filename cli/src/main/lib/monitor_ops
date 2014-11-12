@@ -196,9 +196,6 @@ function stop_update_rrd {
   local hostname=$1
   local metric_type=$2
 
-  if [ `hostname` != $hostname ]; then
-    lxc_assert "$hostname"
-  fi
   assert_metric "$metric_type"
 
   crontab -l | sed "/subutai monitor -u $metric_type $hostname/d" | crontab -
@@ -221,6 +218,20 @@ function query_rrd {
   # Show last X entries
   local start_time=$(($update_sequence * 50))
   rrdtool fetch "$database_file" LAST -e $TIME -s e-"$start_time"sec
+}
+
+
+function destroy_monitor {
+  local hostname=$1
+
+  for metric_type in "${metric_list[@]}"
+  do
+    assert_metric "$metric_type"
+    stop_update_rrd $hostname $metric_type
+    local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
+    rm -f $database_file > /dev/null 2>&1
+    msg_info "    - $metric_type rrd of $hostname is destroyed"
+  done
 }
 
 
@@ -261,9 +272,6 @@ function get_database_file {
   local hostname=$1
   local metric_type=$2
 
-  if [ `hostname` != $hostname ]; then
-    lxc_assert "$hostname" > /dev/null
-  fi
   assert_metric "$metric_type" > /dev/null
 
   echo ""$metric_type"_"$hostname".rrd"

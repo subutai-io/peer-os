@@ -217,6 +217,7 @@ function promote {
   zfs hold keep lxc-data/$lxc_template-home@template
   zfs set readonly=on lxc-data/$lxc_template-home
 
+  destroy_monitor $lxc_template
   msg_ok "Successfully promoted $lxc_template"
   unlock_container_read $lxc
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
