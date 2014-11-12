@@ -146,6 +146,7 @@ function create_rrd {
   pushd $SUBUTAI_RRD_DIRECTORY > /dev/null
   if [ -f $database_file ]; then
     msg_notice "    - $database_file already exists, skipping..."
+    start_update_rrd "$hostname" "$metric_type" > /dev/null
     return
   fi
   rrdtool create "$database_file" --no-overwrite --step $update_sequence DS:"$dataset_name":GAUGE:$(($update_sequence * 2 - 1)):0:U RRA:LAST:0.5:1:1500
