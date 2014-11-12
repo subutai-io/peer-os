@@ -15,7 +15,7 @@ public interface LocalPeer extends Peer
 {
     public Host bindHost( UUID id ) throws PeerException;
 
-    public ResourceHost getResourceHostByName( String hostname );
+    public ResourceHost getResourceHostByName( String hostname ) throws PeerException;
 
     public ContainerHost getContainerHostByName( String hostname ) throws PeerException;
 
