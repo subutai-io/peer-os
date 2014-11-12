@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.hostregistry.impl;
 
 
+import java.io.PrintStream;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -11,10 +12,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doThrow;
@@ -22,7 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class HearBeatListenerTest
 {
     private static final String HOST_HOSTNAME = "host";
@@ -69,7 +71,15 @@ public class HearBeatListenerTest
     {
         heartBeatListener.onMessage( message );
 
-        verify( containerRegistry ).registerHost( isA( HostInfo.class ) );
+        verify( containerRegistry ).registerHost( isA( ResourceHostInfo.class ) );
 
+
+        heartBeatListener.jsonUtil = jsonUtil;
+        RuntimeException exception = mock( RuntimeException.class );
+        doThrow( exception ).when( jsonUtil ).from( anyString(), eq( HeartBeat.class ) );
+
+        heartBeatListener.onMessage( message );
+
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 }

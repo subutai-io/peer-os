@@ -21,7 +21,7 @@ import org.safehaus.subutai.core.broker.api.Broker;
 import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 
 import static junit.framework.Assert.assertEquals;
@@ -57,7 +57,7 @@ public class CommandProcessorTest
     @Mock
     CommandProcess process;
     @Mock
-    HostInfo hostInfo;
+    ResourceHostInfo resourceHostInfo;
     @Mock
     ContainerHostInfo containerHostInfo;
     @Mock
@@ -73,8 +73,8 @@ public class CommandProcessorTest
     {
         commandProcessor = new CommandProcessor( broker, hostRegistry );
         commandProcessor.commands = commands;
-        when( hostRegistry.getContainerInfoById( HOST_ID ) ).thenReturn( containerHostInfo );
-        when( hostRegistry.getParentByChild( containerHostInfo ) ).thenReturn( hostInfo );
+        when( hostRegistry.getContainerHostInfoById( HOST_ID ) ).thenReturn( containerHostInfo );
+        when( hostRegistry.getResourceHostByContainerHost( containerHostInfo ) ).thenReturn( resourceHostInfo );
         when( request.getId() ).thenReturn( HOST_ID );
         when( request.getCommandId() ).thenReturn( COMMAND_ID );
     }
@@ -125,9 +125,9 @@ public class CommandProcessorTest
     @Test
     public void testGetTargetHost() throws Exception
     {
-        HostInfo targetHost = commandProcessor.getTargetHost( HOST_ID );
+        ResourceHostInfo targetHost = commandProcessor.getTargetHost( HOST_ID );
 
-        assertEquals( hostInfo, targetHost );
+        assertEquals( resourceHostInfo, targetHost );
     }
 
 
@@ -274,7 +274,7 @@ public class CommandProcessorTest
         };
         when( commands.put( eq( COMMAND_ID ), any( CommandProcess.class ), anyInt(),
                 any( CommandProcessExpiryCallback.class ) ) ).thenReturn( true );
-        when( hostInfo.getId() ).thenReturn( HOST_ID );
+        when( resourceHostInfo.getId() ).thenReturn( HOST_ID );
 
         commandProcessor.execute( request1, callback );
 
@@ -291,7 +291,7 @@ public class CommandProcessorTest
         {
         }
 
-        when( hostRegistry.getParentByChild( containerHostInfo ) ).thenReturn( null );
+        when( hostRegistry.getResourceHostByContainerHost( containerHostInfo ) ).thenReturn( null );
         try
         {
             commandProcessor.execute( request, callback );

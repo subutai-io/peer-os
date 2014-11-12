@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.hostregistry.impl;
 
 
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +15,10 @@ public class HostNotifier implements Runnable
     private static final Logger LOG = LoggerFactory.getLogger( HostNotifier.class.getName() );
 
     private HostListener listener;
-    private HostInfo info;
+    private ResourceHostInfo info;
 
 
-    public HostNotifier( final HostListener listener, final HostInfo info )
+    public HostNotifier( final HostListener listener, final ResourceHostInfo info )
     {
         this.listener = listener;
         this.info = info;

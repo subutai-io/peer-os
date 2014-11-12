@@ -15,7 +15,7 @@ import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.broker.api.ByteMessageListener;
 import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class CommandProcessor implements ByteMessageListener
     public void execute( final Request request, CommandCallback callback ) throws CommandException
     {
         //find target host
-        HostInfo targetHost = getTargetHost( request.getId() );
+        ResourceHostInfo targetHost = getTargetHost( request.getId() );
         if ( targetHost == null )
         {
             throw new CommandException( "Host is not connected" );
@@ -134,15 +134,15 @@ public class CommandProcessor implements ByteMessageListener
     }
 
 
-    protected HostInfo getTargetHost( UUID hostId )
+    protected ResourceHostInfo getTargetHost( UUID hostId )
     {
-        HostInfo targetHost = hostRegistry.getHostInfoById( hostId );
+        ResourceHostInfo targetHost = hostRegistry.getResourceHostInfoById( hostId );
         if ( targetHost == null )
         {
-            ContainerHostInfo containerHostInfo = hostRegistry.getContainerInfoById( hostId );
+            ContainerHostInfo containerHostInfo = hostRegistry.getContainerHostInfoById( hostId );
             if ( containerHostInfo != null )
             {
-                targetHost = hostRegistry.getParentByChild( containerHostInfo );
+                targetHost = hostRegistry.getResourceHostByContainerHost( containerHostInfo );
             }
         }
         return targetHost;

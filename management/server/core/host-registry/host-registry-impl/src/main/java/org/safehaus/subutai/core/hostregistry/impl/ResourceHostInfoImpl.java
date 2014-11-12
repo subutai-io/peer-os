@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
@@ -15,7 +15,7 @@ import com.google.common.collect.Sets;
 /**
  * Implementation of HostInfo
  */
-public class HostInfoImpl implements HostInfo
+public class ResourceHostInfoImpl implements ResourceHostInfo
 {
     UUID id;
     String hostname;
