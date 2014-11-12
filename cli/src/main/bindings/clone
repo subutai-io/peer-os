@@ -83,10 +83,10 @@ function clone {
   git_child_branch $child
   lxc_install_agent $child
   msg_ok "Successfully cloned $child container from $parent"
-  if [ $monitor_enabled == "true" ]; then
-    create_rrd "$child"
-  fi
   unlock_container_write $child
+  if [ $monitor_enabled == "true" ]; then
+    create_all_rrd "$child"
+  fi
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
 }
 
