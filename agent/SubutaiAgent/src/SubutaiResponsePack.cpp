@@ -67,21 +67,6 @@ string SubutaiResponsePack::createExitMessage(string uuid,int pid,int requestSeq
 	return sendout;
 }
 
-/**
- *  \details   This method creates Registration message.
- */
-string SubutaiResponsePack::createRegistrationMessage(string uuid, string macaddress, string hostname, string parenthostname
-		,string environmentID ,vector<string> ips)
-{
-	this->setType("REGISTRATION_REQUEST");
-	this->setIps(ips);
-	this->setMacAddress(macaddress);
-	this->setHostname(hostname);
-	this->setParentHostname(parenthostname);
-	this->setUuid(uuid);
-	this->serialize(sendout);
-	return sendout;
-}
 
 /**
  *  \details   This method creates IN_QUEUE Message
@@ -141,13 +126,12 @@ string SubutaiResponsePack::createInQueueMessage(string uuid,string taskuuid)	//
 
 }
  */
-string SubutaiResponsePack::createHeartBeatMessage(string uuid,	string hostname,string macaddress)	//Creating HeartBeat Message
+string SubutaiResponsePack::createHeartBeatMessage(string uuid,	string hostname)	//Creating HeartBeat Message
 {
 	//clear();
 	this->setType("HEARTBEAT");
 	this->setUuid(uuid);
 	this->setHostname(hostname);
-	this->setMacAddress(macaddress);
 	this->serialize(sendout);
 	return sendout;
 }

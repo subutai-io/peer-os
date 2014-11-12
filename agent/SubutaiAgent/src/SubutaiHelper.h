@@ -36,6 +36,16 @@ using namespace std;
 using std::stringstream;
 using std::string;
 
+
+
+//interface struct
+struct Interface {
+    string name;
+    string mac;
+    string ip;
+};
+
+
 class SubutaiHelper
 {
     public:

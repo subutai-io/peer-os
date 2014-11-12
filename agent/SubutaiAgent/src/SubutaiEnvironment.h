@@ -48,6 +48,7 @@ using namespace std;
 using std::stringstream;
 using std::string;
 
+
 class SubutaiEnvironment
 {
 public:
@@ -55,18 +56,16 @@ public:
 	virtual ~SubutaiEnvironment( void );
 	int getAgentSettings();
 	bool getAgentUuid();
-	bool getAgentMacAddresses();
+	bool getAgentInterfaces();
 	bool getAgentHostname();
-	bool getAgentIpAddress();
 	bool getAgentEnvironmentId();
 	string getAgentUuidValue();
 	string getAgentHostnameValue();
-	string getAgentMacAddressValue(string);
 	string getAgentConnectionUrlValue();
 	string getAgentConnectionPortValue();
 	string getAgentConnectionOptionsValue();
-	vector<string> getAgentIpValue();
 	string getAgentEnvironmentIdValue();
+	vector<Interface> getAgentInterfaceValues();
 
 private:
 	string connectionUrl;
@@ -79,7 +78,7 @@ private:
 	string hostname;
 	string parentHostname;
 	string environmentId;
-	vector<string> ipAddress;
+	vector<Interface> interfaces;
 	SubutaiLogger*	environmentLogger;
 	SubutaiHelper _helper;
 };

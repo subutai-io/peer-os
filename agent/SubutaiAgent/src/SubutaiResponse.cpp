@@ -30,10 +30,9 @@ SubutaiResponse::SubutaiResponse()
     setStandardOutput("");
     setExitCode(-1);
     setCommandId("");
-    setMacAddress("");
     setHostname("");
     setParentHostname("");
-    getIps().clear();
+    getInterfaces().clear();
 }
 
 /**
@@ -57,10 +56,9 @@ void SubutaiResponse::clear()
     setStandardError("");
     setStandardOutput("");
     setCommandId("");
-    setMacAddress("");
     setHostname("");
     setParentHostname("");
-    getIps().clear();
+    getInterfaces().clear();
     setUuid("");
     setconfigPoint("");
     setDateTime("");
@@ -118,9 +116,11 @@ void SubutaiResponse::serialize(string& output)
     {
         root["response"]["responseNumber"] = this->getResponseSequenceNumber();
     }
-    for(unsigned int index=0; index < this->getIps().size(); index++)
-    {	//automatically check the size of the ips list
-        root["response"]["ips"][index]=this->getIps()[index];
+    for(unsigned int index=0; index < this->getInterfaces().size(); index++)
+    {
+        root["response"]["interfaces"][index]["interfaceName"]=this->getInterfaces()[index].name;
+        root["response"]["interfaces"][index]["ip"]=this->getInterfaces()[index].ip;
+        root["response"]["interfaces"][index]["mac"]=this->getInterfaces()[index].mac;
     }
     if(!(this->getCommandId().empty()))											//check the taskuuid is assigned or not
     {
@@ -133,10 +133,6 @@ void SubutaiResponse::serialize(string& output)
     if(!(this->getParentHostname().empty()))											//check the parenthostname is assigned or not
     {
         root["response"]["parentHostName"] = this->getParentHostname();
-    }
-    if(!(this->getMacAddress().empty()))											//check the macAddress is assigned or not
-    {
-        root["response"]["macAddress"] = this->getMacAddress();
     }
     if(!(this->getconfigPoint().empty()))
     {
@@ -154,9 +150,11 @@ void SubutaiResponse::serialize(string& output)
         root["response"]["containers"][index]["hostname"]	= this->containers[index].getContainerHostnameValue();
         root["response"]["containers"][index]["id"]		= this->containers[index].getContainerIdValue();
         root["response"]["containers"][index]["status"]		= this->containers[index].getContainerStatus();
-        vector<string> ipValues	=	this->containers[index].getContainerIpValue();
-        for(unsigned int i=0; i < ipValues.size(); i++) {
-            root["response"]["containers"][index]["ips"][i]=ipValues[i];
+        vector<Interface> interfaceValues	=	this->containers[index].getContainerInterfaceValues();
+        for(unsigned int i=0; i < interfaceValues.size(); i++) {
+            root["response"]["containers"][index]["interfaces"][i]["interfaceName"]=interfaceValues[i].name;
+            root["response"]["containers"][index]["interfaces"][i]["ip"]=interfaceValues[i].ip;
+            root["response"]["containers"][index]["interfaces"][i]["mac"]=interfaceValues[i].mac;
         }
     }
     for(unsigned int index = 0; index < this->getConfPoints().size(); index++) {
@@ -213,6 +211,17 @@ void SubutaiResponse::serializeDone(string& output)
     }
     output = writer.write(root);	//Json Response Done string is created
 }
+
+
+/**
+ *  \details   getting "interfaces" private vector variable of SubutaiResponse instance.
+ *  		   This is the list of interfacses vector that holds the ip address, name and mac address of each interface of the machine
+ */
+vector<Interface> SubutaiResponse::getInterfaces()
+{
+    return this->interfaces;
+}
+
 
 /**
  *   \details Add a new container set for response.
@@ -385,22 +394,6 @@ void SubutaiResponse::setHostname(const string& hostname)
     this->hostname = hostname;
 }
 
-/**
- *  \details   getting "macAddress" private variable of SubutaiResponse instance.
- */
-string& SubutaiResponse::getMacAddress()
-{
-    return this->macAddress;
-}
-
-/**
- *  \details   setting "macAddress" private variable of SubutaiResponse instance.
- *  		   This holds the macAddress(eth0) of the agent machine
- */
-void SubutaiResponse::setMacAddress(const string& macAddress)
-{
-    this->macAddress = macAddress;
-}
 
 /**
  *  \details   getting "taskUuid" private variable of SubutaiResponse instance.
@@ -423,23 +416,15 @@ void SubutaiResponse::setCommandId(const string& commandid)
  *  \details   setting "ips" private vector variable of SubutaiResponse instance.
  *  		   This is the list of ips vector that holds the ip addresses of the machine
  */
-void SubutaiResponse::setIps(vector<string> myvector)
+void SubutaiResponse::setInterfaces(vector<Interface> myvector)
 {
-    this->ips.clear();
+    this->interfaces.clear();
     for(unsigned int index=0 ; index< myvector.size(); index++)
     {
-        this->ips.push_back(myvector[index]);
+        this->interfaces.push_back(myvector[index]);
     }
 }
 
-/**
- *  \details   getting "ips" private vector variable of SubutaiResponse instance.
- */
-vector<string>& SubutaiResponse::getIps()
-{					//getting ips vector
-
-    return this->ips;
-}
 
 /**
  *  \details   setting "configPoint" private variable of SubutaiResponse instance.
