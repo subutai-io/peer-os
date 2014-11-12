@@ -16,7 +16,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 
-public class HostInfoImplTest
+public class ResourceHostInfoImplTest
 {
     private static final String HOST_HOSTNAME = "host";
     private static final UUID HOST_ID = UUID.randomUUID();
@@ -32,13 +32,13 @@ public class HostInfoImplTest
                     "\"status\":\"%s\" }]}", HOST_HOSTNAME, HOST_ID, HOST_IP, HOST_MAC_ADDRESS, CONTAINER_HOSTNAME,
             CONTAINER_ID, CONTAINER_IP, CONTAINER_STATUS );
 
-    HostInfoImpl hostInfo;
+    ResourceHostInfoImpl hostInfo;
 
 
     @Before
     public void setUp() throws Exception
     {
-        hostInfo = JsonUtil.fromJson( INFO_JSON, HostInfoImpl.class );
+        hostInfo = JsonUtil.fromJson( INFO_JSON, ResourceHostInfoImpl.class );
     }
 
 

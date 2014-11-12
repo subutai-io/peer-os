@@ -21,8 +21,9 @@ import org.safehaus.subutai.core.broker.api.Broker;
 import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -40,14 +41,14 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class CommandProcessorTest
 {
-    private static final UUID ID = UUID.randomUUID();
+    private static final UUID HOST_ID = UUID.randomUUID();
+    private static final UUID COMMAND_ID = UUID.randomUUID();
     private static final String RESPONSE_JSON = String.format(
             "  {" + "      \"type\":\"EXECUTE_RESPONSE\"," + "      \"id\":\"%s\"," + "      \"commandId\":\"%s\","
                     + "      \"pid\":123," + "      \"responseNumber\":2," + "      \"stdOut\":\"output\","
-                    + "      \"stdErr\":\"err\"," + "      \"exitCode\" : 0" + "  }", ID.toString(), ID.toString() );
+                    + "      \"stdErr\":\"err\"," + "      \"exitCode\" : 0" + "  }", HOST_ID.toString(),
+            COMMAND_ID.toString() );
 
-    private static final UUID COMMAND_ID = UUID.randomUUID();
-    private static final UUID HOST_ID = UUID.randomUUID();
     @Mock
     Broker broker;
     @Mock
@@ -57,7 +58,7 @@ public class CommandProcessorTest
     @Mock
     CommandProcess process;
     @Mock
-    HostInfo hostInfo;
+    ResourceHostInfo resourceHostInfo;
     @Mock
     ContainerHostInfo containerHostInfo;
     @Mock
@@ -73,8 +74,9 @@ public class CommandProcessorTest
     {
         commandProcessor = new CommandProcessor( broker, hostRegistry );
         commandProcessor.commands = commands;
-        when( hostRegistry.getContainerInfoById( HOST_ID ) ).thenReturn( containerHostInfo );
-        when( hostRegistry.getParentByChild( containerHostInfo ) ).thenReturn( hostInfo );
+        doThrow( new HostDisconnectedException( "" ) ).when( hostRegistry ).getResourceHostInfoById( HOST_ID );
+        when( hostRegistry.getContainerHostInfoById( HOST_ID ) ).thenReturn( containerHostInfo );
+        when( hostRegistry.getResourceHostByContainerHost( containerHostInfo ) ).thenReturn( resourceHostInfo );
         when( request.getId() ).thenReturn( HOST_ID );
         when( request.getCommandId() ).thenReturn( COMMAND_ID );
     }
@@ -125,9 +127,9 @@ public class CommandProcessorTest
     @Test
     public void testGetTargetHost() throws Exception
     {
-        HostInfo targetHost = commandProcessor.getTargetHost( HOST_ID );
+        ResourceHostInfo targetHost = commandProcessor.getTargetHost( HOST_ID );
 
-        assertEquals( hostInfo, targetHost );
+        assertEquals( resourceHostInfo, targetHost );
     }
 
 
@@ -139,7 +141,7 @@ public class CommandProcessorTest
         commandProcessor.onMessage( message );
 
 
-        when( commands.get( ID ) ).thenReturn( process );
+        when( commands.get( COMMAND_ID ) ).thenReturn( process );
 
         commandProcessor.onMessage( message );
 
@@ -147,7 +149,7 @@ public class CommandProcessorTest
 
 
         RuntimeException exception = mock( RuntimeException.class );
-        doThrow( exception ).when( commands ).get( ID );
+        doThrow( exception ).when( commands ).get( COMMAND_ID );
 
         commandProcessor.onMessage( message );
 
@@ -274,7 +276,7 @@ public class CommandProcessorTest
         };
         when( commands.put( eq( COMMAND_ID ), any( CommandProcess.class ), anyInt(),
                 any( CommandProcessExpiryCallback.class ) ) ).thenReturn( true );
-        when( hostInfo.getId() ).thenReturn( HOST_ID );
+        when( resourceHostInfo.getId() ).thenReturn( HOST_ID );
 
         commandProcessor.execute( request1, callback );
 
@@ -291,7 +293,8 @@ public class CommandProcessorTest
         {
         }
 
-        when( hostRegistry.getParentByChild( containerHostInfo ) ).thenReturn( null );
+        doThrow( new HostDisconnectedException( "" ) ).when( hostRegistry )
+                                                      .getResourceHostByContainerHost( containerHostInfo );
         try
         {
             commandProcessor.execute( request, callback );

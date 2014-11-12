@@ -6,11 +6,10 @@ import java.util.UUID;
 
 
 /**
- * Host info. Can contain info about resource host or management host
+ * Parent interface for host info
  */
 public interface HostInfo
 {
-
     public UUID getId();
 
 
@@ -18,10 +17,4 @@ public interface HostInfo
 
 
     public Set<String> getIps();
-
-
-    public Set<String> getMacs();
-
-
-    public Set<ContainerHostInfo> getContainers();
 }
