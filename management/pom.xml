@@ -380,6 +380,11 @@
         <artifactId>host-registry-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>host-registry-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- command-executor -->
@@ -463,6 +468,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>network-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>network-manager-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -1155,59 +1165,59 @@
         <artifactId>hive-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-<!--
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>lucene-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>lucene-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>lucene-plugin-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>lucene-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>lucene-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+      <!--
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>lucene-plugin-api</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>lucene-plugin-impl</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>lucene-plugin-cli</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>lucene-plugin-rest</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>lucene-plugin-ui</artifactId>
+              <version>${project.version}</version>
+            </dependency>
 
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>mahout-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>mahout-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>mahout-plugin-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>mahout-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>mahout-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-         -->
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>mahout-plugin-api</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>mahout-plugin-impl</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>mahout-plugin-cli</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>mahout-plugin-rest</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>mahout-plugin-ui</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+               -->
       <!-- MONGODB   -->
       <dependency>
         <groupId>${project.groupId}</groupId>
