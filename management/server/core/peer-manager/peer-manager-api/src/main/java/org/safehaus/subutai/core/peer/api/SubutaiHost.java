@@ -132,6 +132,13 @@ public abstract class SubutaiHost implements Host
 
 
     @Override
+    public void setPeerId( final UUID peerId )
+    {
+        this.peerId = peerId;
+    }
+
+
+    @Override
     public UUID getId()
     {
         return agent.getUuid();
