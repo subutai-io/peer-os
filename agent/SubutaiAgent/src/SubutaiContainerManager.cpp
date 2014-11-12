@@ -34,6 +34,7 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger*
     // after crash
     vector<SubutaiContainer> tmp_container = findAllContainers();
     getContainerStates(tmp_container);
+
     _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Initializing"));
 }
 /**
@@ -239,7 +240,7 @@ void SubutaiContainerManager::updateContainerLists()
 	  {
 		  (*it).getContainerAllFields();
 	  }
-	  free(&tmp_container);
+	  //free(&tmp_container);
 }
 
 
