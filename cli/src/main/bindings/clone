@@ -6,7 +6,10 @@ function clone_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Clone a new container instance from a temlate.
   echo
-  echo "        "subutai \[-qh\] clone parent child \[-e\]
+  echo "        "subutai \[-qh\] clone parent child \[-e\|-m\]
+  echo "          "parameters:
+  echo "                    "e -- set environment id for container
+  echo "                    "m -- starts monitoring of container
   echo
   echo -----------------------------------------------------------------------
 }
@@ -44,18 +47,25 @@ function clone {
 
   #getting environmentId using getopts
   local environmentId=""
+  local monitor_enabled="false"
   shift_amount=0;
-  while getopts ":e:" opt; do
-     case $opt in
-       e)
-          environmentId=$OPTARG;
-          ;;
-       \?)
-          msg_error "Unrecognized option -$OPTARG"
-          exit 1
-          ;;
-     esac
-     shift_amount=$(($shift_amount + 1))
+  while getopts ":e:m" opt; do
+    case $opt in
+      e)
+        environmentId=$OPTARG;
+        ;;
+      m)
+	monitor_enabled="true"
+	;;
+      \?)
+        msg_error "Unrecognized option -$OPTARG"
+        exit 1
+        ;;
+      :)
+        msg_error "Option -$OPTARG requires an argument." >&2
+        exit 1
+    esac
+    shift_amount=$(($shift_amount + 1))
   done
 
   lock_container_write $parent $child
@@ -74,6 +84,9 @@ function clone {
   lxc_install_agent $child
   msg_ok "Successfully cloned $child container from $parent"
   unlock_container_write $child
+  if [ $monitor_enabled == "true" ]; then
+    create_all_rrd "$child"
+  fi
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
 }
 
