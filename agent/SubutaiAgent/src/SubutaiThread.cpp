@@ -727,7 +727,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
 
         string executecmd = createExecString(command).c_str();
         string latest = executecmd.substr(executecmd.length()-3);
-        if (latest.find("&") != std::string::npos) {
+        if (command->getIsDaemon()) {
             logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Process will be executed as a Daemon process!!"));
             int myval = daemon(0, 0);
             if (!checkCWD(command, container)) { //if the CWD does not exist
@@ -757,9 +757,11 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
             logger.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getCommand()));
             if (!container) {
                 //executing the process on background
-                system(createExecString(command).c_str());
+                stringstream cmd;
+                cmd << "subutai-run '" << createExecString(command) << "' " << command->getCommandId();
+                system(cmd.str().c_str());
             } else {
-                container->RunCommand(command);
+                container->RunDaemon(command);
             }
             //parent returns with success if the daemon successfully send to process to background
             string message = this->getResponse().createExitMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(),
@@ -810,7 +812,6 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                 close(ret[0]);
                 write(ret[1], &val, sizeof(val));
                 close(ret[1]);
-
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is done!!","pid",pidchldnumstr));
                 exit(EXIT_SUCCESS);
             }

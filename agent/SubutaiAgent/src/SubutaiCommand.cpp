@@ -77,7 +77,11 @@ void SubutaiCommand::clear()
  *  		   it returns true if the given input string is true formatted otherwise return false.
  */
 bool SubutaiCommand::deserialize(string& input)
-{														//Deserialize a Json String to Command instance
+{
+#if USE_PROTOBUF
+    // Protobuffers implementation
+#else
+    //Deserialize a Json String to Command instance
     Json::Reader reader;								//return true Deserialize operation is successfully done
     Json::Value root;
     pair <string,string> dummy;
@@ -119,6 +123,9 @@ bool SubutaiCommand::deserialize(string& input)
         if(!root["request"]["workingDirectory"].isNull())
         {
             this->setWorkingDirectory(root["request"]["workingDirectory"].asString());		//initialize workingDirectory parameter if it is not null
+        }
+        if (!root["request"]["isDaemon"].isNull()) {
+            this->setIsDaemon(root["request"]["isDaemon"].asInt());
         }
         /* removed
 
@@ -202,6 +209,7 @@ bool SubutaiCommand::deserialize(string& input)
     {
         cout << e.what() << endl;
     }
+#endif
 }
 
 /**
@@ -235,6 +243,11 @@ void SubutaiCommand::setEnvironment(list<pair<string,string> >& envr)
 int SubutaiCommand::getPid()
 {
     return this->pid;
+}
+
+int SubutaiCommand::getIsDaemon() 
+{
+    return this->_isDaemon;
 }
 
 /**
@@ -408,6 +421,10 @@ string& SubutaiCommand::getType()
 void SubutaiCommand::setType(const string& mytype)
 { 		//setting command type
     this->type = mytype;
+}
+
+void SubutaiCommand::setIsDaemon(int isDaemon) {
+    this->_isDaemon = isDaemon;
 }
 
 /**

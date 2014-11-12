@@ -1,0 +1,40 @@
+package Subutai;
+
+message Request {
+    enum type {
+        EXECUTE_REQUEST = 0;
+        TERMINATE_REQUEST = 1;
+        PS_REQUEST = 2;
+        SET_INOTIFY_REQUEST = 3;
+        UNSET_INOTIFY_REQUEST = 4;
+        LIST_INOTIFY_REQUEST = 5; 
+    }
+
+    required string id = 1;
+    required string commandId = 2;
+    optional string workindDirectory = 3;
+    optional string command = 4;
+    repeated string args = 5;
+    message env {
+        required string key = 1;
+        required string value = 2;
+    }
+    repeated env environment = 6;
+    enum stdOut {
+        OUT_NO = 0;
+        OUT_RETURN = 1;
+    }
+    enum stdErr {
+        ERR_NO = 0;
+        ERR_RETURN = 1;
+    }
+    optional string runAs = 7;
+    optional int32 timeout = 8;
+}
+
+message Response {
+    enum type {
+        HEARTBEAT;
+        
+    }
+}

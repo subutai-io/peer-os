@@ -93,6 +93,7 @@ class SubutaiContainer
         string findFullProgramPath(string );
         string RunProgram(string , vector<string>);
         ExecutionResult RunCommand(SubutaiCommand* command);
+        ExecutionResult RunDaemon(SubutaiCommand* command);
         ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT, bool captureOutput = true);
 
 

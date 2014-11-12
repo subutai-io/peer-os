@@ -53,6 +53,7 @@ public:
 	string& getStandardOutput();
 	string& getType();
 	int getPid();
+        int getIsDaemon();
 	string& getHostname();
 	string& getMacAddress();
 	string& getCommandId();
@@ -75,6 +76,7 @@ public:
 	void setStandardError(const string&);
 	void setStandardOutput(const string&);
 	void setType(const string&);
+        void setIsDaemon(int);
 	bool deserialize(string&);					//Deserializing Json String to Command Instance
 	bool checkCommandString(const string&);
 	void clear();
@@ -96,5 +98,6 @@ private:
 	string			hostname;
 	vector<string>  ips;
 	vector<string>	watchArgs;
+        int             _isDaemon;
 };
 #endif /* SUBUTAICOMMAND_H_ */
