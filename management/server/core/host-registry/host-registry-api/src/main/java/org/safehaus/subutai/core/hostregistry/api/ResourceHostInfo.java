@@ -9,9 +9,5 @@ import java.util.Set;
  */
 public interface ResourceHostInfo extends HostInfo
 {
-
-    public Set<String> getMacs();
-
-
     public Set<ContainerHostInfo> getContainers();
 }
