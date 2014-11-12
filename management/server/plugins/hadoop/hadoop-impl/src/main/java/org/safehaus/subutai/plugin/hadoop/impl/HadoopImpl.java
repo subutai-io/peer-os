@@ -23,7 +23,6 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
@@ -49,7 +48,6 @@ public class HadoopImpl implements Hadoop
     private static final Logger LOG = LoggerFactory.getLogger( HadoopImpl.class.getName() );
     private Tracker tracker;
     private ContainerManager containerManager;
-    private NetworkManager networkManager;
     private ExecutorService executor;
     private EnvironmentManager environmentManager;
     private Commands commands;
@@ -116,18 +114,6 @@ public class HadoopImpl implements Hadoop
     public void setContainerManager( final ContainerManager containerManager )
     {
         this.containerManager = containerManager;
-    }
-
-
-    public NetworkManager getNetworkManager()
-    {
-        return networkManager;
-    }
-
-
-    public void setNetworkManager( final NetworkManager networkManager )
-    {
-        this.networkManager = networkManager;
     }
 
 
