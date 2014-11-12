@@ -16,5 +16,5 @@ public interface HostInfo
     public String getHostname();
 
 
-    public Set<String> getIps();
+    public Set<Interface> getInterfaces();
 }

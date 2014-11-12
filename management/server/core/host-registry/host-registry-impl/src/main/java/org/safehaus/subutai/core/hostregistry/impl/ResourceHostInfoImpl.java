@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
+import org.safehaus.subutai.core.hostregistry.api.Interface;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 
 import com.google.common.base.Objects;
@@ -13,14 +14,13 @@ import com.google.common.collect.Sets;
 
 
 /**
- * Implementation of HostInfo
+ * Implementation of ResourceHostInfo
  */
 public class ResourceHostInfoImpl implements ResourceHostInfo
 {
     UUID id;
     String hostname;
-    Set<String> ips;
-    Set<String> macs;
+    Set<InterfaceImpl> interfaces;
     Set<ContainerHostInfoImpl> containers;
 
 
@@ -39,37 +39,35 @@ public class ResourceHostInfoImpl implements ResourceHostInfo
 
 
     @Override
-    public Set<String> getIps()
+    public Set<Interface> getInterfaces()
     {
-        return ips;
-    }
-
-
-    @Override
-    public Set<String> getMacs()
-    {
-        return macs;
+        Set<Interface> result = Sets.newHashSet();
+        if ( !CollectionUtil.isCollectionEmpty( interfaces ) )
+        {
+            result.addAll( interfaces );
+        }
+        return result;
     }
 
 
     @Override
     public Set<ContainerHostInfo> getContainers()
     {
-        Set<ContainerHostInfo> info = Sets.newHashSet();
+        Set<ContainerHostInfo> result = Sets.newHashSet();
 
         if ( !CollectionUtil.isCollectionEmpty( containers ) )
         {
-            info.addAll( containers );
+            result.addAll( containers );
         }
 
-        return info;
+        return result;
     }
 
 
     @Override
     public String toString()
     {
-        return Objects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname ).add( "ips", ips )
-                      .add( "macAddress", macs ).add( "containers", containers ).toString();
+        return Objects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
+                      .add( "interfaces", interfaces ).add( "containers", containers ).toString();
     }
 }
