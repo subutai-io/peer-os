@@ -102,40 +102,6 @@ bool SubutaiEnvironment::getAgentUuid()
 }
 
 /**
- *  \details   MACID(eth0) of the KiskisAgent is fetched from statically.
- */
-bool SubutaiEnvironment::getAgentMacAddresses()
-{
-
-	macAddresses.clear();
-	try
-	{
-		vector<string> network_list = _helper.runAndSplit("/bin/ls /sys/class/net/", "r", "\n");
-	   	for (vector<string>::iterator it = network_list.begin(); it != network_list.end(); it++) {
-
-	   		string address_net;
-	    	string addressFile = "/sys/class/net/"+ (*it) +"/address";
-	    	ifstream file(addressFile.c_str());	//opening uuid.txt
-
-	    	getline(file,address_net);
-	    	file.close();
-
-	    	if (address_net.empty()) {		//if mac is null or not reading successfully
-	    		environmentLogger->writeLog(3,environmentLogger->setLogData("<SubutaiAgent>","MacAddress cannot be read !!"));
-	    		return false;
-	    	}
-
-	    	macAddresses.insert(pair<string, string>((*it), address_net));
-	    	environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>", "Subutai Agent MacID for " + (*it) + ":", address_net));
-	    	return true;
-	    }
-	} catch(const std::exception& error) {
-	        cout << error.what()<< endl;
-	}
-	return false;
-}
-
-/**
  *  \details   Hostname of the KiskisAgent machine is fetched from statically.
  */
 bool SubutaiEnvironment::getAgentHostname()
@@ -244,43 +210,59 @@ bool SubutaiEnvironment::isAgentLxc()
 /**
  *  \details   IpAddress of the KiskisAgent machine is fetched from statically.
  */
-bool SubutaiEnvironment::getAgentIpAddress()
+bool SubutaiEnvironment::getAgentInterfaces()
 {
-    try
-    {	
-        ipAddress.clear();
-        FILE * fp = popen("ifconfig", "r");
-        if (fp)
-        {
-            char *p=NULL, *e; size_t n;
-            while ((getline(&p, &n, fp) > 0) && p)
-            {
-                if ((p = strstr(p, "inet addr:")))
-                {
-                    p+=10;
-                    if ((e = strchr(p, ' ')))
-                    {
-                        *e='\0';
-                        ipAddress.push_back(p);
-                        //printf("%s\n", p);
-                    }
-                }
-            }
-        }
-        pclose(fp);
+	interfaces.clear();
 
-        for(unsigned int i=0; i < ipAddress.size() ; i++)
-        {
-            environmentLogger->writeLog(6,environmentLogger->setLogData("<SubutaiAgent>","Subutai Agent IpAddress:",ipAddress[i]));
-        }
-        return true;
-    }
-    catch(const std::exception& error)
-    {
-        cout << error.what()<< endl;
-    }
-    environmentLogger->writeLog(3,environmentLogger->setLogData("<SubutaiAgent>","IpAddress cannot be read !!"));
-    return false;
+	environmentLogger->writeLog(1, environmentLogger->setLogData("<SubutaiContainer>", "Run ifconfig on resource host"));
+	FILE * fp = popen("ifconfig", "r");
+	if (fp)
+	{
+		char *line=NULL; size_t n;
+		string nic = "", address = "", ip = ""; bool found_name=false, found_mac = false, found_ip = false;
+	    while ((getline(&line, &n, fp) > 0) && line)
+	    {
+	    	vector<string> splitted = _helper.splitResult(line, " ");
+	    	if(line[0] != ' ')
+	    	{
+	    		found_name = true; found_mac = false; found_ip = false;
+	    		nic = splitted[0];
+	    	}
+	    	if(splitted.size() > 0)
+	    	{
+	    		bool found_m = false, found_i = false;
+	    		for (vector<string>::iterator it_s = splitted.begin(); it_s != splitted.end(); it_s++)
+	    		{
+	    			if(found_m)
+	    			{
+	    				found_mac = true;
+	    				address = *it_s;
+	    				found_m = false;
+	    			}
+	    			if(!strcmp((*it_s).c_str(), "HWaddr")) found_m = true;
+	    			if(found_i)
+	    			{
+	    				found_ip = true;
+	    				ip = _helper.splitResult((*it_s), " ")[1];
+	    				found_i = false;
+	    			}
+	    			if(!strcmp((*it_s).c_str(), "inet")) found_i = true;
+	    		}
+
+	    		if(found_mac && found_name && found_ip)
+	    		{
+	    			struct Interface interface_n;
+	    			interface_n.name = nic; interface_n.mac = address; interface_n.ip = ip;
+	    			interfaces.push_back(interface_n);
+	    			environmentLogger->writeLog(1, environmentLogger->setLogData("<SubutaiContainer>", "Adding interface: " + nic + " " + address + " " + ip));
+				    found_mac = false; found_ip = false; found_name = false; nic = ""; address = ""; ip = "";
+	    		}
+	    	}
+	    }
+	}
+	pclose(fp);
+
+    return true;
 }
 
 /**
@@ -302,9 +284,9 @@ string SubutaiEnvironment::getAgentHostnameValue()
 /**
  *  \details   getting Agent macaddress value.
  */
-string SubutaiEnvironment::getAgentMacAddressValue(string network)
+vector<Interface> SubutaiEnvironment::getAgentInterfaceValues()
 {
-	return macAddresses.find(network)->second;
+	return interfaces;
 }
 
 
@@ -332,13 +314,6 @@ string SubutaiEnvironment::getAgentConnectionOptionsValue()
     return connectionOptions;
 }
 
-/**
- *  \details   getting Agent Ip values.
- */
-vector<string> SubutaiEnvironment::getAgentIpValue()
-{
-    return ipAddress;
-}
 
 /**
  *  \details   getting Agent environmentId value.

@@ -92,7 +92,7 @@ void threadSend(message_queue *mq,SubutaiConnection *connection,SubutaiLogger* l
  */
 int main(int argc,char *argv[],char *envp[])
 {
-        string serverAddress        = "SERVICE_TOPIC";              // Default SERVICE TOPIC
+        string serverAddress        = "RESPONSE_TOPIC";              // Default SERVICE TOPIC
         string broadcastAddress     = "BROADCAST_TOPIC";	        // Default BROADCAST TOPIC
         string clientAddress;
         SubutaiHelper helper;
@@ -136,8 +136,7 @@ int main(int argc,char *argv[],char *envp[])
 
         environment.getAgentSettings();
         environment.getAgentUuid();
-        environment.getAgentMacAddresses();
-        environment.getAgentIpAddress();
+        environment.getAgentInterfaces();
         environment.getAgentHostname();
         environment.getAgentEnvironmentId();
         clientAddress = environment.getAgentUuidValue();
@@ -371,6 +370,8 @@ int main(int argc,char *argv[],char *envp[])
                                                                                 preArg + command.getWatchArguments()[i]));
                                                 }
                                                 Watcher.stats();
+                                                sendout = response.setInotifyResponse(environment.getAgentUuidValue(),response.getCommandId());
+                        						connection->sendMessage(sendout, "INOTIFY_TOPIC");
                                                 Watcher.stats();
                                         }
                                         else if (command.getType() == "UNSET_INOTIFY_REQUEST")
@@ -385,6 +386,8 @@ int main(int argc,char *argv[],char *envp[])
                                                                                 preArg + command.getWatchArguments()[i]));
                                                 }
                                                 Watcher.stats();
+                                                sendout = response.unsetInotifyResponse(environment.getAgentUuidValue(),response.getCommandId());
+                        						connection->sendMessage(sendout, "INOTIFY_TOPIC");
                                                 Watcher.stats();
                                         }
                                         else if (command.getType() == "LIST_INOTIFY_REQUEST") {

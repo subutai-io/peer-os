@@ -113,17 +113,16 @@ void SubutaiTimer::sendHeartBeat()
     /*
      * Refresh new agent ip address set for each heartbeat message
      */
-    environment->getAgentIpAddress();
+    environment->getAgentInterfaces();
     /*
      * Update each field of container nodes and set for each heartbeat message
      */
     containerManager->updateContainerLists();
 
-    response->setIps(environment->getAgentIpValue());
+    response->setInterfaces(environment->getAgentInterfaceValues());
     response->setHostname(environment->getAgentHostnameValue());
-    response->setMacAddress(environment->getAgentMacAddressValue("eth0"));
     response->setContainerSet(containerManager->getAllContainers());
-    string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue(), environment->getAgentMacAddressValue("eth0"));
+    string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue());
     connection->sendMessage(resp, "HEARTBEAT_TOPIC");
 
     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "HeartBeat:", resp));

@@ -60,6 +60,8 @@ struct ExecutionResult {
     int exit_code;
 };
 
+
+
 enum containerStatus { RUNNING, STOPPED, FROZEN };
 
 class SubutaiContainer
@@ -70,9 +72,8 @@ class SubutaiContainer
         bool getContainerId();
         void tryLongCommand();
         void UpdateUsersList();
-        bool getContainerIpAddress();
         void getContainerAllFields();
-        bool getContainerMacAddresses();
+        bool getContainerInterfaces();
         void setContainerHostname(string);
         void setContainerStatus(containerStatus);
         void write();
@@ -82,12 +83,11 @@ class SubutaiContainer
         int getRunAsUserId(string username);
         void PutToFile(string filename, string text);
 
-        vector<string> getContainerIpValue();
+        vector<Interface> getContainerInterfaceValues();
         lxc_container* getLxcContainerValue();
         string getContainerStatus();
         string getContainerIdValue();
         string getContainerHostnameValue();
-        string getContainerMacAddressValue(string);
         string RunPsCommand();
 
         string findFullProgramPath(string );
@@ -103,10 +103,9 @@ class SubutaiContainer
         containerStatus 	status;
         lxc_container* 		container;
         string 				id;
-        map<string,string> 	macAddresses;
         string 				hostname;
         map<int, string> 	_users;        // List of users available in system
-        vector<string> 		ipAddress;
+        vector<Interface> 	interfaces;
         SubutaiLogger*		containerLogger;
         SubutaiHelper 		_helper;
 };

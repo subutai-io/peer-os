@@ -32,6 +32,7 @@
 #include <fstream>
 #include "SubutaiContainer.h"
 #include "Message.pb.h"
+#include "SubutaiHelper.h"
 using namespace std;
 using std::stringstream;
 using std::string;
@@ -51,9 +52,8 @@ public:
 	int getPid();
 	string& getHostname();
 	string& getParentHostname();
-	string& getMacAddress();
+	vector<Interface> getInterfaces();
 	string& getCommandId();
-	vector<string>& getIps();
 	string& getconfigPoint();
 	string& getDateTime();
 	string& getChangeType();
@@ -61,9 +61,8 @@ public:
 	void setContainerSet(vector<SubutaiContainer>);
 	void setHostname(const string&);
 	void setParentHostname(const string&);
-	void setMacAddress(const string&);
 	void setCommandId(const string&);
-	void setIps(vector<string>);
+	void setInterfaces(vector<Interface>);
 	void setPid(int);
 	void setType(const string&);
 	void setUuid(const string&);
@@ -80,23 +79,22 @@ public:
 	void serializeDone(string&);					//Serializing a Last Done Response message to a Json string
 	void clear();
 private:
-	string        	type;
-	string		    uuid;
-	int			 	requestSequenceNumber;
-	int			 	responseSequenceNumber;
-	int				exitCode;
-	int				pid;
-	string       	stdOut;
-	string        	stdErr;
-	string			commandId;
-	string			macAddress;
-	string			hostname;
-	string			parentHostname;
-	vector<string>  ips;
-	string 			configPoint;
-	string			dateTime;
-	string			changeType;
-        string                  topic;
+	string        		type;
+	string		   	 	uuid;
+	int			 		requestSequenceNumber;
+	int			 		responseSequenceNumber;
+	int					exitCode;
+	int					pid;
+	string       		stdOut;
+	string        		stdErr;
+	string				commandId;
+	string				hostname;
+	string				parentHostname;
+	vector<Interface>  	interfaces;
+	string 				configPoint;
+	string				dateTime;
+	string				changeType;
+    string              topic;
 	vector<string>  confPoints;
 	vector<SubutaiContainer>  containers;
 };

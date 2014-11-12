@@ -55,8 +55,7 @@ SubutaiContainer::~SubutaiContainer()
 void SubutaiContainer::clear()
 {
     id = "";
-    macAddresses.clear();
-    ipAddress.clear();
+    interfaces.clear();
 }
 
 /**
@@ -222,38 +221,53 @@ bool SubutaiContainer::getContainerId()
 /**
  *  \details   get mac ids of the Subutai Container is fetched from statically.
  */
-bool SubutaiContainer::getContainerMacAddresses()
+bool SubutaiContainer::getContainerInterfaces()
 {
-    macAddresses.clear();
+    interfaces.clear();
     if (this->status != RUNNING) return false;
 
     vector<string> v;
     string result = RunProgram("ifconfig", v);
     vector<string> lines = _helper.splitResult(result, "\n");
     containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Run ifconfig on LXC"));
-
+    string nic = "", address = "", ip = ""; bool found_name=false, found_mac = false, found_ip = false;
     for (vector<string>::iterator it = lines.begin(); it != lines.end(); it++)
     {
     	vector<string> splitted = _helper.splitResult((*it), " ");
-
+    	if((*it).at(0) != ' ')
+    	{
+    		found_name = true; found_mac = false; found_ip = false;
+    		nic = splitted[0];
+    	}
     	if(splitted.size() > 0)
     	{
-			string nic = splitted[0], address = "";
-			bool found = false;
+			bool found_m = false, found_i = false;
 
 			for (vector<string>::iterator it_s = splitted.begin(); it_s != splitted.end(); it_s++)
 			{
-				if(found)
+				if(found_m)
 				{
-					address = *it_s; break;
+					found_mac = true;
+					address = *it_s;
+					found_m = false;
 				}
-				if(!strcmp((*it_s).c_str(), "HWaddr")) found = true;
+				if(!strcmp((*it_s).c_str(), "HWaddr")) found_m = true;
+				if(found_i)
+				{
+					found_ip = true;
+					ip = _helper.splitResult((*it_s), " ")[1];
+					found_i = false;
+				}
+				if(!strcmp((*it_s).c_str(), "inet")) found_i = true;
 			}
 
-			if(found)
+			if(found_mac && found_name && found_ip)
 			{
-				macAddresses.insert(pair<string, string>(nic, address));
-			    containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Adding mac: " + nic + " " + address));
+				struct Interface interface_n;
+				interface_n.name = nic; interface_n.mac = address; interface_n.ip = ip;
+				interfaces.push_back(interface_n);
+			    containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Adding interface: " + nic + " " + address + " " + ip));
+			    found_mac = false; found_ip = false; found_name = false; nic = ""; address = ""; ip = "";
 			}
     	}
     }
@@ -292,7 +306,7 @@ void SubutaiContainer::setContainerStatus(containerStatus status)
 
 /**
  *  \details   IpAddress of the SubutaiContainer machine is fetched from statically.
- */
+ *//*
 bool SubutaiContainer::getContainerIpAddress()
 {
     containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "get container ip addresses"));
@@ -323,7 +337,7 @@ bool SubutaiContainer::getContainerIpAddress()
     } else {
         return false;
     }
-}
+}*/
 
 void SubutaiContainer::write()
 {
@@ -357,18 +371,12 @@ lxc_container* SubutaiContainer::getLxcContainerValue()
 /**
  *  \details   getting SubutaiContainer macaddress value for a given interface.
  */
-string SubutaiContainer::getContainerMacAddressValue(string network)
+vector<Interface> SubutaiContainer::getContainerInterfaceValues()
 {
-    return macAddresses.find(network)->second;
+	return interfaces;
 }
 
-/**
- *  \details   getting SubutaiContainer Ip values.
- */
-vector<string> SubutaiContainer::getContainerIpValue()
-{
-    return ipAddress;
-}
+
 
 /**
  *  \details   update all field of Subutai Container
@@ -378,8 +386,7 @@ void SubutaiContainer::getContainerAllFields()
     containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "get all container fields"));
     clear();
     getContainerId();
-    getContainerMacAddresses();
-    getContainerIpAddress();
+    getContainerInterfaces();
 
     UpdateUsersList();
 }
