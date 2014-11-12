@@ -386,10 +386,10 @@ int main(int argc,char *argv[],char *envp[])
                                                 Watcher.stats();
                                                 Watcher.stats();
                                         }
-                                        else if (command.getType() == "INOTIFY_LIST_REQUEST") {
+                                        else if (command.getType() == "LIST_INOTIFY_REQUEST") {
                                                 logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "executing INOTIFY_SHOW_REQUEST.."));
                                                 Watcher.stats();
-                                                sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(), response.getConfPoints());
+                                                sendout = response.createInotifyShowMessage(environment.getAgentUuidValue(), command.getCommandId(), response.getConfPoints());
                                                 connection->sendMessage(sendout);
                                                 Watcher.stats();
                                                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>", "Sending Inotify Show Message: ", sendout));

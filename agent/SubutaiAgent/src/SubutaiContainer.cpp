@@ -93,16 +93,13 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
 	}
     _params[i] = NULL;
 
-    // DEBUG
-
 #if _DEBUG
     for (int __j = 0; __j < params.size() + 2; __j++) {
         cout << "<DEBUG> PARAMS DATA: " << _params[__j] << endl;
     }
 #endif
 
-
-    //   run command on LXC and read stdout into buffer.
+    // run command on LXC and read stdout into buffer.
     int fd[2];
     int _stdout = dup(1);
     ExecutionResult result;
@@ -165,14 +162,11 @@ void SubutaiContainer::UpdateUsersList()
     while (getline(ss, line, '\n')) {
         int uid;
         string uname;
-
         std::size_t found_first  = line.find(":");
         std::size_t found_second = line.find(":", found_first+1);
         std::size_t found_third  = line.find(":", found_second+1);
-
         uname = line.substr(0, found_first);
         uid   = atoi(line.substr(found_second+1, found_third).c_str());
-
         this->_users.insert(make_pair(uid, uname));
         containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Adding user: " + _helper.toString(uid) + " " + uname));
     }
@@ -323,7 +317,7 @@ bool SubutaiContainer::getContainerIpAddress()
     containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "get container interfaces"));
 
     int i = 0;
-    if(interfaces != NULL)
+    if (interfaces != NULL)
     {
         while (interfaces[i] != NULL) {
             char** ips = this->container->get_ips(this->container, interfaces[i], "inet", 0);
@@ -331,7 +325,7 @@ bool SubutaiContainer::getContainerIpAddress()
             int j = 0;
             while (ips[j] != NULL) {
                 ipAddress.push_back(ips[j]);
-                containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Adding " + ipAddress.at(ipAddress.size()-1) + ".."));
+                containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Adding " + ipAddress.at(ipAddress.size() - 1) + ".."));
                 j++;
             }
             i++;
@@ -471,11 +465,9 @@ ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command)
     vector<string> pr = ExplodeCommandArguments(command);
     string program = "subutai-run";
     vector<string> args;
-    args.push_back("'");
     for (vector<string>::iterator it = pr.begin(); it != pr.end(); it++) {
         args.push_back((*it));
     }
-    args.push_back("'");
     args.push_back(command->getCommandId());
 
     // execute program on LXC

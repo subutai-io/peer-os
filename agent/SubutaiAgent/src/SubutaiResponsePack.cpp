@@ -221,7 +221,7 @@ string SubutaiResponsePack::createTimeoutMessage(string uuid,int pid,int request
 string SubutaiResponsePack::createInotifyMessage(string uuid ,string configPoint,string dateTime,string changeType)
 {
 	clear();
-	this->setType("INOTIFY_ACTION_RESPONSE");
+	this->setType("INOTIFY_EVENT");
 	this->setUuid(uuid);
 	this->setconfigPoint(configPoint);
 	this->setDateTime(dateTime);
@@ -234,11 +234,12 @@ string SubutaiResponsePack::createInotifyMessage(string uuid ,string configPoint
 /**
  *  \details   This method creates Inotify showing all watcher message.
  */
-string SubutaiResponsePack::createInotifyShowMessage(string uuid ,vector<string>  configPoint)
+string SubutaiResponsePack::createInotifyShowMessage(string uuid, string commandId, vector<string>  configPoint)
 {
 	clear();
-	this->setType("INOTIFY_LIST_RESPONSE");
+	this->setType("LIST_INOTIFY_RESPONSE");
 	this->setUuid(uuid);
+    this->setCommandId(commandId);
 	this->setConfPoints(configPoint);
 	this->serialize(sendout);
 	return sendout;

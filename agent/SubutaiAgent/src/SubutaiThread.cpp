@@ -758,7 +758,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
             if (!container) {
                 //executing the process on background
                 stringstream cmd;
-                cmd << "subutai-run '" << createExecString(command) << "' " << command->getCommandId();
+                cmd << "subutai-run " << createExecString(command) << " " << command->getCommandId();
                 system(cmd.str().c_str());
             } else {
                 container->RunDaemon(command);
