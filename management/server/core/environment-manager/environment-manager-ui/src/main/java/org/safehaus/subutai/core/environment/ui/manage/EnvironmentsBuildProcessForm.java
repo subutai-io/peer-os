@@ -241,7 +241,15 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 executorService.shutdown();
                 executorServiceMap.remove( uuid );
                 environmentBuildProcess.setProcessStatusEnum( ProcessStatusEnum.TERMINATED );
-                module.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
+                try
+                {
+                    module.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
+                    Notification.show( "Saved" );
+                }
+                catch ( EnvironmentManagerException e )
+                {
+                    Notification.show( e.toString() );
+                }
             }
             Notification.show( "Terminated" );
         }
@@ -305,25 +313,25 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         actionBtn.setEnabled( false );
                         p.setValue( new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) );
 
-                        ebp.setProcessStatusEnum( ProcessStatusEnum.IN_PROGRESS );
-                        module.getEnvironmentManager().saveBuildProcess( ebp );
+                        //                        ebp.setProcessStatusEnum( ProcessStatusEnum.IN_PROGRESS );
+                        //                        module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.SUCCESS.equals( event.getEventType() ) )
                     {
                         p.setValue( new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) );
 
-                        ebp.setProcessStatusEnum( ProcessStatusEnum.SUCCESSFUL );
-                        module.getEnvironmentManager().saveBuildProcess( ebp );
+                        //                        ebp.setProcessStatusEnum( ProcessStatusEnum.SUCCESSFUL );
+                        //                        module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.FAIL.equals( event.getEventType() ) )
                     {
                         p.setValue( new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) ) );
 
-                        ebp.setProcessStatusEnum( ProcessStatusEnum.FAILED );
+                        //                        ebp.setProcessStatusEnum( ProcessStatusEnum.FAILED );
                     }
                 }
 
-                module.getEnvironmentManager().saveBuildProcess( ebp );
+                //                module.getEnvironmentManager().saveBuildProcess( ebp );
             }
         } );
     }
