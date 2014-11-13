@@ -73,33 +73,7 @@ public class ZookeeperClusterOperationHandler extends AbstractPluginOperationHan
     public void run()
     {
         Preconditions.checkNotNull( zookeeperClusterConfig, "Configuration is null !!!" );
-        switch ( operationType )
-        {
-            case INSTALL:
-//                executor.execute( new Runnable()
-//                {
-//                    public void run()
-//                    {
-                        setupCluster();
-//                    }
-//                } );
-                break;
-            case UNINSTALL:
-//                executor.execute( new Runnable()
-//                {
-//                    public void run()
-//                    {
-                        destroyCluster();
-//                    }
-//                } );
-                break;
-            case START_ALL:
-            case STOP_ALL:
-            case STATUS_ALL:
-            case ADD:
-                runOperationOnContainers( operationType );
-                break;
-        }
+        runOperationOnContainers( operationType );
     }
 
 
@@ -107,28 +81,34 @@ public class ZookeeperClusterOperationHandler extends AbstractPluginOperationHan
     public void runOperationOnContainers( ClusterOperationType clusterOperationType )
     {
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
-        List<CommandResult> commandResultList = new ArrayList<CommandResult>(  );
+        List<CommandResult> commandResultList = new ArrayList<>(  );
         switch ( clusterOperationType )
         {
+            case INSTALL:
+                setupCluster();
+                break;
+            case UNINSTALL:
+                destroyCluster();
+                break;
             case START_ALL:
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     commandResultList.add( executeCommand( containerHost,
-                            new Commands().getStartCommand() ) );
+                            Commands.getStartCommand() ) );
                 }
                 break;
             case STOP_ALL:
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     commandResultList.add( executeCommand( containerHost,
-                            new Commands().getStopCommand() ) );
+                            Commands.getStopCommand() ) );
                 }
                 break;
             case STATUS_ALL:
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     commandResultList.add( executeCommand( containerHost,
-                            new Commands().getStatusCommand() ) );
+                            Commands.getStatusCommand() ) );
                 }
                 break;
             case ADD:
@@ -207,7 +187,7 @@ public class ZookeeperClusterOperationHandler extends AbstractPluginOperationHan
         try
         {
             if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
-                List<CommandResult> commandResultList = new ArrayList<CommandResult>(  );
+                List<CommandResult> commandResultList = new ArrayList<>(  );
 
                 trackerOperation.addLog( "Uninstalling zookeeper on hadoop nodes" );
                 Environment zookeeperEnvironment =
