@@ -76,22 +76,22 @@ public class ZookeeperClusterOperationHandler extends AbstractPluginOperationHan
         switch ( operationType )
         {
             case INSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
+//                executor.execute( new Runnable()
+//                {
+//                    public void run()
+//                    {
                         setupCluster();
-                    }
-                } );
+//                    }
+//                } );
                 break;
             case UNINSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
+//                executor.execute( new Runnable()
+//                {
+//                    public void run()
+//                    {
                         destroyCluster();
-                    }
-                } );
+//                    }
+//                } );
                 break;
             case START_ALL:
             case STOP_ALL:
@@ -149,7 +149,7 @@ public class ZookeeperClusterOperationHandler extends AbstractPluginOperationHan
     private List<CommandResult> addNode()
     {
         List<CommandResult> commandResultList = new ArrayList<>();
-        trackerOperation.addLogDone( "Adding node on standalone Zookeeper cluster is not supported yet!" );
+        trackerOperation.addLogFailed( "Adding node on standalone Zookeeper cluster is not supported yet!" );
         return commandResultList;
     }
 

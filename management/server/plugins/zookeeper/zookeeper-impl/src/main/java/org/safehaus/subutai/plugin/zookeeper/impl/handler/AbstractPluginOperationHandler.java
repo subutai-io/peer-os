@@ -1,6 +1,7 @@
 package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.safehaus.subutai.common.command.CommandException;
@@ -9,6 +10,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.slf4j.Logger;
@@ -49,11 +51,25 @@ public abstract class AbstractPluginOperationHandler<T extends ApiBase, V extend
     }
 
 
+    public List<CommandResult> getFailedCommandResults( final List<CommandResult> commandResultList )
+    {
+        List<CommandResult> failedCommands = new ArrayList<>();
+        for ( CommandResult commandResult : commandResultList ) {
+            if ( ! commandResult.hasSucceeded() )
+                failedCommands.add( commandResult );
+        }
+        return failedCommands;
+    }
+
+
     public void logResults( TrackerOperation po, List<CommandResult> commandResultList )
     {
         Preconditions.checkNotNull( commandResultList );
         for ( CommandResult commandResult : commandResultList )
             po.addLog( commandResult.getStdOut() );
-        po.addLogDone( "" );
+        if ( po.getState() == OperationState.FAILED )
+            po.addLogFailed( "" );
+        else
+            po.addLogDone( "" );
     }
 }
