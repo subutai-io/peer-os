@@ -170,49 +170,33 @@ void SubutaiThread::lastCheckAndSend(message_queue *messageQueue, SubutaiCommand
             if (command->getStandardOutput() == "RETURN" && command->getStandardError() == "RETURN") {
                 // Send main buffers without blocking output and error
                 this->captureOutputBuffer(messageQueue, command, true, true);
-            }
-            else if (command->getStandardOutput() == "RETURN")
-            {
+            } else if (command->getStandardOutput() == "RETURN") {
                 // send main buffers with block error buff
                 this->geterrBuff().clear();
                 this->captureOutputBuffer(messageQueue, command, true, false);
-            }
-            else if (command->getStandardError() == "RETURN")
-            {
+            } else if (command->getStandardError() == "RETURN") {
                 // send main buffers with blocking error buff
                 this->getoutBuff().clear();
                 this->captureOutputBuffer(messageQueue, command, false, true);
-            }
-            else
-            {
+            } else {
                 this->getoutBuff().clear();
                 this->geterrBuff().clear();
             }
-        }
-        else if (outBuffsize != 0)
-        {
-            if (command->getStandardOutput() == "RETURN")
-            {
+        } else if (outBuffsize != 0) {
+            if (command->getStandardOutput() == "RETURN") {
                 // send main buffers without block output. (errbuff size is zero)
                 this->geterrBuff().clear();
                 this->captureOutputBuffer(messageQueue, command, true, false);
-            }
-            else
-            {
+            } else {
                 this->getoutBuff().clear();
                 this->geterrBuff().clear();
             }
-        }
-        else if (errBuffsize != 0)
-        {
-            if (command->getStandardError() == "RETURN")
-            {
+        } else if (errBuffsize != 0) {
+            if (command->getStandardError() == "RETURN") {
                 // send main buffers without block output. (errbuff size is zero)
                 this->getoutBuff().clear();
                 this->captureOutputBuffer(messageQueue, command, false, true);
-            }
-            else
-            {
+            } else {
                 this->getoutBuff().clear();
                 this->geterrBuff().clear();
             }
@@ -228,31 +212,20 @@ void SubutaiThread::checkAndSend(message_queue* messageQueue,SubutaiCommand* com
 {
     this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::checkAndSend> Method starts..."));
 
-    //if output is RETURN or CAPT_AND_RET
-    if (this->getOutputStream().getMode() == "RETURN")
-    {
-        if (command->getStandardError() == "NO")
-        {
-            /*
-             * send main buffers with blocking error
-             */
+    //if output is RETURN
+    if (this->getOutputStream().getMode() == "RETURN") {
+        if (command->getStandardError() == "NO") {
+            // send main buffers with blocking error
             this->geterrBuff().clear();
             this->captureOutputBuffer(messageQueue, command, false, false);
-        }
-        else	//stderr is not in capture mode so it will not be blocked
-        {
-            /*
-             * send main buffers without blocking
-             */
+        } else {	
+            //stderr is not in capture mode so it will not be blocked
+            // send main buffers without blocking
             this->captureOutputBuffer(messageQueue, command, false, false);
         }
-    }
-    else	//out capture or No so it should be blocked
-    {
+    } else {	//out capture or No so it should be blocked
         if (command->getStandardError() != "NO" ) {
-            /*
-             * send main buffers without block output
-             */
+            // send main buffers without block output
             this->getoutBuff().clear();
             this->captureOutputBuffer(messageQueue, command, false, false);
         }
@@ -306,9 +279,9 @@ void SubutaiThread::checkAndWrite(message_queue *messageQueue,SubutaiCommand* co
     if (errBuffsize > 0)	//if there is an error in the pipe, it will be set.
         this->setEXITSTATUS(1);
 
-    if ( outBuffsize >= MaxBuffSize || errBuffsize >= MaxBuffSize )
+    if (outBuffsize >= MaxBuffSize || errBuffsize >= MaxBuffSize)
     {
-        if ( outBuffsize >= MaxBuffSize && errBuffsize >= MaxBuffSize )		//Both buffer is big enough than standard size ?
+        if (outBuffsize >= MaxBuffSize && errBuffsize >= MaxBuffSize)		//Both buffer is big enough than standard size ?
         {
             string divisionOut = this->getoutBuff().substr(MaxBuffSize,(outBuffsize-MaxBuffSize));	//cut the excess string from output buffer
             this->getoutBuff() = this->getoutBuff().substr(0,MaxBuffSize);
@@ -322,7 +295,7 @@ void SubutaiThread::checkAndWrite(message_queue *messageQueue,SubutaiCommand* co
             this->setoutBuff(divisionOut);
             this->seterrBuff(divisionErr);
         }
-        else if ( outBuffsize >= MaxBuffSize )
+        else if (outBuffsize >= MaxBuffSize)
         {
             string divisionOut = this->getoutBuff().substr(MaxBuffSize, (outBuffsize-MaxBuffSize));	//cut the excess string from buffer
             this->getoutBuff() = this->getoutBuff().substr(0, MaxBuffSize);
@@ -336,7 +309,7 @@ void SubutaiThread::checkAndWrite(message_queue *messageQueue,SubutaiCommand* co
             this->geterrBuff().clear();
             this->setoutBuff(divisionOut);
         }
-        else if ( errBuffsize >= MaxBuffSize )
+        else if (errBuffsize >= MaxBuffSize)
         {
             string divisionErr = this->geterrBuff().substr(MaxBuffSize,(errBuffsize-MaxBuffSize));	//cut the excess string from buffer
             this->geterrBuff() = this->geterrBuff().substr(0,MaxBuffSize);
