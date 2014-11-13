@@ -22,20 +22,31 @@ public interface RepositoryManager
     /**
      * Removes package from repository
      *
-     * @param packageName - name of package
+     * @param packageName - full name of package
      *
      * @throws RepositoryException -  thrown if some error occurs during removal
      */
     public void removePackageByName( String packageName ) throws RepositoryException;
 
     /**
-     * Extracts package to /tmp directory, Extracted package contents will reside under /tmp/packageName direcotry
+     * Extracts package to /tmp directory, Extracted package contents will reside under /tmp/packageName directory
      *
-     * @param packageName - name of package
+     * @param packageName - full name of package
      *
      * @throws RepositoryException - thrown if some error occurs during extraction
      */
     public void extractPackageByName( String packageName ) throws RepositoryException;
+
+    /**
+     * Extracts specified files from the package to /tmp/packageName. They will reside in the same subdirectories as in
+     * the package
+     *
+     * @param packageName - full name of package
+     * @param files - relative paths to files inside the package
+     *
+     * @throws RepositoryException - thrown if some error occurs during extraction
+     */
+    public void extractPackageFiles( String packageName, Set<String> files ) throws RepositoryException;
 
 
     /**
@@ -53,7 +64,7 @@ public interface RepositoryManager
     /**
      * Returns detailed information about the specified package
      *
-     * @param packageName - name of package
+     * @param packageName - short name of package, taken from listPackages output
      *
      * @return - string containing package details
      *

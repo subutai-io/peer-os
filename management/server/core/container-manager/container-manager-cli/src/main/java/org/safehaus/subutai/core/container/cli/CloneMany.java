@@ -20,19 +20,19 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command( scope = "container", name = "clone-many" )
+@Command(scope = "container", name = "clone-many")
 public class CloneMany extends OsgiCommandSupport implements ContainerEventListener
 {
 
     ContainerManager containerManager;
 
-    @Argument( index = 0, required = true )
+    @Argument(index = 0, required = true)
     private String template;
-    @Argument( index = 1, required = true )
+    @Argument(index = 1, required = true)
     private int nodesCount;
-    @Argument( index = 2, required = true )
+    @Argument(index = 2, required = true)
     private String strategyId;
-    @Argument( index = 3, required = false )
+    @Argument(index = 3, required = false)
     private String criteriaList;
 
 
@@ -84,9 +84,5 @@ public class CloneMany extends OsgiCommandSupport implements ContainerEventListe
     {
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis( containerEvent.getTimestamp() );
-        System.out.println(
-                String.format( "%1$s: %2$s %3$s -< %4$s %5$tm %5$te,%5$tY %5$tT", containerEvent.getEventType(),
-                        containerEvent.getEnvId(), containerEvent.getParentHostname(), containerEvent.getHostname(),
-                        cal ) );
     }
 }

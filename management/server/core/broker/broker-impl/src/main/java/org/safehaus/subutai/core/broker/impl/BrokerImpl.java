@@ -107,8 +107,8 @@ public class BrokerImpl implements Broker
     public void init() throws BrokerException
     {
         //TODO enable below lines after migration to new agent
-       // setupConnectionPool();
-       // setupRouter();
+        setupConnectionPool();
+        setupRouter();
     }
 
 

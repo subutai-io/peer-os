@@ -26,6 +26,8 @@ public interface Host extends Serializable
 
     public UUID getPeerId();
 
+    public void setPeerId( UUID peerId );
+
     public UUID getId();
 
     public String getParentHostname();
