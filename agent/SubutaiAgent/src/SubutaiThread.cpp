@@ -134,7 +134,7 @@ void SubutaiThread::retrieveDaemonOutput(SubutaiCommand* command) {
     // TBD
 }
 
-string SubutaiThread::captureOutputBuffer(message_queue* messageQueue, SubutaiCommand* command, bool outputBuffer, bool errorBuffer) {
+void SubutaiThread::captureOutputBuffer(message_queue* messageQueue, SubutaiCommand* command, bool outputBuffer, bool errorBuffer) {
     string message = this->getResponse().createResponseMessage(
             command->getUuid(),
             this->getPpid(),
@@ -143,10 +143,10 @@ string SubutaiThread::captureOutputBuffer(message_queue* messageQueue, SubutaiCo
             this->geterrBuff(),
             this->getoutBuff(),
             command->getCommandId());
-    this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::lastCheckAndSend1> " "Message was created for send to the shared memory","Message:",message));
+    this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::lastCheckAndSend> " "Message was created for send to the shared memory","Message:",message));
     while (!messageQueue->try_send(message.data(), message.size(), 0));
     this->getResponsecount() = this->getResponsecount() + 1;
-    this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::lastCheckAndSend1> " "Message was created and sent to the shared memory"));
+    this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::lastCheckAndSend> " "Message was created and sent to the shared memory"));
     if (outputBuffer) {
         this->getoutBuff().clear();
     }
@@ -168,24 +168,18 @@ void SubutaiThread::lastCheckAndSend(message_queue *messageQueue, SubutaiCommand
     if (outBuffsize != 0 || errBuffsize != 0) {
         if (outBuffsize != 0 && errBuffsize!= 0) {
             if (command->getStandardOutput() == "RETURN" && command->getStandardError() == "RETURN") {
-                /*
-                 * send main buffers without blocking output and error
-                 */
+                // Send main buffers without blocking output and error
                 this->captureOutputBuffer(messageQueue, command, true, true);
             }
             else if (command->getStandardOutput() == "RETURN")
             {
-                /*
-                 * send main buffers with block error buff
-                 */
+                // send main buffers with block error buff
                 this->geterrBuff().clear();
                 this->captureOutputBuffer(messageQueue, command, true, false);
             }
             else if (command->getStandardError() == "RETURN")
             {
-                /*
-                 * send main buffers with blocking error buff
-                 */
+                // send main buffers with blocking error buff
                 this->getoutBuff().clear();
                 this->captureOutputBuffer(messageQueue, command, false, true);
             }
@@ -199,9 +193,7 @@ void SubutaiThread::lastCheckAndSend(message_queue *messageQueue, SubutaiCommand
         {
             if (command->getStandardOutput() == "RETURN")
             {
-                /*
-                 * send main buffers without block output. (errbuff size is zero)
-                 */
+                // send main buffers without block output. (errbuff size is zero)
                 this->geterrBuff().clear();
                 this->captureOutputBuffer(messageQueue, command, true, false);
             }
@@ -215,9 +207,7 @@ void SubutaiThread::lastCheckAndSend(message_queue *messageQueue, SubutaiCommand
         {
             if (command->getStandardError() == "RETURN")
             {
-                /*
-                 * send main buffers without block output. (errbuff size is zero)
-                 */
+                // send main buffers without block output. (errbuff size is zero)
                 this->getoutBuff().clear();
                 this->captureOutputBuffer(messageQueue, command, false, true);
             }
@@ -239,56 +229,32 @@ void SubutaiThread::checkAndSend(message_queue* messageQueue,SubutaiCommand* com
     this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::checkAndSend> Method starts..."));
 
     //if output is RETURN or CAPT_AND_RET
-    if ( this->getOutputStream().getMode() == "RETURN" || this->getOutputStream().getMode() == "CAPTURE_AND_RETURN" )
+    if (this->getOutputStream().getMode() == "RETURN")
     {
-        if (command->getStandardError() == "CAPTURE" || command->getStandardError() == "NO" )
+        if (command->getStandardError() == "NO")
         {
             /*
              * send main buffers with blocking error
              */
             this->geterrBuff().clear();
-
-            string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                    this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getCommandId());
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndSend1> " "Message was created for sending to the shared memory","Message:",message));
-            while (!messageQueue->try_send(message.data(), message.size(), 0));
-            this->getResponsecount() = this->getResponsecount()+1;
-            this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::checkAndSend1> " "Message was created and sent to the shared memory"));
+            this->captureOutputBuffer(messageQueue, command, false, false);
         }
         else	//stderr is not in capture mode so it will not be blocked
         {
             /*
              * send main buffers without blocking
              */
-            string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                    this->getResponsecount(),this->geterrBuff(),this->getoutBuff(),command->getCommandId());
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndSend2> " "Message was created for sending to the shared memory","Message:",message));
-            while (!messageQueue->try_send(message.data(), message.size(), 0));
-            this->getResponsecount() = this->getResponsecount()+1;
-            this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::checkAndSend2> " "Message was created and sent to the shared memory"));
+            this->captureOutputBuffer(messageQueue, command, false, false);
         }
     }
     else	//out capture or No so it should be blocked
     {
-        if (command->getStandardError() == "CAPTURE" || command->getStandardError() == "NO" )
-        {
-            /*
-             * send main buffers with blocking error and output
-             */
-            //Nothing will be send..
-        }
-        else	//stderr is not in capture mode so it will not be blocked
-        {
+        if (command->getStandardError() != "NO" ) {
             /*
              * send main buffers without block output
              */
             this->getoutBuff().clear();
-            string message = this->getResponse().createResponseMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(),
-                    this->getResponsecount(), this->geterrBuff(), this->getoutBuff(), command->getCommandId());
-            this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::checkAndSend2> " "Message was created for sending to the shared memory","Message:",message));
-            while (!messageQueue->try_send(message.data(), message.size(), 0));
-            this->getResponsecount() = this->getResponsecount()+1;
-            this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::checkAndSend2> " "Message was created and sent to the shared memory"));
+            this->captureOutputBuffer(messageQueue, command, false, false);
         }
 
     }
