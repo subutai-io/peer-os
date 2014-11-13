@@ -273,7 +273,6 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
         LOG.info( String.format( "=============> Received: %s %d %s", nodeGroupName, quantity,
                 creatorPeerId.toString() ) );
 
-        Set<ContainerHost> result = new HashSet<>();
         try
         {
             for ( Template t : templates )

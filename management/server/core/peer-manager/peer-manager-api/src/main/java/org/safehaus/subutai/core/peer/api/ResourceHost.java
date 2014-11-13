@@ -404,34 +404,6 @@ public class ResourceHost extends SubutaiHost
                 }
             }
         } );
-
-        //        ExecutorCompletionService completionService = new ExecutorCompletionService<>( getExecutor() );
-        //        completionService.submit( new Callable()
-        //        {
-        //            @Override
-        //            public ContainerHost call() throws Exception
-        //            {
-        //                return create( creatorPeerId, environmentId, templates, containerName );
-        //            }
-        //        } );
-        //
-        //        ContainerHost result = null;
-        //        try
-        //        {
-        //            Future<ContainerHost> future = completionService.take();
-        //            result = future.get();
-        //            if ( !result.getHostname().equals( containerName ) )
-        //            {
-        //                throw new PeerException(
-        //                        String.format( "Invalid host name. Requested %s <> actual %", result.getHostname(),
-        //                                containerName ) );
-        //            }
-        //            return result;
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            throw new PeerException( e.toString() );
-        //        }
     }
 
 
