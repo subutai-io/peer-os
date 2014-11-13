@@ -41,7 +41,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 //import org.safehaus.subutai.plugin.common.PluginDao;
-
+//
 //import org.safehaus.subutai.core.agent.api.AgentManager;
 
 
@@ -267,8 +267,12 @@ public class CassandraImpl implements Cassandra
         blueprint.setExchangeSshKeys( true );
 
         NodeGroup nodeGroup = new NodeGroup();
+        nodeGroup.setName( config.PRODUCT_NAME );
+        nodeGroup.setLinkHosts( true );
+        nodeGroup.setExchangeSshKeys( true );
+        nodeGroup.setDomainName( Common.DEFAULT_DOMAIN_NAME );
         nodeGroup.setTemplateName( config.getTemplateName() );
-        nodeGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        nodeGroup.setPlacementStrategy( new PlacementStrategy( "ROUND_ROBIN" ) );
         nodeGroup.setNumberOfNodes( config.getNumberOfNodes() );
 
         blueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );

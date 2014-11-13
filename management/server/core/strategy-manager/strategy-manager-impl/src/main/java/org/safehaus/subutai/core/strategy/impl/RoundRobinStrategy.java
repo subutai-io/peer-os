@@ -1,18 +1,14 @@
 package org.safehaus.subutai.core.strategy.impl;
 
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.strategy.api.AbstractContainerPlacementStrategy;
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
-
-import com.google.common.collect.Lists;
 
 
 public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
@@ -36,7 +32,7 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
 
 
     @Override
-    public void calculatePlacement( int nodesCount, Map<Agent, ServerMetric> serverMetrics, List<Criteria> criteria )
+    public void calculatePlacement( int nodesCount, List<ServerMetric> serverMetrics, List<Criteria> criteria )
             throws StrategyException
     {
         if ( serverMetrics == null || serverMetrics.isEmpty() )
@@ -44,13 +40,14 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
             return;
         }
 
-        List<Agent> ls = sortServers( serverMetrics );
+        List<ServerMetric> sortedMetrics = sortServers( serverMetrics );
+
 
         // distribute required nodes among servers in round-robin fashion
-        Map<Agent, Integer> slots = new HashMap<>();
+        Map<ServerMetric, Integer> slots = new HashMap<>();
         for ( int i = 0; i < nodesCount; i++ )
         {
-            Agent best = ls.get( i % ls.size() );
+            ServerMetric best = sortedMetrics.get( i % sortedMetrics.size() );
             if ( slots.containsKey( best ) )
             {
                 slots.put( best, slots.get( best ) + 1 );
@@ -62,17 +59,9 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
         }
         // add node distribution counts
         clearPlacementInfo();
-        for ( Map.Entry<Agent, Integer> e : slots.entrySet() )
+        for ( Map.Entry<ServerMetric, Integer> e : slots.entrySet() )
         {
             addPlacementInfo( e.getKey(), DEFAULT_NODE_TYPE, e.getValue() );
         }
-    }
-
-
-    protected List<Agent> sortServers( Map<Agent, ServerMetric> serverMetrics ) throws StrategyException
-    {
-        List<Agent> ls = Lists.newArrayList( serverMetrics.keySet() );
-        Collections.sort( ls );
-        return ls;
     }
 }

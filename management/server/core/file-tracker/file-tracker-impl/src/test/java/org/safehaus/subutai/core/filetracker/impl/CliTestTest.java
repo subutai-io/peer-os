@@ -1,18 +1,18 @@
 package org.safehaus.subutai.core.filetracker.impl;
 
 
-import java.util.Collections;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.filetracker.api.FileTracker;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.ManagementHost;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.UUID;
+
+import static org.mockito.Mockito.*;
 
 
 /**
@@ -20,25 +20,25 @@ import static org.mockito.Mockito.when;
  */
 public class CliTestTest
 {
-    private AgentManager agentManager;
+    private PeerManager peerManager;
     private CliTest cliTest;
-
+    private FileTracker fileTracker;
 
     @Before
     public void setupClasses()
     {
-        agentManager = mock( AgentManager.class );
-        final FileTracker fileTracker = mock( FileTracker.class );
+        peerManager = mock( PeerManager.class );
+        fileTracker  = mock( FileTracker.class );
         cliTest = new CliTest();
-        cliTest.setAgentManager( agentManager );
         cliTest.setFileTracker( fileTracker );
+        cliTest.setPeerManager(peerManager);
     }
 
 
     @Test( expected = NullPointerException.class )
-    public void shouldThrowNullPointerExceptionOnSetAgentManager()
+    public void shouldThrowNullPointerExceptionOnSetPeerManager()
     {
-        cliTest.setAgentManager( null );
+        cliTest.setPeerManager( null );
     }
 
 
@@ -49,13 +49,13 @@ public class CliTestTest
     }
 
 
-    @Test
-    public void shouldAccessFileTrackerAndAgentManagerOnDoExecute()
-    {
-        when( agentManager.getAgents() ).thenReturn( Collections.<Agent>emptySet() );
-        cliTest.doExecute();
-        verify( agentManager ).getAgents();
-    }
+    //    @Test
+    //    public void shouldAccessFileTrackerAndAgentManagerOnDoExecute()
+    //    {
+    //        when( agentManager.getAgents() ).thenReturn( Collections.<Agent>emptySet() );
+    //        cliTest.doExecute();
+    //        verify( agentManager ).getAgents();
+    //    }
 
 
     @Test
@@ -63,5 +63,25 @@ public class CliTestTest
     {
         Response response = mock( Response.class );
         cliTest.onResponse( response );
+    }
+
+    @Test
+    public void testDoExecute() throws Exception {
+
+        String[] CONFIG_POINTS = new String[] { "/etc", "/etc/subutai-agent" };
+
+        ManagementHost managementHost = new ManagementHost(mock(Agent.class), UUID.randomUUID());
+
+        LocalPeer localPeer = mock(LocalPeer.class);
+        when(peerManager.getLocalPeer()).thenReturn(localPeer);
+
+        when(localPeer.getManagementHost()).thenReturn(managementHost);
+
+        cliTest.doExecute();
+
+
+        verify(fileTracker).createConfigPoints(managementHost,CONFIG_POINTS);
+        verify(peerManager).getLocalPeer();
+        verify(peerManager.getLocalPeer()).getManagementHost();
     }
 }

@@ -1,0 +1,12 @@
+Source: subutai-cli-net
+Section: devel
+Priority: optional
+Maintainer: Subutai
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.4
+Homepage: http://www.safehaus.org
+
+Package: subutai-cli-net
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, subutai-cli, openvswitch-common
+Description: Describe what this subutai cli net package is for

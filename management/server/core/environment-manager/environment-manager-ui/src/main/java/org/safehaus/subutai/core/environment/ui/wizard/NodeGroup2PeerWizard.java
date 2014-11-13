@@ -8,7 +8,8 @@ import java.util.Map;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.core.environment.api.TopologyEnum;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
+import org.safehaus.subutai.core.environment.api.topology.NodeGroup2PeerData;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.Peer;
 
@@ -181,7 +182,7 @@ public class NodeGroup2PeerWizard extends Window
             nodeGroupMap.put( itemId, ng );
             //            }
         }
-        Button nextButton = new Button( "Build" );
+        Button nextButton = new Button( "Save build task" );
         nextButton.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -191,8 +192,15 @@ public class NodeGroup2PeerWizard extends Window
                 if ( !topology.isEmpty() || ngTopgTable.getItemIds().size() != topology.size() )
                 {
                     Map<Object, NodeGroup> map = getNodeGroupMap();
-                    managerUI.getEnvironmentManager()
-                             .saveBuildProcess( blueprint.getId(), topology, map, TopologyEnum.NODE_GROUP_2_PEER );
+                    try
+                    {
+                        managerUI.getEnvironmentManager()
+                                 .saveBuildProcess( new NodeGroup2PeerData( blueprint.getId(), topology, map ) );
+                    }
+                    catch ( EnvironmentManagerException e )
+                    {
+                        Notification.show( e.getMessage() );
+                    }
                 }
                 else
                 {
@@ -254,8 +262,7 @@ public class NodeGroup2PeerWizard extends Window
         Map<Object, Peer> topology = new HashMap<>();
         for ( Object itemId : getNgTopgTable().getItemIds() )
         {
-            ComboBox selection =
-                    ( ComboBox ) getNgTopgTable().getItem( itemId ).getItemProperty( "Put" ).getValue();
+            ComboBox selection = ( ComboBox ) getNgTopgTable().getItem( itemId ).getItemProperty( "Put" ).getValue();
             Peer peer = ( Peer ) selection.getValue();
 
             topology.put( itemId, peer );

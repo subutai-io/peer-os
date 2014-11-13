@@ -3,11 +3,10 @@ package org.safehaus.subutai.core.strategy.api;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
@@ -15,8 +14,8 @@ import org.safehaus.subutai.common.protocol.Agent;
  */
 public abstract class AbstractContainerPlacementStrategy implements ContainerPlacementStrategy
 {
-    private final Map<Agent, Map<String, Integer>> placementInfoMap = new HashMap<>();
-    private List<Criteria> criteria = new ArrayList<>();
+    private final Map<ServerMetric, Map<String, Integer>> placementInfoMap = new HashMap<>();
+    private List<CriteriaDef> criteria = new ArrayList<>();
 
 
     protected void clearPlacementInfo()
@@ -25,7 +24,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
     }
 
 
-    public final void addPlacementInfo( Agent physicalNode, String nodeType, int numberOfLxcsToCreate )
+    public final void addPlacementInfo( ServerMetric physicalNode, String nodeType, int numberOfLxcsToCreate )
     {
         if ( physicalNode == null )
         {
@@ -57,7 +56,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
      * @return map where key is a physical server and value is a map where key is type of node and value is a number of
      * lxcs to place on this server
      */
-    public Map<Agent, Map<String, Integer>> getPlacementInfoMap()
+    public Map<ServerMetric, Map<String, Integer>> getPlacementInfoMap()
     {
         return Collections.unmodifiableMap( placementInfoMap );
     }
@@ -71,7 +70,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
 
 
     @Override
-    public List<Criteria> getCriteria()
+    public List<CriteriaDef> getCriteriaDef()
     {
         return Collections.unmodifiableList( criteria );
     }
@@ -85,7 +84,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
      * @return map where key is a physical agent and value is a number of lxcs this physical server can accommodate
      */
     @Override
-    public Map<Agent, Integer> calculateSlots( int nodesCount, Map<Agent, ServerMetric> serverMetrics )
+    public Map<ServerMetric, Integer> calculateSlots( int nodesCount, List<ServerMetric> serverMetrics )
     {
         return null;
     }
@@ -97,10 +96,10 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
      * @return map where key is a physical server and value is a number of containers to be placed on that server
      */
     @Override
-    public Map<Agent, Integer> getPlacementDistribution()
+    public Map<ServerMetric, Integer> getPlacementDistribution()
     {
-        Map<Agent, Integer> res = new HashMap<>();
-        for ( Map.Entry<Agent, Map<String, Integer>> e : placementInfoMap.entrySet() )
+        Map<ServerMetric, Integer> res = new HashMap<>();
+        for ( Map.Entry<ServerMetric, Map<String, Integer>> e : placementInfoMap.entrySet() )
         {
             int total = 0;
             for ( Integer i : e.getValue().values() )
@@ -110,5 +109,21 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
             res.put( e.getKey(), total );
         }
         return res;
+    }
+
+
+    protected List<ServerMetric> sortServers( List<ServerMetric> serverMetrics ) throws StrategyException
+    {
+        List<ServerMetric> result = new ArrayList<>( serverMetrics );
+
+        Collections.sort( result, new Comparator<ServerMetric>()
+        {
+            @Override
+            public int compare( final ServerMetric o1, final ServerMetric o2 )
+            {
+                return o1.getHostname().compareTo( o2.getHostname() );
+            }
+        } );
+        return result;
     }
 }

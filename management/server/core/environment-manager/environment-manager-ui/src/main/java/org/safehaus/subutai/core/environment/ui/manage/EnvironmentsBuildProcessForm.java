@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.ProcessStatusEnum;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
@@ -99,85 +101,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
         {
             for ( final EnvironmentBuildProcess process : processList )
             {
-                Button viewButton = new Button( "Info" );
-                viewButton.addClickListener( new Button.ClickListener()
-                {
-                    @Override
-                    public void buttonClick( final Button.ClickEvent clickEvent )
-                    {
-                        Window window = genProcessWindow( process );
-                        window.setVisible( true );
-                    }
-                } );
-
-                Button processButton = null;
-                Button destroyButton = null;
-                Embedded icon = null;
-
-                switch ( process.getProcessStatusEnum() )
-                {
-                    case NEW_PROCESS:
-                    {
-                        processButton = new Button( "Build" );
-                        icon = new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) );
-                        processButton.addClickListener( new Button.ClickListener()
-                        {
-                            @Override
-                            public void buttonClick( final Button.ClickEvent clickEvent )
-                            {
-                                startBuildProcess( process );
-                            }
-                        } );
-
-                        break;
-                    }
-                    case IN_PROGRESS:
-                    {
-                        processButton = new Button( "Terminate" );
-                        icon = new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) );
-                        processButton.addClickListener( new Button.ClickListener()
-                        {
-                            @Override
-                            public void buttonClick( final Button.ClickEvent clickEvent )
-                            {
-                                terminateBuildProcess( process );
-                            }
-                        } );
-                        break;
-                    }
-                    case FAILED:
-                        icon = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
-                        break;
-                    case TERMINATED:
-                    {
-                        icon = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
-                        break;
-                    }
-                    case SUCCESSFUL:
-                    {
-                        icon = new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) );
-                        break;
-                    }
-
-                    default:
-                    {
-                        break;
-                    }
-                }
-
-                destroyButton = new Button( "Destroy" );
-                destroyButton.addClickListener( new Button.ClickListener()
-                {
-                    @Override
-                    public void buttonClick( final Button.ClickEvent clickEvent )
-                    {
-                        destroyBuildProcess( process );
-                        environmentsButton.click();
-                    }
-                } );
-                environmentsTable.addItem( new Object[] {
-                        process.getBlueprintId().toString(), icon, viewButton, processButton, destroyButton
-                }, process.getId() );
+                addProcessToTable( process );
             }
         }
         else
@@ -185,6 +109,99 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
             Notification.show( EnvAnswer.NO_BUILD_PROCESS.getAnswer() );
         }
         environmentsTable.refreshRowCache();
+    }
+
+
+    public void addProcessToTable( final EnvironmentBuildProcess process )
+    {
+        Button viewButton = new Button( "Info" );
+        viewButton.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                Window window = genProcessWindow( process );
+                window.setVisible( true );
+            }
+        } );
+
+        Button processButton = null;
+        Button destroyButton = null;
+        Embedded icon = null;
+
+        switch ( process.getProcessStatusEnum() )
+        {
+            case NEW_PROCESS:
+            {
+                processButton = new Button( "Build" );
+                icon = new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) );
+                processButton.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
+                        startBuildProcess( process );
+                    }
+                } );
+
+                break;
+            }
+            case IN_PROGRESS:
+            {
+                processButton = new Button( "Terminate" );
+                icon = new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) );
+                processButton.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
+                        terminateBuildProcess( process );
+                    }
+                } );
+                break;
+            }
+            case FAILED:
+                icon = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
+                break;
+            case TERMINATED:
+            {
+                icon = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
+                break;
+            }
+            case SUCCESSFUL:
+            {
+                icon = new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) );
+                break;
+            }
+
+            default:
+            {
+                break;
+            }
+        }
+
+        destroyButton = new Button( "Destroy" );
+        destroyButton.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                destroyBuildProcess( process );
+                environmentsButton.click();
+            }
+        } );
+        try
+        {
+            EnvironmentBlueprint blueprint =
+                    module.getEnvironmentManager().getEnvironmentBlueprint( process.getBlueprintId() );
+            environmentsTable.addItem( new Object[] {
+                    blueprint.getName(), icon, viewButton, processButton, destroyButton
+            }, process.getId() );
+        }
+        catch ( EnvironmentManagerException e )
+        {
+            Notification.show( e.getMessage() );
+        }
     }
 
 
@@ -224,7 +241,15 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 executorService.shutdown();
                 executorServiceMap.remove( uuid );
                 environmentBuildProcess.setProcessStatusEnum( ProcessStatusEnum.TERMINATED );
-                module.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
+                try
+                {
+                    module.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
+                    Notification.show( "Saved" );
+                }
+                catch ( EnvironmentManagerException e )
+                {
+                    Notification.show( e.toString() );
+                }
             }
             Notification.show( "Terminated" );
         }
@@ -242,13 +267,12 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     }
 
 
-    private void startBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
+    public void startBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
     {
 
         BuildProcessExecutor buildProcessExecutor = new BuildProcessExecutorImpl( environmentBuildProcess );
         buildProcessExecutor.addListener( this );
         ExecutorService executor = Executors.newCachedThreadPool();
-        executorServiceMap.put( environmentBuildProcess.getId(), executor );
 
 
         buildProcessExecutor.execute( executor,
@@ -289,25 +313,25 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         actionBtn.setEnabled( false );
                         p.setValue( new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) );
 
-                        ebp.setProcessStatusEnum( ProcessStatusEnum.IN_PROGRESS );
-                        module.getEnvironmentManager().saveBuildProcess( ebp );
+                        //                        ebp.setProcessStatusEnum( ProcessStatusEnum.IN_PROGRESS );
+                        //                        module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.SUCCESS.equals( event.getEventType() ) )
                     {
                         p.setValue( new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) );
 
-                        ebp.setProcessStatusEnum( ProcessStatusEnum.SUCCESSFUL );
-                        module.getEnvironmentManager().saveBuildProcess( ebp );
+                        //                        ebp.setProcessStatusEnum( ProcessStatusEnum.SUCCESSFUL );
+                        //                        module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.FAIL.equals( event.getEventType() ) )
                     {
                         p.setValue( new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) ) );
 
-                        ebp.setProcessStatusEnum( ProcessStatusEnum.FAILED );
+                        //                        ebp.setProcessStatusEnum( ProcessStatusEnum.FAILED );
                     }
                 }
 
-                module.getEnvironmentManager().saveBuildProcess( ebp );
+                //                module.getEnvironmentManager().saveBuildProcess( ebp );
             }
         } );
     }

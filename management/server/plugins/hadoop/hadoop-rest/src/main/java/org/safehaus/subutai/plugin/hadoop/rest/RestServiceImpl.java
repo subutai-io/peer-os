@@ -107,15 +107,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response restartNameNode( String clusterName )
-    {
-        HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( clusterName );
-        String operationId = JsonUtil.toJson( OPERATION_ID, hadoopManager.restartNameNode( hadoopClusterConfig ) );
-        return Response.status( Response.Status.OK ).entity( operationId ).build();
-    }
-
-
-    @Override
     public Response statusNameNode( String clusterName )
     {
         HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( clusterName );
@@ -153,15 +144,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response restartJobTracker( String clusterName )
-    {
-        HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( clusterName );
-        String operationId = JsonUtil.toJson( OPERATION_ID, hadoopManager.restartJobTracker( hadoopClusterConfig ) );
-        return Response.status( Response.Status.OK ).entity( operationId ).build();
-    }
-
-
-    @Override
     public Response statusJobTracker( String clusterName )
     {
         HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( clusterName );
@@ -183,30 +165,7 @@ public class RestServiceImpl implements RestService
     {
         Agent agent = agentManager.getAgentByHostname( hostname );
         String operationId = JsonUtil.toJson( OPERATION_ID,
-                hadoopManager.statusDataNode( hadoopManager.getCluster( clusterName ), agent ) );
-        return Response.status( Response.Status.OK ).entity( operationId ).build();
-    }
-
-
-    @Override
-    public Response blockDataNode( String clusterName, String lxcHostName )
-    {
-        HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( clusterName );
-        Agent agent = agentManager.getAgentByHostname( lxcHostName );
-
-        String operationId = JsonUtil.toJson( OPERATION_ID, hadoopManager.blockDataNode( hadoopClusterConfig, agent ) );
-        return Response.status( Response.Status.OK ).entity( operationId ).build();
-    }
-
-
-    @Override
-    public Response unblockDataNode( String clusterName, String lxcHostName )
-    {
-        HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( clusterName );
-        Agent agent = agentManager.getAgentByHostname( lxcHostName );
-
-        String operationId =
-                JsonUtil.toJson( OPERATION_ID, hadoopManager.unblockDataNode( hadoopClusterConfig, agent ) );
+                hadoopManager.statusDataNode( hadoopManager.getCluster( clusterName ), agent.getHostname() ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
 
@@ -216,32 +175,8 @@ public class RestServiceImpl implements RestService
     {
         Agent agent = agentManager.getAgentByHostname( hostname );
         HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( clusterName );
-        String operationId =
-                JsonUtil.toJson( OPERATION_ID, hadoopManager.statusTaskTracker( hadoopClusterConfig, agent ) );
-        return Response.status( Response.Status.OK ).entity( operationId ).build();
-    }
-
-
-    @Override
-    public Response blockTaskTracker( String clusterName, String lxcHostName )
-    {
-        HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( clusterName );
-        Agent agent = agentManager.getAgentByHostname( lxcHostName );
-
-        String operationId =
-                JsonUtil.toJson( OPERATION_ID, hadoopManager.blockTaskTracker( hadoopClusterConfig, agent ) );
-        return Response.status( Response.Status.OK ).entity( operationId ).build();
-    }
-
-
-    @Override
-    public Response unblockTaskTracker( String clusterName, String lxcHostName )
-    {
-        HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( clusterName );
-        Agent agent = agentManager.getAgentByHostname( lxcHostName );
-
-        String operationId =
-                JsonUtil.toJson( OPERATION_ID, hadoopManager.unblockTaskTracker( hadoopClusterConfig, agent ) );
+        String operationId = JsonUtil.toJson( OPERATION_ID,
+                hadoopManager.statusTaskTracker( hadoopClusterConfig, agent.getHostname() ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
 }

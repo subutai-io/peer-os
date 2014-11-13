@@ -599,8 +599,8 @@ public class Manager
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
-            executorService
-                    .execute( new StartTask( cassandra, tracker, config.getClusterName(), containerId, new CompleteEvent()
+            executorService.execute(
+                    new StartTask( cassandra, tracker, config.getClusterName(), containerId, new CompleteEvent()
                     {
                         @Override
                         public void onComplete( String result )
@@ -667,7 +667,14 @@ public class Manager
         if ( config != null )
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-            populateTable( nodesTable, environment.getContainers() );
+            if ( environment != null )
+            {
+                populateTable( nodesTable, environment.getContainers() );
+            }
+            else
+            {
+                Notification.show( String.format( "Could not get environment data" ) );
+            }
         }
         else
         {

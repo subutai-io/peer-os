@@ -17,11 +17,8 @@ import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.api.NodeType;
-import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.common.ui.AddNodeWindow;
 import org.safehaus.subutai.plugin.common.ui.BaseManager;
-import org.safehaus.subutai.plugin.common.ui.OperationTask;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
@@ -29,10 +26,8 @@ import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.SetupType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -227,7 +222,7 @@ public class Manager extends BaseManager
                         HadoopClusterConfig info = hadoopManager.getCluster( hadoopClusterName );
                         if ( info != null )
                         {
-                            HashSet<Agent> nodes = new HashSet<>( info.getAllNodes() );
+                            HashSet<UUID> nodes = new HashSet<>( info.getAllNodes() );
                             nodes.removeAll( config.getAllOozieAgents() );
                             if ( !nodes.isEmpty() )
                             {
@@ -292,7 +287,6 @@ public class Manager extends BaseManager
     }
 
 
-
     private void populateServerTable( final Table table, final Agent agent )
     {
         List<Agent> agentList = new ArrayList<>();
@@ -306,7 +300,7 @@ public class Manager extends BaseManager
     {
 
         table.removeAllItems();
-        List<Agent> agentList = new ArrayList<>();
+        List<UUID> agentList = new ArrayList<>();
         agentList.addAll( clientNodes );
         populateTable( table, agentList );
     }
@@ -389,10 +383,10 @@ public class Manager extends BaseManager
                     Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null )
                     {
-                        TerminalWindow terminal =
+                        /*TerminalWindow terminal =
                                 new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
                                         agentManager );
-                        contentRoot.getUI().addWindow( terminal.getWindow() );
+                        contentRoot.getUI().addWindow( terminal.getWindow() );*/
                     }
                     else
                     {
@@ -532,14 +526,14 @@ public class Manager extends BaseManager
                 checkButton.setEnabled( false );
                 Agent agent = getAgentByRow( row );
 
-                OperationType operationType;
+                NodeOperationType operationType;
                 if ( !isRunning )
                 {
-                    operationType = OperationType.Start;
+                    operationType = NodeOperationType.Start;
                 }
                 else
                 {
-                    operationType = OperationType.Stop;
+                    operationType = NodeOperationType.Stop;
                 }
                 executorService.execute(
                         new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
@@ -671,10 +665,10 @@ public class Manager extends BaseManager
                 checkButton.setEnabled( false );
                 Agent agent = getAgentByRow( row );
 
-                OperationType operationType;
+                NodeOperationType operationType;
                 if ( !isRunning )
                 {
-                    operationType = OperationType.Start;
+                    operationType = NodeOperationType.Start;
 
                     executorService.execute(
                             new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
@@ -706,10 +700,10 @@ public class Manager extends BaseManager
                 checkButton.setEnabled( false );
                 Agent agent = getAgentByRow( row );
 
-                OperationType operationType;
+                NodeOperationType operationType;
                 if ( !isRunning )
                 {
-                    operationType = OperationType.Stop;
+                    operationType = NodeOperationType.Stop;
 
                     executorService.execute(
                             new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
@@ -739,12 +733,11 @@ public class Manager extends BaseManager
                 checkButton.setEnabled( false );
                 Agent agent = getAgentByRow( row );
 
-                OperationType operationType = OperationType.Status;
+                NodeOperationType operationType = NodeOperationType.Status;
                 executorService.execute(
                         new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
                                 startStopCheckCompleteEvent( row ), null, agent ) );
             }
         };
     }
-
 }

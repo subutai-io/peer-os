@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.metric.api.MonitorException;
+import org.safehaus.subutai.core.peer.api.Payload;
 import org.slf4j.Logger;
 
 import static org.mockito.Matchers.anyString;
@@ -17,14 +17,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class RemoteAlertListenerTest
 {
 
     @Mock
     MonitorImpl monitor;
     @Mock
-    Message message;
+    Payload payload;
     @Mock
     ContainerHostMetricImpl metric;
     @Mock
@@ -44,15 +44,15 @@ public class RemoteAlertListenerTest
     @Test
     public void testOnMessage() throws Exception
     {
-        when( message.getPayload( ContainerHostMetricImpl.class ) ).thenReturn( metric );
+        when( payload.getMessage( ContainerHostMetricImpl.class ) ).thenReturn( metric );
 
-        remoteAlertListener.onMessage( message );
+        remoteAlertListener.onRequest( payload );
 
         verify( monitor ).alertThresholdExcess( metric );
 
         doThrow( new MonitorException( "" ) ).when( monitor ).alertThresholdExcess( metric );
 
-        remoteAlertListener.onMessage( message );
+        remoteAlertListener.onRequest( payload );
 
         verify( logger ).error( anyString(), isA( MonitorException.class ) );
     }

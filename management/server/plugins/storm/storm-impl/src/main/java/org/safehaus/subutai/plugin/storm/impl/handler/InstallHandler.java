@@ -1,33 +1,27 @@
 package org.safehaus.subutai.plugin.storm.impl.handler;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.tracker.OperationState;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 
 
 public class InstallHandler extends AbstractHandler
 {
 
-    private final StormConfig config;
+    private final StormClusterConfiguration config;
 
 
-    public InstallHandler( StormImpl manager, StormConfig config )
+    public InstallHandler( StormImpl manager, StormClusterConfiguration config )
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        this.trackerOperation = manager.getTracker().createTrackerOperation( StormConfig.PRODUCT_NAME,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( StormClusterConfiguration.PRODUCT_NAME,
                 "Install cluster " + config.getClusterName() );
     }
 
@@ -36,7 +30,7 @@ public class InstallHandler extends AbstractHandler
     public void run()
     {
         Environment env = null;
-        EnvironmentBuildTask eb = manager.getDefaultEnvironmentBlueprint( config );
+        EnvironmentBlueprint eb = manager.getDefaultEnvironmentBlueprint( config );
         try
         {
             trackerOperation.addLog( "Building environment..." );
@@ -74,28 +68,29 @@ public class InstallHandler extends AbstractHandler
 
     void destroyNodes( Environment env )
     {
+        trackerOperation.addLogFailed( "Destroy nodes is not provided by environment manager now. Aborting!" );
 
-        if ( env == null || env.getContainers().isEmpty() )
-        {
-            return;
-        }
-
-        Set<Agent> set = new HashSet<>( env.getContainers().size() );
-        for ( EnvironmentContainer n : env.getContainers() )
-        {
-            set.add( n.getAgent() );
-        }
-        trackerOperation.addLog( "Destroying node(s)..." );
-        try
-        {
-            manager.getContainerManager().clonesDestroy( set );
-            trackerOperation.addLog( "Destroying node(s) completed" );
-        }
-        catch ( LxcDestroyException ex )
-        {
-            String m = "Failed to destroy node(s)";
-            trackerOperation.addLog( m );
-            manager.getLogger().error( m, ex );
-        }
+        //        if ( env == null || env.getContainers().isEmpty() )
+//        {
+//            return;
+//        }
+//
+//        Set<Agent> set = new HashSet<>( env.getContainers().size() );
+//        for ( EnvironmentContainer n : env.getContainers() )
+//        {
+//            set.add( n.getAgent() );
+//        }
+//        trackerOperation.addLog( "Destroying node(s)..." );
+//        try
+//        {
+//            manager.getContainerManager().clonesDestroy( set );
+//            trackerOperation.addLog( "Destroying node(s) completed" );
+//        }
+//        catch ( LxcDestroyException ex )
+//        {
+//            String m = "Failed to destroy node(s)";
+//            trackerOperation.addLog( m );
+//            manager.getLogger().error( m, ex );
+//        }
     }
 }

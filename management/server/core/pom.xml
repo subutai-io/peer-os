@@ -30,6 +30,7 @@
     <module>lxc-quota-manager</module>
     <module>monitoring</module>
     <module>network-manager</module>
+    <module>security-manager</module>
     <module>peer-manager</module>
     <module>strategy-manager</module>
     <module>template-manager</module>
@@ -37,6 +38,11 @@
     <module>tracker</module>
     <module>metric</module>
     <module>messenger</module>
+    <module>script-manager</module>
+    <module>repository-manager</module>
+    <module>broker</module>
+    <module>host-registry</module>
+    <module>command-executor</module>
   </modules>
 
 </project>

@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.storm.api.Storm;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
 import com.vaadin.shared.ui.label.ContentMode;
@@ -36,11 +36,12 @@ public class VerificationStep extends Panel
                 + "(you may change them by clicking on Back button)</strong><br/>" );
         confirmationLbl.setContentMode( ContentMode.HTML );
 
-        StormConfig config = wizard.getConfig();
+        StormClusterConfiguration config = wizard.getConfig();
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", config.getClusterName() );
         if ( config.isExternalZookeeper() )
         {
+
             cfgView.addStringCfg( "Master node", config.getNimbus().getHostname() );
         }
         cfgView.addStringCfg( "Supervisor nodes count", config.getSupervisorsCount() + "" );
@@ -57,7 +58,7 @@ public class VerificationStep extends Panel
 
                 UUID trackID = storm.installCluster( wizard.getConfig() );
                 ProgressWindow window =
-                        new ProgressWindow( executorService, tracker, trackID, StormConfig.PRODUCT_NAME );
+                        new ProgressWindow( executorService, tracker, trackID, StormClusterConfiguration.PRODUCT_NAME );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override

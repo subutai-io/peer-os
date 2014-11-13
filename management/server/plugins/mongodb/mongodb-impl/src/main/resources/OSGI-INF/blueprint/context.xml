@@ -13,8 +13,8 @@
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
-  <reference id="containerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.container.api.container.ContainerManager" />
+  <reference id="peerManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
   <reference id="environmentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
@@ -23,7 +23,7 @@
     <property name="tracker" ref="tracker" />
     <property name="commandRunner" ref="commandRunner" />
     <property name="agentManager" ref="agentManager" />
-    <property name="containerManager" ref="containerManager" />
+    <property name="peerManager" ref="peerManager" />
     <property name="environmentManager" ref="environmentManager" />
     <argument ref="dataSource" />
   </bean>

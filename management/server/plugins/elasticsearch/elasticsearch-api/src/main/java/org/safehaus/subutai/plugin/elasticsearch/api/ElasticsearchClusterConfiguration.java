@@ -3,8 +3,8 @@ package org.safehaus.subutai.plugin.elasticsearch.api;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
@@ -15,21 +15,24 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
     public static final String PRODUCT_KEY = "Elasticsearch";
     public static final String PRODUCT_NAME = "elasticsearch";
 
-    public static final String templateName = "elastic";
+    public static final String templateName = "elasticsearch";
 
     private String clusterName = "";
     private int numberOfNodes;
-    private int numberOfMasterNodes;
-    private int numberOfDataNodes;
-    private int numberOfShards = 5;
-    private int numberOfReplicas = 5;
+    private UUID environmentId;
 
-    private Set<Agent> nodes = new HashSet<>();
-    private Set<Agent> masterNodes = new HashSet<>();
-    private Set<Agent> dataNodes = new HashSet<>();
+    private Set<UUID> nodes = new HashSet<>();
+    private Set<UUID> masterNodes = new HashSet<>();
+    private Set<UUID> dataNodes = new HashSet<>();
 
 
-    public static String getTemplateName()
+    public static PlacementStrategy getNodePlacementStrategy()
+    {
+        return new PlacementStrategy( "ROUND_ROBIN" );
+    }
+
+
+    public String getTemplateName()
     {
         return templateName;
     }
@@ -74,92 +77,50 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
     }
 
 
-    public int getNumberOfShards()
-    {
-        return numberOfShards;
-    }
-
-
-    public void setNumberOfShards( final int numberOfShards )
-    {
-        this.numberOfShards = numberOfShards;
-    }
-
-
-    public int getNumberOfReplicas()
-    {
-        return numberOfReplicas;
-    }
-
-
-    public void setNumberOfReplicas( final int numberOfReplicas )
-    {
-        this.numberOfReplicas = numberOfReplicas;
-    }
-
-
-    public int getNumberOfMasterNodes()
-    {
-        return numberOfMasterNodes;
-    }
-
-
-    public void setNumberOfMasterNodes( int numberOfSeeds )
-    {
-        this.numberOfMasterNodes = numberOfSeeds;
-    }
-
-
-    public int getNumberOfDataNodes()
-    {
-        return numberOfDataNodes;
-    }
-
-
-    public void setNumberOfDataNodes( int numberOfDataNodes )
-    {
-        this.numberOfDataNodes = numberOfDataNodes;
-    }
-
-
-    public Set<Agent> getNodes()
+    public Set<UUID> getNodes()
     {
         return nodes;
     }
 
 
-    public void setNodes( Set<Agent> nodes )
+    public void setNodes( Set<UUID> nodes )
     {
         this.nodes = nodes;
     }
 
 
-    public Set<Agent> getMasterNodes()
+    public Set<UUID> getMasterNodes()
     {
         return masterNodes;
     }
 
 
-    public void setMasterNodes( Set<Agent> nodes )
+    public void setMasterNodes( Set<UUID> nodes )
     {
         this.masterNodes = nodes;
     }
 
 
-    public Set<Agent> getDataNodes()
+    public Set<UUID> getDataNodes()
     {
         return dataNodes;
     }
 
 
-    public void setDataNodes( Set<Agent> nodes )
+    public void setDataNodes( Set<UUID> nodes )
     {
         this.dataNodes = nodes;
     }
 
 
-    public static PlacementStrategy getNodePlacementStrategy()
+    public UUID getEnvironmentId()
     {
-        return PlacementStrategy.ROUND_ROBIN;
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
     }
 }

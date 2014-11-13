@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
 
@@ -85,7 +85,7 @@ public interface ContainerManager
     public Map<String, EnumMap<ContainerState, List<String>>> getContainersOnPhysicalServers();
 
 
-    public Map<Agent, ServerMetric> getPhysicalServerMetrics();
+    public List<ServerMetric> getPhysicalServerMetrics();
 
     /**
      * Starts lxc on a given physical server
