@@ -38,6 +38,7 @@ public class HBasePortalModule implements PortalModule
 
     public void init()
     {
+        LOG.info( "HBase module initializing..." );
         executor = Executors.newCachedThreadPool();
     }
 

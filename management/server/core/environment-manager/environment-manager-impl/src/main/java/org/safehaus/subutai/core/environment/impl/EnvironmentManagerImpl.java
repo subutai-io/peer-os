@@ -280,16 +280,32 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void saveEnvironment( final Environment environment )
+    public void saveEnvironment( final Environment environment ) throws EnvironmentManagerException
     {
-        environmentDAO.saveInfo( ENVIRONMENT, environment.getId().toString(), environment );
+        try
+        {
+            environmentDAO.saveInfo( ENVIRONMENT, environment.getId().toString(), environment );
+        }
+        catch ( EnvironmentPersistenceException e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new EnvironmentManagerException( e.getMessage() );
+        }
     }
 
 
     @Override
-    public boolean saveBuildProcess( final EnvironmentBuildProcess buildProgress )
+    public boolean saveBuildProcess( final EnvironmentBuildProcess buildProgress ) throws EnvironmentManagerException
     {
-        return environmentDAO.saveInfo( PROCESS, buildProgress.getId().toString(), buildProgress );
+        try
+        {
+            return environmentDAO.saveInfo( PROCESS, buildProgress.getId().toString(), buildProgress );
+        }
+        catch ( EnvironmentPersistenceException e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new EnvironmentManagerException( e.getMessage() );
+        }
     }
 
 
@@ -307,6 +323,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBlueprintId() );
+            if ( blueprint == null )
+            {
+                throw new EnvironmentBuildException( "Blueprint not found..." );
+            }
             Environment environment = environmentBuilder.build( blueprint, process );
             saveEnvironment( environment );
 
@@ -319,6 +339,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             return environment;
         }
         catch ( EnvironmentPersistenceException | BuildException | EnvironmentConfigureException e )
+        {
+            throw new EnvironmentBuildException( e.getMessage() );
+        }
+        catch ( EnvironmentManagerException e )
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
@@ -477,12 +501,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 throw new EnvironmentBuildException( String.format( "FAILED create container on %s", peer.getId() ) );
             }
+            saveEnvironment( environment );
         }
         catch ( PeerException e )
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
-        saveEnvironment( environment );
+        catch ( EnvironmentManagerException e )
+        {
+            throw new EnvironmentBuildException( e.getMessage() );
+        }
     }
 
 
