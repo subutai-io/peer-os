@@ -18,7 +18,6 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.ui.SqoopComponent;
@@ -52,7 +51,7 @@ public class Manager
     protected static final String IP_COLUMN_CAPTION = "IP List";
     protected static final String BUTTON_STYLE_NAME = "default";
 
-    private final Button refreshClustersBtn, destroyClusterBtn, addNodeBtn;
+    private final Button refreshClustersBtn, destroyClusterBtn;
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
@@ -141,13 +140,6 @@ public class Manager
         controlsContent.addComponent( destroyClusterBtn );
 
 
-        /** Add Node button */
-        addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
-        addNodeBtn.setId( "sqoopMngAddNode" );
-        addNodeBtn.addStyleName( "default" );
-        addClickListenerToAddNodeButton();
-        controlsContent.addComponent( addNodeBtn );
-
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
 
@@ -189,54 +181,6 @@ public class Manager
                     } );
 
                     contentRoot.getUI().addWindow( alert.getAlert() );
-                }
-                else
-                {
-                    show( "Please, select cluster" );
-                }
-            }
-        } );
-    }
-
-
-    private void addClickListenerToAddNodeButton()
-    {
-        addNodeBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config != null )
-                {
-                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( config.getHadoopClusterName() );
-                    if ( hadoopConfig != null )
-                    {
-                        HashSet<UUID> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
-                        nodes.removeAll( config.getNodes() );
-                        if ( !nodes.isEmpty() )
-                        {
-                            Set<ContainerHost> hosts = environment.getHostsByIds( nodes );
-                            AddNodeWindow addNodeWindow
-                                    = new AddNodeWindow( sqoop, tracker, executorService, config, hosts );
-                            contentRoot.getUI().addWindow( addNodeWindow );
-                            addNodeWindow.addCloseListener( new Window.CloseListener()
-                            {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
-                                    refreshClustersInfo();
-                                }
-                            } );
-                        }
-                        else
-                        {
-                            show( "All nodes in corresponding Hadoop cluster have Lucene installed" );
-                        }
-                    }
-                    else
-                    {
-                        show( "Hadoop cluster info not found" );
-                    }
                 }
                 else
                 {

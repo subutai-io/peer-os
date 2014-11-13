@@ -15,7 +15,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.sqoop.api.DataSourceType;
@@ -84,43 +83,17 @@ public class RestService
     @POST
     @Path( "clusters" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response installCluster( @PathParam( "clusterName" ) String clusterName,
-                                    @QueryParam( "nodes" ) String nodes )
+    public Response installCluster( @QueryParam( "config" ) String config )
     {
 
-        SqoopConfig config = new SqoopConfig();
-        config.setClusterName( clusterName );
+        SqoopConfig sqoopConfig = JsonUtil.fromJson( config, SqoopConfig.class );
 
-        if ( nodes != null )
-        {
-            String[] arr = nodes.split( "[,;]" );
-            for ( String s : arr )
-            {
-                Agent a = agentManager.getAgentByHostname( s );
-                if ( a != null )
-                {
-                    config.getNodes().add( a );
-                }
-            }
-        }
-
-        UUID uuid = sqoopManager.installCluster( config );
+        UUID uuid = sqoopManager.installCluster( sqoopConfig );
 
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
         return Response.status( Response.Status.CREATED ).entity( operationId ).build();
     }
-
-
-    @POST
-    @Path( "clusters/{clusterName}/nodes/{hostname}" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    @Deprecated()
-    public Response addNode( @PathParam( "clusterName" ) String clusterName, @PathParam( "hostname" ) String hostname )
-    {
-        String operationId = JsonUtil.toJson( OPERATION_ID, null );
-        return Response.status( Response.Status.CREATED ).entity( operationId ).build();
-    }
-
+    
 
     @DELETE
     @Path( "clusters/{clusterName}/nodes/{hostname}" )
