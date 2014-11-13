@@ -39,7 +39,7 @@ public abstract class SqoopBase implements Sqoop
         }
         catch ( SQLException e )
         {
-            LOG.error( e.getMessage(), e );
+            LOG.error( "Failed to init DAO", e );
         }
 
         executor = Executors.newCachedThreadPool();
@@ -105,10 +105,5 @@ public abstract class SqoopBase implements Sqoop
         this.executor = executor;
     }
 
-
-    public Logger getLogger()
-    {
-        return LOG;
-    }
 }
 

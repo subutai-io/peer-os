@@ -25,11 +25,6 @@ class SetupStrategyWithHadoop extends SqoopSetupStrategy
 
         checkConfig();
 
-        if ( environment == null )
-        {
-            throw new ClusterSetupException( "Environment not specified" );
-        }
-
         if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );

@@ -44,6 +44,11 @@ abstract class SqoopSetupStrategy implements ClusterSetupStrategy
                     m + String.format( "Sqoop installation already exists: %s", config.getClusterName() ) );
         }
 
+        if ( environment == null )
+        {
+            throw new ClusterSetupException( "Environment not specified" );
+        }
+
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
             if ( config.getNodes() == null || config.getNodes().isEmpty() )

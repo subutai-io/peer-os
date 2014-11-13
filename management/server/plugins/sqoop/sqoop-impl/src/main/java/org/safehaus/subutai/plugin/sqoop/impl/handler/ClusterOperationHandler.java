@@ -18,6 +18,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
@@ -36,15 +37,19 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SqoopImpl,
     private HadoopClusterConfig hadoopConfig;
 
 
-    public ClusterOperationHandler( final SqoopImpl manager, final SqoopConfig config,
-                                    final ClusterOperationType operationType, HadoopClusterConfig hadoopClusterConfig )
+    public ClusterOperationHandler( SqoopImpl manager, SqoopConfig config, ClusterOperationType operationType )
     {
         super( manager, config );
         this.operationType = operationType;
-        this.hadoopConfig = hadoopClusterConfig;
 
         String desc = String.format( "Executing %s operation on cluster %s", operationType.name(), clusterName );
         this.trackerOperation = manager.getTracker().createTrackerOperation( SqoopConfig.PRODUCT_KEY, desc );
+    }
+
+
+    public void setHadoopConfig( HadoopClusterConfig hadoopConfig )
+    {
+        this.hadoopConfig = hadoopConfig;
     }
 
 
@@ -91,11 +96,11 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SqoopImpl,
                 try
                 {
                     trackerOperation.addLog( "Building environment..." );
-                    EnvironmentBlueprint eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
+                    Hadoop hadoop = manager.getHadoopManager();
+                    EnvironmentBlueprint eb = hadoop.getDefaultEnvironmentBlueprint( hadoopConfig );
                     env = manager.getEnvironmentManager().buildEnvironment( eb );
 
-                    ClusterSetupStrategy s = manager.getHadoopManager().getClusterSetupStrategy( env, hadoopConfig,
-                                                                                                 trackerOperation );
+                    ClusterSetupStrategy s = hadoop.getClusterSetupStrategy( env, hadoopConfig, trackerOperation );
                     s.setup();
                 }
                 catch ( ClusterSetupException | EnvironmentBuildException ex )
@@ -149,13 +154,13 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SqoopImpl,
     @Override
     public void destroyCluster()
     {
-        Environment env = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
         try
         {
             if ( manager.getCluster( clusterName ) == null )
             {
                 throw new ClusterException( "Sqoop installation not found: " + clusterName );
             }
+            Environment env = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
             if ( env == null )
             {
                 throw new ClusterException( "Environment not found: " + config.getEnvironmentId() );

@@ -33,7 +33,7 @@ public class SqoopImpl extends SqoopBase
     @Override
     public UUID installCluster( SqoopConfig config )
     {
-        AbstractOperationHandler h = new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL, null );
+        AbstractOperationHandler h = new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
         executor.execute( h );
         return h.getTrackerId();
     }
@@ -42,8 +42,8 @@ public class SqoopImpl extends SqoopBase
     @Override
     public UUID installCluster( SqoopConfig config, HadoopClusterConfig hadoopConfig )
     {
-        AbstractOperationHandler h = new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL,
-                                                                  hadoopConfig );
+        ClusterOperationHandler h = new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
+        h.setHadoopConfig( hadoopConfig );
         executor.execute( h );
         return h.getTrackerId();
     }
@@ -52,7 +52,8 @@ public class SqoopImpl extends SqoopBase
     @Override
     public UUID uninstallCluster( String clusterName )
     {
-        AbstractOperationHandler h = new ClusterOperationHandler( this, null, ClusterOperationType.UNINSTALL, null );
+        SqoopConfig config = getCluster( clusterName );
+        AbstractOperationHandler h = new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL );
         executor.execute( h );
         return h.getTrackerId();
     }
