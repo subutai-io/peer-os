@@ -44,9 +44,9 @@ public class CommandProcessorTest
     private static final UUID HOST_ID = UUID.randomUUID();
     private static final UUID COMMAND_ID = UUID.randomUUID();
     private static final String RESPONSE_JSON = String.format(
-            "  {" + "      \"type\":\"EXECUTE_RESPONSE\"," + "      \"id\":\"%s\"," + "      \"commandId\":\"%s\","
+            " { response: {" + "      \"type\":\"EXECUTE_RESPONSE\"," + "      \"id\":\"%s\"," + "      \"commandId\":\"%s\","
                     + "      \"pid\":123," + "      \"responseNumber\":2," + "      \"stdOut\":\"output\","
-                    + "      \"stdErr\":\"err\"," + "      \"exitCode\" : 0" + "  }", HOST_ID.toString(),
+                    + "      \"stdErr\":\"err\"," + "      \"exitCode\" : 0" + "  } }", HOST_ID.toString(),
             COMMAND_ID.toString() );
 
     @Mock

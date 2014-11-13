@@ -31,23 +31,15 @@ public class RepositoryManagerImpl implements RepositoryManager
     private static final String LINE_SEPARATOR = "\n";
     private static final String INVALID_PACKAGE_NAME = "Invalid package name";
 
-    private final ManagementHost managementHost;
+    private final PeerManager peerManager;
     protected Commands commands = new Commands();
 
 
-    public RepositoryManagerImpl( final PeerManager peerManager ) throws RepositoryException
+    public RepositoryManagerImpl( final PeerManager peerManager )
     {
         Preconditions.checkNotNull( peerManager, "Peer manager is null" );
 
-        try
-        {
-            managementHost = peerManager.getLocalPeer().getManagementHost();
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( "Error in constructor", e );
-            throw new RepositoryException( e );
-        }
+        this.peerManager = peerManager;
     }
 
 
@@ -55,6 +47,7 @@ public class RepositoryManagerImpl implements RepositoryManager
     {
         try
         {
+            ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
             CommandResult result = managementHost.execute( requestBuilder );
             if ( !result.hasSucceeded() )
             {
@@ -70,7 +63,7 @@ public class RepositoryManagerImpl implements RepositoryManager
 
             return result;
         }
-        catch ( CommandException e )
+        catch ( PeerException | CommandException e )
         {
             throw new RepositoryException( e );
         }

@@ -34,28 +34,28 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void setupN2NConnection( final String superNodeIp, final int superNodePort, final String tapInterfaceName,
+    public void setupN2NConnection( final String superNodeIp, final int superNodePort, final String interfaceName,
                                     final String communityName, final String localIp ) throws NetworkManagerException
     {
         execute( getManagementHost(),
-                commands.getSetupN2NConnectionCommand( superNodeIp, superNodePort, tapInterfaceName, communityName,
+                commands.getSetupN2NConnectionCommand( superNodeIp, superNodePort, interfaceName, communityName,
                         localIp ) );
     }
 
 
     @Override
-    public void removeN2NConnection( final String tapInterfaceName, final String communityName )
+    public void removeN2NConnection( final String interfaceName, final String communityName )
             throws NetworkManagerException
     {
-        execute( getManagementHost(), commands.getRemoveN2NConnectionCommand( tapInterfaceName, communityName ) );
+        execute( getManagementHost(), commands.getRemoveN2NConnectionCommand( interfaceName, communityName ) );
     }
 
 
     @Override
-    public void setupTunnel( final String tunnelName, final String peerIp, final String connectionType )
+    public void setupTunnel( final String tunnelName, final String tunnelIp, final String tunnelType )
             throws NetworkManagerException
     {
-        execute( getManagementHost(), commands.getSetupTunnelCommand( tunnelName, peerIp, connectionType ) );
+        execute( getManagementHost(), commands.getSetupTunnelCommand( tunnelName, tunnelIp, tunnelType ) );
     }
 
 
@@ -63,6 +63,20 @@ public class NetworkManagerImpl implements NetworkManager
     public void removeTunnel( final String tunnelName ) throws NetworkManagerException
     {
         execute( getManagementHost(), commands.getRemoveTunnelCommand( tunnelName ) );
+    }
+
+
+    @Override
+    public void setupGateway( final String gatewayIp, final int vLanId ) throws NetworkManagerException
+    {
+        execute( getManagementHost(), commands.getSetupGatewayCommand( gatewayIp, vLanId ) );
+    }
+
+
+    @Override
+    public void removeGateway( final int vLanId ) throws NetworkManagerException
+    {
+        execute( getManagementHost(), commands.getRemoveGatewayCommand( vLanId ) );
     }
 
 

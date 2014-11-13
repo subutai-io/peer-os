@@ -26,9 +26,9 @@ public class SetupN2NCommand extends OsgiCommandSupport
     @Argument( index = 1, name = "super node port", required = true, multiValued = false,
             description = "super node port" )
     int superNodePort;
-    @Argument( index = 2, name = "tap interface", required = true, multiValued = false,
-            description = "tap interface" )
-    String tapInterfaceName;
+    @Argument( index = 2, name = "interface name", required = true, multiValued = false,
+            description = "interface name" )
+    String interfaceName;
     @Argument( index = 3, name = "community name", required = true, multiValued = false,
             description = "community name" )
     String communityName;
@@ -51,7 +51,7 @@ public class SetupN2NCommand extends OsgiCommandSupport
 
         try
         {
-            networkManager.setupN2NConnection( superNodeIp, superNodePort, tapInterfaceName, communityName, localIp );
+            networkManager.setupN2NConnection( superNodeIp, superNodePort, interfaceName, communityName, localIp );
             System.out.println( "OK" );
         }
         catch ( NetworkManagerException e )
