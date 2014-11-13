@@ -222,6 +222,8 @@ public class EnvironmentDAO
         try
         {
             dbUtil.update( "delete from blueprint where id = ?", blueprintId );
+            EnvironmentBlueprint b = getBlueprint( blueprintId );
+
             return true;
         }
         catch ( SQLException e )
