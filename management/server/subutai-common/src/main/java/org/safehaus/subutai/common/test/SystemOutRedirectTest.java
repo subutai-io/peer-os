@@ -17,10 +17,9 @@ public abstract class SystemOutRedirectTest
 
 
     @Before
-    public final void before() throws Exception
+    public final void before()
     {
-        myOut = new ByteArrayOutputStream();
-        System.setOut( new PrintStream( myOut ) );
+        resetSysOut();
     }
 
 
@@ -34,5 +33,12 @@ public abstract class SystemOutRedirectTest
     protected String getSysOut()
     {
         return myOut.toString().trim();
+    }
+
+
+    protected void resetSysOut()
+    {
+        myOut = new ByteArrayOutputStream();
+        System.setOut( new PrintStream( myOut ) );
     }
 }
