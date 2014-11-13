@@ -391,7 +391,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
         populateLxcTable( resourceHostFamilies );
         countProcessed = new AtomicInteger( ( int ) ( count ) );
         errorProcessed = new AtomicInteger( 0 );
-        UUID envId = UUIDUtil.generateMACBasedUUID();
+        UUID envId = UUIDUtil.generateRandomUUID();
         for ( final Map.Entry<Host, List<String>> host : resourceHostFamilies.entrySet() )
         {
             AgentExecutor agentExecutor = new AgentExecutorImpl( host.getKey().getHostname(), host.getValue() );
