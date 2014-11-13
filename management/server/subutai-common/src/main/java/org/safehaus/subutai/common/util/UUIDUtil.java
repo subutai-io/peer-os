@@ -45,7 +45,7 @@ public class UUIDUtil
             UUID.fromString( uuid );
             return true;
         }
-        catch ( IllegalArgumentException e )
+        catch ( NullPointerException | IllegalArgumentException e )
         {
             return false;
         }
