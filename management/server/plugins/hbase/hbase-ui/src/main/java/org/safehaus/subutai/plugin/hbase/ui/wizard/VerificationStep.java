@@ -9,7 +9,6 @@ package org.safehaus.subutai.plugin.hbase.ui.wizard;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
@@ -52,20 +51,20 @@ public class VerificationStep extends Panel
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
             cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getHadoopClusterName() );
-            cfgView.addStringCfg( "Master Node", wizard.getConfig().getHbaseMaster().getHostname() );
-            for ( Agent agent : wizard.getConfig().getRegionServers() )
+            cfgView.addStringCfg( "Master Node", wizard.getConfig().getHbaseMaster().toString() );
+            for ( UUID agent : wizard.getConfig().getRegionServers() )
             {
-                cfgView.addStringCfg( "Region Servers", agent.getHostname() + "" );
+                cfgView.addStringCfg( "Region Servers", agent.toString() );
             }
 
-            for ( Agent agent : wizard.getConfig().getQuorumPeers() )
+            for ( UUID agent : wizard.getConfig().getQuorumPeers() )
             {
-                cfgView.addStringCfg( "Quorum Peers", agent.getHostname() + "" );
+                cfgView.addStringCfg( "Quorum Peers", agent.toString());
             }
 
-            for ( Agent agent : wizard.getConfig().getBackupMasters() )
+            for ( UUID agent : wizard.getConfig().getBackupMasters() )
             {
-                cfgView.addStringCfg( "Backup Masters", agent.getHostname() + "" );
+                cfgView.addStringCfg( "Backup Masters", agent.toString() );
             }
         }
         else if ( config.getSetupType() == SetupType.WITH_HADOOP )

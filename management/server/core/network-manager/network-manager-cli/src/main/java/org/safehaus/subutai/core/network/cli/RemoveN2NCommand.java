@@ -20,9 +20,9 @@ public class RemoveN2NCommand extends OsgiCommandSupport
 
     private final NetworkManager networkManager;
 
-    @Argument( index = 0, name = "tap interface", required = true, multiValued = false,
-            description = "tap interface" )
-    String tapInterfaceName;
+    @Argument( index = 0, name = "interface name", required = true, multiValued = false,
+            description = "interface name" )
+    String interfaceName;
     @Argument( index = 1, name = "community name", required = true, multiValued = false,
             description = "community name" )
     String communityName;
@@ -42,7 +42,7 @@ public class RemoveN2NCommand extends OsgiCommandSupport
 
         try
         {
-            networkManager.removeN2NConnection( tapInterfaceName, communityName );
+            networkManager.removeN2NConnection( interfaceName, communityName );
             System.out.println( "OK" );
         }
         catch ( NetworkManagerException e )

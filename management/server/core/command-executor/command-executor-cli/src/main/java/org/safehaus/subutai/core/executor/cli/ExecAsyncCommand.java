@@ -28,6 +28,8 @@ public class ExecAsyncCommand extends OsgiCommandSupport
     String hostId;
     @Argument( index = 1, name = "command", required = true, multiValued = false, description = "command to execute" )
     String command;
+    @Argument( index = 2, name = "timeout", required = false, multiValued = false, description = "command timeout" )
+    int timeout = 30;
 
 
     public ExecAsyncCommand( final CommandExecutor executor )
@@ -46,7 +48,7 @@ public class ExecAsyncCommand extends OsgiCommandSupport
         {
             UUID id = UUIDUtil.generateUUIDFromString( hostId );
 
-            executor.executeAsync( id, new RequestBuilder( command ), new CommandCallback()
+            executor.executeAsync( id, new RequestBuilder( command ).withTimeout( timeout ), new CommandCallback()
             {
                 @Override
                 public void onResponse( final Response response, final CommandResult commandResult )

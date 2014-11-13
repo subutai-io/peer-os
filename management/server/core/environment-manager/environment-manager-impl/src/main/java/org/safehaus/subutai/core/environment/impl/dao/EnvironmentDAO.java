@@ -60,7 +60,7 @@ public class EnvironmentDAO
     }
 
 
-    public boolean saveInfo( String source, String key, Object info )
+    public boolean saveInfo( String source, String key, Object info ) throws EnvironmentPersistenceException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
@@ -76,8 +76,8 @@ public class EnvironmentDAO
         catch ( JsonSyntaxException | SQLException e )
         {
             LOG.error( e.getMessage(), e );
+            throw new EnvironmentPersistenceException( e.getMessage() );
         }
-        return false;
     }
 
 
@@ -222,6 +222,8 @@ public class EnvironmentDAO
         try
         {
             dbUtil.update( "delete from blueprint where id = ?", blueprintId );
+            EnvironmentBlueprint b = getBlueprint( blueprintId );
+
             return true;
         }
         catch ( SQLException e )

@@ -85,22 +85,6 @@ public class RepositoryManagerImplTest
         {
         }
 
-
-        PeerException exception = mock( PeerException.class );
-        doThrow( exception ).when( localPeer ).getManagementHost();
-
-        try
-        {
-            new RepositoryManagerImpl( peerManager );
-
-            fail( "Expected RepositoryException" );
-        }
-        catch ( RepositoryException e )
-        {
-            assertEquals( exception, e.getCause() );
-        }
-
-        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 
 
