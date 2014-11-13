@@ -29,7 +29,7 @@ public class Commands
     public RequestBuilder getRemoveN2NConnectionCommand( String tapInterfaceName, String communityName )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( communityName, tapInterfaceName ) );
+                .withCmdArgs( Lists.newArrayList( "-R", communityName, tapInterfaceName ) );
     }
 
 
