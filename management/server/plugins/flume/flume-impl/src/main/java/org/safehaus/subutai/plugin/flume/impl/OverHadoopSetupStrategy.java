@@ -45,21 +45,22 @@ class OverHadoopSetupStrategy extends FlumeSetupStrategy
         //save to db
         config.setEnvironmentId( environment.getId() );
         manager.getPluginDao().saveInfo( FlumeConfig.PRODUCT_KEY, config.getClusterName(), config );
-        po.addLog( "Cluster info saved to DB\nInstalling Pig..." );
+        po.addLog( "Cluster info saved to DB\nInstalling Flume..." );
         //install pig,
-        //timeout?
         String s = Commands.make( CommandType.INSTALL );
         //RequestBuilder installCommand = new RequestBuilder( s ).withTimeout( 1800 );
         for ( ContainerHost node : environment.getHostsByIds( config.getNodes() ) )
         {
             try
             {
-                node.execute(new RequestBuilder( s ).withTimeout( 600 ));
+                CommandResult result = node.execute(new RequestBuilder( s ).withTimeout( 600 ));
+                processResult( node, result );
+
             }
             catch ( CommandException e )
             {
                 throw new ClusterSetupException(
-                        String.format( "Error while installing Pig on container %s; %s", node.getHostname(),
+                        String.format( "Error while installing Flume on container %s; %s", node.getHostname(),
                                 e.getMessage() ) );
             }
         }

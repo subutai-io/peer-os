@@ -6,13 +6,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.sql.DataSource;
-
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDao;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +18,11 @@ public abstract class PrestoBase
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( PrestoBase.class.getName() );
-    CommandRunner commandRunner;
-    AgentManager agentManager;
     Tracker tracker;
     Hadoop hadoopManager;
     EnvironmentManager environmentManager;
-    ContainerManager containerManager;
     ExecutorService executor;
-    PluginDao pluginDAO;
+    PluginDAO pluginDAO;
     Commands commands;
     public DataSource dataSource;
 
@@ -38,13 +31,12 @@ public abstract class PrestoBase
     {
         try
         {
-            this.pluginDAO = new PluginDao( dataSource );
+            this.pluginDAO = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
-        this.commands = new Commands( commandRunner );
 
         executor = Executors.newCachedThreadPool();
     }
@@ -59,30 +51,6 @@ public abstract class PrestoBase
     public void destroy()
     {
         executor.shutdown();
-    }
-
-
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
-    public void setCommandRunner( CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
-    }
-
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
     }
 
 
@@ -128,25 +96,13 @@ public abstract class PrestoBase
     }
 
 
-    public ContainerManager getContainerManager()
-    {
-        return containerManager;
-    }
-
-
-    public void setContainerManager( ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
-    }
-
-
-    public PluginDao getPluginDAO()
+    public PluginDAO getPluginDAO()
     {
         return pluginDAO;
     }
 
 
-    public void setPluginDAO( PluginDao pluginDAO )
+    public void setPluginDAO( PluginDAO pluginDAO )
     {
         this.pluginDAO = pluginDAO;
     }

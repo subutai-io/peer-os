@@ -243,7 +243,6 @@ public class Manager
                 config = ( FlumeConfig ) event.getProperty().getValue();
                 refreshUI();
                 checkAllNodes();
-                checkAllNodes();
             }
         } );
 
@@ -448,14 +447,14 @@ public class Manager
                 disableButtons( buttons );
                 executorService.execute(
                         new NodeOperationTask( flume, tracker, config.getClusterName(), host,
-                                NodeOperationType.SERVICE_STATUS, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                                NodeOperationType.STATUS, new org.safehaus.subutai.common.protocol.CompleteEvent()
                         {
                             public void onComplete( NodeState nodeState )
                             {
                                 synchronized ( PROGRESS_ICON )
                                 {
                                     resultHolder.setValue( nodeState.name() );
-                                    if ( resultHolder.getValue().contains( "not" ) )
+                                    if ( nodeState.name().contains( "STOPPED" ) )
                                     {
                                         getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
                                         getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );

@@ -1,5 +1,8 @@
 package org.safehaus.subutai.plugin.lucene.impl.handler;
 
+
+import java.util.Iterator;
+
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
@@ -11,16 +14,17 @@ import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.impl.Commands;
 import org.safehaus.subutai.plugin.lucene.impl.LuceneImpl;
 
-import java.util.Iterator;
 
 /**
  * Created by ebru on 09.11.2014.
  */
-public class NodeOperationHandler extends AbstractOperationHandler<LuceneImpl, LuceneConfig> {
+public class NodeOperationHandler extends AbstractOperationHandler<LuceneImpl, LuceneConfig>
+{
 
     private String clusterName;
     private String hostname;
     private NodeOperationType operationType;
+
 
     public NodeOperationHandler( final LuceneImpl manager, String clusterName, final String hostname,
                                  NodeOperationType operationType )
@@ -29,9 +33,8 @@ public class NodeOperationHandler extends AbstractOperationHandler<LuceneImpl, L
         this.hostname = hostname;
         this.clusterName = clusterName;
         this.operationType = operationType;
-        this.trackerOperation = manager.getTracker()
-                .createTrackerOperation( LuceneConfig.PRODUCT_KEY,
-                        String.format( "Creating %s tracker object...", clusterName ) );
+        this.trackerOperation = manager.getTracker().createTrackerOperation( LuceneConfig.PRODUCT_KEY,
+                String.format( "Creating %s tracker object...", clusterName ) );
     }
 
 
@@ -74,17 +77,15 @@ public class NodeOperationHandler extends AbstractOperationHandler<LuceneImpl, L
                 result = uninstallProductOnNode( host );
                 break;
         }
-
-
-
     }
+
+
     private CommandResult installProductOnNode( ContainerHost host )
     {
         CommandResult result = null;
         try
         {
-            result = host.execute( new RequestBuilder(
-                    Commands.installCommand ).withTimeout( 600 ) );
+            result = host.execute( new RequestBuilder( Commands.installCommand ).withTimeout( 600 ) );
             if ( result.hasSucceeded() )
             {
                 config.getNodes().add( host.getId() );
@@ -94,7 +95,8 @@ public class NodeOperationHandler extends AbstractOperationHandler<LuceneImpl, L
             }
             else
             {
-                trackerOperation.addLogFailed( "Could not install " + LuceneConfig.PRODUCT_KEY + " to node " + hostname );
+                trackerOperation
+                        .addLogFailed( "Could not install " + LuceneConfig.PRODUCT_KEY + " to node " + hostname );
             }
         }
         catch ( CommandException e )
@@ -110,14 +112,14 @@ public class NodeOperationHandler extends AbstractOperationHandler<LuceneImpl, L
         CommandResult result = null;
         try
         {
-            result = host.execute( new RequestBuilder(
-                    Commands.uninstallCommand ).withTimeout( 600 ) );
+            result = host.execute( new RequestBuilder( Commands.uninstallCommand ).withTimeout( 600 ) );
             if ( result.hasSucceeded() )
             {
                 config.getNodes().remove( host.getId() );
                 manager.getPluginDao().saveInfo( LuceneConfig.PRODUCT_KEY, config.getClusterName(), config );
                 trackerOperation.addLogDone(
-                        LuceneConfig.PRODUCT_KEY + " is uninstalled from node " + host.getHostname() + " successfully." );
+                        LuceneConfig.PRODUCT_KEY + " is uninstalled from node " + host.getHostname()
+                                + " successfully." );
             }
             else
             {
@@ -131,5 +133,4 @@ public class NodeOperationHandler extends AbstractOperationHandler<LuceneImpl, L
         }
         return result;
     }
-
 }

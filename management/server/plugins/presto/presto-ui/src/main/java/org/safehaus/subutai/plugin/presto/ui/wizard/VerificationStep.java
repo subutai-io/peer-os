@@ -1,10 +1,14 @@
 package org.safehaus.subutai.plugin.presto.ui.wizard;
 
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.Presto;
@@ -25,7 +29,7 @@ public class VerificationStep extends Panel
 {
 
     public VerificationStep( final Presto presto, final ExecutorService executorService, final Tracker tracker,
-                             final Wizard wizard )
+                             EnvironmentManager environmentManager,final Wizard wizard )
     {
 
         setSizeFull();
@@ -46,11 +50,14 @@ public class VerificationStep extends Panel
         cfgView.addStringCfg( "Installation name", config.getClusterName() );
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
+            Environment hadoopEnvironment = environmentManager.getEnvironmentByUUID( hc.getEnvironmentId() );
+            ContainerHost coordinator = hadoopEnvironment.getContainerHostByUUID( wizard.getConfig().getCoordinatorNode() );
+            Set<ContainerHost> workers = hadoopEnvironment.getHostsByIds( wizard.getConfig().getWorkers() );
             cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getHadoopClusterName() );
-            cfgView.addStringCfg( "Master Node", wizard.getConfig().getCoordinatorNode().getHostname() );
-            for ( Agent agent : wizard.getConfig().getWorkers() )
+            cfgView.addStringCfg( "Master Node", coordinator.getHostname() );
+            for ( ContainerHost worker : workers )
             {
-                cfgView.addStringCfg( "Slave nodes", agent.getHostname() + "" );
+                cfgView.addStringCfg( "Slave nodes", worker.getHostname() + "" );
             }
         }
         else if ( config.getSetupType() == SetupType.WITH_HADOOP )
@@ -72,7 +79,7 @@ public class VerificationStep extends Panel
                 UUID trackId = null;
                 if ( config.getSetupType() == SetupType.OVER_HADOOP )
                 {
-                    trackId = presto.installCluster( config );
+                    trackId = presto.installCluster( config, hc );
                 }
                 else if ( config.getSetupType() == SetupType.WITH_HADOOP )
                 {

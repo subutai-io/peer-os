@@ -9,8 +9,11 @@ import java.util.concurrent.Executors;
 
 import javax.sql.DataSource;
 
-import com.google.common.collect.Sets;
-import org.safehaus.subutai.common.protocol.*;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -31,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 
 public class LuceneImpl implements Lucene
@@ -65,6 +69,7 @@ public class LuceneImpl implements Lucene
     {
         return commands;
     }
+
 
     public Tracker getTracker()
     {
@@ -107,6 +112,7 @@ public class LuceneImpl implements Lucene
         this.environmentManager = environmentManager;
     }
 
+
     public void init()
     {
         try
@@ -131,23 +137,29 @@ public class LuceneImpl implements Lucene
     public UUID installCluster( final LuceneConfig config )
     {
         Preconditions.checkNotNull( config, "Configuration is null" );
-        ClusterOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
+        ClusterOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
+
 
     @Override
     public UUID uninstallCluster( final LuceneConfig config )
     {
-        ClusterOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.DESTROY );
+        ClusterOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.DESTROY );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
+
     @Override
-    public UUID uninstallCluster(String clusterName) {
+    public UUID uninstallCluster( String clusterName )
+    {
         return null;
     }
+
 
     @Override
     public List<LuceneConfig> getClusters()
@@ -166,7 +178,8 @@ public class LuceneImpl implements Lucene
     @Override
     public UUID installCluster( LuceneConfig config, HadoopClusterConfig hadoopConfig )
     {
-        ClusterOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
+        ClusterOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
         operationHandler.setHadoopConfig( hadoopConfig );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
@@ -176,7 +189,8 @@ public class LuceneImpl implements Lucene
     @Override
     public UUID addNode( final String clusterName, final String lxcHostname )
     {
-        AbstractOperationHandler h = new NodeOperationHandler( this, clusterName, lxcHostname, NodeOperationType.INSTALL );
+        AbstractOperationHandler h =
+                new NodeOperationHandler( this, clusterName, lxcHostname, NodeOperationType.INSTALL );
         executor.execute( h );
         return h.getTrackerId();
     }
@@ -185,13 +199,16 @@ public class LuceneImpl implements Lucene
     @Override
     public UUID uninstallNode( final String clusterName, final String lxcHostname )
     {
-        AbstractOperationHandler h = new NodeOperationHandler( this, clusterName, lxcHostname, NodeOperationType.UNINSTALL );
+        AbstractOperationHandler h =
+                new NodeOperationHandler( this, clusterName, lxcHostname, NodeOperationType.UNINSTALL );
         executor.execute( h );
         return h.getTrackerId();
     }
 
+
     @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint(LuceneConfig config) {
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( LuceneConfig config )
+    {
 
         EnvironmentBlueprint blueprint = new EnvironmentBlueprint();
 
@@ -205,7 +222,7 @@ public class LuceneImpl implements Lucene
         ng.setNumberOfNodes( config.getNodes().size() ); // master +slaves
         ng.setTemplateName( LuceneConfig.TEMPLATE_NAME );
         ng.setPlacementStrategy( PlacementStrategy.MORE_RAM );
-        blueprint.setNodeGroups( Sets.newHashSet(ng) );
+        blueprint.setNodeGroups( Sets.newHashSet( ng ) );
 
 
         return blueprint;

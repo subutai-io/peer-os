@@ -207,7 +207,7 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = nutch.uninstallCluster( config.getClusterName() );
+                            UUID trackID = nutch.uninstallCluster( config );
                             ProgressWindow window =
                                     new ProgressWindow( executorService, tracker, trackID, NutchConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()

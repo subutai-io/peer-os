@@ -191,7 +191,7 @@ public class FlumeImpl implements Flume
     @Override
     public UUID checkServiceStatus( final String clusterName, final String hostname )
     {
-        AbstractOperationHandler h = new NodeOperationHandler( this, clusterName, hostname, NodeOperationType.SERVICE_STATUS );
+        AbstractOperationHandler h = new NodeOperationHandler( this, clusterName, hostname, NodeOperationType.STATUS );
         executor.execute( h );
         return h.getTrackerId();
     }

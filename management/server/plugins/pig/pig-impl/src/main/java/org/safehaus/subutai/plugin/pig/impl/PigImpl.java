@@ -22,12 +22,14 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.pig.api.Pig;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.SetupType;
 import org.safehaus.subutai.plugin.pig.impl.handler.ClusterOperationHandler;
+import org.safehaus.subutai.plugin.pig.impl.handler.NodeOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +68,7 @@ public class PigImpl implements Pig
     {
         this.environmentManager = environmentManager;
     }
+
 
     public Hadoop getHadoopManager()
     {
@@ -135,27 +138,33 @@ public class PigImpl implements Pig
         this.executor = executor;
     }
 
+
     @Override
     public UUID installCluster( final PigConfig config )
     {
-        ClusterOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
+        ClusterOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
+
     @Override
     public UUID installCluster( PigConfig config, HadoopClusterConfig hadoopConfig )
     {
-        ClusterOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
+        ClusterOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
         operationHandler.setHadoopConfig( hadoopConfig );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
+
     @Override
     public UUID uninstallCluster( final PigConfig config )
     {
-        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.DESTROY );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.DESTROY );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -189,26 +198,30 @@ public class PigImpl implements Pig
         return null;
     }
 
+
     @Override
     public UUID destroyNode( final String clusterName, final String lxcHostname )
     {
-        // TODO
-        return null;
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, clusterName, lxcHostname, NodeOperationType.UNINSTALL );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
     @Override
     public UUID addNode( final String clusterName, final String lxcHostName )
     {
-        // TODO
-        /*AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, clusterName, lxcHostName, NodeOperationType.INSTALL );
         executor.execute( operationHandler );
-        return operationHandler.getTrackerId();*/
-        return null;
+        return operationHandler.getTrackerId();
     }
 
+
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final Environment env, final PigConfig config, TrackerOperation po )
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment env, final PigConfig config,
+                                                         TrackerOperation po )
     {
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
@@ -236,5 +249,4 @@ public class PigImpl implements Pig
     {
         return pluginDao.getInfo( PigConfig.PRODUCT_KEY, clusterName, PigConfig.class );
     }
-
 }

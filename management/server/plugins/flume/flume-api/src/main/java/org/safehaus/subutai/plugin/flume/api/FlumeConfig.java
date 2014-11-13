@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
 
@@ -97,6 +96,7 @@ public class FlumeConfig implements ConfigBase
         this.hadoopNodes = hadoopNodes;
     }
 
+
     public UUID getEnvironmentId()
     {
         return environmentId;
@@ -107,6 +107,7 @@ public class FlumeConfig implements ConfigBase
     {
         this.environmentId = environmentId;
     }
+
 
     @Override
     public String toString()

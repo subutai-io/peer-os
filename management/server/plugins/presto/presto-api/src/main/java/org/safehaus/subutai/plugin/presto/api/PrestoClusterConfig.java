@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.presto.api;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
@@ -12,14 +13,16 @@ public class PrestoClusterConfig implements ConfigBase
 {
 
     public static final String PRODUCT_KEY = "Presto";
-    public static final String TEMAPLTE_NAME = "presto";
+    public static final String TEMPLATE_NAME = "presto";
 
     private String clusterName = "";
     private SetupType setupType;
     // over-Hadoop params
     private String hadoopClusterName = "";
-    private Set<Agent> workers = new HashSet<>();
-    private Agent coordinatorNode;
+    private Set<UUID> workers = new HashSet<>();
+    private Set<UUID> hadoopNodes = new HashSet<>();
+    private UUID coordinatorNode;
+    private UUID environmentId;
 
 
     @Override
@@ -73,33 +76,33 @@ public class PrestoClusterConfig implements ConfigBase
     }
 
 
-    public Set<Agent> getWorkers()
+    public Set<UUID> getWorkers()
     {
         return workers;
     }
 
 
-    public void setWorkers( Set<Agent> workers )
+    public void setWorkers( Set<UUID> workers )
     {
         this.workers = workers;
     }
 
 
-    public Agent getCoordinatorNode()
+    public UUID getCoordinatorNode()
     {
         return coordinatorNode;
     }
 
 
-    public void setCoordinatorNode( Agent coordinatorNode )
+    public void setCoordinatorNode( UUID coordinatorNode )
     {
         this.coordinatorNode = coordinatorNode;
     }
 
 
-    public Set<Agent> getAllNodes()
+    public Set<UUID> getAllNodes()
     {
-        Set<Agent> allNodes = new HashSet<>();
+        Set<UUID> allNodes = new HashSet<>();
         if ( workers != null )
         {
             allNodes.addAll( workers );
@@ -117,5 +120,29 @@ public class PrestoClusterConfig implements ConfigBase
     {
         return "Config{" + "clusterName=" + clusterName + ", coordinatorNode=" + coordinatorNode + ", workers="
                 + workers + '}';
+    }
+
+
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
+    }
+
+
+    public Set<UUID> getHadoopNodes()
+    {
+        return hadoopNodes;
+    }
+
+
+    public void setHadoopNodes( final Set<UUID> hadoopNodes )
+    {
+        this.hadoopNodes = hadoopNodes;
     }
 }

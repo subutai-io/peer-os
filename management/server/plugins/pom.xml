@@ -26,18 +26,19 @@
     <module>hive</module>
     <module>spark</module>
     <module>hbase</module>
+    <module>presto</module>
     <!--<module>accumulo</module>
     <module>oozie</module>
      <module>lucene</module>
     <module>accumulo</module>
     <module>spark</module>
     <module>zookeeper</module>
+    <module>storm</module>
     <module>mongodb</module>
     <module>flume</module>
     <module>storm</module>
     <module>oozie</module>
     <module>pig</module>
-    <module>presto</module>
     <module>shark</module>
     <module>sqoop</module>
     <module>lucene</module>

@@ -1095,8 +1095,8 @@
         <groupId>${project.groupId}</groupId>
         <artifactId>hbase-plugin-rest</artifactId>
         <version>${project.version}</version>
-      </dependency>-->
-      <!--<dependency>
+      </dependency>
+      <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>hbase-plugin-ui</artifactId>
         <version>${project.version}</version>
@@ -1181,7 +1181,7 @@
         <artifactId>lucene-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-<!--
+          <!--
               <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>mahout-plugin-api</artifactId>
@@ -1300,9 +1300,9 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>jetty-plugin-ui</artifactId>
                 <version>${project.version}</version>
-              </dependency>-->
+              </dependency>
 
-
+            -->
       <!-- ELASTICSEARCH -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1631,7 +1631,7 @@
          <artifactId>pig-plugin-ui</artifactId>
          <version>${project.version}</version>
        </dependency>
-
+        -->
        <dependency>
          <groupId>${project.groupId}</groupId>
          <artifactId>presto-plugin-api</artifactId>
@@ -1657,7 +1657,7 @@
          <artifactId>presto-plugin-ui</artifactId>
          <version>${project.version}</version>
        </dependency>
-
+       <!--
        <dependency>
          <groupId>${project.groupId}</groupId>
          <artifactId>shark-plugin-api</artifactId>
@@ -1682,8 +1682,8 @@
          <groupId>${project.groupId}</groupId>
          <artifactId>shark-plugin-ui</artifactId>
          <version>${project.version}</version>
-       </dependency> -->
-
+       </dependency>
+       -->
        <dependency>
          <groupId>${project.groupId}</groupId>
          <artifactId>solr-plugin-api</artifactId>

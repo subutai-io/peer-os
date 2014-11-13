@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.presto.api.Presto;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
@@ -34,7 +35,7 @@ public class AddNodeWindow extends Window
 
 
     public AddNodeWindow( final Presto presto, final ExecutorService executorService, final Tracker tracker,
-                          final PrestoClusterConfig config, Set<Agent> nodes )
+                          final PrestoClusterConfig config, Set<ContainerHost> nodes )
     {
         super( "Add New Node" );
         setModal( true );
@@ -60,7 +61,7 @@ public class AddNodeWindow extends Window
         hadoopNodes.setNullSelectionAllowed( false );
         hadoopNodes.setRequired( true );
         hadoopNodes.setWidth( 200, Unit.PIXELS );
-        for ( Agent node : nodes )
+        for ( ContainerHost node : nodes )
         {
             hadoopNodes.addItem( node );
             hadoopNodes.setItemCaption( node, node.getHostname() );
@@ -81,8 +82,8 @@ public class AddNodeWindow extends Window
             {
                 addNodeBtn.setEnabled( false );
                 showProgress();
-                Agent agent = ( Agent ) hadoopNodes.getValue();
-                final UUID trackID = presto.addWorkerNode( config.getClusterName(), agent.getHostname() );
+                ContainerHost host = ( ContainerHost ) hadoopNodes.getValue();
+                final UUID trackID = presto.addWorkerNode( config.getClusterName(), host.getHostname() );
                 executorService.execute( new Runnable()
                 {
 

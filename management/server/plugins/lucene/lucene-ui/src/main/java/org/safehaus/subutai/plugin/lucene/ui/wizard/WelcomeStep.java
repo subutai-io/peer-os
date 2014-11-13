@@ -54,7 +54,7 @@ public class WelcomeStep extends Panel
             }
         } );
 
-        Button next2 = new Button( "Start with-Hadoop installation" );
+        /*Button next2 = new Button( "Start with-Hadoop installation" );
         next2.setId( "LuceneWithHadoop" );
         next2.setStyleName( "default" );
         next2.addClickListener( new Button.ClickListener()
@@ -66,7 +66,7 @@ public class WelcomeStep extends Panel
             }
         } );
         grid.addComponent( next2, 5, 4, 5, 4 );
-        grid.setComponentAlignment( next2, Alignment.BOTTOM_RIGHT );
+        grid.setComponentAlignment( next2, Alignment.BOTTOM_RIGHT );*/
 
         setContent( grid );
     }

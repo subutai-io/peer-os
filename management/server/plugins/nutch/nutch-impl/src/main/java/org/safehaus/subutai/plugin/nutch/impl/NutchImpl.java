@@ -50,9 +50,13 @@ public class NutchImpl implements Nutch
     private DataSource dataSource;
 
 
-    public NutchImpl( DataSource dataSource )
+    public NutchImpl( final DataSource dataSource, final Tracker tracker, final EnvironmentManager environmentManager,
+                      final Hadoop hadoopManager )
     {
         this.dataSource = dataSource;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
+        this.hadoopManager = hadoopManager;
     }
 
 
