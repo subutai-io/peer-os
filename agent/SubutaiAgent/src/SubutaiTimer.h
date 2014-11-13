@@ -30,6 +30,8 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
+#include <stdio.h>
+#include <unistd.h>
 #include <sstream>
 #include <list>
 #include <lxc/lxccontainer.h>

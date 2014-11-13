@@ -23,7 +23,6 @@
  *  @date      Oct 31, 2014
  */
 #include "SubutaiContainerManager.h"
-#include "SubutaiContainer.h"
 
 /**
  * \details 	Default constructor of SubutaiContainerManager

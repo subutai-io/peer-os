@@ -25,6 +25,8 @@
 #ifndef SUBUTAIHELPER_H_
 #define SUBUTAIHELPER_H_
 #include <syslog.h>
+#include <stdio.h>
+#include <unistd.h>
 #include <iostream>
 #include <fstream>
 #include <string>

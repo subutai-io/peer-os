@@ -25,11 +25,6 @@
  *  @date      Oct 31, 2014
  */
 #include "SubutaiContainer.h"
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <iostream>
 
 using namespace std;
 /**

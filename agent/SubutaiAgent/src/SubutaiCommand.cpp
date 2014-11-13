@@ -294,7 +294,7 @@ bool SubutaiCommand::deserialize(string& input)
 }
 
 /**
- *  \details   getting "envioronment" private variable of SubutaiCommand instance
+ *  \details   getting "environment" private variable of SubutaiCommand instance
  */
 list<pair<string,string> >& SubutaiCommand::getEnvironment()
 {					//getting EnvPath
@@ -302,7 +302,7 @@ list<pair<string,string> >& SubutaiCommand::getEnvironment()
 }
 
 /**
- *  \details   setting "envioronment" private variable of SubutaiCommand instance
+ *  \details   setting "environment" private variable of SubutaiCommand instance
  *  		   environment parameter is set and used in execution.
  */
 void SubutaiCommand::setEnvironment(list<pair<string,string> >& envr)

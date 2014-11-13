@@ -123,6 +123,7 @@ string SubutaiThread::createExecString(SubutaiCommand *command)
  */
 bool SubutaiThread::ExecuteCommand(SubutaiCommand* command, SubutaiContainer* container) {
     container->RunCommand(command);
+    return true;
 }
 
 /**
@@ -835,7 +836,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                     this->getOutputStream().closePipe(0);
                     logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Thread is Stopping!!","pid",helper.toString(getpid())));
                     logger.closeLogFile();
-                    int kc = kill(getpid(), SIGKILL);		//killing child
+                    kill(getpid(), SIGKILL);		//killing child
                     return true; //thread successfully done its work.
                 }
                 catch(const std::exception& error)

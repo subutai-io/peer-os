@@ -36,6 +36,10 @@
 #include <list>
 #include <lxc/lxccontainer.h>
 #include "pugixml.hpp"
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <iostream>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>

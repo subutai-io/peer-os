@@ -23,10 +23,6 @@
  *  @date      Oct 31, 2014
  */
 #include "SubutaiTimer.h"
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <iostream>
 
 using namespace std;
 /**

@@ -92,7 +92,7 @@ void threadSend(message_queue *mq,SubutaiConnection *connection,SubutaiLogger* l
  */
 int main(int argc,char *argv[],char *envp[])
 {
-        string serverAddress        = "RESPONSE_TOPIC";              // Default SERVICE TOPIC
+        string serverAddress        = "RESPONSE_TOPIC";              // Default RESPONSE TOPIC
         string broadcastAddress     = "BROADCAST_TOPIC";	        // Default BROADCAST TOPIC
         string clientAddress;
         SubutaiHelper helper;
