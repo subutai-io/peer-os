@@ -10,6 +10,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.storm.api.Storm;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
 import com.vaadin.shared.ui.label.ContentMode;
@@ -44,8 +45,9 @@ public class VerificationStep extends Panel
         cfgView.addStringCfg( "Cluster Name", config.getClusterName() );
         if ( config.isExternalZookeeper() )
         {
-            Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-            ContainerHost nimbusHost = environment.getContainerHostByUUID( config.getNimbus() );
+            ZookeeperClusterConfig zookeeperClusterConfig = wizard.getZookeeperClusterConfig();
+            Environment zookeeperEnvironment = environmentManager.getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
+            ContainerHost nimbusHost = zookeeperEnvironment.getContainerHostByUUID( config.getNimbus() );
             cfgView.addStringCfg( "Master node", nimbusHost.getHostname() );
         }
         cfgView.addStringCfg( "Supervisor nodes count", config.getSupervisorsCount() + "" );

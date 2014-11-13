@@ -32,6 +32,12 @@ public class RestService
     private EnvironmentManager environmentManager;
 
 
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
+    }
+
+
     public EnvironmentManager getEnvironmentManager()
     {
         return environmentManager;
