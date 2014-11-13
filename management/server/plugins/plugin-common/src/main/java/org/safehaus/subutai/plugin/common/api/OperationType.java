@@ -12,6 +12,8 @@ public enum OperationType
     UNINSTALL,
     EXCLUDE,
     INCLUDE,
+    IMPORT,
+    EXPORT,
     DECOMISSION_STATUS,
     CHANGE_MASTER
 }
