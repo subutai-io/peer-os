@@ -14,6 +14,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 
@@ -61,7 +62,7 @@ class SetupStrategyOverHadoop extends SqoopSetupStrategy
         config.setHadoopNodes( new HashSet<>( hc.getAllNodes() ) );
 
         // check if already installed
-        String s = CommandFactory.build( CommandType.LIST, null );
+        String s = CommandFactory.build( NodeOperationType.STATUS, null );
         String hadoop_pack = Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME.toLowerCase();
         Iterator<ContainerHost> it = nodes.iterator();
         while ( it.hasNext() )
@@ -98,7 +99,7 @@ class SetupStrategyOverHadoop extends SqoopSetupStrategy
         }
 
         // installation
-        s = CommandFactory.build( CommandType.INSTALL, null );
+        s = CommandFactory.build( NodeOperationType.INSTALL, null );
         it = nodes.iterator();
         while ( it.hasNext() )
         {

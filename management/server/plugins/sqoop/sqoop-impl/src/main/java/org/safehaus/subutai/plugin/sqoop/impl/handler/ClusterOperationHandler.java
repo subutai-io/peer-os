@@ -17,11 +17,11 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.impl.CommandFactory;
-import org.safehaus.subutai.plugin.sqoop.impl.CommandType;
 import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,12 +174,12 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SqoopImpl,
 
             if ( config.getSetupType() == SetupType.OVER_HADOOP )
             {
-                RequestBuilder uninstallCmd = new RequestBuilder( CommandFactory.build( CommandType.PURGE, null ) );
+                RequestBuilder rb = new RequestBuilder( CommandFactory.build( NodeOperationType.UNINSTALL, null ) );
                 for ( ContainerHost node : nodes )
                 {
                     try
                     {
-                        CommandResult result = node.execute( uninstallCmd );
+                        CommandResult result = node.execute( rb );
                         if ( result.hasSucceeded() )
                         {
                             trackerOperation.addLog( "Sqoop uninstalled from " + node.getHostname() );

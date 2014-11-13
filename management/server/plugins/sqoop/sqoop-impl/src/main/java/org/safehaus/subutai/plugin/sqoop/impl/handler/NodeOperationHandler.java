@@ -8,12 +8,11 @@ import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
 import org.safehaus.subutai.plugin.sqoop.impl.CommandFactory;
-import org.safehaus.subutai.plugin.sqoop.impl.CommandType;
 import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SqoopImpl, Sq
     private static final Logger LOG = LoggerFactory.getLogger( NodeOperationHandler.class.getName() );
 
     private String hostname;
-    private OperationType operationType;
+    private NodeOperationType operationType;
     private Environment environment;
     private ContainerHost node;
 
@@ -33,7 +32,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SqoopImpl, Sq
     private ExportSetting exportSettings;
 
 
-    public NodeOperationHandler( SqoopImpl manager, SqoopConfig config, String hostname, OperationType operationType )
+    public NodeOperationHandler( SqoopImpl manager, SqoopConfig config, String hostname, NodeOperationType operationType )
     {
         super( manager, config );
         this.hostname = hostname;
@@ -87,7 +86,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SqoopImpl, Sq
                 case STATUS:
                     checkNode();
                     break;
-                case EXCLUDE:
+                case UNINSTALL:
                     removeSlaveNode();
                     break;
                 case IMPORT:
@@ -124,7 +123,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SqoopImpl, Sq
         }
 
 
-        String cmd = CommandFactory.build( CommandType.PURGE, null );
+        String cmd = CommandFactory.build( NodeOperationType.UNINSTALL, null );
         try
         {
             node.execute( new RequestBuilder( cmd ) );
@@ -152,7 +151,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SqoopImpl, Sq
 
     private void checkNode() throws ClusterException
     {
-        String cmd = CommandFactory.build( CommandType.LIST, null );
+        String cmd = CommandFactory.build( NodeOperationType.STATUS, null );
         try
         {
             CommandResult res = node.execute( new RequestBuilder( cmd ) );
@@ -181,7 +180,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SqoopImpl, Sq
 
     private void export() throws ClusterException
     {
-        String cmd = CommandFactory.build( CommandType.EXPORT, exportSettings );
+        String cmd = CommandFactory.build( NodeOperationType.EXPORT, exportSettings );
         try
         {
             CommandResult res = node.execute( new RequestBuilder( cmd ) );
@@ -213,7 +212,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SqoopImpl, Sq
 
     private void importOperation() throws ClusterException
     {
-        String cmd = CommandFactory.build( CommandType.IMPORT, importSettings );
+        String cmd = CommandFactory.build( NodeOperationType.IMPORT, importSettings );
         try
         {
             CommandResult res = node.execute( new RequestBuilder( cmd ) );

@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
-import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
@@ -76,7 +76,7 @@ public class SqoopImpl extends SqoopBase
     public UUID isInstalled( String clusterName, String hostname )
     {
         SqoopConfig config = getCluster( clusterName );
-        AbstractOperationHandler h = new NodeOperationHandler( this, config, hostname, OperationType.STATUS );
+        AbstractOperationHandler h = new NodeOperationHandler( this, config, hostname, NodeOperationType.STATUS );
         executor.execute( h );
         return h.getTrackerId();
     }
@@ -86,7 +86,7 @@ public class SqoopImpl extends SqoopBase
     public UUID destroyNode( String clusterName, String hostname )
     {
         SqoopConfig config = getCluster( clusterName );
-        AbstractOperationHandler h = new NodeOperationHandler( this, config, hostname, OperationType.EXCLUDE );
+        AbstractOperationHandler h = new NodeOperationHandler( this, config, hostname, NodeOperationType.UNINSTALL );
         executor.execute( h );
         return h.getTrackerId();
     }
@@ -104,7 +104,8 @@ public class SqoopImpl extends SqoopBase
     public UUID exportData( ExportSetting settings )
     {
         SqoopConfig config = getCluster( settings.getClusterName() );
-        NodeOperationHandler h = new NodeOperationHandler( this, config, settings.getHostname(), OperationType.EXPORT );
+        NodeOperationHandler h = new NodeOperationHandler( this, config, settings.getHostname(),
+                                                           NodeOperationType.EXPORT );
         h.setExportSettings( settings );
 
         executor.execute( h );
@@ -116,7 +117,8 @@ public class SqoopImpl extends SqoopBase
     public UUID importData( ImportSetting settings )
     {
         SqoopConfig config = getCluster( settings.getClusterName() );
-        NodeOperationHandler h = new NodeOperationHandler( this, config, settings.getHostname(), OperationType.IMPORT );
+        NodeOperationHandler h = new NodeOperationHandler( this, config, settings.getHostname(),
+                                                           NodeOperationType.IMPORT );
         h.setImportSettings( settings );
 
         executor.execute( h );
