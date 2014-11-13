@@ -74,9 +74,25 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
+    public void setupGatewayOnContainer( final String containerName, final String gatewayIp,
+                                         final String interfaceName ) throws NetworkManagerException
+    {
+        execute( getContainerHost( containerName ),
+                commands.getSetupGatewayOnContainerCommand( gatewayIp, interfaceName ) );
+    }
+
+
+    @Override
     public void removeGateway( final int vLanId ) throws NetworkManagerException
     {
         execute( getManagementHost(), commands.getRemoveGatewayCommand( vLanId ) );
+    }
+
+
+    @Override
+    public void removeGatewayOnContainer( final String containerName ) throws NetworkManagerException
+    {
+        execute( getContainerHost( containerName ), commands.getRemoveGatewayOnContainerCommand() );
     }
 
 
@@ -115,6 +131,19 @@ public class NetworkManagerImpl implements NetworkManager
         {
             ContainerHost containerHost = peerManager.getLocalPeer().getContainerHostByName( containerName );
             return peerManager.getLocalPeer().getResourceHostByName( containerHost.getParentHostname() );
+        }
+        catch ( PeerException e )
+        {
+            throw new NetworkManagerException( e );
+        }
+    }
+
+
+    public ContainerHost getContainerHost( String containerName ) throws NetworkManagerException
+    {
+        try
+        {
+            return peerManager.getLocalPeer().getContainerHostByName( containerName );
         }
         catch ( PeerException e )
         {
