@@ -38,10 +38,10 @@ Usage:   Remove a n2n Tunnel
         "subutai \[-qh\] management_network -R COMMUNITYNAME INTERFACENAME
 ******************************************************************************
 Usage:   Create a gateway tap device                 
-        "subutai \[-qh\] management_network -T INTERFACENAME VLANIP/SUBNET VLANID
+        "subutai \[-qh\] management_network -T VLANIP/SUBNET VLANID
 
 Usage:   Delete a gateway tap device                 
-        "subutai \[-qh\] management_network -D INTERFACENAME
+        "subutai \[-qh\] management_network -D VLANID
 ******************************************************************************
 Usage:   Create VNI-VLAN Mapping on a Tunnel                
         "subutai \[-qh\] management_network -m TUNNELPORTNAME VNI VLANID
