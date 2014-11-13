@@ -10,9 +10,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
@@ -39,7 +39,7 @@ public class AddNodeWindow extends Window
 
 
     public AddNodeWindow( final Sqoop sqoop, final Tracker tracker, final ExecutorService executorService,
-                          final SqoopConfig config, Set<Agent> nodes )
+                          final SqoopConfig config, Set<ContainerHost> nodes )
     {
         super( "Add New Node" );
         setModal( true );
@@ -66,7 +66,7 @@ public class AddNodeWindow extends Window
         hadoopNodes.setNullSelectionAllowed( false );
         hadoopNodes.setRequired( true );
         hadoopNodes.setWidth( 200, Unit.PIXELS );
-        for ( Agent node : nodes )
+        for ( ContainerHost node : nodes )
         {
             hadoopNodes.addItem( node );
             hadoopNodes.setItemCaption( node, node.getHostname() );
@@ -101,12 +101,13 @@ public class AddNodeWindow extends Window
             {
                 addNodeBtn.setEnabled( false );
                 showProgress();
-                Agent agent = ( Agent ) hadoopNodes.getValue();
+                ContainerHost agent = ( ContainerHost ) hadoopNodes.getValue();
                 final UUID trackID = sqoop.addNode( config.getClusterName(), agent.getHostname() );
                 ok.setEnabled( false );
                 executorService.execute( new Runnable()
                 {
 
+                    @Override
                     public void run()
                     {
                         while ( track )

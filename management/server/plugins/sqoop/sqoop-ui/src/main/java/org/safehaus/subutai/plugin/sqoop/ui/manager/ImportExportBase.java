@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.api.setting.CommonSetting;
@@ -27,7 +27,7 @@ public abstract class ImportExportBase extends VerticalLayout
 
     private final Tracker tracker;
     protected String clusterName;
-    protected Agent agent;
+    protected ContainerHost host;
     protected List<Field> fields = new ArrayList<>();
     AbstractTextField connStringField = UIUtil.getTextField( "Connection string:", 300 );
     AbstractTextField tableField = UIUtil.getTextField( "Table name:", 300 );
@@ -55,15 +55,15 @@ public abstract class ImportExportBase extends VerticalLayout
     }
 
 
-    public Agent getAgent()
+    public ContainerHost getHost()
     {
-        return agent;
+        return host;
     }
 
 
-    public void setAgent( Agent agent )
+    public void setHost( ContainerHost host )
     {
-        this.agent = agent;
+        this.host = host;
         reset();
     }
 
@@ -110,7 +110,7 @@ public abstract class ImportExportBase extends VerticalLayout
         {
             grid.addComponent( components.get( i ), 0, i );
         }
-        String title = "<h1>Hostname: " + agent.getHostname() + "</h1>";
+        String title = "<h1>Hostname: " + host.getHostname() + "</h1>";
         grid.addComponent( UIUtil.getLabel( title, 100, Unit.PERCENTAGE ), 1, 0 );
         grid.addComponent( logTextArea, 1, 1, 1, components.size() - 1 - 1 );
 
