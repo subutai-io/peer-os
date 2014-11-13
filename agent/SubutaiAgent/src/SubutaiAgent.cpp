@@ -92,96 +92,100 @@ void threadSend(message_queue *mq,SubutaiConnection *connection,SubutaiLogger* l
  */
 int main(int argc,char *argv[],char *envp[])
 {
-        string serverAddress        = "RESPONSE_TOPIC";              // Default RESPONSE TOPIC
-        string broadcastAddress     = "BROADCAST_TOPIC";	        // Default BROADCAST TOPIC
-        string clientAddress;
-        SubutaiHelper helper;
-        SubutaiThread thread;
-        SubutaiLogger logMain;
-        SubutaiCommand command;
-        SubutaiResponsePack response;
-        SubutaiEnvironment environment(&logMain);
-        string input = "";
-        string sendout;
+    string serverAddress        = "RESPONSE_TOPIC";              // Default RESPONSE TOPIC
+    string broadcastAddress     = "BROADCAST_TOPIC";	        // Default BROADCAST TOPIC
+    string clientAddress;
+    SubutaiHelper helper;
+    SubutaiThread thread;
+    SubutaiLogger logMain;
+    SubutaiCommand command;
+    SubutaiResponsePack response;
+    SubutaiEnvironment environment(&logMain);
+    string input = "";
+    string sendout;
 
-        if (!thread.getUserID().checkRootUser()) {
-                //user is not root SubutaiAgent Will be closed
-                cout << "Main Process User is not root.. Subutai Agent is going to be closed.." << endl;
-                close(STDIN_FILENO);
-                close(STDOUT_FILENO);
-                close(STDERR_FILENO);
-                return 100;
-        }
+    if (!thread.getUserID().checkRootUser()) {
+        //user is not root SubutaiAgent Will be closed
+        cout << "Main Process User is not root.. Subutai Agent is going to be closed.." << endl;
+        close(STDIN_FILENO);
+        close(STDOUT_FILENO);
+        close(STDERR_FILENO);
+        return 100;
+    }
 
-        if (!logMain.openLogFileWithName("subutai-agent.log")) {
-                cout << "/var/log/subutai-agent/ folder does not exist.. Subutai Agent is going to be closed.."<<endl;
-                FILE* dumplog = fopen("/etc/subutai-agent_dump.log","a+");
-                string log = "<DEBUG> /var/log/subutai-agent/ folder does not exist.. "
-                        "Subutai Agent is going to be closed.. \n";
-                fputs(log.c_str(), dumplog);
-                fflush(dumplog);
-                close(STDIN_FILENO);
-                close(STDOUT_FILENO);
-                close(STDERR_FILENO);
-                return 200;
-        }
+    if (!logMain.openLogFileWithName("subutai-agent.log")) {
+        cout << "/var/log/subutai-agent/ folder does not exist.. Subutai Agent is going to be closed.."<<endl;
+        FILE* dumplog = fopen("/etc/subutai-agent_dump.log","a+");
+        string log = "<DEBUG> /var/log/subutai-agent/ folder does not exist.. "
+            "Subutai Agent is going to be closed.. \n";
+        fputs(log.c_str(), dumplog);
+        fflush(dumplog);
+        close(STDIN_FILENO);
+        close(STDOUT_FILENO);
+        close(STDERR_FILENO);
+        return 200;
+    }
 
-        logMain.setLogLevel(7);
-        logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Subutai Agent is starting.."));
-        logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Agent.xml is reading.."));
+    bool hasLxc = true;
+    if (system("which lxc-ls") != 0) {
+        hasLxc = false;
+    }
 
-        /*
-         * Getting Environment Settings..
-         */
+    logMain.setLogLevel(7);
+    logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Subutai Agent is starting.."));
+    logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Agent.xml is reading.."));
 
-        environment.getAgentSettings();
-        environment.getAgentUuid();
-        environment.getAgentInterfaces();
-        environment.getAgentHostname();
-        environment.getAgentEnvironmentId();
-        clientAddress = environment.getAgentUuidValue();
+    /*
+     * Getting Environment Settings..
+     */
 
-        /*
-         * Starting Container Manager
-         */
-        SubutaiContainerManager cman("/var/lib/lxc", &logMain);
+    environment.getAgentSettings();
+    environment.getAgentUuid();
+    environment.getAgentInterfaces();
+    environment.getAgentHostname();
+    environment.getAgentEnvironmentId();
+    clientAddress = environment.getAgentUuidValue();
 
-        /*
-         * Opening MQTT Connection
-         */
-        class SubutaiConnection *connection;
-        int rc;
-        mosqpp::lib_init();
-        connection = new SubutaiConnection(
-                        clientAddress.c_str(),
-                        clientAddress.c_str(),
-                        serverAddress.c_str(),
-                        broadcastAddress.c_str(),
-                        environment.getAgentConnectionUrlValue().c_str(),
-                        atoi(environment.getAgentConnectionPortValue().c_str()));
+    /*
+     * Starting Container Manager
+     */
+    SubutaiContainerManager cman("/var/lib/lxc", &logMain);
 
-        logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Trying to open Connection with MQTT Broker: ",
-                                environment.getAgentConnectionUrlValue(), " Port: ", environment.getAgentConnectionPortValue()));
+    /*
+     * Opening MQTT Connection
+     */
+    class SubutaiConnection *connection;
+    int rc;
+    mosqpp::lib_init();
+    connection = new SubutaiConnection(
+            clientAddress.c_str(),
+            clientAddress.c_str(),
+            serverAddress.c_str(),
+            broadcastAddress.c_str(),
+            environment.getAgentConnectionUrlValue().c_str(),
+            atoi(environment.getAgentConnectionPortValue().c_str()));
 
-        int reconnectDelay = atoi(environment.getAgentConnectionOptionsValue().c_str()) - 4;
+    logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Trying to open Connection with MQTT Broker: ",
+                environment.getAgentConnectionUrlValue(), " Port: ", environment.getAgentConnectionPortValue()));
 
-        if (reconnectDelay <= 0) {
-                logMain.writeLog(3, logMain.setLogData("<SubutaiAgent>", "Reconnect Delay cannot be under 0",
-                                        " Using default timeout(10).", helper.toString(reconnectDelay)));
-                reconnectDelay = 10;
-        }
+    int reconnectDelay = atoi(environment.getAgentConnectionOptionsValue().c_str()) - 4;
 
-        while (true) {
-                if (!connection->openSession()) {
-                        sleep(reconnectDelay);
-                        logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Trying connect to MQTT Broker:", 
-                                                environment.getAgentConnectionUrlValue()));
-                        if (connection->reConnect()) {
-                                break;
-                        }
-                } else {
-                        break;
-                }
+    if (reconnectDelay <= 0) {
+        logMain.writeLog(3, logMain.setLogData("<SubutaiAgent>", "Reconnect Delay cannot be under 0",
+                    " Using default timeout(10).", helper.toString(reconnectDelay)));
+        reconnectDelay = 10;
+    }
+
+    while (true) {
+        if (!connection->openSession()) {
+            sleep(reconnectDelay);
+            logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", "Trying connect to MQTT Broker:", 
+                        environment.getAgentConnectionUrlValue()));
+            if (connection->reConnect()) {
+                break;
+            }
+        } else {
+            break;
         }
     }
 
