@@ -14,20 +14,27 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.Criteria;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
-import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.api.*;
+import org.safehaus.subutai.plugin.zookeeper.api.CommandType;
+
+import com.google.common.collect.Sets;
 
 
 public class StormSetupStrategyDefault implements ClusterSetupStrategy
 {
 
     private final StormImpl manager;
+    private Zookeeper zookeeperManager;
     private final StormClusterConfiguration config;
     private final Environment environment;
     private final TrackerOperation po;
@@ -67,18 +74,6 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
                 {
                     throw new ClusterSetupException(
                             String.format( "Node %s does not have Storm installed", n.getAgent().getHostname() ) );
-                }
-                else if ( !config.isExternalZookeeper() )
-                {
-                    // check nimbus node if embedded Zookeeper is used
-                    String zk_pack = Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME;
-                    if ( n.getNodeGroupName().equals( StormService.NIMBUS.toString() ) )
-                    {
-                        if ( !n.getTemplate().getProducts().contains( zk_pack ) )
-                        {
-                            throw new ClusterSetupException( "Nimbus node does not have Zookeeper installed" );
-                        }
-                    }
                 }
             }
             catch ( PeerException e )
@@ -184,14 +179,32 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         Set<UUID> allNodes = new HashSet<>( config.getSupervisors() );
         allNodes.add( config.getNimbus() );
 
-        for ( Map.Entry<String, String> e : paramValues.entrySet() )
+        for ( Map.Entry<String, String> entry : paramValues.entrySet() )
         {
-            String s = Commands.configure( "add", "storm.xml", e.getKey(), e.getValue() );
+            String s = Commands.configure( "add", "storm.xml", entry.getKey(), entry.getValue() );
 
             Iterator<UUID> iterator = allNodes.iterator();
 
             while( iterator.hasNext() ) {
                 ContainerHost stormNode = environment.getContainerHostByUUID( iterator.next() );
+
+                // Install zookeeper on nimbus node if embedded zookeeper is selected
+                if ( ! config.isExternalZookeeper() && config.getNimbus().equals( stormNode.getId() ) )
+                {
+                    String installZookeeperCommand = zookeeperManager.getCommand( CommandType.INSTALL );
+                    CommandResult commandResult = null;
+                    try
+                    {
+                        commandResult = stormNode.execute( new RequestBuilder( installZookeeperCommand ).withTimeout( 1800 ) );
+                    }
+                    catch ( CommandException e )
+                    {
+                        e.printStackTrace();
+                    }
+
+                    po.addLog( String.format( "Zookeeper %s installed on Storm nimbus node %s",
+                            commandResult.hasSucceeded() ? "" : "not", stormNode.getHostname() ) );
+                }
                 try
                 {
                     CommandResult commandResult = stormNode.execute( new RequestBuilder( s ).withTimeout( 60 ) );
@@ -238,5 +251,21 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         }
 
         return null;
+    }
+
+
+    public static PlacementStrategy getNodePlacementStrategyByNodeType( NodeType nodeType )
+    {
+        switch ( nodeType )
+        {
+            case STORM_NIMBUS:
+                return new PlacementStrategy( "BEST_SERVER", Sets.newHashSet( new Criteria( "MORE_CPU", true ) ) );
+            case STORM_SUPERVISOR:
+                return new PlacementStrategy( "BEST_SERVER", Sets.newHashSet( new Criteria( "MORE_RAM", true ) ) );
+
+            default:
+                return new PlacementStrategy( "ROUND_ROBIN" );
+
+        }
     }
 }

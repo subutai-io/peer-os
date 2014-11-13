@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.storm.impl.handler.StormClusterOperationHandler;
 import org.safehaus.subutai.plugin.storm.impl.handler.StormNodeOperationHandler;
@@ -146,7 +147,8 @@ public class StormImpl extends StormBase
             nimbus.setName( StormService.NIMBUS.toString() );
             nimbus.setNumberOfNodes( 1 );
             nimbus.setTemplateName( StormClusterConfiguration.TEMPLATE_NAME );
-            nimbus.setPlacementStrategy( PlacementStrategy.MORE_RAM );
+            nimbus.setPlacementStrategy( StormSetupStrategyDefault.getNodePlacementStrategyByNodeType(
+                    NodeType.STORM_NIMBUS ) );
             environmentBlueprint.getNodeGroups().add( nimbus );
         }
 
@@ -154,7 +156,8 @@ public class StormImpl extends StormBase
         workers.setName( StormService.SUPERVISOR.toString() );
         workers.setNumberOfNodes( config.getSupervisorsCount() );
         workers.setTemplateName( StormClusterConfiguration.TEMPLATE_NAME );
-        workers.setPlacementStrategy( PlacementStrategy.MORE_RAM );
+        workers.setPlacementStrategy( StormSetupStrategyDefault.getNodePlacementStrategyByNodeType(
+                NodeType.STORM_SUPERVISOR ) );
         environmentBlueprint.getNodeGroups().add( workers );
 
 
