@@ -42,6 +42,12 @@ Usage:   Create a gateway tap device
 
 Usage:   Delete a gateway tap device                 
         "subutai \[-qh\] management_network -D INTERFACENAME
+******************************************************************************
+Usage:   Create VNI-VLAN Mapping on a Tunnel                
+        "subutai \[-qh\] management_network -m TUNNELPORTNAME VNI VLANID
+
+Usage:   Delete VNI-VLAN Mapping on a Tunnel                 
+        "subutai \[-qh\] management_network -M TUNNELPORTNAME VNI VLANID
 -------------------------------------------------------------------------------
 EOF
 }
@@ -81,9 +87,11 @@ function management_network {
   local removeN2NTunnel="false"
   local createGateway="false"
   local removeGateway="false"
+  local vnivlanMap="false"  
+  local delvnivlanMap="false"
   
   shift_amount=0;
-  while getopts ":clrbfspdNLRTD:" opt; do
+  while getopts ":clrbfspdNLRTDmM:" opt; do
      case $opt in
        c)
 	 createTunnel="true"	
@@ -134,6 +142,14 @@ function management_network {
          ;;
        D)
          removeGateway="true"
+         shift
+         ;;
+       m)
+         vnivlanMap="true"
+         shift
+         ;;
+       M)
+         delvnivlanMap="true"
          shift
          ;;
        \?)
@@ -206,6 +222,7 @@ function management_network {
       net_check_tunnelPortName_exist $tunnelPortName
  
       ovs-vsctl del-port $tunnelPortName
+      rm /var/subutai-network/"$tunnelPortName"_vni_vlan
       msg_info "$tunnelPortName is deleted from br-tun."
    fi
 
@@ -510,6 +527,132 @@ function management_network {
       msg_info "Gateway removed for $vlanID"
    fi
 
+   if [ "true" == "$delvnivlanMap" ]; then
+     tunnelName="$1"
+     vni_id="$2"
+     vlan_id="$3"
+     extra="$4"
+     vni_list=()
+     vlan_list=()
+
+     if [ -z "$tunnelName" ]; then
+        msg_error "Tunnel Name Parameter not provided. Aborting ..."
+        show_usage "`management_network_usage`"
+     fi
+
+     if [ -z "$vni_id" ]; then
+        msg_error "VNI Parameter not provided. Aborting ..."
+        show_usage "`management_network_usage`"
+     fi
+
+     if [ -z "$vlan_id" ]; then
+        msg_error "VLAN ID Parameter not provided. Aborting ..."
+        show_usage "`management_network_usage`"
+     fi
+     if [ "$extra" ]; then
+        msg_error "extra Parameter provided. Aborting ..."
+        show_usage "`management_network_usage`"
+     fi
+
+     tunnel_port=`ovs-ofctl show br-tun|grep $tunnelName|cut -d"(" -f1 | cut -d" " -f2`
+     if [[ -z "$tunnel_port" ]]
+     then
+       msg_fail "Tunnel:$tunnelName not exist! Aborting..."
+       exit 1
+     fi
+     peer_port=`ovs-ofctl show br-tun|grep tunTOint|cut -d"(" -f1 |cut -d" " -f2`
+     file_name="/var/subutai-network/"$tunnelName"_vni_vlan"
+     if [ ! -d '/var/subutai-network' ]
+     then
+        msg_error "/var/subutai-network folder not exists! Aborting..."
+	exit 1
+     fi
+     if [ ! -f $file_name ]
+     then
+        msg_error "$file_name not exists! Aborting..."
+        exit 1
+     fi
+         while read line
+    do
+        vni=`echo $line | cut -d ' ' -f1`
+        vlan=`echo $line | cut -d ' ' -f2`
+        vni_list+=($vni)
+        vlan_list+=($vlan)
+    done < $file_name
+    if [[ ${vlan_list[*]} =~ $vlan_id ]] && [[ ${vni_list[*]} =~ $vni_id ]]
+    then
+      sed -i "/$vni_id $vlan_id/d" $file_name
+      ovs-ofctl del-flows br-tun "in_port=$peer_port,dl_vlan=$vlan_id"
+      ovs-ofctl del-flows br-tun "in_port=$tunnel_port,tun_id=$vni_id"
+      msg_ok "Tunnel: $tunnelName VNI: $vni_id VLAN: $vlan_id Removed..."
+    else
+      msg_error "Unvalid VNI: $vni_id or VLAN: $vlan_id"
+      exit 1
+    fi
+  fi
+
+  if [ "true" == "$vnivlanMap" ]; then
+    tunnelName="$1"
+    vni_id="$2"
+    vlan_id="$3"
+    extra="$4"
+    vni_list=()
+    vlan_list=()
+
+    if [ -z "$tunnelName" ]; then
+        msg_error "Tunnel Name Parameter not provided. Aborting ..."
+        show_usage "`management_network_usage`"
+    fi
+
+    if [ -z "$vni_id" ]; then
+        msg_error "VNI Parameter not provided. Aborting ..."
+        show_usage "`management_network_usage`"
+    fi
+
+    if [ -z "$vlan_id" ]; then
+        msg_error "VLAN ID Parameter not provided. Aborting ..."
+        show_usage "`management_network_usage`"
+    fi
+    if [ "$extra" ]; then
+        msg_error "extra Parameter provided. Aborting ..."
+        show_usage "`management_network_usage`"
+    fi
+
+    tunnel_port=`ovs-ofctl show br-tun|grep $tunnelName|cut -d"(" -f1 | cut -d" " -f2`
+    if [[ -z "$tunnel_port" ]]
+    then
+      msg_fail "Tunnel:$tunnelName not exist! Aborting..."
+      exit 1
+    fi
+    peer_port=`ovs-ofctl show br-tun|grep tunTOint|cut -d"(" -f1 |cut -d" " -f2`
+    file_name="/var/subutai-network/"$tunnelName"_vni_vlan"
+    if [ ! -d '/var/subutai-network' ]
+    then
+        mkdir -p "/var/subutai-network"
+    fi
+    if [ ! -f '$file_name' ]
+    then
+      touch $file_name
+    fi
+    while read line
+    do
+        vni=`echo $line | cut -d ' ' -f1`
+        vlan=`echo $line | cut -d ' ' -f2`
+        vni_list+=($vni)
+        vlan_list+=($vlan)
+    done < $file_name
+
+    if [[ ${vlan_list[*]} =~ $vlan_id ]] || [[ ${vni_list[*]} =~ $vni_id ]]
+    then
+      msg_fail "Vlan ID: $vlan_id or VNI: $vni_id is already in use!"
+      exit 1
+    fi
+    ovs-ofctl add-flow br-tun "in_port=$peer_port,dl_vlan=$vlan_id,actions=set_field:$vni_id->tun_id,output:$tunnel_port"
+    ovs-ofctl add-flow br-tun "in_port=$tunnel_port,tun_id=$vni_id,actions=set_field:$vlan_id->vlan_vid,output:$peer_port"
+    echo "$vni_id $vlan_id" >> $file_name 
+    msg_ok "Tunnel: $tunnelName VNI: $vni_id VLAN: $vlan_id"
+  fi
+
 }
 function management_network_description {
   echo "Create a Tunnel between subutai peers"
@@ -524,4 +667,6 @@ function management_network_description {
   echo "Remove a N2N tunnel"
   echo "Add a Tennant Gateway"
   echo "Remove a Tennant Gateway" 
+  echo "Create VNI-VLAN Mapping on a Tunnel"
+  echo "Delete VNI-VLAN Mapping on a Tunnel"
 }
