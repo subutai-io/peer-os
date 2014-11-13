@@ -68,7 +68,7 @@ public class StormNodeOperationHandler extends AbstractOperationHandler<StormImp
 
         try
         {
-            List<CommandResult> commandResultList = new ArrayList<CommandResult>(  );
+            List<CommandResult> commandResultList = new ArrayList<>(  );
             switch ( operationType )
             {
                 case START:

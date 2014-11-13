@@ -47,7 +47,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
                                          final StormClusterConfiguration config,
                                          final ClusterOperationType operationType )
     {
-        super( manager, config.getClusterName() );
+        super( manager, config );
         this.operationType = operationType;
         this.config = config;
         trackerOperation = manager.getTracker().createTrackerOperation( config.getProductKey(),
@@ -86,7 +86,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
     public void runOperationOnContainers( ClusterOperationType clusterOperationType )
     {
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        List<CommandResult> commandResultList = new ArrayList<CommandResult>(  );
+        List<CommandResult> commandResultList = new ArrayList<>(  );
         switch ( clusterOperationType )
         {
             case START_ALL:
@@ -98,7 +98,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
                         commandResultList.add( executeCommand( containerHost, Commands
                                 .make( CommandType.START, StormService.UI ) ) );
                     }
-                    else if ( config.getSupervisors().equals( containerHost.getId() ) )
+                    else if ( config.getSupervisors().contains( containerHost.getId() ) )
                         commandResultList.add( executeCommand( containerHost, Commands
                                 .make( CommandType.START, StormService.SUPERVISOR ) ) );
                 }
@@ -112,7 +112,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
                         commandResultList.add( executeCommand( containerHost, Commands
                                 .make( CommandType.STOP, StormService.UI ) ) );
                     }
-                    else if ( config.getSupervisors().equals( containerHost.getId() ) )
+                    else if ( config.getSupervisors().contains( containerHost.getId() ) )
                         commandResultList.add( executeCommand( containerHost, Commands
                                 .make( CommandType.STOP, StormService.SUPERVISOR ) ) );
                 }
@@ -126,7 +126,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
                         commandResultList.add( executeCommand( containerHost, Commands
                                 .make( CommandType.STATUS, StormService.UI ) ) );
                     }
-                    else if ( config.getSupervisors().equals( containerHost.getId() ) )
+                    else if ( config.getSupervisors().contains( containerHost.getId() ) )
                         commandResultList.add( executeCommand( containerHost, Commands
                                 .make( CommandType.STATUS, StormService.SUPERVISOR ) ) );
                 }
