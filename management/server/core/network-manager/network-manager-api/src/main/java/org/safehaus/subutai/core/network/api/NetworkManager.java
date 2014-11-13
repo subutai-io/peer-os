@@ -19,6 +19,11 @@ public interface NetworkManager
 
     public void setupGateway( String gatewayIp, int vLanId ) throws NetworkManagerException;
 
+    public void setupGatewayOnContainer( String containerName, String gatewayIp, String interfaceName )
+            throws NetworkManagerException;
+
     public void removeGateway( int vLanId ) throws NetworkManagerException;
+
+    public void removeGatewayOnContainer( String containerName ) throws NetworkManagerException;
 }
 
