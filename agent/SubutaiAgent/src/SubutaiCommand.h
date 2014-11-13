@@ -56,7 +56,7 @@ public:
 	string& getStandardOutput();
 	string& getType();
 	int getPid();
-        int getIsDaemon();
+    int getIsDaemon();
 	string& getHostname();
 	string& getMacAddress();
 	string& getCommandId();
