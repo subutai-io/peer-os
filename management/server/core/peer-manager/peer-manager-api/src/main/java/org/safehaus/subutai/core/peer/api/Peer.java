@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.common.protocol.Criteria;
 
 
 /**

@@ -459,6 +459,8 @@ function lxc_install_agent {
   agentresult=$(lxc-attach -n $container -- dpkg --get-selections | grep $agent_package)
   if [ -z "$agentresult" ] ;then
     #installing agent
+    lxc-attach -n $container -- apt-get update > /dev/null 2>&1
+
     lxc-attach -n $container -- apt-get install --assume-yes --force-yes $agent_package > /dev/null 2>&1
     lxc-attach -n $container -- dpkg -s $agent_package > /dev/null 2>&1
     status=$?

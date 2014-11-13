@@ -25,9 +25,7 @@ import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -361,10 +359,10 @@ public class Manager
                     Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null )
                     {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
-                                        agentManager );
-                        contentRoot.getUI().addWindow( terminal.getWindow() );
+//                        TerminalWindow terminal =
+//                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
+//                                        agentManager );
+//                        contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
@@ -387,9 +385,9 @@ public class Manager
     {
         if ( mongoClusterConfig != null )
         {
-            populateTable( configServersTable, mongoClusterConfig.getConfigServers(), NodeType.CONFIG_NODE );
-            populateTable( routersTable, mongoClusterConfig.getRouterServers(), NodeType.ROUTER_NODE );
-            populateTable( dataNodesTable, mongoClusterConfig.getDataNodes(), NodeType.DATA_NODE );
+//            populateTable( configServersTable, mongoClusterConfig.getConfigServers(), NodeType.CONFIG_NODE );
+//            populateTable( routersTable, mongoClusterConfig.getRouterServers(), NodeType.ROUTER_NODE );
+//            populateTable( dataNodesTable, mongoClusterConfig.getDataNodes(), NodeType.DATA_NODE );
             replicaSetName.setValue( mongoClusterConfig.getReplicaSetName() );
             domainName.setValue( mongoClusterConfig.getDomainName() );
             cfgSrvPort.setValue( mongoClusterConfig.getCfgSrvPort() + "" );

@@ -29,10 +29,10 @@ public class CommandProcess
     private StringBuilder stdOut;
     private StringBuilder stdErr;
     private Integer exitCode;
-    private volatile CommandStatus status;
-    private Semaphore semaphore;
-    private ExecutorService executor;
     private CommandProcessor commandProcessor;
+    protected volatile CommandStatus status;
+    protected Semaphore semaphore;
+    protected ExecutorService executor;
 
 
     public CommandProcess( final CommandProcessor commandProcessor, final CommandCallback callback )
@@ -113,7 +113,7 @@ public class CommandProcess
             }
             if ( !Strings.isNullOrEmpty( response.getStdErr() ) )
             {
-                stdErr.append( response.getStdOut() );
+                stdErr.append( response.getStdErr() );
             }
 
             exitCode = response.getExitCode();
@@ -127,7 +127,9 @@ public class CommandProcess
                 status = CommandStatus.FAILED;
             }
             else if ( response.getType() == ResponseType.LIST_INOTIFY_RESPONSE
-                    || response.getType() == ResponseType.PS_RESPONSE )
+                    || response.getType() == ResponseType.PS_RESPONSE
+                    || response.getType() == ResponseType.SET_INOTIFY_RESPONSE
+                    || response.getType() == ResponseType.UNSET_INOTIFY_RESPONSE )
             {
                 status = CommandStatus.SUCCEEDED;
             }

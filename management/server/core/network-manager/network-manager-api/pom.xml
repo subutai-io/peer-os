@@ -11,7 +11,7 @@
 
   <artifactId>network-manager-api</artifactId>
   <name>Subutai Network Manager Api</name>
-  <description>Network Manager Api</description>
+  <description>Subutai Network Manager Api</description>
 
   <packaging>bundle</packaging>
 

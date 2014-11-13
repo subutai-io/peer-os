@@ -61,6 +61,7 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
                     new ContainerCreatorThread( this, environment.getId(), message, manager.getPeerManager() );
             creatorThread.addObserver( this );
             containersAmount = containersAmount + message.getNumberOfNodes();
+            LOG.info( String.format( "-----------> Scheduled: %s %d %s", key, message.getNumberOfNodes(), message.getTargetPeerId().toString() ) );
             executorService.execute( creatorThread );
         }
 
