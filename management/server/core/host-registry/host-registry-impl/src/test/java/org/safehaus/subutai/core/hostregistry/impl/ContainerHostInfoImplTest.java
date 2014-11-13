@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.hostregistry.impl.ContainerHostInfoImpl;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -20,10 +19,13 @@ public class ContainerHostInfoImplTest
     private static final String HOSTNAME = "container1";
     private static final UUID ID = UUID.randomUUID();
     private static final ContainerHostState CONTAINER_STATUS = ContainerHostState.FROZEN;
+    private static final String INTERFACE = "eth0";
     private static final String IP = "127.0.0.1";
-    private static final String INFO_JSON =
-            String.format( "{ \"hostname\":\"%s\", \"id\":\"%s\", \"ips\" : [\"%s\"], \"status\":\"%s\" }", HOSTNAME,
-                    ID, IP, CONTAINER_STATUS );
+    private static final String MAC = "0c:8b:fd:c0:ea:fe";
+    private static final String INFO_JSON = String.format(
+            "{ \"hostname\":\"%s\", \"id\":\"%s\", \"interfaces\" : [{ \"interfaceName\":\"%s\", "
+                    + "\"ip\":\"%s\",\"mac\":\"%s\"}],  \"status\":\"%s\" }", HOSTNAME, ID, INTERFACE, IP, MAC,
+            CONTAINER_STATUS );
 
 
     ContainerHostInfoImpl containerHostInfo;
@@ -41,8 +43,10 @@ public class ContainerHostInfoImplTest
     {
         assertEquals( HOSTNAME, containerHostInfo.getHostname() );
         assertEquals( ID, containerHostInfo.getId() );
-        assertEquals( IP, containerHostInfo.getIps().iterator().next() );
         assertEquals( CONTAINER_STATUS, containerHostInfo.getStatus() );
+        assertEquals( INTERFACE, containerHostInfo.getInterfaces().iterator().next().getInterfaceName() );
+        assertEquals( MAC, containerHostInfo.getInterfaces().iterator().next().getMac() );
+        assertEquals( IP, containerHostInfo.getInterfaces().iterator().next().getIp() );
     }
 
 
@@ -56,5 +60,7 @@ public class ContainerHostInfoImplTest
         assertThat( toString, containsString( ID.toString() ) );
         assertThat( toString, containsString( CONTAINER_STATUS.name() ) );
     }
+
+
 }
 

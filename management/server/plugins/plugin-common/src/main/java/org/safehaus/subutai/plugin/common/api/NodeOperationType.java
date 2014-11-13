@@ -8,6 +8,8 @@ public enum NodeOperationType
     RESTART,
     STATUS,
     DESTROY,
+    INSTALL,
+    UNINSTALL,
     EXCLUDE,
     INCLUDE,
     DECOMISSION_STATUS

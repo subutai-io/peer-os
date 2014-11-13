@@ -80,15 +80,15 @@ public interface AgentManager
      */
     public void removeListener( AgentListener listener );
 
-    /**
-     * Returning set of agents belonging to an environment
-     *
-     * @param environmentId - environment id
-     *
-     * @return set of agents
-     */
-    @Deprecated
-    public Set<Agent> getAgentsByEnvironmentId( UUID environmentId );
+    //    /**
+    //     * Returning set of agents belonging to an environment
+    //     *
+    //     * @param environmentId - environment id
+    //     *
+    //     * @return set of agents
+    //     */
+    //    @Deprecated
+    //    public Set<Agent> getAgentsByEnvironmentId( UUID environmentId );
 
     /**
      * Wait until agent connects to server

@@ -19,6 +19,8 @@
     <module>elasticsearch</module>
     <module>hadoop</module>
     <module>storm</module>
+    <module>mongodb</module>
+    <module>hive</module>
     <module>spark</module>
     <module>zookeeper</module>
     <module>hbase</module>
@@ -32,7 +34,6 @@
     <module>solr</module>
     <module>mongodb</module>
     <module>flume</module>
-    <module>hive</module>
     <module>presto</module>
     <module>shark</module>
     <module>sqoop</module>

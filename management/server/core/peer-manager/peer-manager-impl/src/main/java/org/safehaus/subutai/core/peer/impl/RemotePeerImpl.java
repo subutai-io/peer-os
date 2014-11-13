@@ -32,7 +32,7 @@ import org.safehaus.subutai.core.peer.impl.container.CreateContainerResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequest;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

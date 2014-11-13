@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.safehaus.subutai.core.strategy.api.AbstractContainerPlacementStrategy;
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 

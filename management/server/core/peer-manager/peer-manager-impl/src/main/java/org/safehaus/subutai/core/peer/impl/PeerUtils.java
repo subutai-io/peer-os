@@ -3,7 +3,6 @@ package org.safehaus.subutai.core.peer.impl;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.util.UUIDUtil;
 
 import com.google.common.base.Strings;
 
@@ -21,7 +20,6 @@ public class PeerUtils
                 response.getHostname(), response.getParentHostName(), response.getMacAddress(), response.getIps(),
                 !Strings.isNullOrEmpty( response.getParentHostName() ),
                 //TODO pass proper site & environment ids
-                response.getTransportId(), UUIDUtil.generateMACBasedUUID(),
-                response.getEnvironmentId() == null ? UUIDUtil.generateMACBasedUUID() : response.getEnvironmentId() );
+                response.getTransportId() );
     }
 }

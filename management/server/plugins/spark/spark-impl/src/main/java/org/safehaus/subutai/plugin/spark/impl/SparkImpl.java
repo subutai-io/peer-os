@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
@@ -231,7 +232,7 @@ public class SparkImpl extends SparkBase implements Spark
         ng.setName( "Default" );
         ng.setNumberOfNodes( 1 + config.getSlaveNodesCount() ); // master +slaves
         ng.setTemplateName( SparkClusterConfig.TEMPLATE_NAME );
-        ng.setPlacementStrategy( PlacementStrategy.MORE_RAM );
+        ng.setPlacementStrategy( new PlacementStrategy( "BEST_SERVER", new Criteria( "MORE_RAM", true ) ) );
         blueprint.setNodeGroups( Sets.newHashSet( ng ) );
 
 
