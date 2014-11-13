@@ -271,9 +271,6 @@ bool SubutaiCommand::deserialize(string& input)
             arg =  root["request"]["ips"][index].asString();
             this->getIps().push_back(arg);
         }
-
-
-
         string arg1;
         arg1.clear();
         watchArgs.clear();

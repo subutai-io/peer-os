@@ -589,7 +589,6 @@ void SubutaiContainer::tryLongCommand() {
     vector<string> args;
     args.push_back("-c");
     args.push_back("ls -la && ls && ls -la && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls");
-
     cout << RunProgram("/bin/bash", args) << endl;
 }
 

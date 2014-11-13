@@ -34,11 +34,11 @@ SubutaiResponsePack::~SubutaiResponsePack()
  *  \details   This method creates default chunk message.
  */
 string SubutaiResponsePack::createResponseMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
-		string error,string output,string taskuuid)
+		string error,string output,string commandid)
 {
 	clear();
 	this->setType("EXECUTE_RESPONSE");			//creating Response chunk message
-	this->setCommandId(taskuuid);
+	this->setCommandId(commandid);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(responseSeqNum);
@@ -53,11 +53,11 @@ string SubutaiResponsePack::createResponseMessage(string uuid,int pid,int reques
  *  \details   This method creates Exit done message.
  */
 string SubutaiResponsePack::createExitMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
-		string taskuuid,int exitcode)	//Creating Exit message
+		string commandid,int exitcode)	//Creating Exit message
 {
 	clear();
-	this->setType("EXECUTE_RESPONSE_DONE");
-	this->setCommandId(taskuuid);
+	this->setType("EXECUTE_RESPONSE");
+	this->setCommandId(commandid);
 	this->setUuid(uuid);
 	this->setPid(pid);
 	this->setRequestSequenceNumber(requestSeqNum);
@@ -71,11 +71,11 @@ string SubutaiResponsePack::createExitMessage(string uuid,int pid,int requestSeq
 /**
  *  \details   This method creates IN_QUEUE Message
  */
-string SubutaiResponsePack::createInQueueMessage(string uuid,string taskuuid)	//Creating IN_QUEUE Message
+string SubutaiResponsePack::createInQueueMessage(string uuid,string commandid)	//Creating IN_QUEUE Message
 {
 	clear();
 	this->setType("IN_QUEUE");
-	this->setCommandId(taskuuid);
+	this->setCommandId(commandid);
 	this->setUuid(uuid);
 	this->serialize(sendout);
 	return sendout;
@@ -148,7 +148,7 @@ string SubutaiResponsePack::createHeartBeatMessage(string uuid,	string hostname)
 
         "exitCode" : 0
  */
-string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string taskuuid, int pid, int exitCode)	//Creating Terminate Message
+string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string commandid, int pid, int exitCode)	//Creating Terminate Message
 {
 	clear();
 	this->setType("TERMINATE_RESPONSE");
@@ -156,7 +156,7 @@ string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(1);
-	this->setCommandId(taskuuid);
+	this->setCommandId(commandid);
 	this->setPid(pid);
 
 	this->serialize(sendout);
@@ -180,7 +180,7 @@ string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum
 										"exitCode" : 1
 
 
-string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,string taskuuid, int pid,const string& stderr)
+string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,string commandid, int pid,const string& stderr)
 {
 	clear();
 	this->setType("TERMINATE_RESPONSE");
@@ -189,7 +189,7 @@ string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSe
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(1);
-	this->setTaskUuid(taskuuid);
+	this->setTaskUuid(commandid);
 	this->setPid(pid);
 	this->setStandardError(stderr);
 	this->serialize(sendout);
@@ -200,11 +200,11 @@ string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSe
  *  \details   This method creates Timeout message.
  */
 string SubutaiResponsePack::createTimeoutMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
-		string stdOut,string stdErr,string taskuuid)	//Creating Timeout Message
+		string stdOut,string stdErr,string commandid)	//Creating Timeout Message
 {
 	clear();
 	this->setType("EXECUTE_TIMEOUT");
-	this->setCommandId(taskuuid);
+	this->setCommandId(commandid);
 	this->setPid(pid);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
