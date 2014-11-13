@@ -177,7 +177,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
         ResourceHost resourceHost = getResourceHostByName( hostName );
         resourceHost
                 .createContainer( this, getId(), envId, Lists.newArrayList( getTemplate( templateName ) ), cloneName,
-                        "custom" );
+                        envId.toString() );
 
         Set<ContainerHost> containerHosts = waitContainerHosts( envId, envId.toString(), 1 );
 
@@ -207,7 +207,8 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
         }
         if ( result.size() != quantity )
         {
-            throw new PeerException( "Not all containers created." );
+            throw new PeerException(
+                    String.format( "Not all containers created (%s count=%d).", nodeGroup, quantity ) );
         }
         return result;
     }
