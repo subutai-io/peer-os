@@ -13,6 +13,7 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
@@ -22,6 +23,7 @@ import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.zookeeper.api.CommandType;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -308,6 +310,23 @@ public class ZookeeperImpl implements Zookeeper
             //this is an over-Hadoop ZK cluster setup
             return new ZookeeperOverHadoopSetupStrategy( environment, config, po, this );
         }
+    }
+
+
+    @Override
+    public String getCommand( final CommandType commandType )
+    {
+        final String PACKAGE_NAME = Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_KEY.toLowerCase();
+
+        switch ( commandType )
+        {
+            case INSTALL:
+                return Commands.getInstallCommand();
+            case UNINSTALL:
+                return Commands.getUninstallCommand();
+        }
+        return null;
+
     }
 
 
