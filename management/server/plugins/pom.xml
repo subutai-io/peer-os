@@ -23,6 +23,7 @@
     <module>spark</module>
     <module>shark</module>
     <module>hbase</module>
+    <module>sqoop</module>
     <!--<module>accumulo</module>
     <module>oozie</module>
     <module>solr</module>
@@ -34,6 +35,7 @@
 
     <module>storm</module>
     <module>presto</module>
+    <module>shark</module>
     <module>sqoop</module>
     <module>lucene</module>
     <module>pig</module>

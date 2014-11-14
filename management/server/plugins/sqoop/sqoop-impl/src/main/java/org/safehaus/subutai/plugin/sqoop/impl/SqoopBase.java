@@ -7,12 +7,9 @@ import java.util.concurrent.Executors;
 
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDao;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 import org.slf4j.Logger;
@@ -24,14 +21,12 @@ public abstract class SqoopBase implements Sqoop
 
     static final Logger LOG = LoggerFactory.getLogger( SqoopImpl.class );
 
-    protected CommandRunner commandRunner;
-    protected AgentManager agentManager;
-    protected Tracker tracker;
-    protected PluginDao pluginDAO;
-    protected Hadoop hadoopManager;
-    protected ContainerManager containerManager;
-    protected EnvironmentManager environmentManager;
-    public DataSource dataSource;
+    Tracker tracker;
+    Hadoop hadoopManager;
+    EnvironmentManager environmentManager;
+
+    PluginDAO pluginDAO;
+    DataSource dataSource;
 
     protected ExecutorService executor;
 
@@ -40,11 +35,11 @@ public abstract class SqoopBase implements Sqoop
     {
         try
         {
-            this.pluginDAO = new PluginDao( dataSource );
+            this.pluginDAO = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
         {
-            LOG.error( e.getMessage(), e );
+            LOG.error( "Failed to init DAO", e );
         }
 
         executor = Executors.newCachedThreadPool();
@@ -54,30 +49,6 @@ public abstract class SqoopBase implements Sqoop
     public void destroy()
     {
         executor.shutdown();
-    }
-
-
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
-    public void setCommandRunner( CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
-    }
-
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
     }
 
 
@@ -93,15 +64,9 @@ public abstract class SqoopBase implements Sqoop
     }
 
 
-    public PluginDao getPluginDao()
+    public PluginDAO getPluginDao()
     {
         return pluginDAO;
-    }
-
-
-    public void setPluginDao( PluginDao pluginDao )
-    {
-        this.pluginDAO = pluginDao;
     }
 
 
@@ -114,18 +79,6 @@ public abstract class SqoopBase implements Sqoop
     public void setHadoopManager( Hadoop hadoopManager )
     {
         this.hadoopManager = hadoopManager;
-    }
-
-
-    public ContainerManager getContainerManager()
-    {
-        return containerManager;
-    }
-
-
-    public void setContainerManager( ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
     }
 
 
@@ -152,9 +105,5 @@ public abstract class SqoopBase implements Sqoop
         this.executor = executor;
     }
 
-
-    public Logger getLogger()
-    {
-        return LOG;
-    }
 }
+
