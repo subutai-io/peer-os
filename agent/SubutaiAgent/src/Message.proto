@@ -1,0 +1,79 @@
+package Subutai;
+
+message Request {
+    enum RequestType {
+        EXECUTE_REQUEST = 0;
+        TERMINATE_REQUEST = 1;
+        PS_REQUEST = 2;
+        SET_INOTIFY_REQUEST = 3;
+        UNSET_INOTIFY_REQUEST = 4;
+        LIST_INOTIFY_REQUEST = 5; 
+    }
+    enum OutputType {
+        NO = 0;
+        RETURN = 1;
+    }
+    message env {
+        required string key = 1;
+        required string value = 2;
+    }
+
+    required RequestType type = 1;
+    required string id = 2;
+    required string commandId = 3;
+    optional string workingDirectory = 4;
+    optional string command = 5;
+    repeated string args = 6;
+    repeated env environment = 7;
+    optional OutputType stdOut = 8;
+    optional OutputType stdErr = 9;
+    optional string runAs = 10;
+    optional int32 timeout = 11;
+    optional int32 isDaemon = 12;
+}
+
+message Response {
+    enum ResponseType {
+        HEARTBEAT = 0;
+        EXECUTE_RESPONSE = 1;
+        EXECUTE_TIMEOUT = 2;
+        IN_QUEUE = 3;
+        TERMINATE_RESPONSE = 4;
+        PS_RESPONSE = 5;
+        SET_INOTIFY_RESPONSE = 6;
+        UNSET_INOTIFY_RESPONSE = 7;
+        LIST_INOTIFY_RESPONSE = 8;
+        INOTIFY_EVENT = 9; 
+    }
+    enum ContainerStatus {
+        RUNNING = 0;
+        STOPPED = 1;
+        FREEZED = 2;
+    }
+    message NetworkInterface {
+        optional string interfaceName = 1;
+        optional string ip = 2;
+        optional string mac = 3;
+    }
+    message Container {
+        optional string hostname = 1;
+        optional string id = 2;
+        repeated NetworkInterface interfaces = 3;
+        optional ContainerStatus status = 4;
+    }
+
+    optional ResponseType type = 1;
+    optional string hostname = 2;
+    optional string id = 3;
+    repeated NetworkInterface interfaces = 4;
+    repeated Container containers = 5;
+    repeated string ips = 6;
+    repeated string macs = 7;
+    optional string commandId = 8;
+    optional int32 pid = 9;
+    optional int32 responseNumber = 10;
+    optional string stdOut = 11;
+    optional string stdErr = 12;
+    optional int32 exitCode = 13;
+    repeated string configPoints = 14;
+}

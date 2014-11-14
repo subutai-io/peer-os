@@ -6,9 +6,8 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.hostregistry.impl.HeartBeat;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
@@ -44,9 +43,9 @@ public class HeartBeatTest
     @Test
     public void testGetHostInfo() throws Exception
     {
-        HostInfo hostInfo = heartBeat.getHostInfo();
+        ResourceHostInfo resourceHostInfo = heartBeat.getHostInfo();
 
-        assertNotNull( hostInfo );
-        assertFalse( hostInfo.getContainers().isEmpty() );
+        assertNotNull( resourceHostInfo );
+        assertFalse( resourceHostInfo.getContainers().isEmpty() );
     }
 }

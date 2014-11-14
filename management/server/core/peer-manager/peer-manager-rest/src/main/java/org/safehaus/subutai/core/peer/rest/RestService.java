@@ -22,19 +22,19 @@ public interface RestService
 
     @POST
     @Path("peer")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces( { MediaType.APPLICATION_JSON } )
     @Consumes(MediaType.TEXT_PLAIN)
     public PeerInfo registerPeer( @QueryParam("peer") String peer );
 
     @GET
     @Path("id")
-    @Produces("text/plain")
+    @Produces({ MediaType.TEXT_PLAIN })
     public String getId();
 
 
     @POST
     @Path("container/create")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON })
     public Response createContainers( @FormParam("ownerPeerId") String ownerPeerId,
                                       @FormParam("environmentId") String environmentId,
                                       @FormParam("templates") String templates, @FormParam("quantity") int quantity,
@@ -44,33 +44,33 @@ public interface RestService
 
     @POST
     @Path("container/destroy")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON })
     public Response destroyContainer( @FormParam("hostId") String host );
 
     @POST
     @Path("container/start")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON })
     public Response startContainer( @FormParam("hostId") String host );
 
     @POST
     @Path("container/stop")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON })
     public Response stopContainer( @FormParam("hostId") String host );
 
     @POST
     @Path("container/isconnected")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON })
     public Response isContainerConnected( @FormParam("hostId") String hostId );
 
 
     @POST
     @Path("template/get")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON })
     public Response getTemplate( @FormParam("templateName") String templateName );
 
     @POST
     @Path("environment/containers")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON })
     public Response environmentContainers( @FormParam("environmentId") String envId );
 
     @GET

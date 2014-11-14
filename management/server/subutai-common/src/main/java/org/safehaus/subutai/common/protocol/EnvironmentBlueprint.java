@@ -31,7 +31,7 @@ public class EnvironmentBlueprint
 
     public UUID getId()
     {
-        return UUID.nameUUIDFromBytes( toString().getBytes() );
+        return UUID.nameUUIDFromBytes( name.getBytes() );
     }
 
 

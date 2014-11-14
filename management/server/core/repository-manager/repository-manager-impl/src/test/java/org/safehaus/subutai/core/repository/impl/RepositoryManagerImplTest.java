@@ -9,8 +9,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
@@ -18,6 +18,8 @@ import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.repository.api.PackageInfo;
 import org.safehaus.subutai.core.repository.api.RepositoryException;
+
+import com.google.common.collect.Sets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -35,6 +37,8 @@ public class RepositoryManagerImplTest
     private static final String ARGUMENT = "argument";
     private static final String LIST_OUTPUT = "subutai-repo-hbase - Subutai Repository Package";
     private static final String PACKAGE_INFO = "Some package info";
+    private static final Set<String> FILES = Sets.newHashSet( ARGUMENT );
+
     @Mock
     PeerManager peerManager;
 
@@ -81,22 +85,6 @@ public class RepositoryManagerImplTest
         {
         }
 
-
-        PeerException exception = mock( PeerException.class );
-        doThrow( exception ).when( localPeer ).getManagementHost();
-
-        try
-        {
-            new RepositoryManagerImpl( peerManager );
-
-            fail( "Expected RepositoryException" );
-        }
-        catch ( RepositoryException e )
-        {
-            assertEquals( exception, e.getCause() );
-        }
-
-        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 
 
@@ -174,6 +162,16 @@ public class RepositoryManagerImplTest
         repositoryManager.extractPackageByName( ARGUMENT );
 
         verify( commands ).getExtractPackageCommand( ARGUMENT );
+    }
+
+
+    @Test
+    public void testExtractFiles() throws Exception
+    {
+
+        repositoryManager.extractPackageFiles( ARGUMENT, FILES );
+
+        verify( commands ).getExtractFilesCommand( ARGUMENT, FILES );
     }
 
 

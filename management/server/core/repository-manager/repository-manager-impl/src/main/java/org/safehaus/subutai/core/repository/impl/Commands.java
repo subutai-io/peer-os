@@ -1,7 +1,10 @@
 package org.safehaus.subutai.core.repository.impl;
 
 
+import java.util.Set;
+
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.util.StringUtil;
 
 
 /**
@@ -30,6 +33,13 @@ public class Commands
     public RequestBuilder getExtractPackageCommand( String packageName )
     {
         return new RequestBuilder( String.format( "subutai package_manager extract %s", packageName ) );
+    }
+
+
+    public RequestBuilder getExtractFilesCommand( String packageName, Set<String> files )
+    {
+        return new RequestBuilder( String.format( "subutai package_manager extract %s -f %s", packageName,
+                StringUtil.joinStrings( files, ',', false ) ) );
     }
 
 

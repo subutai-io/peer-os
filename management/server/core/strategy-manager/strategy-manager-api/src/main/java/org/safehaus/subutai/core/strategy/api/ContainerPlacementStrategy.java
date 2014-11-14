@@ -4,6 +4,8 @@ package org.safehaus.subutai.core.strategy.api;
 import java.util.List;
 import java.util.Map;
 
+import org.safehaus.subutai.common.protocol.Criteria;
+
 
 /**
  * Container placement strategy contains methods to distribute containers on physical hosts
@@ -17,7 +19,7 @@ public interface ContainerPlacementStrategy
 
     public String getTitle();
 
-    public List<Criteria> getCriteria();
+    public List<CriteriaDef> getCriteriaDef();
 
     public Map<ServerMetric, Integer> calculateSlots( int nodesCount, List<ServerMetric> serverMetrics );
 

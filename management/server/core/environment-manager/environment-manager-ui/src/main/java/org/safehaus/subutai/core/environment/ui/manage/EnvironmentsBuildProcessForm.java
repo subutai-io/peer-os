@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.ProcessStatusEnum;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
@@ -188,9 +190,18 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 environmentsButton.click();
             }
         } );
-        environmentsTable.addItem( new Object[] {
-                process.getBlueprintId().toString(), icon, viewButton, processButton, destroyButton
-        }, process.getId() );
+        try
+        {
+            EnvironmentBlueprint blueprint =
+                    module.getEnvironmentManager().getEnvironmentBlueprint( process.getBlueprintId() );
+            environmentsTable.addItem( new Object[] {
+                    blueprint.getName(), icon, viewButton, processButton, destroyButton
+            }, process.getId() );
+        }
+        catch ( EnvironmentManagerException e )
+        {
+            Notification.show( e.getMessage() );
+        }
     }
 
 
@@ -230,7 +241,15 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 executorService.shutdown();
                 executorServiceMap.remove( uuid );
                 environmentBuildProcess.setProcessStatusEnum( ProcessStatusEnum.TERMINATED );
-                module.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
+                try
+                {
+                    module.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
+                    Notification.show( "Saved" );
+                }
+                catch ( EnvironmentManagerException e )
+                {
+                    Notification.show( e.toString() );
+                }
             }
             Notification.show( "Terminated" );
         }
@@ -294,25 +313,25 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         actionBtn.setEnabled( false );
                         p.setValue( new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) );
 
-                        ebp.setProcessStatusEnum( ProcessStatusEnum.IN_PROGRESS );
-                        module.getEnvironmentManager().saveBuildProcess( ebp );
+                        //                        ebp.setProcessStatusEnum( ProcessStatusEnum.IN_PROGRESS );
+                        //                        module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.SUCCESS.equals( event.getEventType() ) )
                     {
                         p.setValue( new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) );
 
-                        ebp.setProcessStatusEnum( ProcessStatusEnum.SUCCESSFUL );
-                        module.getEnvironmentManager().saveBuildProcess( ebp );
+                        //                        ebp.setProcessStatusEnum( ProcessStatusEnum.SUCCESSFUL );
+                        //                        module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.FAIL.equals( event.getEventType() ) )
                     {
                         p.setValue( new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) ) );
 
-                        ebp.setProcessStatusEnum( ProcessStatusEnum.FAILED );
+                        //                        ebp.setProcessStatusEnum( ProcessStatusEnum.FAILED );
                     }
                 }
 
-                module.getEnvironmentManager().saveBuildProcess( ebp );
+                //                module.getEnvironmentManager().saveBuildProcess( ebp );
             }
         } );
     }

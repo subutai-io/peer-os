@@ -8,6 +8,7 @@ package org.safehaus.subutai.plugin.mongodb.api;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
@@ -33,14 +34,15 @@ public class MongoClusterConfig implements ConfigBase
     private int routerPort = 27018;
     private int dataNodePort = 27017;
 
-    private Set<Agent> configServers;
-    private Set<Agent> routerServers;
-    private Set<Agent> dataNodes;
+    private Set<MongoConfigNode> configServers;
+    private Set<MongoRouterNode> routerServers;
+    private Set<MongoDataNode> dataNodes;
+    private UUID environmentId;
 
 
-    public Set<Agent> getAllNodes()
+    public Set<MongoNode> getAllNodes()
     {
-        Set<Agent> nodes = new HashSet<>();
+        Set<MongoNode> nodes = new HashSet<>();
         if ( configServers != null )
         {
             nodes.addAll( configServers );
@@ -142,6 +144,18 @@ public class MongoClusterConfig implements ConfigBase
     }
 
 
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
+    }
+
+
     @Override
     public String getProductName()
     {
@@ -177,37 +191,37 @@ public class MongoClusterConfig implements ConfigBase
     }
 
 
-    public Set<Agent> getRouterServers()
+    public Set<MongoRouterNode> getRouterServers()
     {
         return routerServers;
     }
 
 
-    public void setRouterServers( Set<Agent> routerServers )
+    public void setRouterServers( Set<MongoRouterNode> routerServers )
     {
         this.routerServers = routerServers;
     }
 
 
-    public Set<Agent> getConfigServers()
+    public Set<MongoConfigNode> getConfigServers()
     {
         return configServers;
     }
 
 
-    public void setConfigServers( Set<Agent> configServers )
+    public void setConfigServers( Set<MongoConfigNode> configServers )
     {
         this.configServers = configServers;
     }
 
 
-    public Set<Agent> getDataNodes()
+    public Set<MongoDataNode> getDataNodes()
     {
         return dataNodes;
     }
 
 
-    public void setDataNodes( Set<Agent> dataNodes )
+    public void setDataNodes( Set<MongoDataNode> dataNodes )
     {
         this.dataNodes = dataNodes;
     }
@@ -262,6 +276,26 @@ public class MongoClusterConfig implements ConfigBase
     public void setDataNodePort( int dataNodePort )
     {
         this.dataNodePort = dataNodePort;
+    }
+
+
+    public void addNode( final MongoNode host, final NodeType nodeType )
+    {
+        switch ( nodeType )
+        {
+            case DATA_NODE:
+                getDataNodes().add( ( MongoDataNode ) host );
+                setNumberOfDataNodes( getNumberOfDataNodes() + 1 );
+                break;
+            case ROUTER_NODE:
+                getRouterServers().add( ( MongoRouterNode ) host );
+                setNumberOfRouters( getNumberOfRouters() + 1 );
+                break;
+            case CONFIG_NODE:
+                getConfigServers().add( ( MongoConfigNode ) host );
+                setNumberOfConfigServers( getNumberOfConfigServers() + 1 );
+                break;
+        }
     }
 
 

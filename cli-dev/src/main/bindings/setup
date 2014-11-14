@@ -1,34 +1,14 @@
 #!/bin/bash
 
+modprobe zfs > /dev/null 2>&1;
+if [ "$?" == "0" ];then
+. $subutai_lib_base/master_zfs_ops
+else
+. $subutai_lib_base/master_btrfs_ops
+fi
+
 function setup {
-  # Check that the release code name is trusty
-  # ---------------------------------------------------------------------------
-  if [ ! "$DISTRIB_CODENAME" = "trusty" ]; then 
-    echo "Incompatible Ubuntu Release"
-    exit 1
-  fi
-
-  # Check that zfs has been properly installed
-  # ---------------------------------------------------------------------------
-  if [ -z "`zfs list lxc`" ]; then
-    echo lxc dataset not found
-    exit 1
-  fi
-
-  if [ -z "`zfs list lxc-data`" ]; then
-    echo lxc-data dataset not found
-    exit 1
-  elif [ ! -d "$SUBUTAI_TMPDIR" ]; then
-    mkdir $SUBUTAI_TMPDIR
-  fi
-
-  # Check that the master image has been properly installed
-  # ---------------------------------------------------------------------------
-
-  if [ -z "`lxc-ls | grep master`" ]; then
-    echo Could not find installed base container, installing now ...
-    subutai master_create
-  fi
+  fs_master_setup
 }
 
 

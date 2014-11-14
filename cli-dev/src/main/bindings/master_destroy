@@ -1,78 +1,14 @@
 #!/bin/bash
 
+modprobe zfs > /dev/null 2>&1;
+if [ "$?" == "0" ];then
+. $subutai_lib_base/master_zfs_ops
+else
+. $subutai_lib_base/master_btrfs_ops
+fi
+
 function master_destroy {
-
-  if [ -z "`zfs list lxc/master`" ]; then
-    msg_error "No zfs dataset \"lxc/master\" found - aborting ..."
-    exit 1
-  fi
-
-  if [ "`is_system_all_locked`" == "true" ]
-  then
-     msg_error "System locked by a subutai process"
-     exit 1
-  fi
-
-  local container="master"
-  local package_name=`get_package_name $container`
-  local debian_root="$SUBUTAI_TMPDIR/$container"
-  
-  lock_subutai_system
-  if [ $? != 0 ]; then msg_error "System cannot be locked!"; exit 1; fi
-  
-  # Confirm destroy operation
-  echo WARNING: this destroys everything mercilessly
-  while true; do
-    read -p "Do you wish to destroy master template? [Y/N]" yn
-    case $yn in
-      [Yy]* ) break;;
-      [Nn]* ) unlock_subutai_system
-             if [ $? != 0 ]; then echo "System cannot be unlocked!"; exit 1; fi 
-             exit 1;;
-      * ) echo "Please answer yes or no.";;
-    esac
-  done
-
-  # Destroy all children of master template
-  children_list=`zfs_get_children_list $container`
-  for child in $children_list
-  do
-    subutai destroy -r -f $child
-    if [ $? != 0 ]
-    then
-      unlock_subutai_system
-      if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
-      exit 1
-    fi
-  done
- 
-  # Check if the package is installed
-  is_package_installed $package_name
-  if [ $? == 0  ]; then
-    apt-get --assume-yes --force-yes purge $package_name
-  fi
-
-
-  zfs release keep lxc/master-opt@template
-  zfs destroy -r lxc/master-opt
-
-  zfs release keep lxc-data/master-var@template
-  zfs destroy -r lxc-data/master-var
-
-  zfs release keep lxc-data/master-home@template
-  zfs destroy -r lxc-data/master-home
-
-  zfs release keep lxc/master@template
-  zfs destroy -r lxc/master
-  lxc-destroy -n master
-  
-  # Remove relevant directories under $SUBUTAI_TMPDIR if any
-  rm -rf $debian_root
-  unlock_subutai_system
-  if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
-
-  msg_ok "Destruction of \"master\" completed succesfully "
-
+  fs_master_destroy
 }
 
 

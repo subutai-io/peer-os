@@ -86,38 +86,45 @@ function net_check_bridgeName {
   fi
 }
 
-function net_check_priority {
-  local priority="$1"
+function net_check_N2N_IpAddress {
+  local ipcheck="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([0-9]\
+|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
+  local superNodeIp="$1"
+  local localPeerIp="$2"
 
-  if expr "$priority" : '-\?[0-9]\+$' >/dev/null
+  #Checking superNode IP Address Validation
+  echo $superNodeIp | grep -w -E -o $ipcheck > /dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    msg_info "SuperNode IP Address: OK"
+  else
+    msg_error "Invalid SuperNode IP Address: $superNodeIp. Aborting..."
+    show_usage "`management_network_usage`"
+  fi
+
+  #Checking LocalPeer IP Address Validation
+  echo $localPeerIp | grep -w -E -o $ipcheck > /dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    msg_info "LocalPeer IP Address: OK"
+  else
+    msg_error "Invalid LocalPeer IP Address: $localPeerIp. Aborting..."
+    show_usage "`management_network_usage`"
+  fi
+}
+
+function net_check_portNumber {
+  local port="$1"
+
+  if expr "$port" : '-\?[0-9]\+$' >/dev/null
   then
-     if [ $priority -gt "32768" ]; then
-       msg_error "Priority value \"$priority\" is greater than maximum-32768 value.."
+     if [ $port -gt "65535" ]; then
+       msg_error "Port value \"$port\" is greater than maximum-65535 value.."
        show_usage "`management_network_usage`"
      else
-       echo "Priority: OK"
+       echo "Port Number: OK"
      fi
   else
-     msg_error "Priority value \"$priority\" is not valid.."
+     msg_error "Port value \"$port\" is not valid.."
      show_usage "`management_network_usage`"
   fi
 }
 
-function net_check_action {
-  local action="$1"
-  declare -a listArray=('output' 'enqueue' 'normal' 'flood' 'all' 'controller' 'local' 'drop' 'resubmit' 'drop_spoofed_arp')
-  
-  #checking action is valid or not
-  local result="false"
-  for i in "${listArray[@]}"
-  do
-    if [  $i == $action ]; then
-        result="true"
-    fi
-  done
- 
-  if [ "false" == "$result" ]; then
-    msg_error "Action \"$action\" is not valid.."
-    show_usage "`management_network_usage`"
-  fi
-}
