@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.sqoop.api;
 
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -119,6 +120,27 @@ public class SqoopConfig implements ConfigBase
     public void setHadoopNodes( Set<UUID> hadoopNodes )
     {
         this.hadoopNodes = hadoopNodes;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        hash = 23 * hash + Objects.hashCode( this.clusterName );
+        return hash;
+    }
+
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( obj instanceof SqoopConfig )
+        {
+            SqoopConfig other = ( SqoopConfig ) obj;
+            return Objects.equals( this.clusterName, other.clusterName );
+        }
+        return false;
     }
 
 
