@@ -607,7 +607,7 @@ public class Manager
                                 synchronized ( PROGRESS_ICON )
                                 {
                                     resultHolder.setValue( nodeState.name() );
-                                    if ( nodeState.name().contains( "Not" ) )
+                                    if ( nodeState.name().contains( "STOPPED" )  )
                                     {
                                         getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
                                         getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
@@ -620,7 +620,6 @@ public class Manager
 
                                     PROGRESS_ICON.setVisible( false );
                                     getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                    getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
                                 }
                             }
                         }, null ) );
@@ -648,7 +647,7 @@ public class Manager
                                 synchronized ( PROGRESS_ICON )
                                 {
                                     resultHolder.setValue( nodeState.name() );
-                                    if ( nodeState.name().contains( "Not" ) )
+                                    if ( nodeState.name().contains( "STOPPED" ) )
                                     {
                                         getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
                                         getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );

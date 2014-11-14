@@ -77,12 +77,15 @@ public class NodeOperationHandler extends AbstractOperationHandler<FlumeImpl, Fl
             {
                 case START:
                     result = host.execute( new RequestBuilder( Commands.make( CommandType.START ) ) );
+                    logStatusResults( trackerOperation, result );
                     break;
                 case STOP:
                     result = host.execute( new RequestBuilder( Commands.make( CommandType.STOP ) ) );
+                    logStatusResults( trackerOperation, result );
                     break;
                 case STATUS:
                     result = host.execute( new RequestBuilder( Commands.make( CommandType.SERVICE_STATUS ) ) );
+                    logStatusResults( trackerOperation, result );
                     break;
                 case INSTALL:
                     result = installProductOnNode( host );
@@ -91,7 +94,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<FlumeImpl, Fl
                     result = uninstallProductOnNode( host );
                     break;
             }
-            logStatusResults( trackerOperation, result );
+            //logStatusResults( trackerOperation, result );
         }
         catch ( CommandException e )
         {
@@ -110,7 +113,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<FlumeImpl, Fl
             {
                 config.getNodes().add( host.getId() );
                 manager.getPluginDao().saveInfo( FlumeConfig.PRODUCT_KEY, config.getClusterName(), config );
-                trackerOperation.addLog(
+                trackerOperation.addLogDone(
                         FlumeConfig.PRODUCT_KEY + " is installed on node " + host.getHostname() + " successfully." );
             }
             else
@@ -137,7 +140,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<FlumeImpl, Fl
             {
                 config.getNodes().remove( host.getId() );
                 manager.getPluginDao().saveInfo( FlumeConfig.PRODUCT_KEY, config.getClusterName(), config );
-                trackerOperation.addLog( FlumeConfig.PRODUCT_KEY + " is uninstalled from node " + host.getHostname()
+                trackerOperation.addLogDone( FlumeConfig.PRODUCT_KEY + " is uninstalled from node " + host.getHostname()
                         + " successfully." );
             }
             else
@@ -161,11 +164,11 @@ public class NodeOperationHandler extends AbstractOperationHandler<FlumeImpl, Fl
         String status = "UNKNOWN";
         if ( result.getExitCode() == 0 )
         {
-            status = result.getStdOut();
+            status = "Flume is running";
         }
-        else if ( result.getExitCode() == 768 )
+        else if ( result.getExitCode() == 256 || result.getExitCode() == 1 )
         {
-            status = "Presto is not running";
+            status = "Flume is not running";
         }
         else
         {

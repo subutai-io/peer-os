@@ -89,21 +89,24 @@ public class NodeOperationHanler extends AbstractOperationHandler<PrestoImpl, Pr
             {
                 case START:
                     result = host.execute( manager.getCommands().getStartCommand() );
+                    logStatusResults( trackerOperation, result );
                     break;
                 case STOP:
                     result = host.execute( manager.getCommands().getStopCommand() );
+                    logStatusResults( trackerOperation, result );
                     break;
                 case STATUS:
                     result = host.execute( manager.getCommands().getStatusCommand() );
+                    logStatusResults( trackerOperation, result );
                     break;
                 case INSTALL:
-                    result = installProductOnNode( host );
+                    installProductOnNode( host );
                     break;
                 case UNINSTALL:
-                    result = uninstallProductOnNode( host );
+                    uninstallProductOnNode( host );
                     break;
             }
-            logStatusResults( trackerOperation, result );
+            //logStatusResults( trackerOperation, result );
         }
         catch ( CommandException e )
         {
@@ -146,7 +149,7 @@ public class NodeOperationHanler extends AbstractOperationHandler<PrestoImpl, Pr
                 {
                     config.getWorkers().add( host.getId() );
                     manager.getPluginDAO().saveInfo( PrestoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-                    trackerOperation.addLog(
+                    trackerOperation.addLogDone(
                             PrestoClusterConfig.PRODUCT_KEY + " is installed on node " + host.getHostname() + " successfully." );
                 }
                 else
@@ -177,7 +180,7 @@ public class NodeOperationHanler extends AbstractOperationHandler<PrestoImpl, Pr
             {
                 config.getWorkers().remove( host.getId() );
                 manager.getPluginDAO().saveInfo( PrestoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-                trackerOperation.addLog( PrestoClusterConfig.PRODUCT_KEY + " is uninstalled from node " + host.getHostname()
+                trackerOperation.addLogDone( PrestoClusterConfig.PRODUCT_KEY + " is uninstalled from node " + host.getHostname()
                         + " successfully." );
             }
             else
@@ -197,18 +200,16 @@ public class NodeOperationHanler extends AbstractOperationHandler<PrestoImpl, Pr
         Preconditions.checkNotNull( result );
         StringBuilder log = new StringBuilder();
         String status = "UNKNOWN";
-        if ( result.getExitCode() == 0 )
-        {
-            status = "Flume is running";
-        }
-        else if ( result.getExitCode() == 256 || result.getExitCode() == 1 )
-        {
-            status = "Flume is not running";
-        }
-        else
+
+        if( result.getExitCode() == 0 )
         {
             status = result.getStdOut();
         }
+        if ( result.getExitCode() == 768 )
+        {
+            status = "Not running";
+        }
+
         log.append( String.format( "%s", status ) );
         po.addLogDone( log.toString() );
     }

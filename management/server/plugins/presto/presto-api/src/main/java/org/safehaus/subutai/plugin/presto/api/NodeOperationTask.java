@@ -55,13 +55,13 @@ public class NodeOperationTask extends AbstractNodeOperationTask implements Runn
     @Override
     public String getProductStoppedIdentifier()
     {
-        return "Presto is not running";
+        return "Not running";
     }
 
 
     @Override
     public String getProductRunningIdentifier()
     {
-        return "Presto is running";
+        return "Running as";
     }
 }

@@ -438,6 +438,7 @@ public class ConfigurationStep extends Panel
             }
             else
             {
+                wizard.setHadoopConfig( hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ) );
                 wizard.next();
             }
         }

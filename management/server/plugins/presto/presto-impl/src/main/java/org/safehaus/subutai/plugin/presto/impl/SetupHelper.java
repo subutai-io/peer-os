@@ -2,19 +2,11 @@ package org.safehaus.subutai.plugin.presto.impl;
 
 
 import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Container;
-import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
@@ -43,11 +35,10 @@ public class SetupHelper
     }
 
 
-    void checkConnected() throws ClusterSetupException
+    void checkConnected( Environment environment) throws ClusterSetupException
     {
 
-        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        if ( getCoordinatorHost().getAgent() == null )
+        if ( getCoordinatorHost( environment ).getAgent() == null )
         {
             throw new ClusterSetupException( "Coordinator node is not connected" );
         }
@@ -62,11 +53,11 @@ public class SetupHelper
     }
 
 
-    public void configureAsCoordinator( ContainerHost host ) throws ClusterSetupException, CommandException
+    public void configureAsCoordinator( ContainerHost host, Environment environment ) throws ClusterSetupException, CommandException
     {
         po.addLog( "Configuring coordinator..." );
 
-          CommandResult result = host.execute( manager.getCommands().getSetCoordinatorCommand( getCoordinatorHost()) );
+          CommandResult result = host.execute( manager.getCommands().getSetCoordinatorCommand( getCoordinatorHost( environment)) );
           processResult( host, result );
 
     }
@@ -122,9 +113,8 @@ public class SetupHelper
                     result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
         }
     }
-    public ContainerHost getCoordinatorHost()
+    public ContainerHost getCoordinatorHost( Environment environment)
     {
-        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
         ContainerHost host = environment.getContainerHostByUUID( config.getCoordinatorNode() );
         return host;
     }

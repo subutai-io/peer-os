@@ -66,7 +66,7 @@ public class Wizard
             }
             case 3:
             {
-                component = new VerificationStep( presto, executorService, tracker, this );
+                component = new VerificationStep( presto, executorService, tracker, environmentManager, this );
                 break;
             }
             default:
