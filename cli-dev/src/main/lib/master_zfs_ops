@@ -18,8 +18,8 @@ function fs_master_snapshot {
 }
 
 function fs_master_lxc_create {
-  local $SUBUTAI_USER="$1"
-  local $SUBUTAI_AUTH_KEY="$2"
+  local SUBUTAI_USER="$1"
+  local SUBUTAI_AUTH_KEY="$2"
   lxc-create -n master            \
    -t ubuntu                      \
    -B zfs --                      \
