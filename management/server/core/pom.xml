@@ -43,6 +43,7 @@
     <module>broker</module>
     <module>host-registry</module>
     <module>command-executor</module>
+    <module>wol_manager</module>
   </modules>
 
 </project>
