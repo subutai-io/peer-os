@@ -17,26 +17,26 @@ public class Commands
     private static final String RESOURCE_HOST_NETWORK_BINDING = "subutai network";
 
 
-    public RequestBuilder getSetupN2NConnectionCommand( String superNodeIp, int superNodePort, String tapInterfaceName,
+    public RequestBuilder getSetupN2NConnectionCommand( String superNodeIp, int superNodePort, String interfaceName,
                                                         String communityName, String localIp )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "-N", superNodeIp, String.valueOf( superNodePort ), tapInterfaceName, communityName,
+                Lists.newArrayList( "-N", superNodeIp, String.valueOf( superNodePort ), interfaceName, communityName,
                         localIp ) );
     }
 
 
-    public RequestBuilder getRemoveN2NConnectionCommand( String tapInterfaceName, String communityName )
+    public RequestBuilder getRemoveN2NConnectionCommand( String interfaceName, String communityName )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-R", communityName, tapInterfaceName ) );
+                .withCmdArgs( Lists.newArrayList( "-R", communityName, interfaceName ) );
     }
 
 
-    public RequestBuilder getSetupTunnelCommand( String tunnelName, String peerIp, String connectionType )
+    public RequestBuilder getSetupTunnelCommand( String tunnelName, String tunnelIp, String tunnelType )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-c", tunnelName, peerIp, connectionType ) );
+                .withCmdArgs( Lists.newArrayList( "-c", tunnelName, tunnelIp, tunnelType ) );
     }
 
 
@@ -59,5 +59,32 @@ public class Commands
     {
         return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING )
                 .withCmdArgs( Lists.newArrayList( containerName, "-r" ) );
+    }
+
+
+    public RequestBuilder getSetupGatewayCommand( String gatewayIp, int vLanId )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "-T", gatewayIp, String.valueOf( vLanId ) ) );
+    }
+
+
+    public RequestBuilder getSetupGatewayOnContainerCommand( String gatewayIp, String interfaceName )
+    {
+        return new RequestBuilder( "route add default gw" )
+                .withCmdArgs( Lists.newArrayList( gatewayIp, interfaceName ) );
+    }
+
+
+    public RequestBuilder getRemoveGatewayCommand( int vLanId )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "-D", String.valueOf( vLanId ) ) );
+    }
+
+
+    public RequestBuilder getRemoveGatewayOnContainerCommand()
+    {
+        return new RequestBuilder( "route del default gw" );
     }
 }

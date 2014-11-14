@@ -10,5 +10,19 @@
       </action>
     </command>
   </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="host/container-host">
+      <action class="org.safehaus.subutai.core.hostregistry.cli.GetContainerHostInfoCommand">
+        <argument ref="hostRegistry" />
+      </action>
+    </command>
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="host/resource-host">
+      <action class="org.safehaus.subutai.core.hostregistry.cli.GetResourceHostInfoCommand">
+        <argument ref="hostRegistry" />
+      </action>
+    </command>
+  </command-bundle>
 
 </blueprint>

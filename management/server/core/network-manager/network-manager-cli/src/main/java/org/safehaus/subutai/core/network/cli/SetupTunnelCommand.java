@@ -22,12 +22,12 @@ public class SetupTunnelCommand extends OsgiCommandSupport
     @Argument( index = 0, name = "tunnel name", required = true, multiValued = false,
             description = "tunnel name" )
     String tunnelName;
-    @Argument( index = 1, name = "peer ip", required = true, multiValued = false,
-            description = "peer ip" )
-    String peerIp;
-    @Argument( index = 2, name = "connection type", required = true, multiValued = false,
-            description = "connection type" )
-    String connectionType;
+    @Argument( index = 1, name = "tunnel ip", required = true, multiValued = false,
+            description = "tunnel ip" )
+    String tunnelIp;
+    @Argument( index = 2, name = "tunnel type", required = true, multiValued = false,
+            description = "tunnel type" )
+    String tunnelType;
 
 
     public SetupTunnelCommand( final NetworkManager networkManager )
@@ -44,7 +44,7 @@ public class SetupTunnelCommand extends OsgiCommandSupport
 
         try
         {
-            networkManager.setupTunnel( tunnelName, peerIp, connectionType );
+            networkManager.setupTunnel( tunnelName, tunnelIp, tunnelType );
             System.out.println( "OK" );
         }
         catch ( NetworkManagerException e )

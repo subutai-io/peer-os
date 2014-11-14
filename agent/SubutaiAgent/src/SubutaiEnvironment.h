@@ -43,33 +43,29 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include "SubutaiLogger.h"
+#include "SubutaiHelper.h"
 using namespace std;
 using std::stringstream;
 using std::string;
+
 
 class SubutaiEnvironment
 {
 public:
 	SubutaiEnvironment( SubutaiLogger* );
 	virtual ~SubutaiEnvironment( void );
-	string toString( int );
 	int getAgentSettings();
 	bool getAgentUuid();
-	bool getAgentMacAddress();
+	bool getAgentInterfaces();
 	bool getAgentHostname();
-	bool getAgentParentHostname();
-	bool isAgentLxc();
-	bool getAgentIpAddress();
 	bool getAgentEnvironmentId();
 	string getAgentUuidValue();
 	string getAgentHostnameValue();
-	string getAgentMacAddressValue();
-	string getAgentParentHostnameValue();
 	string getAgentConnectionUrlValue();
 	string getAgentConnectionPortValue();
 	string getAgentConnectionOptionsValue();
-	vector<string> getAgentIpValue();
 	string getAgentEnvironmentIdValue();
+	vector<Interface> getAgentInterfaceValues();
 
 private:
 	string connectionUrl;
@@ -78,13 +74,13 @@ private:
 	string logLevel;
 	string clientPassword;
 	string uuid;
-	string macAddress;
+	map<string,string> 	macAddresses;
 	string hostname;
 	string parentHostname;
 	string environmentId;
-	int islxc;
-	vector<string> ipAddress;
+	vector<Interface> interfaces;
 	SubutaiLogger*	environmentLogger;
+	SubutaiHelper _helper;
 };
 #endif /* SUBUTAIENVIRONMENT_H_ */
 

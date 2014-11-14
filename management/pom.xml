@@ -53,7 +53,7 @@
     <junit.version>4.11</junit.version>
     <org.osgi.version>4.3.1</org.osgi.version>
 
-    <vaadin-version>7.3.2</vaadin-version>
+    <vaadin-version>7.3.3</vaadin-version>
   </properties>
 
   <dependencyManagement>
@@ -396,6 +396,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>command-executor-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>command-executor-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -1107,11 +1112,11 @@
         <artifactId>hbase-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>-->
-      <!--<dependency>
+      <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>hbase-plugin-ui</artifactId>
         <version>${project.version}</version>
-      </dependency>-->
+      </dependency>
 
       <!--
       <dependency>

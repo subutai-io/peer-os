@@ -291,6 +291,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>command-executor-impl</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>command-executor-cli</artifactId>
+    </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- monitor -->
@@ -544,10 +548,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>hbase-plugin-rest</artifactId>
     </dependency>-->
-    <!--<dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hbase-plugin-ui</artifactId>
-    </dependency>-->
+    </dependency>
 
     <!--
     <dependency>
