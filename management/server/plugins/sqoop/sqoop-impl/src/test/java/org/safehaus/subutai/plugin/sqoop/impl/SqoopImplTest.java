@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.sqoop.impl;
 
 
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import javax.sql.DataSource;
@@ -20,11 +19,8 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.mock.TrackerOperationMock;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
-import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
-import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
 
 
 @RunWith( MockitoJUnitRunner.class )
@@ -37,6 +33,7 @@ public class SqoopImplTest
     private Tracker tracker;
 
     private TrackerOperation trackOperation;
+    private String clusterName = "cluster-test";
 
 
     @Before
@@ -45,8 +42,12 @@ public class SqoopImplTest
         sqoop.executor = Mockito.mock( ExecutorService.class );
         trackOperation = new TrackerOperationMock();
 
+        SqoopConfig config = new SqoopConfig();
+        config.setClusterName( clusterName );
+        Mockito.when( sqoop.getCluster( clusterName ) ).thenReturn( config );
+
         Mockito.when( sqoop.getTracker() ).thenReturn( tracker );
-        Mockito.when( tracker.createTrackerOperation( SqoopConfig.PRODUCT_KEY, "desc" ) )
+        Mockito.when( tracker.createTrackerOperation( Matchers.anyString(), Matchers.anyString() ) )
                 .thenReturn( trackOperation );
     }
 
@@ -54,35 +55,6 @@ public class SqoopImplTest
     @After
     public void tearDown()
     {
-    }
-
-
-    @Test
-    public void testInstallCluster_SqoopConfig()
-    {
-        SqoopConfig config = new SqoopConfig();
-        UUID trackId = sqoop.installCluster( config );
-
-        Assert.assertEquals( trackOperation.getId(), trackId );
-    }
-
-
-    @Test
-    public void testInstallCluster_SqoopConfig_HadoopClusterConfig()
-    {
-        SqoopConfig config = new SqoopConfig();
-        HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
-        UUID trackId = sqoop.installCluster( config, hadoopConfig );
-
-        Assert.assertEquals( trackOperation.getId(), trackId );
-    }
-
-
-    @Test
-    public void testUninstallCluster()
-    {
-        UUID trackId = sqoop.uninstallCluster( Matchers.any( String.class ) );
-        Assert.assertEquals( trackOperation.getId(), trackId );
     }
 
 
@@ -95,46 +67,8 @@ public class SqoopImplTest
     @Test
     public void testGetCluster()
     {
-    }
-
-
-    @Test
-    public void testIsInstalled()
-    {
-        UUID trackId = sqoop.isInstalled( Matchers.any( String.class ), Matchers.any( String.class ) );
-        Assert.assertEquals( trackOperation.getId(), trackId );
-    }
-
-
-    @Test
-    public void testDestroyNode()
-    {
-        UUID trackId = sqoop.destroyNode( Matchers.any( String.class ), Matchers.any( String.class ) );
-        Assert.assertEquals( trackOperation.getId(), trackId );
-    }
-
-
-    @Test
-    public void testAddNode()
-    {
-        UUID trackId = sqoop.addNode( null, null );
-        Assert.assertNull( "Null expected that indicates no action is performed", trackId );
-    }
-
-
-    @Test
-    public void testExportData()
-    {
-        UUID trackId = sqoop.exportData( new ExportSetting() );
-        Assert.assertEquals( trackOperation.getId(), trackId );
-    }
-
-
-    @Test
-    public void testImportData()
-    {
-        UUID trackId = sqoop.importData( new ImportSetting() );
-        Assert.assertEquals( trackOperation.getId(), trackId );
+        SqoopConfig config = sqoop.getCluster( clusterName );
+        Assert.assertEquals( clusterName, config.getClusterName() );
     }
 
 
