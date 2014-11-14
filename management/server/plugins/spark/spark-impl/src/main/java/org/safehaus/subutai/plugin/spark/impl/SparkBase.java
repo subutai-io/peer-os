@@ -64,12 +64,6 @@ public abstract class SparkBase
     }
 
 
-    public void setTracker( Tracker tracker )
-    {
-        this.tracker = tracker;
-    }
-
-
     public EnvironmentManager getEnvironmentManager()
     {
         return environmentManager;
@@ -86,6 +80,7 @@ public abstract class SparkBase
     {
         return pluginDAO;
     }
+
 
     protected SparkBase( final DataSource dataSource, final Tracker tracker,
                          final EnvironmentManager environmentManager, final Hadoop hadoopManager )

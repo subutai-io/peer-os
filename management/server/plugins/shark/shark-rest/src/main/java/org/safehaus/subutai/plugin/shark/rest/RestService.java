@@ -15,11 +15,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
-import org.safehaus.subutai.plugin.spark.api.Spark;
-import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
+
+import com.google.common.collect.Lists;
 
 
 public class RestService
@@ -27,25 +26,11 @@ public class RestService
     private static final String OPERATION_ID = "OPERATION_ID";
 
     private Shark sharkManager;
-    private Spark sparkManager;
-    private AgentManager agentManager;
 
 
-    public void setSharkManager( Shark sharkManager )
+    public RestService( final Shark sharkManager )
     {
         this.sharkManager = sharkManager;
-    }
-
-
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }
-
-
-    public void setSparkManager( Spark sparkManager )
-    {
-        this.sparkManager = sparkManager;
     }
 
 
@@ -56,7 +41,7 @@ public class RestService
     {
 
         List<SharkClusterConfig> configList = sharkManager.getClusters();
-        ArrayList<String> clusterNames = new ArrayList();
+        ArrayList<String> clusterNames = Lists.newArrayList();
 
         for ( SharkClusterConfig config : configList )
         {
@@ -83,11 +68,10 @@ public class RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response installCluster( @PathParam( "clusterName" ) String clusterName )
     {
-        SparkClusterConfig sparkConfig = sparkManager.getCluster( clusterName );
         SharkClusterConfig sharkConfig = new SharkClusterConfig();
 
-        sharkConfig.setClusterName( sparkConfig.getClusterName() );
-        sharkConfig.setNodes( sparkConfig.getAllNodes() );
+        sharkConfig.setClusterName( clusterName );
+        sharkConfig.setSparkClusterName( clusterName );
 
         String operationId = JsonUtil.toJson( OPERATION_ID, sharkManager.installCluster( sharkConfig ) );
         return Response.status( Response.Status.CREATED ).entity( operationId ).build();

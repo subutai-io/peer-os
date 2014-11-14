@@ -8,5 +8,6 @@ public enum ClusterOperationType
     START_ALL,
     STOP_ALL,
     STATUS_ALL,
-    DECOMISSION_STATUS
+    DECOMISSION_STATUS,
+    CUSTOM
 }

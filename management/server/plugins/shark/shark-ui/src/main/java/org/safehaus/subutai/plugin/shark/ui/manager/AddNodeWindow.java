@@ -5,9 +5,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
@@ -35,7 +35,7 @@ public class AddNodeWindow extends Window
 
 
     public AddNodeWindow( final Shark shark, final ExecutorService executorService, final Tracker tracker,
-                          final SharkClusterConfig config, Set<Agent> nodes )
+                          final SharkClusterConfig config, Set<ContainerHost> nodes )
     {
         super( "Add New Node" );
         setModal( true );
@@ -61,7 +61,7 @@ public class AddNodeWindow extends Window
         cmbNodes.setNullSelectionAllowed( false );
         cmbNodes.setRequired( true );
         cmbNodes.setWidth( 80, Unit.PERCENTAGE );
-        for ( Agent node : nodes )
+        for ( ContainerHost node : nodes )
         {
             cmbNodes.addItem( node );
             cmbNodes.setItemCaption( node, node.getHostname() );
@@ -95,8 +95,8 @@ public class AddNodeWindow extends Window
             {
                 addNodeBtn.setEnabled( false );
                 showProgress();
-                Agent agent = ( Agent ) cmbNodes.getValue();
-                final UUID trackID = shark.addNode( config.getClusterName(), agent.getHostname() );
+                ContainerHost node = ( ContainerHost ) cmbNodes.getValue();
+                final UUID trackID = shark.addNode( config.getClusterName(), node.getHostname() );
                 executorService.execute( new Runnable()
                 {
                     @Override
