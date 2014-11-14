@@ -21,6 +21,7 @@ import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.storm.impl.handler.StormClusterOperationHandler;
 import org.safehaus.subutai.plugin.storm.impl.handler.StormNodeOperationHandler;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 
 public class StormImpl extends StormBase
@@ -114,20 +115,24 @@ public class StormImpl extends StormBase
     @Override
     public UUID addNode( String clusterName )
     {
-        return null;
-//        AbstractOperationHandler h = new AddNodeHandler( this, clusterName );
-//        executor.execute( h );
-//        return h.getTrackerId();
+        StormClusterConfiguration zookeeperClusterConfig = getCluster( clusterName );
+
+        AbstractOperationHandler h = new StormClusterOperationHandler( this, zookeeperClusterConfig,
+                ClusterOperationType.ADD );
+        executor.execute( h );
+        return h.getTrackerId();
     }
 
 
     @Override
     public UUID destroyNode( String clusterName, String hostname )
     {
-        return null;
-//        AbstractOperationHandler h = new DestroyNodeHandler( this, clusterName, hostname );
-//        executor.execute( h );
-//        return h.getTrackerId();
+        StormClusterConfiguration zookeeperClusterConfig = getCluster( clusterName );
+
+        AbstractOperationHandler h = new StormClusterOperationHandler( this, zookeeperClusterConfig, hostname,
+                ClusterOperationType.ADD );
+        executor.execute( h );
+        return h.getTrackerId();
     }
 
 

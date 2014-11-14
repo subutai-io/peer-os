@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.storm.impl.handler;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,6 +13,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
@@ -24,6 +26,7 @@ import org.safehaus.subutai.plugin.storm.impl.CommandType;
 import org.safehaus.subutai.plugin.storm.impl.Commands;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 import org.safehaus.subutai.plugin.storm.impl.StormService;
+import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +43,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
     private static final Logger LOG = LoggerFactory.getLogger( StormClusterOperationHandler.class.getName() );
     private ClusterOperationType operationType;
     private StormClusterConfiguration config;
+    private String hostname;
     private ExecutorService executor = Executors.newCachedThreadPool();
 
 
@@ -51,34 +55,28 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
         this.operationType = operationType;
         this.config = config;
         trackerOperation = manager.getTracker().createTrackerOperation( config.getProductKey(),
-                String.format( "Creating %s tracker object...", clusterName ) );
+                String.format( "Running %s operation on %s...", operationType , clusterName ) );
+    }
+
+
+    public StormClusterOperationHandler( final StormImpl manager,
+                                         final StormClusterConfiguration config,
+                                         final String hostname,
+                                         final ClusterOperationType operationType )
+    {
+        super( manager, config );
+        this.operationType = operationType;
+        this.config = config;
+        this.hostname = hostname;
+        trackerOperation = manager.getTracker().createTrackerOperation( config.getProductKey(),
+                String.format( "Running %s operation on %s...", operationType , clusterName ) );
     }
 
 
     public void run()
     {
         Preconditions.checkNotNull( config, "Configuration is null !!!" );
-        switch ( operationType )
-        {
-            case INSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
-                        setupCluster();
-                    }
-                } );
-                break;
-            case UNINSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
-                        destroyCluster();
-                    }
-                } );
-                break;
-        }
+        runOperationOnContainers( operationType );
     }
 
 
@@ -89,6 +87,12 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
         List<CommandResult> commandResultList = new ArrayList<>(  );
         switch ( clusterOperationType )
         {
+            case INSTALL:
+                setupCluster();
+                break;
+            case UNINSTALL:
+                destroyCluster();
+                break;
             case START_ALL:
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
@@ -131,8 +135,32 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
                                 .make( CommandType.STATUS, StormService.SUPERVISOR ) ) );
                 }
                 break;
+            case ADD:
+                commandResultList.addAll( addNode() );
+                break;
+            case REMOVE:
+                commandResultList.addAll( removeNode() );
+
+                break;
         }
         logResults( trackerOperation, commandResultList );
+    }
+
+
+    private List<CommandResult> removeNode()
+    {
+        List<CommandResult> commandResults = new ArrayList<>();
+        Preconditions.checkNotNull( hostname, "Hostname of the node to be removed cannot be null!" );
+        trackerOperation.addLogFailed( "Removing node from cluster is not supported yet!" );
+        return commandResults;
+    }
+
+
+    private List<CommandResult> addNode()
+    {
+        List<CommandResult> commandResults = new ArrayList<>();
+        trackerOperation.addLogFailed( "Adding node to cluster is not supported yet!" );
+        return commandResults;
     }
 
 
@@ -181,7 +209,8 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
         catch ( EnvironmentBuildException | ClusterSetupException e )
         {
             trackerOperation.addLogFailed(
-                    String.format( "Failed to setup %s cluster %s : %s", config.getProductKey(), clusterName, e.getMessage() ) );
+                    String.format( "Failed to setup %s cluster %s : %s", config.getProductKey(), clusterName,
+                            e.getMessage() ) );
         }
     }
 
@@ -217,22 +246,11 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
         Preconditions.checkNotNull( commandResultList );
         for ( CommandResult commandResult : commandResultList )
             po.addLog( commandResult.getStdOut() );
-        if ( getFailedCommandResults( commandResultList ).size() == 0 ) {
-            po.addLogDone( "" );
-        }
-        else {
+        if ( po.getState() == OperationState.FAILED ) {
             po.addLogFailed( "" );
         }
-    }
-
-
-    public List<CommandResult> getFailedCommandResults( final List<CommandResult> commandResultList )
-    {
-        List<CommandResult> failedCommands = new ArrayList<>();
-        for ( CommandResult commandResult : commandResultList ) {
-            if ( ! commandResult.hasSucceeded() )
-                failedCommands.add( commandResult );
+        else {
+            po.addLogDone( "" );
         }
-        return failedCommands;
     }
 }
