@@ -67,7 +67,7 @@ function rename {
   lxc_assert_no $dst
 
   # check to make sure the source container is NOT already a template
-  if [ "`zfs_is_template $src`" == "true" ]; then
+  if [ "`fs_is_template $src`" == "true" ]; then
     msg_error "Container \"$src\" is a template. Aborting ..."
     unlock_container_read $src
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi

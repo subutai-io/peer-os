@@ -130,8 +130,8 @@ function lxc_clone_ds {
   local child_ds="$pool/$child-$partition"
   local parent_snap="$pool/$parent-$partition@template"
 
-  zfs_assert_snap "$parent_snap" "$usage"
-  zfs clone "$parent_snap" "$child_ds"
+  fs_assert_snap "$parent_snap" "$usage"
+  fs_clone "$parent_snap" "$child_ds"
   msg_info "    - \"$child_ds\" cloned from \"$parent_snap\""
 }
 
@@ -172,7 +172,7 @@ function lxc_new_mac {
 # (2) setup skeleton of new cloned child container
 #       - create home and rootfs
 #       - stream and filter config with var substitution
-# (3) zfs clone snapshots for child datasets
+# (3) fs clone snapshots for child datasets
 # (4) alter hostname from /etc/hosts and /etc/hostname
 
 function lxc_clone {
@@ -217,7 +217,7 @@ function lxc_clone {
   lxc_assert_no $child "`usage`"
   lxc_assert $parent "`usage`"
 
-  if [ "`zfs_is_template $parent`" == "false" ]; then
+  if [ "`fs_is_template $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is not a template"
     unlock_container_read $child
     exit 1
@@ -238,9 +238,9 @@ function lxc_clone {
      -e "s/$parent-/$child-/g" | grep -v subutai.git.uuid >> $child_conf
   cp $parent_home/fstab $child_home
 
-  # (3) zfs clone snapshots for child datasets
-  zfs clone lxc/$parent@template lxc/$child
-  zfs set mountpoint=$child_rootfs lxc/$child
+  # (3) fs clone snapshots for child datasets
+  fs_clone lxc/$parent@template lxc/$child
+  fs_set_mountpoint $child_rootfs $child
   lxc_clone_ds $parent $child opt lxc "$usage"
   lxc_clone_ds $parent $child var lxc-data "$usage"
   lxc_clone_ds $parent $child home lxc-data "$usage"
@@ -314,7 +314,7 @@ function lxc_copy {
   lxc_assert_no $child "`usage`"
   lxc_assert $parent "`usage`"
 
-  if [ "`zfs_is_template $parent`" == "true" ]; then
+  if [ "`fs_is_template $parent`" == "true" ]; then
     msg_error "Parent \"$parent\" must not be a template for a copy op"
     unlock_container_read $child
     exit 1
@@ -334,13 +334,13 @@ function lxc_copy {
      -e "s/$parent-/$child-/g" | grep -v subutai.git.uuid >> $child_conf
   cp $parent_home/fstab $child_home
 
-  # (3) zfs clone child datasets
-  grand_parent="`zfs_get_parent $parent`"
-  zfs_copy_ds "lxc/$parent" "lxc/$child"
-  zfs set mountpoint="$child_rootfs" "lxc/$child"
-  zfs_copy_ds "lxc/$parent-opt" "lxc/$child-opt"
-  zfs_copy_ds "lxc-data/$parent-var" "lxc-data/$child-var"
-  zfs_copy_ds "lxc-data/$parent-home" "lxc-data/$child-home"
+  # (3) fs clone child datasets
+  grand_parent="`fs_get_parent $parent`"
+  fs_copy_ds "lxc/$parent" "lxc/$child"
+  fs_set_mountpoint $child_rootfs $child
+  fs_copy_ds "lxc/$parent-opt" "lxc/$child-opt"
+  fs_copy_ds "lxc-data/$parent-var" "lxc-data/$child-var"
+  fs_copy_ds "lxc-data/$parent-home" "lxc-data/$child-home"
 
   # (4) alter hostname from /etc/hosts and /etc/hostname
   echo $child > $child_rootfs/etc/hostname
@@ -381,7 +381,7 @@ function lxc_rename {
   lxc_assert_no $dst "`usage`"
   lxc_assert $src "`usage`"
 
-  if [ "`zfs_is_template $src`" == "true" ]; then
+  if [ "`fs_is_template $src`" == "true" ]; then
     msg_error "Source \"$src\" must not be a template for a rename op"
     unlock_container_read $dst
     exit 1
@@ -405,17 +405,7 @@ function lxc_rename {
   umount "/var/lib/lxc/$src/rootfs"
   
   # rename datasets and set mount point for rootfs
-  zfs rename "lxc-data/$src-home" "lxc-data/$dst-home"
-  zfs rename "lxc-data/$src-var"  "lxc-data/$dst-var"
-  zfs rename "lxc/$src-opt" "lxc/$dst-opt"
-  zfs rename "lxc/$src" "lxc/$dst"
-  zfs set mountpoint="$dst_rootfs" "lxc/$dst"
-
-  zfs mount "lxc/$dst"
-  zfs mount "lxc/$dst-opt"
-  zfs mount "lxc-data/$dst-home"
-  zfs mount "lxc-data/$dst-var"
-
+  fs_rename_datasets_set_mount_point $src $dst $dst_rootfs
   # change the hostname
   echo "$dst" > "$dst_rootfs/etc/hostname"
   str_replace_in_file "$src" "$dst" "$dst_rootfs/etc/hosts"
