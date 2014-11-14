@@ -61,13 +61,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<AccumuloIm
         switch ( operationType )
         {
             case INSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
-                        setupCluster();
-                    }
-                } );
+                setupCluster();
                 break;
             case UNINSTALL:
                 executor.execute( new Runnable()

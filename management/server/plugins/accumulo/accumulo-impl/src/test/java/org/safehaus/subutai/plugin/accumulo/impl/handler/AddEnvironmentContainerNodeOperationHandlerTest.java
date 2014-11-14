@@ -17,7 +17,7 @@
 //{
 //
 //    @Test
-//    public void testWithoutCluster()
+//    public void testWithExistingClusterName()
 //    {
 //        AbstractOperationHandler operationHandler =
 //                new AddNodeOperationHandler( new AccumuloImplMock(), "test-cluster", "test-node", NodeType.Tracer );

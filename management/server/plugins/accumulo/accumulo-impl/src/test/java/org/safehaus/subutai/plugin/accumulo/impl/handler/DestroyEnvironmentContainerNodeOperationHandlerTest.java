@@ -19,7 +19,7 @@
 //{
 //
 //    @Test
-//    public void testWithoutCluster()
+//    public void testWithExistingClusterName()
 //    {
 //        AbstractOperationHandler operationHandler =
 //                new DestroyNodeOperationHandler( new AccumuloImplMock(), "test-cluster", "test-node",

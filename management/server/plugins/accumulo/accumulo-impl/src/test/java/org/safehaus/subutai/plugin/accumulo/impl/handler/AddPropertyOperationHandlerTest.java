@@ -16,7 +16,7 @@
 //{
 //
 //    @Test
-//    public void testWithoutCluster()
+//    public void testWithExistingClusterName()
 //    {
 //        AbstractOperationHandler operationHandler =
 //                new AddPropertyOperationHandler( new AccumuloImplMock(), "test-cluster", "test-property",

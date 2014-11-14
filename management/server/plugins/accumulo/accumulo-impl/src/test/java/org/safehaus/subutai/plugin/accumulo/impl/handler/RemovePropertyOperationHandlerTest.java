@@ -15,7 +15,7 @@
 //public class RemovePropertyOperationHandlerTest
 //{
 //    @Test
-//    public void testWithoutCluster()
+//    public void testWithExistingClusterName()
 //    {
 //        AbstractOperationHandler operationHandler =
 //                new RemovePropertyOperationHandler( new AccumuloImplMock(), "test-cluster", "test-property" );
