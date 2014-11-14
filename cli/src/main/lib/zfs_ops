@@ -142,7 +142,6 @@ function fs_remove_mount {
 #release all holds on clone's rootfs snaps and delete snaps
 function fs_rls_holds_delete_snaps {
   local $clone="$1"
-  local $snap="$2"
   for snap in `zfs list -t snapshot -o name -H | grep $clone@`; do
     for hold in `zfs holds -r $snap | grep $snap | awk '{print $2}'`; do
       zfs release $hold $snap

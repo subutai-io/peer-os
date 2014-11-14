@@ -132,7 +132,7 @@ function destroy {
   fi
 
   # (4) & (5) release all holds on clone's rootfs snaps and delete snaps
-  function fs_rls_holds_delete_snaps $clone $snap
+  fs_rls_holds_delete_snaps $clone
 
   destroy_monitor $clone
   ovs_port_name=$(ovs_get_port_name $clone)
