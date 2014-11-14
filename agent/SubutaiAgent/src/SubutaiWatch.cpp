@@ -371,7 +371,7 @@ bool SubutaiWatch::checkNotification()
 						setNewDirectory(getCurrentDirectory() + "/" + event->name);
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								getNewDirectory(),getModificationTime(getNewDirectory(),false),"Create_Folder");
-						watchConnection->sendMessage(sendout);
+						watchConnection->sendMessage(sendout, "INOTIFY_TOPIC");
 						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
@@ -381,7 +381,7 @@ bool SubutaiWatch::checkNotification()
 						string newFile = getCurrentDirectory() + "/" + event->name;
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								newFile,getModificationTime(newFile,false),"Create_File");
-						watchConnection->sendMessage(sendout);
+						watchConnection->sendMessage(sendout, "INOTIFY_TOPIC");
 						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
@@ -397,7 +397,7 @@ bool SubutaiWatch::checkNotification()
 						setNewDirectory(getCurrentDirectory() + "/" + event->name);
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								getNewDirectory(),getModificationTime(getNewDirectory(),true),"Delete_Folder");
-						watchConnection->sendMessage(sendout);
+						watchConnection->sendMessage(sendout, "INOTIFY_TOPIC");
 						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
@@ -407,7 +407,7 @@ bool SubutaiWatch::checkNotification()
 						string newFile = getCurrentDirectory() + "/" + event->name;
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								newFile,getModificationTime(newFile,true),"Delete_File");
-						watchConnection->sendMessage(sendout);
+						watchConnection->sendMessage(sendout, "INOTIFY_TOPIC");
 						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
@@ -428,7 +428,7 @@ bool SubutaiWatch::checkNotification()
 						string modFile = getCurrentDirectory() + "/" + event->name;
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								modFile,getModificationTime(modFile,false),"Modify_file");
-						watchConnection->sendMessage(sendout);
+						watchConnection->sendMessage(sendout, "INOTIFY_TOPIC");
 						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
@@ -444,7 +444,7 @@ bool SubutaiWatch::checkNotification()
 						string modFile = getCurrentDirectory() + "/" + event->name;
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								modFile,getModificationTime(modFile,false),"Modify_Permission_Folder");
-						watchConnection->sendMessage(sendout);
+						watchConnection->sendMessage(sendout, "INOTIFY_TOPIC");
 						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
@@ -454,7 +454,7 @@ bool SubutaiWatch::checkNotification()
 						string modFile = getCurrentDirectory() + "/" + event->name;
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								modFile,getModificationTime(modFile,false),"Modify_Permission_File");
-						watchConnection->sendMessage(sendout);
+						watchConnection->sendMessage(sendout, "INOTIFY_TOPIC");
 						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
@@ -488,9 +488,9 @@ string SubutaiWatch::getModificationTime(string folderpath,bool generate)
 		else
 		{
 			boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-			deleteResult= toString(now.date().day().as_number()) +"-"+toString(now.date().month().as_number())+"-" +
-					toString(now.date().year()) +" "+ toString(now.time_of_day().hours())+
-					":"+toString(now.time_of_day().minutes())+":"+toString(now.time_of_day().seconds());
+			deleteResult= helper.toString(now.date().day().as_number()) +"-"+helper.toString(now.date().month().as_number())+"-" +
+					helper.toString(now.date().year()) +" "+ helper.toString(now.time_of_day().hours())+
+					":"+helper.toString(now.time_of_day().minutes())+":"+helper.toString(now.time_of_day().seconds());
 		}
 	}
 	catch(exception e)
@@ -505,15 +505,5 @@ string SubutaiWatch::getModificationTime(string folderpath,bool generate)
 	{
 		return unixResult;
 	}
-}
-
-/**
- *  \details   This method designed for Typically conversion from integer to string.
- */
-string SubutaiWatch::toString(int intcont)
-{
-	ostringstream dummy;
-	dummy << intcont;
-	return dummy.str();
 }
 

@@ -38,9 +38,10 @@
 #include <list>
 #include <unistd.h>
 #include <time.h>
-#include<boost/date_time/posix_time/posix_time_types.hpp>
-#include<string>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <string>
 #include "SubutaiConnection.h"
+#include "SubutaiHelper.h"
 #include "SubutaiResponsePack.h"
 #include "SubutaiLogger.h"
 
@@ -80,7 +81,6 @@ public:
 	char* getBuffer();
 	bool checkNotification();
 	string getModificationTime(string, bool);
-	string toString(int);
 private:
 	bool folderExistenceChecker(const string &);
 	bool checkDuplicateName(const string &);
@@ -93,20 +93,21 @@ private:
 			return l.pd < r.pd ? true : l.pd == r.pd && l.name < r.name ? true : false;
 		}
 	};
-	map<int, wd_elem> watch;
-	map<wd_elem, int, wd_elem> rwatch;
-	fd_set watch_set;
-	int fd;
-	int wd;
-	char buffer[ EVENT_BUF_LEN ];
-	string currentDirectory;
-	string newDirectory;
-	timeval timeout;
-	int selectResult;
-	int readResult;
-	string sendout;
-	SubutaiResponsePack* watchRepsonse;
-	SubutaiConnection*	watchConnection;
-	SubutaiLogger*		watchLogger;
+	map<int, wd_elem> 				watch;
+	map<wd_elem, int, wd_elem> 		rwatch;
+	fd_set 							watch_set;
+	int 							fd;
+	int 							wd;
+	char 							buffer[ EVENT_BUF_LEN ];
+	string 							currentDirectory;
+	string 							newDirectory;
+	timeval 						timeout;
+	int 							selectResult;
+	int 							readResult;
+	string 							sendout;
+	SubutaiResponsePack*   	 		watchRepsonse;
+	SubutaiConnection*				watchConnection;
+	SubutaiLogger*					watchLogger;
+	SubutaiHelper 					helper;
 };
 #endif /* SUBUTAIWATCH_H_ */

@@ -41,7 +41,7 @@ public:
 	SubutaiConnection(const char*,const char*,const char*,const char*,const char*,int);
 	virtual ~SubutaiConnection();
 	bool openSession();
-	bool sendMessage(string);
+	bool sendMessage(string, string topic = "");
 	bool checkMessageStatus();
 	void resetMessageStatus();
 	void setMessage(string);
