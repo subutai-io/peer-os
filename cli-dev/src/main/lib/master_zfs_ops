@@ -61,7 +61,7 @@ function fs_master_destroy {
   done
 
   # Destroy all children of master template
-  children_list=`zfs_get_children_list $container`
+  children_list=`fs_get_children_list $container`
   for child in $children_list
   do
     subutai destroy -r -f $child
@@ -197,7 +197,7 @@ function fs_master_import {
   local package_name=`get_package_name $container`
 
   lxc_assert_no $container
-  zfs_assert_nods "lxc/$container"
+  fs_assert_nods "lxc/$container"
 
   # Create the container
   # ---------------------------------------------------------------------------
