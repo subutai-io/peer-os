@@ -10,21 +10,22 @@ import java.util.UUID;
  */
 public interface HostRegistry
 {
-    public ContainerHostInfo getContainerInfoById( UUID id );
+    public ContainerHostInfo getContainerHostInfoById( UUID id ) throws HostDisconnectedException;
 
-    public ContainerHostInfo getContainerInfoByHostname( String hostname );
+    public ContainerHostInfo getContainerHostInfoByHostname( String hostname ) throws HostDisconnectedException;
 
-    public Set<ContainerHostInfo> getContainersInfo();
+    public Set<ContainerHostInfo> getContainerHostsInfo();
 
-    public HostInfo getHostInfoById( UUID id );
+    public ResourceHostInfo getResourceHostInfoById( UUID id ) throws HostDisconnectedException;
 
-    public HostInfo getHostInfoByHostname( String hostname );
+    public ResourceHostInfo getResourceHostInfoByHostname( String hostname ) throws HostDisconnectedException;
 
-    public Set<HostInfo> getHostsInfo();
+    public Set<ResourceHostInfo> getResourceHostsInfo();
 
     public void addHostListener( HostListener listener );
 
     public void removeHostListener( HostListener listener );
 
-    public HostInfo getParentByChild( ContainerHostInfo containerHostInfo );
+    public ResourceHostInfo getResourceHostByContainerHost( ContainerHostInfo containerHostInfo )
+            throws HostDisconnectedException;
 }

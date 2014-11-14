@@ -4,6 +4,8 @@ package org.safehaus.subutai.core.strategy.api;
 import java.util.List;
 import java.util.Map;
 
+import org.safehaus.subutai.common.protocol.Criteria;
+
 
 /**
  * Strategy manager provides methods for working with container placement strategy

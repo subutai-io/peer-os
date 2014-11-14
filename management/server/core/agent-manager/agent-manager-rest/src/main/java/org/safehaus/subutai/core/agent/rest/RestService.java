@@ -69,11 +69,11 @@ public interface RestService
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getLxcAgentsByParentHostname( @PathParam("parentHostname") String parentHostname );
 
-    /**
-     * Returning set of agents belonging to an environment
-     */
-    @GET
-    @Path("agents/by-environment-id/{envId}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getAgentsByEnvironmentId( @PathParam("envId") String environmentId );
+//    /**
+//     * Returning set of agents belonging to an environment
+//     */
+//    @GET
+//    @Path("agents/by-environment-id/{envId}")
+//    @Produces({ MediaType.APPLICATION_JSON })
+//    public Response getAgentsByEnvironmentId( @PathParam("envId") String environmentId );
 }

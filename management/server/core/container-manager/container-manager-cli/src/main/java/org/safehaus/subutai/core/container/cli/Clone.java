@@ -62,9 +62,5 @@ public class Clone extends OsgiCommandSupport implements ContainerEventListener
     {
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis( containerEvent.getTimestamp() );
-        System.out.println(
-                String.format( "%1$s: %2$s %3$s -< %4$s %5$tm %5$te,%5$tY %5$tT", containerEvent.getEventType(),
-                        containerEvent.getEnvId(), containerEvent.getParentHostname(), containerEvent.getHostname(),
-                        cal ) );
     }
 }

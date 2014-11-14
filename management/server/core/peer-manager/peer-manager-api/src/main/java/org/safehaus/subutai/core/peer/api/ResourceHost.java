@@ -10,13 +10,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
@@ -32,9 +34,9 @@ public class ResourceHost extends SubutaiHost
     private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
     private static final Pattern LOAD_AVERAGE_PATTERN = Pattern.compile( "load average: (.*)" );
     private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
+    private ExecutorService executor;
 
-
-    Set<ContainerHost> containersHosts = Sets.newHashSet();
+    Set<ContainerHost> containersHosts = Sets.newConcurrentHashSet();
 
 
     public ResourceHost( final Agent agent, UUID peerId )
@@ -43,13 +45,24 @@ public class ResourceHost extends SubutaiHost
     }
 
 
-    public void addContainerHost( ContainerHost host )
+    public synchronized void addContainerHost( ContainerHost host )
     {
         if ( host == null )
         {
             throw new IllegalArgumentException( "Container host could not be null." );
         }
         containersHosts.add( host );
+    }
+
+
+    private ExecutorService getExecutor()
+    {
+        if ( executor == null )
+        {
+            executor = Executors.newFixedThreadPool( 1 );
+        }
+
+        return executor;
     }
 
 
@@ -327,28 +340,28 @@ public class ResourceHost extends SubutaiHost
     }
 
 
-    public ContainerHost createContainer( final UUID creatorPeerId, final UUID environmentId,
-                                          final List<Template> templates, final String containerName )
-            throws PeerException
+    private ContainerHost create( final UUID creatorPeerId, final UUID environmentId, final List<Template> templates,
+                                  final String containerName ) throws PeerException
     {
         Template template = templates.get( templates.size() - 1 );
-        boolean cloneResult = false;
-        try
-        {
-            cloneResult = run( Command.CLONE, template.getTemplateName(), containerName, environmentId.toString() );
-        }
-        catch ( ResourceHostException ignore )
-        {
-
-        }
-
-        if ( cloneResult )
-        {
-            return waitAgentAndCreateContainerHost( containerName, template.getTemplateName(), environmentId,
-                    creatorPeerId );
-        }
+        //        boolean cloneResult = false;
+        //        try
+        //        {
+        //            cloneResult = run( Command.CLONE, template.getTemplateName(), containerName,
+        // environmentId.toString() );
+        //        }
+        //        catch ( ResourceHostException ignore )
+        //        {
+        //
+        //        }
+        //
+        //        if ( cloneResult )
+        //        {
+        //            return waitAgentAndCreateContainerHost( containerName, template.getTemplateName(), environmentId,
+        //                    creatorPeerId );
+        //        }
         prepareTemplates( templates );
-        cloneResult = run( Command.CLONE, template.getTemplateName(), containerName, environmentId.toString() );
+        boolean cloneResult = run( Command.CLONE, template.getTemplateName(), containerName, environmentId.toString() );
         if ( cloneResult )
         {
             return waitAgentAndCreateContainerHost( containerName, template.getTemplateName(), environmentId,
@@ -360,6 +373,65 @@ public class ResourceHost extends SubutaiHost
                     String.format( "Unable create container %s on %s using template %s", containerName, getHostname(),
                             template.getTemplateName() ), null );
         }
+    }
+
+
+    public void createContainer( final LocalPeer localPeer, final UUID creatorPeerId, final UUID environmentId,
+                                 final List<Template> templates, final String containerName,
+                                 final String nodeGroupName )
+
+    {
+
+        //        if (containerName.length() > 0)
+        //            throw new PeerException("Test");
+
+        getExecutor().execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    ContainerHost containerHost = create( creatorPeerId, environmentId, templates, containerName );
+                    containerHost.setNodeGroupName( nodeGroupName );
+                    containerHost.setPeerId( localPeer.getId() );
+                    containerHost.setEnvironmentId( environmentId );
+                    localPeer.onPeerEvent( new PeerEvent( PeerEventType.CONTAINER_CREATE_SUCCESS, containerHost ) );
+                }
+                catch ( Exception e )
+                {
+                    localPeer.onPeerEvent( new PeerEvent( PeerEventType.CONTAINER_CREATE_FAIL, e ) );
+                }
+            }
+        } );
+
+        //        ExecutorCompletionService completionService = new ExecutorCompletionService<>( getExecutor() );
+        //        completionService.submit( new Callable()
+        //        {
+        //            @Override
+        //            public ContainerHost call() throws Exception
+        //            {
+        //                return create( creatorPeerId, environmentId, templates, containerName );
+        //            }
+        //        } );
+        //
+        //        ContainerHost result = null;
+        //        try
+        //        {
+        //            Future<ContainerHost> future = completionService.take();
+        //            result = future.get();
+        //            if ( !result.getHostname().equals( containerName ) )
+        //            {
+        //                throw new PeerException(
+        //                        String.format( "Invalid host name. Requested %s <> actual %", result.getHostname(),
+        //                                containerName ) );
+        //            }
+        //            return result;
+        //        }
+        //        catch ( Exception e )
+        //        {
+        //            throw new PeerException( e.toString() );
+        //        }
     }
 
 

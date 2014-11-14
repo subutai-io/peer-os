@@ -272,7 +272,7 @@ public class CassandraImpl implements Cassandra
         nodeGroup.setExchangeSshKeys( true );
         nodeGroup.setDomainName( Common.DEFAULT_DOMAIN_NAME );
         nodeGroup.setTemplateName( config.getTemplateName() );
-        nodeGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        nodeGroup.setPlacementStrategy( new PlacementStrategy( "ROUND_ROBIN" ) );
         nodeGroup.setNumberOfNodes( config.getNumberOfNodes() );
 
         blueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
