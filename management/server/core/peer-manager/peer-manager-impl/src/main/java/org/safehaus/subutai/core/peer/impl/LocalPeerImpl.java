@@ -338,6 +338,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
         }
         catch ( Exception e )
         {
+            e.printStackTrace();
             //TODO: destroy environment containers
             throw new PeerException( e.toString() );
         }
