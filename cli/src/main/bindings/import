@@ -42,7 +42,7 @@ function import {
   #       if NOT the user will have to install the parent template first
   # ----------------------------------------------------------------------------
   lxc_assert_no $template
-  zfs_assert_nods lxc/$template
+  fs_assert_nods lxc/$template
 
   if [ -f "$debian_file" ]; then
     is_local="true"
@@ -163,7 +163,7 @@ function import {
   lxc_assert $parent
 
   # check to make sure the parent is a template
-  if [ "`zfs_is_template $parent`" == "false" ]; then
+  if [ "`fs_is_template $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
     apt-get --assume-yes --force-yes purge $package_name
     unlock_container_read $template
@@ -196,12 +196,7 @@ function import {
   cp $debian_root/fstab $lxc_home;
   cp $debian_root/packages $lxc_home;
 
-  zfs recv lxc/$template < $deltas/rootfs.delta
-  zfs set mountpoint=$lxc_rootfs lxc/$template
-
-  zfs recv lxc/$template-opt < $deltas/opt.delta
-  zfs recv lxc-data/$template-var < $deltas/var.delta
-  zfs recv lxc-data/$template-home < $deltas/home.delta
+  fs_recv $template $deltas $lxc_rootfs  
 
   if [ "`is_registered $template`" == "true" ]; then
     notify_template_import $template

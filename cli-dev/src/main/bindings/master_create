@@ -1,5 +1,11 @@
 #!/bin/bash
 
+modprobe zfs > /dev/null 2>&1;
+if [ "$?" == "0" ];then
+. $subutai_lib_base/master_zfs_ops
+else
+. $subutai_lib_base/master_btrfs_ops
+fi
 
 function master_create {
   if [ "`is_system_all_locked`" == "true" ]
@@ -15,17 +21,11 @@ function master_create {
   # ---------------------------------------------------------------------------
 
   lxc_assert_no master
-  zfs_assert_nods "lxc/master"
+  fs_assert_nods "lxc/master"
 
   # Create the container
   # ---------------------------------------------------------------------------
-
-  lxc-create -n master            \
-   -t ubuntu                      \
-   -B zfs --                      \
-   -u $SUBUTAI_USER               \
-   -S $SUBUTAI_AUTH_KEY 
-
+  fs_master_lxc_create $SUBUTAI_USER $SUBUTAI_AUTH_KEY
   # Add config and app data paths to the config file
   config=/var/lib/lxc/master/config
   for config_path in `echo "$SUBUTAI_CONFIG_PATH" | sed -e "s/\:/ /g"`; do
@@ -86,20 +86,7 @@ function master_create {
 
   # (6)
   echo Taking @template snapshot of master\'s rootfs
-  zfs snapshot lxc/master@template
-  zfs hold keep lxc/master@template
-
-  # Handle all other mountpoints
-  # ---------------------------------------------------------------------------
-  # Using the addmount function almost the same operations as we did above on 
-  # the rootfs are handled: whatever existing data that was found inside the 
-  # mount point on the rootfs are moved over to the new dataset once created
-  # snapshots with holds are taken.
-
-  addmount master opt lxc
-  addmount master home lxc-data
-  addmount master var lxc-data
-  
+  fs_master_snapshot  
   unlock_subutai_system
   if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
 }

@@ -1,5 +1,12 @@
 #!/bin/bash
 
+modprobe zfs > /dev/null 2>&1;
+if [ "$?" == "0" ];then
+. $subutai_lib_base/master_zfs_ops
+else
+. $subutai_lib_base/master_btrfs_ops
+fi
+
 function usage {
   echo -----------------------------------------------------------------------
   echo Usage: Exports the master template as a debian package
@@ -18,88 +25,7 @@ function usage {
 # (3) generate the debian package file from deltas, and package info
 
 function master_export {
-
-  if [ "`is_system_all_locked`" == "true" ]
-  then
-     msg_error "System locked by a subutai process"
-     exit 1
-  fi
-
-  lock_subutai_system
-  if [ $? != 0 ]; then msg_error "System cannot be locked!"; exit 1; fi
-
-  # ---------------------------------------------------------------------------
-  # (1) perform some sanity checks
-  # ---------------------------------------------------------------------------
-  local container="master"
-  local debian_package_name=`get_debian_package_name $container`
-  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
-  local debian_dir=$SUBUTAI_TMPDIR/$debian_package_name
-  local debian_root="$debian_dir$SUBUTAI_TMPDIR/$container"
-  local deltas="$debian_root/deltas"
-
-  if [ -f "$debian_file" ]; then
-    msg_error "It seems the debian package file has already been generated"
-    msg_error "Run rm -rf $debian_root* and try again"
-    unlock_subutai_system
-    if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
-    exit 1
-  fi
-
-  mkdir -p $deltas
-
-  zfs send "lxc/master@template" > "$deltas/rootfs.delta"
-  if [ $? -eq 0 ]; then
-    size=`ls -lh $deltas/rootfs.delta | awk '{print $5}'`
-    msg_info "Exported $size delta for rootfs"
-  else
-    msg_error "Delta generation for rootfs failed"
-  fi
-
-  zfs send "lxc/master-opt@template" > "$deltas/opt.delta"
-  if [ $? -eq 0 ]; then
-    size=`ls -lh $deltas/opt.delta | awk '{print $5}'`
-    msg_info "Exported $size delta for opt"
-  else
-    msg_error "Delta generation for opt failed"
-  fi
-
-  zfs send "lxc-data/master-var@template" > "$deltas/var.delta"
-  if [ $? -eq 0 ]; then
-    size=`ls -lh $deltas/var.delta | awk '{print $5}'`
-    msg_info "Exported $size delta for var"
-  else
-    msg_error "Delta generation for opt failed"
-  fi
-
-  zfs send "lxc-data/master-home@template" > "$deltas/home.delta"
-  if [ $? -eq 0 ]; then
-    size=`ls -lh $deltas/home.delta | awk '{print $5}'`
-    msg_info "Exported $size delta for home"
-  else
-    msg_error "Delta generation for opt failed"
-  fi
-
-
-  # ---------------------------------------------------------------------------
-  # (3) generate the debian package from deltas, and package info
-  # ---------------------------------------------------------------------------
-
-  lxc_home=/var/lib/lxc/$container
-  cp $lxc_home/config $debian_root
-  cp $lxc_home/fstab  $debian_root
-  cp $lxc_home/packages  $debian_root
-
-  msg_info "Building debian package file for master"
-
-  pkg=`deb_pkg $container`
-  check_status "debian package $pkg generated" "$?"
-
-  # Remove debian root directory after debian package generation
-  rm -rf $debian_dir
-  unlock_subutai_system
-  if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
-
+  fs_master_export
 }
 
 
