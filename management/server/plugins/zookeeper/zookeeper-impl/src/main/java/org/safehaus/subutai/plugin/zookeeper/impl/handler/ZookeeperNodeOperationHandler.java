@@ -10,6 +10,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
+import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
@@ -37,7 +38,7 @@ public class ZookeeperNodeOperationHandler extends AbstractPluginOperationHandle
         this.clusterName = clusterName;
         this.operationType = operationType;
         this.trackerOperation = manager.getTracker().createTrackerOperation( ZookeeperClusterConfig.PRODUCT_NAME,
-                String.format( "Running %s operaion on %s...", operationType, hostname ) );
+                String.format( "Running %s operation on %s...", operationType, hostname ) );
     }
 
 
@@ -62,30 +63,36 @@ public class ZookeeperNodeOperationHandler extends AbstractPluginOperationHandle
 
         try
         {
-            List<CommandResult> commandResultList = new ArrayList<CommandResult>(  );
+            List<CommandResult> commandResultList = new ArrayList<>(  );
             switch ( operationType )
             {
                 case START:
-                        commandResultList.add( containerHost.execute( new RequestBuilder(
-                                new Commands().getStartCommand()) ) );
+                    commandResultList.add( containerHost.execute( new RequestBuilder(
+                            Commands.getStartCommand()) ) );
                     break;
                 case STOP:
                     commandResultList.add( containerHost.execute( new RequestBuilder(
-                            new Commands().getStopCommand()) ) );
+                            Commands.getStopCommand()) ) );
                     break;
                 case STATUS:
                     commandResultList.add( containerHost.execute( new RequestBuilder(
-                            new Commands().getStatusCommand()) ) );
+                            Commands.getStatusCommand()) ) );
                     break;
                 case DESTROY:
-                    commandResultList.add( containerHost.execute( new RequestBuilder(
-                    Commands.getUninstallCommand() ) ) );
-                    boolean isRemoved = config.getNodes().remove( containerHost.getId() );
-                    if ( isRemoved ) {
-                        manager.getPluginDAO().deleteInfo( config.getProductKey(), config.getClusterName() );
-                        manager.getPluginDAO()
-                               .saveInfo( config.getProductKey(), config.getClusterName(), config );
+                    if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+                        commandResultList.add( containerHost.execute( new RequestBuilder(
+                                Commands.getUninstallCommand() ) ) );
+                        boolean isRemoved = config.getNodes().remove( containerHost.getId() );
+                        if ( isRemoved ) {
+                            manager.getPluginDAO().deleteInfo( config.getProductKey(), config.getClusterName() );
+                            manager.getPluginDAO()
+                                   .saveInfo( config.getProductKey(), config.getClusterName(), config );
+                        }
                     }
+                    else {
+                        trackerOperation.addLogFailed( "Cluster node deletion is not supported yet!" );
+                    }
+
                     break;
             }
             logResults( trackerOperation, commandResultList );
