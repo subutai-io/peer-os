@@ -30,6 +30,8 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
+import org.safehaus.subutai.core.hostregistry.api.HostListener;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
@@ -70,7 +72,7 @@ import com.google.common.collect.Sets;
 /**
  * Local peer implementation
  */
-public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventListener
+public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener, PeerEventListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
@@ -677,6 +679,49 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
             throw new IllegalArgumentException( "Resource host could not be null." );
         }
         resourceHosts.add( host );
+    }
+
+
+    @Override
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
+    {
+        if ( resourceHostInfo.getHostname().equals( "management" ) )
+        {
+            if ( managementHost == null )
+            {
+                managementHost = new ManagementHost( resourceHostInfo );
+                //                managementHost.setParentAgent( NullAgent.getInstance() );
+                //                try
+                //                {
+                //                    managementHost.init();
+                //                }
+                //                catch ( SubutaiInitException e )
+                //                {
+                //                    LOG.error( e.toString() );
+                //                }
+            }
+            //            managementHost.updateHeartbeat();
+            //            peerDAO.saveInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId().toString(), managementHost );
+            return;
+        }
+
+        if ( resourceHostInfo.getHostname().startsWith( "py" ) )
+        {
+            ResourceHost host;
+            try
+            {
+                host = getResourceHostByName( resourceHostInfo.getHostname() );
+            }
+            catch ( PeerException e )
+            {
+                host = new ResourceHost( resourceHostInfo );
+                host.setParentAgent( NullAgent.getInstance() );
+                addResourceHost( host );
+            }
+            host.updateHeartbeat();
+            //            peerDAO.saveInfo( SOURCE_RESOURCE_HOST, host.getId().toString(), host );
+            return;
+        }
     }
 
 

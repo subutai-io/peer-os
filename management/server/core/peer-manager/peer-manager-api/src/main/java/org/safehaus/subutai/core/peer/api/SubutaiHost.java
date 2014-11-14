@@ -15,6 +15,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.NullAgent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.hostregistry.api.Interface;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 
 import com.google.common.base.Preconditions;
 
@@ -28,6 +30,9 @@ public abstract class SubutaiHost implements Host
     private Agent agent = NullAgent.getInstance();
     private Agent parentAgent = NullAgent.getInstance();
     protected long lastHeartbeat = System.currentTimeMillis();
+    private UUID id;
+    private String hostname;
+    private Set<Interface> interfaces;
 
 
     protected SubutaiHost( final Agent agent, UUID peerId )
@@ -36,6 +41,15 @@ public abstract class SubutaiHost implements Host
 
         this.agent = agent;
         this.peerId = peerId;
+    }
+
+
+    protected SubutaiHost( ResourceHostInfo resourceHostInfo )
+    {
+        Preconditions.checkNotNull( resourceHostInfo, "ResourceHostInfo is null" );
+        hostname = resourceHostInfo.getHostname();
+        id = resourceHostInfo.getId();
+        interfaces = resourceHostInfo.getInterfaces();
     }
 
 
