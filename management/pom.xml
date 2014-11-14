@@ -997,11 +997,17 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!--<dependency>
+      <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>oozie-plugin-api</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>oozie-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <!--
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>oozie-plugin-impl</artifactId>
@@ -1015,11 +1021,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>oozie-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>oozie-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
 

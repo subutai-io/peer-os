@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="oozieManager" availability="mandatory"
+  <!--<reference id="oozieManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.oozie.api.Oozie" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
   <reference id="hadoopManager" availability="mandatory"
-             interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
-  <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
+             interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />-->
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.oozie.ui.OoziePortalModule"
         init-method="init" destroy-method="destroy">

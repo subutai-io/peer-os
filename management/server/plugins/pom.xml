@@ -22,8 +22,8 @@
     <module>hive</module>
     <module>spark</module>
     <module>hbase</module>
-    <!--<module>accumulo</module>
     <module>oozie</module>
+    <!--<module>accumulo</module>
     <module>solr</module>
 
     <module>zookeeper</module>

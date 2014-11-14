@@ -34,7 +34,7 @@ public class AddNodeWindow extends Window
 
 
     public AddNodeWindow( final ApiBase product, final ExecutorService executorService, final Tracker tracker,
-                          final ConfigBase config, Set<Agent> nodes )
+                          final ConfigBase config, Set<UUID> nodes )
     {
         super( "Add New Node" );
         setModal( true );
@@ -60,10 +60,10 @@ public class AddNodeWindow extends Window
         availableNodesComboBox.setNullSelectionAllowed( false );
         availableNodesComboBox.setRequired( true );
         availableNodesComboBox.setWidth( 200, Unit.PIXELS );
-        for ( Agent node : nodes )
+        for ( UUID node : nodes )
         {
             availableNodesComboBox.addItem( node );
-            availableNodesComboBox.setItemCaption( node, node.getHostname() );
+            availableNodesComboBox.setItemCaption( node, node.toString() );
         }
         availableNodesComboBox.setValue( nodes.iterator().next() );
 
