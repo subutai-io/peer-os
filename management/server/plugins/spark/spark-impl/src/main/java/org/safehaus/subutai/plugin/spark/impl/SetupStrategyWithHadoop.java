@@ -70,7 +70,6 @@ public class SetupStrategyWithHadoop implements ClusterSetupStrategy
             config.setMasterNodeId( null );
             config.getSlaveIds().clear();
             config.getHadoopNodeIds().clear();
-            config.setEnvironmentId( environment.getId() );
 
             for ( ContainerHost container : environment.getContainers() )
             {
@@ -111,10 +110,9 @@ public class SetupStrategyWithHadoop implements ClusterSetupStrategy
 
     private void configure() throws ClusterSetupException
     {
+        config.setEnvironmentId( environment.getId() );
 
-        po.addLog( "Saving cluster info..." );
-        manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-        po.addLog( "Cluster info saved to DB" );
+        po.addLog( "Configuring cluster..." );
 
         ClusterConfiguration configuration = new ClusterConfiguration( manager, po );
 
@@ -125,6 +123,13 @@ public class SetupStrategyWithHadoop implements ClusterSetupStrategy
         catch ( ClusterConfigurationException e )
         {
             throw new ClusterSetupException( e );
+        }
+
+        po.addLog( "Saving cluster info..." );
+
+        if ( !manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
+        {
+            throw new ClusterSetupException( "Could not save cluster info" );
         }
     }
 }

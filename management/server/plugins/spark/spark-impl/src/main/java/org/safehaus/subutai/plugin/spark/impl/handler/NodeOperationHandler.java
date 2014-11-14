@@ -3,11 +3,11 @@ package org.safehaus.subutai.plugin.spark.impl.handler;
 
 import java.util.Set;
 
-import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.ClusterException;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -183,12 +183,6 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
         config.getSlaveIds().add( node.getId() );
 
-        trackerOperation.addLog( "Updating db..." );
-
-        //save to db
-        manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-        trackerOperation.addLog( "Cluster info updated in DB" );
-
         //install spark
         if ( install )
         {
@@ -217,6 +211,12 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
         RequestBuilder startSlaveCommand = manager.getCommands().getStartSlaveCommand();
         executeCommand( node, startSlaveCommand );
+
+        trackerOperation.addLog( "Updating db..." );
+        if ( !manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, clusterName, config ) )
+        {
+            throw new ClusterException( "Could not update cluster info" );
+        }
     }
 
 
@@ -290,7 +290,10 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
         trackerOperation.addLog( "Updating db..." );
 
-        manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        if ( !manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, clusterName, config ) )
+        {
+            throw new ClusterException( "Could not update cluster info" );
+        }
     }
 
 
@@ -398,7 +401,10 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
         trackerOperation.addLog( "Updating db..." );
         //update db
-        manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, clusterName, config );
+        if ( !manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, clusterName, config ) )
+        {
+            throw new ClusterException( "Could not update cluster info" );
+        }
     }
 
 
