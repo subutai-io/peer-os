@@ -58,7 +58,7 @@ echo "moving object files"
 mv *.o $BASE/debug
 
 #Generation of the TestAgent executable
-g++ -L/lib/x86_64-linux-gnu -L"$BASE/libs" -o "SubutaiAgentTest"   $BASE/debug/SubutaiCommand.o $BASE/debug/SubutaiConnection.o $BASE/debug/SubutaiContainer.o $BASE/debug/SubutaiEnvironment.o $BASE/debug/SubutaiContainerManager.o $BASE/debug/SubutaiHelper.o $BASE/debug/SubutaiTimer.o $BASE/debug/SubutaiLogger.o $BASE/debug/SubutaiResponse.o $BASE/debug/SubutaiResponsePack.o $BASE/debug/SubutaiStreamReader.o $BASE/debug/SubutaiThread.o $BASE/debug/SubutaiUserID.o $BASE/debug/mosquittopp.o $BASE/debug/pugixml.o $BASE/debug/SubutaiAgentTest.o $BASE/debug/SubutaiWatch.o -lcppunit -ljson_linux-gcc-4.6_libmt -lmosquitto -lcrypto -lmosquittopp -lssl -lpthread -lboost_thread -lcares -lrt -llxc -lprotobuf -lbooost_system
+g++ -L/lib/x86_64-linux-gnu -L"$BASE/libs" -o "SubutaiAgentTest"   $BASE/debug/SubutaiCommand.o $BASE/debug/SubutaiConnection.o $BASE/debug/SubutaiContainer.o $BASE/debug/SubutaiEnvironment.o $BASE/debug/SubutaiContainerManager.o $BASE/debug/SubutaiHelper.o $BASE/debug/SubutaiTimer.o $BASE/debug/SubutaiLogger.o $BASE/debug/SubutaiResponse.o $BASE/debug/SubutaiResponsePack.o $BASE/debug/SubutaiStreamReader.o $BASE/debug/SubutaiThread.o $BASE/debug/SubutaiUserID.o $BASE/debug/mosquittopp.o $BASE/debug/pugixml.o $BASE/debug/SubutaiAgentTest.o $BASE/debug/SubutaiWatch.o -lcppunit -ljson_linux-gcc-4.6_libmt -lmosquitto -lcrypto -lmosquittopp -lssl -lpthread -lboost_thread -lcares -lrt -llxc -lprotobuf -lboost_system
 echo "finishing AgentTest Executables"
 strip -s SubutaiAgentTest
 mv SubutaiAgentTest $BASE/bin
