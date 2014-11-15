@@ -101,40 +101,6 @@ void AgentTest::tearDown(void)
 //SubutaiCommand-Deserialize
 void AgentTest::testCommandDeserialize(void)
 {
-{
-   "request":
-
-    {
-
-        "type": "EXECUTE_REQUEST",
-
-        "id": "56b0ac88-5140-4a32-8691-916d75d62f1c",
-
-        "commandId": "c6cd5988-ceac-11e3-82b2-ebd389e743a3",
-
-        "workingDirectory": "/",
-
-        "command": "ls -l /root/",
-
-        "args" : ["arg1", "arg2"],
-
-        "environment" : { "var1" : "val1", "var2" : "val2"},
-
-        "stdOut": "RETURN", //NO or RETURN
-
-        "stdErr": "RETURN", //NO or RETURN
-
-        "runAs": "root",
-
-        "timeout": 30,
-
-        "isDaemon": 0
-
-    }
-
-}
-
-
 	//Test string for deserialization
 	string input = "{\"command\":{\"type\": \"EXECUTE_REQUEST\","
 			"\"id\": \"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
