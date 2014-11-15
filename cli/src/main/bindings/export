@@ -73,7 +73,7 @@ function export {
   fi
 
   # check to make sure the container is a template
-  if [ "`zfs_is_template $container`" == "false" ]; then
+  if [ "`fs_is_template $container`" == "false" ]; then
     msg_error "Container \"$container\" is NOT a template. Aborting ..."
     unlock_container_write $container
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
@@ -82,10 +82,10 @@ function export {
     msg_info "    - check passed: \"$container\" is a template"
   fi
 
-  parent=`zfs_get_parent $container`
+  parent=`fs_get_parent $container`
   lxc_assert $parent
   # check to make sure the parent is a template
-  if [ "`zfs_is_template $parent`" == "false" ]; then
+  if [ "`fs_is_template $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
     unlock_container_write $container
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
@@ -113,11 +113,7 @@ function export {
   debian_root="$debian_dir$SUBUTAI_TMPDIR/$container"
   deltas="$debian_root/deltas"
   mkdir -p $deltas
-  zfs send -I "lxc/$parent@template" "lxc/$container@template" > "$deltas/rootfs.delta"
-  zfs send -I "lxc/$parent-opt@template" "lxc/$container-opt@template" > "$deltas/opt.delta"
-  zfs send -I "lxc-data/$parent-var@template" "lxc-data/$container-var@template" > "$deltas/var.delta"
-  zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template" > "$deltas/home.delta"
-
+  fs_send $parent $container $deltas
 
   # ----------------------------------------------------------------------------
   # (3) generate the debian file from deltas, and package info
