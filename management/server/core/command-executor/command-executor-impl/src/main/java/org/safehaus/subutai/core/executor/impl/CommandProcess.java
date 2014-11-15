@@ -99,7 +99,7 @@ public class CommandProcess
 
     protected boolean isCompleted()
     {
-        return callback.isStopped() || getResult().hasCompleted();
+        return getResult().hasCompleted();
     }
 
 
