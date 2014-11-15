@@ -40,10 +40,8 @@ class AgentTest : public CppUnit::TestFixture
 	CPPUNIT_TEST(testUserIDCheekRootUser);
 	CPPUNIT_TEST(testResponsePackCreateResponse);
 	CPPUNIT_TEST(testResponsePackCreateExit);
-	CPPUNIT_TEST(testResponsePackCreateRegistration);
 	CPPUNIT_TEST(testResponsePackCreateHeartbeat);
 	CPPUNIT_TEST(testResponsePackCreateTerminate);
-	CPPUNIT_TEST(testResponsePackCreateTerminateFail);
 	CPPUNIT_TEST(testResponsePackCreateTimeout);
 	CPPUNIT_TEST_SUITE_END();
 
