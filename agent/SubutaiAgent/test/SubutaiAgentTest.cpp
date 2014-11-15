@@ -210,7 +210,7 @@ void AgentTest::testResponseSerializeDone(void)
 	resp->setCommandId("a7349720-9e2f-11e3-b9d6-080027b00009");
 	resp->setType("EXECUTE_RESPONSE");
 	resp->setUuid("5373b7c4-a039-44a9-9270-9e0e45d549cf");
-	rsp->setStandardOutput("Command execution is successful");
+	resp->setStandardOutput("Command execution is successful");
 
 	resp->serializeDone(result);
 
