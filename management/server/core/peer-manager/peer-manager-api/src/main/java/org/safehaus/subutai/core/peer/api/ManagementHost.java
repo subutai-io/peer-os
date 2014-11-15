@@ -27,7 +27,7 @@ public class ManagementHost extends SubutaiHost
 
     public ManagementHost( ResourceHostInfo resourceHostInfo )
     {
-        super();
+        super( resourceHostInfo );
     }
 
 

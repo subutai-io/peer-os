@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.exception.SubutaiException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
@@ -103,15 +103,15 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
             {
                 case CONFIG_NODE:
                     mongoNode = new MongoConfigNodeImpl( containerHost.getAgent(), containerHost.getPeerId(),
-                            containerHost.getEnvironmentId() );
+                            containerHost.getEnvironmentId(), config.getDomainName(), config.getCfgSrvPort() );
                     break;
                 case ROUTER_NODE:
                     mongoNode = new MongoRouterNodeImpl( containerHost.getAgent(), containerHost.getPeerId(),
-                            containerHost.getEnvironmentId(), config.getRouterPort() );
+                            containerHost.getEnvironmentId(), config.getDomainName(), config.getRouterPort() );
                     break;
                 case DATA_NODE:
                     mongoNode = new MongoDataNodeImpl( containerHost.getAgent(), containerHost.getPeerId(),
-                            containerHost.getEnvironmentId(), config.getDataNodePort() );
+                            containerHost.getEnvironmentId(), config.getDomainName(), config.getDataNodePort() );
                     break;
             }
             config.addNode( mongoNode, nodeType );

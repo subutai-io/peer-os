@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoException;
 import org.safehaus.subutai.plugin.mongodb.impl.common.CommandDef;
@@ -17,15 +16,14 @@ import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 import com.google.common.base.Strings;
 
 
-public class MongoDataNodeImpl extends ContainerHost implements MongoDataNode
+public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
 {
-    int port;
 
 
-    public MongoDataNodeImpl( final Agent agent, final UUID peerId, final UUID environmentId, int port )
+    public MongoDataNodeImpl( final Agent agent, final UUID peerId, final UUID environmentId, final String domainName,
+                              final int port )
     {
-        super( agent, peerId, environmentId );
-        this.port = port;
+        super( agent, peerId, environmentId, domainName, port );
     }
 
 

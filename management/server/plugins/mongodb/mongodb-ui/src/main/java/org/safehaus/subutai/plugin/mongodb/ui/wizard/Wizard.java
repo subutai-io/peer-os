@@ -30,7 +30,7 @@ public class Wizard
     private final Tracker tracker;
     private final ExecutorService executorService;
     private int step = 1;
-    private MongoClusterConfig mongoClusterConfig = new MongoClusterConfig();
+    private MongoClusterConfig mongoClusterConfig;// = new MongoClusterConfigImpl();
 
 
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -38,6 +38,7 @@ public class Wizard
         this.executorService = executorService;
         this.mongo = serviceLocator.getService( Mongo.class );
         this.tracker = serviceLocator.getService( Tracker.class );
+        this.mongoClusterConfig = mongo.newMongoClusterConfigInstance();
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
         grid.setSizeFull();
@@ -103,7 +104,7 @@ public class Wizard
     protected void init()
     {
         step = 1;
-        mongoClusterConfig = new MongoClusterConfig();
+        mongoClusterConfig = mongo.newMongoClusterConfigInstance();// new MongoClusterConfigImpl();
         putForm();
     }
 

@@ -176,12 +176,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     public ContainerHost createContainer( final String hostName, final String templateName, final String cloneName,
                                           final UUID envId ) throws PeerException
     {
+        String nodeGroup = UUID.randomUUID().toString();
         ResourceHost resourceHost = getResourceHostByName( hostName );
         resourceHost
                 .createContainer( this, getId(), envId, Lists.newArrayList( getTemplate( templateName ) ), cloneName,
-                        envId.toString() );
+                        nodeGroup );
 
-        Set<ContainerHost> containerHosts = waitContainerHosts( envId, envId.toString(), 1 );
+        Set<ContainerHost> containerHosts = waitContainerHosts( envId, nodeGroup, 1 );
 
         return containerHosts.iterator().next();
         //        resourceHost.addContainerHost( containerHost );

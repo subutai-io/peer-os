@@ -88,14 +88,6 @@ public class Commands
     }
 
 
-    public CommandDef getCheckInstanceRunningCommand( ContainerHost node, String domainName, int port )
-    {
-        return new CommandDef( "Check node(s)",
-                String.format( "mongo --host %s.%s --port %s", node.getHostname(), domainName, port ),
-                Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC );
-    }
-
-
     public Command getCheckInstanceRunningCommandOld( Agent node, String domainName, int port )
     {
         return commandRunnerBase.createCommand( "Check node(s)", new RequestBuilder(
@@ -493,12 +485,12 @@ public class Commands
     }
 
 
-    public void getAddDataNodeCommands( MongoClusterConfig config, MongoDataNode newDataNodeAgent )
+    public void getAddDataNodeCommands( MongoClusterConfig config, MongoDataNode newDataNode )
     {
 
 
         Set<Host> clusterMembers = new HashSet<Host>( config.getAllNodes() );
-        clusterMembers.add( newDataNodeAgent );
+        clusterMembers.add( newDataNode );
         try
         {
             for ( Host c : clusterMembers )
@@ -510,18 +502,15 @@ public class Commands
 
             CommandDef commandDef = getSetReplicaSetNameCommandLine( config.getReplicaSetName() );
 
-            newDataNodeAgent
-                    .execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
+            newDataNode.execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
 
             commandDef = getStartDataNodeCommandLine( config.getDataNodePort() );
 
-            newDataNodeAgent
-                    .execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
+            newDataNode.execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
 
             commandDef = getStartDataNodeCommandLine( config.getDataNodePort() );
 
-            newDataNodeAgent
-                    .execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
+            newDataNode.execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
 
             commandDef = getFindPrimaryNodeCommandLine( config.getDataNodePort() );
 
@@ -567,6 +556,14 @@ public class Commands
     {
         return new CommandDef( "Find primary node",
                 String.format( "/bin/echo 'db.isMaster()' | mongo --port %s", dataNodePort ), 30 );
+    }
+
+
+    public static CommandDef getCheckInstanceRunningCommand( String hostname, String domainName, int port )
+    {
+        return new CommandDef( "Check node(s)",
+                String.format( "mongo --host %s.%s --port %s", hostname, domainName, port ),
+                Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC );
     }
 
 

@@ -55,7 +55,7 @@ public class RestServiceImpl implements RestService
     public Response createCluster( final String config )
     {
         TrimmedMongodbConfig mongodbConfig = JsonUtil.fromJson( config, TrimmedMongodbConfig.class );
-        MongoClusterConfig expandedConfig = new MongoClusterConfig();
+        MongoClusterConfig expandedConfig = mongodbManager.newMongoClusterConfigInstance();
         expandedConfig.setClusterName( mongodbConfig.getClusterName() );
         expandedConfig.setDomainName( mongodbConfig.getDomainName() );
         expandedConfig.setReplicaSetName( mongodbConfig.getReplicaSetName() );
