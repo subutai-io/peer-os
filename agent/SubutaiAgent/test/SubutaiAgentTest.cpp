@@ -364,7 +364,7 @@ void AgentTest::testResponsePackCreateHeartbeat(void)
 	string input =	"{\"response\":{"
 				"\"hostname\":\"management\","
 				"\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
-				"\"interfaces\":[{\"interfaceName\":\"eth0\", "
+				"\"interfaces\":[{\"interfaceName\":\"eth0\","
 							"\"ip\":\"10.10.10.1\","
 							"\"mac\":\"08:00:27:59:3b:2e\"},"
 						 "{\"interfaceName\":\"eth0\","
