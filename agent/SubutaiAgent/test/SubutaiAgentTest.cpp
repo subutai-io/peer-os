@@ -171,10 +171,10 @@ void AgentTest::testResponseSerialize(void)
 				"\"interfaces\":[{\"interfaceName\":\"eth0\","
 							"\"ip\":\"10.10.10.1\","
 							"\"mac\":\"08:00:27:59:3b:2e\"},"
-						 "{\"interfaceName\":\"eth0\", "
+						 "{\"interfaceName\":\"eth0\","
 							"\"ip\":\"172.16.11.4\","
 							"\"mac\":\"07:01:25:57:3c:2d\"},"
-						 "{\"interfaceName\":\"eth0\", "
+						 "{\"interfaceName\":\"eth0\","
 							"\"ip\":\"127.0.0.1\","
 							"\"mac\":\"06:02:23:53:3d:2c\"}],"
 				"\"type\":\"HEARTBEAT\"}}\n";
@@ -367,10 +367,10 @@ void AgentTest::testResponsePackCreateHeartbeat(void)
 				"\"interfaces\":[{\"interfaceName\":\"eth0\", "
 							"\"ip\":\"10.10.10.1\","
 							"\"mac\":\"08:00:27:59:3b:2e\"},"
-						 "{\"interfaceName\":\"eth0\", "
+						 "{\"interfaceName\":\"eth0\","
 							"\"ip\":\"172.16.11.4\","
 							"\"mac\":\"07:01:25:57:3c:2d\"},"
-						 "{\"interfaceName\":\"eth0\", "
+						 "{\"interfaceName\":\"eth0\","
 							"\"ip\":\"127.0.0.1\","
 							"\"mac\":\"06:02:23:53:3d:2c\"}],"
 				"\"type\":\"HEARTBEAT\"}}\n";
@@ -392,7 +392,7 @@ void AgentTest::testResponsePackCreateTerminate(void)
 	//Test string for serialization
 	string input =	"{\"response\":{"
 			"\"commandId\":\"4573n9c4-a051-44a9-9660-9e0e45d54add\","
-			"\"exitCode\":0,\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\",\"pid\": 1234,"
+			"\"exitCode\":0,\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\",\"pid\":1234,"
             "\"type\":\"TERMINATE_RESPONSE\"}}\n";
 
 	string uuid = "5373b7c4-a039-44a9-9270-9e0e45d549cf";
