@@ -196,7 +196,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     {
 
         Set<ContainerHost> result = new HashSet<>();
-        long threshold = System.currentTimeMillis() + 60 * quantity * 1000;
+        long threshold = System.currentTimeMillis() + 120 * quantity * 1000;
         while ( result.size() != quantity && threshold - System.currentTimeMillis() > 0 )
         {
             try

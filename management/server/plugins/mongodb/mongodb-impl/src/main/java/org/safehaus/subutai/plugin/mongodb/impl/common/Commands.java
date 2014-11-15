@@ -96,7 +96,7 @@ public class Commands
     }
 
 
-    public CommandDef getStopNodeCommand( ContainerHost nodes )
+    public static CommandDef getStopNodeCommand()
     {
         return new CommandDef( "Stop node", "/usr/bin/pkill -2 mongo", Timeouts.STOP_NODE_TIMEOUT_SEC );
     }
@@ -148,9 +148,9 @@ public class Commands
     }
 
 
-    public CommandDef getStopMongodbService()
+    public static CommandDef getStopMongodbService()
     {
-        return new CommandDef( "Stop mongodb service", "service mongodb stop", Timeouts.START_DATE_NODE_TIMEOUT_SEC );
+        return new CommandDef( "Stop mongodb service", "service mongodb stop", Timeouts.STOP_NODE_TIMEOUT_SEC );
     }
 
 
@@ -257,7 +257,7 @@ public class Commands
 
 
     // LIFECYCLE COMMANDS =======================================================
-    public CommandDef getStartConfigServerCommand( int cfgSrvPort )
+    public static CommandDef getStartConfigServerCommand( int cfgSrvPort )
     {
         return new CommandDef( "Start config server(s)", String.format(
                 "/bin/mkdir -p %s ; mongod --configsvr --dbpath %s --port %s --fork --logpath %s/mongodb.log",
@@ -365,17 +365,10 @@ public class Commands
     }
 
 
-    public CommandDef getRegisterSecondaryNodesWithPrimaryCommand( String secondaryNodeHostname, int dataNodePort,
-                                                                   String domainName )
+    public static CommandDef getInitiateReplicaSetCommandLine( int port )
     {
-        StringBuilder secondaryStr = new StringBuilder();
-        secondaryStr.append( "rs.add('" ).
-                append( secondaryNodeHostname ).append( "." ).append( domainName ).
-                            append( ":" ).append( dataNodePort ).append( "');" );
-
         return new CommandDef( "Initiate replica set",
-                String.format( "mongo --port %s --eval \"rs.initiate();\" ; sleep 30 ; mongo --port %s --eval \"%s\"",
-                        dataNodePort, dataNodePort, secondaryStr.toString() ), 180 );
+                String.format( "mongo --port %d --eval \"rs.initiate();\" ; sleep 30", port ), 180 );
     }
 
 
@@ -401,19 +394,22 @@ public class Commands
     }
 
 
-    public CommandDef getRegisterReplicaWithRouterCommand( Set<ContainerHost> dataNodes, int routerPort,
-                                                           int dataNodePort, String domainName, String replicaSetName )
+    public static CommandDef getRegisterReplicaWithRouterCommandLine( MongoRouterNode routerNode,
+                                                                      Set<MongoDataNode> dataNodes,
+                                                                      String replicaSetName )
     {
+        String domainName = routerNode.getDomainName();
         StringBuilder shard = new StringBuilder();
-        for ( Host agent : dataNodes )
+        for ( MongoDataNode dataNode : dataNodes )
         {
             shard.append( "sh.addShard('" ).append( replicaSetName ).
-                    append( "/" ).append( agent.getHostname() ).append( "." ).append( domainName ).
-                         append( ":" ).append( dataNodePort ).append( "');" );
+                    append( "/" ).append( dataNode.getHostname() ).append( "." ).append( domainName ).
+                         append( ":" ).append( dataNode.getPort() ).append( "');" );
         }
 
         return new CommandDef( "Register replica with router",
-                String.format( "sleep 30 ; mongo --port %s --eval \"%s\"", routerPort, shard.toString() ), 120 );
+                String.format( "sleep 30 ; mongo --port %s --eval \"%s\"", routerNode.getPort(), shard.toString() ),
+                120 );
     }
 
 

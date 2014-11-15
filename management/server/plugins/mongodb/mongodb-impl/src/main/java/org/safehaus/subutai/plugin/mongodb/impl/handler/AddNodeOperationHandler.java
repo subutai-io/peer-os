@@ -107,7 +107,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
                     break;
                 case ROUTER_NODE:
                     mongoNode = new MongoRouterNodeImpl( containerHost.getAgent(), containerHost.getPeerId(),
-                            containerHost.getEnvironmentId(), config.getDomainName(), config.getRouterPort() );
+                            containerHost.getEnvironmentId(), config.getDomainName(), config.getRouterPort(),
+                            config.getCfgSrvPort() );
                     break;
                 case DATA_NODE:
                     mongoNode = new MongoDataNodeImpl( containerHost.getAgent(), containerHost.getPeerId(),
@@ -174,7 +175,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
             if ( primaryNode != null )
             {
 
-                primaryNode.registerSecondaryNode( newDataNode, config.getDataNodePort(), config.getDomainName() );
+                primaryNode.registerSecondaryNode( newDataNode );
 
                 po.addLog( String.format( "Secondary node registered successfully." ) );
                 return true;
@@ -348,7 +349,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
                 c.addIpHostToEtcHosts( config.getDomainName(), clusterMembers, Common.IP_MASK );
             }
 
-            newRouter.start( config.getConfigServers(), config.getDomainName(), config.getCfgSrvPort() );
+            newRouter.start();
             //            CommandDef commandDef = manager.getCommands()
             //                                           .getStartRouterCommand( config.getRouterPort(),
             // config.getCfgSrvPort(),
