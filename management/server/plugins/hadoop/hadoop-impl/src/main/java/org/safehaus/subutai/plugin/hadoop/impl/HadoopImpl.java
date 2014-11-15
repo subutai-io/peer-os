@@ -489,9 +489,12 @@ public class HadoopImpl implements Hadoop
         environmentBlueprint.setLinkHosts( true );
         environmentBlueprint.setExchangeSshKeys( true );
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
-        Set<NodeGroup> nodeGroups = new HashSet<>( INITIAL_CAPACITY );
+//        Set<NodeGroup> nodeGroups = new HashSet<>( INITIAL_CAPACITY );
 
         NodeGroup nodeGroup = new NodeGroup();
+        nodeGroup.setName( "Hadoop node group" );
+        nodeGroup.setLinkHosts( true );
+        nodeGroup.setExchangeSshKeys( true );
         nodeGroup.setTemplateName( config.getTemplateName() );
         nodeGroup.setPlacementStrategy( new PlacementStrategy( "ROUND_ROBIN" ) );
         nodeGroup.setNumberOfNodes(
