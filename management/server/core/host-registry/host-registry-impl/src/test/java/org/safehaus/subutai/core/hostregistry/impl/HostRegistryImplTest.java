@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +53,7 @@ public class HostRegistryImplTest
     Set<HostListener> hostListeners;
 
     @Mock
-    Executor notifier;
+    ExecutorService notifier;
 
     @Mock
     HeartBeatListener heartBeatListener;

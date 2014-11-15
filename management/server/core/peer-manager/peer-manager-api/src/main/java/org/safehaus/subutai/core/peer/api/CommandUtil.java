@@ -91,6 +91,8 @@ public class CommandUtil
             }
         }
 
+        taskExecutor.shutdown();
+
         return resultMap;
     }
 
