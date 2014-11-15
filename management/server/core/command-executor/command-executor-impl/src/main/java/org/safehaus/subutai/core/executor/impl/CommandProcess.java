@@ -99,7 +99,7 @@ public class CommandProcess
 
     protected boolean isDone()
     {
-        return status != CommandStatus.RUNNING;
+        return !( status == CommandStatus.RUNNING || status == CommandStatus.NEW );
     }
 
 

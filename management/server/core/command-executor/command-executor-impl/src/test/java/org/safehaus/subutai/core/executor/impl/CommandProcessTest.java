@@ -203,7 +203,7 @@ public class CommandProcessTest
         verify( response, times( 2 ) ).getStdOut();
         verify( response, times( 2 ) ).getStdErr();
         verify( response ).getExitCode();
-        assertEquals( CommandStatus.FAILED, commandProcess.status );
+        assertEquals( CommandStatus.KILLED, commandProcess.status );
 
 
         reset( response );
