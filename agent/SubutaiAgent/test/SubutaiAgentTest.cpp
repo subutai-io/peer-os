@@ -167,7 +167,7 @@ void AgentTest::testResponseSerialize(void)
 	//Test string for serialization
 	string input =	"{\"response\":{"
 				"\"hostname\":\"management\","
-			    "\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"
+			    "\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
 				"\"interfaces\":[{\"interfaceName\":\"eth0\","
 							"\"ip\":\"10.10.10.1\","
 							"\"mac\":\"08:00:27:59:3b:2e\"},"
@@ -337,7 +337,8 @@ void AgentTest::testResponsePackCreateResponse(void)
 void AgentTest::testResponsePackCreateExit(void)
 {
 	//Test string for serialization
-	string input =	"{\"response\":{"\"commandId\":\"dca7e550-9f8e-11e3-b9d6-080027b00009\","
+	string input =	"{\"response\":{"
+					"\"commandId\":\"dca7e550-9f8e-11e3-b9d6-080027b00009\","
 					"\"exitCode\":0,"
 					"\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
 					"\"pid\":14601,\"requestSequenceNumber\":1,\"responseSequenceNumber\":1,"
