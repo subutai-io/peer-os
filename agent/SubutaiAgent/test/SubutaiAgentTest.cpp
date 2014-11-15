@@ -125,7 +125,7 @@ void AgentTest::testCommandDeserialize(void)
 	CPPUNIT_ASSERT("RETURN"== cmd->getStandardError());
 	CPPUNIT_ASSERT("root"== cmd->getRunAs());
 	CPPUNIT_ASSERT(30== cmd->getTimeout());
-	CPPUNIT_ASSERT(0 == cmd->getIsDeamon());
+	CPPUNIT_ASSERT(0 == cmd->getIsDaemon());
 }
 //SubutaiCommand-Clear
 void AgentTest::testCommandClear(void)
@@ -227,7 +227,6 @@ void AgentTest::testResponseClear(void)
 	resp->setStandardError("/");
 	resp->setStandardOutput("/");
 	resp->setCommandId("12345");
-	resp->setMacAddress("aa:bb:cc:dd:ee:ff");
 	resp->setHostname("test");
 
 	resp->clear();
@@ -237,7 +236,6 @@ void AgentTest::testResponseClear(void)
 	CPPUNIT_ASSERT(""== resp->getCommandId());
 	CPPUNIT_ASSERT(-1 == resp->getRequestSequenceNumber());
 	CPPUNIT_ASSERT(-1 == resp->getResponseSequenceNumber());
-	CPPUNIT_ASSERT(""== resp->getMacAddress());
 	CPPUNIT_ASSERT(""== resp->getHostname());
 	CPPUNIT_ASSERT(""== resp->getStandardOutput());
 	CPPUNIT_ASSERT(""== resp->getStandardError());
