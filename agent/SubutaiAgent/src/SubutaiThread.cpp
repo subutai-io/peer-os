@@ -613,8 +613,10 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* c
          */
         int val;
         close(ret[1]);
-        read(ret[0], &val, sizeof(val));
+        size_t ret_val = read(ret[0], &val, sizeof(val));
         close(ret[0]);
+
+        if(static_cast<int>(ret_val) == -1) this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Cannot read output.."));
 
         if (this->getCWDERR() == true || this->getUIDERR() == true)
             val = 1;
@@ -787,7 +789,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                 this->getOutputStream().closePipe(0);
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Thread is Stopping!!","pid",helper.toString(getpid())));
                 logger.closeLogFile();
-                int kc = kill(getpid(), SIGKILL);		//killing child
+                kill(getpid(), SIGKILL);		//killing child
                 return true; //thread successfully done its work.
             }
             catch(const std::exception& error)

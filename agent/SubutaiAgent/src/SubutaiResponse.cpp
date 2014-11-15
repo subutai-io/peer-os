@@ -343,6 +343,7 @@ void SubutaiResponse::serializeDone(string& output)
     output = writer.write(root);	//Json Response Done string is created
 #endif
 }
+
 /**
  *  \details   Add new interface to interfaces
  *
@@ -355,6 +356,8 @@ void SubutaiResponse::addInterface(string name, string ip , string mac){
 	i.mac = mac;
 	this->interfaces.push_back(i);
 }
+
+
 /**
  *  \details   getting "interfaces" private vector variable of SubutaiResponse instance.
  *  		   This is the list of interfaces vector that holds the ip address, name and mac address of each interface of the machine
