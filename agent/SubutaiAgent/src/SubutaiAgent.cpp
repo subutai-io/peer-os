@@ -342,7 +342,7 @@ int main(int argc,char *argv[],char *envp[])
                                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on resource host: " + command.getPid()));
                                 retstatus = kill(command.getPid(),SIGKILL);
                                 resp = response.createTerminateMessage(environment.getAgentUuidValue(),
-                                        command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
+                                        command.getCommandId(), command.getPid(), retstatus);
                             }
                             else
                             {
@@ -353,7 +353,7 @@ int main(int argc,char *argv[],char *envp[])
                                 retstatus  = execResult.exit_code;
 
                                 resp = response.createTerminateMessage(target_container->getContainerIdValue(),
-                                        command.getRequestSequenceNumber(),command.getCommandId(), command.getPid(), retstatus);
+                                        command.getCommandId(), command.getPid(), retstatus);
 
                             }
 

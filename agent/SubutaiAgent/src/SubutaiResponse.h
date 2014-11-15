@@ -63,6 +63,7 @@ public:
 	void setParentHostname(const string&);
 	void setCommandId(const string&);
 	void setInterfaces(vector<Interface>);
+	void addInterface(string, string, string);
 	void setPid(int);
 	void setType(const string&);
 	void setUuid(const string&);
