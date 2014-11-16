@@ -264,7 +264,12 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
         RequestBuilder restartMasterCommand = manager.getCommands().getRestartMasterCommand();
 
-        executeCommand( master, restartMasterCommand );
+        CommandResult result = executeCommand( master, restartMasterCommand );
+
+        if ( !result.getStdOut().contains( "starting" ) )
+        {
+            trackerOperation.addLog( "Master restart failed, skipping..." );
+        }
 
 
         boolean uninstall = !node.getId().equals( config.getMasterNodeId() );
