@@ -59,7 +59,7 @@ public class WolForm extends CustomComponent implements Disposable {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent ) {
 
-                testTextField.setValue(wolManager.sendMagicPackagebyMacId("aa:bb:cc:dd:ee"));
+             //   testTextField.setValue(wolManager.sendMagicPackagebyMacId("aa:bb:cc:dd:ee"));
             }
         } );
 
