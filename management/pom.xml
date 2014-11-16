@@ -53,7 +53,7 @@
     <junit.version>4.11</junit.version>
     <org.osgi.version>4.3.1</org.osgi.version>
 
-    <vaadin-version>7.3.2</vaadin-version>
+    <vaadin-version>7.3.3</vaadin-version>
   </properties>
 
   <dependencyManagement>
@@ -168,44 +168,44 @@
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- config-point-tracker -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>config-point-tracker-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>config-point-tracker-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>config-point-tracker-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>${project.groupId}</groupId>-->
+        <!--<artifactId>config-point-tracker-api</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
+      <!--<dependency>-->
+        <!--<groupId>${project.groupId}</groupId>-->
+        <!--<artifactId>config-point-tracker-impl</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
+      <!--<dependency>-->
+        <!--<groupId>${project.groupId}</groupId>-->
+        <!--<artifactId>config-point-tracker-cli</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- configuration-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>configuration-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>configuration-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>configuration-manager-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>configuration-manager-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>${project.groupId}</groupId>-->
+        <!--<artifactId>configuration-manager-api</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
+      <!--<dependency>-->
+        <!--<groupId>${project.groupId}</groupId>-->
+        <!--<artifactId>configuration-manager-impl</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
+      <!--<dependency>-->
+        <!--<groupId>${project.groupId}</groupId>-->
+        <!--<artifactId>configuration-manager-cli</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
+      <!--<dependency>-->
+        <!--<groupId>${project.groupId}</groupId>-->
+        <!--<artifactId>configuration-manager-ui</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- container-manager -->
@@ -268,16 +268,16 @@
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- file-tracker -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>file-tracker-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>file-tracker-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>${project.groupId}</groupId>-->
+        <!--<artifactId>file-tracker-api</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
+      <!--<dependency>-->
+        <!--<groupId>${project.groupId}</groupId>-->
+        <!--<artifactId>file-tracker-impl</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- git-manager -->
@@ -1112,11 +1112,11 @@
         <artifactId>hbase-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>-->
-      <!--<dependency>
+      <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>hbase-plugin-ui</artifactId>
         <version>${project.version}</version>
-      </dependency>-->
+      </dependency>
 
       <!--
       <dependency>

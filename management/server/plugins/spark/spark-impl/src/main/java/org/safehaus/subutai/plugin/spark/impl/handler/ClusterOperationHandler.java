@@ -3,14 +3,14 @@ package org.safehaus.subutai.plugin.spark.impl.handler;
 
 import java.util.Set;
 
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -124,9 +124,17 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
         {
             checkPrerequisites();
 
-            executeCommand( master, manager.getCommands().getStartAllCommand() );
+            CommandResult result = executeCommand( master, manager.getCommands().getStartAllCommand() );
 
-            trackerOperation.addLogDone( "Cluster started successfully" );
+            if ( !result.getStdOut().contains( "starting" ) )
+            {
+                trackerOperation.addLogFailed( "Failed to start cluster" );
+            }
+            else
+            {
+
+                trackerOperation.addLogDone( "Cluster started successfully" );
+            }
         }
         catch ( ClusterException e )
         {
@@ -193,6 +201,11 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
                     throw new ClusterException(
                             String.format( "Error uninstalling Spark on node %s", node.getHostname() ), e );
                 }
+            }
+
+            if ( !manager.getPluginDAO().deleteInfo( SparkClusterConfig.PRODUCT_KEY, clusterName ) )
+            {
+                throw new ClusterException( "Could not remove cluster info" );
             }
 
             trackerOperation.addLogDone( "Cluster uninstalled successfully" );

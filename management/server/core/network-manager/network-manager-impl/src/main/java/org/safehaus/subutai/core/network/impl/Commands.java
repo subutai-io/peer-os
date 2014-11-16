@@ -69,9 +69,22 @@ public class Commands
     }
 
 
+    public RequestBuilder getSetupGatewayOnContainerCommand( String gatewayIp, String interfaceName )
+    {
+        return new RequestBuilder( "route add default gw" )
+                .withCmdArgs( Lists.newArrayList( gatewayIp, interfaceName ) );
+    }
+
+
     public RequestBuilder getRemoveGatewayCommand( int vLanId )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
                 .withCmdArgs( Lists.newArrayList( "-D", String.valueOf( vLanId ) ) );
+    }
+
+
+    public RequestBuilder getRemoveGatewayOnContainerCommand()
+    {
+        return new RequestBuilder( "route del default gw" );
     }
 }

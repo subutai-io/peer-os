@@ -9,17 +9,12 @@
       <cxf:logging />
     </cxf:features>
   </cxf:bus>
-  <reference id="sparkManager" availability="mandatory"
-             interface="org.safehaus.subutai.plugin.spark.api.Spark" />
+
   <reference id="sharkManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.shark.api.Shark" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
   <bean id="sharkRestService" class="org.safehaus.subutai.plugin.shark.rest.RestService">
-    <property name="agentManager" ref="agentManager" />
-    <property name="sharkManager" ref="sharkManager" />
-    <property name="sparkManager" ref="sparkManager" />
+    <argument ref="sharkManager" />
   </bean>
 
   <jaxrs:server address="/shark" id="sharkRestServiceImpl">
