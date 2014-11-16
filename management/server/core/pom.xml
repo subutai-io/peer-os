@@ -20,15 +20,15 @@
     <module>apt-repository-manager</module>
     <module>command-runner</module>
     <module>communication-manager</module>
-    <module>config-point-tracker</module>
-    <module>configuration-manager</module>
+    <module>monitoring</module>
     <module>container-manager</module>
+    <!--<module>config-point-tracker</module>-->
+    <!--<module>configuration-manager</module>-->
+    <!--<module>file-tracker</module>-->
     <module>environment-manager</module>
     <module>environment-terminal</module>
-    <module>file-tracker</module>
     <module>git-manager</module>
     <module>lxc-quota-manager</module>
-    <module>monitoring</module>
     <module>network-manager</module>
     <module>security-manager</module>
     <module>peer-manager</module>

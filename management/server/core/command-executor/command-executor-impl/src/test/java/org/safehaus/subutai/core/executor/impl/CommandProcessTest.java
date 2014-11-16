@@ -144,18 +144,18 @@ public class CommandProcessTest
 
 
     @Test
-    public void testIsCompleted() throws Exception
+    public void testIsDone() throws Exception
     {
-        boolean completed = commandProcess.isCompleted();
+        boolean done = commandProcess.isDone();
 
-        assertFalse( completed );
+        assertFalse( done );
 
 
         commandProcess.status = CommandStatus.FAILED;
 
-        completed = commandProcess.isCompleted();
+        done = commandProcess.isDone();
 
-        assertTrue( completed );
+        assertTrue( done );
     }
 
 
@@ -203,7 +203,7 @@ public class CommandProcessTest
         verify( response, times( 2 ) ).getStdOut();
         verify( response, times( 2 ) ).getStdErr();
         verify( response ).getExitCode();
-        assertEquals( CommandStatus.FAILED, commandProcess.status );
+        assertEquals( CommandStatus.KILLED, commandProcess.status );
 
 
         reset( response );
