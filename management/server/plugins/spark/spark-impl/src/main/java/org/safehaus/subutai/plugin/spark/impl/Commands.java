@@ -55,7 +55,7 @@ public class Commands
 
     public RequestBuilder getStartMasterCommand()
     {
-        return new RequestBuilder( "service spark-master start" ).withTimeout( 90 );
+        return new RequestBuilder( "service spark-master start" ).withTimeout( 90 ).daemon();
     }
 
 
@@ -86,7 +86,7 @@ public class Commands
 
     public RequestBuilder getStartSlaveCommand()
     {
-        return new RequestBuilder( "service spark-slave start" ).withTimeout( 90 );
+        return new RequestBuilder( "service spark-slave start" ).withTimeout( 90 ).daemon();
     }
 
 

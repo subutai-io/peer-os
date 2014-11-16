@@ -113,8 +113,13 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
     public void startNode() throws ClusterException
     {
-        executeCommand( node, nodeType == NodeType.MASTER_NODE ? manager.getCommands().getStartMasterCommand() :
-                              manager.getCommands().getStartSlaveCommand() );
+        CommandResult result = executeCommand( node,
+                nodeType == NodeType.MASTER_NODE ? manager.getCommands().getStartMasterCommand() :
+                manager.getCommands().getStartSlaveCommand() );
+        if ( !result.getStdOut().contains( "starting" ) )
+        {
+            throw new ClusterException( String.format( "Failed to start node %s", node.getHostname() ) );
+        }
     }
 
 
@@ -205,12 +210,25 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
         trackerOperation.addLog( "Restarting master..." );
 
         RequestBuilder restartMasterCommand = manager.getCommands().getRestartMasterCommand();
-        executeCommand( master, restartMasterCommand );
+        result = executeCommand( master, restartMasterCommand );
+
+
+        if ( !result.getStdOut().contains( "starting" ) )
+        {
+            trackerOperation.addLog( "Master restart failed, skipping..." );
+        }
+
 
         trackerOperation.addLog( "Starting Spark on new node..." );
 
         RequestBuilder startSlaveCommand = manager.getCommands().getStartSlaveCommand();
-        executeCommand( node, startSlaveCommand );
+        result = executeCommand( node, startSlaveCommand );
+
+        if ( !result.getStdOut().contains( "starting" ) )
+        {
+            trackerOperation.addLog( "Slave start failed, skipping..." );
+        }
+
 
         trackerOperation.addLog( "Updating db..." );
         if ( !manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, clusterName, config ) )
@@ -401,7 +419,12 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
         RequestBuilder startNodesCommand = manager.getCommands().getStartAllCommand();
 
-        executeCommand( node, startNodesCommand, true );
+        CommandResult result = executeCommand( node, startNodesCommand, true );
+
+        if ( !result.getStdOut().contains( "starting" ) )
+        {
+            trackerOperation.addLog( "Failed to start cluster, skipping..." );
+        }
 
 
         trackerOperation.addLog( "Updating db..." );
