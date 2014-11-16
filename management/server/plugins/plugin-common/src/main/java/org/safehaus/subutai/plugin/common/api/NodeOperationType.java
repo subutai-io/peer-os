@@ -12,5 +12,6 @@ public enum NodeOperationType
     UNINSTALL,
     EXCLUDE,
     INCLUDE,
+    CHECK_INSTALLATION,
     DECOMISSION_STATUS
 }

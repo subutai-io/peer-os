@@ -21,6 +21,7 @@
     <module>hive</module>
     <module>spark</module>
     <module>hbase</module>
+    <module>hipi</module>
     <!--<module>accumulo</module>
     <module>oozie</module>
     <module>solr</module>
