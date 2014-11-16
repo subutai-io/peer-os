@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -23,6 +24,7 @@ public class Wizard
     private final Sqoop sqoop;
     private final Hadoop hadoop;
     private final Tracker tracker;
+    private final EnvironmentManager environmentManager;
     private final ExecutorService executorService;
     private int step = 1;
     private SqoopConfig config = new SqoopConfig();
@@ -36,6 +38,7 @@ public class Wizard
         this.sqoop = serviceLocator.getService( Sqoop.class );
         this.tracker = serviceLocator.getService( Tracker.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
@@ -58,12 +61,12 @@ public class Wizard
             }
             case 2:
             {
-                component = new NodeSelectionStep( hadoop, this );
+                component = new NodeSelectionStep( hadoop, environmentManager, this );
                 break;
             }
             case 3:
             {
-                component = new VerificationStep( sqoop, executorService, tracker, this );
+                component = new VerificationStep( sqoop, executorService, tracker, environmentManager, this );
                 break;
             }
             default:
@@ -119,3 +122,4 @@ public class Wizard
         return hadoopConfig;
     }
 }
+

@@ -133,22 +133,34 @@ function contains() {
 
 function create_rrd {
   local hostname=$1
-
+  local metric_type=$2
   if [ `hostname` != $hostname ]; then
     lxc_assert "$hostname"
   fi
-
+  
   mkdir -p $SUBUTAI_RRD_DIRECTORY > /dev/null 2>&1
+  assert_metric "$metric_type"
+  local database_file=$(get_database_file $hostname $metric_type)
+  local dataset_name=$(get_dataset_name $metric_type)
+  local update_sequence=$(get_update_sequence)
+  pushd $SUBUTAI_RRD_DIRECTORY > /dev/null
+  if [ -f $database_file ]; then
+    msg_notice "    - $database_file already exists, skipping..."
+    start_update_rrd "$hostname" "$metric_type" > /dev/null
+    return
+  fi
+  rrdtool create "$database_file" --no-overwrite --step $update_sequence DS:"$dataset_name":GAUGE:$(($update_sequence * 2 - 1)):0:U RRA:LAST:0.5:1:1500
+  msg_info "    - $metric_type rrd is created for $hostname"
+  popd > /dev/null
+  start_update_rrd "$hostname" "$metric_type" > /dev/null
+}
+
+
+function create_all_rrd {
+  local hostname=$1
   for metric_type in "${metric_list[@]}"
   do
-    assert_metric "$metric_type"
-    msg_info "$metric_type rrd is created for $hostname"
-    local dataset_name=$(get_dataset_name $metric_type)
-    local update_sequence=$(get_update_sequence)
-    pushd $SUBUTAI_RRD_DIRECTORY > /dev/null
-    rrdtool create "$(get_database_file $hostname $metric_type)" --step $update_sequence DS:"$dataset_name":GAUGE:$(($update_sequence * 2 - 1)):0:U RRA:LAST:0.5:1:1500
-    popd > /dev/null
-    start_update_rrd "$hostname" "$metric_type" > /dev/null
+    create_rrd "$hostname" "$metric_type"
   done
 }
 
@@ -168,7 +180,7 @@ function update_rrd {
   local update_sequence=$(get_update_sequence)
   local metric_value=$(subutai monitor $hostname | awk -F"$tag" '{print $2}' | awk -F"," '{print $1}' | awk -F"\"" '{print $3}')
 
-  msg_info "$metric_value is stored at `date +%s`"
+  msg_info "    - $metric_value is stored at `date +%s`"
   rrdtool update  "$database_file" --template "$dataset_name" N:"$metric_value"
 }
 
@@ -176,11 +188,18 @@ function update_rrd {
 function start_update_rrd {
   local hostname=$1
   local metric_type=$2
-
   if [ `hostname` != $hostname ]; then
     lxc_assert "$hostname"
   fi
+
+  local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
+  if [ ! -f $database_file ]; then
+    msg_error "Please create the $metric_type rrd for $hostname first. Aborting!"
+    exit 1
+  fi
+
   assert_metric "$metric_type"
+  # Remove cron job of host for metric_type if exists
   stop_update_rrd "$hostname" "$metric_type" > /dev/null
   #write out current crontab
   crontab -l > mycron
@@ -192,17 +211,43 @@ function start_update_rrd {
 }
 
 
-function stop_update_rrd {
+function start_update_all_rrd {
   local hostname=$1
-  local metric_type=$2
 
   if [ `hostname` != $hostname ]; then
     lxc_assert "$hostname"
   fi
+
+  for metric_type in "${metric_list[@]}"
+  do
+    start_update_rrd $hostname $metric_type > /dev/null
+  done
+}
+
+
+function stop_update_rrd {
+  local hostname=$1
+  local metric_type=$2
+
   assert_metric "$metric_type"
 
   crontab -l | sed "/subutai monitor -u $metric_type $hostname/d" | crontab -
 }
+
+
+function stop_update_all_rrd {
+  local hostname=$1
+
+  if [ `hostname` != $hostname ]; then
+    lxc_assert "$hostname"
+  fi
+
+  for metric_type in "${metric_list[@]}"
+  do
+    stop_update_rrd $hostname $metric_type > /dev/null
+  done
+}
+
 
 
 function query_rrd {
@@ -224,9 +269,23 @@ function query_rrd {
 }
 
 
+function destroy_monitor {
+  local hostname=$1
+
+  for metric_type in "${metric_list[@]}"
+  do
+    assert_metric "$metric_type"
+    stop_update_rrd $hostname $metric_type
+    local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
+    rm -f $database_file > /dev/null 2>&1
+    msg_info "    - $metric_type rrd of $hostname is destroyed"
+  done
+}
+
+
 function assert_metric {
   if [ -z $metric_type ]; then
-    msg_error "Metric type is empty.Aborting!"
+    msg_error "Metric type is empty. Aborting!"
     exit 1
   fi
 
@@ -261,9 +320,6 @@ function get_database_file {
   local hostname=$1
   local metric_type=$2
 
-  if [ `hostname` != $hostname ]; then
-    lxc_assert "$hostname" > /dev/null
-  fi
   assert_metric "$metric_type" > /dev/null
 
   echo ""$metric_type"_"$hostname".rrd"

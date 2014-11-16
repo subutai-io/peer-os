@@ -18,10 +18,16 @@
     <module>cassandra</module>
     <module>elasticsearch</module>
     <module>hadoop</module>
+    <module>mongodb</module>
     <module>hive</module>
     <module>spark</module>
+    <module>shark</module>
     <module>hbase</module>
+<<<<<<< HEAD
     <module>hipi</module>
+=======
+    <module>sqoop</module>
+>>>>>>> c34f55518e51bcf827c6b3bea98d838962241933
     <!--<module>accumulo</module>
     <module>oozie</module>
     <module>solr</module>

@@ -15,7 +15,7 @@ import java.util.Map;
 public abstract class AbstractContainerPlacementStrategy implements ContainerPlacementStrategy
 {
     private final Map<ServerMetric, Map<String, Integer>> placementInfoMap = new HashMap<>();
-    private List<Criteria> criteria = new ArrayList<>();
+    private List<CriteriaDef> criteria = new ArrayList<>();
 
 
     protected void clearPlacementInfo()
@@ -70,7 +70,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
 
 
     @Override
-    public List<Criteria> getCriteria()
+    public List<CriteriaDef> getCriteriaDef()
     {
         return Collections.unmodifiableList( criteria );
     }

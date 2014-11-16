@@ -2,9 +2,11 @@ package org.safehaus.subutai.plugin.shark.api;
 
 
 import java.util.Set;
+import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
+
+import com.google.common.collect.Sets;
 
 
 public class SharkClusterConfig implements ConfigBase
@@ -17,7 +19,20 @@ public class SharkClusterConfig implements ConfigBase
     private String clusterName = "";
     private String sparkClusterName = "";
     private String hadoopClusterName = "";
-    private Set<Agent> nodes;
+    private Set<UUID> nodeIds = Sets.newHashSet();
+    private UUID environmentId;
+
+
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
+    }
 
 
     public SetupType getSetupType()
@@ -59,15 +74,9 @@ public class SharkClusterConfig implements ConfigBase
     }
 
 
-    public Set<Agent> getNodes()
+    public Set<UUID> getNodeIds()
     {
-        return nodes;
-    }
-
-
-    public void setNodes( Set<Agent> nodes )
-    {
-        this.nodes = nodes;
+        return nodeIds;
     }
 
 
@@ -98,7 +107,7 @@ public class SharkClusterConfig implements ConfigBase
     @Override
     public String toString()
     {
-        return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
+        return "Config{" + "clusterName=" + clusterName + ", nodeIds=" + nodeIds + '}';
     }
 }
 

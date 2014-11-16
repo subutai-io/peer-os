@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.peer.ui.forms;
 
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -279,9 +280,15 @@ public class PeerRegisterForm extends CustomComponent
             WebClient client = WebClient.create( baseUrl );
             if ( servicePort.length() > 0 && ip.length() > 0 )
             {
-                String peerJson = client.path( "peer/json" ).accept( MediaType.APPLICATION_JSON ).get( String.class );
+                String peerJson = client.path( "peer/id" ).accept( MediaType.TEXT_PLAIN ).get( String.class );
                 LOG.warn( peerJson );
-                return GSON.fromJson( peerJson, PeerInfo.class );
+
+                PeerInfo peerInfo = new PeerInfo();
+                peerInfo.setId( GSON.fromJson( peerJson, UUID.class ) );
+                peerInfo.setIp( ip );
+                peerInfo.setName( "Peer on " + ip );
+
+                return peerInfo;
             }
             else
             {

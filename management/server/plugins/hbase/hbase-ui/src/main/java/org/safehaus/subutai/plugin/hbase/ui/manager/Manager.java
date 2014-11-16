@@ -14,11 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.naming.NamingException;
-
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -27,7 +23,7 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBaseType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
+
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -78,8 +74,6 @@ public class Manager
     private final HBase hbase;
     private final Hadoop hadoop;
     private final Tracker tracker;
-    private final AgentManager agentManager;
-    private final CommandRunner commandRunner;
     private final String MESSAGE = "No cluster is installed !";
     private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final Pattern HMASTER_PATTERN = Pattern.compile( ".*(HMaster.+?g).*" );
@@ -97,8 +91,6 @@ public class Manager
         this.hbase = serviceLocator.getService( HBase.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
         this.tracker = serviceLocator.getService( Tracker.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
         this.executor = executor;
 
         contentRoot = new GridLayout();
@@ -372,13 +364,13 @@ public class Manager
     }
 
 
-    private void populateTable( final Table table, Set<Agent> agents )
+    private void populateTable( final Table table, Set<UUID> agents )
     {
-        for ( final Agent agent : agents )
+        for ( final UUID agent : agents )
         {
             final Label resultHolder = new Label();
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId( agent.getListIP().get( 0 ) + "-hbaseCheck" );
+            //            checkBtn.setId( agent.getListIP().get( 0 ) + "-hbaseCheck" );
             checkBtn.addStyleName( BUTTON_STYLE_NAME );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
             startBtn.addStyleName( BUTTON_STYLE_NAME );
@@ -399,7 +391,7 @@ public class Manager
 
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), findNodeRoles( agent ), resultHolder,
+                    agent.toString(), /*agent.getListIP().get( 0 ),*/ findNodeRoles( agent ), resultHolder,
                     availableOperations
             }, null );
 
@@ -412,7 +404,7 @@ public class Manager
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
                     checkBtn.setEnabled( false );
-                    executor.execute( new CheckTask( hbase, tracker, config.getClusterName(), agent.getHostname(),
+                    executor.execute( new CheckTask( hbase, tracker, config.getClusterName(), agent.toString(),
                             new CompleteEvent()
                             {
                                 public void onComplete( String result )
@@ -464,7 +456,7 @@ public class Manager
     }
 
 
-    private String findNodeRoles( Agent node )
+    private String findNodeRoles( UUID node )
     {
         StringBuilder sb = new StringBuilder();
         if ( config.getHbaseMaster() == node )
@@ -620,18 +612,18 @@ public class Manager
                 {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
-                    {
-                        TerminalWindow terminal =
+                    //                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
+                    //                    if ( lxcAgent != null )
+                    //                    {
+                       /* TerminalWindow terminal =
                                 new TerminalWindow( Sets.newHashSet( lxcAgent ), executor, commandRunner,
                                         agentManager );
-                        contentRoot.getUI().addWindow( terminal.getWindow() );
-                    }
-                    else
-                    {
-                        show( "Agent is not connected" );
-                    }
+                        contentRoot.getUI().addWindow( terminal.getWindow() );*/
+                    //                    }
+                    //                    else
+                    //                    {
+                    //                        show( "Agent is not connected" );
+                    //                    }
                 }
             }
         } );

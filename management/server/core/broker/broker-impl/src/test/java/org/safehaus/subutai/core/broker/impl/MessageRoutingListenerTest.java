@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.broker.impl;
 
 import java.io.PrintStream;
 import java.util.Set;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -35,7 +35,7 @@ public class MessageRoutingListenerTest
     Set<MessageListener> listeners;
 
     @Mock
-    Executor notifier;
+    ExecutorService notifier;
 
     @Mock
     MessageListener listener;
@@ -108,5 +108,15 @@ public class MessageRoutingListenerTest
         router.onMessage( message );
 
         verify( exception ).printStackTrace( any( PrintStream.class ) );
+    }
+
+
+    @Test
+    public void testDispose() throws Exception
+    {
+
+        router.dispose();
+
+        verify( notifier ).shutdown();
     }
 }

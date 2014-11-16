@@ -16,7 +16,7 @@ import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 /**
  * Handles install mongo cluster operation
  */
-public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
+public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl, MongoClusterConfig>
 {
 
     private final TrackerOperation po;

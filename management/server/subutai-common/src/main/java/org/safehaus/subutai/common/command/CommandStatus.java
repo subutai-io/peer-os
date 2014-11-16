@@ -17,11 +17,11 @@ public enum CommandStatus
      */
     NEW,
     /**
-     * command has been just sent to agents
+     * command has been just sent to container
      */
     RUNNING,
     /**
-     * command had timed out before agent sent response
+     * command had timed out before container sent response
      */
     TIMEOUT,
     /**
@@ -29,7 +29,11 @@ public enum CommandStatus
      */
     SUCCEEDED,
     /**
-     * command failed, exit code was not 0 or agent interrupted command because of timeout
+     * command failed, exit code was not 0
      */
-    FAILED
+    FAILED,
+    /**
+     * command was killed by agent due to timeout
+     */
+    KILLED
 }

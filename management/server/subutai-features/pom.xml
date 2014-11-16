@@ -111,25 +111,25 @@
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- config-point-tracker -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>config-point-tracker-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>config-point-tracker-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>config-point-tracker-cli</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>config-point-tracker-api</artifactId>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>config-point-tracker-impl</artifactId>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>config-point-tracker-cli</artifactId>-->
+    <!--</dependency>-->
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- configuration-manager -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>configuration-manager-api</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>configuration-manager-api</artifactId>-->
+    <!--</dependency>-->
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- container-manager -->
@@ -181,15 +181,15 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- file-tracker -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>file-tracker-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>file-tracker-impl</artifactId>
-    </dependency>
+    <!--&lt;!&ndash; file-tracker &ndash;&gt;-->
+    <!--<dependency>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>file-tracker-api</artifactId>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>file-tracker-impl</artifactId>-->
+    <!--</dependency>-->
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- git-manager -->
@@ -276,6 +276,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>host-registry-impl</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>host-registry-cli</artifactId>
+    </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- command-executor -->
@@ -286,6 +290,10 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>command-executor-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>command-executor-cli</artifactId>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -329,12 +337,14 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>network-manager-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>network-manager-impl</artifactId>
-      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>network-manager-cli</artifactId>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -500,7 +510,6 @@
       <artifactId>elasticsearch-plugin-ui</artifactId>
     </dependency>
 
-
     <!-- HADOOP -->
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -539,10 +548,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>hbase-plugin-rest</artifactId>
     </dependency>-->
-    <!--<dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hbase-plugin-ui</artifactId>
-    </dependency>-->
+    </dependency>
 
     <!--
     <dependency>
@@ -628,7 +637,7 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>zookeeper-plugin-ui</artifactId>
     </dependency>
-
+           -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mongodb-plugin-api</artifactId>
@@ -649,311 +658,311 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>mongodb-plugin-ui</artifactId>
     </dependency>
+    <!--
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>flume-plugin-api</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>flume-plugin-impl</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>flume-plugin-cli</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>flume-plugin-rest</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>flume-plugin-ui</artifactId>
+</dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>flume-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>flume-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>flume-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>flume-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>flume-plugin-ui</artifactId>
-    </dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>hive-plugin-api</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>hive-plugin-impl</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>hive-plugin-cli</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>hive-plugin-rest</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>hive-plugin-ui</artifactId>
+</dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hive-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hive-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hive-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hive-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hive-plugin-ui</artifactId>
-    </dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>storm-plugin-api</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>storm-plugin-impl</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>storm-plugin-rest</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>storm-plugin-ui</artifactId>
+</dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>storm-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>storm-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>storm-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>storm-plugin-ui</artifactId>
-    </dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>presto-plugin-api</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>presto-plugin-impl</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>presto-plugin-cli</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>presto-plugin-rest</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>presto-plugin-ui</artifactId>
+</dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>presto-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>presto-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>presto-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>presto-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>presto-plugin-ui</artifactId>
-    </dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>spark-plugin-api</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>spark-plugin-impl</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>spark-plugin-cli</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>spark-plugin-rest</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>spark-plugin-ui</artifactId>
+</dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>spark-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>spark-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>spark-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>spark-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>spark-plugin-ui</artifactId>
-    </dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>shark-plugin-api</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>shark-plugin-impl</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>shark-plugin-cli</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>shark-plugin-rest</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>shark-plugin-ui</artifactId>
+</dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>shark-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>shark-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>shark-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>shark-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>shark-plugin-ui</artifactId>
-    </dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>sqoop-plugin-api</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>sqoop-plugin-impl</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>sqoop-plugin-cli</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>sqoop-plugin-rest</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>sqoop-plugin-ui</artifactId>
+</dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>sqoop-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>sqoop-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>sqoop-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>sqoop-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>sqoop-plugin-ui</artifactId>
-    </dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>lucene-plugin-api</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>lucene-plugin-impl</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>lucene-plugin-cli</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>lucene-plugin-rest</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>lucene-plugin-ui</artifactId>
+</dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>lucene-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>lucene-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>lucene-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>lucene-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>lucene-plugin-ui</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>pig-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>pig-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>pig-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>pig-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>pig-plugin-ui</artifactId>
-    </dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>pig-plugin-api</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>pig-plugin-impl</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>pig-plugin-cli</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>pig-plugin-rest</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>pig-plugin-ui</artifactId>
+</dependency>
 
 
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hbase-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hbase-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hbase-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hbase-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hbase-plugin-ui</artifactId>
-    </dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>hbase-plugin-api</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>hbase-plugin-impl</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>hbase-plugin-cli</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>hbase-plugin-rest</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>hbase-plugin-ui</artifactId>
+</dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>mahout-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>mahout-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>mahout-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>mahout-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>mahout-plugin-ui</artifactId>
-    </dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>mahout-plugin-api</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>mahout-plugin-impl</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>mahout-plugin-cli</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>mahout-plugin-rest</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>mahout-plugin-ui</artifactId>
+</dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-ui</artifactId>
-    </dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>cassandra-plugin-api</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>cassandra-plugin-impl</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>cassandra-plugin-cli</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>cassandra-plugin-rest</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>cassandra-plugin-ui</artifactId>
+</dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hipi-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hipi-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hipi-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hipi-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hipi-plugin-ui</artifactId>
-    </dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>hipi-plugin-api</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>hipi-plugin-impl</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>hipi-plugin-cli</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>hipi-plugin-rest</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>hipi-plugin-ui</artifactId>
+</dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>nutch-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>nutch-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>nutch-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>nutch-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>nutch-plugin-ui</artifactId>
-    </dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>nutch-plugin-api</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>nutch-plugin-impl</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>nutch-plugin-cli</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>nutch-plugin-rest</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>nutch-plugin-ui</artifactId>
+</dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>jetty-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>jetty-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>jetty-plugin-ui</artifactId>
-    </dependency>-->
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>jetty-plugin-api</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>jetty-plugin-impl</artifactId>
+</dependency>
+<dependency>
+<groupId>${project.groupId}</groupId>
+<artifactId>jetty-plugin-ui</artifactId>
+</dependency>-->
 
   </dependencies>
 

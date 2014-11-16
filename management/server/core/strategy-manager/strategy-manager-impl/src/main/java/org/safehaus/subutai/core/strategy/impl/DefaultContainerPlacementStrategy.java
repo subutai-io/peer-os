@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.strategy.api.AbstractContainerPlacementStrategy;
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

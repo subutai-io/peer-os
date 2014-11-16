@@ -14,7 +14,7 @@ function list_usage {
 function get_ancestor_list {
   contemp="$1"
   ancestor_list=
-  ancestor=`zfs_get_parent $contemp`
+  ancestor=`fs_get_parent $contemp`
   while true; do
     if [ -z "$ancestor_list" ]; then
       ancestor_list="$ancestor"
@@ -25,7 +25,7 @@ function get_ancestor_list {
     if [ "master" == "$ancestor" ]; then
       break
     else
-      ancestor=`zfs_get_parent $ancestor`
+      ancestor=`fs_get_parent $ancestor`
     fi
   done
  
@@ -61,7 +61,7 @@ function list_contemp {
     elif [ "ancestors" == "$mode" ]; then 
       echo -e "$contemp\t\t`get_ancestor_list $contemp`"
     elif [ "parents" == "$mode" ]; then 
-      echo -e "$contemp\t\t`zfs_get_parent $contemp`"
+      echo -e "$contemp\t\t`fs_get_parent $contemp`"
     fi
   done
 }
@@ -72,7 +72,7 @@ function list_contemp {
 # second parameter $2 = mode which can be "", "parents" or "ancestors"
 function list_templates {
   if [ -z "$1" ]; then
-    local templates=`zfs_list_templates`
+    local templates=`fs_list_templates`
   else
     local templates="$1"
   fi
@@ -90,7 +90,7 @@ function list_templates {
   fi
 
   for template in $templates; do
-    if [ "false" == "`zfs_is_template $template`" ]; then
+    if [ "false" == "`fs_is_template $template`" ]; then
       msg_error "Provided operand $template is a container not a template"
       exit 1
     fi
@@ -100,7 +100,7 @@ function list_templates {
     elif [ "ancestors" == "$mode" ]; then 
       echo -e "$template\t\t`get_ancestor_list $template`"
     elif [ "parents" == "$mode" ]; then 
-      echo -e "$template\t\t`zfs_get_parent $template`"
+      echo -e "$template\t\t`fs_get_parent $template`"
     fi
   done
 }
@@ -135,7 +135,7 @@ function list_registered_templates {
 # first parameter $1 = set of container names for filtering (operands)
 # second parameter $2 = mode which can be "", "parents" or "ancestors"
 function list_containers {
-  local templates=`zfs_list_templates`
+  local templates=`fs_list_templates`
   local lxc_list=`lxc-ls`
   local mode="$2"
   local containers="$1"
@@ -161,7 +161,7 @@ function list_containers {
   fi
 
   for container in $containers; do
-    if [ "true" == "`zfs_is_template $container`" ]; then
+    if [ "true" == "`fs_is_template $container`" ]; then
       msg_error "Provided operand $container is a template not a container"
       exit 1
     fi
@@ -171,7 +171,7 @@ function list_containers {
     elif [ "ancestors" == "$mode" ]; then 
       echo -e "$container\t\t`get_ancestor_list $container`"
     elif [ "parents" == "$mode" ]; then 
-      echo -e "$container\t\t`zfs_get_parent $container`"
+      echo -e "$container\t\t`fs_get_parent $container`"
     fi
   done
 }

@@ -8,5 +8,5 @@ Homepage: http://www.safehaus.org
 
 Package: subutai-cli-net
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, subutai-cli
+Depends: ${shlibs:Depends}, ${misc:Depends}, subutai-cli, openvswitch-common
 Description: Describe what this subutai cli net package is for

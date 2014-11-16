@@ -3,14 +3,10 @@
 
   <reference id="manager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.sqoop.api.Sqoop" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
   <reference id="hadoopManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
-  <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.sqoop.ui.SqoopPortalModule"
         init-method="init" destroy-method="destroy">

@@ -17,11 +17,8 @@ import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.api.NodeOperationType;
-import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.common.ui.AddNodeWindow;
 import org.safehaus.subutai.plugin.common.ui.BaseManager;
-import org.safehaus.subutai.plugin.common.ui.OperationTask;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
@@ -225,7 +222,7 @@ public class Manager extends BaseManager
                         HadoopClusterConfig info = hadoopManager.getCluster( hadoopClusterName );
                         if ( info != null )
                         {
-                            HashSet<Agent> nodes = new HashSet<>( info.getAllNodes() );
+                            HashSet<UUID> nodes = new HashSet<>( info.getAllNodes() );
                             nodes.removeAll( config.getAllOozieAgents() );
                             if ( !nodes.isEmpty() )
                             {
@@ -290,7 +287,6 @@ public class Manager extends BaseManager
     }
 
 
-
     private void populateServerTable( final Table table, final Agent agent )
     {
         List<Agent> agentList = new ArrayList<>();
@@ -304,7 +300,7 @@ public class Manager extends BaseManager
     {
 
         table.removeAllItems();
-        List<Agent> agentList = new ArrayList<>();
+        List<UUID> agentList = new ArrayList<>();
         agentList.addAll( clientNodes );
         populateTable( table, agentList );
     }
@@ -744,5 +740,4 @@ public class Manager extends BaseManager
             }
         };
     }
-
 }
