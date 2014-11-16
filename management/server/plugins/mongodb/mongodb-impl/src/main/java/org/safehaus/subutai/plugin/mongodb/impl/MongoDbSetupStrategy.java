@@ -236,14 +236,14 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
         config.setDataNodes( dataNodes );
 
 
-//        try
-//        {
-//            configureMongoCluster();
-//        }
-//        catch ( ClusterConfigurationException e )
-//        {
-//            throw new ClusterSetupException( e.getMessage() );
-//        }
+        try
+        {
+            configureMongoCluster();
+        }
+        catch ( ClusterConfigurationException e )
+        {
+            throw new ClusterSetupException( e.getMessage() );
+        }
 
         po.addLog( "Saving cluster information to database..." );
 
@@ -309,7 +309,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
             e.printStackTrace();
             throw new ClusterConfigurationException( e );
         }
-
+        po.addLogDone( String.format( "Cluster %s configured successfully.", config.getClusterName() ) );
 
         //                List<Command> installationCommands = mongoManager.getCommands().getInstallationCommands(
         // config );
