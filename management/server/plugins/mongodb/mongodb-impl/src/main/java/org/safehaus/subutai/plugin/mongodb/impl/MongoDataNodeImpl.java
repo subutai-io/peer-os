@@ -2,14 +2,11 @@ package org.safehaus.subutai.plugin.mongodb.impl;
 
 
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.Response;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoException;
@@ -35,23 +32,11 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
         try
         {
             CommandDef commandDef = Commands.getStartDataNodeCommandLine( port );
-            final AtomicBoolean commandOk = new AtomicBoolean();
-            execute( commandDef.build(), new CommandCallback()
-            {
-                @Override
-                public void onResponse( final Response response, final CommandResult commandResult )
-                {
-                    if ( response.getStdOut().contains( "child process started successfully, parent exiting" ) )
-                    {
-                        commandOk.set( true );
-                        stop();
-                    }
-                }
-            } );
+            CommandResult commandResult = execute( commandDef.build( true ) );
 
-            if ( !commandOk.get() )
+            if ( !commandResult.getStdOut().contains( "child process started successfully, parent exiting" ) )
             {
-                throw new CommandException( "Could not start mongo data instance." );
+                throw new CommandException( "Could not start mongo config instance." );
             }
         }
         catch ( CommandException e )
@@ -113,21 +98,9 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
                 Commands.getRegisterSecondaryNodeWithPrimaryCommandLine( dataNode.getHostname(), port, domainName );
         try
         {
-            final AtomicBoolean commandOk = new AtomicBoolean();
-            execute( commandDef.build(), new CommandCallback()
-            {
-                @Override
-                public void onResponse( final Response response, final CommandResult commandResult )
-                {
-                    if ( response.getStdOut().contains( "connecting to:" ) )
-                    {
-                        commandOk.set( true );
-                        stop();
-                    }
-                }
-            } );
+            CommandResult commandResult = execute( commandDef.build() );
 
-            if ( !commandOk.get() )
+            if ( !commandResult.getStdOut().contains( "connecting to:" ) )
             {
                 throw new CommandException( "Could not register secondary node." );
             }
@@ -146,21 +119,9 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
         CommandDef commandDef = Commands.getInitiateReplicaSetCommandLine( port );
         try
         {
-            final AtomicBoolean commandOk = new AtomicBoolean();
-            execute( commandDef.build(), new CommandCallback()
-            {
-                @Override
-                public void onResponse( final Response response, final CommandResult commandResult )
-                {
-                    if ( response.getStdOut().contains( "connecting to:" ) )
-                    {
-                        commandOk.set( true );
-                        stop();
-                    }
-                }
-            } );
+            CommandResult commandResult = execute( commandDef.build() );
 
-            if ( !commandOk.get() )
+            if ( !commandResult.getStdOut().contains( "connecting to:" ) )
             {
                 throw new CommandException( "Could not register secondary node." );
             }

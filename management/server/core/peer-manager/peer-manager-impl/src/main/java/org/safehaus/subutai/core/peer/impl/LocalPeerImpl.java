@@ -747,6 +747,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
                     try
                     {
                         managementHost.init();
+                        peerDAO.saveInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId().toString(), managementHost );
                     }
                     catch ( SubutaiInitException e )
                     {
@@ -754,7 +755,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
                     }
                 }
                 managementHost.updateHeartbeat();
-                peerDAO.saveInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId().toString(), managementHost );
                 return;
             }
 
@@ -764,6 +764,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
                 try
                 {
                     host = getResourceHostByName( response.getHostname() );
+                    peerDAO.saveInfo( SOURCE_RESOURCE_HOST, host.getId().toString(), host );
                 }
                 catch ( PeerException e )
                 {
@@ -772,7 +773,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
                     addResourceHost( host );
                 }
                 host.updateHeartbeat();
-                peerDAO.saveInfo( SOURCE_RESOURCE_HOST, host.getId().toString(), host );
                 return;
             }
 
@@ -797,9 +797,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
 
 
     @Override
-    public CommandResult execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
-            throws CommandException
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host aHost,
+                                  final CommandCallback callback ) throws CommandException
     {
+        Host host = null;
+        try
+        {
+            host = bindHost( aHost.getId() );
+        }
+        catch ( PeerException e )
+        {
+            throw new CommandException( "Host not register." );
+        }
         if ( !host.isConnected() )
         {
             throw new CommandException( "Host disconnected." );
@@ -836,9 +845,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
 
 
     @Override
-    public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+    public void executeAsync( final RequestBuilder requestBuilder, final Host aHost, final CommandCallback callback )
             throws CommandException
     {
+        Host host = null;
+        try
+        {
+            host = bindHost( aHost.getId() );
+        }
+        catch ( PeerException e )
+        {
+            throw new CommandException( "Host not register." );
+        }
         if ( !host.isConnected() )
         {
             throw new CommandException( "Host disconnected." );

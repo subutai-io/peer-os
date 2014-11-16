@@ -50,20 +50,17 @@ public abstract class MongoNodeImpl extends ContainerHost implements MongoNode
         try
         {
             CommandResult commandResult = execute( commandDef.build() );
-            if ( commandResult.hasSucceeded() )
+            if ( commandResult.getStdOut().contains( "couldn't connect to server" ) )
             {
-                if ( commandResult.getStdOut().contains( "couldn't connect to server" ) )
-                {
-                    return false;
-                }
-                else if ( commandResult.getStdOut().contains( "connecting to" ) )
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return false;
+            }
+            else if ( commandResult.getStdOut().contains( "connecting to" ) )
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
         catch ( CommandException e )
@@ -91,7 +88,12 @@ public abstract class MongoNodeImpl extends ContainerHost implements MongoNode
         CommandDef commandDef = Commands.getStopNodeCommand();
         try
         {
-            execute( commandDef.build() );
+            CommandResult commandResult = execute( commandDef.build() );
+
+            if ( !commandResult.hasSucceeded() )
+            {
+                throw new CommandException( "Could not stop mongo instance." );
+            }
         }
         catch ( CommandException e )
         {
