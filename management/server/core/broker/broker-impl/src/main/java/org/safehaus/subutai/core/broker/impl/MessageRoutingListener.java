@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.broker.impl;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.jms.JMSException;
@@ -26,7 +26,7 @@ public class MessageRoutingListener implements MessageListener
     protected Set<org.safehaus.subutai.core.broker.api.MessageListener> listeners = Collections
             .newSetFromMap( new ConcurrentHashMap<org.safehaus.subutai.core.broker.api.MessageListener, Boolean>() );
 
-    protected Executor notifier = Executors.newCachedThreadPool();
+    protected ExecutorService notifier = Executors.newCachedThreadPool();
 
 
     public void addListener( org.safehaus.subutai.core.broker.api.MessageListener listener )
@@ -67,5 +67,11 @@ public class MessageRoutingListener implements MessageListener
     protected void notifyListener( org.safehaus.subutai.core.broker.api.MessageListener listener, Message message )
     {
         notifier.execute( new MessageNotifier( listener, message ) );
+    }
+
+
+    protected void dispose()
+    {
+        notifier.shutdown();
     }
 }
