@@ -3,7 +3,8 @@
 
     <service ref="wolManager" interface="org.safehaus.subutai.wol.api.WolManager"/>
 
-    <bean id="wolManager" scope="singleton" class="org.safehaus.subutai.wol.impl.WolImpl">
+    <bean id="wolManager" init-method="init" destroy-method="destroy" scope="singleton"
+          class="org.safehaus.subutai.wol.impl.WolImpl">
     </bean>
 
 </blueprint>

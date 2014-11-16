@@ -8,7 +8,9 @@ import org.safehaus.subutai.wol.api.WolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -21,15 +23,29 @@ public class WolImpl implements WolManager {
 
     public WolImpl()
     {
+
+
+    }
+
+
+    public void init()
+    {
         try {
             managementHost = peerManager.getLocalPeer().getManagementHost();
         }
         catch(PeerException e){
             LOG.error(e.getMessage(), e);
         }
-
     }
 
+
+    public void destroy()
+    {
+    }
+
+
+
+    @Override
     public String sendMagicPackagebyMacId(String macId) {
 
        return managementHost.getHostname().toString();
@@ -44,9 +60,9 @@ public class WolImpl implements WolManager {
     }
 
 
-
     @Override
     public Boolean sendMagicPackagebyList(ArrayList<String> macList){ return true; }
+
 
     @Override
     public String getWolName() {
