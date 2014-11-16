@@ -236,14 +236,14 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
         config.setDataNodes( dataNodes );
 
 
-        try
-        {
-            configureMongoCluster();
-        }
-        catch ( ClusterConfigurationException e )
-        {
-            throw new ClusterSetupException( e.getMessage() );
-        }
+//        try
+//        {
+//            configureMongoCluster();
+//        }
+//        catch ( ClusterConfigurationException e )
+//        {
+//            throw new ClusterSetupException( e.getMessage() );
+//        }
 
         po.addLog( "Saving cluster information to database..." );
 

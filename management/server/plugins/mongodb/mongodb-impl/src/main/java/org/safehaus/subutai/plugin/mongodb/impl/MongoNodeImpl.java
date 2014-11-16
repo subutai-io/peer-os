@@ -91,15 +91,12 @@ public abstract class MongoNodeImpl extends ContainerHost implements MongoNode
         CommandDef commandDef = Commands.getStopNodeCommand();
         try
         {
-            CommandResult commandResult = execute( commandDef.build() );
-            if ( !( commandResult.hasSucceeded() && commandResult.getStdOut().contains( "connecting to" ) ) )
-            {
-                throw new MongoException( "Stop command failed." );
-            }
+            execute( commandDef.build() );
         }
         catch ( CommandException e )
         {
-            throw new MongoException( "Stop command failed." );
+            LOG.error( e.toString(), e );
+            throw new MongoException( "Could not stop mongo instance." );
         }
     }
 }

@@ -63,28 +63,13 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
 
 
     @Override
-    public void stop() throws MongoException
-    {
-        try
-        {
-            CommandDef commandDef = Commands.getStopMongodbService();
-            execute( commandDef.build() );
-        }
-        catch ( CommandException e )
-        {
-            LOG.error( "Stop command failed.", e );
-            throw new MongoException( "Stop command failed" );
-        }
-    }
-
-
-    @Override
     public void setReplicaSetName( final String replicaSetName ) throws MongoException
     {
         try
         {
             CommandDef commandDef = Commands.getSetReplicaSetNameCommandLine( replicaSetName );
-            execute( commandDef.build() );
+            CommandResult commandResult = execute( commandDef.build() );
+            LOG.info( commandResult.toString() );
         }
         catch ( CommandException e )
         {
@@ -161,7 +146,24 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
         CommandDef commandDef = Commands.getInitiateReplicaSetCommandLine( port );
         try
         {
-            execute( commandDef.build() );
+            final AtomicBoolean commandOk = new AtomicBoolean();
+            execute( commandDef.build(), new CommandCallback()
+            {
+                @Override
+                public void onResponse( final Response response, final CommandResult commandResult )
+                {
+                    if ( response.getStdOut().contains( "connecting to:" ) )
+                    {
+                        commandOk.set( true );
+                        stop();
+                    }
+                }
+            } );
+
+            if ( !commandOk.get() )
+            {
+                throw new CommandException( "Could not register secondary node." );
+            }
         }
         catch ( CommandException e )
         {

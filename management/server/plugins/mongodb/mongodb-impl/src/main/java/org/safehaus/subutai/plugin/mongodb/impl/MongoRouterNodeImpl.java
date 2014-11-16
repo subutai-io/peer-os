@@ -77,20 +77,6 @@ public class MongoRouterNodeImpl extends MongoNodeImpl implements MongoRouterNod
     }
 
 
-    public void stop() throws MongoException
-    {
-        try
-        {
-            execute( new RequestBuilder( "/usr/bin/pkill -2 mongo" ).withTimeout( Timeouts.STOP_NODE_TIMEOUT_SEC ) );
-        }
-        catch ( CommandException e )
-        {
-            LOG.error( e.toString(), e );
-            throw new MongoException( "Could not start mongo router node." );
-        }
-    }
-
-
     @Override
     public void registerDataNodesWithReplica( final Set<MongoDataNode> dataNodes, final String replicaName )
             throws MongoException

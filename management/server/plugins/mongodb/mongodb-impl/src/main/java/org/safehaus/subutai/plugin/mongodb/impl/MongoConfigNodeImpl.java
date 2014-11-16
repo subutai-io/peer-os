@@ -37,7 +37,7 @@ public class MongoConfigNodeImpl extends MongoNodeImpl implements MongoConfigNod
                 @Override
                 public void onResponse( final Response response, final CommandResult commandResult )
                 {
-                    if (response.getStdOut().contains( "child process started successfully, parent exiting" ) )
+                    if ( response.getStdOut().contains( "child process started successfully, parent exiting" ) )
                     {
                         commandOk.set( true );
                         stop();
