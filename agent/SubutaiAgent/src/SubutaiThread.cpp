@@ -132,7 +132,27 @@ void SubutaiThread::retrieveDaemonOutput(SubutaiCommand* command) {
     if (!command->getIsDaemon()) { 
         return;
     } 
-    // TBD
+    stringstream path;
+    // TODO: Add path of unprivileged container
+    if (_container) {
+    path << "/var/lib/lxc/" << _container->getContainerHostnameValue() << "/rootfs";
+    }
+    path << "/tmp/";
+    ifstream outFile(path.str().append(command->getCommandId()).append("_out").c_str());
+    string line;
+    if (outFile.is_open()) {
+        while (getline(outFile, line)) {
+            cout << line.c_str() << "\n"; 
+        }
+        outFile.close();
+    }
+    ifstream errFile(path.str().append(command->getCommandId()).append("_err").c_str());
+    if (errFile.is_open()) {
+        while (getline(errFile, line)) {
+            cout << line.c_str() << "\n"; 
+        }
+        errFile.close();
+    }
 }
 
 void SubutaiThread::captureOutputBuffer(message_queue* messageQueue, SubutaiCommand* command, bool outputBuffer, bool errorBuffer) {
@@ -165,6 +185,8 @@ void SubutaiThread::lastCheckAndSend(message_queue *messageQueue, SubutaiCommand
     this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::lastCheckAndSend> " "The method starts..."));
     unsigned int outBuffsize = this->getoutBuff().size();					//real output buffer size
     unsigned int errBuffsize = this->geterrBuff().size();					//real error buffer size
+
+    retrieveDaemonOutput(command);
 
     if (outBuffsize != 0 || errBuffsize != 0) {
         if (outBuffsize != 0 && errBuffsize!= 0) {
@@ -589,10 +611,28 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* c
         /*
          * Timeout Response is sending..
          */
-        this->lastCheckAndSend(messageQueue,command);
+        this->lastCheckAndSend(messageQueue, command);
         this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Timeout Done message is sending.."));
-        string message = this->getResponse().createTimeoutMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                this->getResponsecount(),"","",command->getCommandId());
+
+        string message;
+        if (command->getIsDaemon()) {
+            message = this->getResponse().createTimeoutMessage(command->getUuid(),
+                    this->getPpid(),
+                    command->getRequestSequenceNumber(),
+                    this->getResponsecount(), 
+                    "", 
+                    "", 
+                    command->getCommandId());
+        } else {
+            // EXECUTE_RESPONSE
+            message = this->getResponse().createExitMessage(command->getUuid(),
+                    this->getPpid(),
+                    command->getRequestSequenceNumber(),
+                    this->getResponsecount(),
+                    command->getCommandId(),
+                    0
+                    );
+        }
         while (!messageQueue->try_send(message.data(), message.size(), 0));
         this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Process Last Message",message));
         if (this->getPpid())
@@ -643,6 +683,9 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* c
  */
 int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *command, char* argv[], SubutaiContainer* container)
 {
+    if (container) {
+        _container = container; // Keep container for future use
+    }
     //signal(SIGCHLD, SIG_IGN);	// when the child process done it will be raped by kernel. We do not allowed zombie processes.
     pid = fork();		// creating a child process
     if (pid == 0)		// child process is starting
