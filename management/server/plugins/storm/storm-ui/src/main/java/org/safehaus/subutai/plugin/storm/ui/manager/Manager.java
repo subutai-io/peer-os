@@ -405,16 +405,25 @@ public class Manager
                         @Override
                         public void onComplete( final NodeState state )
                         {
-                            boolean running = state == NodeState.RUNNING;
-                            checkBtn.setEnabled( true );
-                            startBtn.setEnabled( !running );
-                            stopBtn.setEnabled( running );
-                            restartBtn.setEnabled( running );
-                            if ( destroyBtn != null )
-                            {
-                                destroyBtn.setEnabled( true );
-                            }
-                            icon.setVisible( false );
+                            executorService.execute( new StormNodeOperationTask( storm, tracker, config.getClusterName(),
+                                    containerHost, NodeOperationType.STATUS, new CompleteEvent() {
+
+                                @Override
+                                public void onComplete( final NodeState state )
+                                {
+                                    boolean running = state == NodeState.RUNNING;
+                                    checkBtn.setEnabled( true );
+                                    startBtn.setEnabled( !running );
+                                    stopBtn.setEnabled( running );
+                                    restartBtn.setEnabled( running );
+                                    if ( destroyBtn != null )
+                                    {
+                                        destroyBtn.setEnabled( true );
+                                    }
+                                    icon.setVisible( false );
+                                }
+                            }, null ) ) ;
+
                         }
                     }, null ) );
                 }

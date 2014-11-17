@@ -202,6 +202,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
         {
             Environment env = manager.getEnvironmentManager()
                                      .buildEnvironment( manager.getDefaultEnvironmentBlueprint( config ) );
+            trackerOperation.addLog( String.format( "Environment created successfully", clusterName ) );
 
             ClusterSetupStrategy clusterSetupStrategy =
                     manager.getClusterSetupStrategy( env, config, trackerOperation );

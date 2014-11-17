@@ -138,18 +138,19 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
 
         ContainerHost containerHost = environment.getContainerHostByUUID( config.getNimbus() );
 
-        if ( !containerHost.isConnected() )
-        {
-            throw new ClusterSetupException( "Nimbus node is not connected" );
-        }
-        for ( UUID supervisorUuids : config.getSupervisors() )
-        {
-            if ( ! environment
-                    .getContainerHostByUUID( supervisorUuids ).isConnected() )
-            {
-                throw new ClusterSetupException( "Not all worker nodes are connected" );
-            }
-        }
+        //TODO enable these checks when isConnected method working OK
+//        if ( !containerHost.isConnected() )
+//        {
+//            throw new ClusterSetupException( "Nimbus node is not connected" );
+//        }
+//        for ( UUID supervisorUuids : config.getSupervisors() )
+//        {
+//            if ( ! environment
+//                    .getContainerHostByUUID( supervisorUuids ).isConnected() )
+//            {
+//                throw new ClusterSetupException( "Not all worker nodes are connected" );
+//            }
+//        }
 
         configure();
 
@@ -172,18 +173,31 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         Map<String, String> paramValues = new LinkedHashMap<>();
         paramValues.put( "storm.zookeeper.servers", zk_servers );
         paramValues.put( "storm.local.dir", "/var/lib/storm" );
-        ContainerHost nimbusHost = environment.getContainerHostByUUID( config.getNimbus() );
+        ContainerHost nimbusHost;
+        if ( config.isExternalZookeeper() ) {
+            ZookeeperClusterConfig zookeeperClusterConfig =
+                    manager.getZookeeperManager().getCluster( config.getZookeeperClusterName() );
+            Environment zookeeperEnvironment =
+                    environmentManager.getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
+            nimbusHost = zookeeperEnvironment.getContainerHostByUUID( config.getNimbus() );
+        }
+        else {
+            nimbusHost = environment.getContainerHostByUUID( config.getNimbus() );
+        }
         paramValues.put( "nimbus.host", nimbusHost.getAgent().getListIP().get( 0 ) );
 
-        Set<UUID> allNodes = new HashSet<>( config.getSupervisors() );
-        allNodes.add( config.getNimbus() );
+        Set<ContainerHost> supervisorNodes = environment.getHostsByIds( config.getSupervisors() );
+
+        Set<ContainerHost> allNodes = new HashSet<>(  );
+        allNodes.add( nimbusHost );
+        allNodes.addAll( supervisorNodes );
 
         ContainerHost stormNode;
-        Iterator<UUID> iterator = allNodes.iterator();
+        Iterator<ContainerHost> iterator = allNodes.iterator();
 
         while( iterator.hasNext() )
         {
-            stormNode = environment.getContainerHostByUUID( iterator.next() );
+            stormNode = iterator.next();
             int operation_count = 0;
 
             for ( Map.Entry<String, String> entry : paramValues.entrySet() )

@@ -100,6 +100,8 @@ public class ZookeeperNodeOperationHandler extends AbstractPluginOperationHandle
         catch ( CommandException e )
         {
             trackerOperation.addLogFailed( String.format( "Command failed, %s", e.getMessage() ) );
+            e.printStackTrace();
+
         }
     }
 }

@@ -142,8 +142,6 @@ public class StormImpl extends StormBase
         environmentBlueprint.setName( StormClusterConfiguration.PRODUCT_NAME + UUIDUtil.generateTimeBasedUUID() );
         environmentBlueprint.setNodeGroups( new HashSet<NodeGroup>() );
 
-        // no need to create new container for nimbus node if external Zookeeper
-        // instance is used as nimbus node
         if ( !config.isExternalZookeeper() )
         {
             NodeGroup nimbus = new NodeGroup();
