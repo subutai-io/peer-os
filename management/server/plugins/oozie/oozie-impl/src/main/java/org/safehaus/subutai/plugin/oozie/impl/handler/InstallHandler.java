@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
@@ -43,7 +44,7 @@ public class InstallHandler extends AbstractOperationHandler<OozieImpl, OozieClu
     @Override
     public void run()
     {
-        /*Environment env = null;
+        Environment env = null;
 
         if ( config.getSetupType() == SetupType.WITH_HADOOP )
         {
@@ -58,7 +59,7 @@ public class InstallHandler extends AbstractOperationHandler<OozieImpl, OozieClu
             hadoopConfig.setTemplateName( OozieClusterConfig.PRODUCT_NAME_SERVER );
             try
             {
-                EnvironmentBuildTask eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
+                EnvironmentBlueprint eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
                 env = manager.getEnvironmentManager().buildEnvironment( eb );
             }
             catch ( ClusterSetupException ex )
@@ -88,6 +89,6 @@ public class InstallHandler extends AbstractOperationHandler<OozieImpl, OozieClu
         catch ( ClusterSetupException ex )
         {
             trackerOperation.addLogFailed( "Failed to setup cluster: " + ex.getMessage() );
-        }*/
+        }
     }
 }
