@@ -70,7 +70,7 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy
 
         if ( accumuloManager.getCluster( accumuloClusterConfig.getClusterName() ) != null )
         {
-//            trackerOperation.addLogFailed( "There is already a cluster with that name" );
+            trackerOperation.addLogFailed( "There is already a cluster with that name" );
             throw new ClusterSetupException(
                     String.format( "Cluster with name '%s' already exists", accumuloClusterConfig.getClusterName() ) );
         }

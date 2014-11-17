@@ -64,13 +64,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<AccumuloIm
                 setupCluster();
                 break;
             case UNINSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
-                        destroyCluster();
-                    }
-                } );
+                destroyCluster();
                 break;
             case START_ALL:
                 runOperationOnContainers( operationType );
