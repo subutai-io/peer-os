@@ -25,10 +25,10 @@ public class ManagementHost extends SubutaiHost
     }
 
 
-    public ManagementHost( ResourceHostInfo resourceHostInfo )
-    {
-        super( resourceHostInfo );
-    }
+//    public ManagementHost( ResourceHostInfo resourceHostInfo )
+//    {
+//        super( resourceHostInfo );
+//    }
 
 
     public void init() throws SubutaiInitException

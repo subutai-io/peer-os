@@ -691,7 +691,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
         {
             if ( managementHost == null )
             {
-                managementHost = new ManagementHost( resourceHostInfo );
+                //                managementHost = new ManagementHost( resourceHostInfo );
                 //                managementHost.setParentAgent( NullAgent.getInstance() );
                 //                try
                 //                {
@@ -716,11 +716,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
             }
             catch ( PeerException e )
             {
-                host = new ResourceHost( resourceHostInfo );
-                host.setParentAgent( NullAgent.getInstance() );
-                addResourceHost( host );
+                //                host = new ResourceHost( resourceHostInfo );
+                //                host.setParentAgent( NullAgent.getInstance() );
+                //                addResourceHost( host );
             }
-            host.updateHeartbeat();
+            //            host.updateHeartbeat();
             //            peerDAO.saveInfo( SOURCE_RESOURCE_HOST, host.getId().toString(), host );
             return;
         }
@@ -764,13 +764,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
                 try
                 {
                     host = getResourceHostByName( response.getHostname() );
-                    peerDAO.saveInfo( SOURCE_RESOURCE_HOST, host.getId().toString(), host );
                 }
                 catch ( PeerException e )
                 {
                     host = new ResourceHost( PeerUtils.buildAgent( response ), getId() );
                     host.setParentAgent( NullAgent.getInstance() );
                     addResourceHost( host );
+                    peerDAO.saveInfo( SOURCE_RESOURCE_HOST, host.getId().toString(), host );
                 }
                 host.updateHeartbeat();
                 return;
