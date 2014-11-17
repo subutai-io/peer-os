@@ -72,6 +72,8 @@ public class RequestBuilder
     // Config points for inotify
     private String[] confPoints;
 
+    private int isDaemon = 0;
+
 
     /**
      * Constructor
@@ -272,6 +274,14 @@ public class RequestBuilder
     }
 
 
+    public RequestBuilder daemon()
+    {
+        this.isDaemon = 1;
+
+        return this;
+    }
+
+
     /**
      * Builds and returns Request object
      *
@@ -292,7 +302,7 @@ public class RequestBuilder
         //TODO pass proper arguments after migration to new agent
         return new RequestImpl( org.safehaus.subutai.common.command.RequestType.EXECUTE_REQUEST, id, cwd, command,
                 cmdArgs, envVars, org.safehaus.subutai.common.command.OutputRedirection.RETURN,
-                org.safehaus.subutai.common.command.OutputRedirection.RETURN, runAs, timeout, 0 );
+                org.safehaus.subutai.common.command.OutputRedirection.RETURN, runAs, timeout, isDaemon );
     }
 
 

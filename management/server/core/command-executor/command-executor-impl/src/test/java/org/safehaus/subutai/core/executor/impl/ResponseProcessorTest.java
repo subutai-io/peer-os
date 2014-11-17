@@ -42,7 +42,7 @@ public class ResponseProcessorTest
     {
         responseProcessor = new ResponseProcessor( response, commandProcess, commandProcessor );
         when( commandProcess.getCallback() ).thenReturn( callback );
-        when( commandProcess.isCompleted() ).thenReturn( true );
+        when( commandProcess.isDone() ).thenReturn( true );
     }
 
 
@@ -85,13 +85,13 @@ public class ResponseProcessorTest
         verify( commandProcess ).appendResponse( response );
         verify( commandProcess ).getCallback();
         verify( callback ).onResponse( eq( response ), any( CommandResult.class ) );
-        verify( commandProcess ).isCompleted();
+        verify( commandProcess ).isDone();
         verify( commandProcessor ).remove( any( UUID.class ) );
         verify( commandProcess ).stop();
 
 
         RuntimeException exception = mock( RuntimeException.class );
-        doThrow( exception ).when( commandProcess ).isCompleted();
+        doThrow( exception ).when( commandProcess ).isDone();
 
         responseProcessor.run();
 

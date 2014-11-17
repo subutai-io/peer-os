@@ -71,12 +71,11 @@ function destroy {
   lxc_stop $clone
 
   # (1) let's get the clone's parent
-  parent_snap=`zfs get origin "lxc/$clone" -o value -H`
-  parent=`zfs_ctnr_from_ds $parent_snap`
+  parent=`fs_get_parent $clone`
 
   # (2) check if the clone has dependent children
   msg_info "    - checking if \"$clone\" has dependent children ..."
-  zfs_get_children $clone
+  fs_get_children $clone
   child_count=$?
 
   if [ $child_count -gt 0 ]; then
@@ -102,7 +101,7 @@ function destroy {
   fi
  
   # Destroy all children of master template
-  children_list=`zfs_get_children_list $clone`
+  children_list=`fs_get_children_list $clone`
   for child in $children_list 
   do
     subutai destroy -r -f $child
@@ -133,15 +132,7 @@ function destroy {
   fi
 
   # (4) & (5) release all holds on clone's rootfs snaps and delete snaps
-  for snap in `zfs list -t snapshot -o name -H | grep $clone@`; do
-    for hold in `zfs holds -r $snap | grep $snap | awk '{print $2}'`; do
-      zfs release $hold $snap
-      msg_info "    - \"$hold\" hold removed from $snap"
-    done
-
-    zfs destroy $snap
-    msg_info "    - \"$snap\" snapshot destroyed"
-  done
+  fs_rls_holds_delete_snaps $clone
 
   destroy_monitor $clone
   ovs_port_name=$(ovs_get_port_name $clone)
@@ -149,9 +140,9 @@ function destroy {
   lxc-destroy -n $clone -f
 
   # (7) destroy mounted partitions 
-  remove-mount $clone $parent opt lxc
-  remove-mount $clone $parent var lxc-data
-  remove-mount $clone $parent home lxc-data
+  fs_remove_mount $clone $parent opt lxc
+  fs_remove_mount $clone $parent var lxc-data
+  fs_remove_mount $clone $parent home lxc-data
 
   # (8) notify template destroy if template is registered
   if [ "`is_registered $clone`" == "true" ]; then
@@ -173,30 +164,6 @@ function destroy {
   exit 0
 }
 
-
-function remove-mount {
-  child="$1"
-  parent="$2"
-  partition="$3"
-  pool="$4"
-
-  child_ds="$pool/$child-$partition"
-  parent_ds="$pool/$parent-$partition"
-
-  for snap in `zfs list -t snapshot -o name -H | grep $child_ds@`; do
-    for hold in `zfs holds -r $snap | grep $snap | awk '{print $2}'`; do
-      zfs release $hold $snap
-      msg_info "    - \"$hold\" hold removed from \"$snap\""
-    done
-
-    zfs destroy $snap
-    msg_info "    - \"$snap\" snapshot destroyed"
-  done
-
-  # Need to destroy mount
-  zfs destroy $child_ds
-  msg_info "    - \"$child_ds\" dataset destroyed"
-}
 
 function destroy_description {
   echo destroys a template or instance container

@@ -288,6 +288,8 @@ bool SubutaiCommand::deserialize(string& input)
         cout << e.what() << endl;
     }
 #endif
+
+    return true;
 }
 
 /**

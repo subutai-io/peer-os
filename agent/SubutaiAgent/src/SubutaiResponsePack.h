@@ -33,8 +33,7 @@ public:
 	virtual ~SubutaiResponsePack();
 	string createResponseMessage(string,int,int,int,string,string,string);
 	string createExitMessage(string,int, int, int,string,int);
-	string createTerminateMessage(string,int,string,int, int);
-	//string createFailTerminateMessage(string,int,string,int,const string& );
+	string createTerminateMessage(string,string,int, int);
 	string createInQueueMessage(string,string);
 	string createHeartBeatMessage(string,string);
 	string createTimeoutMessage(string,int,int,int,string,string,string);
