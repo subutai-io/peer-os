@@ -28,6 +28,9 @@ public abstract class SubutaiHost implements Host
     private Agent agent = NullAgent.getInstance();
     private Agent parentAgent = NullAgent.getInstance();
     protected long lastHeartbeat = System.currentTimeMillis();
+//    private UUID id;
+//    private String hostname;
+//    private Set<Interface> interfaces;
 
 
     protected SubutaiHost( final Agent agent, UUID peerId )
@@ -36,7 +39,19 @@ public abstract class SubutaiHost implements Host
 
         this.agent = agent;
         this.peerId = peerId;
+//        this.id = agent.getUuid();
+//        this.hostname = agent.getHostname();
+//        this.interfaces = new HashSet<>();
     }
+
+//
+//    protected SubutaiHost( ResourceHostInfo resourceHostInfo )
+//    {
+//        Preconditions.checkNotNull( resourceHostInfo, "ResourceHostInfo is null" );
+//        hostname = resourceHostInfo.getHostname();
+//        id = resourceHostInfo.getId();
+//        interfaces = resourceHostInfo.getInterfaces();
+//    }
 
 
     public Agent getAgent()

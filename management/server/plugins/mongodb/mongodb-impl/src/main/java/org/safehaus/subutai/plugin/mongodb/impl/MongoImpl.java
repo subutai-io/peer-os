@@ -6,7 +6,9 @@
 package org.safehaus.subutai.plugin.mongodb.impl;
 
 
+import java.lang.reflect.Type;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -30,6 +32,9 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
+import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
+import org.safehaus.subutai.plugin.mongodb.api.MongoRouterNode;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 import org.safehaus.subutai.plugin.mongodb.impl.handler.AddNodeOperationHandler;
@@ -45,6 +50,14 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 
 /**
@@ -172,7 +185,13 @@ public class MongoImpl implements Mongo
     {
         try
         {
-            this.pluginDAO = new PluginDAO( dataSource );
+
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.registerTypeAdapter( MongoDataNode.class, new InterfaceAdapter<MongoDataNode>() ).create();
+            gsonBuilder.registerTypeAdapter( MongoConfigNode.class, new InterfaceAdapter<MongoConfigNode>() ).create();
+            gsonBuilder.registerTypeAdapter( MongoRouterNode.class, new InterfaceAdapter<MongoRouterNode>() ).create();
+
+            this.pluginDAO = new PluginDAO( dataSource, gsonBuilder );
         }
         catch ( SQLException e )
         {
@@ -218,8 +237,12 @@ public class MongoImpl implements Mongo
 
     public List<MongoClusterConfig> getClusters()
     {
+        List<MongoClusterConfigImpl> r =
+                pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, MongoClusterConfigImpl.class );
 
-        return pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, MongoClusterConfig.class );
+        List<MongoClusterConfig> result = new ArrayList<>();
+        result.addAll( r );
+        return result;
     }
 
 
@@ -228,7 +251,7 @@ public class MongoImpl implements Mongo
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
 
-        return pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, clusterName, MongoClusterConfig.class );
+        return pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, clusterName, MongoClusterConfigImpl.class );
     }
 
 
@@ -361,5 +384,60 @@ public class MongoImpl implements Mongo
 
         //        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
         return environmentBlueprint;
+    }
+
+
+    @Override
+    public MongoClusterConfig newMongoClusterConfigInstance()
+    {
+        return new MongoClusterConfigImpl();
+    }
+
+
+    class InterfaceAdapter<T> implements JsonSerializer<T>, JsonDeserializer<T>
+    {
+        public JsonElement serialize( T object, Type interfaceType, JsonSerializationContext context )
+        {
+            final JsonObject wrapper = new JsonObject();
+            wrapper.addProperty( "type", object.getClass().getName() );
+            wrapper.add( "data", context.serialize( object ) );
+            return wrapper;
+        }
+
+
+        public T deserialize( JsonElement elem, Type interfaceType, JsonDeserializationContext context )
+                throws JsonParseException
+        {
+            final JsonObject wrapper = ( JsonObject ) elem;
+            final JsonElement typeName = get( wrapper, "type" );
+            final JsonElement data = get( wrapper, "data" );
+            final Type actualType = typeForName( typeName );
+            return context.deserialize( data, actualType );
+        }
+
+
+        private Type typeForName( final JsonElement typeElem )
+        {
+            try
+            {
+                return Class.forName( typeElem.getAsString() );
+            }
+            catch ( ClassNotFoundException e )
+            {
+                throw new JsonParseException( e );
+            }
+        }
+
+
+        private JsonElement get( final JsonObject wrapper, String memberName )
+        {
+            final JsonElement elem = wrapper.get( memberName );
+            if ( elem == null )
+            {
+                throw new JsonParseException(
+                        "no '" + memberName + "' member found in what was expected to be an interface wrapper" );
+            }
+            return elem;
+        }
     }
 }

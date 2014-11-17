@@ -4,9 +4,10 @@ package org.safehaus.subutai.core.peer.api;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 
 
 /**
@@ -24,16 +25,22 @@ public class ManagementHost extends SubutaiHost
     }
 
 
+//    public ManagementHost( ResourceHostInfo resourceHostInfo )
+//    {
+//        super( resourceHostInfo );
+//    }
+
+
     public void init() throws SubutaiInitException
     {
-//        try
-//        {
-//            createFlows();
-//        }
-//        catch ( CommandException e )
-//        {
-//            throw new SubutaiInitException( "Could not create network flows." );
-//        }
+        //        try
+        //        {
+        //            createFlows();
+        //        }
+        //        catch ( CommandException e )
+        //        {
+        //            throw new SubutaiInitException( "Could not create network flows." );
+        //        }
     }
 
 
