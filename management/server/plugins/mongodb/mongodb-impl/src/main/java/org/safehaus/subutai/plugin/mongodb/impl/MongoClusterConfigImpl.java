@@ -16,6 +16,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
+import org.safehaus.subutai.plugin.mongodb.api.MongoException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoRouterNode;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
@@ -180,7 +181,7 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
     }
 
 
-    public NodeType getNodeType( Agent node )
+    public NodeType getNodeType( MongoNode node )
     {
         NodeType nodeType = null;
 
@@ -203,7 +204,7 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
 
     public Set<MongoRouterNode> getRouterServers()
     {
-        return new HashSet<MongoRouterNode>( routerServers );
+        return routerServers;
     }
 
 
@@ -311,6 +312,15 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
                 setNumberOfConfigServers( getNumberOfConfigServers() + 1 );
                 break;
         }
+    }
+
+
+    @Override
+    public MongoDataNode findPrimaryNode() throws MongoException
+    {
+        String primaryNodeName = getDataNodes().iterator().next().getPrimaryNodeName();
+
+        return ( MongoDataNode ) findNode( primaryNodeName );
     }
 
 
