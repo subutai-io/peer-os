@@ -2,15 +2,13 @@ package org.safehaus.subutai.plugin.hbase.impl.handler;
 
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
 import com.google.common.collect.Sets;
 
 
-public class CheckNodeHandler extends AbstractOperationHandler<HBaseImpl>
+public class CheckNodeHandler extends AbstractOperationHandler<HBaseImpl, HBaseClusterConfig>
 {
 
     private String clusterName, lxcHostname;
@@ -29,7 +27,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<HBaseImpl>
     @Override
     public void run()
     {
-        HBaseClusterConfig config = manager.getCluster( clusterName );
+        /*HBaseClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
             trackerOperation.addLogFailed(
@@ -54,7 +52,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<HBaseImpl>
         else
         {
             trackerOperation.addLogFailed( String.format( "Check failed, %s", checkCommand.getAllErrors() ) );
-        }
+        }*/
     }
 }
 

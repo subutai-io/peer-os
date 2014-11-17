@@ -13,13 +13,10 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDao;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
@@ -40,14 +37,12 @@ public class HBaseImpl implements HBase
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( HBaseImpl.class.getName() );
-    private AgentManager agentManager;
     private Hadoop hadoopManager;
     private Tracker tracker;
     private ExecutorService executor;
-    private CommandRunner commandRunner;
     private EnvironmentManager environmentManager;
-    private ContainerManager containerManager;
-    private PluginDao pluginDAO;
+
+    private PluginDAO pluginDAO;
     private Commands commands;
     private DataSource dataSource;
 
@@ -58,27 +53,15 @@ public class HBaseImpl implements HBase
     }
 
 
-    public PluginDao getPluginDAO()
+    public PluginDAO getPluginDAO()
     {
         return pluginDAO;
     }
 
 
-    public void setPluginDAO( final PluginDao pluginDAO )
+    public void setPluginDAO( final PluginDAO pluginDAO )
     {
         this.pluginDAO = pluginDAO;
-    }
-
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
     }
 
 
@@ -106,18 +89,6 @@ public class HBaseImpl implements HBase
     }
 
 
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
-    public void setCommandRunner( CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
-    }
-
-
     public EnvironmentManager getEnvironmentManager()
     {
         return environmentManager;
@@ -130,32 +101,19 @@ public class HBaseImpl implements HBase
     }
 
 
-    public ContainerManager getContainerManager()
-    {
-        return containerManager;
-    }
-
-
-    public void setContainerManager( final ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
-    }
-
-
     public void init()
     {
         try
         {
-            this.pluginDAO = new PluginDao( dataSource );
+            this.pluginDAO = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
-        this.commands = new Commands( commandRunner );
 
-        commands = new Commands( commandRunner );
-        executor = Executors.newCachedThreadPool();
+        this.commands = new Commands(  );
+        this.executor = Executors.newCachedThreadPool();
     }
 
 

@@ -5,13 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
 
-public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
+public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl, HBaseClusterConfig>
 {
     private String clusterName;
 
@@ -28,7 +27,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
     @Override
     public void run()
     {
-        HBaseClusterConfig config = manager.getCluster( clusterName );
+       /* HBaseClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
             trackerOperation.addLogFailed(
@@ -69,11 +68,11 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
         else
         {
             trackerOperation.addLogFailed( String.format( "Check failed, %s", checkCommand.getAllErrors() ) );
-        }
+        }*/
     }
 
 
-    private Set<Agent> getAllNodes( HBaseClusterConfig config )
+    /*private Set<Agent> getAllNodes( HBaseClusterConfig config )
     {
         final Set<Agent> allNodes = new HashSet<>();
         allNodes.add( config.getHbaseMaster() );
@@ -91,5 +90,5 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
             allNodes.add( agent );
         }
         return allNodes;
-    }
+    }*/
 }

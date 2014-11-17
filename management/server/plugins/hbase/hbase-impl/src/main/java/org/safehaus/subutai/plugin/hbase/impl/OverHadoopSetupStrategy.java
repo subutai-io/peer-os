@@ -4,9 +4,9 @@ package org.safehaus.subutai.plugin.hbase.impl;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
@@ -70,12 +70,12 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
         }
 
         // check if nodes are connected
-        if ( manager.getAgentManager().getAgentByHostname( config.getHbaseMaster().getHostname() ) == null )
+      /*  if ( manager.getAgentManager().getAgentByHostname( config.getHbaseMaster().getHostname() ) == null )
         {
             throw new ClusterSetupException( "Master node is not connected" );
         }
 
-        for ( Agent a : config.getRegionServers() )
+        for ( UUID a : config.getRegionServers() )
         {
             if ( manager.getAgentManager().getAgentByHostname( a.getHostname() ) == null )
             {
@@ -83,7 +83,7 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
             }
         }
 
-        for ( Agent a : config.getQuorumPeers() )
+        for ( UUID a : config.getQuorumPeers() )
         {
             if ( manager.getAgentManager().getAgentByHostname( a.getHostname() ) == null )
             {
@@ -91,13 +91,13 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
             }
         }
 
-        for ( Agent a : config.getBackupMasters() )
+        for ( UUID a : config.getBackupMasters() )
         {
             if ( manager.getAgentManager().getAgentByHostname( a.getHostname() ) == null )
             {
                 throw new ClusterSetupException( "Not all backup master nodes are connected" );
             }
-        }
+        }*/
 
         // check Hadoop cluster
         HadoopClusterConfig hc = manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
@@ -115,18 +115,18 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
         po.addLog( "Checking prerequisites..." );
 
         //check installed subutai packages
-        Set<Agent> allNodes = config.getAllNodes();
-        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( allNodes );
-        manager.getCommandRunner().runCommand( checkInstalledCommand );
+        /*Set<UUID> allNodes = config.getAllNodes();
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( allNodes );*/
+        /*manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
         {
             throw new ClusterSetupException(
                     "Failed to check presence of installed subutai packages\nInstallation aborted" );
         }
-        for ( Iterator<Agent> it = allNodes.iterator(); it.hasNext(); )
+        for ( Iterator<UUID> it = allNodes.iterator(); it.hasNext(); )
         {
-            Agent node = it.next();
+            UUID node = it.next();
 
             AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
             if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
@@ -154,13 +154,13 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
         if ( !allNodes.contains( config.getHbaseMaster() ) )
         {
             throw new ClusterSetupException( "Master node was omitted\nInstallation aborted" );
-        }
+        }*/
     }
 
 
     private void configure() throws ClusterSetupException
     {
-        po.addLog( "Updating db..." );
+       /* po.addLog( "Updating db..." );
         //save to db
         manager.getPluginDAO().saveInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
         po.addLog( "Cluster info saved to DB\nInstalling HBase..." );
@@ -181,6 +181,6 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
         else
         {
             throw new ClusterSetupException( "Installation failed: " + installCommand.getAllErrors() );
-        }
+        }*/
     }
 }

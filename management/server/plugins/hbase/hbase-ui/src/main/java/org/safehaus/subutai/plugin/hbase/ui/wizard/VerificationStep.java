@@ -9,6 +9,7 @@ package org.safehaus.subutai.plugin.hbase.ui.wizard;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
@@ -44,6 +45,7 @@ public class VerificationStep extends Panel
         confirmationLbl.setContentMode( ContentMode.HTML );
 
         final HBaseClusterConfig config = wizard.getConfig();
+//        final Environment environment = wizard.getEnvironmentManager().getEnvironment( config.getEnvironmentId().toString() );
         final HadoopClusterConfig hc = wizard.getHadoopConfig();
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
@@ -52,20 +54,21 @@ public class VerificationStep extends Panel
         {
             cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getHadoopClusterName() );
             cfgView.addStringCfg( "Master Node", wizard.getConfig().getHbaseMaster().toString() );
-            for ( UUID agent : wizard.getConfig().getRegionServers() )
+            for ( UUID host : wizard.getConfig().getRegionServers() )
             {
-                cfgView.addStringCfg( "Region Servers", agent.toString() );
+                cfgView.addStringCfg( "Region Servers", host.toString() );
             }
 
-            for ( UUID agent : wizard.getConfig().getQuorumPeers() )
+            for ( UUID host : wizard.getConfig().getQuorumPeers() )
             {
-                cfgView.addStringCfg( "Quorum Peers", agent.toString());
+                cfgView.addStringCfg( "Quorum Peers", host.toString() );
             }
 
-            for ( UUID agent : wizard.getConfig().getBackupMasters() )
+            for ( UUID host : wizard.getConfig().getBackupMasters() )
             {
-                cfgView.addStringCfg( "Backup Masters", agent.toString() );
+                cfgView.addStringCfg( "Backup Masters", host.toString() );
             }
+            cfgView.addStringCfg( "Environment ID", config.getEnvironmentId().toString() );
         }
         else if ( config.getSetupType() == SetupType.WITH_HADOOP )
         {

@@ -1,8 +1,9 @@
 package org.safehaus.subutai.plugin.hbase.impl;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
@@ -28,8 +29,8 @@ public class SetupHelper
 
     public void configureHMaster() throws ClusterSetupException
     {
-        po.addLog( "Setting master" );
-        Agent hmaster = config.getHbaseMaster();
+        /*po.addLog( "Setting master" );
+        UUID hmaster = config.getHbaseMaster();
         Command cmd = manager.getCommands().getConfigMasterCommand( config.getAllNodes(), config.getHadoopNameNode(),
                 hmaster.getHostname() );
         manager.getCommandRunner().runCommand( cmd );
@@ -39,15 +40,15 @@ public class SetupHelper
             throw new ClusterSetupException( "Setting regions servers:" + cmd.getAllErrors() );
         }
 
-        po.addLog( "Setting regions servers succeeded" );
+        po.addLog( "Setting regions servers succeeded" );*/
     }
 
 
     public void configureRegionServers() throws ClusterSetupException
     {
-        po.addLog( "Setting regions servers" );
+       /* po.addLog( "Setting regions servers" );
         StringBuilder sb = new StringBuilder();
-        for ( Agent agent : config.getRegionServers() )
+        for ( UUID agent : config.getRegionServers() )
         {
             sb.append( agent.getHostname() );
             sb.append( " " );
@@ -61,15 +62,15 @@ public class SetupHelper
             throw new ClusterSetupException( "Setting regions servers:" + cmd.getAllErrors() );
         }
 
-        po.addLog( "Setting regions servers succeeded" );
+        po.addLog( "Setting regions servers succeeded" );*/
     }
 
 
     public void configureQuorumPeers() throws ClusterSetupException
     {
-        po.addLog( "Setting quorum peers" );
+       /* po.addLog( "Setting quorum peers" );
         StringBuilder sb = new StringBuilder();
-        for ( Agent agent : config.getQuorumPeers() )
+        for ( UUID agent : config.getQuorumPeers() )
         {
             sb.append( agent.getHostname() );
             sb.append( " " );
@@ -83,13 +84,13 @@ public class SetupHelper
             throw new ClusterSetupException( "Setting quorum peers:" + cmd.getAllErrors() );
         }
 
-        po.addLog( "Setting quorum peers succeeded" );
+        po.addLog( "Setting quorum peers succeeded" );*/
     }
 
 
     public void configureBackUpMasters() throws ClusterSetupException
     {
-        po.addLog( "Setting backup masters" );
+        /*po.addLog( "Setting backup masters" );
         StringBuilder sb = new StringBuilder();
         for ( Agent agent : config.getBackupMasters() )
         {
@@ -105,13 +106,13 @@ public class SetupHelper
             throw new ClusterSetupException( "Setting backup masters:" + cmd.getAllErrors() );
         }
 
-        po.addLog( "Setting backup masters succeeded" );
+        po.addLog( "Setting backup masters succeeded" );*/
     }
 
 
     public void startCluster() throws ClusterSetupException
     {
-        po.addLog( "Starting cluster..." );
+       /* po.addLog( "Starting cluster..." );
 
         Command cmd = manager.getCommands().getStartCommand( Sets.newHashSet( config.getHbaseMaster() ) );
         manager.getCommandRunner().runCommand( cmd );
@@ -123,7 +124,7 @@ public class SetupHelper
         else
         {
             throw new ClusterSetupException( "Failed to start cluster:" + cmd.getAllErrors() );
-        }
+        }*/
     }
 }
 

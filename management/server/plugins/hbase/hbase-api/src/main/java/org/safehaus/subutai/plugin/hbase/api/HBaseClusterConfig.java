@@ -34,6 +34,19 @@ public class HBaseClusterConfig implements ConfigBase
     private Set<UUID> allNodes = Sets.newHashSet();
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private SetupType setupType;
+    private UUID environmentId;
+
+
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
+    }
 
 
     public HBaseClusterConfig()

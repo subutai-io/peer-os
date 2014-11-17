@@ -10,7 +10,7 @@ import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 import com.google.common.collect.Sets;
 
 
-public class StopClusterHandler extends AbstractOperationHandler<HBaseImpl>
+public class StopClusterHandler extends AbstractOperationHandler<HBaseImpl, HBaseClusterConfig>
 {
     private String clusterName;
 
@@ -28,7 +28,7 @@ public class StopClusterHandler extends AbstractOperationHandler<HBaseImpl>
     public void run()
     {
 
-        HBaseClusterConfig config = manager.getCluster( clusterName );
+        /*HBaseClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
             trackerOperation.addLogFailed(
@@ -54,6 +54,6 @@ public class StopClusterHandler extends AbstractOperationHandler<HBaseImpl>
         else
         {
             trackerOperation.addLogFailed( String.format( "Stop failed, %s", stopCommand.getAllErrors() ) );
-        }
+        }*/
     }
 }

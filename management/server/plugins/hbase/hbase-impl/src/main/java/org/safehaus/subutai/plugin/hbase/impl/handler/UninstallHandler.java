@@ -11,7 +11,7 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
 
-public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
+public class UninstallHandler extends AbstractOperationHandler<HBaseImpl, HBaseClusterConfig>
 {
     private String clusterName;
 
@@ -28,7 +28,7 @@ public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
     @Override
     public void run()
     {
-        HBaseClusterConfig config = manager.getCluster( clusterName );
+       /* HBaseClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
             trackerOperation.addLogFailed(
@@ -65,11 +65,11 @@ public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
 
         trackerOperation.addLog( "Updating db..." );
         manager.getPluginDAO().deleteInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName() );
-        trackerOperation.addLogDone( "Cluster info deleted from DB\nDone" );
+        trackerOperation.addLogDone( "Cluster info deleted from DB\nDone" );*/
     }
 
 
-    private Set<Agent> getAllNodes( HBaseClusterConfig config )
+    /*private Set<Agent> getAllNodes( HBaseClusterConfig config )
     {
         final Set<Agent> allNodes = new HashSet<>();
         allNodes.add( config.getHbaseMaster() );
@@ -86,5 +86,5 @@ public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
             allNodes.add( agent );
         }
         return allNodes;
-    }
+    }*/
 }

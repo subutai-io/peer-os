@@ -9,7 +9,7 @@ import org.safehaus.subutai.plugin.hbase.api.SetupType;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
 
-public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
+public class InstallHandler extends AbstractOperationHandler<HBaseImpl, HBaseClusterConfig>
 {
 
     private HBaseClusterConfig config;
@@ -40,7 +40,7 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
 
     private void setupOverHadoop()
     {
-        try
+        /*try
         {
             //setup up HBase cluster
             ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( null, config, trackerOperation );
@@ -53,7 +53,7 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
         {
             trackerOperation
                     .addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
-        }
+        }*/
     }
 
 

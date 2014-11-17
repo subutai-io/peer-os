@@ -30,7 +30,7 @@ public interface EnvironmentManager
 
     List<Environment> getEnvironments();
 
-    Environment getEnvironment( String environmentName );
+    Environment getEnvironment( String environmentId );
 
     boolean destroyEnvironment( UUID environmentId ) throws EnvironmentDestroyException;
 

@@ -7,26 +7,18 @@
     <property name="password" value="" />
   </bean>
 
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
+
   <reference id="hadoopManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
-  <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
-  <reference id="containerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.container.api.container.ContainerManager" />
   <reference id="environmentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
   <bean id="hbase-impl" scope="singleton" class="org.safehaus.subutai.plugin.hbase.impl.HBaseImpl"
         init-method="init" destroy-method="destroy">
-    <property name="agentManager" ref="agentManager" />
     <property name="hadoopManager" ref="hadoopManager" />
     <property name="tracker" ref="tracker" />
-    <property name="commandRunner" ref="commandRunner" />
-    <property name="containerManager" ref="containerManager" />
     <property name="environmentManager" ref="environmentManager" />
     <argument ref="dataSource" />
   </bean>
