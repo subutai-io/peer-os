@@ -1,23 +1,11 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="communicationManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.communication.api.CommunicationManager" />
-
-  <reference id="peerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <reference id="broker" availability="mandatory"
+             interface="org.safehaus.subutai.core.broker.api.Broker" />
 
   <bean id="fileTracker" class="org.safehaus.subutai.core.filetracker.impl.FileTrackerImpl"
         init-method="init" destroy-method="destroy" scope="singleton">
-    <property name="communicationManager" ref="communicationManager" />
+    <argument ref="broker" />
   </bean>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="file-tracker/test">
-      <action class="org.safehaus.subutai.core.filetracker.impl.CliTest">
-        <property name="fileTracker" ref="fileTracker" />
-        <property name="peerManager" ref="peerManager" />
-      </action>
-    </command>
-  </command-bundle>
 
 </blueprint>

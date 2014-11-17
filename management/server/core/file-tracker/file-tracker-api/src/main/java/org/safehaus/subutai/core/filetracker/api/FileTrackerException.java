@@ -10,4 +10,10 @@ public class FileTrackerException extends SubutaiException
     {
         super( message );
     }
+
+
+    public FileTrackerException( final Throwable cause )
+    {
+        super( cause );
+    }
 }

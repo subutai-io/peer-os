@@ -1,120 +1,164 @@
 package org.safehaus.subutai.core.filetracker.impl;
 
 
-import com.google.common.base.Preconditions;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.command.Response;
 import org.safehaus.subutai.common.enums.RequestType;
-import org.safehaus.subutai.common.enums.ResponseType;
-import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.protocol.ResponseListener;
-import org.safehaus.subutai.core.communication.api.CommunicationManager;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.broker.api.Broker;
+import org.safehaus.subutai.core.broker.api.BrokerException;
+import org.safehaus.subutai.core.broker.api.ByteMessageListener;
+import org.safehaus.subutai.core.broker.api.Topic;
+import org.safehaus.subutai.core.filetracker.api.ConfigPointListener;
 import org.safehaus.subutai.core.filetracker.api.FileTracker;
 import org.safehaus.subutai.core.filetracker.api.FileTrackerException;
+import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.Host;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 
-public class FileTrackerImpl implements FileTracker, ResponseListener
+//TODO use proper RequestType and update RequestBuilder.RequestImpl after migration to new agent
+public class FileTrackerImpl implements FileTracker, ByteMessageListener
 {
 
-    private final Set<ResponseListener> listeners = new HashSet<>();
+    private final Set<ConfigPointListener> listeners =
+            Collections.newSetFromMap( new ConcurrentHashMap<ConfigPointListener, Boolean>() );
 
-    private CommunicationManager communicationManager;
+    private Broker broker;
+    protected CommandUtil commandUtil = new CommandUtil();
 
 
-    public void setCommunicationManager( CommunicationManager communicationManager )
+    public FileTrackerImpl( final Broker broker )
     {
-        Preconditions.checkNotNull( communicationManager, "CommunicationManager is null." );
-        this.communicationManager = communicationManager;
+        Preconditions.checkNotNull( broker );
+
+        this.broker = broker;
     }
 
 
-    public void init()
+    public void init() throws FileTrackerException
     {
-        communicationManager.addListener( this );
+        try
+        {
+            broker.addByteMessageListener( this );
+        }
+        catch ( BrokerException e )
+        {
+            throw new FileTrackerException( e );
+        }
     }
 
 
     public void destroy()
     {
-        communicationManager.removeListener( this );
+        broker.removeMessageListener( this );
     }
 
 
     @Override
-    public void addListener( ResponseListener listener )
+    public void addListener( ConfigPointListener listener )
     {
+        Preconditions.checkNotNull( listener );
+
         listeners.add( listener );
     }
 
 
     @Override
-    public void removeListener( ResponseListener listener )
+    public void removeListener( ConfigPointListener listener )
     {
+        Preconditions.checkNotNull( listener );
+
         listeners.remove( listener );
     }
 
 
     @Override
-    public void createConfigPoints( Host host, String[] configPoints ) throws FileTrackerException
+    public void createConfigPoints( Host host, Set<String> configPoints ) throws FileTrackerException
     {
+        Preconditions.checkNotNull( host, "Host is null" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( configPoints ), "Invalid config points" );
+
         try
         {
-            host.execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_CREATE_REQUEST )
-                                                     .withConfPoints( configPoints ) );
+            commandUtil.execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_CREATE_REQUEST )
+                                                            .withConfPoints( configPoints ), host );
         }
         catch ( CommandException e )
         {
-            throw new FileTrackerException( "Could not create config points: " + e.toString() );
+            throw new FileTrackerException( e );
         }
     }
 
 
     @Override
-    public void removeConfigPoints( Host host, String[] configPoints ) throws FileTrackerException
+    public void removeConfigPoints( Host host, Set<String> configPoints ) throws FileTrackerException
     {
+        Preconditions.checkNotNull( host, "Host is null" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( configPoints ), "Invalid config points" );
+
         try
         {
-            host.execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_REMOVE_REQUEST )
-                                                     .withConfPoints( configPoints ) );
+            commandUtil.execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_REMOVE_REQUEST )
+                                                            .withConfPoints( configPoints ), host );
         }
         catch ( CommandException e )
         {
-            throw new FileTrackerException( "Could not remove config points: " + e.toString() );
+            throw new FileTrackerException( e );
         }
     }
 
 
     @Override
-    public String[] listConfigPoints( final Host host ) throws FileTrackerException
+    public Set<String> listConfigPoints( final Host host ) throws FileTrackerException
     {
+        Preconditions.checkNotNull( host, "Host is null" );
+
+        final Set<String> configPoints = Sets.newHashSet();
+
         try
         {
-            host.execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_LIST_REQUEST ) );
+            host.execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_LIST_REQUEST ),
+                    new CommandCallback()
+                    {
+                        @Override
+                        public void onResponse( final Response response, final CommandResult commandResult )
+                        {
+                            if ( !CollectionUtil.isCollectionEmpty( response.getConfigPoints() ) )
+                            {
+                                configPoints.addAll( response.getConfigPoints() );
+                            }
+                        }
+                    } );
         }
         catch ( CommandException e )
         {
-            throw new FileTrackerException( "Could not list config points: " + e.toString() );
+            throw new FileTrackerException( e );
         }
-        return new String[] { };
+
+        return configPoints;
     }
 
 
     @Override
-    public void onResponse( Response response )
+    public void onMessage( final byte[] message )
     {
-        if ( response == null || response.getType() != ResponseType.INOTIFY_ACTION_RESPONSE )
-        {
-            //System.out.println( "Listener is null." );
-            return;
-        }
+        //TODO process inotify event here
+    }
 
-        for ( ResponseListener listener : listeners )
-        {
-            listener.onResponse( response );
-        }
+
+    @Override
+    public Topic getTopic()
+    {
+        return Topic.INOTIFY_TOPIC;
     }
 }
