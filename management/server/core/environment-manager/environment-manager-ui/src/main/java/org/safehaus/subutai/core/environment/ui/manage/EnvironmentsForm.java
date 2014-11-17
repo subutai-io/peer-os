@@ -30,7 +30,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class EnvironmentsForm
 {
 
@@ -233,7 +233,7 @@ public class EnvironmentsForm
     private String getSampleNodeGroup()
     {
         NodeGroup ng = new NodeGroup();
-        ng.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        ng.setPlacementStrategy( new PlacementStrategy( "ROUND_ROBIN" ) );
         ng.setTemplateName( "cassandra" );
         ng.setNumberOfNodes( 2 );
         ng.setExchangeSshKeys( true );

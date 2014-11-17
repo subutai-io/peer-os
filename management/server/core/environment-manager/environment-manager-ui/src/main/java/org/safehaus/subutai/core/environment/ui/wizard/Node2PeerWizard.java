@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
@@ -195,7 +196,8 @@ public class Node2PeerWizard extends Window
                     Node2PeerData data = new Node2PeerData( blueprint.getId(), topology, map );
                     try
                     {
-                        managerUI.getEnvironmentManager().saveBuildProcess( data );
+                        UUID processId = managerUI.getEnvironmentManager().saveBuildProcess( data );
+                        Notification.show( String.format( "Process %s prepared", processId.toString() ) );
                     }
                     catch ( EnvironmentManagerException e )
                     {

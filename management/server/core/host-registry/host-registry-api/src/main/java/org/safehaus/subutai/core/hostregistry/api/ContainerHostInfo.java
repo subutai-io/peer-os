@@ -1,23 +1,10 @@
 package org.safehaus.subutai.core.hostregistry.api;
 
 
-import java.util.Set;
-import java.util.UUID;
-
-
 /**
  * Container info
  */
-public interface ContainerHostInfo
+public interface ContainerHostInfo extends HostInfo
 {
-    public UUID getId();
-
-
-    public String getHostname();
-
-
-    public Set<String> getIps();
-
-
     public ContainerHostState getStatus();
 }

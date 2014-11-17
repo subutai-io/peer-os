@@ -74,7 +74,7 @@ function config {
   lxc_assert $lxc
 
   # check to make sure the container is NOT a template
-  if [ "`zfs_is_template $lxc`" == "true" ]; then
+  if [ "`fs_is_template $lxc`" == "true" ]; then
     msg_error "Container \"$lxc\" is a template. Aborting ..."
     exit 1
   else

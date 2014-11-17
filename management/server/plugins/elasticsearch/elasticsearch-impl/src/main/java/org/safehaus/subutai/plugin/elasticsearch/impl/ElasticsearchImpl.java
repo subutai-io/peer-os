@@ -261,7 +261,7 @@ public class ElasticsearchImpl implements Elasticsearch
 
         NodeGroup nodeGroup = new NodeGroup();
         nodeGroup.setTemplateName( config.getTemplateName() );
-        nodeGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        nodeGroup.setPlacementStrategy( new PlacementStrategy("ROUND_ROBIN") );
         nodeGroup.setNumberOfNodes( config.getNumberOfNodes() );
 
         blueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );

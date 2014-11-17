@@ -4,8 +4,8 @@ package org.safehaus.subutai.plugin.shark.ui.wizard;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.ui.ConfigView;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.shark.api.SetupType;
 import org.safehaus.subutai.plugin.shark.api.Shark;
@@ -46,10 +46,6 @@ public class VerificationStep extends Panel
         if ( config.getSetupType() == SetupType.OVER_SPARK )
         {
             cfgView.addStringCfg( "Spark cluster name", config.getSparkClusterName() );
-            for ( Agent agent : wizard.getConfig().getNodes() )
-            {
-                cfgView.addStringCfg( "Node(s) to install", agent.getHostname() );
-            }
         }
         else if ( config.getSetupType() == SetupType.WITH_HADOOP_SPARK )
         {

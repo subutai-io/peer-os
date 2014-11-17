@@ -60,22 +60,10 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HiveImpl, 
         switch ( operationType )
         {
             case INSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
-                        setupCluster();
-                    }
-                } );
+                setupCluster();
                 break;
             case UNINSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
-                        destroyCluster();
-                    }
-                } );
+                destroyCluster();
                 break;
             case START_ALL:
             case STOP_ALL:

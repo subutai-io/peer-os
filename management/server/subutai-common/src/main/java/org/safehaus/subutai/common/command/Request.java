@@ -32,4 +32,6 @@ public interface Request
     public String getRunAs();
 
     public Integer getTimeout();
+
+    public Integer isDaemon();
 }

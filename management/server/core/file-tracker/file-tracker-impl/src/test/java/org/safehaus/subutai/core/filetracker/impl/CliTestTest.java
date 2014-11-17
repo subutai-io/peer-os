@@ -3,11 +3,16 @@ package org.safehaus.subutai.core.filetracker.impl;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.filetracker.api.FileTracker;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
-import static org.mockito.Mockito.mock;
+import java.util.UUID;
+
+import static org.mockito.Mockito.*;
 
 
 /**
@@ -17,15 +22,16 @@ public class CliTestTest
 {
     private PeerManager peerManager;
     private CliTest cliTest;
-
+    private FileTracker fileTracker;
 
     @Before
     public void setupClasses()
     {
         peerManager = mock( PeerManager.class );
-        final FileTracker fileTracker = mock( FileTracker.class );
+        fileTracker  = mock( FileTracker.class );
         cliTest = new CliTest();
         cliTest.setFileTracker( fileTracker );
+        cliTest.setPeerManager(peerManager);
     }
 
 
@@ -57,5 +63,25 @@ public class CliTestTest
     {
         Response response = mock( Response.class );
         cliTest.onResponse( response );
+    }
+
+    @Test
+    public void testDoExecute() throws Exception {
+
+        String[] CONFIG_POINTS = new String[] { "/etc", "/etc/subutai-agent" };
+
+        ManagementHost managementHost = new ManagementHost(mock(Agent.class), UUID.randomUUID());
+
+        LocalPeer localPeer = mock(LocalPeer.class);
+        when(peerManager.getLocalPeer()).thenReturn(localPeer);
+
+        when(localPeer.getManagementHost()).thenReturn(managementHost);
+
+        cliTest.doExecute();
+
+
+        verify(fileTracker).createConfigPoints(managementHost,CONFIG_POINTS);
+        verify(peerManager).getLocalPeer();
+        verify(peerManager.getLocalPeer()).getManagementHost();
     }
 }

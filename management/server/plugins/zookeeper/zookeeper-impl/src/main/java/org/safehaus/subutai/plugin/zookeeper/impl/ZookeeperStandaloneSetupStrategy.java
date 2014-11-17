@@ -50,7 +50,7 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy
 
     public static PlacementStrategy getNodePlacementStrategy()
     {
-        return PlacementStrategy.ROUND_ROBIN;
+        return new PlacementStrategy("ROUND_ROBIN");
     }
 
 

@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -46,7 +47,6 @@ import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.monitor.api.Monitoring;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
@@ -246,28 +246,28 @@ public class ContainerManagerImpl extends ContainerManagerBase
     public Agent clone( UUID envId, String hostName, String templateName, String cloneName )
             throws ContainerCreateException
     {
-        fireEvent( new ContainerEvent( ContainerEventType.CLONING_STARTED, envId, hostName, cloneName ) );
+        fireEvent( new ContainerEvent( ContainerEventType.CLONING_STARTED, hostName, cloneName ) );
         try
         {
             templateManager.clone( hostName, templateName, cloneName, envId.toString() );
         }
         catch ( TemplateException te )
         {
-            fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, envId, hostName, cloneName ) );
+            fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, hostName, cloneName ) );
             throw new ContainerCreateException(
                     String.format( "Couldn't create container %s : %s. %s", hostName, cloneName, te.toString() ) );
         }
         Agent agent = agentManager.waitForRegistration( cloneName, Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000 );
         if ( agent == null )
         {
-            fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, envId, hostName, cloneName ) );
+            fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, hostName, cloneName ) );
             throw new ContainerCreateException(
                     String.format( "Couldn't create container %s : %s. Could not get response from container.",
                             hostName, cloneName ) );
         }
         else
         {
-            fireEvent( new ContainerEvent( ContainerEventType.CLONING_SUCCEED, envId, hostName, cloneName ) );
+            fireEvent( new ContainerEvent( ContainerEventType.CLONING_SUCCEED, hostName, cloneName ) );
             return agent;
         }
     }
@@ -276,25 +276,16 @@ public class ContainerManagerImpl extends ContainerManagerBase
     @Override
     public void destroy( String hostName, String cloneName ) throws ContainerDestroyException
     {
-        UUID envId = null;
-
-        Agent agent = agentManager.getAgentByHostname( cloneName );
-
-        if ( agent != null )
-        {
-            envId = agent.getEnvironmentId();
-        }
-
-        fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_STARTED, envId, hostName, cloneName ) );
+        fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_STARTED, hostName, cloneName ) );
         if ( !templateManager.cloneDestroy( hostName, cloneName ) )
         {
-            fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_FAILED, envId, hostName, cloneName ) );
+            fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_FAILED, hostName, cloneName ) );
             throw new ContainerDestroyException(
                     String.format( "Could not destroy container %s : %s.", hostName, cloneName ) );
         }
         else
         {
-            fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_SUCCEED, envId, hostName, cloneName ) );
+            fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_SUCCEED, hostName, cloneName ) );
         }
     }
 

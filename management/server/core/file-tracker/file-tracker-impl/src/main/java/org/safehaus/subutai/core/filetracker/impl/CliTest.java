@@ -5,6 +5,7 @@ import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.core.filetracker.api.FileTracker;
 import org.safehaus.subutai.core.filetracker.api.FileTrackerException;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -48,7 +49,9 @@ public class CliTest extends OsgiCommandSupport implements ResponseListener
 
         fileTracker.addListener( this );
 
-        ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
+        LocalPeer localPeer = peerManager.getLocalPeer();
+
+        ManagementHost managementHost = localPeer.getManagementHost();
 
         fileTracker.createConfigPoints( managementHost, CONFIG_POINTS );
 

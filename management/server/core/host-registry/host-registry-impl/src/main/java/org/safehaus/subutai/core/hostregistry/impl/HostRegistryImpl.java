@@ -5,17 +5,18 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.core.broker.api.Broker;
 import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistryException;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,9 +40,9 @@ public class HostRegistryImpl implements HostRegistry
 
     protected Set<HostListener> hostListeners =
             Collections.newSetFromMap( new ConcurrentHashMap<HostListener, Boolean>() );
-    protected Executor notifier = Executors.newCachedThreadPool();
+    protected ExecutorService notifier = Executors.newCachedThreadPool();
     protected HeartBeatListener heartBeatListener;
-    protected Cache<UUID, HostInfo> hosts;
+    protected Cache<UUID, ResourceHostInfo> hosts;
 
 
     public HostRegistryImpl( final Broker broker )
@@ -54,13 +55,13 @@ public class HostRegistryImpl implements HostRegistry
 
 
     @Override
-    public ContainerHostInfo getContainerInfoById( final UUID id )
+    public ContainerHostInfo getContainerHostInfoById( final UUID id ) throws HostDisconnectedException
     {
         Preconditions.checkNotNull( id, "Id is null" );
 
-        for ( HostInfo hostInfo : hosts.asMap().values() )
+        for ( ResourceHostInfo resourceHostInfo : hosts.asMap().values() )
         {
-            for ( ContainerHostInfo containerHostInfo : hostInfo.getContainers() )
+            for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
             {
                 if ( id.equals( containerHostInfo.getId() ) )
                 {
@@ -68,18 +69,19 @@ public class HostRegistryImpl implements HostRegistry
                 }
             }
         }
-        return null;
+
+        throw new HostDisconnectedException( String.format( "Host %s is not connected", id.toString() ) );
     }
 
 
     @Override
-    public ContainerHostInfo getContainerInfoByHostname( final String hostname )
+    public ContainerHostInfo getContainerHostInfoByHostname( final String hostname ) throws HostDisconnectedException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
 
-        for ( HostInfo hostInfo : hosts.asMap().values() )
+        for ( ResourceHostInfo resourceHostInfo : hosts.asMap().values() )
         {
-            for ( ContainerHostInfo containerHostInfo : hostInfo.getContainers() )
+            for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
             {
                 if ( hostname.equalsIgnoreCase( containerHostInfo.getHostname() ) )
                 {
@@ -88,18 +90,18 @@ public class HostRegistryImpl implements HostRegistry
             }
         }
 
-        return null;
+        throw new HostDisconnectedException( String.format( "Host %s is not connected", hostname ) );
     }
 
 
     @Override
-    public Set<ContainerHostInfo> getContainersInfo()
+    public Set<ContainerHostInfo> getContainerHostsInfo()
     {
         Set<ContainerHostInfo> containersInfo = Sets.newHashSet();
 
-        for ( HostInfo hostInfo : hosts.asMap().values() )
+        for ( ResourceHostInfo resourceHostInfo : hosts.asMap().values() )
         {
-            containersInfo.addAll( hostInfo.getContainers() );
+            containersInfo.addAll( resourceHostInfo.getContainers() );
         }
 
         return containersInfo;
@@ -107,63 +109,64 @@ public class HostRegistryImpl implements HostRegistry
 
 
     @Override
-    public HostInfo getHostInfoById( final UUID id )
+    public ResourceHostInfo getResourceHostInfoById( final UUID id ) throws HostDisconnectedException
     {
         Preconditions.checkNotNull( id, "Id is null" );
 
-        for ( HostInfo hostInfo : hosts.asMap().values() )
+        for ( ResourceHostInfo resourceHostInfo : hosts.asMap().values() )
         {
-            if ( id.equals( hostInfo.getId() ) )
+            if ( id.equals( resourceHostInfo.getId() ) )
             {
-                return hostInfo;
+                return resourceHostInfo;
             }
         }
 
-        return null;
+        throw new HostDisconnectedException( String.format( "Host %s is not connected", id.toString() ) );
     }
 
 
     @Override
-    public HostInfo getHostInfoByHostname( final String hostname )
+    public ResourceHostInfo getResourceHostInfoByHostname( final String hostname ) throws HostDisconnectedException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
 
-        for ( HostInfo hostInfo : hosts.asMap().values() )
+        for ( ResourceHostInfo resourceHostInfo : hosts.asMap().values() )
         {
-            if ( hostname.equalsIgnoreCase( hostInfo.getHostname() ) )
+            if ( hostname.equalsIgnoreCase( resourceHostInfo.getHostname() ) )
             {
-                return hostInfo;
+                return resourceHostInfo;
             }
         }
 
-        return null;
+        throw new HostDisconnectedException( String.format( "Host %s is not connected", hostname ) );
     }
 
 
     @Override
-    public Set<HostInfo> getHostsInfo()
+    public Set<ResourceHostInfo> getResourceHostsInfo()
     {
         return Sets.newHashSet( hosts.asMap().values() );
     }
 
 
     @Override
-    public HostInfo getParentByChild( final ContainerHostInfo containerHostInfo )
+    public ResourceHostInfo getResourceHostByContainerHost( final ContainerHostInfo containerHostInfo )
+            throws HostDisconnectedException
     {
         Preconditions.checkNotNull( containerHostInfo, "Container host info is null" );
 
-        for ( HostInfo hostInfo : hosts.asMap().values() )
+        for ( ResourceHostInfo resourceHostInfo : hosts.asMap().values() )
         {
-            for ( ContainerHostInfo containerHostInfo1 : hostInfo.getContainers() )
+            for ( ContainerHostInfo containerHostInfo1 : resourceHostInfo.getContainers() )
             {
                 if ( containerHostInfo.getId().equals( containerHostInfo1.getId() ) )
                 {
-                    return hostInfo;
+                    return resourceHostInfo;
                 }
             }
         }
 
-        return null;
+        throw new HostDisconnectedException( "Host is not connected" );
     }
 
 
@@ -185,7 +188,7 @@ public class HostRegistryImpl implements HostRegistry
     }
 
 
-    protected void registerHost( HostInfo info )
+    protected void registerHost( ResourceHostInfo info )
     {
         Preconditions.checkNotNull( info, "Info is null" );
 
@@ -221,5 +224,6 @@ public class HostRegistryImpl implements HostRegistry
     {
         broker.removeMessageListener( heartBeatListener );
         hosts.invalidateAll();
+        notifier.shutdown();
     }
 }

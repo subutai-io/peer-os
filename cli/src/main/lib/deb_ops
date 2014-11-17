@@ -115,7 +115,7 @@ function create_control_file {
   
   # Check if lxc is master. If not, put a dependency to the parent template 
   lxc_assert $lxc "`usage`" > /dev/null
-  local parent=`zfs_get_parent $container`
+  local parent=`fs_get_parent $container`
   local parent_package_name=`get_package_name $parent`
 
   if [ "$lxc" != "master" ]; then
@@ -177,7 +177,7 @@ function create_postinst_script {
   echo "# Check if lxc already exists" >> $postinst_file
   echo "\`lxc_assert_no $lxc > /dev/null 2>&1\`" >> $postinst_file
   echo "lxc_status=\$?" >> $postinst_file
-  echo "\`zfs_assert_nods \"lxc/$lxc\" > /dev/null 2>&1\`" >> $postinst_file
+  echo "\`fs_assert_nods \"lxc/$lxc\" > /dev/null 2>&1\`" >> $postinst_file
   echo "dataset_status=\$?" >> $postinst_file
   echo "if [ \$lxc_status -eq 0 ] && [ \$dataset_status -eq 0 ]; then" >> $postinst_file
   # Check if the template is master
