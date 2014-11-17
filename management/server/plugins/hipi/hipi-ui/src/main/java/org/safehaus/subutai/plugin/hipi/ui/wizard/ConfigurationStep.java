@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -126,7 +127,7 @@ public class ConfigurationStep extends Panel
                 {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     select.setValue( null );
-                    select.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                    select.setContainerDataSource( new BeanItemContainer<>( UUID.class, hadoopInfo.getAllNodes() ) );
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
                     config.getNodes().clear();
                 }

@@ -12,22 +12,19 @@ import javax.sql.DataSource;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDao;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hipi.api.Hipi;
 import org.safehaus.subutai.plugin.hipi.api.HipiConfig;
 import org.safehaus.subutai.plugin.hipi.api.SetupType;
-import org.safehaus.subutai.plugin.hipi.impl.handler.AddNodeOperationHandler;
-import org.safehaus.subutai.plugin.hipi.impl.handler.DestroyNodeOperationHandler;
-import org.safehaus.subutai.plugin.hipi.impl.handler.InstallOperationHandler;
-import org.safehaus.subutai.plugin.hipi.impl.handler.UninstallOperationHandler;
+import org.safehaus.subutai.plugin.hipi.impl.dao.PluginDAO;
+import org.safehaus.subutai.plugin.hipi.impl.handler.ClusterOperationHandler;
+import org.safehaus.subutai.plugin.hipi.impl.handler.NodeOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,63 +35,17 @@ public class HipiImpl implements Hipi
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( HipiImpl.class.getName() );
-    protected Commands commands;
-    private CommandRunner commandRunner;
-    private AgentManager agentManager;
     private Tracker tracker;
-    private Hadoop hadoopManager;
+    private PluginDAO pluginDao;
     private ExecutorService executor;
     private EnvironmentManager environmentManager;
-    private ContainerManager containerManager;
     private DataSource dataSource;
-    private PluginDao pluginDao;
+    private Hadoop hadoopManager;
 
 
     public HipiImpl( DataSource dataSource )
     {
         this.dataSource = dataSource;
-    }
-
-
-    public Hadoop getHadoopManager()
-    {
-        return hadoopManager;
-    }
-
-
-    public void setHadoopManager( final Hadoop hadoopManager )
-    {
-        this.hadoopManager = hadoopManager;
-    }
-
-
-    public Commands getCommands()
-    {
-        return commands;
-    }
-
-
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
-    public void setCommandRunner( final CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
-    }
-
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public void setAgentManager( final AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
     }
 
 
@@ -110,27 +61,27 @@ public class HipiImpl implements Hipi
     }
 
 
-    public PluginDao getPluginDao()
+    public PluginDAO getPluginDao()
     {
         return pluginDao;
-    }
-
-
-    public ContainerManager getContainerManager()
-    {
-        return containerManager;
-    }
-
-
-    public void setContainerManager( final ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
     }
 
 
     public EnvironmentManager getEnvironmentManager()
     {
         return environmentManager;
+    }
+
+
+    public Hadoop getHadoopManager()
+    {
+        return hadoopManager;
+    }
+
+
+    public void setHadoopManager( final Hadoop hadoopManager )
+    {
+        this.hadoopManager = hadoopManager;
     }
 
 
@@ -156,13 +107,12 @@ public class HipiImpl implements Hipi
     {
         try
         {
-            this.pluginDao = new PluginDao( dataSource );
+            this.pluginDao = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
-        this.commands = new Commands( commandRunner );
         executor = Executors.newCachedThreadPool();
     }
 
@@ -177,7 +127,21 @@ public class HipiImpl implements Hipi
     public UUID installCluster( final HipiConfig config )
     {
         Preconditions.checkNotNull( config, "Configuration is null" );
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID installCluster( final HipiConfig config, final HadoopClusterConfig hadoopClusterConfig )
+    {
+        Preconditions.checkNotNull( config, "Hipi Configuration is not specified" );
+        Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop Configuration is not specified" );
+
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL, hadoopClusterConfig );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -186,7 +150,8 @@ public class HipiImpl implements Hipi
     @Override
     public UUID uninstallCluster( final String clusterName )
     {
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, getCluster( clusterName ), ClusterOperationType.UNINSTALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -207,19 +172,10 @@ public class HipiImpl implements Hipi
 
 
     @Override
-    public UUID installCluster( HipiConfig config, HadoopClusterConfig hadoopConfig )
-    {
-        InstallOperationHandler operationHandler = new InstallOperationHandler( this, config );
-        operationHandler.setHadoopConfig( hadoopConfig );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
-    }
-
-
-    @Override
     public UUID addNode( final String clusterName, final String lxcHostname )
     {
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, getCluster( clusterName ), lxcHostname, NodeOperationType.INCLUDE );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -228,7 +184,9 @@ public class HipiImpl implements Hipi
     @Override
     public UUID destroyNode( final String clusterName, final String lxcHostname )
     {
-        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, getCluster( clusterName ), lxcHostname,
+                        NodeOperationType.CHECK_INSTALLATION.EXCLUDE );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -239,14 +197,8 @@ public class HipiImpl implements Hipi
     {
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            return new OverHadoopSetupStrategy( this, config, po );
+            return new OverHadoopSetupStrategy( this, config, env, po );
         }
-        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
-        {
-            WithHadoopSetupStrategy s = new WithHadoopSetupStrategy( this, config, po );
-            s.setEnvironment( env );
-            return s;
-        }
-        return null;
+        return new WithHadoopSetupStrategy( this, config, env, po );
     }
 }
