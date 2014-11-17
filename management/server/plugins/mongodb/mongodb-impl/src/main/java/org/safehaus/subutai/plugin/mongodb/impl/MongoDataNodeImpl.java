@@ -36,7 +36,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
 
             if ( !commandResult.getStdOut().contains( "child process started successfully, parent exiting" ) )
             {
-                throw new CommandException( "Could not start mongo config instance." );
+                throw new CommandException( "Could not start mongo data instance." );
             }
         }
         catch ( CommandException e )
@@ -64,7 +64,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
 
 
     @Override
-    public String getPrimaryNodeName( String domainName ) throws MongoException
+    public String getPrimaryNodeName() throws MongoException
     {
         CommandDef commandDef = Commands.getFindPrimaryNodeCommandLine( port );
         try
@@ -109,6 +109,28 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
         {
             LOG.error( commandDef.getDescription(), e );
             throw new MongoException( "Error on registering secondary node." );
+        }
+    }
+
+
+    @Override
+    public void unRegisterSecondaryNode( final MongoDataNode dataNode ) throws MongoException
+    {
+        CommandDef commandDef =
+                Commands.getUnregisterSecondaryNodeFromPrimaryCommandLine( port, dataNode.getHostname(), domainName );
+        try
+        {
+            CommandResult commandResult = execute( commandDef.build() );
+
+            if ( !commandResult.getStdOut().contains( "connecting to:" ) )
+            {
+                throw new CommandException( "Could not remove secondary node." );
+            }
+        }
+        catch ( CommandException e )
+        {
+            LOG.error( commandDef.getDescription(), e );
+            throw new MongoException( "Error on removing secondary node." );
         }
     }
 

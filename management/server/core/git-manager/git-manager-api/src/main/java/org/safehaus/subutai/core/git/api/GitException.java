@@ -10,4 +10,10 @@ public class GitException extends Exception
     {
         super( message );
     }
+
+
+    public GitException( final Throwable cause )
+    {
+        super( cause );
+    }
 }
