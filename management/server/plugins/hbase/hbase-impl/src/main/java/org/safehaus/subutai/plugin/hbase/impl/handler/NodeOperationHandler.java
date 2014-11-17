@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.OperationType;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.impl.Commands;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ import com.google.common.base.Strings;
 /**
  * Created by bahadyr on 11/17/14.
  */
-public class NodeOperationHandler extends AbstractOperationHandler<HBaseImpl, HBaseClusterConfig>
+public class NodeOperationHandler extends AbstractOperationHandler<HBaseImpl, HBaseConfig>
 {
     private static final Logger LOG = LoggerFactory.getLogger( NodeOperationHandler.class.getName() );
     private String hostname;
@@ -31,13 +31,13 @@ public class NodeOperationHandler extends AbstractOperationHandler<HBaseImpl, HB
     private Environment environment;
 
 
-    public NodeOperationHandler( final HBaseImpl manager, final HBaseClusterConfig config )
+    public NodeOperationHandler( final HBaseImpl manager, final HBaseConfig config )
     {
         super( manager, config );
     }
 
 
-    public NodeOperationHandler( final HBaseImpl manager, final HBaseClusterConfig config, final String hostname,
+    public NodeOperationHandler( final HBaseImpl manager, final HBaseConfig config, final String hostname,
                                  OperationType operationType )
     {
         super( manager, config );
@@ -45,7 +45,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HBaseImpl, HB
         Preconditions.checkNotNull( operationType );
         this.hostname = hostname;
         this.operationType = operationType;
-        this.trackerOperation = manager.getTracker().createTrackerOperation( HBaseClusterConfig.PRODUCT_KEY,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( HBaseConfig.PRODUCT_KEY,
                 String.format( "Executing %s operation on node %s", operationType.name(), hostname ) );
     }
 
@@ -124,7 +124,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HBaseImpl, HB
 
         trackerOperation.addLog( "Updating db..." );
 
-        if ( !manager.getPluginDAO().saveInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
+        if ( !manager.getPluginDAO().saveInfo( HBaseConfig.PRODUCT_KEY, config.getClusterName(), config ) )
         {
             throw new ClusterException( "Could not update cluster info" );
         }
@@ -159,7 +159,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HBaseImpl, HB
 
         trackerOperation.addLog( "Updating db..." );
 
-        if ( !manager.getPluginDAO().saveInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
+        if ( !manager.getPluginDAO().saveInfo( HBaseConfig.PRODUCT_KEY, config.getClusterName(), config ) )
         {
             throw new ClusterException( "Could not update cluster info" );
         }

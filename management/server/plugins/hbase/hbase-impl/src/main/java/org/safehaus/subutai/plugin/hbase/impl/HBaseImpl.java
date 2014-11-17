@@ -21,7 +21,7 @@ import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
 import org.safehaus.subutai.plugin.hbase.impl.handler.ClusterOperationHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.NodeOperationHandler;
@@ -138,7 +138,7 @@ public class HBaseImpl implements HBase
     }
 
 
-    public UUID installCluster( final HBaseClusterConfig config )
+    public UUID installCluster( final HBaseConfig config )
     {
         Preconditions.checkNotNull( config, "Configuration is null" );
         AbstractOperationHandler operationHandler =
@@ -149,7 +149,7 @@ public class HBaseImpl implements HBase
 
 
     @Override
-    public UUID installCluster( final HBaseClusterConfig config, final HadoopClusterConfig hadoopConfig )
+    public UUID installCluster( final HBaseConfig config, final HadoopClusterConfig hadoopConfig )
     {
         Preconditions.checkNotNull( config, "HBase configuration is null" );
         Preconditions.checkNotNull( hadoopConfig, "Hadoop configuration is null" );
@@ -164,7 +164,7 @@ public class HBaseImpl implements HBase
     public UUID uninstallCluster( final String clusterName )
     {
         Preconditions.checkNotNull( clusterName );
-        HBaseClusterConfig config = getCluster( clusterName );
+        HBaseConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
                 new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL );
         return operationHandler.getTrackerId();
@@ -172,10 +172,10 @@ public class HBaseImpl implements HBase
 
 
     @Override
-    public HBaseClusterConfig getCluster( String clusterName )
+    public HBaseConfig getCluster( String clusterName )
     {
         Preconditions.checkNotNull( clusterName );
-        return pluginDAO.getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName, HBaseClusterConfig.class );
+        return pluginDAO.getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
     }
 
 
@@ -184,7 +184,7 @@ public class HBaseImpl implements HBase
     {
         Preconditions.checkNotNull( clusterName );
         Preconditions.checkNotNull( hostname );
-        HBaseClusterConfig config = getCluster( clusterName );
+        HBaseConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
                 new NodeOperationHandler( this, config, hostname, OperationType.INCLUDE );
         executor.execute( operationHandler );
@@ -197,7 +197,7 @@ public class HBaseImpl implements HBase
     {
         Preconditions.checkNotNull( clusterName );
         Preconditions.checkNotNull( hostname );
-        HBaseClusterConfig config = getCluster( clusterName );
+        HBaseConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
                 new NodeOperationHandler( this, config, hostname, OperationType.EXCLUDE );
         executor.execute( operationHandler );
@@ -206,14 +206,14 @@ public class HBaseImpl implements HBase
 
 
     @Override
-    public List<HBaseClusterConfig> getClusters()
+    public List<HBaseConfig> getClusters()
     {
-        return pluginDAO.getInfo( HBaseClusterConfig.PRODUCT_KEY, HBaseClusterConfig.class );
+        return pluginDAO.getInfo( HBaseConfig.PRODUCT_KEY, HBaseConfig.class );
     }
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final TrackerOperation po, final HBaseClusterConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( final TrackerOperation po, final HBaseConfig config,
                                                          final Environment environment )
     {
         if ( config.getSetupType() == SetupType.OVER_HADOOP )

@@ -13,13 +13,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
 
 import com.google.common.base.Strings;
@@ -137,7 +136,7 @@ public class ConfigurationStep extends Panel
     }
 
 
-    private void addOverHadoopComponents( ComponentContainer parent, final HBaseClusterConfig config )
+    private void addOverHadoopComponents( ComponentContainer parent, final HBaseConfig config )
     {
         final ComboBox hadoopClustersCombo = new ComboBox( "Hadoop cluster" );
         final ComboBox masterNodeCombo = new ComboBox( "Master node" );
@@ -453,7 +452,7 @@ public class ConfigurationStep extends Panel
 
     private void nextClickHandler( Wizard wizard )
     {
-        HBaseClusterConfig config = wizard.getConfig();
+        HBaseConfig config = wizard.getConfig();
         if ( config.getClusterName() == null || config.getClusterName().isEmpty() )
         {
             show( "Enter cluster name" );

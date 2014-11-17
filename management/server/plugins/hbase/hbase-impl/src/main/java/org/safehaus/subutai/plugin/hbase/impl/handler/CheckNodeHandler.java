@@ -2,13 +2,11 @@ package org.safehaus.subutai.plugin.hbase.impl.handler;
 
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
-import com.google.common.collect.Sets;
 
-
-public class CheckNodeHandler extends AbstractOperationHandler<HBaseImpl, HBaseClusterConfig>
+public class CheckNodeHandler extends AbstractOperationHandler<HBaseImpl, HBaseConfig>
 {
 
     private String clusterName, lxcHostname;
@@ -19,7 +17,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<HBaseImpl, HBaseC
         super( manager, clusterName );
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
-        trackerOperation = manager.getTracker().createTrackerOperation( HBaseClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HBaseConfig.PRODUCT_KEY,
                 String.format( "Checking %s cluster node %s ...", clusterName, lxcHostname ) );
     }
 

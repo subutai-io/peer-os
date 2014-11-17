@@ -1,16 +1,12 @@
 package org.safehaus.subutai.plugin.hbase.impl.handler;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
 
-public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl, HBaseClusterConfig>
+public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl, HBaseConfig>
 {
     private String clusterName;
 
@@ -19,7 +15,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl, HBa
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        trackerOperation = manager.getTracker().createTrackerOperation( HBaseClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HBaseConfig.PRODUCT_KEY,
                 String.format( "Checking %s cluster...", clusterName ) );
     }
 

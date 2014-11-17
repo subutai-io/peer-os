@@ -1,11 +1,9 @@
 package org.safehaus.subutai.plugin.hbase.impl;
 
 
-import java.util.UUID;
-
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 
 import com.google.common.base.Preconditions;
 
@@ -15,10 +13,10 @@ public class SetupBase
 
     final TrackerOperation po;
     final HBaseImpl manager;
-    final HBaseClusterConfig config;
+    final HBaseConfig config;
 
 
-    public SetupBase( TrackerOperation po, HBaseImpl manager, HBaseClusterConfig config )
+    public SetupBase( TrackerOperation po, HBaseImpl manager, HBaseConfig config )
     {
 
         Preconditions.checkNotNull( config, "HBase cluster config is null" );

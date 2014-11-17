@@ -1,25 +1,20 @@
 package org.safehaus.subutai.plugin.hbase.impl;
 
 
-import java.util.UUID;
-
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
-
-import com.google.common.collect.Sets;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 
 
 public class SetupHelper
 {
 
     private final HBaseImpl manager;
-    private final HBaseClusterConfig config;
+    private final HBaseConfig config;
     private final TrackerOperation po;
 
 
-    public SetupHelper( HBaseImpl manager, HBaseClusterConfig config, TrackerOperation po )
+    public SetupHelper( HBaseImpl manager, HBaseConfig config, TrackerOperation po )
     {
         this.manager = manager;
         this.config = config;

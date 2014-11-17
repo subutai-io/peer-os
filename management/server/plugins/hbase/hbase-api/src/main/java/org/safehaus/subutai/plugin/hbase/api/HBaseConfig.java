@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import com.google.common.collect.Sets;
 
 
-public class HBaseClusterConfig implements ConfigBase
+public class HBaseConfig implements ConfigBase
 {
 
     public static final String PRODUCT_KEY = "HBase";
@@ -24,8 +24,27 @@ public class HBaseClusterConfig implements ConfigBase
     private Set<UUID> quorumPeers = Sets.newHashSet();
     private Set<UUID> backupMasters = Sets.newHashSet();
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
+    private Set<UUID> hadoopNodes;
     private SetupType setupType;
     private UUID environmentId;
+
+
+    public HBaseConfig()
+    {
+        this.uuid = UUID.fromString( UUIDUtil.generateTimeBasedUUID().toString() );
+    }
+
+
+    public Set<UUID> getHadoopNodes()
+    {
+        return hadoopNodes;
+    }
+
+
+    public void setHadoopNodes( final Set<UUID> hadoopNodes )
+    {
+        this.hadoopNodes = hadoopNodes;
+    }
 
 
     public UUID getEnvironmentId()
@@ -37,12 +56,6 @@ public class HBaseClusterConfig implements ConfigBase
     public void setEnvironmentId( final UUID environmentId )
     {
         this.environmentId = environmentId;
-    }
-
-
-    public HBaseClusterConfig()
-    {
-        this.uuid = UUID.fromString( UUIDUtil.generateTimeBasedUUID().toString() );
     }
 
 

@@ -2,15 +2,11 @@ package org.safehaus.subutai.plugin.hbase.impl.handler;
 
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
-import com.google.common.collect.Sets;
 
-
-public class StopClusterHandler extends AbstractOperationHandler<HBaseImpl, HBaseClusterConfig>
+public class StopClusterHandler extends AbstractOperationHandler<HBaseImpl, HBaseConfig>
 {
     private String clusterName;
 
@@ -19,7 +15,7 @@ public class StopClusterHandler extends AbstractOperationHandler<HBaseImpl, HBas
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        trackerOperation = manager.getTracker().createTrackerOperation( HBaseClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HBaseConfig.PRODUCT_KEY,
                 String.format( "Stopping %s cluster...", clusterName ) );
     }
 

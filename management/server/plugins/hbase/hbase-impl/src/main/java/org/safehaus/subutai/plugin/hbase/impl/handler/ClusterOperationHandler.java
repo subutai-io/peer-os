@@ -17,7 +17,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 import org.slf4j.Logger;
@@ -29,17 +29,17 @@ import com.google.common.base.Preconditions;
 /**
  * Created by bahadyr on 11/17/14.
  */
-public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl, HBaseClusterConfig>
+public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl, HBaseConfig>
         implements ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
     private ClusterOperationType operationType;
     private Environment environment;
-    private HBaseClusterConfig config;
+    private HBaseConfig config;
     private HadoopClusterConfig hadoopConfig;
 
 
-    public ClusterOperationHandler( final HBaseImpl manager, final HBaseClusterConfig baseClusterConfig )
+    public ClusterOperationHandler( final HBaseImpl manager, final HBaseConfig baseClusterConfig )
     {
         super( manager, baseClusterConfig );
         Preconditions.checkNotNull( baseClusterConfig );
@@ -47,13 +47,13 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
     }
 
 
-    public ClusterOperationHandler( final HBaseImpl manager, final HBaseClusterConfig hbaseConfig,
+    public ClusterOperationHandler( final HBaseImpl manager, final HBaseConfig hbaseConfig,
                                     final ClusterOperationType operationType )
     {
         this( manager, hbaseConfig );
         Preconditions.checkNotNull( hbaseConfig );
         this.operationType = operationType;
-        this.trackerOperation = manager.getTracker().createTrackerOperation( HBaseClusterConfig.PRODUCT_KEY,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( HBaseConfig.PRODUCT_KEY,
                 String.format( "Executing %s operation on cluster %s", operationType.name(), clusterName ) );
     }
 
@@ -99,7 +99,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
                 trackerOperation.addLog( "Preparing environment..." );
 
                 //setup Hadoop cluster
-                hadoopConfig.setTemplateName( HBaseClusterConfig.TEMPLATE_NAME );
+                hadoopConfig.setTemplateName( HBaseConfig.TEMPLATE_NAME );
                 EnvironmentBlueprint eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
                 environment = manager.getEnvironmentManager().buildEnvironment( eb );
                 manager.getHadoopManager().getClusterSetupStrategy( environment, hadoopConfig, trackerOperation )
@@ -165,7 +165,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
                 executeCommand( host, uninstallCommand );
             }
 
-            if ( !manager.getPluginDAO().deleteInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName ) )
+            if ( !manager.getPluginDAO().deleteInfo( HBaseConfig.PRODUCT_KEY, clusterName ) )
             {
                 throw new ClusterException( "Could not remove cluster info" );
             }

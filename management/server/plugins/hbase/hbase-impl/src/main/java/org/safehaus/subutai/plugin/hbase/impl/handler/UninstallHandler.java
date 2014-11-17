@@ -1,17 +1,12 @@
 package org.safehaus.subutai.plugin.hbase.impl.handler;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
 
-public class UninstallHandler extends AbstractOperationHandler<HBaseImpl, HBaseClusterConfig>
+public class UninstallHandler extends AbstractOperationHandler<HBaseImpl, HBaseConfig>
 {
     private String clusterName;
 
@@ -20,7 +15,7 @@ public class UninstallHandler extends AbstractOperationHandler<HBaseImpl, HBaseC
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        trackerOperation = manager.getTracker().createTrackerOperation( HBaseClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HBaseConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", clusterName ) );
     }
 

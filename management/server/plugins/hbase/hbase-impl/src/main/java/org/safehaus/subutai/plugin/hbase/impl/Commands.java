@@ -1,18 +1,16 @@
 package org.safehaus.subutai.plugin.hbase.impl;
 
 
-import java.util.Set;
-
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 
 
 public class Commands
 {
 
-    public final static String PACKAGE_NAME = Common.PACKAGE_PREFIX + HBaseClusterConfig.PRODUCT_KEY.toLowerCase();
+    public final static String PACKAGE_NAME = Common.PACKAGE_PREFIX + HBaseConfig.PRODUCT_KEY.toLowerCase();
 
 
     public RequestBuilder getInstallDialogCommand()
@@ -24,7 +22,7 @@ public class Commands
     }
 
 
-    public RequestBuilder getInstallCommand()
+    public static RequestBuilder getInstallCommand()
     {
 
         return new RequestBuilder( "apt-get --assume-yes --force-yes install " + PACKAGE_NAME ).withTimeout( 360 )
@@ -54,7 +52,7 @@ public class Commands
     }
 
 
-    public RequestBuilder getStatusCommand()
+    public static RequestBuilder getStatusCommand()
     {
         return new RequestBuilder( "service hbase status" );
     }

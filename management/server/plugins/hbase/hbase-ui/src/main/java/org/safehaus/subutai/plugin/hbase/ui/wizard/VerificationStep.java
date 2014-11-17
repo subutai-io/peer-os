@@ -9,11 +9,10 @@ package org.safehaus.subutai.plugin.hbase.ui.wizard;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
@@ -44,7 +43,7 @@ public class VerificationStep extends Panel
                 + "(you may change them by clicking on Back button)</strong><br/>" );
         confirmationLbl.setContentMode( ContentMode.HTML );
 
-        final HBaseClusterConfig config = wizard.getConfig();
+        final HBaseConfig config = wizard.getConfig();
 //        final Environment environment = wizard.getEnvironmentManager().getEnvironment( config.getEnvironmentId().toString() );
         final HadoopClusterConfig hc = wizard.getHadoopConfig();
 
@@ -96,7 +95,7 @@ public class VerificationStep extends Panel
                 }
 
                 ProgressWindow window =
-                        new ProgressWindow( executor, tracker, trackId, HBaseClusterConfig.PRODUCT_KEY );
+                        new ProgressWindow( executor, tracker, trackId, HBaseConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override

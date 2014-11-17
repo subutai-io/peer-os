@@ -5,32 +5,18 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 
 
-public class WithHadoopSetupStrategy extends HBaseSetupStrategy
+class WithHadoopSetupStrategy extends HBaseSetupStrategy
 {
 
-    private Environment environment;
-
-
-    public WithHadoopSetupStrategy( Environment environment, HBaseImpl manager, TrackerOperation po,
-                                    HBaseClusterConfig config )
+    public WithHadoopSetupStrategy( HBaseImpl manager, HBaseConfig config, Environment environment,
+                                    TrackerOperation po )
     {
-        super( manager, po, config );
-        this.environment = environment;
-    }
-
-
-    public Environment getEnvironment()
-    {
-        return environment;
-    }
-
-
-    public void setEnvironment( final Environment environment )
-    {
-        this.environment = environment;
+        super( manager, config, environment, po );
     }
 
 
@@ -38,7 +24,59 @@ public class WithHadoopSetupStrategy extends HBaseSetupStrategy
     public ConfigBase setup() throws ClusterSetupException
     {
 
+        checkConfig();
 
+        if ( environment == null )
+        {
+            throw new ClusterSetupException( "Environment not specified" );
+        }
+
+        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
+        {
+            throw new ClusterSetupException( "Environment has no nodes" );
+        }
+
+        config.setEnvironmentId( environment.getId() );
+        config.getAllNodes().clear();
+        config.getHadoopNodes().clear();
+
+        for ( ContainerHost host : environment.getContainers() )
+        {
+            if ( !host.isConnected() )
+            {
+                throw new ClusterSetupException( "Node is not connected " + host.getHostname() );
+            }
+
+            try
+            {
+                config.getHadoopNodes().add( host.getId() );
+                if ( host.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
+                {
+                    config.getAllNodes().add( host.getId() );
+                }
+            }
+            catch ( PeerException ex )
+            {
+                throw new ClusterSetupException( ex );
+            }
+        }
+
+        if ( config.getAllNodes().isEmpty() )
+        {
+            throw new ClusterSetupException( "Environment has no nodes with HBase installed" );
+        }
+
+        trackerOperation.addLog( "Saving to db ..." );
+        boolean saved = manager.getPluginDAO().saveInfo( HBaseConfig.PRODUCT_KEY, config.getClusterName(), config );
+        if ( saved )
+        {
+            trackerOperation.addLog( "Cluster info successfully saved" );
+        }
+        else
+        {
+            throw new ClusterSetupException( "Failed to save installation info" );
+        }
+        trackerOperation.addLog( "Cluster info successfully saved" );
         return config;
     }
 }

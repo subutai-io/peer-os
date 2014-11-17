@@ -16,7 +16,7 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
@@ -33,7 +33,7 @@ public class Wizard
     private final HBase hbase;
     private final EnvironmentManager environmentManager;
     private int step = 1;
-    private HBaseClusterConfig config = new HBaseClusterConfig();
+    private HBaseConfig config = new HBaseConfig();
     private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
 
 
@@ -111,13 +111,13 @@ public class Wizard
     protected void init()
     {
         step = 1;
-        config = new HBaseClusterConfig();
+        config = new HBaseConfig();
         hadoopConfig = new HadoopClusterConfig();
         putForm();
     }
 
 
-    public HBaseClusterConfig getConfig()
+    public HBaseConfig getConfig()
     {
         return config;
     }

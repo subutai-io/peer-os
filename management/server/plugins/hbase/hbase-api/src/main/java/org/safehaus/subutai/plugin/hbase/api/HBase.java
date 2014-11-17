@@ -6,7 +6,6 @@
 package org.safehaus.subutai.plugin.hbase.api;
 
 
-import java.util.List;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ApiBase;
@@ -16,13 +15,13 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 
-public interface HBase extends ApiBase<HBaseClusterConfig>
+public interface HBase extends ApiBase<HBaseConfig>
 {
 
-    public UUID installCluster( HBaseClusterConfig config, HadoopClusterConfig hadoopConfig );
+    public UUID installCluster( HBaseConfig config, HadoopClusterConfig hadoopConfig );
 
     public UUID destroyNode( String clusterName, String lxcHostname );
 
-    public ClusterSetupStrategy getClusterSetupStrategy( TrackerOperation operation, HBaseClusterConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( TrackerOperation operation, HBaseConfig config,
                                                          Environment environment );
 }
