@@ -60,7 +60,7 @@ public interface MongoClusterConfig extends ConfigBase
 
     Set<MongoRouterNode> getRouterServers();
 
-    NodeType getNodeType( Agent agent );
+    NodeType getNodeType( MongoNode node );
 
     void setNumberOfConfigServers( int i );
 
@@ -78,5 +78,9 @@ public interface MongoClusterConfig extends ConfigBase
 
     void setReplicaSetName( String value );
 
+    MongoDataNode findPrimaryNode() throws MongoException;
+
     MongoNode findNode( String lxcHostname );
+
+    void setEnvironmentId( UUID id );
 }

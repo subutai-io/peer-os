@@ -1,39 +1,21 @@
 package org.safehaus.subutai.plugin.hipi.impl;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.plugin.hipi.api.HipiConfig;
 
 
 class WithHadoopSetupStrategy extends HipiSetupStrategy
 {
 
-    Environment environment;
-
-
-    public WithHadoopSetupStrategy( HipiImpl manager, HipiConfig config, TrackerOperation po )
+    public WithHadoopSetupStrategy( HipiImpl manager, HipiConfig config, Environment environment, TrackerOperation po )
     {
-        super( manager, config, po );
-    }
-
-
-    public Environment getEnvironment()
-    {
-        return environment;
-    }
-
-
-    public void setEnvironment( Environment env )
-    {
-        this.environment = env;
+        super( manager, config, environment, po );
     }
 
 
@@ -53,35 +35,47 @@ class WithHadoopSetupStrategy extends HipiSetupStrategy
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
-        Set<Agent> hipiNodes = new HashSet<>(), allNodes = new HashSet<>();
-        for ( EnvironmentContainer n : environment.getContainers() )
+        config.setEnvironmentId( environment.getId() );
+        config.getNodes().clear();
+        config.getHadoopNodes().clear();
+
+        for ( ContainerHost host : environment.getContainers() )
         {
-            allNodes.add( n.getAgent() );
-            if ( n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
+            if ( !host.isConnected() )
             {
-                hipiNodes.add( n.getAgent() );
+                throw new ClusterSetupException( "Node is not connected " + host.getHostname() );
+            }
+
+            try
+            {
+                config.getHadoopNodes().add( host.getId() );
+                if ( host.getTemplate().getProducts().contains( CommandFactory.PACKAGE_NAME ) )
+                {
+                    config.getNodes().add( host.getId() );
+                }
+            }
+            catch ( PeerException ex )
+            {
+                throw new ClusterSetupException( ex );
             }
         }
-        if ( hipiNodes.isEmpty() )
+
+        if ( config.getNodes().isEmpty() )
         {
-            throw new ClusterSetupException( "Environment has no nodes with Flume installed" );
+            throw new ClusterSetupException( "Environment has no nodes with Hipi installed" );
         }
 
-        config.setNodes( hipiNodes );
-        config.setHadoopNodes( allNodes );
-
-        for ( Agent a : config.getNodes() )
+        trackerOperation.addLog( "Saving to db ..." );
+        boolean saved = manager.getPluginDao().saveInfo( HipiConfig.PRODUCT_KEY, config.getClusterName(), config );
+        if ( saved )
         {
-            if ( manager.getAgentManager().getAgentByHostname( a.getHostname() ) == null )
-            {
-                throw new ClusterSetupException( "Node is not connected: " + a.getHostname() );
-            }
+            trackerOperation.addLog( "Cluster info successfully saved" );
         }
-
-        trackerOperation.addLog( "Saving to db..." );
-        manager.getPluginDao().saveInfo( HipiConfig.PRODUCT_KEY, config.getClusterName(), config );
+        else
+        {
+            throw new ClusterSetupException( "Failed to save installation info" );
+        }
         trackerOperation.addLog( "Cluster info successfully saved" );
-
         return config;
     }
 }
