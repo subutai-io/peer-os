@@ -1,8 +1,6 @@
 package org.safehaus.subutai.core.git.cli;
 
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.git.api.GitBranch;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
@@ -24,52 +22,31 @@ public class GetCurrentBranch extends OsgiCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( GetCurrentBranch.class.getName() );
 
-
-    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
-    String hostname;
-    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
+    @Argument( index = 0, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
 
     private final GitManager gitManager;
-    private final AgentManager agentManager;
 
 
-    public GetCurrentBranch( final GitManager gitManager, final AgentManager agentManager )
+    public GetCurrentBranch( final GitManager gitManager )
     {
         Preconditions.checkNotNull( gitManager, "Git Manager is null" );
-        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
 
         this.gitManager = gitManager;
-        this.agentManager = agentManager;
-    }
-
-
-    public void setHostname( final String hostname )
-    {
-        this.hostname = hostname;
     }
 
 
     protected Object doExecute()
     {
-
-        Agent agent = agentManager.getAgentByHostname( hostname );
-        if ( agent == null )
+        try
         {
-            System.out.println( "Agent not connected" );
+            GitBranch gitBranch = gitManager.currentBranch( repoPath );
+            System.out.println( gitBranch.toString() );
         }
-        else
+        catch ( GitException e )
         {
-            try
-            {
-                GitBranch gitBranch = gitManager.currentBranch( agent, repoPath );
-                System.out.println( gitBranch.toString() );
-            }
-            catch ( GitException e )
-            {
-                LOG.error( "Error in doExecute", e );
-                System.out.println( e.getMessage() );
-            }
+            LOG.error( "Error in doExecute", e );
+            System.out.println( e.getMessage() );
         }
 
         return null;
