@@ -12,6 +12,5 @@ public enum NodeOperationType
     UNINSTALL,
     EXCLUDE,
     INCLUDE,
-    DECOMISSION_STATUS,
-    SERVICE_STATUS
+    DECOMISSION_STATUS
 }

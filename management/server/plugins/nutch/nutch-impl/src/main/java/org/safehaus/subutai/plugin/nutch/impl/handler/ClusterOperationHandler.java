@@ -195,7 +195,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<NutchImpl,
     private void uninstallCluster()
     {
         TrackerOperation po = trackerOperation;
-        po.addLog( "Uninstalling Pig..." );
+        po.addLog( "Uninstalling Nutch..." );
 
         for ( UUID uuid : config.getNodes() )
         {
