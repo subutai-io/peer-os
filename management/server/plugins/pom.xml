@@ -24,8 +24,8 @@
     <module>shark</module>
     <module>hbase</module>
     <module>sqoop</module>
+    <module>oozie</module>
     <!--<module>accumulo</module>
-    <module>oozie</module>    
     <module>solr</module>
     <module>zookeeper</module>
     <module>mongodb</module>
