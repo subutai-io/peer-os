@@ -46,7 +46,6 @@ public abstract class MongoNodeImpl extends ContainerHost implements MongoNode
     public boolean isRunning()
     {
         CommandDef commandDef = Commands.getCheckInstanceRunningCommand( getHostname(), domainName, port );
-
         try
         {
             CommandResult commandResult = execute( commandDef.build() );
