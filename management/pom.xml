@@ -1004,15 +1004,15 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
+        <artifactId>oozie-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
         <artifactId>oozie-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!--
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>oozie-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>oozie-plugin-cli</artifactId>
