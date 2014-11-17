@@ -16,7 +16,6 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -24,8 +23,8 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
-import org.safehaus.subutai.plugin.zookeeper.api.*;
 import org.safehaus.subutai.plugin.zookeeper.api.CommandType;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 import com.google.common.collect.Sets;
 
@@ -34,7 +33,6 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
 {
 
     private final StormImpl manager;
-    private Zookeeper zookeeperManager;
     private final StormClusterConfiguration config;
     private final Environment environment;
     private final TrackerOperation po;
@@ -95,7 +93,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
             }
 
             String n = config.getZookeeperClusterName();
-            ZookeeperClusterConfig zk = manager.zookeeperManager.getCluster( n );
+            ZookeeperClusterConfig zk = manager.getZookeeperManager().getCluster( n );
             if ( zk == null )
             {
                 throw new ClusterSetupException( "Zookeeper cluster not found: " + config.getZookeeperClusterName() );
@@ -146,7 +144,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         }
         for ( UUID supervisorUuids : config.getSupervisors() )
         {
-            if ( ! manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
+            if ( ! environment
                     .getContainerHostByUUID( supervisorUuids ).isConnected() )
             {
                 throw new ClusterSetupException( "Not all worker nodes are connected" );
@@ -155,6 +153,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
 
         configure();
 
+        config.setEnvironmentId( environment.getId() );
         manager.getPluginDAO().saveInfo( StormClusterConfiguration.PRODUCT_NAME, config.getClusterName(), config );
         po.addLog( "Cluster info successfully saved" );
 
@@ -179,19 +178,24 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         Set<UUID> allNodes = new HashSet<>( config.getSupervisors() );
         allNodes.add( config.getNimbus() );
 
-        for ( Map.Entry<String, String> entry : paramValues.entrySet() )
+        ContainerHost stormNode;
+        Iterator<UUID> iterator = allNodes.iterator();
+
+        while( iterator.hasNext() )
         {
-            String s = Commands.configure( "add", "storm.xml", entry.getKey(), entry.getValue() );
+            stormNode = environment.getContainerHostByUUID( iterator.next() );
+            int operation_count = 0;
 
-            Iterator<UUID> iterator = allNodes.iterator();
+            for ( Map.Entry<String, String> entry : paramValues.entrySet() )
+            {
+                String s = Commands.configure( "add", "storm.xml", entry.getKey(), entry.getValue() );
 
-            while( iterator.hasNext() ) {
-                ContainerHost stormNode = environment.getContainerHostByUUID( iterator.next() );
 
                 // Install zookeeper on nimbus node if embedded zookeeper is selected
-                if ( ! config.isExternalZookeeper() && config.getNimbus().equals( stormNode.getId() ) )
+                if ( ! config.isExternalZookeeper() && config.getNimbus().equals( stormNode.getId() )
+                        && operation_count == 0 )
                 {
-                    String installZookeeperCommand = zookeeperManager.getCommand( CommandType.INSTALL );
+                    String installZookeeperCommand = manager.getZookeeperManager().getCommand( CommandType.INSTALL );
                     CommandResult commandResult = null;
                     try
                     {
@@ -201,21 +205,21 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
                     {
                         e.printStackTrace();
                     }
-
                     po.addLog( String.format( "Zookeeper %s installed on Storm nimbus node %s",
                             commandResult.hasSucceeded() ? "" : "not", stormNode.getHostname() ) );
                 }
                 try
                 {
                     CommandResult commandResult = stormNode.execute( new RequestBuilder( s ).withTimeout( 60 ) );
-                    po.addLog( String.format( "Storm %s %s configured on %s", nimbusHost.getNodeGroupName(),
-                            commandResult.hasSucceeded() ? "" : "not", stormNode.getHostname() ) );
+                    po.addLog( String.format( "Storm %s%s configured for entry %s on %s", stormNode.getNodeGroupName(),
+                            commandResult.hasSucceeded() ? "" : " not", entry, stormNode.getHostname() ) );
                 }
                 catch ( CommandException exception )
                 {
                     po.addLogFailed("Failed to configure " + stormNode + ": " + exception );
                     exception.printStackTrace();
                 }
+                operation_count++;
             }
         }
     }

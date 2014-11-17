@@ -11,7 +11,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -21,7 +20,6 @@ import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.storm.impl.handler.StormClusterOperationHandler;
 import org.safehaus.subutai.plugin.storm.impl.handler.StormNodeOperationHandler;
-import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 
 public class StormImpl extends StormBase
@@ -150,6 +148,8 @@ public class StormImpl extends StormBase
         {
             NodeGroup nimbus = new NodeGroup();
             nimbus.setName( StormService.NIMBUS.toString() );
+            nimbus.setLinkHosts( false );
+            nimbus.setExchangeSshKeys( false );
             nimbus.setNumberOfNodes( 1 );
             nimbus.setTemplateName( StormClusterConfiguration.TEMPLATE_NAME );
             nimbus.setPlacementStrategy( StormSetupStrategyDefault.getNodePlacementStrategyByNodeType(
@@ -159,6 +159,8 @@ public class StormImpl extends StormBase
 
         NodeGroup workers = new NodeGroup();
         workers.setName( StormService.SUPERVISOR.toString() );
+        workers.setLinkHosts( false );
+        workers.setExchangeSshKeys( false );
         workers.setNumberOfNodes( config.getSupervisorsCount() );
         workers.setTemplateName( StormClusterConfiguration.TEMPLATE_NAME );
         workers.setPlacementStrategy( StormSetupStrategyDefault.getNodePlacementStrategyByNodeType(

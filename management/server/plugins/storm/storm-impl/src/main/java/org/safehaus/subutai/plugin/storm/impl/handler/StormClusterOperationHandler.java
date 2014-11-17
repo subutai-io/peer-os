@@ -83,7 +83,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
     @Override
     public void runOperationOnContainers( ClusterOperationType clusterOperationType )
     {
-        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+        Environment environment;
         List<CommandResult> commandResultList = new ArrayList<>(  );
         switch ( clusterOperationType )
         {
@@ -94,6 +94,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
                 destroyCluster();
                 break;
             case START_ALL:
+                environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     if ( config.getNimbus().equals( containerHost.getId() ) ) {
@@ -108,6 +109,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
                 }
                 break;
             case STOP_ALL:
+                environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     if ( config.getNimbus().equals( containerHost.getId() ) ) {
@@ -122,6 +124,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
                 }
                 break;
             case STATUS_ALL:
+                environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     if ( config.getNimbus().equals( containerHost.getId() ) ) {
@@ -235,7 +238,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
         }
         catch ( EnvironmentDestroyException e )
         {
-            trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
+            trackerOperation.addLogFailed( String.format( "Error destroying environment, %s", e.getMessage() ) );
             LOG.error( e.getMessage(), e );
         }
     }

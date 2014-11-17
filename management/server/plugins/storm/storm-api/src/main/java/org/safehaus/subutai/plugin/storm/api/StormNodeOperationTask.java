@@ -17,11 +17,10 @@ public class StormNodeOperationTask extends AbstractNodeOperationTask implements
     private final ContainerHost containerHost;
     private final Storm storm;
     private NodeOperationType nodeOperationType;
-    private NodeType nodeType;
 
 
     public StormNodeOperationTask( Storm storm, Tracker tracker, String clusterName,
-                                   ContainerHost containerHost, NodeOperationType operationType, NodeType nodeType,
+                                   ContainerHost containerHost, NodeOperationType operationType,
                                    CompleteEvent completeEvent, UUID trackID )
     {
         super( tracker, storm.getCluster( clusterName ), completeEvent, trackID, containerHost );
@@ -29,7 +28,6 @@ public class StormNodeOperationTask extends AbstractNodeOperationTask implements
         this.clusterName = clusterName;
         this.containerHost = containerHost;
         this.nodeOperationType = operationType;
-        this.nodeType = nodeType;
     }
 
 

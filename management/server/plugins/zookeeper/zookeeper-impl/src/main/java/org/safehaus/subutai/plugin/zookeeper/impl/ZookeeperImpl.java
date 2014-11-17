@@ -316,14 +316,18 @@ public class ZookeeperImpl implements Zookeeper
     @Override
     public String getCommand( final CommandType commandType )
     {
-        final String PACKAGE_NAME = Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_KEY.toLowerCase();
-
         switch ( commandType )
         {
             case INSTALL:
                 return Commands.getInstallCommand();
             case UNINSTALL:
                 return Commands.getUninstallCommand();
+            case START:
+                return Commands.getStartCommand();
+            case STOP:
+                return Commands.getStopCommand();
+            case STATUS:
+                return Commands.getStatusCommand();
         }
         return null;
 
@@ -340,13 +344,15 @@ public class ZookeeperImpl implements Zookeeper
                 String.format( "%s-%s", ZookeeperClusterConfig.PRODUCT_KEY, UUIDUtil.generateTimeBasedUUID() ) );
 
         //node group
-        NodeGroup nodesGroup = new NodeGroup();
-        nodesGroup.setName( "DEFAULT" );
-        nodesGroup.setNumberOfNodes( config.getNumberOfNodes() );
-        nodesGroup.setTemplateName( config.getTemplateName() );
-        nodesGroup.setPlacementStrategy( ZookeeperStandaloneSetupStrategy.getNodePlacementStrategy() );
+        NodeGroup nodeGroup = new NodeGroup();
+        nodeGroup.setName( "DEFAULT" );
+        nodeGroup.setLinkHosts( false );
+        nodeGroup.setExchangeSshKeys( false );
+        nodeGroup.setNumberOfNodes( config.getNumberOfNodes() );
+        nodeGroup.setTemplateName( config.getTemplateName() );
+        nodeGroup.setPlacementStrategy( ZookeeperStandaloneSetupStrategy.getNodePlacementStrategy() );
 
-        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodesGroup ) );
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
 
 
         return environmentBlueprint;

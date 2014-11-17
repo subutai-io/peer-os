@@ -59,9 +59,9 @@ public class StormNodeOperationHandler extends AbstractOperationHandler<StormImp
         }
 
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        ContainerHost host = environment.getContainerHostByHostname( hostname );
+        ContainerHost containerHost = environment.getContainerHostByHostname( hostname );
 
-        if ( host == null )
+        if ( containerHost == null )
         {
             trackerOperation.addLogFailed( String.format( "No Container with ID %s", hostname ) );
             return;
@@ -73,46 +73,43 @@ public class StormNodeOperationHandler extends AbstractOperationHandler<StormImp
             switch ( operationType )
             {
                 case START:
-                    for ( ContainerHost containerHost : environment.getContainers() )
-                    {
-                        if ( config.getNimbus().equals( containerHost.getId() ) ) {
-                            commandResultList.add( containerHost.execute( new
-                                    RequestBuilder( Commands.make( CommandType.START, StormService.NIMBUS ) ) ) );
-                            commandResultList.add( containerHost.execute(
-                                    new RequestBuilder( Commands.make( CommandType.START, StormService.UI ) ) ) );
+                    if ( config.getNimbus().equals( containerHost.getId() ) ) {
+                        if ( ! config.isExternalZookeeper() )
+                        {
+                            commandResultList.add( containerHost.execute( new RequestBuilder( manager.getZookeeperManager().getCommand(
+
+                                    org.safehaus.subutai.plugin.zookeeper.api.CommandType.START ) ) ) );
                         }
-                        else if ( config.getSupervisors().contains( containerHost.getId() ) )
-                            commandResultList.add( containerHost.execute(
-                                    new RequestBuilder( Commands.make( CommandType.START, StormService.SUPERVISOR ) ) ) );
+                        commandResultList.add( containerHost.execute( new
+                                RequestBuilder( Commands.make( CommandType.START, StormService.NIMBUS ) ) ) );
+                        commandResultList.add( containerHost.execute(
+                                new RequestBuilder( Commands.make( CommandType.START, StormService.UI ) ) ) );
                     }
+                    else if ( config.getSupervisors().contains( containerHost.getId() ) )
+                        commandResultList.add( containerHost.execute(
+                                new RequestBuilder( Commands.make( CommandType.START, StormService.SUPERVISOR ) ) ) );
                     break;
                 case STOP:
-                    for ( ContainerHost containerHost : environment.getContainers() )
-                    {
-                        if ( config.getNimbus().equals( containerHost.getId() ) ) {
-                            commandResultList.add( containerHost.execute(
-                                    new RequestBuilder( Commands.make( CommandType.STOP, StormService.NIMBUS ) ) ) );
-                            commandResultList.add( containerHost.execute(
-                                    new RequestBuilder( Commands.make( CommandType.STOP, StormService.UI ) ) ) );
-                        }
-                        else if ( config.getSupervisors().contains( containerHost.getId() ) )
-                            commandResultList.add( containerHost.execute(
-                                    new RequestBuilder( Commands.make( CommandType.STOP, StormService.SUPERVISOR ) ) ) );
+                    if ( config.getNimbus().equals( containerHost.getId() ) ) {
+                        commandResultList.add( containerHost.execute(
+                                new RequestBuilder( Commands.make( CommandType.STOP, StormService.NIMBUS ) ) ) );
+                        commandResultList.add( containerHost.execute(
+                                new RequestBuilder( Commands.make( CommandType.STOP, StormService.UI ) ) ) );
                     }
+                    else if ( config.getSupervisors().contains( containerHost.getId() ) )
+                        commandResultList.add( containerHost.execute(
+                                new RequestBuilder( Commands.make( CommandType.STOP, StormService.SUPERVISOR ) ) ) );
                     break;
                 case STATUS:
-                    for ( ContainerHost containerHost : environment.getContainers() )
-                    {
-                        if ( config.getNimbus().equals( containerHost.getId() ) ) {
-                            commandResultList.add( containerHost.execute(
-                                    new RequestBuilder( Commands.make( CommandType.STATUS, StormService.NIMBUS ) ) ) );
-                            commandResultList.add( containerHost.execute(
-                                    new RequestBuilder( Commands.make( CommandType.STATUS, StormService.UI ) ) ) );
-                        }
-                        else if ( config.getSupervisors().contains( containerHost.getId() ) )
-                            commandResultList.add( containerHost.execute(
-                                    new RequestBuilder( Commands.make( CommandType.STATUS, StormService.SUPERVISOR ) ) ) );
+                    if ( config.getNimbus().equals( containerHost.getId() ) ) {
+                        commandResultList.add( containerHost.execute(
+                                new RequestBuilder( Commands.make( CommandType.STATUS, StormService.NIMBUS ) ) ) );
+                        commandResultList.add( containerHost.execute(
+                                new RequestBuilder( Commands.make( CommandType.STATUS, StormService.UI ) ) ) );
                     }
+                    else if ( config.getSupervisors().contains( containerHost.getId() ) )
+                        commandResultList.add( containerHost.execute(
+                                new RequestBuilder( Commands.make( CommandType.STATUS, StormService.SUPERVISOR ) ) ) );
                     break;
             }
             logResults( trackerOperation, commandResultList );

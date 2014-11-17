@@ -80,7 +80,7 @@ public class ZookeeperClusterOperationHandler extends AbstractPluginOperationHan
     @Override
     public void runOperationOnContainers( ClusterOperationType clusterOperationType )
     {
-        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
+        Environment environment;
         List<CommandResult> commandResultList = new ArrayList<>(  );
         switch ( clusterOperationType )
         {
@@ -91,6 +91,7 @@ public class ZookeeperClusterOperationHandler extends AbstractPluginOperationHan
                 destroyCluster();
                 break;
             case START_ALL:
+                environment = manager.getEnvironmentManager().getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     commandResultList.add( executeCommand( containerHost,
@@ -98,6 +99,7 @@ public class ZookeeperClusterOperationHandler extends AbstractPluginOperationHan
                 }
                 break;
             case STOP_ALL:
+                environment = manager.getEnvironmentManager().getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     commandResultList.add( executeCommand( containerHost,
@@ -105,6 +107,7 @@ public class ZookeeperClusterOperationHandler extends AbstractPluginOperationHan
                 }
                 break;
             case STATUS_ALL:
+                environment = manager.getEnvironmentManager().getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     commandResultList.add( executeCommand( containerHost,
