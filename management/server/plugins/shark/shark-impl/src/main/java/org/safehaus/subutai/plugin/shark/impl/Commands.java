@@ -1,17 +1,11 @@
 package org.safehaus.subutai.plugin.shark.impl;
 
 
-import java.util.Set;
-
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.OutputRedirection;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
-
-import com.google.common.base.Preconditions;
 
 
 public class Commands
@@ -19,52 +13,32 @@ public class Commands
 
     public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + SharkClusterConfig.PRODUCT_KEY.toLowerCase();
 
-    private CommandRunnerBase commandRunner;
 
-
-    public Commands( CommandRunnerBase commandRunner )
+    public RequestBuilder getInstallCommand()
     {
-        Preconditions.checkNotNull( "Command Runner is null" );
-        this.commandRunner = commandRunner;
+        return new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 900 )
+                                                                                               .withStdOutRedirection(
+                                                                                                       OutputRedirection.NO );
     }
 
 
-    public Command getInstallCommand( Set<Agent> agents )
+    public RequestBuilder getUninstallCommand()
     {
-        return createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 900 )
-                                                                                                .withStdOutRedirection(
-                                                                                                        OutputRedirection.NO ),
-                agents );
+        return new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 600 );
     }
 
 
-    private Command createCommand( RequestBuilder rb, Set<Agent> agents )
+    public RequestBuilder getCheckInstalledCommand()
     {
-        return commandRunner.createCommand( rb, agents );
+        return new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH );
     }
 
 
-    public Command getUninstallCommand( Set<Agent> agents )
+    public RequestBuilder getSetMasterIPCommand( ContainerHost master )
     {
-        return createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 600 ),
-                agents );
-    }
-
-
-    public Command getCheckInstalledCommand( Set<Agent> agents )
-    {
-        return createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH ),
-                agents );
-    }
-
-
-    public Command getSetMasterIPCommand( Set<Agent> agents, Agent masterNode )
-    {
-        return createCommand( new RequestBuilder(
+        return new RequestBuilder(
                 String.format( ". /etc/profile && sharkConf.sh clear master ; sharkConf.sh master %s",
-                        masterNode.getHostname() ) ).withTimeout( 60 ), agents );
+                        master.getHostname() ) ).withTimeout( 60 );
     }
 }
 
