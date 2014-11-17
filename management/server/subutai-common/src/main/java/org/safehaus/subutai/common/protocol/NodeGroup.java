@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.settings.Common;
 /**
  * Node Group class
  */
-@Entity( name = "NodeGroup" )
+
 public class NodeGroup
 {
 

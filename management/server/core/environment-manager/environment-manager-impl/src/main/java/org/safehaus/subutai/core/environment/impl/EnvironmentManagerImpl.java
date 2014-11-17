@@ -488,7 +488,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             Set<ContainerHost> containers = peerManager.getPeer( peer.getId() ).
                     createContainers( peerId, environment.getId(), templatesData, nodeGroup.getNumberOfNodes(),
-                            nodeGroup.getPlacementStrategy().toString(), null, nodeGroup.getName() );
+                            nodeGroup.getPlacementStrategy().getStrategyId(),
+                            nodeGroup.getPlacementStrategy().getCriteriaAsList(), nodeGroup.getName() );
             if ( !containers.isEmpty() )
             {
                 for ( ContainerHost container : containers )
