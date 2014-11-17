@@ -771,10 +771,6 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
                     callback.onResponse( TempResponseConverter.convertResponse( response ),
                             new CommandResultImpl( agentResult.getExitCode(), agentResult.getStdOut(),
                                     agentResult.getStdErr(), command.getCommandStatus() ) );
-                    if ( callback.isStopped() )
-                    {
-                        stop();
-                    }
                 }
             }
         } );
@@ -814,10 +810,6 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventList
                     callback.onResponse( TempResponseConverter.convertResponse( response ),
                             new CommandResultImpl( agentResult.getExitCode(), agentResult.getStdOut(),
                                     agentResult.getStdErr(), command.getCommandStatus() ) );
-                    if ( callback.isStopped() )
-                    {
-                        stop();
-                    }
                 }
             }
         } );

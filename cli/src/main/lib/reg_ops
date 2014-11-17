@@ -3,7 +3,7 @@
 # URGENT: this is a stub function and needs to be properly implemented
 # this function needs to ask Subutai if a template name is registered 
 # already. Since this functionality is not available I just stubbed it 
-# out with a call to zfs_is_template. 
+# out with a call to fs_is_template. 
 function is_registered {
  
   local template=$1
