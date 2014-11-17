@@ -3,9 +3,11 @@ package org.safehaus.subutai.plugin.mongodb.impl.handler;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 
 
@@ -37,15 +39,31 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<MongoImp
     @Override
     public void run()
     {
-        po.addLog( "Not implemented yet." );
+        MongoClusterConfig config = manager.getCluster( clusterName );
+        if ( config == null )
+        {
+            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            return;
+        }
 
-        //        MongoClusterConfig config = manager.getCluster( clusterName );
-        //        if ( config == null )
-        //        {
-        //            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
-        //            return;
-        //        }
-        //
+
+        MongoNode node = config.findNode( lxcHostname );
+        if ( node == null )
+        {
+            po.addLogFailed( String.format( "Node on %s is not found", lxcHostname ) );
+            return;
+        }
+        NodeState nodeState;
+        if ( node.isRunning() )
+        {
+            nodeState = NodeState.RUNNING;
+        }
+        else
+        {
+            nodeState = NodeState.STOPPED;
+        }
+        po.addLogDone( String.format( "Node on %s is %s", lxcHostname, nodeState ) );
+
         //        Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
         //        if ( node == null )
         //        {
@@ -60,8 +78,9 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<MongoImp
         //            return;
         //        }
         //        po.addLog( "Checking node..." );
-        //        Command checkNodeCommand = manager.getCommands().
-        //                getCheckInstanceRunningCommand( node, config.getDomainName(), config.getNodePort( node ) );
+        //                Command checkNodeCommand = manager.getCommands().
+        //                        getCheckInstanceRunningCommand( node, config.getDomainName(), config.getNodePort(
+        // node ) );
         //        manager.getCommandRunner().runCommand( checkNodeCommand );
         //
         //        if ( checkNodeCommand.hasCompleted() )

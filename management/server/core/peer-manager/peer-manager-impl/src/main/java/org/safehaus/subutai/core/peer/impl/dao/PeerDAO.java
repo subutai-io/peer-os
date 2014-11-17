@@ -63,13 +63,18 @@ public class PeerDAO
 
         try
         {
+            String json = GSON.toJson( info );
             dbUtil.update( "merge into peer (source, id, info) values (?, ? ,?)", source, UUID.fromString( key ),
-                    GSON.toJson( info ) );
+                    json );
             return true;
         }
         catch ( SQLException e )
         {
             LOG.error( e.getMessage() );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.toString() );
         }
         return false;
     }
