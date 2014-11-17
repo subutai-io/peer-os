@@ -40,7 +40,7 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl, HBaseClu
 
     private void setupOverHadoop()
     {
-        /*try
+        try
         {
             //setup up HBase cluster
             ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( null, config, trackerOperation );
@@ -53,7 +53,7 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl, HBaseClu
         {
             trackerOperation
                     .addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
-        }*/
+        }
     }
 
 
