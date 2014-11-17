@@ -90,7 +90,7 @@ public class RestService
         // as plain string and use splitting.
         for ( String node : nodes.split( "," ) )
         {
-            config.getNodes().add( agentManager.getAgentByHostname( node ) );
+            config.getNodes().add( UUID.fromString( node ) );
         }
 
         UUID uuid = hipiManager.installCluster( config );
