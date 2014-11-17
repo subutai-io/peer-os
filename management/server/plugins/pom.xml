@@ -21,16 +21,15 @@
     <module>mongodb</module>
     <module>hive</module>
     <module>spark</module>
+    <module>shark</module>
     <module>hbase</module>
-    <module>oozie</module>
+    <module>sqoop</module>
     <!--<module>accumulo</module>
+    <module>oozie</module>    
     <module>solr</module>
-
     <module>zookeeper</module>
-
     <module>mongodb</module>
     <module>flume</module>
-
     <module>storm</module>
     <module>presto</module>
     <module>shark</module>
