@@ -536,11 +536,11 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>hbase-plugin-api</artifactId>
     </dependency>
-    <!--<dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hbase-plugin-impl</artifactId>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hbase-plugin-cli</artifactId>
     </dependency>

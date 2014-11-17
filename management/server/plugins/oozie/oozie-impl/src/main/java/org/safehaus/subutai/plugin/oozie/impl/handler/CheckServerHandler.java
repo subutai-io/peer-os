@@ -7,14 +7,13 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
 
-public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
+public class CheckServerHandler extends AbstractOperationHandler<OozieImpl, OozieClusterConfig>
 {
 
     private static final Logger logger = Logger.getLogger( CheckServerHandler.class.getName() );
@@ -42,7 +41,7 @@ public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
     public void run()
     {
 
-        manager.getExecutor().execute( new Runnable()
+        /*manager.getExecutor().execute( new Runnable()
         {
 
             public void run()
@@ -75,6 +74,6 @@ public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
                             String.format( "Failed to check status, %s", statusServiceCommand.getAllErrors() ) );
                 }
             }
-        } );
+        } );*/
     }
 }

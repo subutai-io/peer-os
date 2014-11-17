@@ -16,7 +16,7 @@ import org.safehaus.subutai.plugin.oozie.api.SetupType;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
 
-public class InstallHandler extends AbstractOperationHandler<OozieImpl>
+public class InstallHandler extends AbstractOperationHandler<OozieImpl, OozieClusterConfig>
 {
 
     private final TrackerOperation trackerOperation;
@@ -43,7 +43,7 @@ public class InstallHandler extends AbstractOperationHandler<OozieImpl>
     @Override
     public void run()
     {
-        Environment env = null;
+        /*Environment env = null;
 
         if ( config.getSetupType() == SetupType.WITH_HADOOP )
         {
@@ -88,6 +88,6 @@ public class InstallHandler extends AbstractOperationHandler<OozieImpl>
         catch ( ClusterSetupException ex )
         {
             trackerOperation.addLogFailed( "Failed to setup cluster: " + ex.getMessage() );
-        }
+        }*/
     }
 }

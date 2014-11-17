@@ -7,7 +7,6 @@
     <property name="password" value="" />
   </bean>
 
-
   <reference id="hadoopManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
   <reference id="tracker" availability="mandatory"

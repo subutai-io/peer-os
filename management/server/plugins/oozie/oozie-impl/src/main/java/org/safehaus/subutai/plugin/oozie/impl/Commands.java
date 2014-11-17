@@ -4,11 +4,8 @@ package org.safehaus.subutai.plugin.oozie.impl;
 import java.util.Set;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 
 
@@ -22,12 +19,10 @@ public class Commands
     public static final String CLIENT_PACKAGE_NAME =
             Common.PACKAGE_PREFIX + OozieClusterConfig.PRODUCT_KEY.toLowerCase() + "-client";
 
-    private final CommandRunnerBase commandRunnerBase;
 
-
-    public Commands( CommandRunnerBase commandRunnerBase )
+    public Commands()
     {
-        this.commandRunnerBase = commandRunnerBase;
+
     }
 
 
@@ -63,89 +58,88 @@ public class Commands
     }
 
 
-    public Command getInstallServerCommand( Set<Agent> agents )
+    public RequestBuilder getInstallServerCommand()
     {
 
-        return commandRunnerBase.createCommand(
+        return
 
                 new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install " + SERVER_PACKAGE_NAME )
-                        .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents );
+                        .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO );
     }
 
 
-    public Command getInstallClientCommand( Set<Agent> agents )
+    public RequestBuilder getInstallClientCommand()
     {
 
-        return commandRunnerBase.createCommand(
+        return
 
                 new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install " + CLIENT_PACKAGE_NAME )
-                        .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents );
+                        .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO );
     }
 
 
-    public Command getStartServerCommand( Set<Agent> agents )
+    public RequestBuilder getStartServerCommand()
     {
-        return commandRunnerBase.createCommand( new RequestBuilder( "service oozie-server start &" ), agents );
+        return new RequestBuilder( "service oozie-server start &" );
     }
 
 
-    public Command getStopServerCommand( Set<Agent> agents )
+    public RequestBuilder getStopServerCommand()
     {
-        return commandRunnerBase.createCommand( new RequestBuilder( "service oozie-server stop" ), agents );
+        return new RequestBuilder( "service oozie-server stop" );
     }
 
 
-    public Command getStatusServerCommand( Set<Agent> agents )
+    public RequestBuilder getStatusServerCommand()
     {
-        return commandRunnerBase.createCommand( new RequestBuilder( "service oozie-server status" ), agents );
+        return new RequestBuilder( "service oozie-server status" );
     }
 
 
-    public Command getConfigureRootHostsCommand( Set<Agent> agents, String param )
+    public RequestBuilder getConfigureRootHostsCommand( String param )
     {
 
-        return commandRunnerBase.createCommand( new RequestBuilder( String.format(
+        return new RequestBuilder( String.format(
                 ". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser"
-                        + ".root.hosts %s", param ) ), agents );
+                        + ".root.hosts %s", param ) );
     }
 
 
-    public Command getConfigureRootGroupsCommand( Set<Agent> agents )
+    public RequestBuilder getConfigureRootGroupsCommand()
     {
 
-        return commandRunnerBase.createCommand( new RequestBuilder( String.format(
+        return new RequestBuilder( String.format(
                 ". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser"
-                        + ".root.groups '\\*' " ) ), agents );
+                        + ".root.groups '\\*' " ) );
     }
 
 
-    public Command getUninstallServerCommand( Set<Agent> agents )
+    public RequestBuilder getUninstallServerCommand()
     {
-        return commandRunnerBase.createCommand(
+        return
 
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge " + SERVER_PACKAGE_NAME ).withTimeout( 90 )
                                                                                                      .withStdOutRedirection(
-                                                                                                             OutputRedirection.NO ),
+                                                                                                             OutputRedirection.NO )
 
-                agents );
+                ;
     }
 
 
-    public Command getUninstallClientsCommand( Set<Agent> agents )
+    public RequestBuilder getUninstallClientsCommand()
     {
-        return commandRunnerBase.createCommand(
+        return
 
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge " + CLIENT_PACKAGE_NAME ).withTimeout( 90 )
                                                                                                      .withStdOutRedirection(
-                                                                                                             OutputRedirection.NO ),
+                                                                                                             OutputRedirection.NO )
 
-                agents );
+                ;
     }
 
 
-    public Command getCheckInstalledCommand( Set<Agent> agents )
+    public RequestBuilder getCheckInstalledCommand()
     {
-        return commandRunnerBase.createCommand( "Check installed subutai packages",
-                new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH ), agents );
+        return new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH );
     }
 }
