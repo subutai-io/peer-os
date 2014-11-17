@@ -72,6 +72,8 @@ public class RequestBuilder
     // Config points for inotify
     private String[] confPoints;
 
+    private int isDaemon = 0;
+
 
     /**
      * Constructor
@@ -272,6 +274,14 @@ public class RequestBuilder
     }
 
 
+    public RequestBuilder daemon()
+    {
+        this.isDaemon = 1;
+
+        return this;
+    }
+
+
     /**
      * Builds and returns Request object
      *
@@ -281,9 +291,9 @@ public class RequestBuilder
     public org.safehaus.subutai.common.protocol.Request build( UUID agentUUID, UUID taskUUID )
     {
 
-        return new org.safehaus.subutai.common.protocol.Request( SOURCE, type, agentUUID, taskUUID, REQUEST_SEQUENCE_NUMBER, cwd, command, outputRedirection,
-                errRedirection, stdOutPath, stdErrPath, runAs, cmdArgs, envVars, pid, timeout )
-                .setConfPoints( confPoints );
+        return new org.safehaus.subutai.common.protocol.Request( SOURCE, type, agentUUID, taskUUID,
+                REQUEST_SEQUENCE_NUMBER, cwd, command, outputRedirection, errRedirection, stdOutPath, stdErrPath, runAs,
+                cmdArgs, envVars, pid, timeout ).setConfPoints( confPoints );
     }
 
 
@@ -292,7 +302,7 @@ public class RequestBuilder
         //TODO pass proper arguments after migration to new agent
         return new RequestImpl( org.safehaus.subutai.common.command.RequestType.EXECUTE_REQUEST, id, cwd, command,
                 cmdArgs, envVars, org.safehaus.subutai.common.command.OutputRedirection.RETURN,
-                org.safehaus.subutai.common.command.OutputRedirection.RETURN, runAs, timeout );
+                org.safehaus.subutai.common.command.OutputRedirection.RETURN, runAs, timeout, isDaemon );
     }
 
 
@@ -400,6 +410,7 @@ public class RequestBuilder
         private org.safehaus.subutai.common.command.OutputRedirection stdErr;
         private String runAs;
         private Integer timeout;
+        private Integer isDaemon;
 
 
         RequestImpl( final org.safehaus.subutai.common.command.RequestType type, final UUID id,
@@ -407,7 +418,7 @@ public class RequestBuilder
                      final Map<String, String> environment,
                      final org.safehaus.subutai.common.command.OutputRedirection stdOut,
                      final org.safehaus.subutai.common.command.OutputRedirection stdErr, final String runAs,
-                     final Integer timeout )
+                     final Integer timeout, final Integer isDaemon )
         {
             this.type = type;
             this.id = id;
@@ -420,6 +431,7 @@ public class RequestBuilder
             this.stdErr = stdErr;
             this.runAs = runAs;
             this.timeout = timeout;
+            this.isDaemon = isDaemon;
         }
 
 
@@ -497,6 +509,13 @@ public class RequestBuilder
         public Integer getTimeout()
         {
             return timeout;
+        }
+
+
+        @Override
+        public Integer isDaemon()
+        {
+            return isDaemon;
         }
     }
 }

@@ -48,11 +48,6 @@ public class SolrSetupStrategy implements ClusterSetupStrategy
     }
 
 
-    public static PlacementStrategy getPlacementStrategy()
-    {
-        return PlacementStrategy.ROUND_ROBIN;
-    }
-
 
     @Override
     public ConfigBase setup() throws ClusterSetupException

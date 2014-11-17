@@ -215,7 +215,7 @@ public class NutchImpl implements Nutch
         ng.setName( "Default" );
         ng.setNumberOfNodes( config.getNodes().size() ); // master +slaves
         ng.setTemplateName( NutchConfig.TEMPLATE_NAME );
-        ng.setPlacementStrategy( PlacementStrategy.MORE_RAM );
+        ng.setPlacementStrategy( new PlacementStrategy( "MORE_RAM" ) );
         blueprint.setNodeGroups( Sets.newHashSet( ng ) );
 
 

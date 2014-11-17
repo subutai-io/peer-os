@@ -28,7 +28,7 @@ public class CommandExecutorImpl implements CommandExecutor
     private static final Logger LOG = LoggerFactory.getLogger( CommandExecutorImpl.class.getName() );
 
     private final Broker broker;
-    private CommandProcessor commandProcessor;
+    protected CommandProcessor commandProcessor;
 
 
     public CommandExecutorImpl( final Broker broker, final HostRegistry hostRegistry )

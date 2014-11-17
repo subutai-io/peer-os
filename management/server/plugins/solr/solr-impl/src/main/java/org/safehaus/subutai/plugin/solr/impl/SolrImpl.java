@@ -239,7 +239,7 @@ public class SolrImpl implements Solr
         //1 node group
         NodeGroup nodeGroup = new NodeGroup();
         nodeGroup.setTemplateName( config.getTemplateName() );
-        nodeGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        nodeGroup.setPlacementStrategy( new PlacementStrategy( "ROUND_ROBIN" ) );
         nodeGroup.setNumberOfNodes( config.getNumberOfNodes() );
 
         environmentBlueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );

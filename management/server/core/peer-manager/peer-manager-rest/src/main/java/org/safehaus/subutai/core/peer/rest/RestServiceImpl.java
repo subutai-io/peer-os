@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.Template;
@@ -20,9 +21,13 @@ import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -72,6 +77,7 @@ public class RestServiceImpl implements RestService
         if ( config != null )
         {
             PeerInfo peerInfo = GSON.fromJson( config, PeerInfo.class );
+            peerInfo.setIp( getRequestIp() );
             try
             {
                 peerManager.register( peerInfo );
@@ -100,6 +106,8 @@ public class RestServiceImpl implements RestService
     public Response processRegisterRequest( String peer )
     {
         PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
+
+        p.setIp( getRequestIp() );
         try
         {
             peerManager.register( p );
@@ -139,6 +147,7 @@ public class RestServiceImpl implements RestService
     public Response updatePeer( String peer )
     {
         PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
+        p.setIp( getRequestIp() );
         peerManager.update( p );
         return Response.ok( GSON.toJson( p ) ).build();
     }
@@ -171,6 +180,14 @@ public class RestServiceImpl implements RestService
         }
 
         return "127.0.0.1";
+    }
+
+
+    private String getRequestIp()
+    {
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        HttpServletRequest request = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
+        return request.getRemoteAddr();
     }
 
 

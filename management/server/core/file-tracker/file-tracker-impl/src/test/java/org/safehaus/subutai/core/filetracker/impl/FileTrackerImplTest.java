@@ -1,20 +1,22 @@
 package org.safehaus.subutai.core.filetracker.impl;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
+import org.safehaus.subutai.core.filetracker.api.FileTrackerException;
+import org.safehaus.subutai.core.peer.api.Host;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.mockito.Mockito.*;
 
 
 /**
@@ -27,6 +29,7 @@ public class FileTrackerImplTest
     private CommunicationManager communicationManager;
 
     private FileTrackerImpl fileTracker;
+    private Host host;
 
 
     @Before
@@ -36,6 +39,7 @@ public class FileTrackerImplTest
 
         fileTracker = new FileTrackerImpl();
         fileTracker.setCommunicationManager( communicationManager );
+        host = mock(Host.class);
     }
 
 
@@ -113,5 +117,51 @@ public class FileTrackerImplTest
         fileTracker.addListener( listener );
         fileTracker.onResponse( response );
         verify( listener ).onResponse( response );
+    }
+
+    @Test
+    public void testRemoveConfigPoints() throws Exception {
+        String[] configPoints = {"test"};
+        fileTracker.removeConfigPoints(host,configPoints);
+
+        verify(host).execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_REMOVE_REQUEST )
+                .withConfPoints(configPoints));
+    }
+
+    @Test
+    public void testCreateConfigPoints() throws  Exception {
+        String[] configPoints = {"test"};
+        fileTracker.createConfigPoints(host, configPoints);
+
+        verify(host).execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_CREATE_REQUEST )
+                .withConfPoints( configPoints ) );
+
+    }
+
+    @Test
+    public void testListConfigPoints() throws  Exception {
+        fileTracker.listConfigPoints(host);
+        verify(host).execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_LIST_REQUEST ) );
+        host.execute(new RequestBuilder("pwd").withType(RequestType.INOTIFY_LIST_REQUEST));
+    }
+
+    @Test ( expected = FileTrackerException.class )
+    public void shouldThrowFileTrackerExceptionInListConfigPoints() throws FileTrackerException, CommandException {
+        when(host.execute(any(RequestBuilder.class))).thenThrow(FileTrackerException.class);
+        fileTracker.listConfigPoints(host);
+    }
+
+    @Test ( expected = FileTrackerException.class )
+    public void shouldThrowFileTrackerExceptionInCreateConfigPoints() throws FileTrackerException, CommandException {
+        String[] configPoints = {"test"};
+        when(host.execute(any(RequestBuilder.class))).thenThrow(FileTrackerException.class);
+        fileTracker.createConfigPoints(host,configPoints);
+    }
+
+    @Test ( expected = FileTrackerException.class )
+    public void shouldThrowFileTrackerExceptionRemoveConfigPoints() throws FileTrackerException, CommandException {
+        String[] configPoints = {"test"};
+        when(host.execute(any(RequestBuilder.class))).thenThrow(FileTrackerException.class);
+        fileTracker.removeConfigPoints(host,configPoints);
     }
 }

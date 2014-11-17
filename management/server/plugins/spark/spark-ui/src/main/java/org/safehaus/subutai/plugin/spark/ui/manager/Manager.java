@@ -213,7 +213,7 @@ public class Manager
                     show( "Hadoop cluster not found" );
                     return;
                 }
-                set.removeAll( config.getAllNodesIds() );
+                set.removeAll( environment.getHostsByIds( Sets.newHashSet(config.getAllNodesIds())) );
                 if ( set.isEmpty() )
                 {
                     show( "All nodes in Hadoop cluster have Spark installed" );
@@ -422,7 +422,7 @@ public class Manager
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Container not found" );
                     }
                 }
             }

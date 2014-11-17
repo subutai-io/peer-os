@@ -23,12 +23,11 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
-import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.AddOperationHandler;
@@ -49,12 +48,12 @@ public class HadoopImpl implements Hadoop
     private static final Logger LOG = LoggerFactory.getLogger( HadoopImpl.class.getName() );
     private Tracker tracker;
     private ContainerManager containerManager;
-    private NetworkManager networkManager;
     private ExecutorService executor;
     private EnvironmentManager environmentManager;
     private Commands commands;
     private PluginDAO pluginDAO;
     private DataSource dataSource;
+
 
     public HadoopImpl( DataSource dataSource )
     {
@@ -118,18 +117,6 @@ public class HadoopImpl implements Hadoop
     }
 
 
-    public NetworkManager getNetworkManager()
-    {
-        return networkManager;
-    }
-
-
-    public void setNetworkManager( final NetworkManager networkManager )
-    {
-        this.networkManager = networkManager;
-    }
-
-
     public ExecutorService getExecutor()
     {
         return executor;
@@ -166,8 +153,8 @@ public class HadoopImpl implements Hadoop
         Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
-        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, hadoopClusterConfig,
-                ClusterOperationType.INSTALL, null );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.INSTALL, null );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -176,8 +163,10 @@ public class HadoopImpl implements Hadoop
     @Override
     public UUID uninstallCluster( final HadoopClusterConfig hadoopClusterConfig )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ), "Cluster name is null or empty" );
-        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.UNINSTALL, null );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
+                "Cluster name is null or empty" );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.UNINSTALL, null );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -209,7 +198,7 @@ public class HadoopImpl implements Hadoop
     @Override
     public UUID uninstallCluster( final String clustername )
     {
-         return null;
+        return null;
     }
 
 
@@ -220,7 +209,8 @@ public class HadoopImpl implements Hadoop
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.START_ALL, NodeType.NAMENODE );
+                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.START_ALL,
+                        NodeType.NAMENODE );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -233,7 +223,8 @@ public class HadoopImpl implements Hadoop
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.STOP_ALL, NodeType.NAMENODE );
+                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.STOP_ALL,
+                        NodeType.NAMENODE );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -246,7 +237,8 @@ public class HadoopImpl implements Hadoop
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.STATUS_ALL, NodeType.NAMENODE );
+                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.STATUS_ALL,
+                        NodeType.NAMENODE );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -306,8 +298,8 @@ public class HadoopImpl implements Hadoop
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Lxc hostname is null or empty" );
 
         AbstractOperationHandler operationHandler =
-                new NodeOperationHandler( this, hadoopClusterConfig.getClusterName(), hostname, NodeOperationType.STATUS,
-                        NodeType.DATANODE );
+                new NodeOperationHandler( this, hadoopClusterConfig.getClusterName(), hostname,
+                        NodeOperationType.STATUS, NodeType.DATANODE );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -321,7 +313,8 @@ public class HadoopImpl implements Hadoop
                 "Cluster name is null or empty" );
 
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.START_ALL, NodeType.JOBTRACKER );
+                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.START_ALL,
+                        NodeType.JOBTRACKER );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -335,7 +328,8 @@ public class HadoopImpl implements Hadoop
                 "Cluster name is null or empty" );
 
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.STOP_ALL, NodeType.JOBTRACKER );
+                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.STOP_ALL,
+                        NodeType.JOBTRACKER );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -348,7 +342,8 @@ public class HadoopImpl implements Hadoop
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.STATUS_ALL, NodeType.JOBTRACKER );
+                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.STATUS_ALL,
+                        NodeType.JOBTRACKER );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -391,8 +386,8 @@ public class HadoopImpl implements Hadoop
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Lxc hostname is null or empty" );
 
         AbstractOperationHandler operationHandler =
-                new NodeOperationHandler( this, hadoopClusterConfig.getClusterName(), hostname, NodeOperationType.STATUS,
-                        NodeType.TASKTRACKER );
+                new NodeOperationHandler( this, hadoopClusterConfig.getClusterName(), hostname,
+                        NodeOperationType.STATUS, NodeType.TASKTRACKER );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -453,8 +448,8 @@ public class HadoopImpl implements Hadoop
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Lxc hostname is null or empty" );
 
         AbstractOperationHandler operationHandler =
-                new NodeOperationHandler( this, hadoopClusterConfig.getClusterName(), hostname, NodeOperationType.EXCLUDE,
-                        NodeType.SLAVE_NODE );
+                new NodeOperationHandler( this, hadoopClusterConfig.getClusterName(), hostname,
+                        NodeOperationType.EXCLUDE, NodeType.SLAVE_NODE );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -469,18 +464,17 @@ public class HadoopImpl implements Hadoop
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Lxc hostname is null or empty" );
 
         AbstractOperationHandler operationHandler =
-                new NodeOperationHandler( this, hadoopClusterConfig.getClusterName(), hostname, NodeOperationType.INCLUDE,
-                        NodeType.SLAVE_NODE );
+                new NodeOperationHandler( this, hadoopClusterConfig.getClusterName(), hostname,
+                        NodeOperationType.INCLUDE, NodeType.SLAVE_NODE );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment,
-                                                         HadoopClusterConfig hadoopClusterConfig,
-                                                         TrackerOperation po )
+                                                         HadoopClusterConfig hadoopClusterConfig, TrackerOperation po )
     {
-        return new HadoopSetupStrategy( environment, hadoopClusterConfig, po, this);
+        return new HadoopSetupStrategy( environment, hadoopClusterConfig, po, this );
     }
 
 
@@ -495,11 +489,14 @@ public class HadoopImpl implements Hadoop
         environmentBlueprint.setLinkHosts( true );
         environmentBlueprint.setExchangeSshKeys( true );
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
-        Set<NodeGroup> nodeGroups = new HashSet<>( INITIAL_CAPACITY );
+//        Set<NodeGroup> nodeGroups = new HashSet<>( INITIAL_CAPACITY );
 
         NodeGroup nodeGroup = new NodeGroup();
+        nodeGroup.setName( "Hadoop node group" );
+        nodeGroup.setLinkHosts( true );
+        nodeGroup.setExchangeSshKeys( true );
         nodeGroup.setTemplateName( config.getTemplateName() );
-        nodeGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        nodeGroup.setPlacementStrategy( new PlacementStrategy( "ROUND_ROBIN" ) );
         nodeGroup.setNumberOfNodes(
                 HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY + config.getCountOfSlaveNodes() );
 

@@ -6,5 +6,5 @@ package org.safehaus.subutai.core.hostregistry.api;
  */
 public interface HostListener
 {
-    public void onHeartbeat( HostInfo hostInfo );
+    public void onHeartbeat( ResourceHostInfo resourceHostInfo );
 }

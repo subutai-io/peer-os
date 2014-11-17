@@ -9,10 +9,10 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
@@ -68,8 +68,10 @@ public class Manager
     private final Spark spark;
     private final Tracker tracker;
     private final Shark shark;
-    private final AgentManager agentManager;
-    private final CommandRunner commandRunner;
+    private final EnvironmentManager environmentManager;
+    private Environment environment;
+
+
     private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private SharkClusterConfig config;
 
@@ -81,9 +83,7 @@ public class Manager
         this.shark = serviceLocator.getService( Shark.class );
         this.spark = serviceLocator.getService( Spark.class );
         this.tracker = serviceLocator.getService( Tracker.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
-
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -172,24 +172,34 @@ public class Manager
                 SparkClusterConfig sparkInfo = spark.getCluster( config.getClusterName() );
                 if ( sparkInfo != null )
                 {
-                    Set<Agent> nodes = new HashSet<>( sparkInfo.getAllNodes() );
-                    nodes.removeAll( config.getNodes() );
-                    if ( !nodes.isEmpty() )
+                    Environment environment = environmentManager.getEnvironmentByUUID( sparkInfo.getEnvironmentId() );
+                    if ( environment != null )
                     {
-                        AddNodeWindow win = new AddNodeWindow( shark, executorService, tracker, config, nodes );
-                        contentRoot.getUI().addWindow( win );
-                        win.addCloseListener( new Window.CloseListener()
+                        Set<UUID> nodeIds = new HashSet<>( sparkInfo.getAllNodesIds() );
+                        nodeIds.removeAll( config.getNodeIds() );
+                        Set<ContainerHost> availableNodes = environment.getHostsByIds( nodeIds );
+                        if ( !nodeIds.isEmpty() )
                         {
-                            @Override
-                            public void windowClose( Window.CloseEvent closeEvent )
+                            AddNodeWindow win =
+                                    new AddNodeWindow( shark, executorService, tracker, config, availableNodes );
+                            contentRoot.getUI().addWindow( win );
+                            win.addCloseListener( new Window.CloseListener()
                             {
-                                refreshClustersInfo();
-                            }
-                        } );
+                                @Override
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
+                                    refreshClustersInfo();
+                                }
+                            } );
+                        }
+                        else
+                        {
+                            show( "All nodes in corresponding Spark cluster have Shark installed" );
+                        }
                     }
                     else
                     {
-                        show( "All nodes in corresponding Spark cluster have Shark installed" );
+                        show( "Spark environment not found" );
                     }
                 }
                 else
@@ -269,19 +279,17 @@ public class Manager
             {
                 if ( event.isDoubleClick() )
                 {
-                    String lxcHostname =
+                    String hostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
+                    ContainerHost node = environment.getContainerHostByHostname( hostname );
+                    if ( node != null )
                     {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
-                                        agentManager );
+                        TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( node ) );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Container not found" );
                     }
                 }
             }
@@ -299,7 +307,8 @@ public class Manager
     {
         if ( config != null )
         {
-            populateTable( nodesTable, config.getNodes() );
+            environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+            populateTable( nodesTable, environment.getHostsByIds( config.getNodeIds() ) );
         }
         else
         {
@@ -308,13 +317,13 @@ public class Manager
     }
 
 
-    private void populateTable( final Table table, Set<Agent> agents )
+    private void populateTable( final Table table, Set<ContainerHost> nodes )
     {
         table.removeAllItems();
-        for ( final Agent agent : agents )
+        for ( final ContainerHost node : nodes )
         {
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( agent.getListIP().get( 0 ) + "-sharkDestroy" );
+            destroyBtn.setId( node.getAgent().getListIP().get( 0 ) + "-sharkDestroy" );
 
             addStyleNameToButtons( destroyBtn );
             PROGRESS_ICON.setVisible( false );
@@ -326,7 +335,7 @@ public class Manager
             addGivenComponents( availableOperations, destroyBtn );
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), availableOperations
+                    node.getHostname(), node.getAgent().getListIP().get( 0 ), availableOperations
             }, null );
 
             destroyBtn.addClickListener( new Button.ClickListener()
@@ -335,13 +344,13 @@ public class Manager
                 public void buttonClick( Button.ClickEvent clickEvent )
                 {
                     ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
+                            String.format( "Do you want to destroy the %s node?", node.getHostname() ), "Yes", "No" );
                     alert.getOk().addClickListener( new Button.ClickListener()
                     {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = shark.destroyNode( config.getClusterName(), agent.getHostname() );
+                            UUID trackID = shark.destroyNode( config.getClusterName(), node.getHostname() );
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     SharkClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()

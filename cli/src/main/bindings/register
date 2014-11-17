@@ -70,7 +70,7 @@ function register {
     exit 1
   fi
   # check to make sure the container is a template
-  if [ "`zfs_is_template $container`" == "false" ]; then
+  if [ "`fs_is_template $container`" == "false" ]; then
     msg_error "Container \"$container\" is NOT a template. Aborting ..."
     unlock_container_write $container
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
@@ -88,10 +88,10 @@ function register {
     msg_info "    - check passed: \"$container\" is not registered"
   fi
 
-  parent=`zfs_get_parent $container`
+  parent=`fs_get_parent $container`
   lxc_assert $parent
   # check to make sure the parent is a template
-  if [ "`zfs_is_template $parent`" == "false" ]; then
+  if [ "`fs_is_template $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
     unlock_container_write $container
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi

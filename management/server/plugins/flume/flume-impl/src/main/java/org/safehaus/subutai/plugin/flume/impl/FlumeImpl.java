@@ -234,7 +234,7 @@ public class FlumeImpl implements Flume
         ng.setName( "Default" );
         ng.setNumberOfNodes( config.getNodes().size() ); // master +slaves
         ng.setTemplateName( FlumeConfig.TEMPLATE_NAME );
-        ng.setPlacementStrategy( PlacementStrategy.MORE_RAM );
+        ng.setPlacementStrategy( new PlacementStrategy( "MORE_RAM" ) );
         blueprint.setNodeGroups( Sets.newHashSet(ng) );
 
         return blueprint;

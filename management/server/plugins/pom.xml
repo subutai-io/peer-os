@@ -23,10 +23,14 @@
     <module>lucene</module>
     <module>flume</module>
     <module>nutch</module>
+    <module>mongodb</module>
     <module>hive</module>
     <module>spark</module>
+    <module>shark</module>
     <module>hbase</module>
     <module>presto</module>
+    <module>hipi</module>
+    <module>sqoop</module>
     <!--<module>accumulo</module>
     <module>oozie</module>
      <module>lucene</module>

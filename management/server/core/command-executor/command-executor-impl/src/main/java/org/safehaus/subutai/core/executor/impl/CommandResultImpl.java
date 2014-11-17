@@ -4,6 +4,8 @@ package org.safehaus.subutai.core.executor.impl;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandStatus;
 
+import com.google.common.base.Objects;
+
 
 /**
  * Command Result returned by Host.execute
@@ -57,12 +59,20 @@ public class CommandResultImpl implements CommandResult
 
     public boolean hasTimedOut()
     {
-        return status == CommandStatus.TIMEOUT;
+        return status == CommandStatus.TIMEOUT || status == CommandStatus.KILLED;
     }
 
 
     public CommandStatus getStatus()
     {
         return status;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return Objects.toStringHelper( this ).add( "exitCode", exitCode ).add( "stdOut", stdOut )
+                      .add( "stdErr", stdErr ).add( "status", status ).toString();
     }
 }

@@ -45,11 +45,6 @@
       <artifactId>hadoop-plugin-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>plugin-common</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
 
   <build>

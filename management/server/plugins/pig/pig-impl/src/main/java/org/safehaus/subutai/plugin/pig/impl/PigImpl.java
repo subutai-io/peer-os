@@ -184,7 +184,7 @@ public class PigImpl implements Pig
         ng.setName( "Default" );
         ng.setNumberOfNodes( config.getNodes().size() ); // master +slaves
         ng.setTemplateName( PigConfig.TEMPLATE_NAME );
-        ng.setPlacementStrategy( PlacementStrategy.MORE_RAM );
+        ng.setPlacementStrategy( new PlacementStrategy( "MORE_RAM" ) );
         blueprint.setNodeGroups( Sets.newHashSet( ng ) );
 
 

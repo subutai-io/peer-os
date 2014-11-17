@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
@@ -24,8 +23,8 @@ public class OozieClusterConfig implements ConfigBase
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private String hadoopClusterName;
     private UUID uuid;
-    private Agent server;
-    private Set<Agent> clients;
+    private UUID server;
+    private Set<UUID> clients;
     private String clusterName = "";
     private SetupType setupType;
 
@@ -103,25 +102,25 @@ public class OozieClusterConfig implements ConfigBase
     }
 
 
-    public Agent getServer()
+    public UUID getServer()
     {
         return server;
     }
 
 
-    public void setServer( Agent server )
+    public void setServer( UUID server )
     {
         this.server = server;
     }
 
 
-    public Set<Agent> getClients()
+    public Set<UUID> getClients()
     {
         return clients;
     }
 
 
-    public void setClients( Set<Agent> clients )
+    public void setClients( Set<UUID> clients )
     {
         this.clients = clients;
     }
@@ -189,16 +188,16 @@ public class OozieClusterConfig implements ConfigBase
     }
 
 
-    public Set<Agent> getAllOozieAgents()
+    public Set<UUID> getAllOozieAgents()
     {
-        Set<Agent> allAgents = new HashSet<>();
+        Set<UUID> allAgents = new HashSet<>();
         allAgents.addAll( clients );
         allAgents.add( server );
         return allAgents;
     }
 
 
-    public void removeClient( final Agent node )
+    public void removeClient( final UUID node )
     {
         clients.remove( node );
     }

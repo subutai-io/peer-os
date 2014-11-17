@@ -27,9 +27,9 @@ function add_package {
 function remove_package {
   local debian_package=$1
   local file_path=$SUBUTAI_REPO_DIR/amd64/trusty/$debian_package
-  assert_debian_package "$debian_package"
   assert_file "$file_path"
-  
+  assert_debian_package "$debian_package"
+ 
   # Remove file under custom package directory
   rm $file_path
   pushd $SUBUTAI_REPO_DIR > /dev/null
@@ -42,17 +42,47 @@ function remove_package {
 
 function extract_package {
   local debian_package=$1
+  local extract_files=$2
+
   local file_path=$SUBUTAI_REPO_DIR/amd64/trusty/$debian_package
-  assert_debian_package "$debian_package"
   assert_file "$file_path"
+  assert_debian_package "$debian_package"
 
   pushd $SUBUTAI_TMPDIR > /dev/null
   local extract_directory_name=${debian_package:0:$((${#debian_package} - 4))}
   # delete directory if exists
   rm -rf "$SUBUTAI_TMPDIR/$extract_directory_name"
-  # extract the package under $SUBUTAI_TMPDIR
-  dpkg -x $file_path "$SUBUTAI_TMPDIR/$extract_directory_name"
-  dpkg -e $file_path "$SUBUTAI_TMPDIR/$extract_directory_name/DEBIAN/"
+  mkdir "$SUBUTAI_TMPDIR/$extract_directory_name"
+
+  # Extract whole package content
+  if [ -z $extract_files ]; then
+    pushd $SUBUTAI_TMPDIR > /dev/null
+    # extract the package under $SUBUTAI_TMPDIR
+    dpkg -x $file_path "$SUBUTAI_TMPDIR/$extract_directory_name"
+    dpkg -e $file_path "$SUBUTAI_TMPDIR/$extract_directory_name/DEBIAN/"
+  # Extract the specific files from the debian package
+  else
+    pushd $SUBUTAI_TMPDIR/$extract_directory_name > /dev/null
+
+    data_tar_file=$(ar t $file_path | grep data)
+    # Extract specific file from debian package
+    ar x $file_path $data_tar_file
+    IFS=',' read -a files <<< "$extract_files"
+    for file in "${files[@]}"
+    do
+      file="./$file"
+      msg_info "    - extracting file: $file"
+      tar -xf $data_tar_file $file > /dev/null 2>&1
+      local status=$?
+      if [ $status != 0 ]; then
+	msg_error "Could not extract $file. Aborting!"
+	exit 1
+      fi
+    done
+    rm $data_tar_file
+  fi
+  msg_ok "Files extracted under $SUBUTAI_TMPDIR/$extract_directory_name"
+
   popd > /dev/null
 }
 
@@ -90,6 +120,7 @@ function assert_file {
     msg_error "File $file does not exist."
     exit 1
   fi
+  msg_info "    - check passed: file \"$file\" exists."
 }
 
 
@@ -105,6 +136,7 @@ function assert_debian_package {
     msg_error "$file is not a debian package!"
     exit 1
   fi
+  msg_info "    - check passed: file \"$file\" is a debian package."
 }
 
 

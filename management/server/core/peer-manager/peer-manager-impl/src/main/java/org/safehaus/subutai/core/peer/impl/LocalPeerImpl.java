@@ -17,10 +17,11 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandStatus;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.NullAgent;
-import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.protocol.Template;
@@ -39,6 +40,8 @@ import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.Payload;
+import org.safehaus.subutai.core.peer.api.PeerEvent;
+import org.safehaus.subutai.core.peer.api.PeerEventListener;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -52,7 +55,6 @@ import org.safehaus.subutai.core.peer.impl.command.TempResponseConverter;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
@@ -68,7 +70,7 @@ import com.google.common.collect.Sets;
 /**
  * Local peer implementation
  */
-public class LocalPeerImpl implements LocalPeer, ResponseListener
+public class LocalPeerImpl implements LocalPeer, ResponseListener, PeerEventListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
@@ -88,6 +90,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private ConcurrentMap<String, AtomicInteger> sequences;
+    private Map<UUID, List> peerEvents = new ConcurrentHashMap<>();
 
     private Set<RequestListener> requestListeners;
 
@@ -172,12 +175,41 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                                           final UUID envId ) throws PeerException
     {
         ResourceHost resourceHost = getResourceHostByName( hostName );
-        ContainerHost containerHost = resourceHost
-                .createContainer( getId(), envId, Lists.newArrayList( getTemplate( templateName ) ), cloneName );
+        resourceHost
+                .createContainer( this, getId(), envId, Lists.newArrayList( getTemplate( templateName ) ), cloneName,
+                        "custom" );
 
-        resourceHost.addContainerHost( containerHost );
-        peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
-        return containerHost;
+        Set<ContainerHost> containerHosts = waitContainerHosts( envId, envId.toString(), 1 );
+
+        return containerHosts.iterator().next();
+        //        resourceHost.addContainerHost( containerHost );
+        //        peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
+        //        return containerHost;
+    }
+
+
+    private Set<ContainerHost> waitContainerHosts( UUID environmentId, String nodeGroup, int quantity )
+            throws PeerException
+    {
+
+        Set<ContainerHost> result = new HashSet<>();
+        long threshold = System.currentTimeMillis() + 60 * quantity * 1000;
+        while ( result.size() != quantity && threshold - System.currentTimeMillis() > 0 )
+        {
+            try
+            {
+                Thread.sleep( 5000 );
+            }
+            catch ( InterruptedException ignore )
+            {
+            }
+            result = getContainerHostsByEnvironmentIdAndNodeGroupName( environmentId, nodeGroup );
+        }
+        if ( result.size() != quantity )
+        {
+            throw new PeerException( "Not all containers created." );
+        }
+        return result;
     }
 
 
@@ -237,6 +269,9 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                                                 final String strategyId, final List<Criteria> criteria,
                                                 String nodeGroupName ) throws PeerException
     {
+        LOG.info( String.format( "=============> Received: %s %d %s", nodeGroupName, quantity,
+                creatorPeerId.toString() ) );
+
         Set<ContainerHost> result = new HashSet<>();
         try
         {
@@ -292,21 +327,43 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                 ResourceHost resourceHost = getResourceHostByName( rh.getHostname() );
                 for ( String cloneName : clones )
                 {
-                    ContainerHost containerHost =
-                            resourceHost.createContainer( creatorPeerId, environmentId, templates, cloneName );
-                    containerHost.setNodeGroupName( nodeGroupName );
-                    resourceHost.createContainer( creatorPeerId, environmentId, templates, cloneName );
-                    resourceHost.addContainerHost( containerHost );
-                    result.add( containerHost );
-                    peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
+                    LOG.info(
+                            String.format( "+++++++++++++++++++++> Ordered: %s on %s", cloneName, rh.getHostname() ) );
+                    resourceHost
+                            .createContainer( this, creatorPeerId, environmentId, templates, cloneName, nodeGroupName );
                 }
             }
+
+            return waitContainerHosts( environmentId, nodeGroupName, quantity );
         }
-        catch ( RegistryException e )
+        catch ( Exception e )
         {
+            e.printStackTrace();
+            //TODO: destroy environment containers
             throw new PeerException( e.toString() );
         }
-        return result;
+    }
+
+
+    @Override
+    public void onPeerEvent( PeerEvent event )
+    {
+        switch ( event.getType() )
+        {
+            case CONTAINER_CREATE_SUCCESS:
+                ContainerHost containerHost = ( ContainerHost ) event.getObject();
+                try
+                {
+                    ResourceHost resourceHost = getResourceHostByName( containerHost.getParentHostname() );
+                    resourceHost.addContainerHost( containerHost );
+                    peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
+                }
+                catch ( PeerException e )
+                {
+                    LOG.error( "Error in onPeerEvent", e );
+                }
+                break;
+        }
     }
 
 
@@ -355,7 +412,7 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
 
     @Override
-    public ContainerHost getContainerHostByName( String hostname )
+    public ContainerHost getContainerHostByName( String hostname ) throws PeerException
     {
         ContainerHost result = null;
         Iterator<ResourceHost> iterator = getResourceHosts().iterator();
@@ -363,12 +420,16 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
         {
             result = iterator.next().getContainerHostByName( hostname );
         }
+        if ( result == null )
+        {
+            throw new PeerException( "Container host not found" );
+        }
         return result;
     }
 
 
     @Override
-    public ResourceHost getResourceHostByName( String hostname )
+    public ResourceHost getResourceHostByName( String hostname ) throws PeerException
     {
         ResourceHost result = null;
         Iterator iterator = getResourceHosts().iterator();
@@ -382,6 +443,10 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                 result = host;
             }
         }
+        if ( result == null )
+        {
+            throw new PeerException( "Resource host not found" );
+        }
         return result;
     }
 
@@ -393,6 +458,26 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
             result.addAll( resourceHost.getContainerHostsByEnvironmentId( environmentId ) );
+        }
+        return result;
+    }
+
+
+    private Set<ContainerHost> getContainerHostsByEnvironmentIdAndNodeGroupName( final UUID environmentId,
+                                                                                 String nodeGroupName )
+            throws PeerException
+    {
+        Set<ContainerHost> result = new HashSet<>();
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            Set<ContainerHost> containerHosts = resourceHost.getContainerHostsByEnvironmentId( environmentId );
+            for ( ContainerHost containerHost : containerHosts )
+            {
+                if ( nodeGroupName.equals( containerHost.getNodeGroupName() ) )
+                {
+                    result.add( containerHost );
+                }
+            }
         }
         return result;
     }
@@ -557,6 +642,10 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
     @Override
     public ManagementHost getManagementHost() throws PeerException
     {
+        if ( managementHost == null )
+        {
+            throw new PeerException( "Management host not found" );
+        }
         return managementHost;
     }
 
@@ -625,8 +714,12 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
 
             if ( response.getHostname().startsWith( "py" ) )
             {
-                ResourceHost host = getResourceHostByName( response.getHostname() );
-                if ( host == null )
+                ResourceHost host;
+                try
+                {
+                    host = getResourceHostByName( response.getHostname() );
+                }
+                catch ( PeerException e )
                 {
                     host = new ResourceHost( PeerUtils.buildAgent( response ), getId() );
                     host.setParentAgent( NullAgent.getInstance() );
@@ -678,10 +771,6 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                     callback.onResponse( TempResponseConverter.convertResponse( response ),
                             new CommandResultImpl( agentResult.getExitCode(), agentResult.getStdOut(),
                                     agentResult.getStdErr(), command.getCommandStatus() ) );
-                    if ( callback.isStopped() )
-                    {
-                        stop();
-                    }
                 }
             }
         } );
@@ -721,10 +810,6 @@ public class LocalPeerImpl implements LocalPeer, ResponseListener
                     callback.onResponse( TempResponseConverter.convertResponse( response ),
                             new CommandResultImpl( agentResult.getExitCode(), agentResult.getStdOut(),
                                     agentResult.getStdErr(), command.getCommandStatus() ) );
-                    if ( callback.isStopped() )
-                    {
-                        stop();
-                    }
                 }
             }
         } );

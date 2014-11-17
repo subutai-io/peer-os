@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -117,9 +116,9 @@ public class ConfigurationStep extends Panel
     {
         final ComboBox hadoopClustersCombo = new ComboBox( "Hadoop cluster" );
         final ComboBox masterNodeCombo = new ComboBox( "Master node" );
-        final TwinColSelect regionServers = new TwinColSelect( "Region Servers", new ArrayList<Agent>() );
-        final TwinColSelect quorumPeers = new TwinColSelect( "Quroum Peers", new ArrayList<Agent>() );
-        final TwinColSelect backUpMasters = new TwinColSelect( "Backup Masters", new ArrayList<Agent>() );
+        final TwinColSelect regionServers = new TwinColSelect( "Region Servers", new ArrayList<UUID>() );
+        final TwinColSelect quorumPeers = new TwinColSelect( "Quroum Peers", new ArrayList<UUID>() );
+        final TwinColSelect backUpMasters = new TwinColSelect( "Backup Masters", new ArrayList<UUID>() );
 
         hadoopClustersCombo.setId( "HbaseConfHadoopCluster" );
         masterNodeCombo.setId( "HbaseMasters" );
@@ -268,7 +267,7 @@ public class ConfigurationStep extends Panel
                     {
                         config.getBackupMasters().remove( master );
                     }
-                    List<UUID> hadoopNodes = hadoopInfo.getAllNodes();
+                    Set<UUID> hadoopNodes = hadoopInfo.getAllNodes();
                     hadoopNodes.remove( master );
 
                     /** fill region servers table */

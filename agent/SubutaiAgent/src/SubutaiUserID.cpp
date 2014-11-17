@@ -96,7 +96,7 @@ bool SubutaiUserID::getIDs(uid_t& ruid,uid_t&  euid,string runAs)	//getting UID 
 bool SubutaiUserID::checkRootUser()
 {
 	uid_t ruid = getuid();	//if the user is root = 0
-	if(ruid==0)
+	if (ruid==0)
 		return true;		//the user is root
 	else
 		return false;		//user is not root

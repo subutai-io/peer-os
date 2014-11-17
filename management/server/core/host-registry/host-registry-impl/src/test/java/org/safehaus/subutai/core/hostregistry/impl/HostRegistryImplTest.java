@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,15 +16,15 @@ import org.safehaus.subutai.core.broker.api.Broker;
 import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.broker.api.ByteMessageListener;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistryException;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 
 import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
 
 import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
@@ -53,19 +53,19 @@ public class HostRegistryImplTest
     Set<HostListener> hostListeners;
 
     @Mock
-    Executor notifier;
+    ExecutorService notifier;
 
     @Mock
     HeartBeatListener heartBeatListener;
 
     @Mock
-    Cache<UUID, HostInfo> hosts;
+    Cache<UUID, ResourceHostInfo> hosts;
 
     @Mock
     ConcurrentMap map;
 
     @Mock
-    HostInfo hostInfo;
+    ResourceHostInfo resourceHostInfo;
 
     @Mock
     ContainerHostInfo containerHostInfo;
@@ -85,10 +85,10 @@ public class HostRegistryImplTest
         registry.heartBeatListener = heartBeatListener;
         registry.hosts = hosts;
         when( hosts.asMap() ).thenReturn( map );
-        when( map.values() ).thenReturn( Sets.newHashSet( hostInfo ) );
-        when( hostInfo.getContainers() ).thenReturn( Sets.newHashSet( containerHostInfo ) );
-        when( hostInfo.getId() ).thenReturn( HOST_ID );
-        when( hostInfo.getHostname() ).thenReturn( HOST_HOSTNAME );
+        when( map.values() ).thenReturn( Sets.newHashSet( resourceHostInfo ) );
+        when( resourceHostInfo.getContainers() ).thenReturn( Sets.newHashSet( containerHostInfo ) );
+        when( resourceHostInfo.getId() ).thenReturn( HOST_ID );
+        when( resourceHostInfo.getHostname() ).thenReturn( HOST_HOSTNAME );
         when( containerHostInfo.getId() ).thenReturn( CONTAINER_ID );
         when( containerHostInfo.getHostname() ).thenReturn( CONTAINER_HOSTNAME );
         Iterator<HostListener> hostListenerIterator = mock( Iterator.class );
@@ -108,22 +108,35 @@ public class HostRegistryImplTest
     @Test
     public void testGetContainerInfoById() throws Exception
     {
-        ContainerHostInfo existingHost = registry.getContainerInfoById( CONTAINER_ID );
-        ContainerHostInfo nonExistingHost = registry.getContainerInfoById( UUID.randomUUID() );
+        ContainerHostInfo existingHost = registry.getContainerHostInfoById( CONTAINER_ID );
 
         assertNotNull( existingHost );
-        assertNull( nonExistingHost );
+
+        try
+        {
+            registry.getContainerHostInfoById( UUID.randomUUID() );
+            fail( "Expected HostDisconnectedException" );
+        }
+        catch ( HostDisconnectedException e )
+        {
+        }
     }
 
 
     @Test
     public void testGetContainerInfoByHostname() throws Exception
     {
-        ContainerHostInfo existingHost = registry.getContainerInfoByHostname( CONTAINER_HOSTNAME );
-        ContainerHostInfo nonExistingHost = registry.getContainerInfoByHostname( DUMMY_HOSTNAME );
-
+        ContainerHostInfo existingHost = registry.getContainerHostInfoByHostname( CONTAINER_HOSTNAME );
         assertNotNull( existingHost );
-        assertNull( nonExistingHost );
+
+        try
+        {
+            registry.getContainerHostInfoByHostname( DUMMY_HOSTNAME );
+            fail( "Expected HostDisconnectedException" );
+        }
+        catch ( HostDisconnectedException e )
+        {
+        }
     }
 
 
@@ -131,7 +144,7 @@ public class HostRegistryImplTest
     public void testGetContainersInfo() throws Exception
     {
 
-        Set<ContainerHostInfo> info = registry.getContainersInfo();
+        Set<ContainerHostInfo> info = registry.getContainerHostsInfo();
 
         assertFalse( info.isEmpty() );
         assertTrue( info.contains( containerHostInfo ) );
@@ -141,45 +154,66 @@ public class HostRegistryImplTest
     @Test
     public void testGetHostInfoById() throws Exception
     {
-        HostInfo existingHost = registry.getHostInfoById( HOST_ID );
-        HostInfo nonExistingHost = registry.getHostInfoById( UUID.randomUUID() );
-
+        ResourceHostInfo existingHost = registry.getResourceHostInfoById( HOST_ID );
         assertNotNull( existingHost );
-        assertNull( nonExistingHost );
+
+        try
+        {
+            registry.getResourceHostInfoById( UUID.randomUUID() );
+            fail( "Expected HostDisconnectedException" );
+        }
+        catch ( HostDisconnectedException e )
+        {
+        }
     }
 
 
     @Test
     public void testGetHostInfoByHostname() throws Exception
     {
-        HostInfo existingHost = registry.getHostInfoByHostname( HOST_HOSTNAME );
-        HostInfo nonExistingHost = registry.getHostInfoByHostname( DUMMY_HOSTNAME );
+        ResourceHostInfo existingHost = registry.getResourceHostInfoByHostname( HOST_HOSTNAME );
 
         assertNotNull( existingHost );
-        assertNull( nonExistingHost );
+
+        try
+        {
+            ResourceHostInfo nonExistingHost = registry.getResourceHostInfoByHostname( DUMMY_HOSTNAME );
+            fail( "Expected HostDisconnectedException" );
+        }
+        catch ( HostDisconnectedException e )
+        {
+        }
     }
 
 
     @Test
     public void testGetHostsInfo() throws Exception
     {
-        Set<HostInfo> info = registry.getHostsInfo();
+        Set<ResourceHostInfo> info = registry.getResourceHostsInfo();
 
         assertFalse( info.isEmpty() );
-        assertTrue( info.contains( hostInfo ) );
+        assertTrue( info.contains( resourceHostInfo ) );
     }
 
 
     @Test
     public void testGetParentByChild() throws Exception
     {
-        HostInfo existingHost = registry.getParentByChild( containerHostInfo );
-        ContainerHostInfo containerHostInfo1 = mock( ContainerHostInfo.class );
-        when(containerHostInfo1.getId()).thenReturn( UUID.randomUUID() );
-        HostInfo nonExistingHost = registry.getParentByChild( containerHostInfo1 );
+        ResourceHostInfo existingHost = registry.getResourceHostByContainerHost( containerHostInfo );
 
         assertNotNull( existingHost );
-        assertNull( nonExistingHost );
+
+
+        ContainerHostInfo containerHostInfo1 = mock( ContainerHostInfo.class );
+        when( containerHostInfo1.getId() ).thenReturn( UUID.randomUUID() );
+        try
+        {
+            registry.getResourceHostByContainerHost( containerHostInfo1 );
+            fail( "Expected HostDisconnectedException" );
+        }
+        catch ( HostDisconnectedException e )
+        {
+        }
     }
 
 
@@ -205,9 +239,9 @@ public class HostRegistryImplTest
     public void testRegisterHost() throws Exception
     {
 
-        registry.registerHost( hostInfo );
+        registry.registerHost( resourceHostInfo );
 
-        verify( hosts ).put( hostInfo.getId(), hostInfo );
+        verify( hosts ).put( resourceHostInfo.getId(), resourceHostInfo );
         verify( notifier ).execute( isA( HostNotifier.class ) );
     }
 

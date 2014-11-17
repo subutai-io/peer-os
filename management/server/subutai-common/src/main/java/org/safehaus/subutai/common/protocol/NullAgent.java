@@ -18,7 +18,7 @@ public class NullAgent extends Agent
     private NullAgent()
     {
         super( UUID.fromString( NULL_UUID ), "NULL_AGENT", "NULL_PARENT", "NULL_MAC", new ArrayList<String>(), false,
-                "NULL_TRANSPORT_ID", UUID.fromString( NULL_UUID ), UUID.fromString( NULL_UUID ) );
+                "NULL_TRANSPORT_ID" );
     }
 
 

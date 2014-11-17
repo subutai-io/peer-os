@@ -34,23 +34,23 @@ public class Agent implements Serializable, Comparable<Agent>
     private String macAddress;
     private String hostname;
 
-    @ElementCollection( targetClass = String.class )
+    @ElementCollection(targetClass = String.class)
     private List<String> listIP;
 
     private boolean isLXC;
     private String parentHostName;
     private String transportId;
-    private UUID siteId;
-    private UUID environmentId;
+//    private UUID siteId;
+//    private UUID environmentId;
 
 
     public Agent( UUID uuid, String hostname, String parentHostName, String macAddress, List<String> listIP,
-                  boolean isLXC, String transportId, UUID siteId, UUID environmentId )
+                  boolean isLXC, String transportId )
     {
         Preconditions.checkNotNull( uuid, "UUID is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Hostname is null or empty" );
-        Preconditions.checkNotNull( siteId, "Site id is null" );
-        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        //        Preconditions.checkNotNull( siteId, "Site id is null" );
+        //        Preconditions.checkNotNull( environmentId, "Environment id is null" );
 
         this.uuid = uuid;
         this.macAddress = macAddress;
@@ -59,21 +59,21 @@ public class Agent implements Serializable, Comparable<Agent>
         this.isLXC = isLXC;
         this.parentHostName = parentHostName;
         this.transportId = transportId;
-        this.siteId = siteId;
-        this.environmentId = environmentId;
+        //        this.siteId = siteId;
+        //        this.environmentId = environmentId;
     }
 
 
-    public UUID getSiteId()
-    {
-        return siteId;
-    }
-
-
-    public UUID getEnvironmentId()
-    {
-        return environmentId;
-    }
+//    public UUID getSiteId()
+    //    {
+    //        return siteId;
+    //    }
+    //
+    //
+    //    public UUID getEnvironmentId()
+    //    {
+    //        return environmentId;
+    //    }
 
 
     public String getTransportId()
@@ -148,8 +148,8 @@ public class Agent implements Serializable, Comparable<Agent>
                 ", isLXC=" + isLXC +
                 ", parentHostName='" + parentHostName + '\'' +
                 ", transportId='" + transportId + '\'' +
-                ", siteId=" + siteId +
-                ", environmentId=" + environmentId +
+//                ", siteId=" + siteId +
+//                ", environmentId=" + environmentId +
                 '}';
     }
 
