@@ -40,10 +40,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HipiImpl, 
     public ClusterOperationHandler( final HipiImpl manager, final HipiConfig config,
                                     final ClusterOperationType operationType )
     {
-        super( manager, config );
-        this.operationType = operationType;
-        trackerOperation = manager.getTracker().createTrackerOperation( HipiConfig.PRODUCT_KEY,
-                String.format( "Executing %s operation on cluster %s", operationType.name(), clusterName ) );
+        this(manager, config, operationType, null);
     }
 
 
@@ -52,6 +49,9 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HipiImpl, 
     {
         super( manager, config );
         this.hadoopConfig = hadoopClusterConfig;
+        this.operationType = operationType;
+        trackerOperation = manager.getTracker().createTrackerOperation( HipiConfig.PRODUCT_KEY,
+                String.format( "Executing %s operation on cluster %s", operationType.name(), clusterName ) );
     }
 
 
