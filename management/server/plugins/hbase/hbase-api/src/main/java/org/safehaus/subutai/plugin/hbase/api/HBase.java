@@ -11,44 +11,18 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 
 public interface HBase extends ApiBase<HBaseClusterConfig>
 {
 
-    public UUID installCluster( HBaseClusterConfig config );
+    public UUID installCluster( HBaseClusterConfig config, HadoopClusterConfig hadoopConfig );
 
-    public List<HBaseClusterConfig> getClusters();
+    public UUID destroyNode( String clusterName, String lxcHostname );
 
-    UUID startCluster( String clusterName );
-
-    //    UUID checkNode(HBaseType type, String clusterName, String lxcHostname);
-
-    //    UUID startNodes(String clusterName);
-
-    //    UUID stopNodes(String clusterName);
-
-    UUID stopCluster( String clusterName );
-
-    UUID checkCluster( String clusterName );
-
-    //    List<HadoopClusterConfig> getHadoopClusters();
-
-    //    HadoopClusterConfig getHadoopCluster( String clusterName );
-
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, HBaseClusterConfig config,
-                                                         TrackerOperation po );
-
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( HBaseClusterConfig config );
-
-    UUID checkNode( String clustername, String lxchostname );
-
-    UUID destroyNode( String clustername, String lxchostname, String nodetype );
-
-    UUID addNode( String clustername, String lxchostname, String nodetype );
-
-    UUID destroyCluster( String clusterName );
+    public ClusterSetupStrategy getClusterSetupStrategy( TrackerOperation operation, HBaseClusterConfig config,
+                                                         Environment environment );
 }

@@ -12,7 +12,7 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 public class Commands
 {
 
-    protected final static String PACKAGE_NAME = Common.PACKAGE_PREFIX + HBaseClusterConfig.PRODUCT_KEY.toLowerCase();
+    public final static String PACKAGE_NAME = Common.PACKAGE_PREFIX + HBaseClusterConfig.PRODUCT_KEY.toLowerCase();
 
 
     public RequestBuilder getInstallDialogCommand()
