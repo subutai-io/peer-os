@@ -10,5 +10,6 @@ public enum ClusterOperationType
     STATUS_ALL,
     DECOMISSION_STATUS,
     ADD,
-    REMOVE
+    REMOVE,
+    CUSTOM
 }

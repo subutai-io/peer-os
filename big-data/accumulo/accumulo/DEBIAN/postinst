@@ -2,7 +2,7 @@
 set -e
 FilePath="/etc/profile"
 
-accumuloVersion=1.4.2
+accumuloVersion=1.6.1
 accumuloHome="/opt/accumulo-$accumuloVersion"
 accumuloConf="/etc/accumulo"
 

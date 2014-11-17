@@ -1,10 +1,13 @@
 package org.safehaus.subutai.plugin.sqoop.ui.wizard;
 
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.SetupType;
@@ -25,7 +28,7 @@ public class VerificationStep extends Panel
 {
 
     public VerificationStep( final Sqoop sqoop, final ExecutorService executorService, final Tracker tracker,
-                             final Wizard wizard )
+                             EnvironmentManager environmentManager, final Wizard wizard )
     {
 
         setSizeFull();
@@ -45,9 +48,11 @@ public class VerificationStep extends Panel
         cfgView.addStringCfg( "Installation name", wizard.getConfig().getClusterName() );
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            for ( Agent agent : wizard.getConfig().getNodes() )
+            Environment hadoopEnv = environmentManager.getEnvironmentByUUID( hc.getEnvironmentId() );
+            Set<ContainerHost> hosts = hadoopEnv.getHostsByIds( config.getNodes() );
+            for ( ContainerHost host : hosts )
             {
-                cfgView.addStringCfg( "Node(s) to install", agent.getHostname() + "" );
+                cfgView.addStringCfg( "Node(s) to install", host.getHostname() );
             }
         }
         else if ( config.getSetupType() == SetupType.WITH_HADOOP )
@@ -78,8 +83,8 @@ public class VerificationStep extends Panel
                     trackId = sqoop.installCluster( config, hc );
                 }
 
-                ProgressWindow window =
-                        new ProgressWindow( executorService, tracker, trackId, SqoopConfig.PRODUCT_KEY );
+                ProgressWindow window
+                        = new ProgressWindow( executorService, tracker, trackId, SqoopConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override
@@ -115,3 +120,4 @@ public class VerificationStep extends Panel
         setContent( grid );
     }
 }
+

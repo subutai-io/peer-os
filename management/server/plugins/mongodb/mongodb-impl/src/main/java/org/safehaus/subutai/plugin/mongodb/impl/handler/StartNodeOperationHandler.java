@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 
 
@@ -37,7 +38,28 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<MongoImp
     @Override
     public void run()
     {
-        po.addLog( "Not implemented yet." );
+        MongoClusterConfig config = manager.getCluster( clusterName );
+        if ( config == null )
+        {
+            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            return;
+        }
+
+
+        po.addLog( "Starting node..." );
+
+        MongoNode node = config.findNode( lxcHostname );
+
+        try
+        {
+            node.stop();
+            po.addLogDone( String.format( "Node on %s started", lxcHostname ) );
+        }
+        catch ( Exception e )
+        {
+            po.addLogFailed( String.format( "Failed to start node %s, %s", lxcHostname, e ) );
+        }
+
         //        MongoClusterConfig config = manager.getCluster( clusterName );
         //        if ( config == null )
         //        {
@@ -106,7 +128,8 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<MongoImp
         //        else
         //        {
         //            po.addLogFailed(
-        //                    String.format( "Failed to start node %s. %s", lxcHostname, startNodeCommand.getAllErrors() ) );
+        //                    String.format( "Failed to start node %s. %s", lxcHostname, startNodeCommand
+        // .getAllErrors() ) );
         //        }
     }
 }
