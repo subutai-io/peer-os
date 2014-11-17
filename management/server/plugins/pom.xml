@@ -23,6 +23,7 @@
     <module>spark</module>
     <module>shark</module>
     <module>hbase</module>
+    <module>hipi</module>
     <module>sqoop</module>
     <!--<module>accumulo</module>
     <module>oozie</module>
