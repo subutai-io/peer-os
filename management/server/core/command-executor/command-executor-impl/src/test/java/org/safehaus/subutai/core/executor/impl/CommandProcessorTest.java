@@ -45,10 +45,10 @@ public class CommandProcessorTest
     private static final UUID HOST_ID = UUID.randomUUID();
     private static final UUID COMMAND_ID = UUID.randomUUID();
     private static final String RESPONSE_JSON = String.format(
-            " { response: {" + "      \"type\":\"EXECUTE_RESPONSE\"," + "      \"id\":\"%s\"," + "      \"commandId\":\"%s\","
-                    + "      \"pid\":123," + "      \"responseNumber\":2," + "      \"stdOut\":\"output\","
-                    + "      \"stdErr\":\"err\"," + "      \"exitCode\" : 0" + "  } }", HOST_ID.toString(),
-            COMMAND_ID.toString() );
+            " { response: {" + "      \"type\":\"EXECUTE_RESPONSE\"," + "      \"id\":\"%s\","
+                    + "      \"commandId\":\"%s\"," + "      \"pid\":123," + "      \"responseNumber\":2,"
+                    + "      \"stdOut\":\"output\"," + "      \"stdErr\":\"err\"," + "      \"exitCode\" : 0" + "  } }",
+            HOST_ID.toString(), COMMAND_ID.toString() );
 
     @Mock
     Broker broker;
@@ -280,7 +280,7 @@ public class CommandProcessorTest
         when( commands.put( eq( COMMAND_ID ), any( CommandProcess.class ), anyInt(),
                 any( CommandProcessExpiryCallback.class ) ) ).thenReturn( true );
         when( resourceHostInfo.getId() ).thenReturn( HOST_ID );
-        when(containerHostInfo.getStatus()).thenReturn( ContainerHostState.RUNNING );
+        when( containerHostInfo.getStatus() ).thenReturn( ContainerHostState.RUNNING );
 
         commandProcessor.execute( request1, callback );
 
