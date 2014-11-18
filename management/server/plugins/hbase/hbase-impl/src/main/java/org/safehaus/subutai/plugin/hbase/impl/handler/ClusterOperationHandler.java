@@ -88,7 +88,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
     {
         try
         {
-            if ( config.getSetupType() == SetupType.WITH_HADOOP )
+            if ( config.getSetupType() == SetupType.WITH_HADOOP)
             {
 
                 if ( hadoopConfig == null )
@@ -112,12 +112,11 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
 
             }
 
-            //setup Shark cluster
-            ClusterSetupStrategy s = manager.getClusterSetupStrategy( trackerOperation, config, environment );
-
+            //setup HBase cluster
             trackerOperation.addLog( "Installing cluster..." );
-            s.setup();
+            manager.getClusterSetupStrategy( trackerOperation, config, environment ).setup();
             trackerOperation.addLogDone( "Installing cluster completed" );
+
         }
         catch ( EnvironmentBuildException | ClusterSetupException e )
         {

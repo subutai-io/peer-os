@@ -149,18 +149,6 @@ public class HBaseImpl implements HBase
 
 
     @Override
-    public UUID installCluster( final HBaseConfig config, final HadoopClusterConfig hadoopConfig )
-    {
-        Preconditions.checkNotNull( config, "HBase configuration is null" );
-        Preconditions.checkNotNull( hadoopConfig, "Hadoop configuration is null" );
-        AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
-    }
-
-
-    @Override
     public UUID uninstallCluster( final String clusterName )
     {
         Preconditions.checkNotNull( clusterName );
@@ -168,6 +156,13 @@ public class HBaseImpl implements HBase
         AbstractOperationHandler operationHandler =
                 new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL );
         return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public List<HBaseConfig> getClusters()
+    {
+        return pluginDAO.getInfo( HBaseConfig.PRODUCT_KEY, HBaseConfig.class );
     }
 
 
@@ -192,6 +187,24 @@ public class HBaseImpl implements HBase
     }
 
 
+
+    /*public UUID installCluster( final HBaseConfig config )
+    {
+        Preconditions.checkNotNull( config, "HBase configuration is null" );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }*/
+
+
+    @Override
+    public UUID installCluster( final HBaseConfig config, final HadoopClusterConfig hadoopConfig )
+    {
+        return null;
+    }
+
+
     @Override
     public UUID destroyNode( final String clusterName, final String hostname )
     {
@@ -206,23 +219,18 @@ public class HBaseImpl implements HBase
 
 
     @Override
-    public List<HBaseConfig> getClusters()
-    {
-        return pluginDAO.getInfo( HBaseConfig.PRODUCT_KEY, HBaseConfig.class );
-    }
-
-
-    @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final TrackerOperation po, final HBaseConfig config,
                                                          final Environment environment )
     {
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            return new OverHadoopSetupStrategy( this, po, config );
+
+            return new OverHadoopSetupStrategy( this, config, environment, po );
         }
         else
         {
-            return new WithHadoopSetupStrategy( environment, this, po, config );
+            return new WithHadoopSetupStrategy( this, config, environment, po );
         }
     }
 }
+

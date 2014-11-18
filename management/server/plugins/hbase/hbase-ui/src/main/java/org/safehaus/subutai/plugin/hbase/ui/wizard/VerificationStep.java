@@ -51,7 +51,7 @@ public class VerificationStep extends Panel
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getHadoopClusterName() );
+//            cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getHadoopClusterName() );
             cfgView.addStringCfg( "Master Node", wizard.getConfig().getHbaseMaster().toString() );
             for ( UUID host : wizard.getConfig().getRegionServers() )
             {
@@ -85,14 +85,14 @@ public class VerificationStep extends Panel
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 UUID trackId = null;
-                if ( config.getSetupType() == SetupType.OVER_HADOOP )
+//                if ( config.getSetupType() == SetupType.OVER_HADOOP )
+//                {
+                    trackId = hbase.installCluster( config );
+//                }
+                /*else if ( config.getSetupType() == SetupType.WITH_HADOOP )
                 {
                     trackId = hbase.installCluster( config );
-                }
-                else if ( config.getSetupType() == SetupType.WITH_HADOOP )
-                {
-                    trackId = hbase.installCluster( config );
-                }
+                }*/
 
                 ProgressWindow window =
                         new ProgressWindow( executor, tracker, trackId, HBaseConfig.PRODUCT_KEY );

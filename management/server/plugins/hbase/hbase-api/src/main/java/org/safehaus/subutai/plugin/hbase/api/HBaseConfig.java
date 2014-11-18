@@ -27,11 +27,37 @@ public class HBaseConfig implements ConfigBase
     private Set<UUID> hadoopNodes;
     private SetupType setupType;
     private UUID environmentId;
+    private String hadoopClusterName;
+    private UUID hadoopNameNode;
 
 
     public HBaseConfig()
     {
         this.uuid = UUID.fromString( UUIDUtil.generateTimeBasedUUID().toString() );
+    }
+
+
+    public String getHadoopClusterName()
+    {
+        return hadoopClusterName;
+    }
+
+
+    public void setHadoopClusterName( final String hadoopClusterName )
+    {
+        this.hadoopClusterName = hadoopClusterName;
+    }
+
+
+    public UUID getHadoopNameNode()
+    {
+        return hadoopNameNode;
+    }
+
+
+    public void setHadoopNameNode( final UUID hadoopNameNode )
+    {
+        this.hadoopNameNode = hadoopNameNode;
     }
 
 

@@ -107,32 +107,19 @@ public class ConfigurationStep extends Panel
         {
             addOverHadoopComponents( content, wizard.getConfig() );
         }
-        //        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP )
-        //        {
-        //            addWithHadoopComponents( content, wizard.getConfig(), wizard.getHadoopConfig() );
-        //        }
+        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP )
+        {
+            addWithHadoopComponents( content, wizard.getConfig() );
+        }
         content.addComponent( buttons );
 
         setContent( layout );
     }
 
 
-    private Set<ContainerHost> getHadoopContainerHosts( HadoopClusterConfig hadoopInfo )
+    private void addWithHadoopComponents( final GridLayout content, final HBaseConfig config )
     {
-        Environment hadoopEnvironment =
-                wizard.getEnvironmentManager().getEnvironment( hadoopInfo.getEnvironmentId().toString() );
-        Set<ContainerHost> hadoopHosts = new HashSet<>();
-        for ( ContainerHost host : hadoopEnvironment.getContainers() )
-        {
-            if ( host.getNodeGroupName().toLowerCase().contains( hadoopInfo.getProductName().toLowerCase() ) )
-            {
-                if ( hadoopInfo.getAllNodes().contains( host.getId() ) )
-                {
-                    hadoopHosts.add( host );
-                }
-            }
-        }
-        return hadoopHosts;
+
     }
 
 
@@ -228,7 +215,7 @@ public class ConfigurationStep extends Panel
 
 
             config.setHadoopClusterName( hadoopInfo.getClusterName() );
-            config.setHadoopNameNode( hadoopInfo.getNameNode().toString() );
+            config.setHadoopNameNode( hadoopInfo.getNameNode() );
 
             /** fill all tables  */
 
@@ -255,7 +242,7 @@ public class ConfigurationStep extends Panel
                 {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     Environment environment =
-                            wizard.getEnvironmentManager().getEnvironment( hadoopInfo.getEnvironmentId().toString() );
+                            wizard.getEnvironmentManager().getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
 
                     Set<ContainerHost> hadoopHosts = getHadoopContainerHosts( hadoopInfo );
                     regionServers.setValue( null );
@@ -447,6 +434,25 @@ public class ConfigurationStep extends Panel
         parent.addComponent( regionServers );
         parent.addComponent( quorumPeers );
         parent.addComponent( backUpMasters );
+    }
+
+
+    private Set<ContainerHost> getHadoopContainerHosts( HadoopClusterConfig hadoopInfo )
+    {
+        Environment hadoopEnvironment =
+                wizard.getEnvironmentManager().getEnvironment( hadoopInfo.getEnvironmentId().toString() );
+        Set<ContainerHost> hadoopHosts = new HashSet<>();
+        for ( ContainerHost host : hadoopEnvironment.getContainers() )
+        {
+            if ( host.getNodeGroupName().toLowerCase().contains( hadoopInfo.getProductName().toLowerCase() ) )
+            {
+                if ( hadoopInfo.getAllNodes().contains( host.getId() ) )
+                {
+                    hadoopHosts.add( host );
+                }
+            }
+        }
+        return hadoopHosts;
     }
 
 
