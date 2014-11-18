@@ -1,6 +1,8 @@
 package org.safehaus.subutai.plugin.hbase.impl.handler;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
@@ -29,6 +31,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HBaseImpl, HB
     private OperationType operationType;
     private ContainerHost node;
     private Environment environment;
+    private UUID hostId;
 
 
     public NodeOperationHandler( final HBaseImpl manager, final HBaseConfig config, final String hostname,
@@ -44,10 +47,12 @@ public class NodeOperationHandler extends AbstractOperationHandler<HBaseImpl, HB
     }
 
 
-    public NodeOperationHandler( final HBaseImpl hBase, final HBaseConfig config, final OperationType status )
+    public NodeOperationHandler( final HBaseImpl hBase, final HBaseConfig config, UUID hostId,
+                                 final OperationType status )
     {
         this( hBase, config );
         this.operationType = status;
+        this.hostId = hostId;
     }
 
 
@@ -98,6 +103,9 @@ public class NodeOperationHandler extends AbstractOperationHandler<HBaseImpl, HB
                 case EXCLUDE:
                     removeNode();
                     break;
+                case STATUS:
+                    checkServiceStatus();
+                    break;
             }
         }
         catch ( ClusterException e )
@@ -105,6 +113,30 @@ public class NodeOperationHandler extends AbstractOperationHandler<HBaseImpl, HB
             LOG.error( "Error in NodeOperationHandler", e );
             trackerOperation
                     .addLogFailed( String.format( "Operation %s failed: %s", operationType.name(), e.getMessage() ) );
+        }
+    }
+
+
+    private void checkServiceStatus()
+    {
+        ContainerHost host = environment.getContainerHostByUUID( hostId );
+        try
+        {
+            CommandResult result = host.execute( Commands.getStatusCommand() );
+            if ( result.hasSucceeded() )
+            {
+                trackerOperation.addLog( result.getStdOut() );
+            }
+            else
+            {
+                trackerOperation.addLogFailed( result.getStdErr() );
+            }
+            trackerOperation.addLogDone( "Check service status command executed" );
+        }
+        catch ( CommandException e )
+        {
+            trackerOperation.addLogFailed( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
     }
 

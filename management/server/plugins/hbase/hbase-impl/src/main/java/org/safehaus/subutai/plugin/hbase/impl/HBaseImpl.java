@@ -204,7 +204,7 @@ public class HBaseImpl implements HBase
     {
         Preconditions.checkNotNull( clusterName );
         HBaseConfig config = getCluster( clusterName );
-        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, config, OperationType.STATUS );
+        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, config, hostId, OperationType.STATUS );
         return operationHandler.getTrackerId();
     }
 
