@@ -93,11 +93,15 @@ function fs_recv {
   local template="$1"
   local deltas="$2"
   local lxc_rootfs="$3"
-  zfs recv lxc/$template < $deltas/rootfs.delta
-  zfs set mountpoint=$lxc_rootfs lxc/$template
-  zfs recv lxc/$template-opt < $deltas/opt.delta
-  zfs recv lxc-data/$template-var < $deltas/var.delta
-  zfs recv lxc-data/$template-home < $deltas/home.delta
+  rm -rf /var/lib/lxc/$template/rootfs
+  btrfs receive /var/lib/lxc/$template < $deltas/rootfs.delta
+  btrfs receive /lxc/ < $deltas/opt.delta
+  btrfs receive /lxc-data/ < $deltas/var.delta
+  btrfs receive /lxc-data/ < $deltas/home.delta
+  btrfs property set -ts /var/lib/lxc/$template/rootfs/ ro true
+  btrfs property set -ts /lxc/$template-opt ro true
+  btrfs property set -ts /lxc-data/$template-var ro true
+  btrfs property set -ts /lxc-data/$template-home ro true
 }
 
 #generate delta images of all filesystems
