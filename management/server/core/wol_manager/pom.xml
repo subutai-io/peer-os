@@ -18,6 +18,5 @@
         <module>wol-manager-api</module>
         <module>wol-manager-impl</module>
         <module>wol-manager-ui</module>
-        <module>wol-manager-cli</module>
     </modules>
 </project>
