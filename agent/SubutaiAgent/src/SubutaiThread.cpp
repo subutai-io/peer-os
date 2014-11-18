@@ -41,7 +41,7 @@ SubutaiThread::~SubutaiThread()
  */
 bool SubutaiThread::checkCWD(SubutaiCommand *command, SubutaiContainer* cont)
 {
-    if (cont) {
+    if (cont && command->getWorkingDirectory() != "" ) {
         return cont->checkCWD(command->getWorkingDirectory());
     } else {
         if ((chdir(command->getWorkingDirectory().c_str())) < 0) {		
@@ -60,7 +60,7 @@ bool SubutaiThread::checkCWD(SubutaiCommand *command, SubutaiContainer* cont)
  */
 bool SubutaiThread::checkUID(SubutaiCommand *command, SubutaiContainer* container)
 {
-    if (container) {
+    if (container && command->getRunAs() != "") {
         return container->checkUser(command->getRunAs());
     } else {
         if (uid.getIDs(ruid, euid, command->getRunAs())) {	
@@ -135,7 +135,7 @@ void SubutaiThread::retrieveDaemonOutput(SubutaiCommand* command) {
     stringstream path;
     // TODO: Add path of unprivileged container
     if (_container) {
-    path << "/var/lib/lxc/" << _container->getContainerHostnameValue() << "/rootfs";
+        path << "/var/lib/lxc/" << _container->getContainerHostnameValue() << "/rootfs";
     }
     path << "/tmp/";
     ifstream outFile(path.str().append(command->getCommandId()).append("_out").c_str());
@@ -420,7 +420,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* c
     /*
      * if the execution is done process pid could not be read and should be skipped now..
      */
-    if (!checkCWD(command)) {
+    if (!_container && !checkCWD(command, _container)) {
         this->setCWDERR(true);
         string message = this->getResponse().createResponseMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(), 1,
                 "Working Directory Does Not Exist on System", "", command->getCommandId());
@@ -428,7 +428,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* c
         this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "CWD id not found on system..", "CWD:", command->getWorkingDirectory()));
         //problem about absolute path
     }
-    if (!checkUID(command)) {
+    if (!_container && checkUID(command, _container)) {
         this->setUIDERR(true);
         string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
                 "User Does Not Exist on System","",command->getCommandId());
@@ -615,7 +615,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* c
         this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Timeout Done message is sending.."));
 
         string message;
-        if (command->getIsDaemon()) {
+        if (!command->getIsDaemon()) {
             message = this->getResponse().createTimeoutMessage(command->getUuid(),
                     this->getPpid(),
                     command->getRequestSequenceNumber(),
@@ -625,13 +625,17 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* c
                     command->getCommandId());
         } else {
             // EXECUTE_RESPONSE
-            message = this->getResponse().createExitMessage(command->getUuid(),
-                    this->getPpid(),
-                    command->getRequestSequenceNumber(),
-                    this->getResponsecount(),
-                    command->getCommandId(),
-                    0
-                    );
+            if (command->getType() == "PS_REQUEST") {
+                message = this->getResponse().createPsResponse(command->getUuid(), command->getCommandId());
+            } else {
+                message = this->getResponse().createExitMessage(command->getUuid(),
+                        this->getPpid(),
+                        command->getRequestSequenceNumber(),
+                        this->getResponsecount(),
+                        command->getCommandId(),
+                        0
+                        );
+            }
         }
         while (!messageQueue->try_send(message.data(), message.size(), 0));
         this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Process Last Message",message));
@@ -664,8 +668,13 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* c
         this->lastCheckAndSend(messageQueue,command);
 
         this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Done message is sending.."));
-        string message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-                this->getResponsecount(),command->getCommandId(),val);
+        string message;
+        if (command->getType() == "PS_REQUEST") {
+            message = this->getResponse().createPsResponse(command->getUuid(), command->getCommandId());
+        } else {
+            message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+                    this->getResponsecount(),command->getCommandId(),val);
+        }
         while (!messageQueue->try_send(message.data(), message.size(), 0));
         this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "Process Last Message",message));
     }
