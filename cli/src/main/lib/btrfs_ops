@@ -83,21 +83,10 @@ function fs_addmount {
 #snaphost ll holds on clone's rootfs
 function fs_snap_hold_readonly {
   local $lxc_template="$1"
-  zfs snapshot lxc/$lxc_template@template
-  zfs hold keep lxc/$lxc_template@template
-  zfs set readonly=on lxc/$lxc_template
-
-  zfs snapshot lxc/$lxc_template-opt@template
-  zfs hold keep lxc/$lxc_template-opt@template
-  zfs set readonly=on lxc/$lxc_template-opt
-
-  zfs snapshot lxc-data/$lxc_template-var@template
-  zfs hold keep lxc-data/$lxc_template-var@template
-  zfs set readonly=on lxc-data/$lxc_template-var
-
-  zfs snapshot lxc-data/$lxc_template-home@template
-  zfs hold keep lxc-data/$lxc_template-home@template
-  zfs set readonly=on lxc-data/$lxc_template-home
+  btrfs property set -ts /var/lib/lxc/$lxc_template/rootfs/ ro true
+  btrfs property set -ts /lxc/$lxc_template-opt ro true
+  btrfs property set -ts /lxc-data/$lxc_template-var ro true
+  btrfs property set -ts /lxc-data/$lxc_template-home ro true
 }
 
 function fs_recv {
