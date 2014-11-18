@@ -34,7 +34,6 @@
  */
 
 #include "SubutaiCommand.h"
-#include "SubutaiHelper.h"
 #include "SubutaiResponse.h"
 #include "SubutaiUserID.h"
 #include "SubutaiResponsePack.h"
@@ -48,8 +47,6 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <iostream>
-#include <cstdio>
-#include <lxc/lxccontainer.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -382,6 +379,7 @@ int main(int argc,char *argv[],char *envp[])
                         }
                         Watcher.stats();
                         sendout = response.setInotifyResponse(environment.getAgentUuidValue(),response.getCommandId());
+                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Set_Inotify response: " + sendout));
                         connection->sendMessage(sendout, "RESPONSE_TOPIC");
                         Watcher.stats();
                     }
@@ -398,6 +396,7 @@ int main(int argc,char *argv[],char *envp[])
                         }
                         Watcher.stats();
                         sendout = response.unsetInotifyResponse(environment.getAgentUuidValue(),response.getCommandId());
+                        logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Unset_Inotify response: " + sendout));
                         connection->sendMessage(sendout, "RESPONSE_TOPIC");
                         Watcher.stats();
                     }
