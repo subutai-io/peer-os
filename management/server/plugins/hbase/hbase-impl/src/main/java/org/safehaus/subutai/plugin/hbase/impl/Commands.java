@@ -40,13 +40,13 @@ public class Commands
     }
 
 
-    public RequestBuilder getStartCommand()
+    public static RequestBuilder getStartCommand()
     {
         return new RequestBuilder( "service hbase start &" );
     }
 
 
-    public RequestBuilder getStopCommand()
+    public static RequestBuilder getStopCommand()
     {
         return new RequestBuilder( "service hbase stop" ).withTimeout( 360 );
     }

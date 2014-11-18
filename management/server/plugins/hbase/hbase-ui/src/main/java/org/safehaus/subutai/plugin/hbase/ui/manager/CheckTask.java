@@ -13,17 +13,18 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 public class CheckTask implements Runnable
 {
 
-    private final String clusterName, lxcHostname;
+    private final String clusterName;
+    private final UUID hostId;
     private final CompleteEvent completeEvent;
     private final HBase hbase;
     private final Tracker tracker;
 
 
-    public CheckTask( final HBase hbase, final Tracker tracker, String clusterName, String lxcHostname,
+    public CheckTask( final HBase hbase, final Tracker tracker, String clusterName, UUID hostId,
                       CompleteEvent completeEvent )
     {
         this.clusterName = clusterName;
-        this.lxcHostname = lxcHostname;
+        this.hostId = hostId;
         this.completeEvent = completeEvent;
         this.hbase = hbase;
         this.tracker = tracker;
@@ -33,7 +34,7 @@ public class CheckTask implements Runnable
     @Override
     public void run()
     {
-        UUID trackID = hbase.checkNode( clusterName, lxcHostname );
+        UUID trackID = hbase.checkNode( clusterName, hostId );
 
         long start = System.currentTimeMillis();
         while ( !Thread.interrupted() )

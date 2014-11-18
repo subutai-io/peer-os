@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.hbase.impl.handler;
 
 
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
@@ -9,16 +10,13 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
+import org.safehaus.subutai.plugin.hbase.impl.Commands;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,15 +34,6 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
     private ClusterOperationType operationType;
     private Environment environment;
     private HBaseConfig config;
-    private HadoopClusterConfig hadoopConfig;
-
-
-    public ClusterOperationHandler( final HBaseImpl manager, final HBaseConfig baseClusterConfig )
-    {
-        super( manager, baseClusterConfig );
-        Preconditions.checkNotNull( baseClusterConfig );
-        this.config = baseClusterConfig;
-    }
 
 
     public ClusterOperationHandler( final HBaseImpl manager, final HBaseConfig hbaseConfig,
@@ -55,6 +44,14 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
         this.operationType = operationType;
         this.trackerOperation = manager.getTracker().createTrackerOperation( HBaseConfig.PRODUCT_KEY,
                 String.format( "Executing %s operation on cluster %s", operationType.name(), clusterName ) );
+    }
+
+
+    public ClusterOperationHandler( final HBaseImpl manager, final HBaseConfig baseClusterConfig )
+    {
+        super( manager, baseClusterConfig );
+        Preconditions.checkNotNull( baseClusterConfig );
+        this.config = baseClusterConfig;
     }
 
 
@@ -76,9 +73,48 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
             case UNINSTALL:
                 destroyCluster();
                 break;
-            case CUSTOM:
-                //                actualizeMasterIP();
+            case START_ALL:
+                startCluster();
                 break;
+            case STOP_ALL:
+                stopCluster();
+                break;
+        }
+    }
+
+
+    private void stopCluster()
+    {
+        environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+        Set<UUID> allNodes = config.getAllNodes();
+        for ( ContainerHost host : environment.getHostsByIds( allNodes ) )
+        {
+            try
+            {
+                host.execute( Commands.getStopCommand() );
+            }
+            catch ( CommandException e )
+            {
+                LOG.error( e.getMessage(), e );
+            }
+        }
+    }
+
+
+    private void startCluster()
+    {
+        environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+        Set<UUID> allNodes = config.getAllNodes();
+        for ( ContainerHost host : environment.getHostsByIds( allNodes ) )
+        {
+            try
+            {
+                host.execute( Commands.getStartCommand() );
+            }
+            catch ( CommandException e )
+            {
+                LOG.error( e.getMessage(), e );
+            }
         }
     }
 
@@ -88,10 +124,10 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
     {
         try
         {
-            if ( config.getSetupType() == SetupType.WITH_HADOOP)
+            if ( config.getSetupType() == SetupType.WITH_HADOOP )
             {
 
-                if ( hadoopConfig == null )
+                /*if ( hadoopConfig == null )
                 {
                     throw new ClusterSetupException( "No Hadoop configuration specified" );
                 }
@@ -106,19 +142,19 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
                        .setup();
 
                 trackerOperation.addLog( "Environment built successfully" );
+*/
             }
             else
             {
-
+                environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
             }
 
             //setup HBase cluster
             trackerOperation.addLog( "Installing cluster..." );
             manager.getClusterSetupStrategy( trackerOperation, config, environment ).setup();
             trackerOperation.addLogDone( "Installing cluster completed" );
-
         }
-        catch ( EnvironmentBuildException | ClusterSetupException e )
+        catch ( /*EnvironmentBuildException |*/ ClusterSetupException e )
         {
             LOG.error( "Error in setupCluster", e );
             trackerOperation.addLogFailed( String.format( "Failed to setup cluster : %s", e.getMessage() ) );

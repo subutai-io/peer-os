@@ -19,7 +19,6 @@ import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
@@ -138,12 +137,64 @@ public class HBaseImpl implements HBase
     }
 
 
+    @Override
     public UUID installCluster( final HBaseConfig config )
     {
         Preconditions.checkNotNull( config, "Configuration is null" );
         AbstractOperationHandler operationHandler =
                 new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
         executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID destroyNode( final String clusterName, final String hostname )
+    {
+        Preconditions.checkNotNull( clusterName );
+        Preconditions.checkNotNull( hostname );
+        HBaseConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, config, hostname, OperationType.EXCLUDE );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public ClusterSetupStrategy getClusterSetupStrategy( final TrackerOperation po, final HBaseConfig config,
+                                                         final Environment environment )
+    {
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
+        {
+
+            return new OverHadoopSetupStrategy( this, config, environment, po );
+        }
+        else
+        {
+            return new WithHadoopSetupStrategy( this, config, environment, po );
+        }
+    }
+
+
+    @Override
+    public UUID stopCluster( final String clusterName )
+    {
+        Preconditions.checkNotNull( clusterName );
+        HBaseConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.STOP_ALL );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID startCluster( final String clusterName )
+    {
+        Preconditions.checkNotNull( clusterName );
+        HBaseConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.START_ALL );
         return operationHandler.getTrackerId();
     }
 
@@ -184,53 +235,6 @@ public class HBaseImpl implements HBase
                 new NodeOperationHandler( this, config, hostname, OperationType.INCLUDE );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
-    }
-
-
-
-    /*public UUID installCluster( final HBaseConfig config )
-    {
-        Preconditions.checkNotNull( config, "HBase configuration is null" );
-        AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
-    }*/
-
-
-    @Override
-    public UUID installCluster( final HBaseConfig config, final HadoopClusterConfig hadoopConfig )
-    {
-        return null;
-    }
-
-
-    @Override
-    public UUID destroyNode( final String clusterName, final String hostname )
-    {
-        Preconditions.checkNotNull( clusterName );
-        Preconditions.checkNotNull( hostname );
-        HBaseConfig config = getCluster( clusterName );
-        AbstractOperationHandler operationHandler =
-                new NodeOperationHandler( this, config, hostname, OperationType.EXCLUDE );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
-    }
-
-
-    @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final TrackerOperation po, final HBaseConfig config,
-                                                         final Environment environment )
-    {
-        if ( config.getSetupType() == SetupType.OVER_HADOOP )
-        {
-
-            return new OverHadoopSetupStrategy( this, config, environment, po );
-        }
-        else
-        {
-            return new WithHadoopSetupStrategy( this, config, environment, po );
-        }
     }
 }
 

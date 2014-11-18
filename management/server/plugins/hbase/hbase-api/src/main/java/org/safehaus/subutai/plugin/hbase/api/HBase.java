@@ -12,16 +12,21 @@ import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 
 public interface HBase extends ApiBase<HBaseConfig>
 {
 
-    public UUID installCluster( HBaseConfig config, HadoopClusterConfig hadoopConfig );
+    public UUID installCluster( HBaseConfig config );
 
-    public UUID destroyNode( String clusterName, String lxcHostname );
+    public UUID destroyNode( final String clusterName, final String hostname );
 
     public ClusterSetupStrategy getClusterSetupStrategy( TrackerOperation operation, HBaseConfig config,
                                                          Environment environment );
+
+    public UUID stopCluster( String clusterName );
+
+    public UUID startCluster( String clusterName );
+
+    public UUID checkNode( String clusterName, UUID hostId );
 }
