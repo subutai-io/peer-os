@@ -35,6 +35,7 @@ public:
 	string createExitMessage(string,int, int, int,string,int);
 	string createTerminateMessage(string,string,int, int);
 	string createInQueueMessage(string,string);
+    string createPsResponse(string id, string commandId);
 	string createHeartBeatMessage(string,string);
 	string createTimeoutMessage(string,int,int,int,string,string,string);
 	string createInotifyMessage(string,string,string,string);

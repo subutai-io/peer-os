@@ -81,6 +81,15 @@ string SubutaiResponsePack::createInQueueMessage(string uuid,string commandid)	/
 	return sendout;
 }
 
+string SubutaiResponsePack::createPsResponse(string id, string commandId) {
+    clear();
+    this->setType("PS_RESPONSE");
+    this->setUuid(id);
+    this->setCommandId(commandId);
+    this->serializeDone(sendout);
+    return sendout;
+}
+
 /**
  *  \details   This method creates HeartBeat message.
  *  {
