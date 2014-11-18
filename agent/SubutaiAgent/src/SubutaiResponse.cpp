@@ -63,6 +63,7 @@ void SubutaiResponse::clear()
     setconfigPoint("");
     setDateTime("");
     setChangeType("");
+    setExitCode(-1);
 }
 
 /**
@@ -250,7 +251,7 @@ void SubutaiResponse::serialize(string& output)
 		}
     }
     for(unsigned int index = 0; index < this->getConfPoints().size(); index++) {
-        if (this->getType() == "INOTIFY_LIST_RESPONSE") {
+        if (this->getType() == "LIST_INOTIFY_RESPONSE") {
             root["response"]["configPoints"][index]=this->getConfPoints()[index];
         } else if (this->getType() == "INOTIFY_EVENT") {
             root["response"]["configPoint"][index]=this->getConfPoints()[index];
