@@ -1,24 +1,45 @@
 #!/bin/bash
 
 # --------------------------------------------------------------------------
-# Bunch-O BTRFS convenience operations
+# Bunch-O ZFS convenience operations
 # --------------------------------------------------------------------------
 
 
 # rename datasets and set mount point for rootfs
 function fs_rename_datasets_set_mount_points {
-  local src="$1"
-  local dst="$2"
-  local dst_rootfs="$3"
+  local $src="$1"
+  local $dst="$2"
+  local $dst_rootfs="$3"
+  zfs rename "lxc-data/$src-home" "lxc-data/$dst-home"
+  zfs rename "lxc-data/$src-var"  "lxc-data/$dst-var"
+  zfs rename "lxc/$src-opt" "lxc/$dst-opt"
+  zfs rename "lxc/$src" "lxc/$dst"
+  zfs set mountpoint="$dst_rootfs" "lxc/$dst"
+
+  zfs mount "lxc/$dst"
+  zfs mount "lxc/$dst-opt"
+  zfs mount "lxc-data/$dst-home"
+  zfs mount "lxc-data/$dst-var"
 }
 
 function fs_clone {
-  local parent_snap="$1"
-  local child_ds="$2"
+  local parent_snap=`echo "$1" | awk -F"/" '{print $2}' | awk -F"@" '{print $1}'`
+  local child_ds=`echo "$2" | awk -F"/" '{print $2}'`
+  if [[ "$1" =~ "var" ]] || [[ "$1" =~ "home" ]]; then
+    btrfs subvolume snapshot /lxc-data/$parent_snap /lxc-data/$child_ds > /dev/null 2>&1
+  elif [[ "$1" =~ "opt" ]]; then
+    btrfs subvolume snapshot /lxc/$parent_snap /lxc/$child_ds > /dev/null 2>&1
+  else
+    rm -rf /var/lib/lxc/$child_ds/rootfs
+    btrfs subvolume snapshot /var/lib/lxc/$parent_snap/rootfs /var/lib/lxc/$child_ds > /dev/null 2>&1
+  fi
+  #btrfs subvolume snapshot /var/lib/lxc/$parent_snap/rootfs /var/lib/lxc/$child_ds/
+  #zfs clone "$parent_snap" "$child_ds"
 }
 function fs_set_mountpoint {
   local child_roofs="$1"
   local child="$2"
+  #zfs set mountpoint=$child_rootfs lxc/$child
 }
 
 function fs_addmount {
@@ -27,25 +48,78 @@ function fs_addmount {
   local zpool=$3
   local dataset=$zpool/$name-$mount
 
+  echo Creating $dataset dataset for $mount mount entry
+  btrfs subvolume create /$dataset > /dev/null 2>&1
+
+  if [ -z "`btrfs subvolume list /$dataset`" ]; then
+    echo Could not create $dataset dataset
+    exit 1
+  else
+    echo Created $dataset dataset, adding $mount mount entry
+    echo lxc.mount.entry = /$dataset $mount none bind,rw 0 0 \
+         >> /var/lib/lxc/$name/config
+  fi
+  echo Copying $mount data from rootfs to new $dataset dataset
+  pushd .
+  local mountpath=/var/lib/lxc/$name/rootfs/$mount
+  cd $mountpath
+
+  if [ -n "`ls -A $mountpath`" ]; then
+    # We use tar to preserve permissions: do NOT use cp or mv
+    tar -c * | tar -x -C /$dataset
+    echo Deleting $mount contents from rootfs
+    rm -rf /var/lib/lxc/$name/rootfs/$mount/*
+  else
+    echo Nothing within $mountpath, abandoning copy
+  fi
+
+  popd
+  # Time to Snapshot and Apply Holds
+  btrfs subvolume snapshot -r /$dataset /$dataset-2 > /dev/null 2>&1
+  btrfs subvolume delete /$dataset > /dev/null 2>&1
+  mv /$dataset-2 /$dataset
   return
 }
-
 #snaphost ll holds on clone's rootfs
 function fs_snap_hold_readonly {
-  local lxc_template="$1"
+  local $lxc_template="$1"
+  zfs snapshot lxc/$lxc_template@template
+  zfs hold keep lxc/$lxc_template@template
+  zfs set readonly=on lxc/$lxc_template
+
+  zfs snapshot lxc/$lxc_template-opt@template
+  zfs hold keep lxc/$lxc_template-opt@template
+  zfs set readonly=on lxc/$lxc_template-opt
+
+  zfs snapshot lxc-data/$lxc_template-var@template
+  zfs hold keep lxc-data/$lxc_template-var@template
+  zfs set readonly=on lxc-data/$lxc_template-var
+
+  zfs snapshot lxc-data/$lxc_template-home@template
+  zfs hold keep lxc-data/$lxc_template-home@template
+  zfs set readonly=on lxc-data/$lxc_template-home
 }
 
 function fs_recv {
-  local template="$1"
-  local deltas="$2"
-  local lxc_rootfs="$3"
+  local $template="$1"
+  local $deltas="$2"
+  local $lxc_rootfs="$3"
+  zfs recv lxc/$template < $deltas/rootfs.delta
+  zfs set mountpoint=$lxc_rootfs lxc/$template
+  zfs recv lxc/$template-opt < $deltas/opt.delta
+  zfs recv lxc-data/$template-var < $deltas/var.delta
+  zfs recv lxc-data/$template-home < $deltas/home.delta
 }
 
 #generate delta images of all filesystems
 function fs_send {
-  local parent="$1"
-  local container="$2"
-  local deltas="$3"
+  local $parent="$1"
+  local $container="$2"
+  local $deltas="$3"
+  zfs send -I "lxc/$parent@template" "lxc/$container@template" > "$deltas/rootfs.delta"
+  zfs send -I "lxc/$parent-opt@template" "lxc/$container-opt@template" > "$deltas/opt.delta"
+  zfs send -I "lxc-data/$parent-var@template" "lxc-data/$container-var@template" > "$deltas/var.delta"
+  zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template" > "$deltas/home.delta"
 }
 
 function fs_remove_mount {
@@ -57,20 +131,63 @@ function fs_remove_mount {
   child_ds="$pool/$child-$partition"
   parent_ds="$pool/$parent-$partition"
 
+  if [[ "$pool"  == "lxc" ]]; then
+    btrfs subvolume delete /lxc/$child-$partition > /dev/null 2>&1
+  else
+    btrfs subvolume delete /lxc-data/$child-$partition > /dev/null 2>&1
+  fi
+
+  # Need to destroy mount
   msg_info "    - \"$child_ds\" dataset destroyed"
 }
 
 
 #release all holds on clone's rootfs snaps and delete snaps
 function fs_rls_holds_delete_snaps {
-  local clone="$1"
+  local $clone="$1"
+  local $snap="$2"
+  for snap in `zfs list -t snapshot -o name -H | grep $clone@`; do
+    for hold in `zfs holds -r $snap | grep $snap | awk '{print $2}'`; do
+      zfs release $hold $snap
+      msg_info "    - \"$hold\" hold removed from $snap"
+    done
+
+    zfs destroy $snap
+    msg_info "    - \"$snap\" snapshot destroyed"
+  done
 }
 
 #demote template
 function fs_demote_template {
-  local temp="$1"  
+  local $temp="$1"  
   local lxc_path="/var/lib/lxc/$temp"
 
+  cat $lxc_path/config | \
+    grep -v "lxc.hook.pre-start" | \
+    grep -v "subutai.template.package" | \
+    grep -v "subutai.git.uuid" >> $lxc_path/config.new
+  rm $lxc_path/config
+  mv $lxc_path/config.new $lxc_path/config
+
+  local var_snap="lxc-data/$temp-var@template"
+  zfs release keep "$var_snap"
+  zfs destroy "$var_snap"
+  zfs set readonly=off "lxc-data/$temp-var"
+
+  local home_snap="lxc-data/$temp-home@template"
+  zfs release keep "$home_snap"
+  zfs destroy "$home_snap"
+  zfs set readonly=off "lxc-data/$temp-home"
+
+  local opt_snap="lxc/$temp-opt@template"
+  zfs release keep "$opt_snap"
+  zfs destroy "$opt_snap"
+  zfs set readonly=off "lxc/$temp-opt"
+
+  local root_snap="lxc/$temp@template"
+  zfs release keep "$root_snap"
+  zfs destroy "$root_snap"
+  zfs set readonly=off "lxc/$temp"
 
 }
 
@@ -79,6 +196,18 @@ function fs_get_children_list {
   local parent="$1"
   local snap=
 
+  # we got a dataset instead of a clone name
+  if [ -n "`echo $parent | egrep 'lxc.*/'`" ]; then
+    snap="$parent@template"
+  else
+    snap="lxc/$parent@template"
+  fi
+  local count=0
+  for ds in $(btrfs subvolume list -q /var/lib/lxc | grep `btrfs subvolume list -u /var/lib/lxc | grep $parent | awk '{print $9}'` | awk '{print $11}' | awk -F "/" '{print $1}')
+  do
+    children_list[$count]=`fs_ctnr_from_ds $ds`
+    count=`expr $count + 1`
+  done
 
   echo ${children_list[*]}
 }
@@ -91,7 +220,24 @@ function fs_get_children {
   local parent="$1"
   local snap=
 
+  # we got a dataset instead of a clone name
+  if [ -n "`echo $parent | egrep 'lxc.*/'`" ]; then 
+    snap="$parent@template"
+  else
+    snap="lxc/$parent@template"
+  fi
 
+  local count=0
+  for ds in $(btrfs subvolume list -q /var/lib/lxc | grep `btrfs subvolume list -u /var/lib/lxc | grep $parent | awk '{print $9}'` | awk '{print $11}' | awk -F "/" '{print $1}')
+  do
+     msg_info "        -> \"`fs_ctnr_from_ds $ds`\" is a child of $parent"
+     count=`expr $count + 1`
+  done
+  #for ds in `zfs get origin | grep $snap | awk '{print $1}' | grep -v $snap`
+  #do
+  #  msg_info "        -> \"`fs_ctnr_from_ds $ds`\" is a child of $parent"
+  #  count=`expr $count + 1`
+  #done
   return $count
 }
 
@@ -112,12 +258,24 @@ function fs_assert_nosnap {
 # assert snapshot (arg $1) exists, if it does NOT show usage (arg $2)
 # warning: exits!
 function fs_assert_snap {
-  local snap="$1"
+  local snap=`echo "$1" | awk -F"/" '{print $2}' | awk -F"@" '{print $1}'`
   local usage="$2"
-
-  if [ -z "`zfs list -t snapshot -o name -H $snap`" ]; then
-    msg_error "Snapshot \"$snap\" does NOT exist!"
-    show_usage "$usage"
+ 
+  if [[ "$1" =~ "home" ]] || [[ "$1" =~ "var" ]]; then
+    if [ -z "` btrfs property get -ts /lxc-data/$snap/ | grep true`" ]; then
+        msg_error "Snapshot \"$snap\" does NOT exist!"
+        show_usage "$usage"
+    fi
+  elif  [[ "$1" =~ "opt" ]]; then
+    if [ -z "` btrfs property get -ts /lxc/$snap/ | grep true`" ]; then
+      msg_error "Snapshot \"$snap\" does NOT exist!"
+      show_usage "$usage"
+    fi
+  else
+    if [ -z "` btrfs property get -ts /var/lib/lxc/$snap/rootfs | grep true`" ]; then
+      msg_error "Snapshot \"$snap\" does NOT exist!"
+      show_usage "$usage"
+    fi
   fi
 }
 
@@ -125,15 +283,14 @@ function fs_assert_snap {
 # assert dataset (arg $1) does NOT exist, if it does show usage (arg $2)
 # warning: exits!
 function fs_assert_nods {
-  local ds="$1"
+  local ds="$1" #test/rootfs
   local usage="$2"
 
-  if [ -n "`zfs list -o name -H | grep $ds`" ]; then
+  if [ -n "`btrfs subvolume list /lxc | grep $ds`" ]; then
     msg_error "ZFS dataset \"$ds\" already exists!"
     show_usage "$usage"
   fi
 }
-
 
 # assert dataset (arg $1) exists, if it does NOT show usage (arg $2)
 # warning: exits!
@@ -151,7 +308,7 @@ function fs_assert_ds {
 # checks if the container (arg $1) is a template, echo "true"/"false"
 function fs_is_template {
   local c="$1"
-  if [ -z "`zfs list -t snapshot -o name -H | grep "lxc/$c@template"`" ]; then
+  if [ -z "`btrfs property get -ts /var/lib/lxc/$c/rootfs/ | grep true`" ]; then
     echo false
   else
     echo true
@@ -170,7 +327,7 @@ function fs_get_parent {
     return
   fi
 
-  local snap=`zfs get origin -o value -H lxc/$c`
+  local snap=$(btrfs subvolume list -u /var/lib/lxc | grep `btrfs subvolume list -q /var/lib/lxc | grep $c/ | awk -F" " '{print $9}'` | awk -F" " '{print $11}' | awk -F"/" '{print $1}')
   echo `fs_ctnr_from_ds $snap`
 }
 

@@ -1,0 +1,31 @@
+#!/bin/bash
+. /usr/share/subutai-cli/subutai/lib/btrfs_ops
+# tag master template snapshot and hold
+function fs_master_snapshot {
+  #zfs snapshot lxc/master@template
+  #zfs hold keep lxc/master@template
+
+  # Handle all other mountpoints
+  # ---------------------------------------------------------------------------
+  # Using the addmount function almost the same operations as we did above on 
+  # the rootfs are handled: whatever existing data that was found inside the 
+  # mount point on the rootfs are moved over to the new dataset once created
+  # snapshots with holds are taken.
+
+  fs_addmount master opt lxc
+  fs_addmount master home lxc-data
+  fs_addmount master var lxc-data
+  btrfs subvolume snapshot -r /var/lib/lxc/master/rootfs /var/lib/lxc/master/rootfs2
+  btrfs subvolume delete /var/lib/lxc/master/rootfs
+  mv  /var/lib/lxc/master/rootfs2  /var/lib/lxc/master/rootfs
+}
+
+function fs_master_lxc_create {
+  local SUBUTAI_USER="$1"
+  local SUBUTAI_AUTH_KEY="$2"
+  lxc-create -n master            \
+   -t ubuntu                      \
+   -B btrfs --                      \
+   -u $SUBUTAI_USER               \
+   -S $SUBUTAI_AUTH_KEY
+}
