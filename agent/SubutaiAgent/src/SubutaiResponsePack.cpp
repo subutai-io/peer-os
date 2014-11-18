@@ -187,9 +187,28 @@ string SubutaiResponsePack::createTimeoutMessage(string uuid,int pid,int request
 string SubutaiResponsePack::createInotifyMessage(string uuid ,string configPoint,string dateTime,string changeType)
 {
 	clear();
+	string path = configPoint;
+	vector<string> hierarchy = helper.splitResult(configPoint, "/");
+	if(hierarchy.at(2) == "lxc" && hierarchy.at(4) == "rootfs")
+	{
+		vector<SubutaiContainer> containerSet = getContainerSet();
+		for (vector<SubutaiContainer>::iterator it = containerSet.begin(); it != containerSet.end(); it++) {
+			if((*it).getContainerHostnameValue() == hierarchy.at(3))
+			{
+				uuid = (*it).getContainerIdValue(); break;
+			}
+		}
+		path = "";
+		int i=0;
+		for (vector<string>::iterator it_h = hierarchy.begin()+5; it_h != hierarchy.end(); it_h++) {
+			if(i++!=0) path.append("/");
+			path.append((*it_h));
+		}
+	}
+
 	this->setType("INOTIFY_EVENT");
 	this->setUuid(uuid);
-	this->setconfigPoint(configPoint);
+	this->setconfigPoint(path);
 	this->setDateTime(dateTime);
 	this->setChangeType(changeType);
 	this->getConfPoints().clear();

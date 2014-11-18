@@ -47,9 +47,11 @@
 #include "SubutaiTimer.h"
 #include <stdio.h>
 #include <pthread.h>
+#include <iostream>
+#include <cstdio>
+#include <lxc/lxccontainer.h>
 #include <string.h>
 #include <unistd.h>
-#include <iostream>
 
 using namespace std;
 
@@ -60,6 +62,7 @@ using namespace std;
  */
 void threadSend(message_queue *mq,SubutaiConnection *connection,SubutaiLogger* logMain)
 {
+
     try
     {
         string str;
@@ -92,7 +95,7 @@ void threadSend(message_queue *mq,SubutaiConnection *connection,SubutaiLogger* l
  */
 int main(int argc,char *argv[],char *envp[])
 {
-    string serverAddress        = "RESPONSE_TOPIC";              // Default RESPONSE TOPIC
+	string serverAddress        = "RESPONSE_TOPIC";              // Default RESPONSE TOPIC
     string broadcastAddress     = "BROADCAST_TOPIC";	        // Default BROADCAST TOPIC
     string clientAddress;
     SubutaiHelper helper;
@@ -255,7 +258,7 @@ int main(int argc,char *argv[],char *envp[])
                 }
             }
 
-            Watcher.checkNotification(); //checking the watch event status
+            Watcher.checkNotification(&cman); //checking the watch event status
 
             rc = connection->loop(1); // checking the status of the new message
             if (rc) {

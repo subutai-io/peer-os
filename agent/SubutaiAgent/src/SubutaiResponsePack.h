@@ -43,5 +43,6 @@ public:
 	string unsetInotifyResponse(string, string);
 private:
 	string sendout;
+	SubutaiHelper helper;
 };
 #endif /* SUBUTAIRESPONSEPACK_H_ */
