@@ -96,7 +96,6 @@ public class SparkImpl extends SparkBase implements Spark
     @Override
     public UUID installCluster( SparkClusterConfig config, HadoopClusterConfig hadoopConfig )
     {
-
         Preconditions.checkNotNull( config, "Configuration is null" );
         Preconditions.checkNotNull( hadoopConfig, "Hadoop Configuration is null" );
 
