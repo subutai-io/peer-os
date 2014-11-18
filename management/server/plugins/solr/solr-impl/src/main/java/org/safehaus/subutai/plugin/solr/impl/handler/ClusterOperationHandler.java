@@ -3,17 +3,20 @@ package org.safehaus.subutai.plugin.solr.impl.handler;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.plugin.common.api.*;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 
 
@@ -28,10 +31,11 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SolrImpl, 
     private SolrClusterConfig config;
     private ExecutorService executor = Executors.newCachedThreadPool();
 
+
     public ClusterOperationHandler( final SolrImpl manager, final SolrClusterConfig config,
                                     final ClusterOperationType operationType )
     {
-        super( manager, config.getClusterName() );
+        super( manager, config );
         this.operationType = operationType;
         this.config = config;
         trackerOperation = manager.getTracker().createTrackerOperation( SolrClusterConfig.PRODUCT_KEY,
@@ -60,8 +64,6 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SolrImpl, 
                     manager.getClusterSetupStrategy( env, config, trackerOperation );
             clusterSetupStrategy.setup();
 
-            //solrClusterConfig.setEnvironmentId( env.getId() );
-
             trackerOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
         catch ( EnvironmentBuildException | ClusterSetupException e )
@@ -71,6 +73,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SolrImpl, 
             throw new RuntimeException( msg );
         }
     }
+
 
     @Override
     public void destroyCluster()
@@ -98,7 +101,6 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SolrImpl, 
 
         manager.getPluginDAO().deleteInfo( SolrClusterConfig.PRODUCT_KEY, solrClusterConfig.getClusterName() );
         trackerOperation.addLogDone( "Information updated in database" );
-
     }
 
 
@@ -109,24 +111,11 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SolrImpl, 
         switch ( operationType )
         {
             case INSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
-                        setupCluster();
-                    }
-                } );
+                setupCluster();
                 break;
             case UNINSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
-                        destroyCluster();
-                    }
-                } );
+                destroyCluster();
                 break;
         }
-
     }
 }

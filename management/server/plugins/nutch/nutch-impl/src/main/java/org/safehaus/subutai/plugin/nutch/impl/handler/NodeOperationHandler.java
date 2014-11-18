@@ -60,14 +60,14 @@ public class NodeOperationHandler extends AbstractOperationHandler<NutchImpl, Nu
         }
 
 
-        CommandResult result = null;
+
         switch ( operationType )
         {
             case INSTALL:
-                result = installProductOnNode( host );
+                installProductOnNode( host );
                 break;
             case UNINSTALL:
-                result = uninstallProductOnNode( host );
+                uninstallProductOnNode( host );
                 break;
         }
 

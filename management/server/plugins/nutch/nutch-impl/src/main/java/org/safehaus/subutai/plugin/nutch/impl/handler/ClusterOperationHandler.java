@@ -162,13 +162,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<NutchImpl,
         switch ( operationType )
         {
             case INSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
-                        setupCluster();
-                    }
-                } );
+                setupCluster();
                 break;
             case DESTROY:
                 if ( config.getSetupType() == SetupType.OVER_HADOOP )
@@ -177,13 +171,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<NutchImpl,
                 }
                 else if ( config.getSetupType() == SetupType.WITH_HADOOP )
                 {
-                    executor.execute( new Runnable()
-                    {
-                        public void run()
-                        {
-                            destroyCluster();
-                        }
-                    } );
+                    destroyCluster();
                 }
 
                 break;

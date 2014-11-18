@@ -67,14 +67,13 @@ public class NodeOperationHandler extends AbstractOperationHandler<LuceneImpl, L
         }
 
 
-        CommandResult result = null;
         switch ( operationType )
         {
             case INSTALL:
-                result = installProductOnNode( host );
+                installProductOnNode( host );
                 break;
             case UNINSTALL:
-                result = uninstallProductOnNode( host );
+                uninstallProductOnNode( host );
                 break;
         }
     }
