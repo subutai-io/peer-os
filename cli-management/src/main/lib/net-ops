@@ -12,9 +12,6 @@ function net_check_tunnelPortName {
   
   #checking TunnelPortname is duplicated or not
   if [ "$result" ]; then
-<<<<<<< HEAD
-    msg_error "TunnelPortName \"$tunnelPortName\" is already exist.."
-=======
     msg_error "TunnelPortName \"$tunnelPortName\" might be already exist or wrong pattern..
      Try opening a tunnel for instance: tunnel2, tunnel3, tunnel4"
     show_usage "`management_network_usage`"
@@ -25,7 +22,6 @@ function net_check_tunnelPortName {
      echo ""
   else
     msg_error "TunnelPortName \"$tunnelPortName\" is not valid.. It should contain tunnel tag inside"
->>>>>>> 82f370cf4ec71f9ad14ebe73818325083dda08be
     show_usage "`management_network_usage`"
   fi
 }

@@ -76,9 +76,9 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public Set<UUID> getAllDataNodeAgent()
+    public List<UUID> getAllDataNodeAgent()
     {
-        Set<UUID> allAgents = new HashSet<>();
+        List<UUID> allAgents = new ArrayList<>();
         for ( UUID uuid : getDataNodes() )
         {
             allAgents.add( uuid );
