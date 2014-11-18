@@ -12,7 +12,7 @@ expect {
 	"*exists*" {
 		send "Y\r"
 		expect {
-			"Enter initial password for root:" {
+			"Enter initial password for root (this may not be applicable for your security setup):" {
 				send "$pass\r"
 			}
 			"Confirm initial password for root:"{

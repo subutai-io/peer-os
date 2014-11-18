@@ -40,6 +40,13 @@ else
         $accumuloHome/bin/accumulo-property.sh HADOOP_HOME $HADOOP_HOME
 fi
 
+if [ "x$HADOOP_PREFIX" = "x" ];
+then
+	$accumuloHome/bin/accumulo-property.sh HADOOP_PREFIX /opt/hadoop-1.2.1
+else
+        $accumuloHome/bin/accumulo-property.sh HADOOP_PREFIX $HADOOP_PREFIX
+fi
+
 if [ "x$ZOOKEEPER_HOME" = "x" ];
 then
         $accumuloHome/bin/accumulo-property.sh ZOOKEEPER_HOME /opt/zookeeper-3.4.5
