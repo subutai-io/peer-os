@@ -76,9 +76,9 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public List<UUID> getAllDataNodeAgent()
+    public Set<UUID> getAllDataNodeAgent()
     {
-        List<UUID> allAgents = new ArrayList<>();
+        Set<UUID> allAgents = new HashSet<>();
         for ( UUID uuid : getDataNodes() )
         {
             allAgents.add( uuid );
@@ -222,7 +222,7 @@ public class HadoopClusterConfig implements ConfigBase
 
     public List<UUID> getAllNodes()
     {
-        List<UUID> allAgents = new ArrayList<>();
+        Set<UUID> allAgents = new HashSet<>();
         if ( dataNodes != null )
         {
             allAgents.addAll( dataNodes );
@@ -245,7 +245,7 @@ public class HadoopClusterConfig implements ConfigBase
             allAgents.add( secondaryNameNode );
         }
 
-        return allAgents;
+        return new ArrayList<>( allAgents );
     }
 
 
