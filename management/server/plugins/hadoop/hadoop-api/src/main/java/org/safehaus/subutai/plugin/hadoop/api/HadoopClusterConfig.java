@@ -220,9 +220,9 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public Set<UUID> getAllNodes()
+    public List<UUID> getAllNodes()
     {
-        Set<UUID> allAgents = new HashSet<>();
+        List<UUID> allAgents = new ArrayList<>();
         if ( dataNodes != null )
         {
             allAgents.addAll( dataNodes );

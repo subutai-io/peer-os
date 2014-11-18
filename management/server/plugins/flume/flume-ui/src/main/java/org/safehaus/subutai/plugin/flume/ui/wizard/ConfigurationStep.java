@@ -12,6 +12,7 @@ import org.safehaus.subutai.plugin.flume.api.SetupType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
+import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
@@ -134,10 +135,10 @@ public class ConfigurationStep extends VerticalLayout
                 {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
-                    config.setHadoopNodes( hadoopInfo.getAllNodes() );
+                    config.setHadoopNodes( Sets.newHashSet(hadoopInfo.getAllNodes()) );
                     hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
                     Set<ContainerHost> hadoopNodes =
-                            hadoopEnvironment.getHostsByIds(  hadoopInfo.getAllNodes()  );
+                            hadoopEnvironment.getHostsByIds(  Sets.newHashSet(hadoopInfo.getAllNodes())  );
                     select.setValue( null );
                     select.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );

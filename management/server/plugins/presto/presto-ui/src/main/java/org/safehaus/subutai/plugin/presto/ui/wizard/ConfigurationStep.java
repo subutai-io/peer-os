@@ -194,7 +194,7 @@ public class ConfigurationStep extends Panel
             HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
             config.setHadoopClusterName( hadoopInfo.getClusterName() );
             hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
-            Set<ContainerHost> hadoopNodes = hadoopEnvironment.getHostsByIds( hadoopInfo.getAllNodes() );
+            Set<ContainerHost> hadoopNodes = hadoopEnvironment.getHostsByIds( Sets.newHashSet(hadoopInfo.getAllNodes()) );
             workersSelect.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
             for ( ContainerHost hadoopNode : hadoopNodes )
             {
@@ -230,7 +230,7 @@ public class ConfigurationStep extends Panel
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
                     hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
-                    Set<ContainerHost> hadoopNodes = hadoopEnvironment.getHostsByIds( hadoopInfo.getAllNodes() );
+                    Set<ContainerHost> hadoopNodes = hadoopEnvironment.getHostsByIds( Sets.newHashSet(hadoopInfo.getAllNodes()) );
                     workersSelect.setValue( null );
                     workersSelect
                             .setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
@@ -268,7 +268,7 @@ public class ConfigurationStep extends Panel
                     }
                     hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
                     Set<ContainerHost> hadoopNodes =
-                            hadoopEnvironment.getHostsByIds( hadoopInfo.getAllNodes() );
+                            hadoopEnvironment.getHostsByIds( Sets.newHashSet(hadoopInfo.getAllNodes()) );
                     hadoopNodes.remove( coordinator );
                     workersSelect.getContainerDataSource().removeAllItems();
                     for ( ContainerHost hadoopNode : hadoopNodes )
