@@ -559,6 +559,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             host.dispose();
+            environment.removeContainer( host );
+            saveEnvironment( environment );
         }
         catch ( PeerException e )
         {
