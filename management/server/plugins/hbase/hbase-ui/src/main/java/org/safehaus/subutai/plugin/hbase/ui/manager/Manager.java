@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.naming.NamingException;
+
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -23,7 +24,6 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBaseType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-
 
 import com.google.common.base.Preconditions;
 import com.vaadin.data.Item;
@@ -363,13 +363,13 @@ public class Manager
     }
 
 
-    private void populateTable( final Table table, Set<UUID> agents )
+    private void populateTable( final Table table, Set<UUID> containerHosts )
     {
-        for ( final UUID agent : agents )
+        for ( final UUID containerHost : containerHosts )
         {
             final Label resultHolder = new Label();
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            //            checkBtn.setId( agent.getListIP().get( 0 ) + "-hbaseCheck" );
+            //            checkBtn.setId( containerHost.getListIP().get( 0 ) + "-hbaseCheck" );
             checkBtn.addStyleName( BUTTON_STYLE_NAME );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
             startBtn.addStyleName( BUTTON_STYLE_NAME );
@@ -390,7 +390,7 @@ public class Manager
 
 
             table.addItem( new Object[] {
-                    agent.toString(), /*agent.getListIP().get( 0 ),*/ findNodeRoles( agent ), resultHolder,
+                    containerHost.toString(), /*containerHost.getListIP().get( 0 ),*/ findNodeRoles( containerHost ), resultHolder,
                     availableOperations
             }, null );
 
@@ -403,19 +403,18 @@ public class Manager
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
                     checkBtn.setEnabled( false );
-                    executor.execute( new CheckTask( hbase, tracker, config.getClusterName(), agent.toString(),
-                            new CompleteEvent()
+                    executor.execute( new CheckTask( hbase, tracker, config.getClusterName(), containerHost, new CompleteEvent()
+                    {
+                        public void onComplete( String result )
+                        {
+                            synchronized ( PROGRESS_ICON )
                             {
-                                public void onComplete( String result )
-                                {
-                                    synchronized ( PROGRESS_ICON )
-                                    {
-                                        resultHolder.setValue( parseStatus( result, findNodeRoles( agent ) ) );
-                                        PROGRESS_ICON.setVisible( false );
-                                        checkBtn.setEnabled( true );
-                                    }
-                                }
-                            } ) );
+                                resultHolder.setValue( parseStatus( result, findNodeRoles( containerHost ) ) );
+                                PROGRESS_ICON.setVisible( false );
+                                checkBtn.setEnabled( true );
+                            }
+                        }
+                    } ) );
                 }
             } );
         }
@@ -519,7 +518,7 @@ public class Manager
 
         if ( result.contains( "not connected" ) )
         {
-            sb.append( "Agent is not connected !" );
+            sb.append( "Host is not connected !" );
             return sb.toString();
         }
 
