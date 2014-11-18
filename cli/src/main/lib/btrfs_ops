@@ -105,10 +105,10 @@ function fs_send {
   local parent="$1"
   local container="$2"
   local deltas="$3"
-  zfs send -I "lxc/$parent@template" "lxc/$container@template" > "$deltas/rootfs.delta"
-  zfs send -I "lxc/$parent-opt@template" "lxc/$container-opt@template" > "$deltas/opt.delta"
-  zfs send -I "lxc-data/$parent-var@template" "lxc-data/$container-var@template" > "$deltas/var.delta"
-  zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template" > "$deltas/home.delta"
+  btrfs send -p "/var/lib/lxc/$parent/rootfs" "/var/lib/lxc/$container/rootfs" > "$deltas/rootfs.delta" > /dev/null 2>&1
+  btrfs send -p "/lxc/$parent-opt" "/lxc/$container-opt" > "$deltas/opt.delta" > /dev/null 2>&1
+  btrfs send -p "/lxc-data/$parent-var" "/lxc-data/$container-var" > "$deltas/var.delta" > /dev/null 2>&1
+  btrfs send -p "/lxc-data/$parent-home" "/lxc-data/$container-home" > "$deltas/home.delta" > /dev/null 2>&1
 }
 
 function fs_remove_mount {
