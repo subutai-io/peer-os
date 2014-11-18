@@ -200,6 +200,16 @@ public class HBaseImpl implements HBase
 
 
     @Override
+    public UUID checkNode( final String clusterName, final UUID hostId )
+    {
+        Preconditions.checkNotNull( clusterName );
+        HBaseConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, config, OperationType.STATUS );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
     public UUID uninstallCluster( final String clusterName )
     {
         Preconditions.checkNotNull( clusterName );

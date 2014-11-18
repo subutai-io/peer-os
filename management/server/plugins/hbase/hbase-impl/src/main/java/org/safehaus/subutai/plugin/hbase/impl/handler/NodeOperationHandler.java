@@ -8,7 +8,6 @@ import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.impl.Commands;
@@ -32,12 +31,6 @@ public class NodeOperationHandler extends AbstractOperationHandler<HBaseImpl, HB
     private Environment environment;
 
 
-    public NodeOperationHandler( final HBaseImpl manager, final HBaseConfig config )
-    {
-        super( manager, config );
-    }
-
-
     public NodeOperationHandler( final HBaseImpl manager, final HBaseConfig config, final String hostname,
                                  OperationType operationType )
     {
@@ -51,9 +44,16 @@ public class NodeOperationHandler extends AbstractOperationHandler<HBaseImpl, HB
     }
 
 
-    public NodeOperationHandler( final HBaseImpl hBase, final HBaseConfig config, final ClusterOperationType startAll )
+    public NodeOperationHandler( final HBaseImpl hBase, final HBaseConfig config, final OperationType status )
     {
-        super( hBase, config );
+        this( hBase, config );
+        this.operationType = status;
+    }
+
+
+    public NodeOperationHandler( final HBaseImpl manager, final HBaseConfig config )
+    {
+        super( manager, config );
     }
 
 

@@ -109,10 +109,12 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
         {
             try
             {
-                host.execute( Commands.getStartCommand() );
+                CommandResult result = host.execute( Commands.getStartCommand() );
+                trackerOperation.addLog( result.getStdOut() );
             }
             catch ( CommandException e )
             {
+                trackerOperation.addLogFailed( e.getMessage() );
                 LOG.error( e.getMessage(), e );
             }
         }
