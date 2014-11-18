@@ -7,9 +7,9 @@
 
 # rename datasets and set mount point for rootfs
 function fs_rename_datasets_set_mount_points {
-  local $src="$1"
-  local $dst="$2"
-  local $dst_rootfs="$3"
+  local src="$1"
+  local dst="$2"
+  local dst_rootfs="$3"
   zfs rename "lxc-data/$src-home" "lxc-data/$dst-home"
   zfs rename "lxc-data/$src-var"  "lxc-data/$dst-var"
   zfs rename "lxc/$src-opt" "lxc/$dst-opt"
@@ -82,7 +82,7 @@ function fs_addmount {
 }
 #snaphost ll holds on clone's rootfs
 function fs_snap_hold_readonly {
-  local $lxc_template="$1"
+  local lxc_template="$1"
   btrfs property set -ts /var/lib/lxc/$lxc_template/rootfs/ ro true
   btrfs property set -ts /lxc/$lxc_template-opt ro true
   btrfs property set -ts /lxc-data/$lxc_template-var ro true
@@ -90,9 +90,9 @@ function fs_snap_hold_readonly {
 }
 
 function fs_recv {
-  local $template="$1"
-  local $deltas="$2"
-  local $lxc_rootfs="$3"
+  local template="$1"
+  local deltas="$2"
+  local lxc_rootfs="$3"
   zfs recv lxc/$template < $deltas/rootfs.delta
   zfs set mountpoint=$lxc_rootfs lxc/$template
   zfs recv lxc/$template-opt < $deltas/opt.delta
@@ -102,9 +102,9 @@ function fs_recv {
 
 #generate delta images of all filesystems
 function fs_send {
-  local $parent="$1"
-  local $container="$2"
-  local $deltas="$3"
+  local parent="$1"
+  local container="$2"
+  local deltas="$3"
   zfs send -I "lxc/$parent@template" "lxc/$container@template" > "$deltas/rootfs.delta"
   zfs send -I "lxc/$parent-opt@template" "lxc/$container-opt@template" > "$deltas/opt.delta"
   zfs send -I "lxc-data/$parent-var@template" "lxc-data/$container-var@template" > "$deltas/var.delta"
@@ -112,10 +112,10 @@ function fs_send {
 }
 
 function fs_remove_mount {
-  child="$1"
-  parent="$2"
-  partition="$3"
-  pool="$4"
+  local child="$1"
+  local parent="$2"
+  local partition="$3"
+  local pool="$4"
 
   child_ds="$pool/$child-$partition"
   parent_ds="$pool/$parent-$partition"
@@ -133,8 +133,8 @@ function fs_remove_mount {
 
 #release all holds on clone's rootfs snaps and delete snaps
 function fs_rls_holds_delete_snaps {
-  local $clone="$1"
-  local $snap="$2"
+  local clone="$1"
+  local snap="$2"
   for snap in `zfs list -t snapshot -o name -H | grep $clone@`; do
     for hold in `zfs holds -r $snap | grep $snap | awk '{print $2}'`; do
       zfs release $hold $snap
@@ -148,7 +148,7 @@ function fs_rls_holds_delete_snaps {
 
 #demote template
 function fs_demote_template {
-  local $temp="$1"  
+  local temp="$1"  
   local lxc_path="/var/lib/lxc/$temp"
 
   cat $lxc_path/config | \
