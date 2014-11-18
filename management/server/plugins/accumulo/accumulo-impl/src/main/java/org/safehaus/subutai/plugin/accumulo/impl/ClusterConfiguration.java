@@ -68,10 +68,13 @@ public class ClusterConfiguration
             // configure zookeeper
             executeCommand( host, Commands.getBindZKClusterCommand( serializeZKNodeNames( zookeeperClusterConfig ) ) );
 
-            // init accumulo instance
-            executeCommand( master, Commands.getInitCommand( accumuloClusterConfig.getInstanceName(),
-                    accumuloClusterConfig.getPassword() ) );
         }
+
+        // init accumulo instance
+        executeCommand( master, Commands.getInitCommand( accumuloClusterConfig.getInstanceName(),
+                accumuloClusterConfig.getPassword() ) );
+
+
         accumuloClusterConfig.setEnvironmentId( environment.getId() );
         accumuloManager.getPluginDAO()
                        .saveInfo( AccumuloClusterConfig.PRODUCT_KEY, accumuloClusterConfig.getClusterName(),
