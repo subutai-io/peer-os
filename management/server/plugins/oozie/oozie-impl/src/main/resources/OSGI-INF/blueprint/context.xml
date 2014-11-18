@@ -7,14 +7,8 @@
     <property name="password" value="" />
   </bean>
 
-  <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
-  <reference id="containerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.container.api.container.ContainerManager" />
   <reference id="environmentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
   <reference id="hadoopManager" availability="mandatory"
@@ -22,10 +16,7 @@
 
   <bean id="oozie-impl" scope="singleton" class="org.safehaus.subutai.plugin.oozie.impl.OozieImpl"
         init-method="init" destroy-method="destroy">
-    <property name="agentManager" ref="agentManager" />
     <property name="tracker" ref="tracker" />
-    <property name="commandRunner" ref="commandRunner" />
-    <property name="containerManager" ref="containerManager" />
     <property name="environmentManager" ref="environmentManager" />
     <property name="hadoopManager" ref="hadoopManager" />
     <argument ref="dataSource" />
