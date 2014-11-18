@@ -91,10 +91,20 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
         {
             try
             {
-                host.execute( Commands.getStopCommand() );
+                CommandResult result = host.execute( Commands.getStopCommand() );
+                if ( result.hasSucceeded() )
+                {
+                    trackerOperation.addLog( result.getStdOut() );
+                }
+                else
+                {
+                    trackerOperation.addLogFailed( result.getStdErr() );
+                }
+                trackerOperation.addLogDone( "Stop cluster command executed" );
             }
             catch ( CommandException e )
             {
+                trackerOperation.addLogFailed( e.getMessage() );
                 LOG.error( e.getMessage(), e );
             }
         }
@@ -110,7 +120,15 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
             try
             {
                 CommandResult result = host.execute( Commands.getStartCommand() );
-                trackerOperation.addLog( result.getStdOut() );
+                if ( result.hasSucceeded() )
+                {
+                    trackerOperation.addLog( result.getStdOut() );
+                }
+                else
+                {
+                    trackerOperation.addLogFailed( result.getStdErr() );
+                }
+                trackerOperation.addLogDone( "Start cluster command executed" );
             }
             catch ( CommandException e )
             {
