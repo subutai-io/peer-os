@@ -6,14 +6,13 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
@@ -221,6 +220,24 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
                     }
                     po.addLog( String.format( "Zookeeper %s installed on Storm nimbus node %s",
                             commandResult.hasSucceeded() ? "" : "not", stormNode.getHostname() ) );
+                }
+                // Install storm on zookeeper node if external zookeeper is selected
+                else if ( config.isExternalZookeeper() && config.getNimbus().equals( stormNode.getId() )
+                        && operation_count == 0 )
+                {
+                    String installStormCommand = Commands.make( org.safehaus.subutai.plugin.storm.impl.CommandType.INSTALL );
+                    CommandResult commandResult = null;
+                    try
+                    {
+                        commandResult = stormNode.execute( new RequestBuilder( installStormCommand ).withTimeout( 1800 ) );
+                    }
+                    catch ( CommandException e )
+                    {
+                        e.printStackTrace();
+                    }
+                    po.addLog( String.format( "Storm %s installed on zookeeper node %s",
+                            commandResult.hasSucceeded() ? "" : "not", stormNode.getHostname() ) );
+
                 }
                 try
                 {

@@ -7,7 +7,6 @@ import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
-import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.common.impl.AbstractNodeOperationTask;
 
 

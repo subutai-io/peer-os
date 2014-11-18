@@ -2,17 +2,14 @@ package org.safehaus.subutai.plugin.storm.impl.handler;
 
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
@@ -26,7 +23,7 @@ import org.safehaus.subutai.plugin.storm.impl.CommandType;
 import org.safehaus.subutai.plugin.storm.impl.Commands;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 import org.safehaus.subutai.plugin.storm.impl.StormService;
-import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +41,6 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
     private ClusterOperationType operationType;
     private StormClusterConfiguration config;
     private String hostname;
-    private ExecutorService executor = Executors.newCachedThreadPool();
 
 
     public StormClusterOperationHandler( final StormImpl manager,
@@ -234,12 +230,26 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
         {
             trackerOperation.addLog( "Destroying environment..." );
             manager.getEnvironmentManager().destroyEnvironment( config.getEnvironmentId() );
+            if ( config.isExternalZookeeper() ) {
+                ZookeeperClusterConfig zookeeperClusterConfig =
+                        manager.getZookeeperManager().getCluster( config.getZookeeperClusterName() );
+                Environment zookeeperEnvironment =
+                        manager.getEnvironmentManager().getEnvironmentByUUID(
+                                zookeeperClusterConfig.getEnvironmentId() );
+                ContainerHost nimbusNode = zookeeperEnvironment.getContainerHostByUUID( config.getNimbus() );
+                nimbusNode.execute( new RequestBuilder( Commands.make( CommandType.PURGE ) ) );
+            }
             manager.getPluginDAO().deleteInfo( config.getProductKey(), config.getClusterName() );
             trackerOperation.addLogDone( "Cluster destroyed" );
         }
         catch ( EnvironmentDestroyException e )
         {
             trackerOperation.addLogFailed( String.format( "Error destroying environment, %s", e.getMessage() ) );
+            LOG.error( e.getMessage(), e );
+        }
+        catch ( CommandException e )
+        {
+            trackerOperation.addLogFailed( String.format( "Error uninstalling storm package, %s", e.getMessage() ) );
             LOG.error( e.getMessage(), e );
         }
     }

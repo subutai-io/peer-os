@@ -18,6 +18,7 @@ import org.safehaus.subutai.plugin.storm.impl.CommandType;
 import org.safehaus.subutai.plugin.storm.impl.Commands;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 import org.safehaus.subutai.plugin.storm.impl.StormService;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 import com.google.common.base.Preconditions;
 
@@ -60,6 +61,15 @@ public class StormNodeOperationHandler extends AbstractOperationHandler<StormImp
 
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
         ContainerHost containerHost = environment.getContainerHostByHostname( hostname );
+        // Check if the container is on external environment
+        if ( config.isExternalZookeeper() && containerHost == null )
+        {
+            ZookeeperClusterConfig zookeeperCluster = manager.getZookeeperManager().getCluster(
+                    config.getZookeeperClusterName() );
+            Environment zookeeperEnvironment =
+                    manager.getEnvironmentManager().getEnvironmentByUUID( zookeeperCluster.getEnvironmentId() );
+            containerHost =zookeeperEnvironment.getContainerHostByHostname( hostname );
+        }
 
         if ( containerHost == null )
         {
@@ -74,12 +84,9 @@ public class StormNodeOperationHandler extends AbstractOperationHandler<StormImp
             {
                 case START:
                     if ( config.getNimbus().equals( containerHost.getId() ) ) {
-                        if ( ! config.isExternalZookeeper() )
-                        {
-                            commandResultList.add( containerHost.execute( new RequestBuilder( manager.getZookeeperManager().getCommand(
+                        commandResultList.add( containerHost.execute( new RequestBuilder( manager.getZookeeperManager().getCommand(
 
-                                    org.safehaus.subutai.plugin.zookeeper.api.CommandType.START ) ) ) );
-                        }
+                                org.safehaus.subutai.plugin.zookeeper.api.CommandType.START ) ) ) );
                         commandResultList.add( containerHost.execute( new
                                 RequestBuilder( Commands.make( CommandType.START, StormService.NIMBUS ) ) ) );
                         commandResultList.add( containerHost.execute(
