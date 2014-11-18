@@ -3,7 +3,6 @@ package org.safehaus.subutai.plugin.oozie.ui.wizard;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
@@ -38,12 +37,12 @@ public class VerificationStep extends Panel
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
-        cfgView.addStringCfg( "Server", wizard.getConfig().getServer().getHostname() + "\n" );
+        cfgView.addStringCfg( "Server", wizard.getConfig().getServer().toString() + "\n" );
         if ( wizard.getConfig().getClients() != null )
         {
-            for ( Agent agent : wizard.getConfig().getClients() )
+            for ( UUID agent : wizard.getConfig().getClients() )
             {
-                cfgView.addStringCfg( "Clients", agent.getHostname() + "\n" );
+                cfgView.addStringCfg( "Clients", agent.toString() + "\n" );
             }
         }
 
@@ -70,10 +69,10 @@ public class VerificationStep extends Panel
                         Hadoop hadoopManager = wizard.getHadoopManager();
                         String hadoopClusterName = wizard.getConfig().getHadoopClusterName();
                         HadoopClusterConfig cluster = hadoopManager.getCluster( hadoopClusterName );
-                        UUID trackID = hadoopManager.restartNameNode( cluster );
-                        ProgressWindow window = new ProgressWindow( wizard.getExecutor(), wizard.getTracker(), trackID,
+//                        UUID trackID = hadoopManager.restartNameNode( cluster );
+                        /*ProgressWindow window = new ProgressWindow( wizard.getExecutor(), wizard.getTracker(), trackID,
                                 HadoopClusterConfig.PRODUCT_KEY );
-                        getUI().addWindow( window.getWindow() );
+                        getUI().addWindow( window.getWindow() );*/
                     }
                 } );
 
