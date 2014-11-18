@@ -21,6 +21,7 @@ import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.filetracker.api.ConfigPointListener;
 import org.safehaus.subutai.core.filetracker.api.FileTrackerException;
+import org.safehaus.subutai.core.filetracker.api.InotifyEventType;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -43,12 +44,12 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class FileTrackerImplTest
 {
-    private static final String CONFIG_POINT = "/etc";
-    private final static UUID ID = UUIDUtil.generateRandomUUID();
-    private static final Set<String> CONFIG_POINTS = Sets.newHashSet( "/etc/approx", "/etc/nginx" );
+    private static final  UUID ID = UUIDUtil.generateRandomUUID();
+    private static final String CONFIG_POINT = "/etc/approx";
+    private static final InotifyEventType EVENT_TYPE= InotifyEventType.CREATE_FOLDER;
     private static final String INOTIFY_RESPONSE = String.format(
-            "{ \"response\": {" + "  \"type\": \"INOTIFY_EVENT\"," + "  \"id\": \"%s\","
-                    + "  \"configPoints\":[%s]  } }", ID, StringUtil.joinStrings( CONFIG_POINTS, ',', true ) );
+            "{ \"response\": {" + "  \"type\": \"INOTIFY_EVENT\"," + "  \"id\": \"%s\"," + "  \"configPoint\":\"%s\", \"dateTime\":\"18.11.2014 11:42:39\", \"eventType\":\"%s\"  } }",
+            ID, CONFIG_POINT,EVENT_TYPE );
     @Mock
     Broker broker;
     @Mock
