@@ -3,25 +3,22 @@ package org.safehaus.subutai.plugin.mongodb.impl.handler;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.exception.SubutaiException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
-import org.safehaus.subutai.plugin.mongodb.api.MongoException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoRouterNode;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
@@ -85,13 +82,18 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
         try
         {
             List<Template> templates = new ArrayList();
-            //TODO: add to list all templates hierarchy (parent templates)
-            templates.add( localPeer.getTemplate( config.getTemplateName() ) );
+            Template template = localPeer.getTemplate( config.getTemplateName() );
+            templates.add( template );
+            while ( !"master".equals( template.getTemplateName() ) )
+            {
+                template = localPeer.getTemplate( template.getParentTemplateName() );
+                templates.add( 0, template );
+            }
             Set<ContainerHost> containerHosts = localPeer
                     .createContainers( localPeer.getId(), config.getEnvironmentId(), templates, 1,
                             MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( nodeType ).getStrategyId(),
                             MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( nodeType ).getCriteriaAsList(),
-                            "mongoNodeGroup" );
+                            nodeType.name() );
 
             if ( containerHosts.size() != 1 )
             {
@@ -103,15 +105,16 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
             {
                 case CONFIG_NODE:
                     mongoNode = new MongoConfigNodeImpl( containerHost.getAgent(), containerHost.getPeerId(),
-                            containerHost.getEnvironmentId() );
+                            containerHost.getEnvironmentId(), config.getDomainName(), config.getCfgSrvPort() );
                     break;
                 case ROUTER_NODE:
                     mongoNode = new MongoRouterNodeImpl( containerHost.getAgent(), containerHost.getPeerId(),
-                            containerHost.getEnvironmentId(), config.getRouterPort() );
+                            containerHost.getEnvironmentId(), config.getDomainName(), config.getRouterPort(),
+                            config.getCfgSrvPort() );
                     break;
                 case DATA_NODE:
                     mongoNode = new MongoDataNodeImpl( containerHost.getAgent(), containerHost.getPeerId(),
-                            containerHost.getEnvironmentId(), config.getDataNodePort() );
+                            containerHost.getEnvironmentId(), config.getDomainName(), config.getDataNodePort() );
                     break;
             }
             config.addNode( mongoNode, nodeType );
@@ -120,6 +123,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
         catch ( PeerException e )
         {
             po.addLogFailed( e.toString() );
+            return;
         }
 
         boolean result = true;
@@ -152,7 +156,6 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
 
         Set<Host> clusterMembers = new HashSet<Host>( config.getAllNodes() );
         clusterMembers.add( newDataNode );
-        //        CommandDef commandDef = null;
         CommandResult commandResult = null;
         try
         {
@@ -163,18 +166,19 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
 
             newDataNode.setReplicaSetName( config.getReplicaSetName() );
             po.addLog( String.format( "Set replica set name succeeded" ) );
-
+            po.addLog( String.format( "Stopping node..." ) );
+            newDataNode.stop();
+            po.addLog( String.format( "Starting node..." ) );
             newDataNode.start();
+
             po.addLog( String.format( "Data node started successfully" ) );
 
-
-            MongoDataNode primaryNode = findPrimaryNode( config );
-
+            MongoDataNode primaryNode = config.findPrimaryNode();
 
             if ( primaryNode != null )
             {
 
-                primaryNode.registerSecondaryNode( newDataNode, config.getDataNodePort(), config.getDomainName() );
+                primaryNode.registerSecondaryNode( newDataNode );
 
                 po.addLog( String.format( "Secondary node registered successfully." ) );
                 return true;
@@ -294,48 +298,6 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
     }
 
 
-    private MongoDataNode findPrimaryNode( MongoClusterConfig config ) throws MongoException
-    {
-        MongoDataNode node = config.getDataNodes().iterator().next();
-
-        String primaryNodeHostname = node.getPrimaryNodeName( config.getDomainName() );
-
-        return node;
-    }
-
-
-    private ContainerHost findNodeInCluster( String hostname )
-    {
-        MongoClusterConfig config = manager.getCluster( clusterName );
-
-        if ( config == null )
-        {
-            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
-            return null;
-        }
-
-
-        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        Iterator iterator = environment.getContainers().iterator();
-        ContainerHost host = null;
-        while ( iterator.hasNext() )
-        {
-            host = ( ContainerHost ) iterator.next();
-            if ( host.getHostname().equals( hostname ) )
-            {
-                break;
-            }
-        }
-
-        if ( host == null )
-        {
-            trackerOperation.addLogFailed( String.format( "No Container with ID %s", host.getId() ) );
-            return null;
-        }
-        return host;
-    }
-
-
     private boolean addRouter( TrackerOperation po, final MongoClusterConfig config, MongoRouterNode newRouter )
     {
 
@@ -348,7 +310,10 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
                 c.addIpHostToEtcHosts( config.getDomainName(), clusterMembers, Common.IP_MASK );
             }
 
-            newRouter.start( config.getConfigServers(), config.getDomainName(), config.getCfgSrvPort() );
+            po.addLog( String.format( "Starting router: %s", newRouter.getHostname() ) );
+            newRouter.setConfigServers( config.getConfigServers() );
+            newRouter.start();
+            return true;
             //            CommandDef commandDef = manager.getCommands()
             //                                           .getStartRouterCommand( config.getRouterPort(),
             // config.getCfgSrvPort(),

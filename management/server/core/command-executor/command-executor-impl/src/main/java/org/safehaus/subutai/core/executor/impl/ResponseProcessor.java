@@ -41,7 +41,7 @@ public class ResponseProcessor implements Runnable
         {
             process.getCallback().onResponse( response, process.getResult() );
 
-            if ( process.isCompleted() )
+            if ( process.isDone() )
             {
                 //remove process from command processor
                 processor.remove( response.getCommandId() );

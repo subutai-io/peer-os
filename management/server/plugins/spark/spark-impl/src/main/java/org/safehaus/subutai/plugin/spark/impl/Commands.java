@@ -3,8 +3,8 @@ package org.safehaus.subutai.plugin.spark.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
@@ -37,7 +37,7 @@ public class Commands
 
     public RequestBuilder getStartAllCommand()
     {
-        return new RequestBuilder( "service spark-all start" ).withTimeout( 360 );
+        return new RequestBuilder( "service spark-all start" ).withTimeout( 360 ).daemon();
     }
 
 
@@ -55,13 +55,14 @@ public class Commands
 
     public RequestBuilder getStartMasterCommand()
     {
-        return new RequestBuilder( "service spark-master start" ).withTimeout( 90 );
+        return new RequestBuilder( "service spark-master start" ).withTimeout( 90 ).daemon();
     }
 
 
     public RequestBuilder getRestartMasterCommand()
     {
-        return new RequestBuilder( "service spark-master stop && service spark-master start" ).withTimeout( 60 );
+        return new RequestBuilder( "service spark-master stop && service spark-master start" ).withTimeout( 60 )
+                                                                                              .daemon();
     }
 
 
@@ -85,7 +86,7 @@ public class Commands
 
     public RequestBuilder getStartSlaveCommand()
     {
-        return new RequestBuilder( "service spark-slave start" ).withTimeout( 90 );
+        return new RequestBuilder( "service spark-slave start" ).withTimeout( 90 ).daemon();
     }
 
 

@@ -1,167 +1,222 @@
 package org.safehaus.subutai.core.filetracker.impl;
 
 
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.enums.RequestType;
-import org.safehaus.subutai.common.enums.ResponseType;
-import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.protocol.ResponseListener;
-import org.safehaus.subutai.core.communication.api.CommunicationManager;
+import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.util.StringUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.core.broker.api.Broker;
+import org.safehaus.subutai.core.broker.api.BrokerException;
+import org.safehaus.subutai.core.broker.api.Topic;
+import org.safehaus.subutai.core.filetracker.api.ConfigPointListener;
 import org.safehaus.subutai.core.filetracker.api.FileTrackerException;
+import org.safehaus.subutai.core.filetracker.api.InotifyEventType;
+import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.google.common.collect.Sets;
 
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
-/**
- * Created by bahadyr on 9/25/14.
- */
+@RunWith( MockitoJUnitRunner.class )
 public class FileTrackerImplTest
 {
+    private static final  UUID ID = UUIDUtil.generateRandomUUID();
+    private static final String CONFIG_POINT = "/etc/approx";
+    private static final InotifyEventType EVENT_TYPE= InotifyEventType.CREATE_FOLDER;
+    private static final String INOTIFY_RESPONSE = String.format(
+            "{ \"response\": {" + "  \"type\": \"INOTIFY_EVENT\"," + "  \"id\": \"%s\"," + "  \"configPoint\":\"%s\", \"dateTime\":\"18.11.2014 11:42:39\", \"eventType\":\"%s\"  } }",
+            ID, CONFIG_POINT,EVENT_TYPE );
+    @Mock
+    Broker broker;
+    @Mock
+    PeerManager peerManager;
+    @Mock
+    JsonUtil jsonUtil;
+    @Mock
+    CommandUtil commandUtil;
+    @Mock
+    ExecutorService notifier;
+    @Mock
+    ConfigPointListener listener;
+    Set<ConfigPointListener> listeners = Sets.newHashSet( listener );
+    @Mock
+    Host host;
+    Set<String> configPoints = Sets.newHashSet( CONFIG_POINT );
+    @Mock
+    LocalPeer localPeer;
 
-    private final Set<ResponseListener> listeners = new HashSet<>();
-    private CommunicationManager communicationManager;
 
-    private FileTrackerImpl fileTracker;
-    private Host host;
+    FileTrackerImpl fileTracker;
 
 
     @Before
-    public void setupClasses()
+    public void setUp() throws Exception
     {
-        communicationManager = mock( CommunicationManager.class );
-
-        fileTracker = new FileTrackerImpl();
-        fileTracker.setCommunicationManager( communicationManager );
-        host = mock(Host.class);
+        fileTracker = new FileTrackerImpl( broker, peerManager );
+        fileTracker.notifier = notifier;
+        fileTracker.commandUtil = commandUtil;
+        fileTracker.jsonUtil = jsonUtil;
+        fileTracker.listeners = listeners;
+        when( peerManager.getLocalPeer() ).thenReturn( localPeer );
+        when( localPeer.bindHost( ID ) ).thenReturn( host );
     }
 
 
-    @Test( expected = NullPointerException.class )
-    public void shouldThrowNullPointerExceptionOnSetCommunicationManager()
+    private void throwCommandException() throws CommandException
     {
-        fileTracker.setCommunicationManager( null );
+        doThrow( new CommandException( "" ) ).when( commandUtil )
+                                             .execute( any( RequestBuilder.class ), any( Host.class ) );
     }
 
 
     @Test
-    public void shouldAccessCommunicationManagerAndCallAddListenerOnInit()
+    public void testConstructor() throws Exception
+    {
+        try
+        {
+            new FileTrackerImpl( null, peerManager );
+            fail( "Expected NullPointerException" );
+        }
+        catch ( NullPointerException e )
+        {
+        }
+        try
+        {
+            new FileTrackerImpl( broker, null );
+            fail( "Expected NullPointerException" );
+        }
+        catch ( NullPointerException e )
+        {
+        }
+    }
+
+
+    @Test
+    public void testInit() throws Exception
     {
         fileTracker.init();
-        verify( communicationManager ).addListener( fileTracker );
+
+        verify( broker ).addByteMessageListener( fileTracker );
+
+
+        doThrow( new BrokerException( "" ) ).when( broker ).addByteMessageListener( fileTracker );
+
+        try
+        {
+            fileTracker.init();
+            fail( "Expected FileTrackerException" );
+        }
+        catch ( FileTrackerException e )
+        {
+        }
     }
 
 
     @Test
-    public void shouldAccessCommunicationManagerAndCallRemoveListenerOnDestroy()
+    public void testDestroy() throws Exception
     {
         fileTracker.destroy();
-        verify( communicationManager ).removeListener( fileTracker );
+
+        verify( broker ).removeMessageListener( fileTracker );
+        verify( notifier ).shutdown();
     }
 
 
     @Test
-    public void shouldAddRemoveListenersFromListenersSet()
+    public void testAddRemoveListener() throws Exception
     {
-        ResponseListener listener = mock( ResponseListener.class );
+
         fileTracker.addListener( listener );
+
+        assertTrue( listeners.contains( listener ) );
+
         fileTracker.removeListener( listener );
+
+        assertFalse( listeners.contains( listener ) );
     }
 
 
-//    @Test
-    //    public void shouldAccessCommandRunnerOnCreateConfigPoints() throws FileTrackerException
-    //    {
-    //        Command command = mock( Command.class );
-    //        when( commandRunner.createCommand( any( RequestBuilder.class ), anySetOf( Agent.class ) ) )
-    //                .thenReturn( command );
-    //        fileTracker.createConfigPoints( mock( ManagementHost.class ), new String[] { "configPoints" } );
-    //        verify( commandRunner ).createCommand( any( RequestBuilder.class ), anySetOf( Agent.class ) );
-    //    }
-    //
-    //
-    //    @Test
-    //    public void shouldAccessCommandRunnerOnRemoveConfigPoints() throws FileTrackerException
-    //    {
-    //        Command command = mock( Command.class );
-    //        when( commandRunner.createCommand( any( RequestBuilder.class ), anySetOf( Agent.class ) ) )
-    //                .thenReturn( command );
-    //        fileTracker.removeConfigPoints( mock( ManagementHost.class ), new String[] { "configPoints" } );
-    //        verify( commandRunner ).createCommand( any( RequestBuilder.class ), anySetOf( Agent.class ) );
-    //    }
-    //
-    //
-    //    @Test
-    //    public void shouldAccessCommandRunnerCreateCommandOnListConfigPoints() throws FileTrackerException
-    //    {
-    //        Command command = mock( Command.class );
-    //        when( commandRunner.createCommand( any( RequestBuilder.class ), anySetOf( Agent.class ) ) )
-    //                .thenReturn( command );
-    //        fileTracker.listConfigPoints( mock( ManagementHost.class ) );
-    //        verify( commandRunner ).createCommand( any( RequestBuilder.class ), anySetOf( Agent.class ) );
-    //    }
-
-
-    @Test
-    public void shouldCallInterfaceMethodOnResponse()
+    @Test( expected = FileTrackerException.class )
+    public void testCreateConfigPoints() throws Exception
     {
-        ResponseListener listener = mock( ResponseListener.class );
-        Response response = mock( Response.class );
-        when( response.getType() ).thenReturn( ResponseType.INOTIFY_ACTION_RESPONSE );
-        fileTracker.addListener( listener );
-        fileTracker.onResponse( response );
-        verify( listener ).onResponse( response );
+        fileTracker.createConfigPoints( host, configPoints );
+
+        verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
+
+        throwCommandException();
+
+        fileTracker.createConfigPoints( host, configPoints );
     }
+
+
+    @Test( expected = FileTrackerException.class )
+    public void testRemoveConfigPoints() throws Exception
+    {
+        fileTracker.removeConfigPoints( host, configPoints );
+
+        verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
+
+        throwCommandException();
+
+        fileTracker.removeConfigPoints( host, configPoints );
+    }
+
+
+    @Test( expected = FileTrackerException.class )
+    public void testListConfigPoints() throws Exception
+    {
+        fileTracker.listConfigPoints( host );
+
+        verify( host ).execute( isA( RequestBuilder.class ), isA( CommandCallback.class ) );
+
+
+        doThrow( new CommandException( "" ) ).when( host )
+                                             .execute( isA( RequestBuilder.class ), isA( CommandCallback.class ) );
+
+        fileTracker.listConfigPoints( host );
+    }
+
 
     @Test
-    public void testRemoveConfigPoints() throws Exception {
-        String[] configPoints = {"test"};
-        fileTracker.removeConfigPoints(host,configPoints);
+    public void testGetTopic() throws Exception
+    {
 
-        verify(host).execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_REMOVE_REQUEST )
-                .withConfPoints(configPoints));
+        assertEquals( Topic.INOTIFY_TOPIC, fileTracker.getTopic() );
     }
+
 
     @Test
-    public void testCreateConfigPoints() throws  Exception {
-        String[] configPoints = {"test"};
-        fileTracker.createConfigPoints(host, configPoints);
+    public void testOnMessage() throws Exception
+    {
+        when( jsonUtil.from( anyString(), any( Class.class ) ) ).thenCallRealMethod();
 
-        verify(host).execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_CREATE_REQUEST )
-                .withConfPoints( configPoints ) );
+        fileTracker.onMessage( INOTIFY_RESPONSE.getBytes() );
 
-    }
-
-    @Test
-    public void testListConfigPoints() throws  Exception {
-        fileTracker.listConfigPoints(host);
-        verify(host).execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_LIST_REQUEST ) );
-        host.execute(new RequestBuilder("pwd").withType(RequestType.INOTIFY_LIST_REQUEST));
-    }
-
-    @Test ( expected = FileTrackerException.class )
-    public void shouldThrowFileTrackerExceptionInListConfigPoints() throws FileTrackerException, CommandException {
-        when(host.execute(any(RequestBuilder.class))).thenThrow(FileTrackerException.class);
-        fileTracker.listConfigPoints(host);
-    }
-
-    @Test ( expected = FileTrackerException.class )
-    public void shouldThrowFileTrackerExceptionInCreateConfigPoints() throws FileTrackerException, CommandException {
-        String[] configPoints = {"test"};
-        when(host.execute(any(RequestBuilder.class))).thenThrow(FileTrackerException.class);
-        fileTracker.createConfigPoints(host,configPoints);
-    }
-
-    @Test ( expected = FileTrackerException.class )
-    public void shouldThrowFileTrackerExceptionRemoveConfigPoints() throws FileTrackerException, CommandException {
-        String[] configPoints = {"test"};
-        when(host.execute(any(RequestBuilder.class))).thenThrow(FileTrackerException.class);
-        fileTracker.removeConfigPoints(host,configPoints);
+        verify( peerManager ).getLocalPeer();
+        verify( notifier ).execute( isA( Runnable.class ) );
     }
 }

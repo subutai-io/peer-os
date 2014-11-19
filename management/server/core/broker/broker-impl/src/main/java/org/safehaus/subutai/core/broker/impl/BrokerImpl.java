@@ -106,7 +106,6 @@ public class BrokerImpl implements Broker
 
     public void init() throws BrokerException
     {
-        //TODO enable below lines after migration to new agent
         setupConnectionPool();
         setupRouter();
     }
@@ -118,6 +117,8 @@ public class BrokerImpl implements Broker
         {
             pool.stop();
         }
+
+        messageRouter.dispose();
     }
 
 

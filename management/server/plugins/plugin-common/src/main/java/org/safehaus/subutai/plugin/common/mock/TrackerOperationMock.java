@@ -11,21 +11,22 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 public class TrackerOperationMock implements TrackerOperation
 {
     private final StringBuilder log = new StringBuilder();
-
+    private final UUID uuid = UUID.randomUUID();
+    private final Date created = new Date();
     private OperationState state = OperationState.RUNNING;
 
 
     @Override
     public String getDescription()
     {
-        return null;
+        return "desc";
     }
 
 
     @Override
     public UUID getId()
     {
-        return null;
+        return uuid;
     }
 
 
@@ -39,7 +40,7 @@ public class TrackerOperationMock implements TrackerOperation
     @Override
     public Date createDate()
     {
-        return null;
+        return created;
     }
 
 
