@@ -36,7 +36,7 @@ public:
 	string createTerminateMessage(string,string,int, int);
 	string createInQueueMessage(string,string);
 	string createHeartBeatMessage(string,string);
-    string createPsResponse(string id, string commandId);
+    string createPsResponse(string, string);
 	string createTimeoutMessage(string,int,int,int,string,string,string);
 	string createInotifyMessage(string,string,string,string);
 	string createInotifyShowMessage(string, string, vector<string>);
