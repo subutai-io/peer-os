@@ -1034,6 +1034,28 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
+        <artifactId>accumulo-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>accumulo-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>accumulo-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>accumulo-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- PIG -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
         <artifactId>pig-plugin-api</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1052,7 +1074,6 @@
         <artifactId>pig-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>pig-plugin-ui</artifactId>

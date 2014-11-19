@@ -554,6 +554,28 @@
       <artifactId>hbase-plugin-ui</artifactId>
     </dependency>
 
+    <!-- ACCUMULO -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>accumulo-plugin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>accumulo-plugin-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>accumulo-plugin-cli</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>accumulo-plugin-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>accumulo-plugin-ui</artifactId>
+    </dependency>
+
     <!-- OOZIE -->
     <!--
     <dependency>
