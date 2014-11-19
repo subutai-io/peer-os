@@ -12,7 +12,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
 
-public class StopEnvironmentContainerOperationHandlerTest
+/*public class StopEnvironmentContainerOperationHandlerTest
 {
 
 
@@ -41,4 +41,4 @@ public class StopEnvironmentContainerOperationHandlerTest
         assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not connected" ) );
         assertEquals( operationHandler.getTrackerOperation().getState(), OperationState.FAILED );
     }
-}
+}*/

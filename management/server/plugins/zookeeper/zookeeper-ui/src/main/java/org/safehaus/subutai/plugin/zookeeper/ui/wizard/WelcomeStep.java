@@ -58,8 +58,8 @@ public class WelcomeStep extends Panel
         Button startWithHadoop = new Button( "Start with-Hadoop installation" );
         startWithHadoop.setId( "ZookeeperStartWithHadoop" );
         startWithHadoop.addStyleName( "default" );
-        grid.addComponent( startWithHadoop, 6, 4, 6, 4 );
-        grid.setComponentAlignment( startWithHadoop, Alignment.BOTTOM_RIGHT );
+//        grid.addComponent( startWithHadoop, 6, 4, 6, 4 );
+//        grid.setComponentAlignment( startWithHadoop, Alignment.BOTTOM_RIGHT );
 
         startStandalone.addClickListener( new Button.ClickListener()
         {

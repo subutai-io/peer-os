@@ -144,12 +144,12 @@ public class NodeSelectionStep extends VerticalLayout
                     select.setValue( null );
                     select.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, allNodes ) );
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
+                    config.setEnvironmentId( hadoopInfo.getEnvironmentId() );
                 }
             }
         } );
 
-        Hadoop hadoopManager = hadoop;
-        List<HadoopClusterConfig> clusters = hadoopManager.getClusters();
+        List<HadoopClusterConfig> clusters = hadoop.getClusters();
         if ( clusters != null )
         {
             for ( HadoopClusterConfig hadoopClusterInfo : clusters )
@@ -162,7 +162,7 @@ public class NodeSelectionStep extends VerticalLayout
         String hcn = config.getHadoopClusterName();
         if ( hcn != null && !hcn.isEmpty() )
         {
-            HadoopClusterConfig info = hadoopManager.getCluster( hcn );
+            HadoopClusterConfig info = hadoop.getCluster( hcn );
             if ( info != null )
             {
                 hadoopClusters.setValue( info );

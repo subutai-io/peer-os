@@ -3,19 +3,6 @@
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
 
-  <reference id="accumuloManager" availability="mandatory"
-             interface="org.safehaus.subutai.plugin.accumulo.api.Accumulo" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
-  <reference id="tracker" availability="mandatory"
-             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
-  <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
-  <reference id="hadoopManager" availability="mandatory"
-             interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
-  <reference id="zookeeperManager" availability="mandatory"
-             interface="org.safehaus.subutai.plugin.zookeeper.api.Zookeeper" />
-
   <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.accumulo.ui.AccumuloPortalModule"
         init-method="init" destroy-method="destroy">
   </bean>

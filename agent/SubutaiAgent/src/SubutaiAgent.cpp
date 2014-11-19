@@ -378,7 +378,7 @@ int main(int argc,char *argv[],char *envp[])
                                         preArg + command.getWatchArguments()[i]));
                         }
                         Watcher.stats();
-                        sendout = response.setInotifyResponse(environment.getAgentUuidValue(),response.getCommandId());
+                        sendout = response.setInotifyResponse(environment.getAgentUuidValue(),command.getCommandId());
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Set_Inotify response: " + sendout));
                         connection->sendMessage(sendout, "RESPONSE_TOPIC");
                         Watcher.stats();
@@ -395,7 +395,7 @@ int main(int argc,char *argv[],char *envp[])
                                         preArg + command.getWatchArguments()[i]));
                         }
                         Watcher.stats();
-                        sendout = response.unsetInotifyResponse(environment.getAgentUuidValue(),response.getCommandId());
+                        sendout = response.unsetInotifyResponse(environment.getAgentUuidValue(),command.getCommandId());
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Unset_Inotify response: " + sendout));
                         connection->sendMessage(sendout, "RESPONSE_TOPIC");
                         Watcher.stats();

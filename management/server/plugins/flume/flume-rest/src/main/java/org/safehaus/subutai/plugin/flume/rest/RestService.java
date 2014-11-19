@@ -92,10 +92,9 @@ public class RestService
         String[] arr = nodes.split( "[,;]" );
         for ( String node : arr )
         {
-            Agent agent = agentManager.getAgentByHostname( node );
-            if ( agent != null )
+            if ( UUID.fromString( node ) != null )
             {
-                config.getNodes().add( agent );
+                config.getNodes().add( UUID.fromString( node ) );
             }
         }
 

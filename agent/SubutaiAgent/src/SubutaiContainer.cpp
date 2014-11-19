@@ -125,16 +125,14 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
             }
         }
 
-
         //   get exit code, stdout and stderr.
-
         if (result.exit_code == 0) {
             result.out = command_output;
         } else {
             result.err = command_output;
         }
     }
-    containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>",program + "executed. Exit code: "+ _helper.toString(result.exit_code)
+    containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>",program + " executed. Exit code: "+ _helper.toString(result.exit_code)
     		+ ", out stream: " + result.out + ", err stream: " + result.err));
     return result;
 }
@@ -222,7 +220,7 @@ bool SubutaiContainer::getContainerInterfaces()
     if (this->status != RUNNING) return false;
 
     vector<string> v;
-    string result = RunProgram("ifconfig", v);
+    string result = RunProgram("/sbin/ifconfig", v);
     vector<string> lines = _helper.splitResult(result, "\n");
     containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Run ifconfig on LXC"));
     string nic = "", address = "", ip = ""; bool found_name=false, found_mac = false, found_ip = false;

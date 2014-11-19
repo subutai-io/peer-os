@@ -3,15 +3,14 @@ package org.safehaus.subutai.plugin.storm.impl.handler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.CommandResult;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
@@ -24,6 +23,7 @@ import org.safehaus.subutai.plugin.storm.impl.CommandType;
 import org.safehaus.subutai.plugin.storm.impl.Commands;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 import org.safehaus.subutai.plugin.storm.impl.StormService;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,62 +34,63 @@ import com.google.common.base.Strings;
 /**
  * This class handles operations that are related to whole cluster.
  */
-public class StormClusterOperationHandler extends AbstractOperationHandler<StormImpl>
+public class StormClusterOperationHandler extends AbstractOperationHandler<StormImpl, StormClusterConfiguration>
         implements ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( StormClusterOperationHandler.class.getName() );
     private ClusterOperationType operationType;
     private StormClusterConfiguration config;
-    private ExecutorService executor = Executors.newCachedThreadPool();
+    private String hostname;
 
 
     public StormClusterOperationHandler( final StormImpl manager,
                                          final StormClusterConfiguration config,
                                          final ClusterOperationType operationType )
     {
-        super( manager, config.getClusterName() );
+        super( manager, config );
         this.operationType = operationType;
         this.config = config;
         trackerOperation = manager.getTracker().createTrackerOperation( config.getProductKey(),
-                String.format( "Creating %s tracker object...", clusterName ) );
+                String.format( "Running %s operation on %s...", operationType , clusterName ) );
+    }
+
+
+    public StormClusterOperationHandler( final StormImpl manager,
+                                         final StormClusterConfiguration config,
+                                         final String hostname,
+                                         final ClusterOperationType operationType )
+    {
+        super( manager, config );
+        this.operationType = operationType;
+        this.config = config;
+        this.hostname = hostname;
+        trackerOperation = manager.getTracker().createTrackerOperation( config.getProductKey(),
+                String.format( "Running %s operation on %s...", operationType , clusterName ) );
     }
 
 
     public void run()
     {
         Preconditions.checkNotNull( config, "Configuration is null !!!" );
-        switch ( operationType )
-        {
-            case INSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
-                        setupCluster();
-                    }
-                } );
-                break;
-            case UNINSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
-                        destroyCluster();
-                    }
-                } );
-                break;
-        }
+        runOperationOnContainers( operationType );
     }
 
 
     @Override
     public void runOperationOnContainers( ClusterOperationType clusterOperationType )
     {
-        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        List<CommandResult> commandResultList = new ArrayList<CommandResult>(  );
+        Environment environment;
+        List<CommandResult> commandResultList = new ArrayList<>(  );
         switch ( clusterOperationType )
         {
+            case INSTALL:
+                setupCluster();
+                break;
+            case UNINSTALL:
+                destroyCluster();
+                break;
             case START_ALL:
+                environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     if ( config.getNimbus().equals( containerHost.getId() ) ) {
@@ -98,12 +99,13 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
                         commandResultList.add( executeCommand( containerHost, Commands
                                 .make( CommandType.START, StormService.UI ) ) );
                     }
-                    else if ( config.getSupervisors().equals( containerHost.getId() ) )
+                    else if ( config.getSupervisors().contains( containerHost.getId() ) )
                         commandResultList.add( executeCommand( containerHost, Commands
                                 .make( CommandType.START, StormService.SUPERVISOR ) ) );
                 }
                 break;
             case STOP_ALL:
+                environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     if ( config.getNimbus().equals( containerHost.getId() ) ) {
@@ -112,12 +114,13 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
                         commandResultList.add( executeCommand( containerHost, Commands
                                 .make( CommandType.STOP, StormService.UI ) ) );
                     }
-                    else if ( config.getSupervisors().equals( containerHost.getId() ) )
+                    else if ( config.getSupervisors().contains( containerHost.getId() ) )
                         commandResultList.add( executeCommand( containerHost, Commands
                                 .make( CommandType.STOP, StormService.SUPERVISOR ) ) );
                 }
                 break;
             case STATUS_ALL:
+                environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     if ( config.getNimbus().equals( containerHost.getId() ) ) {
@@ -126,13 +129,37 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
                         commandResultList.add( executeCommand( containerHost, Commands
                                 .make( CommandType.STATUS, StormService.UI ) ) );
                     }
-                    else if ( config.getSupervisors().equals( containerHost.getId() ) )
+                    else if ( config.getSupervisors().contains( containerHost.getId() ) )
                         commandResultList.add( executeCommand( containerHost, Commands
                                 .make( CommandType.STATUS, StormService.SUPERVISOR ) ) );
                 }
                 break;
+            case ADD:
+                commandResultList.addAll( addNode() );
+                break;
+            case REMOVE:
+                commandResultList.addAll( removeNode() );
+
+                break;
         }
         logResults( trackerOperation, commandResultList );
+    }
+
+
+    private List<CommandResult> removeNode()
+    {
+        List<CommandResult> commandResults = new ArrayList<>();
+        Preconditions.checkNotNull( hostname, "Hostname of the node to be removed cannot be null!" );
+        trackerOperation.addLogFailed( "Removing node from cluster is not supported yet!" );
+        return commandResults;
+    }
+
+
+    private List<CommandResult> addNode()
+    {
+        List<CommandResult> commandResults = new ArrayList<>();
+        trackerOperation.addLogFailed( "Adding node to cluster is not supported yet!" );
+        return commandResults;
     }
 
 
@@ -171,6 +198,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
         {
             Environment env = manager.getEnvironmentManager()
                                      .buildEnvironment( manager.getDefaultEnvironmentBlueprint( config ) );
+            trackerOperation.addLog( String.format( "Environment created successfully", clusterName ) );
 
             ClusterSetupStrategy clusterSetupStrategy =
                     manager.getClusterSetupStrategy( env, config, trackerOperation );
@@ -181,7 +209,8 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
         catch ( EnvironmentBuildException | ClusterSetupException e )
         {
             trackerOperation.addLogFailed(
-                    String.format( "Failed to setup %s cluster %s : %s", config.getProductKey(), clusterName, e.getMessage() ) );
+                    String.format( "Failed to setup %s cluster %s : %s", config.getProductKey(), clusterName,
+                            e.getMessage() ) );
         }
     }
 
@@ -201,12 +230,26 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
         {
             trackerOperation.addLog( "Destroying environment..." );
             manager.getEnvironmentManager().destroyEnvironment( config.getEnvironmentId() );
+            if ( config.isExternalZookeeper() ) {
+                ZookeeperClusterConfig zookeeperClusterConfig =
+                        manager.getZookeeperManager().getCluster( config.getZookeeperClusterName() );
+                Environment zookeeperEnvironment =
+                        manager.getEnvironmentManager().getEnvironmentByUUID(
+                                zookeeperClusterConfig.getEnvironmentId() );
+                ContainerHost nimbusNode = zookeeperEnvironment.getContainerHostByUUID( config.getNimbus() );
+                nimbusNode.execute( new RequestBuilder( Commands.make( CommandType.PURGE ) ) );
+            }
             manager.getPluginDAO().deleteInfo( config.getProductKey(), config.getClusterName() );
             trackerOperation.addLogDone( "Cluster destroyed" );
         }
         catch ( EnvironmentDestroyException e )
         {
-            trackerOperation.addLogFailed( String.format( "Error running command, %s", e.getMessage() ) );
+            trackerOperation.addLogFailed( String.format( "Error destroying environment, %s", e.getMessage() ) );
+            LOG.error( e.getMessage(), e );
+        }
+        catch ( CommandException e )
+        {
+            trackerOperation.addLogFailed( String.format( "Error uninstalling storm package, %s", e.getMessage() ) );
             LOG.error( e.getMessage(), e );
         }
     }
@@ -217,18 +260,11 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
         Preconditions.checkNotNull( commandResultList );
         for ( CommandResult commandResult : commandResultList )
             po.addLog( commandResult.getStdOut() );
-        String finishMessage = String.format( "%s operation finished", operationType );
-        switch ( po.getState() )
-        {
-            case SUCCEEDED:
-                po.addLogDone( finishMessage );
-                break;
-            case FAILED:
-                po.addLogFailed( finishMessage );
-                break;
-            default:
-                po.addLogDone( String.format( "Still running %s operations on %s", operationType ) );
-                break;
+        if ( po.getState() == OperationState.FAILED ) {
+            po.addLogFailed( "" );
+        }
+        else {
+            po.addLogDone( "" );
         }
     }
 }
