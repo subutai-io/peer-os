@@ -1,8 +1,6 @@
 package org.safehaus.subutai.core.filetracker.api;
 
 
-import java.util.Set;
-
 import org.safehaus.subutai.core.peer.api.Host;
 
 
@@ -11,5 +9,5 @@ import org.safehaus.subutai.core.peer.api.Host;
  */
 public interface ConfigPointListener
 {
-    public void onConfigPointChangeEvent( Host host, Set<String> configPoints );
+    public void onConfigPointChangeEvent( Host host, InotifyEventType eventType, String configPoint );
 }

@@ -22,6 +22,7 @@ import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.filetracker.api.ConfigPointListener;
 import org.safehaus.subutai.core.filetracker.api.FileTracker;
 import org.safehaus.subutai.core.filetracker.api.FileTrackerException;
+import org.safehaus.subutai.core.filetracker.api.InotifyEventType;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -169,10 +170,11 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
         {
             String response = new String( message, "UTF-8" );
             InotifyEvent inotifyEvent = jsonUtil.from( response, InotifyEvent.class );
-            if ( !CollectionUtil.isCollectionEmpty( inotifyEvent.getResponse().getConfigPoints() ) )
+            if ( inotifyEvent.getResponse() != null )
             {
                 Host host = peerManager.getLocalPeer().bindHost( inotifyEvent.getResponse().getId() );
-                notifyListeners( host, inotifyEvent.getResponse().getConfigPoints() );
+                notifyListeners( host, inotifyEvent.getResponse().getEventType(),
+                        inotifyEvent.getResponse().getConfigPoint() );
             }
         }
         catch ( Exception e )
@@ -182,7 +184,7 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
     }
 
 
-    protected void notifyListeners( final Host host, final Set<String> configPoints )
+    protected void notifyListeners( final Host host, final InotifyEventType eventType, final String configPoint )
     {
         for ( final ConfigPointListener listener : listeners )
         {
@@ -191,7 +193,7 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
                 @Override
                 public void run()
                 {
-                    listener.onConfigPointChangeEvent( host, configPoints );
+                    listener.onConfigPointChangeEvent( host, eventType, configPoint );
                 }
             } );
         }

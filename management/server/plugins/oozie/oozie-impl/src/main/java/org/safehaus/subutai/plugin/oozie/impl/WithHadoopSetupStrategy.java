@@ -4,11 +4,10 @@ package org.safehaus.subutai.plugin.oozie.impl;
 import java.util.Set;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
@@ -44,7 +43,7 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
     public ConfigBase setup() throws ClusterSetupException
     {
         //check if node agents are connected
-        for ( Agent agent : config.getClients() )
+        /*for ( Agent agent : config.getClients() )
         {
             String hostname = agent.getHostname();
             if ( oozieManager.getAgentManager().getAgentByHostname( hostname ) == null )
@@ -119,7 +118,7 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
 
         po.addLog( "Saving to db..." );
         oozieManager.getPluginDAO().saveInfo( OozieClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-        po.addLog( "Cluster info successfully saved" );
+        po.addLog( "Cluster info successfully saved" );*/
 
         return config;
     }

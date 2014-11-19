@@ -22,7 +22,6 @@
     <module>communication-manager</module>
     <module>monitoring</module>
     <module>container-manager</module>
-    <!--<module>config-point-tracker</module>-->
     <module>file-tracker</module>
     <module>environment-manager</module>
     <module>environment-terminal</module>

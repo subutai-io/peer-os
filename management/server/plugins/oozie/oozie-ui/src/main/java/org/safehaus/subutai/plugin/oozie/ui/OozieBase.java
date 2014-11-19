@@ -8,15 +8,4 @@ abstract class OozieBase
 {
 
 
-
-
-
-    /*public ExecutorService getExecutor() {
-        return executor;
-    }
-
-
-    public void setExecutor( final ExecutorService executor ) {
-        this.executor = executor;
-    }*/
 }

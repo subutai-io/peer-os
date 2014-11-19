@@ -92,6 +92,7 @@ class SubutaiThread
         SubutaiStreamReader     errorStream;
         SubutaiStreamReader     outputStream;
         SubutaiHelper 			helper;
+        SubutaiContainer*       _container;          // container attached to this thread
         string                  argument, exec, sendout, environment;
         string                  outBuff, errBuff;   //general buffers for error and output
         pid_t                   pid;
