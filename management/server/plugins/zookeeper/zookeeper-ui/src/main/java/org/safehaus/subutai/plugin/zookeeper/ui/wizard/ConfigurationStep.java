@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -39,7 +39,7 @@ import com.vaadin.ui.TwinColSelect;
 public class ConfigurationStep extends Panel
 {
 
-    public ConfigurationStep( final Hadoop hadoop, final Wizard wizard )
+    public ConfigurationStep( final Hadoop hadoop, final Wizard wizard, EnvironmentManager environmentManager )
     {
 
         if ( wizard.getConfig().getSetupType() == SetupType.STANDALONE )
@@ -186,12 +186,23 @@ public class ConfigurationStep extends Panel
                 hadoopClustersCombo.setValue( hadoopClusterConfigs.iterator().next() );
             }
 
+            HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
+
+            List<UUID> allHadoopNodes = hadoopInfo.getAllNodes();
+            Set<UUID> allHadoopNodeSet = new HashSet<>();
+            allHadoopNodeSet.addAll( allHadoopNodes );
+            Environment hadoopEnvironment =
+                    environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
+            final Set<ContainerHost> hadoopNodes = hadoopEnvironment.getHostsByIds( allHadoopNodeSet );
+
             if ( hadoopClustersCombo.getValue() != null )
             {
-                HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
                 wizard.getConfig().setHadoopClusterName( hadoopInfo.getClusterName() );
+                wizard.setHadoopClusterConfig( hadoopInfo );
+
                 hadoopNodesSelect
-                        .setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopInfo.getAllNodes() ) );
+                        .setContainerDataSource(
+                                new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
             }
 
             hadoopClustersCombo.addValueChangeListener( new Property.ValueChangeListener()
@@ -204,9 +215,10 @@ public class ConfigurationStep extends Panel
                         HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                         hadoopNodesSelect.setValue( null );
                         hadoopNodesSelect.setContainerDataSource(
-                                new BeanItemContainer<>( ContainerHost.class, hadoopInfo.getAllNodes() ) );
+                                new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
                         wizard.getConfig().setHadoopClusterName( hadoopInfo.getClusterName() );
-                        wizard.getConfig().setNodes( new HashSet<ContainerHost>() );
+                        wizard.setHadoopClusterConfig( hadoopInfo );
+                        wizard.getConfig().setNodes( new HashSet<UUID>() );
                     }
                 }
             } );
@@ -232,7 +244,10 @@ public class ConfigurationStep extends Panel
                     if ( event.getProperty().getValue() != null )
                     {
                         Set<ContainerHost> containerHosts = new HashSet<>( ( Collection<ContainerHost> ) event.getProperty().getValue() );
-                        wizard.getConfig().setNodes( containerHosts );
+                        Set<UUID> containerIDs = new HashSet<UUID>();
+                        for ( ContainerHost containerHost : containerHosts )
+                            containerIDs.add( containerHost.getId() );
+                        wizard.getConfig().setNodes( containerIDs );
                     }
                 }
             } );

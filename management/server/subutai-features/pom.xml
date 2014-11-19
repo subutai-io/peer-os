@@ -616,7 +616,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>solr-plugin-ui</artifactId>
     </dependency>
-    <!--
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>zookeeper-plugin-api</artifactId>
@@ -637,7 +636,24 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>zookeeper-plugin-ui</artifactId>
     </dependency>
-           -->
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>storm-plugin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>storm-plugin-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>storm-plugin-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>storm-plugin-ui</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mongodb-plugin-api</artifactId>
@@ -658,7 +674,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>mongodb-plugin-ui</artifactId>
     </dependency>
-
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>flume-plugin-api</artifactId>
@@ -700,24 +715,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>hive-plugin-ui</artifactId>
     </dependency>
-    <!--
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>storm-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>storm-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>storm-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>storm-plugin-ui</artifactId>
-    </dependency>
-   -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>presto-plugin-api</artifactId>
@@ -843,28 +840,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>pig-plugin-ui</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hbase-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hbase-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hbase-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hbase-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hbase-plugin-ui</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mahout-plugin-api</artifactId>
@@ -884,27 +859,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mahout-plugin-ui</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-cli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-rest</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cassandra-plugin-ui</artifactId>
     </dependency>
 
     <dependency>
@@ -962,7 +916,6 @@
     <artifactId>jetty-plugin-ui</artifactId>
     </dependency>
     -->
-
   </dependencies>
 
   <build>

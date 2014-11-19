@@ -1022,76 +1022,6 @@
         <artifactId>pig-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-
-      <!--<dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>oozie-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>oozie-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>oozie-plugin-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>oozie-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>oozie-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>accumulo-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>accumulo-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>accumulo-plugin-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>accumulo-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>accumulo-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>jetty-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>jetty-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>jetty-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-     -->
-
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>flume-plugin-api</artifactId>
@@ -1117,33 +1047,6 @@
         <artifactId>flume-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hive-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hive-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hive-plugin-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hive-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hive-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>lucene-plugin-api</artifactId>
@@ -1225,32 +1128,6 @@
 
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>pig-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>pig-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>pig-plugin-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>pig-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>pig-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
         <artifactId>presto-plugin-api</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1326,159 +1203,57 @@
         <artifactId>solr-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!--
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>spark-plugin-api</artifactId>
+        <artifactId>storm-plugin-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>spark-plugin-impl</artifactId>
+        <artifactId>storm-plugin-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>spark-plugin-cli</artifactId>
+        <artifactId>storm-plugin-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>spark-plugin-rest</artifactId>
+        <artifactId>storm-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>spark-plugin-ui</artifactId>
+        <artifactId>storm-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>lucene-plugin-ui</artifactId>
+        <artifactId>zookeeper-plugin-api</artifactId>
         <version>${project.version}</version>
       </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>mahout-plugin-api</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>mahout-plugin-impl</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>mahout-plugin-cli</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>mahout-plugin-rest</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>mahout-plugin-ui</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>mongodb-plugin-api</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>mongodb-plugin-impl</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>mongodb-plugin-cli</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>mongodb-plugin-rest</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>mongodb-plugin-ui</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>oozie-plugin-api</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>oozie-plugin-impl</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>oozie-plugin-cli</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>oozie-plugin-rest</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>oozie-plugin-ui</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>accumulo-plugin-api</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>accumulo-plugin-impl</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>accumulo-plugin-cli</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>accumulo-plugin-rest</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>accumulo-plugin-ui</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jetty-plugin-api</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jetty-plugin-impl</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>jetty-plugin-ui</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-
-            -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>zookeeper-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>zookeeper-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>zookeeper-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>zookeeper-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <!-- ELASTICSEARCH -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1533,31 +1308,6 @@
       </dependency>
 
       <!-- <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>hadoop-plugin-api</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>hadoop-plugin-impl</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>hadoop-plugin-cli</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>hadoop-plugin-rest</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>hadoop-plugin-ui</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-
        <dependency>
          <groupId>${project.groupId}</groupId>
          <artifactId>oozie-plugin-api</artifactId>
@@ -1628,32 +1378,6 @@
        -->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>flume-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>flume-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>flume-plugin-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>flume-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>flume-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
         <artifactId>hbase-plugin-api</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1703,163 +1427,6 @@
         <artifactId>hive-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!--
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>lucene-plugin-api</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>lucene-plugin-impl</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>lucene-plugin-cli</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>lucene-plugin-rest</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>lucene-plugin-ui</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>mahout-plugin-api</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>mahout-plugin-impl</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>mahout-plugin-cli</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>mahout-plugin-rest</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>mahout-plugin-ui</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>mongodb-plugin-api</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>mongodb-plugin-impl</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>mongodb-plugin-cli</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>mongodb-plugin-rest</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>mongodb-plugin-ui</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>pig-plugin-api</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>pig-plugin-impl</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>pig-plugin-cli</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>pig-plugin-rest</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>pig-plugin-ui</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-
- <dependency>
-   <groupId>${project.groupId}</groupId>
-   <artifactId>shark-plugin-api</artifactId>
-   <version>${project.version}</version>
- </dependency>
- <dependency>
-   <groupId>${project.groupId}</groupId>
-   <artifactId>shark-plugin-impl</artifactId>
-   <version>${project.version}</version>
- </dependency>
- <dependency>
-   <groupId>${project.groupId}</groupId>
-   <artifactId>shark-plugin-cli</artifactId>
-   <version>${project.version}</version>
- </dependency>
- <dependency>
-   <groupId>${project.groupId}</groupId>
-   <artifactId>shark-plugin-rest</artifactId>
-   <version>${project.version}</version>
- </dependency>
- <dependency>
-   <groupId>${project.groupId}</groupId>
-   <artifactId>shark-plugin-ui</artifactId>
-   <version>${project.version}</version>
- </dependency>
- -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>solr-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>solr-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>solr-plugin-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>solr-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>solr-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>spark-plugin-api</artifactId>
@@ -1911,59 +1478,6 @@
         <artifactId>sqoop-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!--
-          <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>storm-plugin-api</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>storm-plugin-impl</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>storm-plugin-cli</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>storm-plugin-rest</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>storm-plugin-ui</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-
-          <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>zookeeper-plugin-api</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>zookeeper-plugin-impl</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>zookeeper-plugin-cli</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>zookeeper-plugin-rest</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>zookeeper-plugin-ui</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-          -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>hipi-plugin-api</artifactId>
@@ -1989,33 +1503,6 @@
         <artifactId>hipi-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!--
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>nutch-plugin-api</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>nutch-plugin-impl</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>nutch-plugin-cli</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>nutch-plugin-rest</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>nutch-plugin-ui</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       -->
     </dependencies>
   </dependencyManagement>
 
