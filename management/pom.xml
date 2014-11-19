@@ -1153,7 +1153,7 @@
       </dependency>
 
       <!-- MAHOUT -->
-      <dependency>
+      <!--<dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>mahout-plugin-api</artifactId>
         <version>${project.version}</version>
@@ -1177,7 +1177,7 @@
         <groupId>${project.groupId}</groupId>
         <artifactId>mahout-plugin-ui</artifactId>
         <version>${project.version}</version>
-      </dependency>
+      </dependency>-->
 
       <!-- MONGODB   -->
       <dependency>
