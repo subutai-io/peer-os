@@ -18,18 +18,23 @@
 //import org.safehaus.subutai.plugin.presto.impl.handler.NodeOperationHanler;
 //import org.safehaus.subutai.plugin.presto.impl.mock.PrestoImplMock;
 //
+//import static org.mockito.Mockito.mock;
+//import static org.mockito.Mockito.when;
+//
 //
 //public class CheckEnvironmentContainerNodeOperationHandlerTest
 //{
-//    private PrestoImplMock mock;
+//    private PrestoImpl prestoMock;
 //    private AbstractOperationHandler handler;
+//    private PrestoClusterConfig config;
 //
 //
 //    @Before
 //    public void setUp()
 //    {
-//        mock = new PrestoImplMock();
-//        handler = new NodeOperationHanler( mock, "test-cluster", "test-host", NodeOperationType.STATUS );
+//        prestoMock = mock(PrestoImpl.class);
+//        config = mock( PrestoClusterConfig.class );
+//        handler = new NodeOperationHanler( prestoMock, "test-cluster", "test-host", NodeOperationType.STATUS );
 //    }
 //
 //
@@ -49,9 +54,8 @@
 //    {
 //        PrestoClusterConfig config = new PrestoClusterConfig();
 //        config.setClusterName( "test-cluster" );
-//        config.setWorkers( new HashSet<UUID>( Arrays.asList( CommonMockBuilder.createAgent().getUuid() ) ) );
-//        config.setCoordinatorNode( CommonMockBuilder.createAgent().getUuid() );
-//        mock.setClusterConfig( config );
+//        when(config.getWorkers( )).thenReturn( new HashSet<UUID>( Arrays.asList( CommonMockBuilder.createAgent().getUuid() ) ));
+//        when(config.getCoordinatorNode()).thenReturn( CommonMockBuilder.createAgent().getUuid() );
 //
 //        handler.run();
 //

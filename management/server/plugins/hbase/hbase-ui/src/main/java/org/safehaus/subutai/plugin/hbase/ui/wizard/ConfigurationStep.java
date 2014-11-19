@@ -20,6 +20,7 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
@@ -267,7 +268,7 @@ public class ConfigurationStep extends Panel
                     {
                         config.getBackupMasters().remove( master );
                     }
-                    Set<UUID> hadoopNodes = hadoopInfo.getAllNodes();
+                    Set<UUID> hadoopNodes = Sets.newHashSet( hadoopInfo.getAllNodes() );
                     hadoopNodes.remove( master );
 
                     /** fill region servers table */

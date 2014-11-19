@@ -17,25 +17,31 @@
 //import org.safehaus.subutai.plugin.presto.impl.handler.ClusterOperationHandler;
 //import org.safehaus.subutai.plugin.presto.impl.mock.PrestoImplMock;
 //
+//import static org.mockito.Mockito.mock;
+//import static org.mockito.Mockito.when;
+//
 //
 //public class InstallOperationHandlerTest
 //{
 //
-//    private PrestoImplMock mock;
+//    private PrestoImpl prestoMock;
 //    private AbstractOperationHandler handler;
+//    private PrestoClusterConfig config;
 //
 //
 //    @Before
 //    public void setUp()
 //    {
-//        mock = new PrestoImplMock();
+//        prestoMock = mock(PrestoImpl.class);
+//        config = mock(PrestoClusterConfig.class);
+//
 //    }
 //
 //
 //    @Test( expected = NullPointerException.class )
 //    public void testWithNullConfig()
 //    {
-//        handler = new ClusterOperationHandler( mock, null, ClusterOperationType.INSTALL );
+//        handler = new ClusterOperationHandler( prestoMock, null, ClusterOperationType.INSTALL );
 //        handler.run();
 //    }
 //
@@ -46,7 +52,7 @@
 //        PrestoClusterConfig config = new PrestoClusterConfig();
 //        config.setSetupType( SetupType.OVER_HADOOP );
 //        config.setClusterName( "test" );
-//        handler = new ClusterOperationHandler( mock, config, ClusterOperationType.INSTALL );
+//        handler = new ClusterOperationHandler( prestoMock, config, ClusterOperationType.INSTALL );
 //        handler.run();
 //
 //        TrackerOperation po = handler.getTrackerOperation();
@@ -58,14 +64,12 @@
 //    @Test
 //    public void testWithExistingCluster()
 //    {
-//        PrestoClusterConfig config = new PrestoClusterConfig();
-//        config.setSetupType( SetupType.OVER_HADOOP );
-//        config.setClusterName( "test-cluster" );
-//        config.setWorkers( new HashSet<>( Arrays.asList( CommonMockBuilder.createAgent().getUuid() ) ) );
-//        config.setCoordinatorNode( CommonMockBuilder.createAgent().getUuid() );
+//        when(config.getSetupType()).thenReturn(SetupType.OVER_HADOOP);
+//        when(config.getClusterName()).thenReturn( "test" );
+//        when(config.getWorkers()).thenReturn( new HashSet<>( Arrays.asList( CommonMockBuilder.createAgent().getUuid() ) ) );
+//        when(config.getCoordinatorNode()).thenReturn( CommonMockBuilder.createAgent().getUuid() );
 //
-//        mock.setClusterConfig( config );
-//        handler = new ClusterOperationHandler( mock, config, ClusterOperationType.INSTALL );
+//        handler = new ClusterOperationHandler( prestoMock, config, ClusterOperationType.INSTALL );
 //        handler.run();
 //
 //        TrackerOperation po = handler.getTrackerOperation();
