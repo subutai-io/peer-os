@@ -67,6 +67,13 @@ public class Commands
     }
 
 
+    public RequestBuilder getShowContainerIpCommand( String containerName )
+    {
+        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( containerName, "-l" ) );
+    }
+
+
     public RequestBuilder getRemoveContainerIpCommand( String containerName )
     {
         return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING )

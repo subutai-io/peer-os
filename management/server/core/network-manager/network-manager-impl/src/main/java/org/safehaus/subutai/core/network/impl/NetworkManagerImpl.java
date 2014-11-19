@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.core.network.api.ContainerInfo;
 import org.safehaus.subutai.core.network.api.N2NConnection;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
@@ -155,6 +156,27 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
+    @Override
+    public ContainerInfo getContainerIp( final String containerName ) throws NetworkManagerException
+    {
+        CommandResult result =
+                execute( getResourceHost( containerName ), commands.getShowContainerIpCommand( containerName ) );
+
+        Pattern pattern = Pattern.compile(
+                "Environment IP:\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})/(\\d+)\\s+Vlan ID:\\s+(\\d+)\\s+" );
+        Matcher m = pattern.matcher( result.getStdOut() );
+        if ( m.find() && m.groupCount() == 3 )
+        {
+            return new ContainerInfoImpl( m.group( 1 ), Integer.parseInt( m.group( 2 ) ),
+                    Integer.parseInt( m.group( 3 ) ) );
+        }
+        else
+        {
+            throw new NetworkManagerException( String.format( "Network info of %s not found", containerName ) );
+        }
+    }
+
+
     private ManagementHost getManagementHost() throws NetworkManagerException
     {
         try
@@ -172,7 +194,7 @@ public class NetworkManagerImpl implements NetworkManager
     {
         try
         {
-            ContainerHost containerHost = peerManager.getLocalPeer().getContainerHostByName( containerName );
+            ContainerHost containerHost = getContainerHost( containerName );
             return peerManager.getLocalPeer().getResourceHostByName( containerHost.getParentHostname() );
         }
         catch ( PeerException e )

@@ -29,36 +29,36 @@ public class N2NConnectionImpl implements N2NConnection
 
 
     @Override
+    public String getLocalIp()
+    {
+        return localIp;
+    }
+
+
+    @Override
     public String getSuperNodeIp()
     {
-        return null;
+        return superNodeIp;
     }
 
 
     @Override
     public int getSuperNodePort()
     {
-        return 0;
-    }
-
-
-    @Override
-    public String getLocalIp()
-    {
-        return null;
+        return superNodePort;
     }
 
 
     @Override
     public String getInterfaceName()
     {
-        return null;
+        return interfaceName;
     }
 
 
     @Override
     public String getCommunityName()
     {
-        return null;
+        return communityName;
     }
 }
