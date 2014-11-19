@@ -20,6 +20,72 @@ function fs_master_snapshot {
   mv  /var/lib/lxc/master/rootfs2  /var/lib/lxc/master/rootfs
 }
 
+function fs_master_destroy {
+ if [ -z "`btrfs subvolume list /var/lib/lxc/master/rootfs`" ]; then
+    msg_error "No btrfs dataset \"/master/rootfs\" found - aborting ..."
+    exit 1
+  fi
+
+  if [ "`is_system_all_locked`" == "true" ]
+  then
+     msg_error "System locked by a subutai process"
+     exit 1
+  fi
+
+  local container="master"
+  local package_name=`get_package_name $container`
+  local debian_root="$SUBUTAI_TMPDIR/$container"
+
+  lock_subutai_system
+  if [ $? != 0 ]; then msg_error "System cannot be locked!"; exit 1; fi
+
+  # Confirm destroy operation
+  echo WARNING: this destroys everything mercilessly
+  while true; do
+    read -p "Do you wish to destroy master template? [Y/N]" yn
+    case $yn in
+      [Yy]* ) break;;
+      [Nn]* ) unlock_subutai_system
+             if [ $? != 0 ]; then echo "System cannot be unlocked!"; exit 1; fi
+             exit 1;;
+      * ) echo "Please answer yes or no.";;
+    esac
+  done
+
+  # Destroy all children of master template
+  children_list=`fs_get_children_list $container`
+  for child in $children_list
+  do
+    subutai destroy -r -f $child
+    if [ $? != 0 ]
+    then
+      unlock_subutai_system
+      if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
+      exit 1
+    fi
+  done
+
+  # Check if the package is installed
+  is_package_installed $package_name
+  if [ $? == 0  ]; then
+    apt-get --assume-yes --force-yes purge $package_name
+  fi
+
+  btrfs subvolume delete /lxc/master-opt 
+  btrfs subvolume delete /lxc-data/master-var
+  btrfs subvolume delete /lxc-data/master-home
+  lxc-destroy -n master
+
+  # Remove relevant directories under $SUBUTAI_TMPDIR if any
+  rm -rf $debian_root
+  unlock_subutai_system
+  if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
+
+  msg_ok "Destruction of \"master\" completed succesfully "
+}
+
+
+
 function fs_master_lxc_create {
   local SUBUTAI_USER="$1"
   local SUBUTAI_AUTH_KEY="$2"
