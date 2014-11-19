@@ -47,9 +47,9 @@ public class VerificationStep extends Panel
 
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            for ( Agent agent : wizard.getConfig().getNodes() )
+            for ( UUID nodeId : wizard.getConfig().getNodes() )
             {
-                cfgView.addStringCfg( "Node to install", agent.getHostname() + "" );
+                cfgView.addStringCfg( "Node to install", nodeId + "" );
             }
         }
         else if ( config.getSetupType() == SetupType.WITH_HADOOP )

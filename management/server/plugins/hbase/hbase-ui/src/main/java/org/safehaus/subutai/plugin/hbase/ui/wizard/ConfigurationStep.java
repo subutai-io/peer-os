@@ -267,7 +267,7 @@ public class ConfigurationStep extends Panel
                     {
                         config.getBackupMasters().remove( master );
                     }
-                    List<UUID> hadoopNodes = hadoopInfo.getAllNodes();
+                    Set<UUID> hadoopNodes = hadoopInfo.getAllNodes();
                     hadoopNodes.remove( master );
 
                     /** fill region servers table */

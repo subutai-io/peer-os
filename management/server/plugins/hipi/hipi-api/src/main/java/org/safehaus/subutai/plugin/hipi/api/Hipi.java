@@ -12,8 +12,7 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 public interface Hipi extends ApiBase<HipiConfig>
 {
-
-    public UUID installCluster( HipiConfig config, HadoopClusterConfig hadoopConfig );
+    public UUID installCluster( HipiConfig config, HadoopClusterConfig hadoopClusterConfig );
 
     public UUID addNode( String clusterName, String lxcHostname );
 

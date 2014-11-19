@@ -19,33 +19,26 @@
     <module>elasticsearch</module>
     <module>hadoop</module>
     <module>storm</module>
+    <module>solr</module>
+    <module>pig</module>
+    <module>lucene</module>
+    <module>flume</module>
+    <module>nutch</module>
     <module>mongodb</module>
     <module>hive</module>
     <module>spark</module>
     <module>zookeeper</module>
     <module>shark</module>
     <module>hbase</module>
-    <module>sqoop</module>
-    <!--<module>accumulo</module>
-    <module>oozie</module>
-    <module>solr</module>
-
-
-
-    <module>accumulo</module>
-    <module>solr</module>
-    <module>mongodb</module>
-    <module>flume</module>
     <module>presto</module>
-    <module>shark</module>
-    <module>sqoop</module>
-    <module>lucene</module>
-    <module>pig</module>
-    <module>mahout</module>
     <module>hipi</module>
-    <module>nutch</module>
-    <module>plugin-common</module>
-    <module>jetty</module>-->
+    <module>sqoop</module>
+    <!--
+    <module>accumulo</module>
+    <module>oozie</module>
+    <module>mahout</module>
+    <module>jetty</module>
+    -->
     <module>plugin-common</module>
   </modules>
 

@@ -1,21 +1,15 @@
 package org.safehaus.subutai.core.git.cli;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.common.test.SystemOutRedirectTest;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,66 +18,27 @@ import static org.mockito.Mockito.when;
 /**
  * Test for DiffFile
  */
-public class DiffFileTest
+public class DiffFileTest extends SystemOutRedirectTest
 {
 
-    private ByteArrayOutputStream myOut;
-    private static final String AGENT_NOT_CONNECTED_MSG = "Agent not connected";
-    private static final String HOSTNAME = "hostname";
     private static final String BRANCH_NAME = "branch name";
     private static final String ERR_MSG = "OOPS";
     private static final String FILE_DIFF = "file diff";
-    private Agent agent = mock( Agent.class );
-    private AgentManager agentManager = mock( AgentManager.class );
     private GitManager gitManager = mock( GitManager.class );
+    DiffFile diffFile;
 
 
     @Before
     public void setUp()
     {
-        when( agentManager.getAgentByHostname( HOSTNAME ) ).thenReturn( agent );
-        myOut = new ByteArrayOutputStream();
-        System.setOut( new PrintStream( myOut ) );
-    }
-
-
-    @After
-    public void tearDown()
-    {
-        System.setOut( System.out );
-    }
-
-
-    private String getSysOut()
-    {
-        return myOut.toString().trim();
+        diffFile = new DiffFile( gitManager );
     }
 
 
     @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullGitManager()
     {
-        new DiffFile( null, mock( AgentManager.class ) );
-    }
-
-
-    @Test( expected = NullPointerException.class )
-    public void constructorShouldFailOnNullAgentManager()
-    {
-        new DiffFile( mock( GitManager.class ), null );
-    }
-
-
-    @Test
-    public void shouldFailOnMissingAgent()
-    {
-        DiffFile diffFile = new DiffFile( mock( GitManager.class ), mock( AgentManager.class ) );
-
-
-        diffFile.doExecute();
-
-
-        assertEquals( AGENT_NOT_CONNECTED_MSG, getSysOut() );
+        new DiffFile( null );
     }
 
 
@@ -91,15 +46,13 @@ public class DiffFileTest
     public void shouldExecuteCommand() throws GitException
     {
 
-        DiffFile diffFile = new DiffFile( gitManager, agentManager );
-        diffFile.setHostname( HOSTNAME );
-        when( gitManager.diffFile( eq( agent ), anyString(), anyString(), anyString() ) ).thenReturn( FILE_DIFF );
+        when( gitManager.diffFile( anyString(), anyString(), anyString() ) ).thenReturn( FILE_DIFF );
 
 
         diffFile.doExecute();
 
 
-        verify( gitManager ).diffFile( eq( agent ), anyString(), anyString(), anyString() );
+        verify( gitManager ).diffFile( anyString(), anyString(), anyString() );
     }
 
 
@@ -107,15 +60,11 @@ public class DiffFileTest
     public void shouldExecuteCommand2() throws GitException
     {
 
-        DiffFile diffFile = new DiffFile( gitManager, agentManager );
-        diffFile.setHostname( HOSTNAME );
-        diffFile.setBranchName2( BRANCH_NAME );
-
+        diffFile.branchName2 = BRANCH_NAME;
 
         diffFile.doExecute();
 
-
-        verify( gitManager ).diffFile( eq( agent ), anyString(), anyString(), anyString(), anyString() );
+        verify( gitManager ).diffFile( anyString(), anyString(), anyString(), anyString() );
     }
 
 
@@ -123,10 +72,7 @@ public class DiffFileTest
     public void shouldThrowException() throws GitException
     {
         Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager )
-               .diffFile( eq( agent ), anyString(), anyString(), anyString() );
-        DiffFile diffFile = new DiffFile( gitManager, agentManager );
-        diffFile.setHostname( HOSTNAME );
-
+               .diffFile( anyString(), anyString(), anyString() );
 
         diffFile.doExecute();
 
@@ -139,10 +85,9 @@ public class DiffFileTest
     public void shouldThrowException2() throws GitException
     {
         Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager )
-               .diffFile( eq( agent ), anyString(), anyString(), anyString(), anyString() );
-        DiffFile diffFile = new DiffFile( gitManager, agentManager );
-        diffFile.setHostname( HOSTNAME );
-        diffFile.setBranchName2( BRANCH_NAME );
+               .diffFile( anyString(), anyString(), anyString(), anyString() );
+
+        diffFile.branchName2 = BRANCH_NAME;
 
 
         diffFile.doExecute();

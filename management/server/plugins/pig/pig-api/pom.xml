@@ -16,19 +16,27 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${org.osgi.version}</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-common</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-common</artifactId>
+      <artifactId>environment-manager-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>tracker-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hadoop-plugin-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+      <dependency>
+          <groupId>org.safehaus.subutai</groupId>
+          <artifactId>plugin-common</artifactId>
+      </dependency>
   </dependencies>
 
   <build>

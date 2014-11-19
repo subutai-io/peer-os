@@ -10,6 +10,7 @@ import java.util.Set;
 public class TrimmedPrestoConfig
 {
     private String clusterName;
+    private String hadoopClusterName;
 
     private String coordinatorHost;
     private Set<String> workersHost;
@@ -30,5 +31,10 @@ public class TrimmedPrestoConfig
     public Set<String> getWorkersHost()
     {
         return workersHost;
+    }
+
+    public String getHadoopClusterName()
+    {
+        return hadoopClusterName;
     }
 }
