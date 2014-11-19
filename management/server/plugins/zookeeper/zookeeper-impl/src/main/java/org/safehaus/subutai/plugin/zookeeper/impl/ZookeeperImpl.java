@@ -13,6 +13,7 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
@@ -22,7 +23,7 @@ import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.api.CommandType;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -219,12 +220,12 @@ public class ZookeeperImpl implements Zookeeper
     public UUID addNode( String clusterName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        ZookeeperClusterConfig zookeeperClusterConfig = getCluster( clusterName );
 
-        return null;
-        //TODO add this functionality when environment builder has this functionality
-//        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName );
-//        executor.execute( operationHandler );
-//        return operationHandler.getTrackerId();
+        AbstractOperationHandler operationHandler = new ZookeeperClusterOperationHandler( this, zookeeperClusterConfig,
+                ClusterOperationType.ADD );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
@@ -232,12 +233,11 @@ public class ZookeeperImpl implements Zookeeper
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostname ), "Lxc hostname is null or empty" );
-
-        return null;
-        //TODO add this functionality when environment builder has this functionality
-//        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
-//        executor.execute( operationHandler );
-//        return operationHandler.getTrackerId();
+        ZookeeperClusterConfig zookeeperClusterConfig = getCluster( clusterName );
+        AbstractOperationHandler operationHandler = new ZookeeperClusterOperationHandler( this, zookeeperClusterConfig,
+                lxcHostname, ClusterOperationType.ADD );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
@@ -246,12 +246,10 @@ public class ZookeeperImpl implements Zookeeper
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostName ), "Lxc hostname is null or empty" );
 
-        return null;
-        //TODO add this functionality when environment builder has this functionality
-
-//        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostName );
-//        executor.execute( operationHandler );
-//        return operationHandler.getTrackerId();
+        AbstractOperationHandler operationHandler = new ZookeeperNodeOperationHandler( this, clusterName,
+                lxcHostName, NodeOperationType.DESTROY );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
@@ -315,6 +313,27 @@ public class ZookeeperImpl implements Zookeeper
     }
 
 
+    @Override
+    public String getCommand( final CommandType commandType )
+    {
+        switch ( commandType )
+        {
+            case INSTALL:
+                return Commands.getInstallCommand();
+            case UNINSTALL:
+                return Commands.getUninstallCommand();
+            case START:
+                return Commands.getStartCommand();
+            case STOP:
+                return Commands.getStopCommand();
+            case STATUS:
+                return Commands.getStatusCommand();
+        }
+        return null;
+
+    }
+
+
     public EnvironmentBlueprint getDefaultEnvironmentBlueprint( ZookeeperClusterConfig config )
     {
         Preconditions.checkNotNull( config, "Zookeeper cluster config is null" );
@@ -325,13 +344,15 @@ public class ZookeeperImpl implements Zookeeper
                 String.format( "%s-%s", ZookeeperClusterConfig.PRODUCT_KEY, UUIDUtil.generateTimeBasedUUID() ) );
 
         //node group
-        NodeGroup nodesGroup = new NodeGroup();
-        nodesGroup.setName( "DEFAULT" );
-        nodesGroup.setNumberOfNodes( config.getNumberOfNodes() );
-        nodesGroup.setTemplateName( config.getTemplateName() );
-        nodesGroup.setPlacementStrategy( ZookeeperStandaloneSetupStrategy.getNodePlacementStrategy() );
+        NodeGroup nodeGroup = new NodeGroup();
+        nodeGroup.setName( "DEFAULT" );
+        nodeGroup.setLinkHosts( false );
+        nodeGroup.setExchangeSshKeys( false );
+        nodeGroup.setNumberOfNodes( config.getNumberOfNodes() );
+        nodeGroup.setTemplateName( config.getTemplateName() );
+        nodeGroup.setPlacementStrategy( ZookeeperStandaloneSetupStrategy.getNodePlacementStrategy() );
 
-        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodesGroup ) );
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
 
 
         return environmentBlueprint;

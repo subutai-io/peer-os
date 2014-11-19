@@ -19,7 +19,6 @@
     <property name="tracker" ref="tracker" />
     <property name="zookeeperManager" ref="zookeeperManager" />
     <property name="environmentManager" ref="environmentManager" />
-    <argument ref="stormConfig" />
     <argument ref="dataSource" />
   </bean>
 

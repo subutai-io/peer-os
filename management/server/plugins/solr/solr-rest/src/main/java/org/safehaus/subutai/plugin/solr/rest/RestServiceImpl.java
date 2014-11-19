@@ -90,13 +90,13 @@ public class RestServiceImpl implements RestService
     @Override
     public Response stopNode( final String clusterName, final String lxcHostname )
     {
-        String operationId = wrapUUID( solrManager.stopNode( clusterName, lxcHostname ) );
+        String operationId = wrapUUID( solrManager.stopNode( clusterName,lxcHostname  ));
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
 
 
     @Override
-    public Response destroyNode( final String clusterName, final String lxcHostname )
+    public Response destroyNode( final String clusterName, final String lxcHostname)
     {
         String operationId = wrapUUID( solrManager.destroyNode( clusterName, lxcHostname ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();

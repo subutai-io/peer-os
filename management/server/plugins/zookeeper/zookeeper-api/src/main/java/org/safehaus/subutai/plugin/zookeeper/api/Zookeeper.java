@@ -38,5 +38,7 @@ public interface Zookeeper extends ApiBase<ZookeeperClusterConfig>
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, ZookeeperClusterConfig config,
                                                          TrackerOperation po );
+
+    public String getCommand( CommandType commandType );
 }
 

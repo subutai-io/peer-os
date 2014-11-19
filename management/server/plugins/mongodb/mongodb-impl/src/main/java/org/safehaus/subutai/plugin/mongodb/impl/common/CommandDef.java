@@ -30,6 +30,19 @@ public class CommandDef
     }
 
 
+    public RequestBuilder build( boolean daemon )
+    {
+        if ( daemon )
+        {
+            return new RequestBuilder( command ).withTimeout( timeout ).daemon();
+        }
+        else
+        {
+            return build();
+        }
+    }
+
+
     public String getCommand()
     {
         return command;
@@ -48,8 +61,8 @@ public class CommandDef
     }
 
 
-    public void execute( Host host ) throws CommandException
-    {
-        host.execute( build() );
-    }
+//    public void execute( Host host ) throws CommandException
+    //    {
+    //        host.execute( build() );
+    //    }
 }

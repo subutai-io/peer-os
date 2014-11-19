@@ -11,6 +11,7 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.storm.api.Storm;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
@@ -27,6 +28,8 @@ public class Wizard
     private final EnvironmentManager environmentManager;
     private int step = 1;
     private StormClusterConfiguration config = new StormClusterConfiguration();
+    private ZookeeperClusterConfig zookeeperClusterConfig = new ZookeeperClusterConfig();
+
 
 
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -112,5 +115,17 @@ public class Wizard
     public StormClusterConfiguration getConfig()
     {
         return config;
+    }
+
+
+    public ZookeeperClusterConfig getZookeeperClusterConfig()
+    {
+        return zookeeperClusterConfig;
+    }
+
+
+    public void setZookeeperClusterConfig( final ZookeeperClusterConfig zookeeperClusterConfig )
+    {
+        this.zookeeperClusterConfig = zookeeperClusterConfig;
     }
 }

@@ -22,6 +22,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -359,10 +360,11 @@ public class Manager
                     Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null )
                     {
-//                        TerminalWindow terminal =
-//                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
-//                                        agentManager );
-//                        contentRoot.getUI().addWindow( terminal.getWindow() );
+                        //                        TerminalWindow terminal =
+                        //                                new TerminalWindow( Sets.newHashSet( lxcAgent ),
+                        // executorService, commandRunner,
+                        //                                        agentManager );
+                        //                        contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
@@ -385,9 +387,9 @@ public class Manager
     {
         if ( mongoClusterConfig != null )
         {
-//            populateTable( configServersTable, mongoClusterConfig.getConfigServers(), NodeType.CONFIG_NODE );
-//            populateTable( routersTable, mongoClusterConfig.getRouterServers(), NodeType.ROUTER_NODE );
-//            populateTable( dataNodesTable, mongoClusterConfig.getDataNodes(), NodeType.DATA_NODE );
+            populateTable( configServersTable, mongoClusterConfig.getConfigServers(), NodeType.CONFIG_NODE );
+            populateTable( routersTable, mongoClusterConfig.getRouterServers(), NodeType.ROUTER_NODE );
+            populateTable( dataNodesTable, mongoClusterConfig.getDataNodes(), NodeType.DATA_NODE );
             replicaSetName.setValue( mongoClusterConfig.getReplicaSetName() );
             domainName.setValue( mongoClusterConfig.getDomainName() );
             cfgSrvPort.setValue( mongoClusterConfig.getCfgSrvPort() + "" );
@@ -408,7 +410,7 @@ public class Manager
     }
 
 
-    private void populateTable( final Table table, Set<Agent> agents, final NodeType nodeType )
+    private void populateTableOld( final Table table, Set<Agent> agents, final NodeType nodeType )
     {
 
         table.removeAllItems();
@@ -556,6 +558,175 @@ public class Manager
                         {
                             UUID trackID =
                                     mongo.destroyNode( mongoClusterConfig.getClusterName(), agent.getHostname() );
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                    MongoClusterConfig.PRODUCT_KEY );
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
+                                @Override
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
+                                    refreshClustersInfo();
+                                }
+                            } );
+                            contentRoot.getUI().addWindow( window.getWindow() );
+                        }
+                    } );
+
+                    contentRoot.getUI().addWindow( alert.getAlert() );
+                }
+            } );
+        }
+    }
+
+
+    private void populateTable( final Table table, Set nodes, final NodeType nodeType )
+    {
+
+        table.removeAllItems();
+
+        for ( final Object o : nodes )
+        {
+            final MongoNode node = ( MongoNode ) o;
+            final Button checkBtn = new Button( "Check" );
+            checkBtn.setId( node.getAgent().getListIP().get( 0 ) + "-mongoCheck" );
+            checkBtn.addStyleName( "default" );
+            final Button startBtn = new Button( "Start" );
+            startBtn.setId( node.getAgent().getListIP().get( 0 ) + "-mongoStart" );
+            startBtn.addStyleName( "default" );
+            final Button stopBtn = new Button( "Stop" );
+            stopBtn.setId( node.getAgent().getListIP().get( 0 ) + "mongoStop" );
+            stopBtn.addStyleName( "default" );
+            final Button destroyBtn = new Button( "Destroy" );
+            destroyBtn.setId( node.getAgent().getListIP().get( 0 ) + "mongoDestroy" );
+            destroyBtn.addStyleName( "default" );
+            final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+            progressIcon.setId( node.getAgent().getListIP().get( 0 ) + "mongoProgress" );
+            stopBtn.setEnabled( false );
+            startBtn.setEnabled( false );
+            progressIcon.setVisible( false );
+
+            table.addItem( new Object[] {
+                    node.getHostname(), checkBtn, startBtn, stopBtn, destroyBtn, progressIcon
+            }, null );
+
+            checkBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
+                    progressIcon.setVisible( true );
+                    startBtn.setEnabled( false );
+                    stopBtn.setEnabled( false );
+                    destroyBtn.setEnabled( false );
+
+                    executorService.execute(
+                            new CheckTask( mongo, tracker, mongoClusterConfig.getClusterName(), node.getHostname(),
+                                    new CompleteEvent()
+                                    {
+
+                                        public void onComplete( NodeState state )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                if ( state == NodeState.RUNNING )
+                                                {
+                                                    stopBtn.setEnabled( true );
+                                                }
+                                                else if ( state == NodeState.STOPPED )
+                                                {
+                                                    startBtn.setEnabled( true );
+                                                }
+                                                destroyBtn.setEnabled( true );
+                                                progressIcon.setVisible( false );
+                                            }
+                                        }
+                                    } ) );
+                }
+            } );
+
+            startBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
+                    progressIcon.setVisible( true );
+                    startBtn.setEnabled( false );
+                    stopBtn.setEnabled( false );
+                    destroyBtn.setEnabled( false );
+
+                    executorService.execute(
+                            new StartTask( mongo, tracker, nodeType, mongoClusterConfig.getClusterName(),
+                                    node.getHostname(), new CompleteEvent()
+                            {
+
+                                public void onComplete( NodeState state )
+                                {
+                                    synchronized ( progressIcon )
+                                    {
+                                        if ( state == NodeState.RUNNING )
+                                        {
+                                            stopBtn.setEnabled( true );
+                                        }
+                                        else
+                                        {
+                                            startBtn.setEnabled( true );
+                                        }
+                                        destroyBtn.setEnabled( true );
+                                        progressIcon.setVisible( false );
+                                    }
+                                }
+                            } ) );
+                }
+            } );
+
+            stopBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
+                    progressIcon.setVisible( true );
+                    startBtn.setEnabled( false );
+                    stopBtn.setEnabled( false );
+                    destroyBtn.setEnabled( false );
+
+                    executorService.execute(
+                            new StopTask( mongo, tracker, mongoClusterConfig.getClusterName(), node.getHostname(),
+                                    new CompleteEvent()
+                                    {
+
+                                        public void onComplete( NodeState state )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                if ( state == NodeState.STOPPED )
+                                                {
+                                                    startBtn.setEnabled( true );
+                                                }
+                                                else
+                                                {
+                                                    stopBtn.setEnabled( true );
+                                                }
+                                                destroyBtn.setEnabled( true );
+                                                progressIcon.setVisible( false );
+                                            }
+                                        }
+                                    } ) );
+                }
+            } );
+
+            destroyBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
+                    ConfirmationDialog alert = new ConfirmationDialog(
+                            String.format( "Do you want to destroy the %s node?", node.getHostname() ), "Yes", "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
+                        @Override
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
+                            UUID trackID = mongo.destroyNode( mongoClusterConfig.getClusterName(), node.getHostname() );
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     MongoClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()

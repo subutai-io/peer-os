@@ -90,6 +90,8 @@ public class NodeSelectionStep extends Panel
                             masterNodeCombo.setValue( wizard.getConfig().getNimbus() );
                         }
 
+                        wizard.setZookeeperClusterConfig( zookeeperClusterConfig );
+
                         wizard.getConfig().setZookeeperClusterName( zookeeperClusterConfig.getClusterName() );
                     }
                 }

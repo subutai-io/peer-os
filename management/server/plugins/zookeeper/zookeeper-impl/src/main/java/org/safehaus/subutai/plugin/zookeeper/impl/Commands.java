@@ -6,11 +6,7 @@
 package org.safehaus.subutai.plugin.zookeeper.impl;
 
 
-import java.util.Set;
-
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 

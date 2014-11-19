@@ -9,10 +9,9 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -22,6 +21,7 @@ import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.impl.ClusterConfiguration;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 import org.slf4j.Logger;
@@ -34,94 +34,94 @@ import com.google.common.base.Strings;
 /**
  * This class handles operations that are related to whole cluster.
  */
-public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<ZookeeperImpl, ZookeeperClusterConfig>
+public class ZookeeperClusterOperationHandler extends AbstractPluginOperationHandler<ZookeeperImpl, ZookeeperClusterConfig>
         implements ClusterOperationHandlerInterface
 {
     private static final Logger LOG = LoggerFactory.getLogger( ZookeeperClusterOperationHandler.class.getName() );
     private ClusterOperationType operationType;
     private ZookeeperClusterConfig zookeeperClusterConfig;
-    private HadoopClusterConfig hadoopClusterConfig;
+    private String hostName;
     private ExecutorService executor = Executors.newCachedThreadPool();
 
 
-    public ZookeeperClusterOperationHandler( final ZookeeperImpl manager, final ZookeeperClusterConfig config,
+    public ZookeeperClusterOperationHandler( final ZookeeperImpl manager,
+                                             final ZookeeperClusterConfig config,
                                              final ClusterOperationType operationType )
     {
         super( manager, config );
         this.operationType = operationType;
         this.zookeeperClusterConfig = config;
         trackerOperation = manager.getTracker().createTrackerOperation( config.getProductKey(),
-                String.format( "Creating %s tracker object...", clusterName ) );
+                String.format( "Running %s operation on %s...", operationType , clusterName ) );
     }
 
 
     public ZookeeperClusterOperationHandler( final ZookeeperImpl manager,
                                              final ZookeeperClusterConfig zookeeperClusterConfig,
-                                             final HadoopClusterConfig hadoopClusterConfig,
+                                             final String hostName,
                                              final ClusterOperationType operationType )
     {
-        super( manager, zookeeperClusterConfig.getClusterName() );
+        super( manager, zookeeperClusterConfig );
         this.operationType = operationType;
         this.zookeeperClusterConfig = zookeeperClusterConfig;
-        this.hadoopClusterConfig = hadoopClusterConfig;
+        this.hostName = hostName;
         trackerOperation = manager.getTracker().createTrackerOperation( zookeeperClusterConfig.getProductKey(),
-                String.format( "Creating %s tracker object...", clusterName ) );
+                String.format( "Running %s operation on %s...", operationType , clusterName ) );
     }
 
 
     public void run()
     {
         Preconditions.checkNotNull( zookeeperClusterConfig, "Configuration is null !!!" );
-        switch ( operationType )
-        {
-            case INSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
-                        setupCluster();
-                    }
-                } );
-                break;
-            case UNINSTALL:
-                executor.execute( new Runnable()
-                {
-                    public void run()
-                    {
-                        destroyCluster();
-                    }
-                } );
-                break;
-        }
+        runOperationOnContainers( operationType );
     }
 
 
     @Override
     public void runOperationOnContainers( ClusterOperationType clusterOperationType )
     {
-        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
-        List<CommandResult> commandResultList = new ArrayList<CommandResult>(  );
+        Environment environment;
+        List<CommandResult> commandResultList = new ArrayList<>(  );
         switch ( clusterOperationType )
         {
+            case INSTALL:
+                setupCluster();
+                break;
+            case UNINSTALL:
+                destroyCluster();
+                break;
             case START_ALL:
+                environment = manager.getEnvironmentManager().getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     commandResultList.add( executeCommand( containerHost,
-                            new Commands().getStartCommand() ) );
+                            Commands.getStartCommand() ) );
                 }
                 break;
             case STOP_ALL:
+                environment = manager.getEnvironmentManager().getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     commandResultList.add( executeCommand( containerHost,
-                            new Commands().getStopCommand() ) );
+                            Commands.getStopCommand() ) );
                 }
                 break;
             case STATUS_ALL:
+                environment = manager.getEnvironmentManager().getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
                 for ( ContainerHost containerHost : environment.getContainers() )
                 {
                     commandResultList.add( executeCommand( containerHost,
-                            new Commands().getStatusCommand() ) );
+                            Commands.getStatusCommand() ) );
+                }
+                break;
+            case ADD:
+                if ( zookeeperClusterConfig.getSetupType() == SetupType.OVER_HADOOP )
+                    commandResultList.addAll( addNode( hostName ) );
+                else if ( zookeeperClusterConfig.getSetupType() == SetupType.STANDALONE )
+                    commandResultList.addAll( addNode() );
+                else {
+                    trackerOperation.addLogFailed( "Not supported SetupType" );
+                    return;
                 }
                 break;
         }
@@ -129,19 +129,11 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
     }
 
 
-    private CommandResult executeCommand( ContainerHost containerHost, String command )
+    private List<CommandResult> addNode()
     {
-        CommandResult result = null;
-        try
-        {
-            result = containerHost.execute( new RequestBuilder( command ) );
-        }
-        catch ( CommandException e )
-        {
-            LOG.error( "Could not execute command correctly. ", command );
-            e.printStackTrace();
-        }
-        return result;
+        List<CommandResult> commandResultList = new ArrayList<>();
+        trackerOperation.addLogFailed( "Adding node on standalone Zookeeper cluster is not supported yet!" );
+        return commandResultList;
     }
 
 
@@ -198,7 +190,7 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
         try
         {
             if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
-                List<CommandResult> commandResultList = new ArrayList<CommandResult>(  );
+                List<CommandResult> commandResultList = new ArrayList<>(  );
 
                 trackerOperation.addLog( "Uninstalling zookeeper on hadoop nodes" );
                 Environment zookeeperEnvironment =
@@ -230,12 +222,41 @@ public class ZookeeperClusterOperationHandler extends AbstractOperationHandler<Z
     }
 
 
-    public void logResults( TrackerOperation po, List<CommandResult> commandResultList )
-    {
-        Preconditions.checkNotNull( commandResultList );
-        for ( CommandResult commandResult : commandResultList )
-            po.addLog( commandResult.getStdOut() );
-        po.addLogDone( "" );
+    public List<CommandResult> addNode ( String hostName ) {
+        List<CommandResult> commandResultList = new ArrayList<>();
+        Environment zookeeperEnvironment = manager.getEnvironmentManager().
+                getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
+        HadoopClusterConfig hadoopCluster = manager.getHadoopManager().
+                getCluster( zookeeperClusterConfig.getHadoopClusterName() );
+        Environment hadoopEnvironment = manager.getEnvironmentManager().
+                getEnvironmentByUUID( hadoopCluster.getEnvironmentId() );
+        try
+        {
+            ContainerHost newNode = hadoopEnvironment.getContainerHostByHostname( hostName );
+            String command = Commands.getInstallCommand();
+            if ( ! newNode.isConnected() ) {
+                trackerOperation.addLogFailed( String.format( "Host %s is not connected. Aborting", hostName ) );
+                return commandResultList;
+            }
+            CommandResult commandResult = executeCommand( newNode, command );
+            commandResultList.add( commandResult );
+            if ( ! commandResult.hasSucceeded() ) {
+                trackerOperation.addLogFailed( String.format( "Command %s failed on %s", command, hostName ) );
+                return commandResultList;
+            }
+            zookeeperClusterConfig.getNodes().add( newNode.getId() );
+            new ClusterConfiguration( manager, trackerOperation ).configureCluster( zookeeperClusterConfig,
+                    zookeeperEnvironment );
+            trackerOperation.addLog( "Updating cluster information..." );
+            manager.getPluginDAO()
+                   .saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, zookeeperClusterConfig.getClusterName(),
+                           zookeeperClusterConfig );
+        }
+        catch ( ClusterConfigurationException e )
+        {
+            e.printStackTrace();
+        }
+        return commandResultList;
     }
 
 }
