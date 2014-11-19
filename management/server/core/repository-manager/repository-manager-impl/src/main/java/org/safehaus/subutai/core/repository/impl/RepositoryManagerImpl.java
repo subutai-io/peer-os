@@ -14,8 +14,6 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.repository.api.PackageInfo;
 import org.safehaus.subutai.core.repository.api.RepositoryException;
 import org.safehaus.subutai.core.repository.api.RepositoryManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -27,7 +25,6 @@ import com.google.common.collect.Sets;
  */
 public class RepositoryManagerImpl implements RepositoryManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( RepositoryManagerImpl.class.getName() );
     private static final String LINE_SEPARATOR = "\n";
     private static final String INVALID_PACKAGE_NAME = "Invalid package name";
 
@@ -120,13 +117,10 @@ public class RepositoryManagerImpl implements RepositoryManager
         {
             String line = lines.nextToken();
 
-            if ( line != null )
+            String[] packageFields = line.split( "\\s+-\\s+" );
+            if ( packageFields.length == 2 )
             {
-                String[] packageFields = line.split( "\\s+-\\s+" );
-                if ( packageFields.length == 2 )
-                {
-                    packages.add( new PackageInfo( packageFields[0], packageFields[1] ) );
-                }
+                packages.add( new PackageInfo( packageFields[0], packageFields[1] ) );
             }
         }
 

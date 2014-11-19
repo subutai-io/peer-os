@@ -16,4 +16,5 @@ target
 *.war
 *.ear
 /server/server-karaf/nb-configuration.xml
+/server/core/broker/broker-impl/activemq-data
 server/core/broker/broker-impl/activemq-data

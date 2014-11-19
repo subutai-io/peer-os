@@ -10,17 +10,11 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 
 
 public interface Accumulo extends ApiBase<AccumuloClusterConfig>
 {
-
-    public UUID installCluster( final AccumuloClusterConfig accumuloClusterConfig,
-                                final HadoopClusterConfig hadoopClusterConfig,
-                                final ZookeeperClusterConfig zookeeperClusterConfig );
-
     public UUID startCluster( String clusterName );
 
     public UUID stopCluster( String clusterName );
@@ -36,6 +30,4 @@ public interface Accumulo extends ApiBase<AccumuloClusterConfig>
     public UUID removeProperty( String clusterName, String propertyName );
 
     public EnvironmentBuildTask getDefaultEnvironmentBlueprint( AccumuloClusterConfig config );
-
-    UUID configureEnvironmentCluster( AccumuloClusterConfig config );
 }
