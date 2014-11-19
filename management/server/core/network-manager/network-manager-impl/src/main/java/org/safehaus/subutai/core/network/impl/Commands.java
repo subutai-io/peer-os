@@ -33,6 +33,12 @@ public class Commands
     }
 
 
+    public RequestBuilder getListN2NConnectionsCommand()
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-L" ) );
+    }
+
+
     public RequestBuilder getSetupTunnelCommand( String tunnelName, String tunnelIp, String tunnelType )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
@@ -47,11 +53,24 @@ public class Commands
     }
 
 
+    public RequestBuilder getListTunnelsCommand()
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-l" ) );
+    }
+
+
     public RequestBuilder getSetContainerIpCommand( String containerName, String ip, int netMask, int vLanId )
     {
         return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING ).withCmdArgs(
                 Lists.newArrayList( containerName, "-s", String.format( "%s/%s", ip, netMask ),
                         String.valueOf( vLanId ) ) );
+    }
+
+
+    public RequestBuilder getShowContainerIpCommand( String containerName )
+    {
+        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( containerName, "-l" ) );
     }
 
 

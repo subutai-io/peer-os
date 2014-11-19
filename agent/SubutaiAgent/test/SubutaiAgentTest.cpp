@@ -99,6 +99,7 @@ void AgentTest::tearDown(void)
 //SubutaiCommand-Deserialize
 void AgentTest::testCommandDeserialize(void)
 {
+
 	//Test string for deserialization
 	string input = "{\"request\":{\"type\":\"EXECUTE_REQUEST\","
 			"\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
