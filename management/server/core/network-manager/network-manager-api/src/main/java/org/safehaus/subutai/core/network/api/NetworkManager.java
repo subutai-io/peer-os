@@ -30,5 +30,7 @@ public interface NetworkManager
     public void removeGatewayOnContainer( String containerName ) throws NetworkManagerException;
 
     public Set<Tunnel> listTunnels() throws NetworkManagerException;
+
+    public Set<N2NConnection> listN2NConnections() throws NetworkManagerException;
 }
 

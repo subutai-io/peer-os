@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.core.network.api.N2NConnection;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.network.api.Tunnel;
@@ -115,6 +116,26 @@ public class NetworkManagerImpl implements NetworkManager
             tunnels.add( new TunnelImpl( m.group( 1 ), m.group( 2 ) ) );
         }
         return tunnels;
+    }
+
+
+    @Override
+    public Set<N2NConnection> listN2NConnections() throws NetworkManagerException
+    {
+        CommandResult result = execute( getManagementHost(), commands.getListN2NConnectionsCommand() );
+
+        Set<N2NConnection> connections = Sets.newHashSet();
+        Pattern pattern = Pattern.compile(
+                "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\d+)"
+                        + "\\s+(\\w+)\\s+(\\w+)" );
+        Matcher m = pattern.matcher( result.getStdOut() );
+        while ( m.find() && m.groupCount() == 5 )
+        {
+            connections.add( new N2NConnectionImpl( m.group( 1 ), m.group( 2 ), Integer.parseInt( m.group( 3 ) ),
+                    m.group( 4 ), m.group( 5 ) ) );
+        }
+
+        return connections;
     }
 
 
