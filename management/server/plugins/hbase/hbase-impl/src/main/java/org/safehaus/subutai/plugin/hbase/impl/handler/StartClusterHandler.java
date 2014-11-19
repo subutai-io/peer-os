@@ -2,15 +2,11 @@ package org.safehaus.subutai.plugin.hbase.impl.handler;
 
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
-import com.google.common.collect.Sets;
 
-
-public class StartClusterHandler extends AbstractOperationHandler<HBaseImpl>
+public class StartClusterHandler extends AbstractOperationHandler<HBaseImpl, HBaseConfig>
 {
 
     private String clusterName;
@@ -20,7 +16,7 @@ public class StartClusterHandler extends AbstractOperationHandler<HBaseImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        trackerOperation = manager.getTracker().createTrackerOperation( HBaseClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HBaseConfig.PRODUCT_KEY,
                 String.format( "Starting %s cluster...", clusterName ) );
     }
 
@@ -28,7 +24,7 @@ public class StartClusterHandler extends AbstractOperationHandler<HBaseImpl>
     @Override
     public void run()
     {
-        HBaseClusterConfig config = manager.getCluster( clusterName );
+        /*HBaseClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
             trackerOperation.addLogFailed(
@@ -53,6 +49,6 @@ public class StartClusterHandler extends AbstractOperationHandler<HBaseImpl>
         else
         {
             trackerOperation.addLogFailed( String.format( "Start failed, %s", startCommand.getAllErrors() ) );
-        }
+        }*/
     }
 }

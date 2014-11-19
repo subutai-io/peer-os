@@ -67,7 +67,7 @@ public class CommandProcess
 
     public void stop()
     {
-        if ( !isCompleted() )
+        if ( status == CommandStatus.RUNNING )
         {
             status = CommandStatus.TIMEOUT;
         }
@@ -97,9 +97,9 @@ public class CommandProcess
     }
 
 
-    protected boolean isCompleted()
+    protected boolean isDone()
     {
-        return callback.isStopped() || getResult().hasCompleted();
+        return !( status == CommandStatus.RUNNING || status == CommandStatus.NEW );
     }
 
 
@@ -124,7 +124,7 @@ public class CommandProcess
             }
             else if ( response.getType() == ResponseType.EXECUTE_TIMEOUT )
             {
-                status = CommandStatus.FAILED;
+                status = CommandStatus.KILLED;
             }
             else if ( response.getType() == ResponseType.LIST_INOTIFY_RESPONSE
                     || response.getType() == ResponseType.PS_RESPONSE

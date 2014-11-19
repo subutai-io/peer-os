@@ -6,14 +6,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
 
-public class DestroyNodeOperationHandler extends AbstractOperationHandler<OozieImpl>
+public class DestroyNodeOperationHandler extends AbstractOperationHandler<OozieImpl, OozieClusterConfig>
 {
 
     private final TrackerOperation trackerOperation;
@@ -40,7 +39,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<OozieI
     @Override
     public void run()
     {
-        OozieClusterConfig oozieClusterConfig = manager.getCluster( clusterName );
+        /*OozieClusterConfig oozieClusterConfig = manager.getCluster( clusterName );
         Agent node = manager.getAgentManager().getAgentByHostname( lxcHostName );
 
         if ( oozieClusterConfig == null )
@@ -74,7 +73,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<OozieI
 
         manager.getPluginDAO()
                .saveInfo( OozieClusterConfig.PRODUCT_KEY, oozieClusterConfig.getClusterName(), oozieClusterConfig );
-        trackerOperation.addLogDone( "Cluster info saved to DB" );
+        trackerOperation.addLogDone( "Cluster info saved to DB" );*/
     }
 }
 

@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.Response;
 
 
-public class BlockingCommandCallback extends CommandCallback
+public class BlockingCommandCallback implements CommandCallback
 {
     private final Semaphore completionSemaphore;
     private final CommandCallback callback;
@@ -28,16 +28,11 @@ public class BlockingCommandCallback extends CommandCallback
         if ( callback != null )
         {
             callback.onResponse( response, commandResult );
-
-            if ( callback.isStopped() )
-            {
-                stop();
-            }
         }
 
         this.commandResult = commandResult;
 
-        if ( commandResult.hasCompleted() || commandResult.hasTimedOut() || isStopped() )
+        if ( commandResult.hasCompleted() || commandResult.hasTimedOut() )
         {
             completionSemaphore.release();
         }

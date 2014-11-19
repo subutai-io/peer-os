@@ -15,6 +15,7 @@ import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.broker.api.ByteMessageListener;
 import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
+import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
@@ -152,6 +153,11 @@ public class CommandProcessor implements ByteMessageListener
         catch ( HostDisconnectedException e )
         {
             ContainerHostInfo containerHostInfo = hostRegistry.getContainerHostInfoById( hostId );
+            if ( containerHostInfo.getStatus() != ContainerHostState.RUNNING )
+            {
+                throw new HostDisconnectedException(
+                        String.format( "Container state is %s", containerHostInfo.getStatus() ) );
+            }
             targetHost = hostRegistry.getResourceHostByContainerHost( containerHostInfo );
         }
 

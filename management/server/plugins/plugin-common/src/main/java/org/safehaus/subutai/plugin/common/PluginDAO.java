@@ -27,8 +27,8 @@ public class PluginDAO
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( PluginDAO.class.getName() );
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+//    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     protected DbUtil dbUtil;
 
 
@@ -37,6 +37,16 @@ public class PluginDAO
         Preconditions.checkNotNull( dataSource, "DataSource is null" );
         this.dbUtil = new DbUtil( dataSource );
 
+        setupDb();
+    }
+
+
+    public PluginDAO( final DataSource dataSource, final GsonBuilder gsonBuilder ) throws SQLException
+    {
+        Preconditions.checkNotNull( dataSource, "DataSource is null" );
+        Preconditions.checkNotNull( dataSource, "GsonBuilder is null" );
+        this.dbUtil = new DbUtil( dataSource );
+        gson = gsonBuilder.setPrettyPrinting().disableHtmlEscaping().create();
         setupDb();
     }
 
@@ -94,7 +104,7 @@ public class PluginDAO
                 if ( infoClob != null && infoClob.length() > 0 )
                 {
                     String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                    list.add( GSON.fromJson( info, clazz ) );
+                    list.add( gson.fromJson( info, clazz ) );
                 }
             }
         }
@@ -135,7 +145,7 @@ public class PluginDAO
                 if ( infoClob != null && infoClob.length() > 0 )
                 {
                     String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                    return GSON.fromJson( info, clazz );
+                    return gson.fromJson( info, clazz );
                 }
             }
         }

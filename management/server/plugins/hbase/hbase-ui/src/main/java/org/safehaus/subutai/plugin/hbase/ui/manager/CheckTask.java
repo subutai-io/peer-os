@@ -7,23 +7,24 @@ import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 
 
 public class CheckTask implements Runnable
 {
 
-    private final String clusterName, lxcHostname;
+    private final String clusterName;
+    private final UUID hostId;
     private final CompleteEvent completeEvent;
     private final HBase hbase;
     private final Tracker tracker;
 
 
-    public CheckTask( final HBase hbase, final Tracker tracker, String clusterName, String lxcHostname,
+    public CheckTask( final HBase hbase, final Tracker tracker, String clusterName, UUID hostId,
                       CompleteEvent completeEvent )
     {
         this.clusterName = clusterName;
-        this.lxcHostname = lxcHostname;
+        this.hostId = hostId;
         this.completeEvent = completeEvent;
         this.hbase = hbase;
         this.tracker = tracker;
@@ -33,12 +34,12 @@ public class CheckTask implements Runnable
     @Override
     public void run()
     {
-        UUID trackID = hbase.checkNode( clusterName, lxcHostname );
+        UUID trackID = hbase.checkNode( clusterName, hostId );
 
         long start = System.currentTimeMillis();
         while ( !Thread.interrupted() )
         {
-            TrackerOperationView po = tracker.getTrackerOperation( HBaseClusterConfig.PRODUCT_KEY, trackID );
+            TrackerOperationView po = tracker.getTrackerOperation( HBaseConfig.PRODUCT_KEY, trackID );
             if ( po != null )
             {
                 if ( po.getState() != OperationState.RUNNING )

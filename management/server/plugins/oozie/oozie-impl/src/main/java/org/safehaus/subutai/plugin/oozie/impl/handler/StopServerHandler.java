@@ -13,7 +13,7 @@ import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
 
-public class StopServerHandler extends AbstractOperationHandler<OozieImpl>
+public class StopServerHandler extends AbstractOperationHandler<OozieImpl, OozieClusterConfig>
 {
 
     private final TrackerOperation trackerOperation;
@@ -37,7 +37,7 @@ public class StopServerHandler extends AbstractOperationHandler<OozieImpl>
     @Override
     public void run()
     {
-        manager.getExecutor().execute( new Runnable()
+        /*manager.getExecutor().execute( new Runnable()
         {
 
             public void run()
@@ -98,6 +98,6 @@ public class StopServerHandler extends AbstractOperationHandler<OozieImpl>
                 // stopServiceCommand.getAllErrors() ) );
                 //                }
             }
-        } );
+        } );*/
     }
 }

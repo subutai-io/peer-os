@@ -59,7 +59,7 @@ public class CommandResultImpl implements CommandResult
 
     public boolean hasTimedOut()
     {
-        return status == CommandStatus.TIMEOUT;
+        return status == CommandStatus.TIMEOUT || status == CommandStatus.KILLED;
     }
 
 

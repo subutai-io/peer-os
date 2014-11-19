@@ -63,7 +63,7 @@ public class ImportPanel extends ImportExportBase
         ImportSetting s = new ImportSetting();
         s.setType( type );
         s.setClusterName( clusterName );
-        s.setHostname( agent.getHostname() );
+        s.setHostname( host.getHostname() );
         s.setConnectionString( connStringField.getValue() );
         s.setTableName( tableField.getValue() );
         s.setUsername( usernameField.getValue() );
@@ -127,7 +127,7 @@ public class ImportPanel extends ImportExportBase
             addComponent( layout );
             return;
         }
-        if ( agent == null )
+        if ( host == null )
         {
             addComponent( UIUtil.getLabel( "<h1>No node selected</h1>", 200 ) );
             return;

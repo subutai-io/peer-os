@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.command.Response;
 /**
  * Dummy callback
  */
-public class DummyCallback extends CommandCallback
+public class DummyCallback implements CommandCallback
 {
     @Override
     public void onResponse( final Response response, final CommandResult commandResult )
