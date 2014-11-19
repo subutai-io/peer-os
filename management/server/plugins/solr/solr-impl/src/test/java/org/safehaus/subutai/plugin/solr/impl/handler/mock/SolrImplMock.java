@@ -17,13 +17,13 @@ public class SolrImplMock extends SolrImpl
 {
 
     private SolrClusterConfig clusterSolrClusterConfig = null;
+    private Commands commands;
 
 
     public SolrImplMock()
     {
         super( mock( DataSource.class ) );
-        setCommandRunner( mock( CommandRunner.class ) );
-        setAgentManager( mock( AgentManager.class ) );
+
         setTracker( new TrackerMock() );
     }
 

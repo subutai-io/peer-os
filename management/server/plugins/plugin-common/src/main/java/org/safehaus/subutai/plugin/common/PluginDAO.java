@@ -94,7 +94,7 @@ public class PluginDAO
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkNotNull( clazz, "Class is null" );
 
-        List<T> list = new ArrayList<>();
+        List<T> list = new ArrayList();
         try
         {
             ResultSet rs = dbUtil.select( "select info from cluster_data where source = ?", source );

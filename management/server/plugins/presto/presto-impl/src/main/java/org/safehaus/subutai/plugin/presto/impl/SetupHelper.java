@@ -2,15 +2,13 @@ package org.safehaus.subutai.plugin.presto.impl;
 
 
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 
 import com.google.common.base.Preconditions;
@@ -37,18 +35,17 @@ public class SetupHelper
     }
 
 
-    void checkConnected() throws ClusterSetupException
+    void checkConnected( Environment environment) throws ClusterSetupException
     {
 
-        String hostname = config.getCoordinatorNode().getHostname();
-        if ( manager.getAgentManager().getAgentByHostname( hostname ) == null )
+        if ( getCoordinatorHost( environment ).getAgent() == null )
         {
             throw new ClusterSetupException( "Coordinator node is not connected" );
         }
 
-        for ( Agent a : config.getWorkers() )
+        for ( ContainerHost host : environment.getHostsByIds( config.getWorkers() ) )
         {
-            if ( manager.getAgentManager().getAgentByHostname( a.getHostname() ) == null )
+            if ( host.getAgent() == null )
             {
                 throw new ClusterSetupException( "Not all worker nodes are connected" );
             }
@@ -56,70 +53,69 @@ public class SetupHelper
     }
 
 
-    public void configureAsCoordinator( Agent agent ) throws ClusterSetupException
+    public void configureAsCoordinator( ContainerHost host, Environment environment ) throws ClusterSetupException, CommandException
     {
         po.addLog( "Configuring coordinator..." );
 
-        Command cmd = manager.getCommands().getSetCoordinatorCommand( agent );
-        manager.getCommandRunner().runCommand( cmd );
+          CommandResult result = host.execute( manager.getCommands().getSetCoordinatorCommand( getCoordinatorHost( environment)) );
+          processResult( host, result );
 
-        if ( cmd.hasSucceeded() )
-        {
-            po.addLog( "Coordinator configured successfully" );
-        }
-        else
-        {
-            throw new ClusterSetupException( "Failed to configure coordinator: " + cmd.getAllErrors() );
-        }
     }
 
 
-    public void configureAsWorker( Set<Agent> set, Agent coordinator ) throws ClusterSetupException
+    public void configureAsWorker(Set<ContainerHost> workerHosts) throws ClusterSetupException
     {
         po.addLog( "Configuring worker(s)..." );
 
-        Command cmd = manager.getCommands().getSetWorkerCommand( coordinator, set );
-        manager.getCommandRunner().runCommand( cmd );
+        for( ContainerHost host : workerHosts )
+        {
+            CommandResult result = null;
+            try
+            {
+                result = host.execute( manager.getCommands().getSetCoordinatorCommand( host ) );
+                processResult( host, result );
+            }
+            catch ( CommandException e )
+            {
+                throw new ClusterSetupException(
+                        String.format( "Failed to configure workers Presto node(s): %s", result.getStdErr() ) );
+            }
 
-        if ( cmd.hasSucceeded() )
-        {
-            po.addLog( "Workers configured successfully" );
-        }
-        else
-        {
-            throw new ClusterSetupException( "Failed to configure workers: " + cmd.getAllErrors() );
         }
     }
 
 
-    public void startNodes( final Set<Agent> set ) throws ClusterSetupException
+    public void startNodes( final Set<ContainerHost> set ) throws ClusterSetupException
     {
         po.addLog( "Starting Presto node(s)..." );
-        Command cmd = manager.getCommands().getStartCommand( set );
-        final AtomicInteger okCount = new AtomicInteger();
-        manager.getCommandRunner().runCommand( cmd, new CommandCallback()
+        for(ContainerHost host : set)
         {
-            @Override
-            public void onResponse( Response response, AgentResult agentResult, Command command )
+            CommandResult result = null;
+            try
             {
-                if ( agentResult.getStdOut().toLowerCase().contains( "started" ) )
-                {
-                    if ( okCount.incrementAndGet() == set.size() )
-                    {
-                        stop();
-                    }
-                }
+                result = host.execute( manager.getCommands().getStartCommand() );
+                processResult( host, result );
             }
-        } );
-
-        if ( okCount.get() == set.size() )
-        {
+            catch ( CommandException e )
+            {
+                throw new ClusterSetupException(
+                        String.format( "Failed to start Presto node(s): %s", result.getStdErr() ) );
+            }
             po.addLogDone( "Presto node(s) started successfully\nDone" );
         }
-        else
+    }
+    public void processResult( ContainerHost host, CommandResult result ) throws ClusterSetupException
+    {
+
+        if ( !result.hasSucceeded() )
         {
-            throw new ClusterSetupException(
-                    String.format( "Failed to start Presto node(s): %s", cmd.getAllErrors() ) );
+            throw new ClusterSetupException( String.format( "Error on container %s: %s", host.getHostname(),
+                    result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
         }
+    }
+    public ContainerHost getCoordinatorHost( Environment environment)
+    {
+        ContainerHost host = environment.getContainerHostByUUID( config.getCoordinatorNode() );
+        return host;
     }
 }

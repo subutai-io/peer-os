@@ -3,27 +3,33 @@ package org.safehaus.subutai.plugin.presto.impl;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class SetupStrategyOverHadoop extends SetupHelper implements ClusterSetupStrategy
 {
+    private static final Logger LOG = LoggerFactory.getLogger( SetupStrategyOverHadoop.class.getName() );
+    private Set<UUID> skipInstallation = new HashSet<>();
+    private Environment environment;
 
-    private Set<Agent> skipInstallation = new HashSet<>();
-
-
-    public SetupStrategyOverHadoop( TrackerOperation po, PrestoImpl manager, PrestoClusterConfig config )
+    public SetupStrategyOverHadoop( TrackerOperation po, PrestoImpl manager, PrestoClusterConfig config, Environment environment )
     {
         super( po, manager, config );
+        this.environment = environment;
     }
 
 
@@ -54,73 +60,73 @@ public class SetupStrategyOverHadoop extends SetupHelper implements ClusterSetup
             throw new ClusterSetupException( m + "No workers nodes" );
         }
 
-        checkConnected();
+        checkConnected( environment);
 
         //check installed packages
-        Set<Agent> allNodes = config.getAllNodes();
-        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( allNodes );
-        manager.getCommandRunner().runCommand( checkInstalledCommand );
-
-        if ( !checkInstalledCommand.hasCompleted() )
-        {
-            throw new ClusterSetupException( "Failed to check installed packages\nInstallation aborted" );
-        }
-
         String hadoopPack = Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME;
-        skipInstallation.clear();
-        for ( Agent node : allNodes )
+        RequestBuilder checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( );
+        for( UUID uuid : config.getAllNodes())
         {
-            AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
-            if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
+            ContainerHost node = environment.getContainerHostByUUID( uuid );
+            try
             {
-                skipInstallation.add( node );
-                po.addLog( String.format( "Node %s already has Presto installed. Omitting this node from installation",
-                        node.getHostname() ) );
+                CommandResult result = node.execute( checkInstalledCommand );
+                if(result.getStdOut().contains( Commands.PACKAGE_NAME ))
+                {
+                    po.addLog( String.format( "Node %s already has Presto installed. Omitting this node from installation",
+                            node.getHostname() ) );
+                    config.getWorkers().remove( node.getId() );
+                    config.getAllNodes().remove( node.getId() );
+                }
+                else if ( !result.getStdOut().contains( hadoopPack ) )
+                {
+                    throw new ClusterSetupException(
+                            String.format( "Node %s has no Hadoop installation", node.getHostname() ) );
+                }
             }
-            else if ( !result.getStdOut().contains( hadoopPack ) )
+            catch ( CommandException e )
             {
-                throw new ClusterSetupException(
-                        String.format( "Node %s has no Hadoop installation", node.getHostname() ) );
+                e.printStackTrace();
             }
         }
-
         if ( config.getWorkers().isEmpty() )
         {
             throw new ClusterSetupException( "No nodes eligible for installation\nInstallation aborted" );
         }
-        if ( !allNodes.contains( config.getCoordinatorNode() ) )
+        if ( !config.getAllNodes().contains( config.getCoordinatorNode() ) )
         {
             throw new ClusterSetupException( "Coordinator node was omitted\nInstallation aborted" );
         }
+
     }
 
 
     private void install() throws ClusterSetupException
     {
-        po.addLog( "Updating db..." );
-        //save to db
-        manager.getPluginDAO().saveInfo( PrestoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-
-        po.addLog( "Cluster info saved to DB" );
-
-        //install presto
-        po.addLog( "Installing Presto..." );
-        Set<Agent> installationSet = new HashSet<>( config.getAllNodes() );
-        installationSet.removeAll( skipInstallation );
-        Command installCommand = manager.getCommands().getInstallCommand( installationSet );
-        manager.getCommandRunner().runCommand( installCommand );
-
-        if ( installCommand.hasSucceeded() )
+        try
         {
+            po.addLog( "Updating db..." );
+            config.setEnvironmentId( environment.getId() );
+            manager.getPluginDAO().saveInfo( PrestoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            po.addLog( "Cluster info saved to DB" );
+
+            //install presto
+            po.addLog( "Installing Presto..." );
+            for ( ContainerHost node : environment.getHostsByIds( config.getAllNodes() ) )
+            {
+                CommandResult result = node.execute( manager.getCommands().getInstallCommand() );
+                processResult( node, result );
+            }
+            po.addLog( "Configuring cluster..." );
+            configureAsCoordinator( environment.getContainerHostByUUID( config.getCoordinatorNode() ), environment );
+            configureAsWorker( environment.getHostsByIds( config.getWorkers() ) );
+            startNodes( environment.getHostsByIds( config.getAllNodes() ) );
             po.addLog( "Installation succeeded" );
-
-            configureAsCoordinator( config.getCoordinatorNode() );
-            configureAsWorker( config.getWorkers(), config.getCoordinatorNode() );
-            startNodes( config.getAllNodes() );
-        }
-        else
+        } catch ( CommandException e )
         {
-            throw new ClusterSetupException( "Installation failed: " + installCommand.getAllErrors() );
+            throw new ClusterSetupException(
+                    String.format( "Error while installing Presto on container %s; ",
+                            e.getMessage() ) );
         }
     }
 }

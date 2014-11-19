@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+<reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+
+<bean id="wolManager" scope="singleton" class="org.safehaus.subutai.wol.impl.WolImpl">
+    <argument ref="peerManager" />
+</bean>
+
+<service ref="wolManager" interface="org.safehaus.subutai.wol.api.WolManager" />
+
+</blueprint>

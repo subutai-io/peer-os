@@ -6,10 +6,12 @@
 package org.safehaus.subutai.plugin.zookeeper.ui.wizard;
 
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
@@ -30,7 +32,7 @@ public class VerificationStep extends Panel
 {
 
     public VerificationStep( final Zookeeper zookeeper, final ExecutorService executorService, final Tracker tracker,
-                             final Wizard wizard )
+                             final Wizard wizard, EnvironmentManager environmentManager )
     {
 
         setSizeFull();
@@ -52,8 +54,11 @@ public class VerificationStep extends Panel
         }
         else if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP )
         {
+            Environment hadoopEnvironment =
+                    environmentManager.getEnvironmentByUUID( wizard.getHadoopClusterConfig().getEnvironmentId() );
+            Set<ContainerHost> zookeeperNodes = hadoopEnvironment.getHostsByIds( wizard.getConfig().getNodes() );
             cfgView.addStringCfg( "Hadoop cluster name", wizard.getConfig().getHadoopClusterName() );
-            for ( ContainerHost node : wizard.getConfig().getNodes() )
+            for ( ContainerHost node : zookeeperNodes )
             {
 
                 cfgView.addStringCfg( "Nodes to install", node.getHostname() );
@@ -81,7 +86,7 @@ public class VerificationStep extends Panel
             public void buttonClick( Button.ClickEvent event )
             {
                 UUID trackID = wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP ?
-                               zookeeper.installCluster( wizard.getConfig(), wizard.getHadoopClusterConfig() ) :
+                               zookeeper.installCluster( wizard.getConfig() ) :
                                zookeeper.installCluster( wizard.getConfig() );
 
                 ProgressWindow window =

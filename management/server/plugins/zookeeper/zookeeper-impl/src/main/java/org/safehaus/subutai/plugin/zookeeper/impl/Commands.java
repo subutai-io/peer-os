@@ -6,11 +6,7 @@
 package org.safehaus.subutai.plugin.zookeeper.impl;
 
 
-import java.util.Set;
-
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 
@@ -23,56 +19,56 @@ public class Commands
     public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_KEY.toLowerCase();
 
 
-    public String getCheckInstalledCommand()
+    public static String getCheckInstalledCommand()
     {
         return "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH;
     }
 
 
-    public String getInstallCommand()
+    public static String getInstallCommand()
     {
         return "apt-get --force-yes --assume-yes install " + PACKAGE_NAME;
     }
 
 
-    public String getUninstallCommand()
+    public static String getUninstallCommand()
     {
         return "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME;
     }
 
 
-    public String getStartCommand()
+    public static String getStartCommand()
     {
-        return "service zookeeper start";
+        return "service zookeeper start &";
     }
 
 
-    public String getRestartCommand()
+    public static String getRestartCommand()
     {
-        return "service zookeeper restart";
+        return "service zookeeper restart &";
     }
 
 
-    public String getStopCommand()
+    public static String getStopCommand()
     {
         return "service zookeeper stop";
     }
 
 
-    public String getStatusCommand()
+    public static String getStatusCommand()
     {
         return "service zookeeper status";
     }
 
 
-    public String getConfigureClusterCommand( String zooCfgFileContents, String zooCfgFilePath, int id )
+    public static String getConfigureClusterCommand( String zooCfgFileContents, String zooCfgFilePath, int id )
     {
         return String.format( ". /etc/profile && zookeeper-setID.sh %s && echo '%s' > %s", id,
                             zooCfgFileContents, zooCfgFilePath );
     }
 
 
-    public String getAddPropertyCommand( String fileName, String propertyName, String propertyValue )
+    public static String getAddPropertyCommand( String fileName, String propertyName, String propertyValue )
     {
         return
                 String.format( ". /etc/profile && zookeeper-property.sh add %s %s %s", fileName, propertyName,
@@ -80,7 +76,7 @@ public class Commands
     }
 
 
-    public String getRemovePropertyCommand( String fileName, String propertyName )
+    public static String getRemovePropertyCommand( String fileName, String propertyName )
     {
         return String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName, propertyName );
     }

@@ -9,9 +9,8 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
@@ -24,12 +23,19 @@ public class RestServiceImpl implements RestService
 {
 
     private Zookeeper zookeeperManager;
-    private AgentManager agentManager;
+
+    private EnvironmentManager environmentManager;
 
 
-    public void setAgentManager( final AgentManager agentManager )
+    public EnvironmentManager getEnvironmentManager()
     {
-        this.agentManager = agentManager;
+        return environmentManager;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
     }
 
 
@@ -71,10 +77,10 @@ public class RestServiceImpl implements RestService
         expandedConfig.setSetupType( trimmedZKConfig.getSetupType() );
         if ( trimmedZKConfig.getNodes() != null && !trimmedZKConfig.getNodes().isEmpty() )
         {
-            Set<Agent> nodes = new HashSet<>();
-            for ( String node : trimmedZKConfig.getNodes() )
+            Set<UUID> nodes = new HashSet<>();
+            for ( UUID node : expandedConfig.getNodes() )
             {
-                nodes.add( agentManager.getAgentByHostname( node ) );
+                nodes.add( node );
             }
             expandedConfig.setNodes( nodes );
         }

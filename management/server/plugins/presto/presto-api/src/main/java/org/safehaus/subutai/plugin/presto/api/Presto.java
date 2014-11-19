@@ -15,11 +15,13 @@ public interface Presto extends ApiBase<PrestoClusterConfig>
 
     public UUID installCluster( PrestoClusterConfig config, HadoopClusterConfig hadoopConfig );
 
+    public UUID uninstallCluster( PrestoClusterConfig config );
+
     public UUID addWorkerNode( String clusterName, String lxcHostname );
 
     public UUID destroyWorkerNode( String clusterName, String lxcHostname );
 
-    public UUID changeCoordinatorNode( String clusterName, String newMasterHostname );
+    //public UUID changeCoordinatorNode( String clusterName, String newMasterHostname );
 
     /**
      * Starts the specified node
