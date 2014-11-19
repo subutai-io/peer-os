@@ -58,6 +58,7 @@ public:
 	string& getDateTime();
 	string& getChangeType();
 	vector<string>& getConfPoints();
+	vector<SubutaiContainer>& getContainerSet();
 	void setContainerSet(vector<SubutaiContainer>);
 	void setHostname(const string&);
 	void setParentHostname(const string&);
