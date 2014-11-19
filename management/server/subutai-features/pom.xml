@@ -532,6 +532,7 @@
       <artifactId>hadoop-plugin-ui</artifactId>
     </dependency>
 
+    <!-- HBASE -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hbase-plugin-api</artifactId>
@@ -553,6 +554,7 @@
       <artifactId>hbase-plugin-ui</artifactId>
     </dependency>
 
+    <!-- OOZIE -->
     <!--
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -576,6 +578,7 @@
     </dependency>
     -->
 
+    <!-- SOLR -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>solr-plugin-api</artifactId>
@@ -596,6 +599,8 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>solr-plugin-ui</artifactId>
     </dependency>
+
+    <!-- ZOOKEEPER -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>zookeeper-plugin-api</artifactId>
@@ -617,6 +622,7 @@
       <artifactId>zookeeper-plugin-ui</artifactId>
     </dependency>
 
+    <!-- STORM -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>storm-plugin-api</artifactId>
@@ -634,6 +640,7 @@
       <artifactId>storm-plugin-ui</artifactId>
     </dependency>
 
+    <!-- MONGO -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mongodb-plugin-api</artifactId>
@@ -654,6 +661,8 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>mongodb-plugin-ui</artifactId>
     </dependency>
+
+    <!-- FLUME -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>flume-plugin-api</artifactId>
@@ -675,6 +684,7 @@
       <artifactId>flume-plugin-ui</artifactId>
     </dependency>
 
+    <!-- HIVE -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hive-plugin-api</artifactId>
@@ -695,6 +705,8 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>hive-plugin-ui</artifactId>
     </dependency>
+
+    <!-- PRESTO -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>presto-plugin-api</artifactId>
@@ -716,6 +728,7 @@
       <artifactId>presto-plugin-ui</artifactId>
     </dependency>
 
+    <!-- SPARK -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>spark-plugin-api</artifactId>
@@ -737,6 +750,7 @@
       <artifactId>spark-plugin-ui</artifactId>
     </dependency>
 
+    <!-- SHARK -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>shark-plugin-api</artifactId>
@@ -758,6 +772,7 @@
       <artifactId>shark-plugin-ui</artifactId>
     </dependency>
 
+    <!-- SQOOP -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>sqoop-plugin-api</artifactId>
@@ -779,6 +794,7 @@
       <artifactId>sqoop-plugin-ui</artifactId>
     </dependency>
 
+    <!-- LUCENE -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>lucene-plugin-api</artifactId>
@@ -800,6 +816,7 @@
       <artifactId>lucene-plugin-ui</artifactId>
     </dependency>
 
+    <!-- PIG -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>pig-plugin-api</artifactId>
