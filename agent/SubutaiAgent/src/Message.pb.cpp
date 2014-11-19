@@ -39,7 +39,6 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
   Response_Container_reflection_ = NULL;
 const ::google::protobuf::EnumDescriptor* Response_ResponseType_descriptor_ = NULL;
 const ::google::protobuf::EnumDescriptor* Response_ContainerStatus_descriptor_ = NULL;
-
 }  // namespace
 
 
@@ -64,6 +63,7 @@ void protobuf_AssignDesc_Message_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, timeout_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, isdaemon_),
   };
+
   Request_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
       Request_descriptor_,

@@ -21,7 +21,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>file-tracker-api</artifactId>
-      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

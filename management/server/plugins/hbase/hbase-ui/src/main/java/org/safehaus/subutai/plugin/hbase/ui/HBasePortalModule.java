@@ -15,7 +15,7 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -52,14 +52,14 @@ public class HBasePortalModule implements PortalModule
     @Override
     public String getId()
     {
-        return HBaseClusterConfig.PRODUCT_KEY;
+        return HBaseConfig.PRODUCT_KEY;
     }
 
 
     @Override
     public String getName()
     {
-        return HBaseClusterConfig.PRODUCT_KEY;
+        return HBaseConfig.PRODUCT_KEY;
     }
 
 
