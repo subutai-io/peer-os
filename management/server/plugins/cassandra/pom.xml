@@ -21,4 +21,31 @@
     <module>cassandra-cli</module>
     <module>cassandra-rest</module>
   </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
+        <version>3.0.2</version>
+        <extensions>true</extensions>
+        <configuration>
+          <startLevel>80</startLevel>
+          <aggregateFeatures>true</aggregateFeatures>
+        </configuration>
+        <executions>
+          <execution>
+            <id>create-kar</id>
+            <goals>
+              <goal>features-create-kar</goal>
+            </goals>
+            <configuration>
+              <featuresFile>features.xml</featuresFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

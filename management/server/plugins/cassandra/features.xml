@@ -1,0 +1,9 @@
+<features name="cassandra-plugin" version="2.0.0">
+  <feature name="cassandra-plugin" version="2.0.0">
+    <bundle> mvn:org.safehaus.subutai/cassandra-plugin-api/2.0.0</bundle>
+    <bundle> mvn:org.safehaus.subutai/cassandra-plugin-impl/2.0.0</bundle>
+    <bundle> mvn:org.safehaus.subutai/cassandra-plugin-ui/2.0.0</bundle>
+    <bundle> mvn:org.safehaus.subutai/cassandra-plugin-cli/2.0.0</bundle>
+    <bundle> mvn:org.safehaus.subutai/cassandra-plugin-rest/2.0.0</bundle>
+  </feature>
+</features>
