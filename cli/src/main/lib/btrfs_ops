@@ -199,21 +199,6 @@ function fs_get_children {
   return $count
 }
 
-
-# assert snapshot (arg $1) does NOT exist, if it does show usage (arg $2)
-# warning: exits!
-#TODO
-function fs_assert_nosnap {
-  local snap="$1"
-  local usage="$2"
-
-  if [ "$snap" == "`zfs list -t snapshot -o name -H $snap`" ]; then
-    msg_error "Snapshot \"$snap\" already exists!"
-    show_usage "$usage"
-  fi
-}
-
-
 # assert snapshot (arg $1) exists, if it does NOT show usage (arg $2)
 # warning: exits!
 function fs_assert_snap {
@@ -320,10 +305,13 @@ function fs_part_from_ds {
 
 
 # lists all the templates available
-#TODO
 function fs_list_templates {
-  for l in `zfs list -t snapshot -o name -H | grep @template | grep -v -`; do
-    echo `fs_ctnr_from_ds $l`
+  for item in `lxc-ls`
+  do
+    if [ ! -z "` btrfs property get -ts /var/lib/lxc/$item/rootfs | grep true`" ]
+    then
+       echo $item
+    fi
   done
 }
 
