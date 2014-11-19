@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -63,6 +65,7 @@ public class PeerManagerImpl implements PeerManager
     private CommandResponseListener commandResponseListener;
     private Set<RequestListener> requestListeners = Sets.newHashSet();
     private MessageResponseListener messageResponseListener;
+    private EntityManager entityManager;
 
 
     public PeerManagerImpl( final DataSource dataSource, final Messenger messenger )
@@ -70,6 +73,18 @@ public class PeerManagerImpl implements PeerManager
         Preconditions.checkNotNull( dataSource, "Data source is null" );
         this.dataSource = dataSource;
         this.messenger = messenger;
+    }
+
+
+    public void setEntityManagerFactory( EntityManagerFactory entityManagerFactory )
+    {
+        this.entityManager = entityManagerFactory.createEntityManager();
+    }
+
+
+    public EntityManager getEntityManager()
+    {
+        return entityManager;
     }
 
 

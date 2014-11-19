@@ -1,10 +1,19 @@
-package org.safehaus.subutai.core.peer.api;
+package org.safehaus.subutai.core.peer.impl.model;
 
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.naming.NamingException;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
@@ -12,9 +21,13 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.NullAgent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.hostregistry.api.Interface;
+import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.common.base.Preconditions;
 
@@ -22,26 +35,52 @@ import com.google.common.base.Preconditions;
 /**
  * Base Subutai host class.
  */
-public abstract class SubutaiHost implements Host
+@MappedSuperclass
+@Access( AccessType.FIELD )
+public abstract class AbstractSubutaiHost implements Host
 {
-    private UUID peerId;
-    private Agent agent = NullAgent.getInstance();
-    private Agent parentAgent = NullAgent.getInstance();
+
+    @Id
+    private String id;
+    @Column
+    private String peerId;
+    @Column
+    private String hostname;
+    @Column
+    private String parentHostname;
+    @Column
+    private String netInterfaces;
+
+    @Transient
     protected long lastHeartbeat = System.currentTimeMillis();
-    //    private UUID id;
-    //    private String hostname;
-    //    private Set<Interface> interfaces;
+    @Transient
+    private Set<Interface> interfaces = new HashSet<>();
 
 
-    protected SubutaiHost( final Agent agent, UUID peerId )
+    protected AbstractSubutaiHost( final Agent agent, UUID peerId )
     {
         Preconditions.checkNotNull( agent, "Agent is null" );
 
-        this.agent = agent;
-        this.peerId = peerId;
+        //        this.agent = agent;
+        this.id = agent.getUuid().toString();
+        this.peerId = peerId.toString();
+        this.hostname = agent.getHostname();
+        this.parentHostname = agent.getParentHostName();
+        StringBuilder sb = new StringBuilder();
+
+        for ( String s : agent.getListIP() )
+        {
+            sb.append( s + ";" );
+        }
+        this.netInterfaces = sb.toString();
         //        this.id = agent.getUuid();
         //        this.hostname = agent.getHostname();
         //        this.interfaces = new HashSet<>();
+    }
+
+
+    protected AbstractSubutaiHost()
+    {
     }
 
     //
@@ -54,22 +93,16 @@ public abstract class SubutaiHost implements Host
     //    }
 
 
-    public Agent getAgent()
-    {
-        return agent;
-    }
-
-
-    public Agent getParentAgent()
-    {
-        return parentAgent;
-    }
-
-
-    public void setParentAgent( final Agent parentAgent )
-    {
-        this.parentAgent = parentAgent;
-    }
+    //        public Agent getParentAgent()
+    //        {
+    //            return parentAgent;
+    //        }
+    //
+    //
+    //        public void setParentAgent( final Agent parentAgent )
+    //        {
+    //            this.parentAgent = parentAgent;
+    //        }
 
 
     public Peer getPeer() throws PeerException
@@ -78,7 +111,7 @@ public abstract class SubutaiHost implements Host
         try
         {
             PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
-            result = peerManager.getPeer( peerId );
+            result = peerManager.getPeer( UUID.fromString( peerId ) );
             if ( result == null )
             {
                 throw new PeerException( "Peer not registered." );
@@ -86,7 +119,7 @@ public abstract class SubutaiHost implements Host
         }
         catch ( NamingException e )
         {
-            throw new PeerException( "Coould not locate PeerManager" );
+            throw new PeerException( "Could not locate PeerManager" );
         }
 
         return result;
@@ -142,44 +175,45 @@ public abstract class SubutaiHost implements Host
     @Override
     public UUID getPeerId()
     {
-        return peerId;
+        return UUID.fromString( peerId );
     }
 
-//
-//    @Override
-//    public void setPeerId( final UUID peerId )
-//    {
-//        this.peerId = peerId;
-//    }
+
+    public void setPeerId( final String peerId )
+    {
+        this.peerId = peerId;
+    }
 
 
     @Override
     public UUID getId()
     {
-        return agent.getUuid();
+        return UUID.fromString( id );
     }
 
 
     @Override
     public String getParentHostname()
     {
-        return agent.getParentHostName();
+        return getAgent().getParentHostName();
     }
 
 
     @Override
     public String getHostname()
     {
-        return agent.getHostname();
+        return getAgent().getHostname();
     }
 
 
+    @Override
     public void updateHeartbeat()
     {
         lastHeartbeat = System.currentTimeMillis();
     }
 
 
+    @Override
     public void resetHeartbeat()
     {
         if ( lastHeartbeat > 10 * 100 * 6 )
@@ -223,9 +257,9 @@ public abstract class SubutaiHost implements Host
             return false;
         }
 
-        final SubutaiHost that = ( SubutaiHost ) o;
+        final AbstractSubutaiHost that = ( AbstractSubutaiHost ) o;
 
-        if ( !agent.equals( that.agent ) )
+        if ( !id.equals( that.id ) )
         {
             return false;
         }
@@ -237,14 +271,21 @@ public abstract class SubutaiHost implements Host
     @Override
     public int hashCode()
     {
-        return agent.hashCode();
+        return id != null ? id.hashCode() : 0;
+    }
+
+
+    public Set<Interface> getInterfaces()
+    {
+        return this.interfaces;
     }
 
 
     @Override
     public String getIpByMask( String mask )
     {
-        for ( String ip : agent.getListIP() )
+        String[] s = this.netInterfaces.split( ";" );
+        for ( String ip : s )
         {
             if ( ip.matches( mask ) )
             {
@@ -298,13 +339,44 @@ public abstract class SubutaiHost implements Host
     }
 
 
+    public Agent getAgent()
+    {
+        return new Agent( UUID.fromString( id ), hostname, parentHostname, null, getIps(), false, null );
+    }
+
+
+    private List<String> getIps()
+    {
+        String[] str = this.netInterfaces.split( ";" );
+        List<String> result = new ArrayList<>();
+
+        for ( String s : str )
+        {
+            result.add( s );
+        }
+        return result;
+    }
+
+
+    @Override
+    public Agent getParentAgent()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public void setParentAgent( final Agent agent )
+    {
+        throw new UnsupportedOperationException();
+    }
+
+
     @Override
     public String toString()
     {
         return "SubutaiHost{" +
                 "peerId=" + peerId +
-                ", agent=" + agent +
-                ", parentAgent=" + parentAgent +
                 ", lastHeartbeat=" + lastHeartbeat +
                 '}';
     }

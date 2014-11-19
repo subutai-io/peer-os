@@ -400,7 +400,6 @@ public class ResourceHost extends SubutaiHost
                 {
                     ContainerHost containerHost = create( creatorPeerId, environmentId, templates, containerName );
                     containerHost.setNodeGroupName( nodeGroupName );
-                    containerHost.setPeerId( localPeer.getId() );
                     containerHost.setEnvironmentId( environmentId );
                     localPeer.onPeerEvent( new PeerEvent( PeerEventType.CONTAINER_CREATE_SUCCESS, containerHost ) );
                 }
@@ -423,8 +422,8 @@ public class ResourceHost extends SubutaiHost
         {
             throw new ResourceHostException( "Container successfully created by agent not respond.", null );
         }
-        ContainerHost containerHost = new ContainerHost( agent, getPeerId(), envId );
-        containerHost.setParentAgent( getAgent() );
+        ContainerHost containerHost = new ContainerHost( agent, getPeerId(), creatorPeerId, envId );
+        //        containerHost.setParentAgent( getAgent() );
         containerHost.setCreatorPeerId( creatorPeerId );
         containerHost.setTemplateName( templateName );
         containerHost.updateHeartbeat();

@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint
-    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.1.0"
+    xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.0.0">
 
+  <reference id="emFactory" interface="javax.persistence.EntityManagerFactory"
+             filter="(osgi.unit.name=peerManagerUnit)" />
   <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
     <property name="URL" value="jdbc:h2:~/peer_manager" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
-
   <service ref="peerManager" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
   <reference id="messenger" availability="mandatory"
@@ -39,7 +42,8 @@
     <property name="strategyManager" ref="strategyManager" />
     <property name="quotaManager" ref="quotaManager" />
     <property name="commandExecutor" ref="commandExecutor" />
-
+    <!--<property name="managementHostDataService" ref="managementHostEntityService" />-->
+    <property name="entityManagerFactory" ref="emFactory" />
     <argument ref="dataSource" />
     <argument ref="messenger" />
   </bean>

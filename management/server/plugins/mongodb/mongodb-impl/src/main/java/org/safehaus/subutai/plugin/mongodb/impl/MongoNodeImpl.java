@@ -29,7 +29,7 @@ public abstract class MongoNodeImpl extends ContainerHost implements MongoNode
 
     public MongoNodeImpl( final Agent agent, final UUID peerId, final UUID environmentId, String domainName, int port )
     {
-        super( agent, peerId, environmentId );
+        super( agent, agent.getUuid(), peerId, environmentId );
         this.domainName = domainName;
         this.port = port;
     }

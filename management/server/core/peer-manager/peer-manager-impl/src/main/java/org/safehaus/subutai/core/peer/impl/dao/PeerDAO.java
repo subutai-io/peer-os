@@ -11,6 +11,8 @@ import java.util.UUID;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.util.DbUtil;
+import org.safehaus.subutai.common.util.GsonInterfaceAdapter;
+import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +30,7 @@ public class PeerDAO
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( PeerDAO.class.getName() );
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private Gson gson;
     protected DbUtil dbUtil;
 
 
@@ -37,6 +39,9 @@ public class PeerDAO
         Preconditions.checkNotNull( dataSource, "DataSource is null" );
         this.dbUtil = new DbUtil( dataSource );
 
+        GsonBuilder gsonBuilder = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping();
+        gsonBuilder.registerTypeAdapter( ManagementHost.class, new GsonInterfaceAdapter<ManagementHost>() ).create();
+        gson = gsonBuilder.create();
         setupDb();
     }
 
@@ -63,7 +68,7 @@ public class PeerDAO
 
         try
         {
-            String json = GSON.toJson( info );
+            String json = gson.toJson( info );
             dbUtil.update( "merge into peer (source, id, info) values (?, ? ,?)", source, UUID.fromString( key ),
                     json );
             return true;
@@ -103,7 +108,7 @@ public class PeerDAO
                 if ( infoClob != null && infoClob.length() > 0 )
                 {
                     String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                    list.add( GSON.fromJson( info, clazz ) );
+                    list.add( gson.fromJson( info, clazz ) );
                 }
             }
         }
@@ -141,7 +146,7 @@ public class PeerDAO
                 if ( infoClob != null && infoClob.length() > 0 )
                 {
                     String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                    return GSON.fromJson( info, clazz );
+                    return gson.fromJson( info, clazz );
                 }
             }
         }
@@ -187,7 +192,7 @@ public class PeerDAO
         try
         {
             dbUtil.update( "merge into peer (source, id, info) values (?, ? ,?)", source, UUID.fromString( key ),
-                    GSON.toJson( info ) );
+                    gson.toJson( info ) );
             return true;
         }
         catch ( SQLException e )

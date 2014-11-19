@@ -20,13 +20,15 @@ public interface Host extends Serializable
 {
     public Agent getAgent();
 
+    @Deprecated
     public Agent getParentAgent();
 
+    @Deprecated
     public void setParentAgent( Agent agent );
 
     public UUID getPeerId();
 
-    public void setPeerId( UUID peerId );
+    //    public void setPeerId( UUID peerId );
 
     public UUID getId();
 
@@ -41,6 +43,10 @@ public interface Host extends Serializable
     public void executeAsync( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
 
     public void executeAsync( RequestBuilder requestBuilder ) throws CommandException;
+
+    void updateHeartbeat();
+
+    void resetHeartbeat();
 
     public boolean isConnected();
 

@@ -997,7 +997,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <dependency>
+      <!--<dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>oozie-plugin-api</artifactId>
         <version>${project.version}</version>
@@ -1009,18 +1009,17 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>oozie-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <!--
-      <dependency>
-        <groupId>${project.groupId}</groupId>
         <artifactId>oozie-plugin-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>oozie-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>oozie-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -1098,12 +1097,11 @@
         <artifactId>hbase-plugin-api</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
+      <!--<dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>hbase-plugin-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!--
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>hbase-plugin-cli</artifactId>

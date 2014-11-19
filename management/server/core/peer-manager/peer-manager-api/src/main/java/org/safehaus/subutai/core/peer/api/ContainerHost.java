@@ -21,9 +21,10 @@ public class ContainerHost extends SubutaiHost
     private String nodeGroupName;
 
 
-    public ContainerHost( final Agent agent, UUID peerId, UUID environmentId )
+    public ContainerHost( final Agent agent, UUID peerId, UUID creatorPeerId, UUID environmentId )
     {
         super( agent, peerId );
+        this.creatorPeerId = creatorPeerId;
         this.environmentId = environmentId;
     }
 
