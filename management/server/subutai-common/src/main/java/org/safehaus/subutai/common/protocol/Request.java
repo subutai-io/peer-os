@@ -2,9 +2,9 @@ package org.safehaus.subutai.common.protocol;
 
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
@@ -33,7 +33,7 @@ public class Request implements Serializable
     private Map<String, String> environment = null;
     private Integer pid = null;
     private Integer timeout = 30;
-    private String confPoints[];
+    private Set<String> confPoints;
 
 
     public Request( String source, RequestType type, UUID uuid, UUID taskUuid, Integer requestSequenceNumber,
@@ -165,13 +165,13 @@ public class Request implements Serializable
     }
 
 
-    public String[] getConfPoints()
+    public Set<String> getConfPoints()
     {
         return confPoints;
     }
 
 
-    public Request setConfPoints( String confPoints[] )
+    public Request setConfPoints( Set<String> confPoints )
     {
         this.confPoints = confPoints;
         return this;
@@ -207,7 +207,7 @@ public class Request implements Serializable
         {
             return false;
         }
-        if ( !Arrays.equals( confPoints, request.confPoints ) )
+        if ( confPoints != null ? !confPoints.equals( request.confPoints ) : request.confPoints != null )
         {
             return false;
         }
@@ -297,7 +297,7 @@ public class Request implements Serializable
         result = 31 * result + ( environment != null ? environment.hashCode() : 0 );
         result = 31 * result + ( pid != null ? pid.hashCode() : 0 );
         result = 31 * result + ( timeout != null ? timeout.hashCode() : 0 );
-        result = 31 * result + ( confPoints != null ? Arrays.hashCode( confPoints ) : 0 );
+        result = 31 * result + ( confPoints != null ? confPoints.hashCode() : 0 );
         return result;
     }
 }

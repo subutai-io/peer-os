@@ -530,6 +530,7 @@ void SubutaiContainer::PutToFile(string filename, string text) {
     args.push_back(text);
     args.push_back(">");
     args.push_back(filename);
+    args.push_back("'");
     containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Echo "+ text + "in " + filename));
     RunProgram("/bin/bash", args);
 }
