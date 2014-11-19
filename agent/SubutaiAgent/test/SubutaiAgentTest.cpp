@@ -105,7 +105,7 @@ void AgentTest::testCommandDeserialize(void)
 			"\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
 			"\"commandId\":\"a7349720-9e2f-11e3-b9d6-080027b00009\","
 			"\"workingDirectory\":\"/home\","
-			"\"program\":\"ls\","
+			"\"command\":\"ls\","
 			"\"stdOut\":\"RETURN\","
 			"\"stdErr\":\"RETURN\","
 			"\"runAs\":\"root\","
