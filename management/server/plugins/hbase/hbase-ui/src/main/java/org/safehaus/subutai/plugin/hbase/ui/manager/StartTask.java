@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 
 
 public class StartTask implements Runnable
@@ -39,7 +39,7 @@ public class StartTask implements Runnable
 
         while ( !Thread.interrupted() )
         {
-            TrackerOperationView po = tracker.getTrackerOperation( HBaseClusterConfig.PRODUCT_KEY, trackID );
+            TrackerOperationView po = tracker.getTrackerOperation( HBaseConfig.PRODUCT_KEY, trackID );
             if ( po != null )
             {
                 if ( po.getState() != OperationState.RUNNING )

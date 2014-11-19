@@ -60,10 +60,11 @@ public class AddNodeWindow extends Window
         availableNodesComboBox.setNullSelectionAllowed( false );
         availableNodesComboBox.setRequired( true );
         availableNodesComboBox.setWidth( 200, Unit.PIXELS );
+
         for ( ContainerHost node : nodes )
         {
             availableNodesComboBox.addItem( node );
-            availableNodesComboBox.setItemCaption( node, node.getHostname() );
+            availableNodesComboBox.setItemCaption( node, node.toString() );
         }
         availableNodesComboBox.setValue( nodes.iterator().next() );
 

@@ -6,49 +6,27 @@
 package org.safehaus.subutai.plugin.hbase.api;
 
 
-import java.util.List;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 
-public interface HBase extends ApiBase<HBaseClusterConfig>
+public interface HBase extends ApiBase<HBaseConfig>
 {
 
-    public UUID installCluster( HBaseClusterConfig config );
+    public UUID installCluster( HBaseConfig config );
 
-    public List<HBaseClusterConfig> getClusters();
+    public UUID destroyNode( final String clusterName, final String hostname );
 
-    UUID startCluster( String clusterName );
+    public ClusterSetupStrategy getClusterSetupStrategy( TrackerOperation operation, HBaseConfig config,
+                                                         Environment environment );
 
-    //    UUID checkNode(HBaseType type, String clusterName, String lxcHostname);
+    public UUID stopCluster( String clusterName );
 
-    //    UUID startNodes(String clusterName);
+    public UUID startCluster( String clusterName );
 
-    //    UUID stopNodes(String clusterName);
-
-    UUID stopCluster( String clusterName );
-
-    UUID checkCluster( String clusterName );
-
-    //    List<HadoopClusterConfig> getHadoopClusters();
-
-    //    HadoopClusterConfig getHadoopCluster( String clusterName );
-
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, HBaseClusterConfig config,
-                                                         TrackerOperation po );
-
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( HBaseClusterConfig config );
-
-    UUID checkNode( String clustername, String lxchostname );
-
-    UUID destroyNode( String clustername, String lxchostname, String nodetype );
-
-    UUID addNode( String clustername, String lxchostname, String nodetype );
-
-    UUID destroyCluster( String clusterName );
+    public UUID checkNode( String clusterName, UUID hostId );
 }

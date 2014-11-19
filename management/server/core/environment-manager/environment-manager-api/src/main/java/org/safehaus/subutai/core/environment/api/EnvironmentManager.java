@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -30,7 +31,7 @@ public interface EnvironmentManager
 
     List<Environment> getEnvironments();
 
-    Environment getEnvironment( String environmentName );
+    Environment getEnvironment( String environmentId );
 
     boolean destroyEnvironment( UUID environmentId ) throws EnvironmentDestroyException;
 
@@ -63,4 +64,9 @@ public interface EnvironmentManager
     EnvironmentBlueprint getEnvironmentBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
 
     void createAdditionalContainers( UUID id, String ngJson, Peer peer ) throws EnvironmentBuildException;
+
+    public UUID addContainers( final UUID environmentId, final String template, PlacementStrategy strategy,
+                               String nodeGroupName, final Peer peer ) throws EnvironmentManagerException;
+
+    void removeContainer( UUID environmentId, UUID hostId ) throws EnvironmentManagerException;
 }
