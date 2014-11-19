@@ -877,7 +877,7 @@
     </dependency>
 
     <!-- MAHAOUT -->
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mahout-plugin-api</artifactId>
     </dependency>
@@ -896,7 +896,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mahout-plugin-ui</artifactId>
-    </dependency>
+    </dependency>-->
 
     <!-- HIPI -->
     <dependency>
