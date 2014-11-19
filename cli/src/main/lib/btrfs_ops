@@ -10,16 +10,10 @@ function fs_rename_datasets_set_mount_points {
   local src="$1"
   local dst="$2"
   local dst_rootfs="$3"
-  zfs rename "lxc-data/$src-home" "lxc-data/$dst-home"
-  zfs rename "lxc-data/$src-var"  "lxc-data/$dst-var"
-  zfs rename "lxc/$src-opt" "lxc/$dst-opt"
-  zfs rename "lxc/$src" "lxc/$dst"
-  zfs set mountpoint="$dst_rootfs" "lxc/$dst"
-
-  zfs mount "lxc/$dst"
-  zfs mount "lxc/$dst-opt"
-  zfs mount "lxc-data/$dst-home"
-  zfs mount "lxc-data/$dst-var"
+  mv "/lxc-data/$src-home" "/lxc-data/$dst-home"
+  mv "/lxc-data/$src-var"  "/lxc-data/$dst-var"
+  mv "/lxc/$src-opt" "/lxc/$dst-opt"
+  mv /var/lib/lxc/$src/rootfs /var/lib/lxc/$dst/
 }
 
 function fs_clone {
