@@ -2,18 +2,16 @@ package org.safehaus.subutai.server.ui.component;
 
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
+import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
-import org.safehaus.subutai.core.peer.api.Host;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +39,8 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
     private final HostRegistry hostRegistry;
     private final Tree tree;
     private HierarchicalContainer container;
-    private Set<Agent> currentAgents = new HashSet<>();
-    private Set<Host> selectedHosts = Sets.newHashSet();
+    private Set<HostInfo> presentHosts = Sets.newHashSet();
+    private Set<HostInfo> selectedHosts = Sets.newHashSet();
 
 
     public HostTree( HostRegistry hostRegistry )
@@ -66,7 +64,7 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
                 Item item = tree.getItem( itemId );
                 if ( item != null )
                 {
-                    Host host = ( Host ) item.getItemProperty( "value" ).getValue();
+                    HostInfo host = ( HostInfo ) item.getItemProperty( "value" ).getValue();
                     if ( host != null )
                     {
                         description = "Hostname: " + host.getHostname() + "<br>" + "ID: " + host.getId();
@@ -87,13 +85,13 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
                 {
                     Tree t = ( Tree ) event.getProperty();
 
-                    Set<Host> selectedList = new HashSet<>();
+                    Set<HostInfo> selectedList = new HashSet<>();
 
                     for ( Object o : ( Iterable<?> ) t.getValue() )
                     {
                         if ( tree.getItem( o ).getItemProperty( "value" ).getValue() != null )
                         {
-                            Host host = ( Host ) tree.getItem( o ).getItemProperty( "value" ).getValue();
+                            HostInfo host = ( HostInfo ) tree.getItem( o ).getItemProperty( "value" ).getValue();
                             selectedList.add( host );
                         }
                     }
@@ -111,187 +109,87 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
     public HierarchicalContainer getNodeContainer()
     {
         container = new HierarchicalContainer();
-        container.addContainerProperty( "value", Host.class, null );
+        container.addContainerProperty( "value", HostInfo.class, null );
         container.addContainerProperty( "icon", Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
-        //        refreshAgents( agentManager.getAgents() );
+        refreshTree( hostRegistry.getResourceHostsInfo() );
         return container;
     }
 
 
-    private void refreshAgents( Set<Agent> allFreshAgents )
+    private void refreshTree( Set<ResourceHostInfo> hosts )
     {
-        if ( allFreshAgents != null )
+        if ( !CollectionUtil.isCollectionEmpty( hosts ) )
         {
             try
             {
+                presentHosts.removeAll( hosts );
 
-                currentAgents.removeAll( allFreshAgents );
-
-                if ( !currentAgents.isEmpty() )
+                if ( !presentHosts.isEmpty() )
                 {
-                    for ( Agent missingAgent : currentAgents )
+                    for ( HostInfo host : presentHosts )
                     {
-                        container.removeItemRecursively( missingAgent.getUuid() );
+                        container.removeItemRecursively( host.getId() );
                     }
                 }
 
-                //grab parents
-                Set<Agent> parents = new HashSet<>();
-                for ( Agent agent : allFreshAgents )
-                {
-                    if ( !agent.isLXC() && agent.getUuid() != null && agent.getHostname() != null )
-                    {
-                        parents.add( agent );
-                    }
-                }
+                presentHosts.clear();
 
-                //find children
-                Set<Agent> possibleOrphans = new HashSet<>();
-                Map<Agent, Set<Agent>> families = new HashMap<>();
-                if ( !parents.isEmpty() )
+                for ( ResourceHostInfo resourceHostInfo : hosts )
                 {
-                    Set<Agent> childAgentsWithParents = new HashSet<>();
-                    for ( Agent parent : parents )
-                    {
-                        //find children
-                        Set<Agent> children = new HashSet<>();
-                        for ( Agent possibleChild : allFreshAgents )
-                        {
-                            if ( possibleChild.isLXC() && possibleChild.getUuid() != null
-                                    && possibleChild.getHostname() != null )
-                            {
-                                //add for further orphan children processing
-                                possibleOrphans.add( possibleChild );
-                                //check if this is own child
-                                if ( parent.getHostname().equalsIgnoreCase( possibleChild.getParentHostName() ) )
-                                {
-                                    children.add( possibleChild );
-                                }
-                            }
-                        }
-                        if ( !children.isEmpty() )
-                        {
-                            //add children to parent
-                            childAgentsWithParents.addAll( children );
-                            families.put( parent, children );
-                        }
-                        else
-                        {
-                            families.put( parent, null );
-                        }
-                    }
 
-                    //remove all child agents having parents
-                    possibleOrphans.removeAll( childAgentsWithParents );
-                }
-                else
-                {
-                    //all agents are orphans
-                    for ( Agent possibleChild : allFreshAgents )
-                    {
-                        if ( possibleChild.isLXC() && possibleChild.getUuid() != null
-                                && possibleChild.getHostname() != null )
-                        {
-                            //add for further orphan children processing
-                            possibleOrphans.add( possibleChild );
-                        }
-                    }
-                }
-
-                //add families to tree
-                if ( !families.isEmpty() )
-                {
-                    for ( Map.Entry<Agent, Set<Agent>> family : families.entrySet() )
-                    {
-                        Agent parentAgent = family.getKey();
-
-                        Item parent = container.getItem( parentAgent.getUuid() );
-                        //agent is not yet in the tree
-                        if ( parent == null )
-                        {
-                            parent = container.addItem( parentAgent.getUuid() );
-                        }
-                        if ( parent != null )
-                        {
-                            tree.setItemCaption( parentAgent.getUuid(), parentAgent.getHostname() );
-                            parent.getItemProperty( "value" ).setValue( parentAgent );
-                            if ( family.getValue() != null )
-                            {
-                                container.setChildrenAllowed( parentAgent.getUuid(), true );
-                                for ( Agent childAgent : family.getValue() )
-                                {
-                                    Item child = container.getItem( childAgent.getUuid() );
-                                    //child is not yet in the tree
-                                    if ( child == null )
-                                    {
-                                        child = container.addItem( childAgent.getUuid() );
-                                    }
-                                    if ( child != null )
-                                    {
-                                        tree.setItemCaption( childAgent.getUuid(), childAgent.getHostname() );
-                                        child.getItemProperty( "value" ).setValue( childAgent );
-                                        child.getItemProperty( "icon" )
-                                             .setValue( new ThemeResource( "img/lxc/virtual.png" ) );
-                                        container.setParent( childAgent.getUuid(), parentAgent.getUuid() );
-                                        container.setChildrenAllowed( childAgent.getUuid(), false );
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                container.setChildrenAllowed( parentAgent.getUuid(), false );
-                            }
-                        }
-                    }
-                }
-
-                //add orphans to tree
-                if ( !possibleOrphans.isEmpty() )
-                {
-                    Item parent = container.getItem( Common.UNKNOWN_LXC_PARENT_NAME );
+                    presentHosts.add( resourceHostInfo );
+                    Item parent = container.getItem( resourceHostInfo.getId() );
+                    //host is not yet in the tree
                     if ( parent == null )
                     {
-                        parent = container.addItem( Common.UNKNOWN_LXC_PARENT_NAME );
+                        parent = container.addItem( resourceHostInfo.getId() );
                     }
                     if ( parent != null )
                     {
-                        container.setChildrenAllowed( Common.UNKNOWN_LXC_PARENT_NAME, true );
-                        for ( Agent orphanAgent : possibleOrphans )
+                        tree.setItemCaption( resourceHostInfo.getId(), resourceHostInfo.getHostname() );
+                        parent.getItemProperty( "value" ).setValue( resourceHostInfo );
+                        if ( !CollectionUtil.isCollectionEmpty( resourceHostInfo.getContainers() ) )
                         {
-                            Item child = container.getItem( orphanAgent.getUuid() );
-                            //orphan is not yet in the tree
-                            if ( child == null )
+                            container.setChildrenAllowed( resourceHostInfo.getId(), true );
+                            for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
                             {
-                                child = container.addItem( orphanAgent.getUuid() );
+                                presentHosts.add( containerHostInfo );
+
+                                Item child = container.getItem( containerHostInfo.getId() );
+                                //child is not yet in the tree
+                                if ( child == null )
+                                {
+                                    child = container.addItem( containerHostInfo.getId() );
+                                }
+                                if ( child != null )
+                                {
+                                    tree.setItemCaption( containerHostInfo.getId(), containerHostInfo.getHostname() );
+                                    child.getItemProperty( "value" ).setValue( containerHostInfo );
+                                    child.getItemProperty( "icon" )
+                                         .setValue( new ThemeResource( "img/lxc/virtual.png" ) );
+                                    container.setParent( containerHostInfo.getId(), resourceHostInfo.getId() );
+                                    container.setChildrenAllowed( containerHostInfo.getId(), false );
+                                }
                             }
-                            if ( child != null )
-                            {
-                                tree.setItemCaption( orphanAgent.getUuid(), orphanAgent.getHostname() );
-                                child.getItemProperty( "value" ).setValue( orphanAgent );
-                                child.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
-                                container.setParent( orphanAgent.getUuid(), Common.UNKNOWN_LXC_PARENT_NAME );
-                                container.setChildrenAllowed( orphanAgent.getUuid(), false );
-                            }
+                        }
+                        else
+                        {
+                            container.setChildrenAllowed( resourceHostInfo.getId(), false );
                         }
                     }
                 }
-                else
-                {
-                    container.removeItemRecursively( Common.UNKNOWN_LXC_PARENT_NAME );
-                }
 
-                currentAgents = allFreshAgents;
                 container.sort( new Object[] { "value" }, new boolean[] { true } );
             }
             catch ( Property.ReadOnlyException | Converter.ConversionException ex )
             {
-                LOG.error( "Error in refreshAgents", ex );
+                LOG.error( "Error in refreshTree", ex );
             }
         }
     }
 
 
-    public Set<Host> getSelectedHosts()
+    public Set<HostInfo> getSelectedHosts()
     {
         return Collections.unmodifiableSet( selectedHosts );
     }
@@ -306,6 +204,6 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
-
+        refreshTree( hostRegistry.getResourceHostsInfo() );
     }
 }
