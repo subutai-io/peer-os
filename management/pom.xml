@@ -997,6 +997,41 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- OOZIE -->
+      <!--
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>oozie-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>oozie-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>oozie-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>oozie-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>oozie-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      -->
+
+      <!-- ACCUMULO -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>accumulo-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>pig-plugin-api</artifactId>
@@ -1017,11 +1052,14 @@
         <artifactId>pig-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>pig-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+
+      <!-- FLUME -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>flume-plugin-api</artifactId>
@@ -1047,6 +1085,8 @@
         <artifactId>flume-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+
+      <!-- LUCENE -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>lucene-plugin-api</artifactId>
@@ -1073,6 +1113,7 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- MAHOUT -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>mahout-plugin-api</artifactId>
@@ -1126,6 +1167,7 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- PRESTO -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>presto-plugin-api</artifactId>
@@ -1152,6 +1194,7 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- SHARK -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>shark-plugin-api</artifactId>
@@ -1178,6 +1221,7 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- SOLR -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>solr-plugin-api</artifactId>
@@ -1203,6 +1247,8 @@
         <artifactId>solr-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+
+      <!-- STORM -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>storm-plugin-api</artifactId>
@@ -1229,6 +1275,7 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- ZOOKEEPER -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>zookeeper-plugin-api</artifactId>
@@ -1254,6 +1301,7 @@
         <artifactId>zookeeper-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+
       <!-- ELASTICSEARCH -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -1281,6 +1329,7 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- NUTCH -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>nutch-plugin-api</artifactId>
@@ -1307,75 +1356,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- <dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>oozie-plugin-api</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>oozie-plugin-impl</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>oozie-plugin-cli</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>oozie-plugin-rest</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>oozie-plugin-ui</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>accumulo-plugin-api</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>accumulo-plugin-impl</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>accumulo-plugin-cli</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>accumulo-plugin-rest</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>accumulo-plugin-ui</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>jetty-plugin-api</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>jetty-plugin-impl</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       <dependency>
-         <groupId>${project.groupId}</groupId>
-         <artifactId>jetty-plugin-ui</artifactId>
-         <version>${project.version}</version>
-       </dependency>
-       -->
+      <!-- HBASE -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>hbase-plugin-api</artifactId>
@@ -1402,6 +1383,7 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- HIVE -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>hive-plugin-api</artifactId>
@@ -1427,6 +1409,8 @@
         <artifactId>hive-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+
+      <!-- SPARK -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>spark-plugin-api</artifactId>
@@ -1453,6 +1437,7 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- SQOOP -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>sqoop-plugin-api</artifactId>
@@ -1478,6 +1463,8 @@
         <artifactId>sqoop-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+
+      <!-- HIPI -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>hipi-plugin-api</artifactId>

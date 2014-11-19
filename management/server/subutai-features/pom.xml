@@ -575,6 +575,7 @@
       <artifactId>oozie-plugin-ui</artifactId>
     </dependency>
 
+-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>accumulo-plugin-api</artifactId>
@@ -595,7 +596,8 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>pig-plugin-ui</artifactId>
     </dependency>
-   -->
+
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>solr-plugin-api</artifactId>
@@ -840,6 +842,8 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>pig-plugin-ui</artifactId>
     </dependency>
+
+    <!-- MAHAOUT -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mahout-plugin-api</artifactId>
@@ -861,6 +865,7 @@
       <artifactId>mahout-plugin-ui</artifactId>
     </dependency>
 
+    <!-- HIPI -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hipi-plugin-api</artifactId>
@@ -882,6 +887,7 @@
       <artifactId>hipi-plugin-ui</artifactId>
     </dependency>
 
+    <!-- NUTCH -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>nutch-plugin-api</artifactId>
@@ -902,6 +908,7 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>nutch-plugin-ui</artifactId>
     </dependency>
+
     <!--
     <dependency>
     <groupId>${project.groupId}</groupId>
