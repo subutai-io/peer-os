@@ -14,10 +14,12 @@
              interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
   <reference id="stormManager" availability="mandatory" interface="org.safehaus.subutai.plugin.storm.api.Storm" />
+  <reference id="zookeeperManager" availability="mandatory" interface="org.safehaus.subutai.plugin.zookeeper.api.Zookeeper" />
 
   <bean id="restService" class="org.safehaus.subutai.plugin.storm.rest.RestService">
     <property name="environmentManager" ref="environmentManager" />
     <property name="stormManager" ref="stormManager" />
+    <property name="zookeeperManager" ref="zookeeperManager" />
   </bean>
 
   <jaxrs:server address="/storm" id="stormRestService">
