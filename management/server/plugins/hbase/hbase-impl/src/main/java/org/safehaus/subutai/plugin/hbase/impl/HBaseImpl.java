@@ -236,15 +236,18 @@ public class HBaseImpl implements HBase
 
 
     @Override
-    public UUID addNode( final String clusterName, final String hostname )
+    public UUID addNode( final String clusterName, final String nodeType )
     {
         Preconditions.checkNotNull( clusterName );
-        Preconditions.checkNotNull( hostname );
+        Preconditions.checkNotNull( nodeType );
         HBaseConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
-                new NodeOperationHandler( this, config, hostname, OperationType.INCLUDE );
+                new NodeOperationHandler( this, config, nodeType, OperationType.INCLUDE );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
+
+
+
 }
 
