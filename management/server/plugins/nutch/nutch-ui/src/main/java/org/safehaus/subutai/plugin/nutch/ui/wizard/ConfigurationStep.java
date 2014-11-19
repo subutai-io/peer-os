@@ -19,6 +19,7 @@ import org.safehaus.subutai.plugin.nutch.api.NutchConfig;
 import org.safehaus.subutai.plugin.nutch.api.SetupType;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
@@ -138,10 +139,10 @@ public class ConfigurationStep extends Panel
                 {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
-                    config.setHadoopNodes( hadoopInfo.getAllNodes() );
+                    config.setHadoopNodes( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
                     hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
                     Set<ContainerHost> hadoopNodes =
-                            hadoopEnvironment.getHostsByIds(  hadoopInfo.getAllNodes()  );
+                            hadoopEnvironment.getHostsByIds(  Sets.newHashSet (hadoopInfo.getAllNodes() ) );
                     select.setValue( null );
                     select.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );

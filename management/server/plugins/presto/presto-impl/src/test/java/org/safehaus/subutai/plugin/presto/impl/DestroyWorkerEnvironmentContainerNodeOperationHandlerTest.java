@@ -12,19 +12,24 @@
 //import org.safehaus.subutai.plugin.presto.impl.handler.NodeOperationHanler;
 //import org.safehaus.subutai.plugin.presto.impl.mock.PrestoImplMock;
 //
+//import static org.mockito.Mockito.mock;
+//import static org.mockito.Mockito.when;
+//
 //
 //public class DestroyWorkerEnvironmentContainerNodeOperationHandlerTest
 //{
 //
-//    private PrestoImplMock mock;
+//    private PrestoImpl prestoMock;
 //    private AbstractOperationHandler handler;
+//    private PrestoClusterConfig config;
 //
 //
 //    @Before
 //    public void setUp()
 //    {
-//        mock = new PrestoImplMock();
-//        handler = new NodeOperationHanler( mock, "test-cluster", "test-host", NodeOperationType.UNINSTALL);
+//        prestoMock = mock( PrestoImpl.class );
+//        config = mock( PrestoClusterConfig.class );
+//        handler = new NodeOperationHanler( prestoMock, "test-cluster", "test-host", NodeOperationType.UNINSTALL);
 //    }
 //
 //
@@ -42,7 +47,8 @@
 //    @Test
 //    public void testWithUnconnectedAgents()
 //    {
-//        mock.setClusterConfig( new PrestoClusterConfig() );
+//        when(config.getClusterName()).thenReturn("test-cluster");
+//
 //        handler.run();
 //
 //        TrackerOperation po = handler.getTrackerOperation();

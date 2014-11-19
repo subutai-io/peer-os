@@ -276,7 +276,7 @@ public class Manager
                         HadoopClusterConfig info = hadoop.getCluster( hn );
                         if ( info != null )
                         {
-                            set = environmentManager.getEnvironmentByUUID( info.getEnvironmentId() ).getHostsByIds( info.getAllNodes() );
+                            set = environmentManager.getEnvironmentByUUID( info.getEnvironmentId() ).getHostsByIds( Sets.newHashSet(info.getAllNodes()) );
                             set.removeAll( config.getAllNodes() );
                             if ( !set.isEmpty() )
                             {
