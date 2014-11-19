@@ -41,6 +41,7 @@
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <string>
 #include "SubutaiConnection.h"
+#include "SubutaiContainerManager.h"
 #include "SubutaiHelper.h"
 #include "SubutaiResponsePack.h"
 #include "SubutaiLogger.h"
@@ -79,7 +80,7 @@ public:
 	void setCurrentDirectory(string);
 	void clearBuffer();
 	char* getBuffer();
-	bool checkNotification();
+	bool checkNotification(SubutaiContainerManager*);
 	string getModificationTime(string, bool);
 private:
 	bool folderExistenceChecker(const string &);
@@ -109,5 +110,6 @@ private:
 	SubutaiConnection*				watchConnection;
 	SubutaiLogger*					watchLogger;
 	SubutaiHelper 					helper;
+
 };
 #endif /* SUBUTAIWATCH_H_ */

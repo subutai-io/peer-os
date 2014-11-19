@@ -1,8 +1,9 @@
 package org.safehaus.subutai.core.filetracker.impl;
 
 
-import java.util.Set;
 import java.util.UUID;
+
+import org.safehaus.subutai.core.filetracker.api.InotifyEventType;
 
 
 /**
@@ -16,7 +17,9 @@ public class InotifyEvent
     class EventDetails
     {
         private UUID id;
-        private Set<String> configPoints;
+        private String configPoint;
+        private InotifyEventType eventType;
+        private String dateTime;
 
 
         public UUID getId()
@@ -25,9 +28,15 @@ public class InotifyEvent
         }
 
 
-        public Set<String> getConfigPoints()
+        public String getConfigPoint()
         {
-            return configPoints;
+            return configPoint;
+        }
+
+
+        public InotifyEventType getEventType()
+        {
+            return eventType;
         }
     }
 
