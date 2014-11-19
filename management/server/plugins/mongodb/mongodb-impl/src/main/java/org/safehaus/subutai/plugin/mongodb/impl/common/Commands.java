@@ -69,12 +69,13 @@ public class Commands
     }
 
 
-    public CommandDef getUnregisterSecondaryNodeFromPrimaryCommand( int dataNodePort, ContainerHost removeNode,
-                                                                    String domainName )
+    public static CommandDef getUnregisterSecondaryNodeFromPrimaryCommandLine( int dataNodePort,
+                                                                               String removeNodehostname,
+                                                                               String domainName )
     {
         return new CommandDef( "Unregister node from replica",
-                String.format( "mongo --port %s --eval \"rs.remove('%s.%s:%s');\"", dataNodePort,
-                        removeNode.getHostname(), domainName, dataNodePort ), 300 );
+                String.format( "mongo --port %s --eval \"rs.remove('%s.%s:%s');\"", dataNodePort, removeNodehostname,
+                        domainName, dataNodePort ), 300 );
     }
 
 

@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.oozie.impl;
 
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.AgentUtil;
@@ -34,7 +33,7 @@ public class ClusterConfiguration
     public void configureCluster( OozieClusterConfig config ) throws ClusterConfigurationException
     {
 
-        po.addLog( "Configuring root hosts..." );
+        /*po.addLog( "Configuring root hosts..." );
         Agent server = config.getServer();
         HadoopClusterConfig hadoopClusterConfig =
                 manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
@@ -73,6 +72,6 @@ public class ClusterConfiguration
             po.addLogFailed( String.format( "Configuring failed, %s", configureRootGroupsCommand.getAllErrors() ) );
             return;
         }
-        po.addLogDone( "Oozie installation succeeded" );
+        po.addLogDone( "Oozie installation succeeded" );*/
     }
 }

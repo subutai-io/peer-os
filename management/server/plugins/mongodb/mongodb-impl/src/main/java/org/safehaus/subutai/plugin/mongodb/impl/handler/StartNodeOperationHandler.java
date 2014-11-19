@@ -52,7 +52,7 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<MongoImp
 
         try
         {
-            node.stop();
+            node.start();
             po.addLogDone( String.format( "Node on %s started", lxcHostname ) );
         }
         catch ( Exception e )

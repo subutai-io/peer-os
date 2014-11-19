@@ -18,13 +18,10 @@ import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDao;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
@@ -48,14 +45,11 @@ public class OozieImpl implements Oozie
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( OozieImpl.class.getName() );
-    private PluginDao pluginDAO;
+    private PluginDAO pluginDAO;
     private Commands commands;
-    private AgentManager agentManager;
     private Tracker tracker;
-    private CommandRunner commandRunner;
-//    private LxcManager lxcManager;
+
     private EnvironmentManager environmentManager;
-    private ContainerManager containerManager;
     private Hadoop hadoopManager;
     private ExecutorService executor;
     private DataSource dataSource;
@@ -71,13 +65,13 @@ public class OozieImpl implements Oozie
     {
         try
         {
-            this.pluginDAO = new PluginDao( dataSource );
+            this.pluginDAO = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
-        this.commands = new Commands( commandRunner );
+        this.commands = new Commands();
 
         executor = Executors.newCachedThreadPool();
     }
@@ -89,27 +83,15 @@ public class OozieImpl implements Oozie
     }
 
 
-    public PluginDao getPluginDAO()
+    public PluginDAO getPluginDAO()
     {
         return pluginDAO;
     }
 
 
-    public void setPluginDAO( final PluginDao pluginDAO )
+    public void setPluginDAO( final PluginDAO pluginDAO )
     {
         this.pluginDAO = pluginDAO;
-    }
-
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public void setAgentManager( final AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
     }
 
 
@@ -125,30 +107,6 @@ public class OozieImpl implements Oozie
     }
 
 
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
-    public void setCommandRunner( final CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
-    }
-
-
-    /*public LxcManager getLxcManager()
-    {
-        return lxcManager;
-    }
-
-
-    public void setLxcManager( final LxcManager lxcManager )
-    {
-        this.lxcManager = lxcManager;
-    }*/
-
-
     public EnvironmentManager getEnvironmentManager()
     {
         return environmentManager;
@@ -158,18 +116,6 @@ public class OozieImpl implements Oozie
     public void setEnvironmentManager( final EnvironmentManager environmentManager )
     {
         this.environmentManager = environmentManager;
-    }
-
-
-    public ContainerManager getContainerManager()
-    {
-        return containerManager;
-    }
-
-
-    public void setContainerManager( final ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
     }
 
 
@@ -199,7 +145,6 @@ public class OozieImpl implements Oozie
 
     public void destroy()
     {
-        agentManager = null;
         tracker = null;
         hadoopManager = null;
         executor.shutdown();
@@ -300,13 +245,13 @@ public class OozieImpl implements Oozie
 
         NodeGroup oozieGroup = new NodeGroup();
         oozieGroup.setTemplateName( config.getTemplateNameClient() );
-        oozieGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        oozieGroup.setPlacementStrategy( new PlacementStrategy( "ROUND_ROBIN" ) );
         int numberOfNodes = config.getClients().size();
         oozieGroup.setNumberOfNodes( numberOfNodes );
 
         NodeGroup oozieServer = new NodeGroup();
         oozieServer.setTemplateName( config.getTemplateNameServer() );
-        oozieServer.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        oozieServer.setPlacementStrategy( new PlacementStrategy( "ROUND_ROBIN" ) );
         oozieServer.setNumberOfNodes( 1 );
 
         environmentBlueprint.setNodeGroups( Sets.newHashSet( oozieGroup ) );

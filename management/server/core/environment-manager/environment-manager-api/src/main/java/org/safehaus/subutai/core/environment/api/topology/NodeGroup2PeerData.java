@@ -15,12 +15,12 @@ public class NodeGroup2PeerData extends TopologyData
 {
 
     UUID blueprintId;
-    Map<Object, Peer> topology;
-    Map<Object, NodeGroup> map;
+    Map<Integer, Peer> topology;
+    Map<Integer, NodeGroup> map;
 
 
-    public NodeGroup2PeerData( final UUID blueprintId, final Map<Object, Peer> topology,
-                               final Map<Object, NodeGroup> map )
+    public NodeGroup2PeerData( final UUID blueprintId, final Map<Integer, Peer> topology,
+                               final Map<Integer, NodeGroup> map )
     {
         this.blueprintId = blueprintId;
         this.topology = topology;
@@ -40,25 +40,25 @@ public class NodeGroup2PeerData extends TopologyData
     }
 
 
-    public Map<Object, Peer> getTopology()
+    public Map<Integer, Peer> getTopology()
     {
         return topology;
     }
 
 
-    public void setTopology( final Map<Object, Peer> topology )
+    public void setTopology( final Map<Integer, Peer> topology )
     {
         this.topology = topology;
     }
 
 
-    public Map<Object, NodeGroup> getMap()
+    public Map<Integer, NodeGroup> getMap()
     {
         return map;
     }
 
 
-    public void setMap( final Map<Object, NodeGroup> map )
+    public void setMap( final Map<Integer, NodeGroup> map )
     {
         this.map = map;
     }
