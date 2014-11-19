@@ -16,7 +16,6 @@
   <reference id="luceneManager" availability="mandatory" interface="org.safehaus.subutai.plugin.lucene.api.Lucene" />
 
   <bean id="restService" class="org.safehaus.subutai.plugin.lucene.rest.RestService">
-    <property name="agentManager" ref="agentManager" />
     <property name="luceneManager" ref="luceneManager" />
   </bean>
 
