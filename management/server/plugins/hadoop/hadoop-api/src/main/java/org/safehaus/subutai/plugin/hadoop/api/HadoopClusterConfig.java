@@ -374,7 +374,6 @@ public class HadoopClusterConfig implements ConfigBase
         this.countOfSlaveNodes = countOfSlaveNodes;
     }
 
-
     public Set<UUID> getBlockedAgentUUIDs()
     {
         Set<UUID> blockedAgents = new HashSet<>();
@@ -384,7 +383,6 @@ public class HadoopClusterConfig implements ConfigBase
         }
         return blockedAgents;
     }
-
 
     public Set<UUID> getBlockedAgents()
     {

@@ -11,7 +11,7 @@ import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 
 
-abstract class AbstractHandler extends AbstractOperationHandler<StormImpl>
+abstract class AbstractHandler extends AbstractOperationHandler<StormImpl, StormClusterConfiguration>
 {
 
     public AbstractHandler( StormImpl manager, String clusterName )

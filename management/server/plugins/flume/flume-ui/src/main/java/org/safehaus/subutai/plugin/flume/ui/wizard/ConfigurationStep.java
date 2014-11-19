@@ -1,17 +1,18 @@
 package org.safehaus.subutai.plugin.flume.ui.wizard;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.api.SetupType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
+import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
@@ -30,12 +31,16 @@ public class ConfigurationStep extends VerticalLayout
 {
 
     private final Hadoop hadoop;
+    private final EnvironmentManager environmentManager;
+    private Environment hadoopEnvironment;
+    final Wizard wizard;
 
 
-    public ConfigurationStep( final Hadoop hadoop, final Wizard wizard )
+    public ConfigurationStep( final Hadoop hadoop, final Wizard wizard, final EnvironmentManager environmentManager )
     {
-
         this.hadoop = hadoop;
+        this.environmentManager = environmentManager;
+        this.wizard = wizard;
 
         setSizeFull();
 
@@ -129,8 +134,13 @@ public class ConfigurationStep extends VerticalLayout
                 if ( event.getProperty().getValue() != null )
                 {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
+                    config.setHadoopClusterName( hadoopInfo.getClusterName() );
+                    config.setHadoopNodes( Sets.newHashSet(hadoopInfo.getAllNodes()) );
+                    hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
+                    Set<ContainerHost> hadoopNodes =
+                            hadoopEnvironment.getHostsByIds(  Sets.newHashSet(hadoopInfo.getAllNodes())  );
                     select.setValue( null );
-                    select.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                    select.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
                 }
             }
@@ -180,9 +190,14 @@ public class ConfigurationStep extends VerticalLayout
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Collection agentList = ( Collection ) event.getProperty().getValue();
+                    Set<UUID> nodes = new HashSet<UUID>();
+                    Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
+                    for( ContainerHost host : nodeList)
+                    {
+                        nodes.add( host.getAgent().getUuid() );
+                    }
                     config.getNodes().clear();
-                    config.getNodes().addAll( agentList );
+                    config.getNodes().addAll( nodes );
                 }
             }
         } );
@@ -295,6 +310,7 @@ public class ConfigurationStep extends VerticalLayout
             }
             else
             {
+                wizard.setHadoopConfig( hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ) );
                 wizard.next();
             }
         }

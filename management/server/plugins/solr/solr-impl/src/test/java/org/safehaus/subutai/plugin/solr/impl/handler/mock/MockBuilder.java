@@ -1,19 +1,10 @@
 package org.safehaus.subutai.plugin.solr.impl.handler.mock;
 
 
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.plugin.common.mock.CommandMock;
-import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
-import org.safehaus.subutai.plugin.solr.impl.Commands;
-import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
-import org.safehaus.subutai.plugin.solr.impl.handler.AddNodeOperationHandler;
-import org.safehaus.subutai.plugin.solr.impl.handler.InstallOperationHandler;
-import org.safehaus.subutai.plugin.solr.impl.handler.UninstallOperationHandler;
-
 ;
 
 
-public class MockBuilder
+/*public class MockBuilder
 {
 
     public static AbstractOperationHandler getInstallOperationWithResult( boolean success )
@@ -50,6 +41,7 @@ public class MockBuilder
         SolrImpl solrImpl = new SolrImplMock().setCommands( getCommands( success ) )
                                               .setClusterSolrClusterConfig( new SolrClusterConfig() );
 
-        return new AddNodeOperationHandler( solrImpl, "test-cluster" );
+        //return new NodeOperationHandler( solrImpl, "test-cluster" );
+        return null;
     }
-}
+}*/

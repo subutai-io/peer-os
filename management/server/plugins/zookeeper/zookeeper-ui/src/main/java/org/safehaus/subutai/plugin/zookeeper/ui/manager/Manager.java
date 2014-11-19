@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.zookeeper.ui.manager;
 
 
@@ -14,14 +9,13 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.ui.AddNodeWindow;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
@@ -362,12 +356,12 @@ public class Manager
     public void startAllNodes()
     {
 
-        Set<Agent> agentSet = new HashSet<>();
+        Set<ContainerHost> containerHosts = new HashSet<>();
         Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
         for ( UUID agentID : config.getNodes() ) {
-            agentSet.add( environment.getContainerHostByUUID( agentID ).getAgent() );
+            containerHosts.add( environment.getContainerHostByUUID( agentID ) );
         }
-        for ( Agent agent : agentSet )
+        for ( ContainerHost agent : containerHosts )
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
@@ -390,13 +384,13 @@ public class Manager
 
     public void stopAllNodes()
     {
-        Set<Agent> agentSet = new HashSet<>();
+        Set<ContainerHost> containerHosts = new HashSet<>();
         Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
         for ( UUID agentID : config.getNodes() ) {
-            agentSet.add( environment.getContainerHostByUUID( agentID ).getAgent() );
+            containerHosts.add( environment.getContainerHostByUUID( agentID ) );
         }
 
-        for ( Agent agent : agentSet )
+        for ( ContainerHost agent : containerHosts )
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
@@ -520,11 +514,16 @@ public class Manager
                     else if ( config.getSetupType() == SetupType.OVER_HADOOP
                             || config.getSetupType() == SetupType.WITH_HADOOP )
                     {
-                        HadoopClusterConfig info = hadoop.getCluster( config.getHadoopClusterName() );
+                        HadoopClusterConfig hadoopClusterConfig = hadoop.getCluster( config.getHadoopClusterName() );
 
-                        if ( info != null )
+                        if ( hadoopClusterConfig != null )
                         {
-                            Set<Agent> nodes = new HashSet<>( info.getAllNodes() );
+                            Environment hadoopEnvironment =
+                                    environmentManager.getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
+                            Set<UUID> hadoopNodeIDs = new HashSet<UUID>( hadoopClusterConfig.getAllNodes() );
+                            Set<ContainerHost> hadoopNodes = hadoopEnvironment.getHostsByIds( hadoopNodeIDs );
+                            Set<ContainerHost> nodes = new HashSet<>( );
+                            nodes.addAll( hadoopNodes );
                             nodes.removeAll( config.getNodes() );
                             if ( !nodes.isEmpty() )
                             {
@@ -547,7 +546,7 @@ public class Manager
                         }
                         else
                         {
-                            show( "Hadoop cluster info not found" );
+                            show( "Hadoop cluster hadoopClusterConfig not found" );
                         }
                     }
                 }
@@ -615,15 +614,30 @@ public class Manager
 
     private void refreshUI()
     {
-        Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
         if ( config != null )
         {
-            populateTable( nodesTable, environment.getContainers() );
+            Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+
+            populateTable( nodesTable, getZookeeperNodes( environment.getContainers() ) );
         }
         else
         {
             nodesTable.removeAllItems();
         }
+    }
+
+
+    private Set<ContainerHost> getZookeeperNodes( final Set<ContainerHost> containerHosts )
+    {
+            Set<ContainerHost> list = new HashSet<>();
+            for ( ContainerHost containerHost : containerHosts )
+            {
+                if ( config.getNodes().contains( containerHost.getAgent().getUuid() ) )
+                {
+                    list.add( containerHost );
+                }
+            }
+            return list;
     }
 
 
@@ -721,19 +735,19 @@ public class Manager
 
     public void refreshClustersInfo()
     {
-        List<ZookeeperClusterConfig> mongoClusterInfos = zookeeper.getClusters();
+        List<ZookeeperClusterConfig> zookeeperClusterConfigs = zookeeper.getClusters();
         ZookeeperClusterConfig clusterInfo = ( ZookeeperClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( mongoClusterInfos != null && !mongoClusterInfos.isEmpty() )
+        if ( zookeeperClusterConfigs != null && !zookeeperClusterConfigs.isEmpty() )
         {
-            for ( ZookeeperClusterConfig mongoClusterInfo : mongoClusterInfos )
+            for ( ZookeeperClusterConfig zookeeperClusterConfig : zookeeperClusterConfigs )
             {
-                clusterCombo.addItem( mongoClusterInfo );
-                clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
+                clusterCombo.addItem( zookeeperClusterConfig );
+                clusterCombo.setItemCaption( zookeeperClusterConfig, zookeeperClusterConfig.getClusterName() );
             }
             if ( clusterInfo != null )
             {
-                for ( ZookeeperClusterConfig mongoClusterInfo : mongoClusterInfos )
+                for ( ZookeeperClusterConfig mongoClusterInfo : zookeeperClusterConfigs )
                 {
                     if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
                     {
@@ -744,7 +758,7 @@ public class Manager
             }
             else
             {
-                clusterCombo.setValue( mongoClusterInfos.iterator().next() );
+                clusterCombo.setValue( zookeeperClusterConfigs.iterator().next() );
             }
         }
     }

@@ -6,6 +6,7 @@
 package org.safehaus.subutai.plugin.solr.ui.manager;
 
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -13,18 +14,21 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.solr.api.NodeOperationTask;
 import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -64,9 +68,8 @@ public class Manager
     private final Table nodesTable;
     private final ExecutorService executorService;
     private final Tracker tracker;
+    private final EnvironmentManager environmentManager;
     private final Solr solr;
-    private final AgentManager agentManager;
-    private final CommandRunner commandRunner;
     private SolrClusterConfig solrClusterConfig;
 
 
@@ -76,8 +79,7 @@ public class Manager
         this.executorService = executorService;
         this.tracker = serviceLocator.getService( Tracker.class );
         this.solr = serviceLocator.getService( Solr.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -163,7 +165,7 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = solr.uninstallCluster( solrClusterConfig.getClusterName() );
+                            UUID trackID = solr.uninstallCluster( solrClusterConfig );
                             final ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     SolrClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
@@ -193,7 +195,8 @@ public class Manager
     {
         if ( solrClusterConfig != null )
         {
-            populateTable( nodesTable, solrClusterConfig.getNodes() );
+            Environment environment = environmentManager.getEnvironmentByUUID( solrClusterConfig.getEnvironmentId() );
+            populateTable( nodesTable, environment.getContainers() );
         }
         else
         {
@@ -202,21 +205,21 @@ public class Manager
     }
 
 
-    private void populateTable( final Table table, Set<Agent> agents )
+    private void populateTable( final Table table, Set<ContainerHost> containerHosts )
     {
 
         table.removeAllItems();
 
-        for ( final Agent agent : agents )
+        for ( final ContainerHost containerHost : containerHosts )
         {
             final Label resultHolder = new Label();
-            resultHolder.setId( agent.getListIP().get( 0 ) + "-solrResult" );
+            resultHolder.setId( containerHost.getAgent().getListIP().get( 0 ) + "-solrResult" );
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId( agent.getListIP().get( 0 ) + "-solrCheck" );
+            checkBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-solrCheck" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.setId( agent.getListIP().get( 0 ) + "-solrStart" );
+            startBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-solrStart" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.setId( agent.getListIP().get( 0 ) + "-solrStop" );
+            stopBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-solrStop" );
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn );
             enableButtons( startBtn, stopBtn );
@@ -233,12 +236,12 @@ public class Manager
 
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), resultHolder, availableOperations
+                    containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ), resultHolder, availableOperations
             }, null );
 
-            addCheckButtonClickListener( agent, resultHolder, startBtn, stopBtn, checkBtn );
-            addStartButtonClickListener( agent, startBtn, stopBtn, checkBtn );
-            addStopButtonClickListener( agent, startBtn, stopBtn, checkBtn );
+            addCheckButtonClickListener( containerHost, resultHolder, startBtn, stopBtn, checkBtn );
+            addStartButtonClickListener( containerHost, startBtn, stopBtn, checkBtn );
+            addStopButtonClickListener( containerHost, startBtn, stopBtn, checkBtn );
         }
     }
 
@@ -279,7 +282,7 @@ public class Manager
     }
 
 
-    private void addCheckButtonClickListener( final Agent agent, final Label resultHolder, final Button... buttons )
+    private void addCheckButtonClickListener( final ContainerHost containerHost, final Label resultHolder, final Button... buttons )
     {
         getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -289,29 +292,34 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new CheckTask( solr, tracker, solrClusterConfig.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
+                        new NodeOperationTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost,
+                                NodeOperationType.STATUS, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                        {
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    public void onComplete( String result )
+                                    if ( nodeState.equals( NodeState.RUNNING ) )
                                     {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            resultHolder.setValue( result );
-                                            if ( resultHolder.getValue().contains( "not" ) )
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                            }
-                                            else
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            }
-                                            PROGRESS_ICON.setVisible( false );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                        }
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
                                     }
-                                } ) );
+                                    else if ( nodeState.equals( NodeState.STOPPED ) )
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                    }
+                                    else if ( nodeState.equals( NodeState.UNKNOWN ) )
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    }
+                                    resultHolder.setValue( nodeState.name() );
+                                    PROGRESS_ICON.setVisible( false );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                }
+                            }
+                        }, null ) );
             }
         } );
     }
@@ -330,7 +338,7 @@ public class Manager
     }
 
 
-    private void addStopButtonClickListener( final Agent agent, final Button... buttons )
+    private void addStopButtonClickListener( final ContainerHost containerHost, final Button... buttons )
     {
         getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -340,25 +348,25 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StopTask( solr, tracker, solrClusterConfig.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
+                        new NodeOperationTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost,
+                                NodeOperationType.STOP, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            enableButtons( buttons );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    enableButtons( buttons );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        }, null ) );
             }
         } );
     }
 
 
-    private void addStartButtonClickListener( final Agent agent, final Button... buttons )
+    private void addStartButtonClickListener( final ContainerHost containerHost, final Button... buttons )
     {
         getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -368,19 +376,19 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StartTask( solr, tracker, solrClusterConfig.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
+                        new NodeOperationTask( solr, tracker, solrClusterConfig.getClusterName(), containerHost,
+                                NodeOperationType.START, new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            enableButtons( buttons );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    enableButtons( buttons );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        }, null ) );
             }
         } );
     }
@@ -436,14 +444,24 @@ public class Manager
             {
                 if ( event.isDoubleClick() )
                 {
-                    String lxcHostname =
-                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
+                    String containerId =
+                            ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION )
+                                            .getValue();
+                    Set<ContainerHost> containerHosts =
+                            environmentManager.getEnvironmentByUUID( solrClusterConfig.getEnvironmentId() ).getContainers();
+                    Iterator iterator = containerHosts.iterator();
+                    ContainerHost containerHost = null;
+                    while ( iterator.hasNext() )
                     {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
-                                        agentManager );
+                        containerHost = ( ContainerHost ) iterator.next();
+                        if ( containerHost.getId().equals( UUID.fromString( containerId ) ) )
+                        {
+                            break;
+                        }
+                    }
+                    if ( containerHost != null )
+                    {
+                        TerminalWindow terminal = new TerminalWindow( containerHosts );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else

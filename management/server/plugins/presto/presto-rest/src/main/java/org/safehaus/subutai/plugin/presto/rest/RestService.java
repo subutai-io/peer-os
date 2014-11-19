@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -20,8 +21,16 @@ import javax.ws.rs.core.Response;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.Presto;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
+import org.safehaus.subutai.plugin.presto.api.SetupType;
+
+import com.google.common.collect.Sets;
 
 
 public class RestService
@@ -30,7 +39,16 @@ public class RestService
     private static final String OPERATION_ID = "OPERATION_ID";
 
     private Presto prestoManager;
-    private AgentManager agentManager;
+    private Hadoop hadoopManager;
+    private EnvironmentManager environmentManager;
+
+    public RestService( final Presto prestoManager, final Hadoop hadoopManager,
+                        final EnvironmentManager environmentManager )
+    {
+        this.prestoManager = prestoManager;
+        this.hadoopManager = hadoopManager;
+        this.environmentManager = environmentManager;
+    }
 
 
     public void setPrestoManager( Presto prestoManager )
@@ -38,11 +56,6 @@ public class RestService
         this.prestoManager = prestoManager;
     }
 
-
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }
 
 
     @GET
@@ -79,23 +92,52 @@ public class RestService
     public Response installCluster( @QueryParam( "config" ) String config )
     {
         TrimmedPrestoConfig trimmedPrestoConfig = JsonUtil.GSON.fromJson( config, TrimmedPrestoConfig.class );
-        PrestoClusterConfig expandedConfig = new PrestoClusterConfig();
 
-        expandedConfig.setClusterName( trimmedPrestoConfig.getClusterName() );
-        expandedConfig
-                .setCoordinatorNode( agentManager.getAgentByHostname( trimmedPrestoConfig.getCoordinatorHost() ) );
-        if ( trimmedPrestoConfig.getWorkersHost() != null && !trimmedPrestoConfig.getWorkersHost().isEmpty() )
+
+        HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( trimmedPrestoConfig.getHadoopClusterName() );
+
+        if ( hadoopClusterConfig == null )
         {
-            Set<Agent> nodes = new HashSet<>();
-            for ( String node : trimmedPrestoConfig.getWorkersHost() )
-            {
-                nodes.add( agentManager.getAgentByHostname( node ) );
-            }
-            expandedConfig.setWorkers( nodes );
+            return Response.status( Response.Status.NOT_FOUND ).entity(
+                    String.format( "Hadoop cluster %s not found", trimmedPrestoConfig.getHadoopClusterName() ) ).build();
         }
 
+        Environment environment = environmentManager.getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
+
+        if ( environment == null )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).entity(
+                    String.format( "Environment %s not found", hadoopClusterConfig.getEnvironmentId() ) ).build();
+        }
+
+        ContainerHost master = environment.getContainerHostByHostname( trimmedPrestoConfig.getCoordinatorHost() );
+        if ( master == null )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).entity(
+                    String.format( "Master node %s not found", trimmedPrestoConfig.getCoordinatorHost() ) ).build();
+        }
+        Set<UUID> slaveIds = Sets.newHashSet();
+        for ( String slaveHostname : trimmedPrestoConfig.getWorkersHost() )
+        {
+            ContainerHost slave = environment.getContainerHostByHostname( slaveHostname );
+            if ( slave == null )
+            {
+                return Response.status( Response.Status.NOT_FOUND )
+                               .entity( String.format( "Slave node %s not found", slaveHostname ) ).build();
+            }
+            slaveIds.add( slave.getId() );
+        }
+        //fill cluster config
+        PrestoClusterConfig expandedConfig = new PrestoClusterConfig();
+        expandedConfig.setClusterName( trimmedPrestoConfig.getClusterName() );
+        expandedConfig.setHadoopClusterName( trimmedPrestoConfig.getHadoopClusterName() );
+        expandedConfig.setSetupType( SetupType.OVER_HADOOP );
+        expandedConfig.setCoordinatorNode( master.getId() );
+        expandedConfig.getWorkers().addAll( slaveIds );
+
         String operationId = JsonUtil.toJson( OPERATION_ID, prestoManager.installCluster( expandedConfig ) );
-        return Response.status( Response.Status.CREATED ).entity( operationId ).build();
+
+        return Response.status( Response.Status.ACCEPTED ).entity( operationId ).build();
     }
 
 
@@ -132,7 +174,7 @@ public class RestService
     }
 
 
-    @PUT
+    /*@PUT
     @Path( "clusters/{clusterName}/nodes/{lxcHostName}/coordinator" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response changeCoordinatorNode( @PathParam( "clusterName" ) String clusterName,
@@ -141,7 +183,7 @@ public class RestService
         String operationId =
                 JsonUtil.toJson( OPERATION_ID, prestoManager.changeCoordinatorNode( clusterName, lxcHostName ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
-    }
+    }*/
 
 
     @PUT
