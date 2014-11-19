@@ -147,11 +147,11 @@
         <artifactId>command-runner-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>command-runner-ui-old</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>${project.groupId}</groupId>-->
+        <!--<artifactId>command-runner-ui-old</artifactId>-->
+        <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- communication-manager -->
