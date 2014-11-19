@@ -1,11 +1,16 @@
 package org.safehaus.subutai.core.network.impl;
 
 
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
+import org.safehaus.subutai.core.network.api.Tunnel;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
@@ -14,6 +19,7 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -97,6 +103,22 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
+    public Set<Tunnel> listTunnels() throws NetworkManagerException
+    {
+        CommandResult result = execute( getManagementHost(), commands.getListTunnelsCommand() );
+
+        Set<Tunnel> tunnels = Sets.newHashSet();
+        Pattern pattern = Pattern.compile( "(tunnel.+)-(.+)" );
+        Matcher m = pattern.matcher( result.getStdOut() );
+        while ( m.find() && m.groupCount() == 2 )
+        {
+            tunnels.add( new TunnelImpl( m.group( 1 ), m.group( 2 ) ) );
+        }
+        return tunnels;
+    }
+
+
+    @Override
     public void setContainerIp( final String containerName, final String ip, final int netMask, final int vLanId )
             throws NetworkManagerException
     {
@@ -152,7 +174,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    private void execute( Host host, RequestBuilder requestBuilder ) throws NetworkManagerException
+    private CommandResult execute( Host host, RequestBuilder requestBuilder ) throws NetworkManagerException
     {
         try
         {
@@ -162,6 +184,8 @@ public class NetworkManagerImpl implements NetworkManager
                 throw new NetworkManagerException(
                         String.format( "Command failed: %s, %s", result.getStdErr(), result.getStatus() ) );
             }
+
+            return result;
         }
         catch ( CommandException e )
         {

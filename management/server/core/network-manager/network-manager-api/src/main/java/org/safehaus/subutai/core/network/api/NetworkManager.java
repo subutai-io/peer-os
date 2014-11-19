@@ -1,6 +1,9 @@
 package org.safehaus.subutai.core.network.api;
 
 
+import java.util.Set;
+
+
 public interface NetworkManager
 {
     public void setupN2NConnection( String superNodeIp, int superNodePort, String interfaceName, String communityName,
@@ -25,5 +28,7 @@ public interface NetworkManager
     public void removeGateway( int vLanId ) throws NetworkManagerException;
 
     public void removeGatewayOnContainer( String containerName ) throws NetworkManagerException;
+
+    public Set<Tunnel> listTunnels() throws NetworkManagerException;
 }
 

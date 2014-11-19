@@ -46,6 +46,12 @@ public class Commands
                 .withCmdArgs( Lists.newArrayList( "-r", tunnelName ) );
     }
 
+    public RequestBuilder getListTunnelsCommand(  )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "-l" ) );
+    }
+
 
     public RequestBuilder getSetContainerIpCommand( String containerName, String ip, int netMask, int vLanId )
     {
