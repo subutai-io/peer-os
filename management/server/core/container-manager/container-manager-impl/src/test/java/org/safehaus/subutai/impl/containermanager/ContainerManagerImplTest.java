@@ -162,7 +162,7 @@ public class ContainerManagerImplTest
 		} catch (LxcDestroyException ex) {
 			error = true;
 		}
-		assertFalse(error);
+		assertFalse(error);commands
 	}
 
 
