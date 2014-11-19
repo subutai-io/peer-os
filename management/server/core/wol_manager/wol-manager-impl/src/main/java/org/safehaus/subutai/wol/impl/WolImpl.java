@@ -18,9 +18,10 @@ import java.util.ArrayList;
 public class WolImpl implements WolManager {
     private static final Logger LOG = LoggerFactory.getLogger(WolImpl.class.getName());
     private final PeerManager peerManager;
-
     protected Commands commands = new Commands();
 
+
+    //Default Impl Constructor
     public WolImpl( final PeerManager peerManager )
     {
         Preconditions.checkNotNull(peerManager);
@@ -37,13 +38,22 @@ public class WolImpl implements WolManager {
 
 
     @Override
-    public CommandResult sendMagicPackagebyList(ArrayList<String> macList)  throws WolManagerException
+    public Boolean sendMagicPackagebyList(ArrayList<String> macList)  throws WolManagerException
     {
-        String macID="test";
-        return execute( getManagementHost(), commands.getSendWakeOnLanCommand( macID ) );
+
+        for(int i=0 ; i<macList.size() ; i++ )
+        {
+            CommandResult commandResult = execute( getManagementHost(), commands.getSendWakeOnLanCommand(macList.get(i)));
+            if ( ! commandResult.hasSucceeded() )
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
 
+    //Returning Command Result for single Wake on lan execution
     private CommandResult execute( Host host, RequestBuilder requestBuilder ) throws WolManagerException
     {
         try
@@ -66,6 +76,7 @@ public class WolImpl implements WolManager {
     }
 
 
+    //getting Management Host
     private ManagementHost getManagementHost() throws WolManagerException
     {
         try

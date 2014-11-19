@@ -8,7 +8,6 @@ import org.safehaus.subutai.wol.api.WolManager;
 import java.io.File;
 
 
-
 /**
  * Created by emin on 14/11/14.
  */
