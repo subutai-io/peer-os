@@ -7,11 +7,9 @@ package org.safehaus.subutai.plugin.hadoop.ui.wizard;
 
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.Arrays;
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
@@ -30,12 +28,10 @@ public class ConfigurationStep extends VerticalLayout
 
     private static final int MAX_NUMBER_OF_NODES_PER_SERVER = 5;
     private static final String SUGGESTED_NUMBER_OF_NODES_CAPTION = " (Suggested)";
-    private AgentManager agentManager;
 
 
-    public ConfigurationStep( final Wizard wizard, AgentManager agentManager )
+    public ConfigurationStep( final Wizard wizard, Hadoop hadoop )
     {
-        this.agentManager = agentManager;
         setSizeFull();
         GridLayout content = new GridLayout( 2, 7 );
         content.setSizeFull();
@@ -61,24 +57,24 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         //configuration servers number
-        List<String> slaveNodeCountList = new ArrayList<String>();
-        Set<Agent> agents = agentManager.getPhysicalAgents();
-        int connected_fai_count = agents.size() - 1;
-        for ( int i = 1; i <= ( connected_fai_count ) * MAX_NUMBER_OF_NODES_PER_SERVER; i++ )
-        {
-            if ( i == connected_fai_count )
-            {
-                slaveNodeCountList.add( i + SUGGESTED_NUMBER_OF_NODES_CAPTION );
-            }
-            else
-            {
-                slaveNodeCountList.add( i + "" );
-            }
-        }
+//        List<String> slaveNodeCountList = new AnrrayList<String>();
+//        Set<Agent> agents = agentManager.getPhysicalAgents();
+//        int connected_fai_count = agents.size() - 1;
+//        for ( int i = 1; i <= ( connected_fai_count ) * MAX_NUMBER_OF_NODES_PER_SERVER; i++ )
+//        {
+//            if ( i == connected_fai_count )
+//            {
+//                slaveNodeCountList.add( i + SUGGESTED_NUMBER_OF_NODES_CAPTION );
+//            }
+//            else
+//            {
+//                slaveNodeCountList.add( i + "" );
+//            }
+//        }
 
-        ComboBox slaveNodesComboBox = new ComboBox( "Choose number of slave nodes", slaveNodeCountList );
+
+        ComboBox slaveNodesComboBox = new ComboBox( "Choose number of slave nodes", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
         slaveNodesComboBox.setId( "HadoopSlavesNodeComboBox" );
-        //        slaveNodesComboBox.setMultiSelect(false);
         slaveNodesComboBox.setImmediate( true );
         slaveNodesComboBox.setTextInputAllowed( false );
         slaveNodesComboBox.setNullSelectionAllowed( false );
@@ -107,13 +103,13 @@ public class ConfigurationStep extends VerticalLayout
             }
         } );
 
-        slaveNodeCountList.remove( connected_fai_count - 1 );
-        slaveNodeCountList.add( connected_fai_count - 1, connected_fai_count + "" );
+//        slaveNodeCountList.remove( connected_fai_count - 1 );
+//        slaveNodeCountList.add( connected_fai_count - 1, connected_fai_count + "" );
+
         //configuration replication factor
         ComboBox replicationFactorComboBox =
-                new ComboBox( "Choose replication factor for slave nodes", slaveNodeCountList );
+                new ComboBox( "Choose replication factor for slave nodes", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
         replicationFactorComboBox.setId( "HadoopReplicationFactorComboBox" );
-        //        replicationFactorComboBox.setMultiSelect(false);
         replicationFactorComboBox.setImmediate( true );
         replicationFactorComboBox.setTextInputAllowed( false );
         replicationFactorComboBox.setNullSelectionAllowed( false );

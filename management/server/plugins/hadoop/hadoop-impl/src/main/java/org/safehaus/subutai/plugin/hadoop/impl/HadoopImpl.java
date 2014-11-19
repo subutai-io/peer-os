@@ -20,7 +20,6 @@ import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -47,7 +46,6 @@ public class HadoopImpl implements Hadoop
     public static final int INITIAL_CAPACITY = 2;
     private static final Logger LOG = LoggerFactory.getLogger( HadoopImpl.class.getName() );
     private Tracker tracker;
-    private ContainerManager containerManager;
     private ExecutorService executor;
     private EnvironmentManager environmentManager;
     private Commands commands;
@@ -102,18 +100,6 @@ public class HadoopImpl implements Hadoop
     public void setTracker( final Tracker tracker )
     {
         this.tracker = tracker;
-    }
-
-
-    public ContainerManager getContainerManager()
-    {
-        return containerManager;
-    }
-
-
-    public void setContainerManager( final ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
     }
 
 

@@ -16,7 +16,7 @@ public class RemoveNodeOperationHandler extends AbstractOperationHandler<HadoopI
 
     public RemoveNodeOperationHandler( HadoopImpl manager, String clusterName, String lxcHostName )
     {
-        super( manager, clusterName );
+        super( manager, manager.getCluster( clusterName ) );
         this.lxcHostName = lxcHostName;
         trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying %s node and updating cluster information of %s", lxcHostName,
