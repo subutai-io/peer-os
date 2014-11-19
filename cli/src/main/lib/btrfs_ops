@@ -27,13 +27,11 @@ function fs_clone {
     rm -rf /var/lib/lxc/$child_ds/rootfs
     btrfs subvolume snapshot /var/lib/lxc/$parent_snap/rootfs /var/lib/lxc/$child_ds > /dev/null 2>&1
   fi
-  #btrfs subvolume snapshot /var/lib/lxc/$parent_snap/rootfs /var/lib/lxc/$child_ds/
-  #zfs clone "$parent_snap" "$child_ds"
 }
+
 function fs_set_mountpoint {
   local child_roofs="$1"
   local child="$2"
-  #zfs set mountpoint=$child_rootfs lxc/$child
 }
 
 function fs_addmount {
@@ -130,18 +128,11 @@ function fs_remove_mount {
 
 
 #release all holds on clone's rootfs snaps and delete snaps
+#no need in btrfs
 function fs_rls_holds_delete_snaps {
   local clone="$1"
   local snap="$2"
-  for snap in `zfs list -t snapshot -o name -H | grep $clone@`; do
-    for hold in `zfs holds -r $snap | grep $snap | awk '{print $2}'`; do
-      zfs release $hold $snap
-      msg_info "    - \"$hold\" hold removed from $snap"
-    done
-
-    zfs destroy $snap
-    msg_info "    - \"$snap\" snapshot destroyed"
-  done
+  msg_info "    - \"$snap\" snapshot destroyed"
 }
 
 #demote template
@@ -205,17 +196,13 @@ function fs_get_children {
      msg_info "        -> \"`fs_ctnr_from_ds $ds`\" is a child of $parent"
      count=`expr $count + 1`
   done
-  #for ds in `zfs get origin | grep $snap | awk '{print $1}' | grep -v $snap`
-  #do
-  #  msg_info "        -> \"`fs_ctnr_from_ds $ds`\" is a child of $parent"
-  #  count=`expr $count + 1`
-  #done
   return $count
 }
 
 
 # assert snapshot (arg $1) does NOT exist, if it does show usage (arg $2)
 # warning: exits!
+#TODO
 function fs_assert_nosnap {
   local snap="$1"
   local usage="$2"
@@ -333,12 +320,14 @@ function fs_part_from_ds {
 
 
 # lists all the templates available
+#TODO
 function fs_list_templates {
   for l in `zfs list -t snapshot -o name -H | grep @template | grep -v -`; do
     echo `fs_ctnr_from_ds $l`
   done
 }
 
+#TODO
 function fs_copy_ds {
   local from_ds="$1"
 
