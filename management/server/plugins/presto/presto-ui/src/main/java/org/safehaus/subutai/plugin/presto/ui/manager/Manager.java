@@ -11,10 +11,7 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -461,7 +458,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToSetCoordinatorButton( final Agent agent, Button setCoordinatorBtn )
+    public void addClickListenerToSetCoordinatorButton( final ContainerHost host, Button setCoordinatorBtn )
     {
         setCoordinatorBtn.addClickListener( new Button.ClickListener()
         {
@@ -469,7 +466,7 @@ public class Manager
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 ConfirmationDialog alert = new ConfirmationDialog(
-                        String.format( "Do you want to set %s as coordinator node?", agent.getHostname() ), "Yes",
+                        String.format( "Do you want to set %s as coordinator node?", host.getHostname() ), "Yes",
                         "No" );
                 alert.getOk().addClickListener( new Button.ClickListener()
                 {
