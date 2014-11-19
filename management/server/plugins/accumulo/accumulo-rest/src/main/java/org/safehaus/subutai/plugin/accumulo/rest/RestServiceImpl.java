@@ -29,6 +29,7 @@ public class RestServiceImpl implements RestService
     private Hadoop hadoop;
     private EnvironmentManager environmentManager;
 
+
     @Override
     public Response listClusters()
     {
@@ -60,10 +61,13 @@ public class RestServiceImpl implements RestService
         expandedConfig.setInstanceName( trimmedAccumuloConfig.getInstanceName() );
         expandedConfig.setPassword( trimmedAccumuloConfig.getPassword() );
         expandedConfig.setHadoopClusterName( trimmedAccumuloConfig.getHadoopClusterName() );
-        Environment environment = environmentManager.getEnvironmentByUUID( hadoop.getCluster( expandedConfig.getHadoopClusterName() ).getEnvironmentId() );
-        expandedConfig.setMasterNode( environment.getContainerHostByHostname( trimmedAccumuloConfig.getMasterNode() ).getId() );
+        Environment environment = environmentManager
+                .getEnvironmentByUUID( hadoop.getCluster( expandedConfig.getHadoopClusterName() ).getEnvironmentId() );
+        expandedConfig.setMasterNode(
+                environment.getContainerHostByHostname( trimmedAccumuloConfig.getMasterNode() ).getId() );
         expandedConfig.setGcNode( environment.getContainerHostByHostname( trimmedAccumuloConfig.getGcNode() ).getId() );
-        expandedConfig.setMonitor( environment.getContainerHostByHostname( trimmedAccumuloConfig.getMonitor() ).getId()  );
+        expandedConfig
+                .setMonitor( environment.getContainerHostByHostname( trimmedAccumuloConfig.getMonitor() ).getId() );
 
         Set<UUID> tracers = new HashSet<>();
         Set<UUID> slaves = new HashSet<>();
@@ -141,15 +145,28 @@ public class RestServiceImpl implements RestService
         return JsonUtil.toJson( "OPERATION_ID", uuid );
     }
 
+
     public Accumulo getAccumuloManager()
     {
         return accumuloManager;
     }
 
 
+    public void setAccumuloManager( final Accumulo accumuloManager )
+    {
+        this.accumuloManager = accumuloManager;
+    }
+
+
     public Hadoop getHadoop()
     {
         return hadoop;
+    }
+
+
+    public void setHadoop( final Hadoop hadoop )
+    {
+        this.hadoop = hadoop;
     }
 
 
@@ -162,17 +179,5 @@ public class RestServiceImpl implements RestService
     public void setEnvironmentManager( final EnvironmentManager environmentManager )
     {
         this.environmentManager = environmentManager;
-    }
-
-
-    public void setAccumuloManager( final Accumulo accumuloManager )
-    {
-        this.accumuloManager = accumuloManager;
-    }
-
-
-    public void setHadoop( final Hadoop hadoop )
-    {
-        this.hadoop = hadoop;
     }
 }

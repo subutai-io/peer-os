@@ -100,10 +100,10 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy
         }
 
 
-         /** start hadoop and zk clusters */
+        /** start hadoop and zk clusters */
         accumuloManager.getHadoopManager().startNameNode( hadoopClusterConfig );
 
-         /** start Zookeeper cluster */
+        /** start Zookeeper cluster */
         for ( UUID node : zookeeperClusterConfig.getNodes() )
         {
             accumuloManager.getZkManager().startNode( zookeeperClusterConfig.getClusterName(),

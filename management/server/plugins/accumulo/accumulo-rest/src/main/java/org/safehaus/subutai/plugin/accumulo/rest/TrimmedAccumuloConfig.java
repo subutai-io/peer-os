@@ -23,7 +23,7 @@ public class TrimmedAccumuloConfig
     private String monitor;
     private Set<String> tracers;
     private Set<String> slaves;
-    private String hadoopClusterName="";
+    private String hadoopClusterName = "";
 
 
     public String getClusterName()

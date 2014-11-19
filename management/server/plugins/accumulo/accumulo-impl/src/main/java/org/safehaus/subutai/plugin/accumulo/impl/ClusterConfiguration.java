@@ -42,6 +42,9 @@ public class ClusterConfiguration
 
         po.addLog( "Configuring cluster..." );
         ContainerHost master = getHost( environment, accumuloClusterConfig.getMasterNode() );
+        ContainerHost gc = getHost( environment, accumuloClusterConfig.getGcNode() );
+        ContainerHost monitor = getHost( environment, accumuloClusterConfig.getMonitor() );
+
 
         /** configure cluster */
         for ( UUID uuid : accumuloClusterConfig.getAllNodes() )
@@ -49,13 +52,13 @@ public class ClusterConfiguration
             ContainerHost host = getHost( environment, uuid );
 
             // configure master node
-            executeCommand( host, Commands.getAddMasterCommand( host.getHostname() ) );
+            executeCommand( host, Commands.getAddMasterCommand( master.getHostname() ) );
 
             // configure GC node
-            executeCommand( host, Commands.getAddGCCommand( host.getHostname() ) );
+            executeCommand( host, Commands.getAddGCCommand( gc.getHostname() ) );
 
             // configure monitor node
-            executeCommand( host, Commands.getAddMonitorCommand( host.getHostname() ) );
+            executeCommand( host, Commands.getAddMonitorCommand( monitor.getHostname() ) );
 
             // configure tracers
             executeCommand( host, Commands.getAddTracersCommand(
@@ -67,7 +70,6 @@ public class ClusterConfiguration
 
             // configure zookeeper
             executeCommand( host, Commands.getBindZKClusterCommand( serializeZKNodeNames( zookeeperClusterConfig ) ) );
-
         }
 
         // init accumulo instance
@@ -82,7 +84,6 @@ public class ClusterConfiguration
 
         // start cluster
         po.addLog( "Starting cluster ..." );
-        executeCommand( master, Commands.stopCommand );
         executeCommand( master, Commands.startCommand );
 
         po.addLogDone( AccumuloClusterConfig.PRODUCT_KEY + " cluster data saved into database" );
