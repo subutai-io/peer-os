@@ -27,14 +27,6 @@ public class RestService
     private static final String OPERATION_ID = "OPERATION_ID";
 
     private Lucene luceneManager;
-    private AgentManager agentManager;
-
-
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }
-
 
     public void setLuceneManager( Lucene luceneManager )
     {
@@ -90,7 +82,7 @@ public class RestService
         // as plain string and use splitting.
         for ( String node : nodes.split( "," ) )
         {
-            config.getNodes().add( agentManager.getAgentByHostname( node ) );
+            config.getNodes().add( UUID.fromString( node ) );
         }
 
         UUID uuid = luceneManager.installCluster( config );
@@ -129,7 +121,7 @@ public class RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response destroyNode( @PathParam( "clusterName" ) String clusterName, @PathParam( "node" ) String node )
     {
-        UUID uuid = luceneManager.destroyNode( clusterName, node );
+        UUID uuid = luceneManager.uninstallNode( clusterName, node );
 
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();

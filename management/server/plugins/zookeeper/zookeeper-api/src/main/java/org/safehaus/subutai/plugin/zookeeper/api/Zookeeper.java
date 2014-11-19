@@ -18,7 +18,7 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 public interface Zookeeper extends ApiBase<ZookeeperClusterConfig>
 {
 
-    public UUID installCluster( ZookeeperClusterConfig config, HadoopClusterConfig hadoopClusterConfig );
+    public UUID installCluster( ZookeeperClusterConfig config );
 
     public UUID startNode( String clusterName, String lxcHostname );
 
@@ -38,5 +38,7 @@ public interface Zookeeper extends ApiBase<ZookeeperClusterConfig>
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, ZookeeperClusterConfig config,
                                                          TrackerOperation po );
+
+    public String getCommand( CommandType commandType );
 }
 

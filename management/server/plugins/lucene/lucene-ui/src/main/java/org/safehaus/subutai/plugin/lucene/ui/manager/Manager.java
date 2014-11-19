@@ -6,18 +6,15 @@
 package org.safehaus.subutai.plugin.lucene.ui.manager;
 
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -27,7 +24,6 @@ import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
-import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
@@ -61,9 +57,8 @@ public class Manager
     private final ExecutorService executorService;
     private final Tracker tracker;
     private final Hadoop hadoop;
-    private final AgentManager agentManager;
-    private final CommandRunner commandRunner;
     private LuceneConfig config;
+    private final EnvironmentManager environmentManager;
 
 
     public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -72,8 +67,7 @@ public class Manager
         this.lucene = serviceLocator.getService( Lucene.class );
         this.tracker = serviceLocator.getService( Tracker.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
 
         contentRoot = new GridLayout();
@@ -127,7 +121,7 @@ public class Manager
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
         destroyClusterBtn.setId( "LuceneDestroyClusterBtn" );
         destroyClusterBtn.addStyleName( "default" );
-        addClickListenerToDestorClusterButton();
+        addClickListenerToDestroyClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
 
 
@@ -155,12 +149,13 @@ public class Manager
                     HadoopClusterConfig hadoopConfig = hadoop.getCluster( config.getHadoopClusterName() );
                     if ( hadoopConfig != null )
                     {
-                        Set<Agent> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
+                        Set<UUID> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
                         nodes.removeAll( config.getNodes() );
                         if ( !nodes.isEmpty() )
                         {
+                            Set<ContainerHost> hosts = environmentManager.getEnvironmentByUUID( hadoopConfig.getEnvironmentId() ).getHostsByIds( nodes );
                             AddNodeWindow addNodeWindow =
-                                    new AddNodeWindow( lucene, tracker, executorService, config, nodes );
+                                    new AddNodeWindow( lucene, tracker, executorService, config, hosts  );
                             contentRoot.getUI().addWindow( addNodeWindow );
                             addNodeWindow.addCloseListener( new Window.CloseListener()
                             {
@@ -190,7 +185,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToDestorClusterButton()
+    public void addClickListenerToDestroyClusterButton()
     {
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -207,7 +202,7 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = lucene.uninstallCluster( config.getClusterName() );
+                            UUID trackID = lucene.uninstallCluster( config );
                             ProgressWindow window =
                                     new ProgressWindow( executorService, tracker, trackID, LuceneConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
@@ -257,14 +252,23 @@ public class Manager
             {
                 if ( event.isDoubleClick() )
                 {
-                    String lxcHostname =
+                    String containerId =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
+                    Set<ContainerHost> containerHosts =
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers();
+                    Iterator iterator = containerHosts.iterator();
+                    ContainerHost containerHost = null;
+                    while ( iterator.hasNext() )
                     {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
-                                        agentManager );
+                        containerHost = ( ContainerHost ) iterator.next();
+                        if ( containerHost.getId().equals( UUID.fromString( containerId ) ) )
+                        {
+                            break;
+                        }
+                    }
+                    if ( containerHost != null )
+                    {
+                        TerminalWindow terminal = new TerminalWindow( containerHosts );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
@@ -287,7 +291,9 @@ public class Manager
     {
         if ( config != null )
         {
-            populateTable( nodesTable, config.getNodes() );
+            Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+            Set<ContainerHost> hosts = environment.getHostsByIds( config.getNodes() );
+            populateTable( nodesTable, hosts);
         }
         else
         {
@@ -296,15 +302,15 @@ public class Manager
     }
 
 
-    private void populateTable( final Table table, Set<Agent> agents )
+    private void populateTable( final Table table, Set<ContainerHost> containerHosts )
     {
 
         table.removeAllItems();
 
-        for ( final Agent agent : agents )
+        for ( final ContainerHost host : containerHosts )
         {
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( agent.getListIP().get( 0 ) + "-luceneDestroy" );
+            destroyBtn.setId( host.getAgent().getListIP().get( 0 ) + "-luceneDestroy" );
             destroyBtn.addStyleName( "default" );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();
@@ -314,9 +320,9 @@ public class Manager
             addGivenComponents( availableOperations, destroyBtn );
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), availableOperations
+                    host.getHostname(), host.getAgent().getListIP().get( 0 ), availableOperations
             }, null );
-            addClickListenerToDestroyButton( agent, destroyBtn );
+            addClickListenerToDestroyButton( host, destroyBtn );
         }
     }
 
@@ -330,7 +336,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToDestroyButton( final Agent agent, Button... buttons )
+    public void addClickListenerToDestroyButton( final ContainerHost host, Button... buttons )
     {
         getButton( DESTROY_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -338,13 +344,13 @@ public class Manager
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 ConfirmationDialog alert = new ConfirmationDialog(
-                        String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
+                        String.format( "Do you want to destroy the %s node?", host.getHostname() ), "Yes", "No" );
                 alert.getOk().addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( Button.ClickEvent clickEvent )
                     {
-                        UUID trackID = lucene.destroyNode( config.getClusterName(), agent.getHostname() );
+                        UUID trackID = lucene.uninstallNode( config.getClusterName(), host.getHostname() );
                         ProgressWindow window =
                                 new ProgressWindow( executorService, tracker, trackID, LuceneConfig.PRODUCT_KEY );
                         window.getWindow().addCloseListener( new Window.CloseListener()

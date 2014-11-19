@@ -3,14 +3,10 @@
 
   <reference id="manager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.storm.api.Storm" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
   <reference id="zookeeper" availability="mandatory"
              interface="org.safehaus.subutai.plugin.zookeeper.api.Zookeeper" />
-  <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.storm.ui.StormPortalModule"
         init-method="init" destroy-method="destroy">

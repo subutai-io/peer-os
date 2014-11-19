@@ -12,12 +12,12 @@
 
   <reference id="zookeeperManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.zookeeper.api.Zookeeper" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
+  <reference id="environmentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
   <bean id="zookeeperRestServiceImpl" class="org.safehaus.subutai.plugin.zookeeper.rest.RestServiceImpl">
     <property name="zookeeperManager" ref="zookeeperManager" />
-    <property name="agentManager" ref="agentManager" />
+    <property name="environmentManager" ref="environmentManager" />
   </bean>
 
   <jaxrs:server address="/zookeeper" id="zookeeperRestService">

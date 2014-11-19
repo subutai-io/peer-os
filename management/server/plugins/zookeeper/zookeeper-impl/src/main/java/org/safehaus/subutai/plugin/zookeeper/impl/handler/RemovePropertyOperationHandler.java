@@ -1,14 +1,17 @@
 package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 
@@ -16,9 +19,9 @@ import com.google.common.base.Strings;
 
 
 /**
- * Handles ZK config property removal
- */
-public class RemovePropertyOperationHandler extends AbstractOperationHandler<ZookeeperImpl>
+* Handles ZK config property removal
+*/
+public class RemovePropertyOperationHandler extends AbstractOperationHandler<ZookeeperImpl, ZookeeperClusterConfig>
 {
     private final String fileName;
     private final String propertyName;
@@ -61,45 +64,65 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Zoo
 
         trackerOperation.addLog( "Removing property..." );
 
-        Command removePropertyCommand =
-                manager.getCommands().getRemovePropertyCommand( fileName, propertyName, config.getNodes() );
-        manager.getCommandRunner().runCommand( removePropertyCommand );
+        String removePropertyCommand =
+                manager.getCommands().getRemovePropertyCommand( fileName, propertyName );
 
-        if ( removePropertyCommand.hasSucceeded() )
+        Environment environment =
+                manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+        Set<ContainerHost> zookeeperNodes = environment.getHostsByIds( config.getNodes() );
+        List<CommandResult> commandResultList = new ArrayList<>();
+        for ( ContainerHost zookeeperNode : zookeeperNodes ) {
+            try
+            {
+                CommandResult commandResult = zookeeperNode.execute( new RequestBuilder( removePropertyCommand ) );
+                commandResultList.add( commandResult );
+            }
+            catch ( CommandException e )
+            {
+                e.printStackTrace();
+            }
+        }
+
+        if ( getFailedCommandResults( commandResultList ).size() == 0 )
         {
             trackerOperation.addLog( "Property removed successfully\nRestarting cluster..." );
 
-            Command restartCommand = manager.getCommands().getRestartCommand( config.getNodes() );
-            final AtomicInteger count = new AtomicInteger();
-            manager.getCommandRunner().runCommand( restartCommand, new CommandCallback()
-            {
-                @Override
-                public void onResponse( Response response, AgentResult agentResult, Command command )
-                {
-                    if ( agentResult.getStdOut().contains( "STARTED" ) )
-                    {
-                        if ( count.incrementAndGet() == config.getNodes().size() )
-                        {
-                            stop();
-                        }
-                    }
-                }
-            } );
+            commandResultList = new ArrayList<>();
+            String restartCommand = manager.getCommands().getRestartCommand();
 
-            if ( count.get() == config.getNodes().size() )
-            {
-                trackerOperation.addLogDone( "Cluster successfully restarted" );
+            for ( ContainerHost zookeeperNode : zookeeperNodes ) {
+                try
+                {
+                    CommandResult commandResult = zookeeperNode.execute( new RequestBuilder( restartCommand ) );
+                    commandResultList.add( commandResult );
+                }
+                catch ( CommandException e )
+                {
+                    e.printStackTrace();
+                }
             }
-            else
-            {
-                trackerOperation.addLogFailed(
-                        String.format( "Failed to restart cluster, %s", restartCommand.getAllErrors() ) );
-            }
+                trackerOperation.addLogDone( String.format( "Cluster %s restarted succesfully", clusterName ) );
         }
         else
         {
+            StringBuilder stringBuilder = new StringBuilder();
+            for ( CommandResult commandResult : getFailedCommandResults( commandResultList ) )
+            {
+                stringBuilder.append( commandResult.getStdErr() );
+            }
             trackerOperation.addLogFailed(
-                    String.format( "Removing property failed, %s", removePropertyCommand.getAllErrors() ) );
+                    String.format( "Removing property failed: %s", stringBuilder.toString() ) );
         }
+    }
+
+
+    public List<CommandResult> getFailedCommandResults( final List<CommandResult> commandResultList )
+    {
+        List<CommandResult> failedCommands = new ArrayList<>();
+        for ( CommandResult commandResult : commandResultList ) {
+            if ( ! commandResult.hasSucceeded() )
+                failedCommands.add( commandResult );
+        }
+        return failedCommands;
     }
 }

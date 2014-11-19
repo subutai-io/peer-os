@@ -11,48 +11,51 @@ import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDao;
+import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
 import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.SetupType;
-import org.safehaus.subutai.plugin.lucene.impl.handler.AddNodeOperationHandler;
-import org.safehaus.subutai.plugin.lucene.impl.handler.DestroyNodeOperationHandler;
-import org.safehaus.subutai.plugin.lucene.impl.handler.InstallOperationHandler;
-import org.safehaus.subutai.plugin.lucene.impl.handler.UninstallOperationHandler;
+import org.safehaus.subutai.plugin.lucene.impl.handler.ClusterOperationHandler;
+import org.safehaus.subutai.plugin.lucene.impl.handler.NodeOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 
 public class LuceneImpl implements Lucene
 {
-
-    protected Commands commands;
     private static final Logger LOG = LoggerFactory.getLogger( LuceneImpl.class.getName() );
-    private CommandRunner commandRunner;
-    private AgentManager agentManager;
+    protected Commands commands;
     private Tracker tracker;
     private Hadoop hadoopManager;
     private ExecutorService executor;
     private EnvironmentManager environmentManager;
-    private ContainerManager containerManager;
     private DataSource dataSource;
-    private PluginDao pluginDao;
+    private PluginDAO pluginDao;
 
 
-    public LuceneImpl( DataSource dataSource )
+    public LuceneImpl( final DataSource dataSource, final Tracker tracker, final EnvironmentManager environmentManager,
+                       final Hadoop hadoopManager )
     {
         this.dataSource = dataSource;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
+        this.hadoopManager = hadoopManager;
     }
 
 
@@ -68,51 +71,21 @@ public class LuceneImpl implements Lucene
     }
 
 
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
     public Tracker getTracker()
     {
         return tracker;
     }
 
 
-    public PluginDao getPluginDao()
+    public PluginDAO getPluginDao()
     {
         return pluginDao;
-    }
-
-
-    public ContainerManager getContainerManager()
-    {
-        return containerManager;
     }
 
 
     public EnvironmentManager getEnvironmentManager()
     {
         return environmentManager;
-    }
-
-
-    public void setCommandRunner( final CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
-    }
-
-
-    public void setAgentManager( final AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
     }
 
 
@@ -140,23 +113,16 @@ public class LuceneImpl implements Lucene
     }
 
 
-    public void setContainerManager( final ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
-    }
-
-
     public void init()
     {
         try
         {
-            this.pluginDao = new PluginDao( dataSource );
+            this.pluginDao = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
-        this.commands = new Commands( commandRunner );
         executor = Executors.newCachedThreadPool();
     }
 
@@ -171,18 +137,27 @@ public class LuceneImpl implements Lucene
     public UUID installCluster( final LuceneConfig config )
     {
         Preconditions.checkNotNull( config, "Configuration is null" );
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
+        ClusterOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID uninstallCluster( final String clusterName )
+    public UUID uninstallCluster( final LuceneConfig config )
     {
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
+        ClusterOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.DESTROY );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID uninstallCluster( String clusterName )
+    {
+        return null;
     }
 
 
@@ -203,7 +178,8 @@ public class LuceneImpl implements Lucene
     @Override
     public UUID installCluster( LuceneConfig config, HadoopClusterConfig hadoopConfig )
     {
-        InstallOperationHandler operationHandler = new InstallOperationHandler( this, config );
+        ClusterOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
         operationHandler.setHadoopConfig( hadoopConfig );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
@@ -213,18 +189,43 @@ public class LuceneImpl implements Lucene
     @Override
     public UUID addNode( final String clusterName, final String lxcHostname )
     {
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
+        AbstractOperationHandler h =
+                new NodeOperationHandler( this, clusterName, lxcHostname, NodeOperationType.INSTALL );
+        executor.execute( h );
+        return h.getTrackerId();
     }
 
 
     @Override
-    public UUID destroyNode( final String clusterName, final String lxcHostname )
+    public UUID uninstallNode( final String clusterName, final String lxcHostname )
     {
-        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
+        AbstractOperationHandler h =
+                new NodeOperationHandler( this, clusterName, lxcHostname, NodeOperationType.UNINSTALL );
+        executor.execute( h );
+        return h.getTrackerId();
+    }
+
+
+    @Override
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( LuceneConfig config )
+    {
+
+        EnvironmentBlueprint blueprint = new EnvironmentBlueprint();
+
+        blueprint.setName( String.format( "%s-%s", config.getProductKey(), UUIDUtil.generateTimeBasedUUID() ) );
+        blueprint.setExchangeSshKeys( true );
+        blueprint.setLinkHosts( true );
+        blueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
+
+        NodeGroup ng = new NodeGroup();
+        ng.setName( "Default" );
+        ng.setNumberOfNodes( config.getNodes().size() ); // master +slaves
+        ng.setTemplateName( LuceneConfig.TEMPLATE_NAME );
+        ng.setPlacementStrategy( new PlacementStrategy( "MORE_RAM" ) );
+        blueprint.setNodeGroups( Sets.newHashSet( ng ) );
+
+
+        return blueprint;
     }
 
 
@@ -233,7 +234,7 @@ public class LuceneImpl implements Lucene
     {
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            return new OverHadoopSetupStrategy( this, config, po );
+            return new OverHadoopSetupStrategy( this, config, po, env );
         }
         else if ( config.getSetupType() == SetupType.WITH_HADOOP )
         {
