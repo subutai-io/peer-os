@@ -66,3 +66,4 @@ fi
 find ./$packageName -name "*~" -print0 | xargs -0 rm -rf
 md5sum `find ./$packageName -type f | awk '/.\//{ print substr($0, 3) }'` >> $packageName/DEBIAN/md5sums
 dpkg-deb -z8 -Zgzip --build $packageName/
+
