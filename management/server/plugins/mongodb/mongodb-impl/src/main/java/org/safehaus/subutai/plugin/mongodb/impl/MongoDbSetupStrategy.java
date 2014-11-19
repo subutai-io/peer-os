@@ -259,56 +259,56 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
     {
 
         po.addLog( "Configuring cluster..." );
-        try
-        {
-            for ( MongoDataNode dataNode : config.getDataNodes() )
-            {
-                po.addLog( "Setting replicaSetname: " + dataNode.getHostname() );
-                dataNode.setReplicaSetName( config.getReplicaSetName() );
-            }
-
-            for ( MongoConfigNode configNode : config.getConfigServers() )
-            {
-                po.addLog( "Starting config node: " + configNode.getHostname() );
-                configNode.start();
-            }
-
-            for ( MongoRouterNode routerNode : config.getRouterServers() )
-            {
-                po.addLog( "Starting router node: " + routerNode.getHostname() );
-                routerNode.setConfigServers( config.getConfigServers() );
-                routerNode.start();
-            }
-
-            for ( MongoDataNode dataNode : config.getDataNodes() )
-            {
-                po.addLog( "Stopping data node: " + dataNode.getHostname() );
-                dataNode.stop();
-            }
-
-            MongoDataNode primaryDataNode = null;
-            for ( MongoDataNode dataNode : config.getDataNodes() )
-            {
-                po.addLog( "Starting data node: " + dataNode.getHostname() );
-                dataNode.start();
-                if ( primaryDataNode == null )
-                {
-                    primaryDataNode = dataNode;
-                    primaryDataNode.initiateReplicaSet();
-                    po.addLog( "Primary data node: " + dataNode.getHostname() );
-                }
-                else
-                {
-                    po.addLog( "registering secondary data node: " + dataNode.getHostname() );
-                    primaryDataNode.registerSecondaryNode( dataNode );
-                }
-            }
-        }
-        catch ( MongoException e )
-        {
-            e.printStackTrace();
-            throw new ClusterConfigurationException( e );
-        }
+//        try
+//        {
+//            for ( MongoDataNode dataNode : config.getDataNodes() )
+//            {
+//                po.addLog( "Setting replicaSetname: " + dataNode.getHostname() );
+//                dataNode.setReplicaSetName( config.getReplicaSetName() );
+//            }
+//
+//            for ( MongoConfigNode configNode : config.getConfigServers() )
+//            {
+//                po.addLog( "Starting config node: " + configNode.getHostname() );
+//                configNode.start();
+//            }
+//
+//            for ( MongoRouterNode routerNode : config.getRouterServers() )
+//            {
+//                po.addLog( "Starting router node: " + routerNode.getHostname() );
+//                routerNode.setConfigServers( config.getConfigServers() );
+//                routerNode.start();
+//            }
+//
+//            for ( MongoDataNode dataNode : config.getDataNodes() )
+//            {
+//                po.addLog( "Stopping data node: " + dataNode.getHostname() );
+//                dataNode.stop();
+//            }
+//
+//            MongoDataNode primaryDataNode = null;
+//            for ( MongoDataNode dataNode : config.getDataNodes() )
+//            {
+//                po.addLog( "Starting data node: " + dataNode.getHostname() );
+//                dataNode.start();
+//                if ( primaryDataNode == null )
+//                {
+//                    primaryDataNode = dataNode;
+//                    primaryDataNode.initiateReplicaSet();
+//                    po.addLog( "Primary data node: " + dataNode.getHostname() );
+//                }
+//                else
+//                {
+//                    po.addLog( "registering secondary data node: " + dataNode.getHostname() );
+//                    primaryDataNode.registerSecondaryNode( dataNode );
+//                }
+//            }
+//        }
+//        catch ( MongoException e )
+//        {
+//            e.printStackTrace();
+//            throw new ClusterConfigurationException( e );
+//        }
         po.addLogDone( String.format( "Cluster %s configured successfully.", config.getClusterName() ) );
 
         //                List<Command> installationCommands = mongoManager.getCommands().getInstallationCommands(
