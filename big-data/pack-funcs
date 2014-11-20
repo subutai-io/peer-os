@@ -163,4 +163,71 @@ getArchitecture() {
   echo "all"
 }
 
+generateRepoPackage() {
+  #check initial productName is not empty
+  if [[ $1 == "" ]]; then
+    usage
+  fi
+  
+  #Basic path definitions
+  productName=$1
+  productNameUppercase="$(tr '[:lower:]' '[:upper:]' <<< ${productName:0:1})${productName:1}"
+  BASE=/var/lib/jenkins/jobs/master.bigdata.$productName/$productNameUppercase
+  SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
+  TARGET="/var/lib/jenkins/Automation/Bigdata/$productName"
+  PACK="/var/lib/jenkins/Automation/Automation_ISO/mgmt-repo/template-repo-package/"
+  ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
+ 
+  pushd $BASE
+  
+  #get package full name, for example:subutai-hadoop_1.0.12_all.deb
+  currentPackage=`ls -lt $TARGET | awk '{ print $9 }' | grep .deb` 
+  echo "CurrentPackageName: $currentPackage"
+  
+  #delete repo package: subutai-repo-hadoop_1.0.12_all.deb
+  if [ -f "$ISOPATH/subutai-repo-$currentPackage" ]; then
+      rm $ISOPATH/subutai-repo-$currentPackage 
+  fi
+
+  #check package starts with subutai tag
+  if [[ "$currentPackage" == "subutai"* ]]; then
+     shortCurrentPackage=`echo "$currentPackage" | awk '{print substr($1,9); }'  | awk '{print substr($0, 0, length($0)-4)}'`
+     echo "shortCurrentPackage: $shortCurrentPackage"
+  fi
+
+  purePackageName=`echo $shortCurrentPackage | awk -F "." '{print $1}' | awk '{print substr($0, 0, length($0)-2)}'`
+  echo "purePackageName: $purePackageName"
+ 
+  #check purePackageName is empty or not
+  if [ -z $purePackageName ] || [ "x$purePackageName" == "x" ]; then
+     echo "Pure package name is empty. Aborting..."
+     exit 1
+  fi
+
+  templateName="temp"
+
+  #check temp folder does exist or not
+  if [ -d "$templateName" ]; then
+    rm -rf "$BASE/$templateName"
+    cp -a $PACK $BASE/$templateName
+  else
+    cp -a $PACK $BASE/$templateName
+  fi
+  
+  sed -i "s/template/subutai-repo-$purePackageName/g" $BASE/$templateName/DEBIAN/control
+  cp $currentPackage $BASE/$templateName/repo/ksks/amd64/trusty/
+  mv $BASE/$templateName/ $BASE/subutai-repo-$shortCurrentPackage
+  
+  CURRENTPACK=$BASE/subutai-repo-$shortCurrentPackage
+  echo "CURRENTPACK: $CURRENTPACK"
+
+  dpkg-deb --build $CURRENTPACK
+  mv $BASE/subutai-repo-"$shortCurrentPackage".deb $ISOPATH
+  rm -rf $BASE/subutai-repo-$shortCurrentPackage
+  rm -rf $BASE/$templateName
+
+  echo "Repo wrapper package Successfully created."
+
+  popd
+}
 
