@@ -26,7 +26,7 @@ public class MessageRoutingListener implements MessageListener
     protected Set<org.safehaus.subutai.core.broker.api.MessageListener> listeners = Collections
             .newSetFromMap( new ConcurrentHashMap<org.safehaus.subutai.core.broker.api.MessageListener, Boolean>() );
 
-    protected ExecutorService notifier = Executors.newCachedThreadPool();
+    protected ExecutorService notifier = Executors.newSingleThreadExecutor();
 
 
     public void addListener( org.safehaus.subutai.core.broker.api.MessageListener listener )

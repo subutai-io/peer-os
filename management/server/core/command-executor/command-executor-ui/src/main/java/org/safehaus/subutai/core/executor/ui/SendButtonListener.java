@@ -178,6 +178,8 @@ public class SendButtonListener implements Button.ClickListener, CommandCallback
     {
         try
         {
+            form.getIndicator().setVisible( true );
+
             for ( final HostInfo hostInfo : hosts )
             {
                 form.getTaskCount().incrementAndGet();
