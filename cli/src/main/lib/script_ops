@@ -1,0 +1,293 @@
+#!/bin/bash
+
+# ==========================================================================
+# Set of functions for pre and post execution scripts synchronization
+# between resource hosts and management server application
+# ==========================================================================
+
+function register_script {
+  local script="$1"
+  if [ -z "$script" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+  assert_script_name $script
+  assert_script $script
+  assert_script_not_registered $script
+
+  local script_path=$(get_script_full_path $script)
+  local OUT=$( curl -qSfsw '\n%{http_code}' -F "script=@$script_path" `get_script_endpoint` ) 2>/dev/null
+  local RET=$?
+
+  if [[ $RET -ne 0 ]] ; then
+    # print HTTP error
+    msg_error "Error while registering script $script! HTTP Error: $(echo "$OUT" | tail -n1 ). Aborting.."
+    exit 1
+  else
+    msg_ok "script $script is registered succesfully"
+  fi
+}
+
+
+function unregister_script {
+  local script="$1"
+  if [ -z "$script" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  assert_script_name $script
+  assert_script_registered $script
+
+  local OUT=$( curl -qSfsw '\n%{http_code}' -X DELETE "`get_script_endpoint`/$script" ) 2>/dev/null
+  local RET=$?
+
+  if [[ $RET -ne 0 ]] ; then
+    # print HTTP error
+    msg_error "Error while unregistering script $script! HTTP Error: $(echo "$OUT" | tail -n1 ). Aborting.."
+    exit 1
+  else
+    msg_ok "script $script is unregistered succesfully"
+  fi
+}
+
+
+function import_script {
+  local script="$1"
+  if [ -z "$script" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  assert_script_name $script
+  assert_script_registered $script
+
+  local script_exists=$(does_script_exist $script)
+  if [ "x$script_exists" == "xtrue" ]; then
+    msg_notice "    - script with name $script already exists! Skipping.."
+    return
+  else
+    msg_info "    - script $script does not exist"
+  fi
+
+  local script_path=$(get_script_full_path $script)
+  local OUT=$( curl -qSfsw '\n%{http_code}' -o $script_path "`get_script_endpoint`/$script" ) 2>/dev/null
+  local RET=$?
+
+  if [[ $RET -ne 0 ]] ; then
+    # print HTTP error
+    msg_error "Error while importing script $script! HTTP Error: $(echo "$OUT" | tail -n1 ). Aborting.."
+    exit 1
+  else
+    msg_ok "script $script is imported under $script_path"
+  fi
+}
+
+
+function import_all_scripts {
+  local registered_scripts=$(list_registered_scripts)
+  local registered_scripts=${registered_scripts//$'\n'/$';'}
+  IFS=';' read -a scriptArray <<< "$registered_scripts"
+  for script in "${scriptArray[@]}"
+  do
+    local script=$(echo " $script " | tr -d '"')
+    local script=$(echo " $script " | tr -d ' ')
+    msg_info "    - calling import for $script script"
+    import_script "$script"
+  done
+
+}
+function list_registered_scripts {
+  local OUT=$( curl -qSfsw '\n%{http_code}' `get_script_endpoint` ) 2>/dev/null
+  local RET=$?
+
+  if [[ $RET -ne 0 ]] ; then
+    # print HTTP error
+    msg_error "HTTP Error: $(echo "$OUT" | tail -n1 )"
+    exit 1
+  else
+    # and print all but the last line, i.e. the regular response
+    # remove [ and ] characters from response
+    echo "$OUT" | head -n-1 | sed "s/\[//1" | sed "s/\]//1" | sed '/^$/d' | tr -d ' ' | sed "s/",/"/1"
+  fi
+}
+
+
+function is_script_registered {
+  local script=$1
+  if [ -z "$script" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  local registered_scripts=$(list_registered_scripts)
+  # TODO parse the output properly i.e. it does not return true if the match 
+  # has the script name in it but different from that script
+  # example: test-script.sh check returns true if there is my-test-script.sh
+  if [[ $registered_scripts == *\"$script\"* ]]; then
+    echo "true"
+    return
+  fi
+
+  echo "false"
+  return
+}
+
+
+function assert_script_not_registered {
+  local script=$1
+  if [ -z "$script" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  local is_registered=$(is_script_registered $script)
+
+  if [ "x$is_registered" == "xtrue"  ]; then
+    msg_error "Script $script is registered already! Aborting.."
+    exit 1
+  fi
+  msg_info "    - script $script is not registered"
+}
+
+
+function assert_script_registered {
+  local script=$1
+  if [ -z "$script" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  local is_registered=$(is_script_registered $script)
+
+  if [ "x$is_registered" != "xtrue"  ]; then
+    msg_error "Script $script is not registered! Aborting.."
+    exit 1
+  fi
+  msg_info "    - script $script is registered"
+}
+
+
+function get_script_endpoint {
+  local url="`build_rest_url $SUBUTAI_REST_SCRIPT_PATH`"
+  echo $url
+}
+
+
+function assert_script_name {
+  local script=$1
+  if [ -z "$script" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  if [[ $script == pre-* || $script == post-* ]]; then
+    :
+  else
+    msg_error "script $script does not start with \"pre-\" or \"post-\"! Aborting.."
+    exit 1
+  fi
+  msg_info "    - name of $script script is valid"
+}
+
+
+function get_script_category {
+  local script=$1
+  if [ -z "$script" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  if [[ $script == pre-* ]]; then
+    echo "pre"
+    return
+  elif [[ $script == post-* ]]; then
+    echo "post"
+    return
+  else
+    msg_error "script name does not start with \"pre-\" or \"post-\"! Aborting.."
+    exit 1
+  fi
+}
+
+
+function get_script_full_path {
+  local script=$1
+  if [ -z "$script" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  local script_category=$(get_script_category $script)
+  if [ $script_category == "pre" ]; then
+    echo "$subutai_pre_script_base/$script"
+    return
+  elif [ $script_category == "post" ]; then
+    echo "$subutai_post_script_base/$script"
+    return
+  else
+    msg_error "Uncategorized script $script! Aborting.."
+    exit 1
+  fi
+}
+
+
+function assert_script {
+  local script=$1
+  if [ -z "$script" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  local script_path=$(get_script_full_path $script)
+
+  if [ ! -f $script_path ];then
+    msg_error "Script $script_path does not exist! Aborting.."
+    exit 1
+  else
+    msg_info "    - script $script exists"
+  fi
+}
+
+
+function does_script_exist {
+  local script=$1
+  if [ -z "$script" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  local script_path=$(get_script_full_path $script)
+
+  if [ -f $script_path ];then
+    echo "true"
+    return
+  else
+    echo "false"
+    return
+  fi
+}
+
+
+function remove_script {
+  local script=$1
+  if [ -z "$script" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  assert_script_name $script
+  assert_script $script
+
+  local script_path=$(get_script_full_path $script)
+
+  if [ ! -f $script_path ];then
+    msg_error "Script $script_path does not exist! Aborting.."
+    exit 1
+  else
+    rm $script_path
+    msg_ok "script $script is removed from local machine"
+  fi
+}
+
+
