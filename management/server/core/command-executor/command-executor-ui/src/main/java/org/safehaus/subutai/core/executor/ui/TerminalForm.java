@@ -45,6 +45,7 @@ public class TerminalForm extends CustomComponent implements Disposable
     private final TextField programTxtFld;
     private final TextField timeoutTxtFld;
     private final TextField workDirTxtFld;
+    private final TextField runAsTxtFld;
     private final ComboBox requestTypeCombo;
     private final Label indicator;
     private TextArea commandOutputTxtArea;
@@ -90,6 +91,11 @@ public class TerminalForm extends CustomComponent implements Disposable
         workDirTxtFld.setValue( "/" );
         controls.addComponent( workDirLbl );
         controls.addComponent( workDirTxtFld );
+        Label runAsLbl = new Label( "Run As" );
+        runAsTxtFld = new TextField();
+        runAsTxtFld.setValue( "root" );
+        controls.addComponent( runAsLbl );
+        controls.addComponent( runAsTxtFld );
         Label timeoutLbl = new Label( "Timeout" );
         timeoutTxtFld = new TextField();
         timeoutTxtFld.setValue( "30" );
@@ -133,7 +139,7 @@ public class TerminalForm extends CustomComponent implements Disposable
             }
         } );
 
-        sendBtn.addClickListener( new SendButtonListener( this, commandExecutor, executor ) );
+        sendBtn.addClickListener( new SendButtonListener( this, commandExecutor, executor, hostRegistry ) );
 
         clearBtn.addClickListener( new Button.ClickListener()
         {
@@ -167,6 +173,12 @@ public class TerminalForm extends CustomComponent implements Disposable
     protected TextField getWorkDirTxtFld()
     {
         return workDirTxtFld;
+    }
+
+
+    public TextField getRunAsTxtFld()
+    {
+        return runAsTxtFld;
     }
 
 

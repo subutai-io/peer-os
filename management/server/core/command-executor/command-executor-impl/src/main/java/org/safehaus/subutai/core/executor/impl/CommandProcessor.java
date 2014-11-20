@@ -123,9 +123,10 @@ public class CommandProcessor implements ByteMessageListener
         {
             String responseString = new String( message, "UTF-8" );
 
-            LOG.info( String.format( "Received:%n%s", responseString ) );
 
             ResponseWrapper responseWrapper = JsonUtil.fromJson( responseString, ResponseWrapper.class );
+
+            LOG.info( String.format( "Received:%n%s", JsonUtil.toJson( responseWrapper ) ) );
 
             ResponseImpl response = responseWrapper.getResponse();
 

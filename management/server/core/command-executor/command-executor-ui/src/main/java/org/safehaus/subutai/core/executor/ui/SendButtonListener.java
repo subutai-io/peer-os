@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.executor.ui;
 
 
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -14,7 +15,10 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
+import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,19 +37,22 @@ public class SendButtonListener implements Button.ClickListener
     private final TerminalForm form;
     private final CommandExecutor commandExecutor;
     private final ExecutorService executor;
+    private final HostRegistry hostRegistry;
 
 
     public SendButtonListener( final TerminalForm form, final CommandExecutor commandExecutor,
-                               final ExecutorService executor )
+                               final ExecutorService executor, final HostRegistry hostRegistry )
     {
 
         Preconditions.checkNotNull( form );
         Preconditions.checkNotNull( commandExecutor );
         Preconditions.checkNotNull( executor );
+        Preconditions.checkNotNull( hostRegistry );
 
         this.form = form;
         this.commandExecutor = commandExecutor;
         this.executor = executor;
+        this.hostRegistry = hostRegistry;
     }
 
 
@@ -55,15 +62,39 @@ public class SendButtonListener implements Button.ClickListener
         Set<HostInfo> hosts = form.getHostTree().getSelectedHosts();
         if ( hosts.isEmpty() )
         {
-            form.show( "Please, select hosts" );
+            form.addOutput( String.format( "Please, select hosts%n" ) );
         }
         else if ( Strings.isNullOrEmpty( form.getProgramTxtFld().getValue() ) )
         {
-            form.show( "Please, enter command" );
+            form.addOutput( String.format( "Please, enter command%n" ) );
         }
         else
         {
-            executeCommand( hosts );
+            for ( Iterator<HostInfo> iterator = hosts.iterator(); iterator.hasNext(); )
+            {
+                final HostInfo hostInfo = iterator.next();
+                try
+                {
+                    if ( hostInfo instanceof ResourceHostInfo )
+                    {
+                        hostRegistry.getResourceHostInfoById( hostInfo.getId() );
+                    }
+                    else
+                    {
+                        hostRegistry.getContainerHostInfoById( hostInfo.getId() );
+                    }
+                }
+                catch ( HostDisconnectedException e )
+                {
+                    form.addOutput( String.format( "Host %s is disconnected%n", hostInfo.getHostname() ) );
+                    iterator.remove();
+                }
+            }
+
+            if ( !hosts.isEmpty() )
+            {
+                executeCommand( hosts );
+            }
         }
     }
 
@@ -86,10 +117,14 @@ public class SendButtonListener implements Button.ClickListener
                 requestBuilder.withType( RequestType.PS_REQUEST );
             }
 
-            if ( form.getWorkDirTxtFld().getValue() != null && !Strings
-                    .isNullOrEmpty( form.getWorkDirTxtFld().getValue() ) )
+            if ( !Strings.isNullOrEmpty( form.getWorkDirTxtFld().getValue() ) )
             {
                 requestBuilder.withCwd( form.getWorkDirTxtFld().getValue() );
+            }
+
+            if ( !Strings.isNullOrEmpty( form.getRunAsTxtFld().getValue() ) )
+            {
+                requestBuilder.withRunAs( form.getRunAsTxtFld().getValue() );
             }
 
             int timeout = Integer.valueOf( form.getTimeoutTxtFld().getValue() );
@@ -107,7 +142,7 @@ public class SendButtonListener implements Button.ClickListener
                         && Integer.valueOf( form.getProgramTxtFld().getValue() ) > 0 ) )
         {
 
-            form.show( "Please, enter numeric PID greater than 0 to kill" );
+            form.addOutput( String.format( "Please, enter numeric PID greater than 0 to kill%n" ) );
             return false;
         }
 
@@ -116,7 +151,7 @@ public class SendButtonListener implements Button.ClickListener
                         Common.MAX_COMMAND_TIMEOUT_SEC ) ) )
         {
 
-            form.show( String.format( "Timeout must be between %d and %d", Common.MIN_COMMAND_TIMEOUT_SEC,
+            form.addOutput( String.format( "Timeout must be between %d and %d%n", Common.MIN_COMMAND_TIMEOUT_SEC,
                     Common.MAX_COMMAND_TIMEOUT_SEC ) );
             return false;
         }
@@ -152,7 +187,6 @@ public class SendButtonListener implements Button.ClickListener
             {
                 for ( final HostInfo hostInfo : hosts )
                 {
-
                     form.getTaskCount().incrementAndGet();
                     commandExecutor.executeAsync( hostInfo.getId(), requestBuilder, new CommandCallback()
                     {
@@ -186,29 +220,28 @@ public class SendButtonListener implements Button.ClickListener
             StringBuilder out = new StringBuilder();
             if ( !Strings.isNullOrEmpty( response.getStdOut() ) )
             {
-                out.append( response.getStdOut() ).append( "\n" );
+                out.append( response.getStdOut() ).append( String.format( "%n" ) );
             }
             if ( !Strings.isNullOrEmpty( response.getStdErr() ) )
             {
-                out.append( response.getStdErr() ).append( "\n" );
+                out.append( response.getStdErr() ).append( String.format( "%n" ) );
             }
             if ( commandResult.hasCompleted() )
             {
                 if ( response.getExitCode() != 0 )
                 {
-                    out.append( "Exit code: " ).append( response.getExitCode() ).append( "\n\n" );
+                    out.append( "Exit code: " ).append( response.getExitCode() ).append( String.format( "%n%n" ) );
                 }
             }
             else if ( commandResult.hasTimedOut() )
             {
 
-                out.append( commandResult.getStatus() ).append( "\n\n" );
+                out.append( commandResult.getStatus() ).append( String.format( "%n%n" ) );
             }
 
             if ( out.length() > 0 )
             {
-
-                form.addOutput( hostInfo.getHostname() + " [" + response.getPid() + "]" + ":\n" + out );
+                form.addOutput( String.format( "%s [%d]:%n%s", hostInfo.getHostname(), response.getPid(), out ) );
             }
         }
     }
