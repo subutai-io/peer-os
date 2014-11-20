@@ -45,6 +45,7 @@
 #include "SubutaiEnvironment.h"
 #include "SubutaiContainerManager.h"
 #include "SubutaiTimer.h"
+#include "SubutaiCommandManager.h"
 #include <stdio.h>
 #include <pthread.h>
 #include <string.h>
@@ -103,6 +104,8 @@ int main(int argc,char *argv[],char *envp[])
     SubutaiEnvironment environment(&logMain);
     string input = "";
     string sendout;
+
+    SubutaiCommandManager* commandManager = SubutaiCommandManager::getInstance();
 
     if (!thread.getUserID().checkRootUser()) {
         //user is not root SubutaiAgent Will be closed
@@ -310,6 +313,7 @@ int main(int argc,char *argv[],char *envp[])
                         file.open("/etc/subutai-agent/commandQueue.txt",fstream::in | fstream::out | fstream::app);
                         file << input;
                         file.close();
+                        commandManager->addCommand(&command);
                     } else if (command.getType()=="PS_REQUEST") {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","PS execution operation is starting.."));
                         SubutaiThread* subprocess = new SubutaiThread;
