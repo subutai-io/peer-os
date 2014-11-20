@@ -9,7 +9,7 @@ package org.safehaus.subutai.plugin.cassandra.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.common.enums.OutputRedirection;
+import org.safehaus.subutai.common.command.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;

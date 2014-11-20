@@ -19,7 +19,9 @@ import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
@@ -29,7 +31,6 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 
 import com.google.common.collect.Sets;
@@ -152,6 +153,7 @@ public class CommandRunnerImplTest
     }
 
 
+    @Ignore
     @Test
     public void shouldCreateCommand2()
     {
