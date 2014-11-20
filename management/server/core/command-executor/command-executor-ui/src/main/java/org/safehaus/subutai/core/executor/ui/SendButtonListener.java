@@ -15,6 +15,8 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
+import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
+import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
@@ -81,7 +83,11 @@ public class SendButtonListener implements Button.ClickListener
                     }
                     else
                     {
-                        hostRegistry.getContainerHostInfoById( hostInfo.getId() );
+                        ContainerHostInfo containerHostInfo = hostRegistry.getContainerHostInfoById( hostInfo.getId() );
+                        if ( containerHostInfo.getStatus() != ContainerHostState.RUNNING )
+                        {
+                            throw new HostDisconnectedException( null );
+                        }
                     }
                 }
                 catch ( HostDisconnectedException e )
