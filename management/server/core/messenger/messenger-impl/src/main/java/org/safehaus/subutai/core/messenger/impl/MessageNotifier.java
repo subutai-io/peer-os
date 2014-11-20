@@ -14,7 +14,7 @@ import com.google.common.base.Preconditions;
  */
 public class MessageNotifier implements Runnable
 {
-    protected static Logger LOG = LoggerFactory.getLogger( MessageNotifier.class.getName() );
+    private static Logger LOG = LoggerFactory.getLogger( MessageNotifier.class.getName() );
 
     protected MessageListener listener;
     protected Message message;

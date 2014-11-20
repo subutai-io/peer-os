@@ -24,6 +24,8 @@ import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
 
+import junit.framework.Assert;
+
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertNotNull;
@@ -132,6 +134,24 @@ public class HostRegistryImplTest
 
 
     @Test
+    public void testGetHostInfoById() throws Exception
+    {
+
+        assertNotNull(registry.getHostInfoById( CONTAINER_ID ));
+        assertNotNull( registry.getHostInfoById( HOST_ID ) );
+
+        try
+        {
+            registry.getHostInfoById( UUID.randomUUID() );
+            fail( "Expected HostDisconnectedException" );
+        }
+        catch ( HostDisconnectedException e )
+        {
+        }
+    }
+
+
+    @Test
     public void testGetContainerInfoByHostname() throws Exception
     {
         ContainerHostInfo existingHost = registry.getContainerHostInfoByHostname( CONTAINER_HOSTNAME );
@@ -160,7 +180,7 @@ public class HostRegistryImplTest
 
 
     @Test
-    public void testGetHostInfoById() throws Exception
+    public void testGetResourceHostInfoById() throws Exception
     {
         ResourceHostInfo existingHost = registry.getResourceHostInfoById( HOST_ID );
         assertNotNull( existingHost );
@@ -177,7 +197,7 @@ public class HostRegistryImplTest
 
 
     @Test
-    public void testGetHostInfoByHostname() throws Exception
+    public void testGetResourceHostInfoByHostname() throws Exception
     {
         ResourceHostInfo existingHost = registry.getResourceHostInfoByHostname( HOST_HOSTNAME );
 
@@ -195,7 +215,7 @@ public class HostRegistryImplTest
 
 
     @Test
-    public void testGetHostsInfo() throws Exception
+    public void testGetResourceHostsInfo() throws Exception
     {
         Set<ResourceHostInfo> info = registry.getResourceHostsInfo();
 

@@ -3,6 +3,12 @@ package org.safehaus.subutai.core.metric.impl;
 
 public class Constants
 {
+
+    private Constants()
+    {
+    }
+
+
     //max length of subscriber id to store in database varchar(100) field
     public static final int MAX_SUBSCRIBER_ID_LEN = 100;
 
