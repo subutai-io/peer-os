@@ -285,10 +285,21 @@ public class CommandProcessorTest
                 return null;
             }
         };
-        when( commands.put( eq( COMMAND_ID ), any( CommandProcess.class ), anyInt(),
-                any( CommandProcessExpiryCallback.class ) ) ).thenReturn( true );
+
         when( resourceHostInfo.getId() ).thenReturn( HOST_ID );
         when( containerHostInfo.getStatus() ).thenReturn( ContainerHostState.RUNNING );
+        try
+        {
+            commandProcessor.execute( request, callback );
+            fail( "Expected CommandException" );
+        }
+        catch ( CommandException e )
+        {
+        }
+
+
+        when( commands.put( eq( COMMAND_ID ), any( CommandProcess.class ), anyInt(),
+                any( CommandProcessExpiryCallback.class ) ) ).thenReturn( true );
 
         commandProcessor.execute( request1, callback );
 
@@ -315,5 +326,7 @@ public class CommandProcessorTest
         catch ( CommandException e )
         {
         }
+
+
     }
 }

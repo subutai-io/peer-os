@@ -34,7 +34,7 @@ public class HostRegistryImpl implements HostRegistry
 {
     private static final Logger LOG = LoggerFactory.getLogger( HostRegistryImpl.class.getName() );
     //timeout after which host expires in seconds
-    private static final int HOST_EXPIRATION = 60;
+    private final int hostExpiration;
 
     private final Broker broker;
 
@@ -45,11 +45,13 @@ public class HostRegistryImpl implements HostRegistry
     protected Cache<UUID, ResourceHostInfo> hosts;
 
 
-    public HostRegistryImpl( final Broker broker )
+    public HostRegistryImpl( final Broker broker, final int hostExpiration )
     {
         Preconditions.checkNotNull( broker, "Broker is null" );
+        Preconditions.checkArgument( hostExpiration > 0, "Host expiration timeout must be greater than 0" );
 
         this.broker = broker;
+        this.hostExpiration = hostExpiration;
         this.heartBeatListener = new HeartBeatListener( this );
     }
 
@@ -209,7 +211,7 @@ public class HostRegistryImpl implements HostRegistry
             broker.addByteMessageListener( heartBeatListener );
 
             hosts = CacheBuilder.newBuilder().
-                    expireAfterWrite( HOST_EXPIRATION, TimeUnit.SECONDS ).
+                    expireAfterWrite( hostExpiration, TimeUnit.SECONDS ).
                                         build();
         }
         catch ( BrokerException e )

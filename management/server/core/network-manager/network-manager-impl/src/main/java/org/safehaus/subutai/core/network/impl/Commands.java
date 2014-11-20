@@ -8,8 +8,6 @@ import com.google.common.collect.Lists;
 
 /**
  * Networking commands
- *
- * TODO implement list commands when their output format is finalized
  */
 public class Commands
 {

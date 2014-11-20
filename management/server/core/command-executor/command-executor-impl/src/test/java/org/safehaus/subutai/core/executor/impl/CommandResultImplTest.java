@@ -5,8 +5,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.command.CommandStatus;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 
@@ -38,5 +40,17 @@ public class CommandResultImplTest
         assertTrue( commandResult.hasSucceeded() );
         assertTrue( commandResult.hasCompleted() );
         assertFalse( commandResult.hasTimedOut() );
+    }
+
+
+    @Test
+    public void testToString() throws Exception
+    {
+        String toString = commandResult.toString();
+
+        assertThat( toString, containsString( EXIT_CODE.toString() ) );
+        assertThat( toString, containsString( STD_OUT ) );
+        assertThat( toString, containsString( STD_ERR ) );
+        assertThat( toString, containsString( STATUS.name() ) );
     }
 }

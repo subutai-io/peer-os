@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.git.impl;
+package org.safehaus.subutai.core.git.api;
 
 
 import java.util.HashMap;
@@ -9,6 +9,7 @@ import org.safehaus.subutai.core.git.api.GitChangedFile;
 import org.safehaus.subutai.core.git.api.GitFileStatus;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
@@ -61,6 +62,8 @@ public class GitChangedFileTest
         GitChangedFile gitChangedFile = new GitChangedFile( GitFileStatus.MODIFIED, FILE_PATH );
 
         assertEquals( gitChangedFile, new GitChangedFile( GitFileStatus.MODIFIED, FILE_PATH ) );
+
+        assertFalse( gitChangedFile.equals( new Object() ));
     }
 
 

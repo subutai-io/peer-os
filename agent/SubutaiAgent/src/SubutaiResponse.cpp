@@ -331,11 +331,11 @@ void SubutaiResponse::serializeDone(string& output)
     }
     if(this->getRequestSequenceNumber() >= 0)											//check the requestSequenceNumber is assigned or not
     {
-        root["response"]["requestSequenceNumber"] = this->getRequestSequenceNumber();
+        root["response"]["requestNumber"] = this->getRequestSequenceNumber();
     }
     if(this->getResponseSequenceNumber() >= 0)										//check the responseSequenceNumber is assigned or not
     {
-        root["response"]["responseSequenceNumber"] = this->getResponseSequenceNumber();
+        root["response"]["responseNumber"] = this->getResponseSequenceNumber();
     }
     if(this->getPid() >= 0)
     {

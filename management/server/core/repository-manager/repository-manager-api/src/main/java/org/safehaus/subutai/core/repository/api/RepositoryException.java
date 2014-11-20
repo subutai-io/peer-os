@@ -1,13 +1,10 @@
 package org.safehaus.subutai.core.repository.api;
 
 
-import org.safehaus.subutai.common.exception.SubutaiException;
-
-
 /**
  * Exception that might be thrown by Repository Manager
  */
-public class RepositoryException extends SubutaiException
+public class RepositoryException extends Exception
 {
     public RepositoryException( final String message )
     {
