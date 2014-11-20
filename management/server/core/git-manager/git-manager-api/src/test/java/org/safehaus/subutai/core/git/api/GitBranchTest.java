@@ -1,11 +1,11 @@
-package org.safehaus.subutai.core.git.impl;
+package org.safehaus.subutai.core.git.api;
 
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
-import org.safehaus.subutai.core.git.api.GitBranch;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -72,6 +72,7 @@ public class GitBranchTest
 
         assertEquals( gitBranch1, gitBranch2 );
         assertFalse( gitBranch1.equals( gitBranch3 ) );
+        Assert.assertFalse( gitBranch1.equals( new Object() ) );
     }
 
 
