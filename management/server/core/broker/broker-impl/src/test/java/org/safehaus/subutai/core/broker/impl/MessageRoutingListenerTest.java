@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.broker.impl;
 
 
 import java.io.PrintStream;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -24,6 +25,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,13 +37,15 @@ public class MessageRoutingListenerTest
     Set<MessageListener> listeners;
 
     @Mock
-    ExecutorService notifier;
+    Map<org.safehaus.subutai.core.broker.api.Topic, ExecutorService> notifiers;
 
     @Mock
     MessageListener listener;
 
     @Mock
     Message message;
+    @Mock
+    ExecutorService notifier;
 
 
     MessageRoutingListener router;
@@ -52,7 +56,8 @@ public class MessageRoutingListenerTest
     {
         router = new MessageRoutingListener();
         router.listeners = listeners;
-        router.notifier = notifier;
+        router.notifiers = notifiers;
+        when( notifiers.get( any( org.safehaus.subutai.core.broker.api.Topic.class ) ) ).thenReturn( notifier );
     }
 
 
@@ -77,7 +82,8 @@ public class MessageRoutingListenerTest
     @Test
     public void testNotifyListener() throws Exception
     {
-        router.notifyListener( listener, message );
+
+        router.notifyListener( org.safehaus.subutai.core.broker.api.Topic.RESPONSE_TOPIC, listener, message );
 
         ArgumentCaptor<MessageNotifier> captor = ArgumentCaptor.forClass( MessageNotifier.class );
 
@@ -117,6 +123,6 @@ public class MessageRoutingListenerTest
 
         router.dispose();
 
-        verify( notifier ).shutdown();
+        verify( notifier, times( org.safehaus.subutai.core.broker.api.Topic.values().length ) ).shutdown();
     }
 }

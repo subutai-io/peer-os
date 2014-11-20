@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.broker.impl;
 
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -26,7 +27,16 @@ public class MessageRoutingListener implements MessageListener
     protected Set<org.safehaus.subutai.core.broker.api.MessageListener> listeners = Collections
             .newSetFromMap( new ConcurrentHashMap<org.safehaus.subutai.core.broker.api.MessageListener, Boolean>() );
 
-    protected ExecutorService notifier = Executors.newSingleThreadExecutor();
+    protected Map<org.safehaus.subutai.core.broker.api.Topic, ExecutorService> notifiers = new ConcurrentHashMap<>();
+
+
+    public MessageRoutingListener()
+    {
+        for ( org.safehaus.subutai.core.broker.api.Topic topic : org.safehaus.subutai.core.broker.api.Topic.values() )
+        {
+            notifiers.put( topic, Executors.newSingleThreadExecutor() );
+        }
+    }
 
 
     public void addListener( org.safehaus.subutai.core.broker.api.MessageListener listener )
@@ -53,7 +63,7 @@ public class MessageRoutingListener implements MessageListener
             {
                 if ( listener.getTopic().name().equalsIgnoreCase( destination.getTopicName() ) )
                 {
-                    notifyListener( listener, message );
+                    notifyListener( listener.getTopic(), listener, message );
                 }
             }
         }
@@ -64,14 +74,18 @@ public class MessageRoutingListener implements MessageListener
     }
 
 
-    protected void notifyListener( org.safehaus.subutai.core.broker.api.MessageListener listener, Message message )
+    protected void notifyListener( org.safehaus.subutai.core.broker.api.Topic topic,
+                                   org.safehaus.subutai.core.broker.api.MessageListener listener, Message message )
     {
-        notifier.execute( new MessageNotifier( listener, message ) );
+        notifiers.get( topic ).execute( new MessageNotifier( listener, message ) );
     }
 
 
     protected void dispose()
     {
-        notifier.shutdown();
+        for ( org.safehaus.subutai.core.broker.api.Topic topic : org.safehaus.subutai.core.broker.api.Topic.values() )
+        {
+            notifiers.get( topic ).shutdown();
+        }
     }
 }
