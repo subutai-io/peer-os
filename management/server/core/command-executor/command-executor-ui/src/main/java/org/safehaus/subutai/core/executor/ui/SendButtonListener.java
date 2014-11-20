@@ -97,6 +97,7 @@ public class SendButtonListener implements Button.ClickListener
                 }
                 catch ( HostDisconnectedException e )
                 {
+                    LOG.warn( "Host not connected", e );
                     form.addOutput( String.format( "Host %s is disconnected%n", hostInfo.getHostname() ) );
                 }
             }

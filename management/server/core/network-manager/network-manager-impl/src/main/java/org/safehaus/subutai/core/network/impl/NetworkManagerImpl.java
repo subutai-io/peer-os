@@ -177,7 +177,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    private ManagementHost getManagementHost() throws NetworkManagerException
+    protected ManagementHost getManagementHost() throws NetworkManagerException
     {
         try
         {
@@ -190,7 +190,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    public ResourceHost getResourceHost( String containerName ) throws NetworkManagerException
+    protected ResourceHost getResourceHost( String containerName ) throws NetworkManagerException
     {
         try
         {
@@ -204,7 +204,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    public ContainerHost getContainerHost( String containerName ) throws NetworkManagerException
+    protected ContainerHost getContainerHost( String containerName ) throws NetworkManagerException
     {
         try
         {
@@ -217,7 +217,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    private CommandResult execute( Host host, RequestBuilder requestBuilder ) throws NetworkManagerException
+    protected CommandResult execute( Host host, RequestBuilder requestBuilder ) throws NetworkManagerException
     {
         try
         {
