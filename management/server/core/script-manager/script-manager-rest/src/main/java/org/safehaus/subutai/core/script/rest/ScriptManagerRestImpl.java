@@ -66,8 +66,7 @@ public class ScriptManagerRestImpl implements ScriptManagerRest
                 if ( scriptFile.delete() )
                 {
 
-                    return Response.ok( scriptFile ).header( "Content-Disposition",
-                            String.format( "attachment; filename=%s", scriptName ) ).build();
+                    return Response.ok().build();
                 }
                 else
                 {
