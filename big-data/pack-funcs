@@ -181,6 +181,9 @@ generateRepoPackage() {
   mv $BASE/subutai-repo-"$shortCurrentPackage".deb $ISOPATH
   rm -rf $BASE/subutai-repo-$shortCurrentPackage
   rm -rf $BASE/$templateName
+
+  echo "Repo wrapper package Successfully created."
+
   popd
 }
 
