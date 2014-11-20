@@ -8,7 +8,7 @@ import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 
 
 /**
@@ -35,7 +35,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listClusters()
     {
-        List<HBaseClusterConfig> clusters = hbaseManager.getClusters();
+        List<HBaseConfig> clusters = hbaseManager.getClusters();
         String clusterNames = JsonUtil.toJson( clusters );
         return Response.status( Response.Status.OK ).entity( clusterNames ).build();
     }
@@ -44,7 +44,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getCluster( final String source )
     {
-        HBaseClusterConfig cluster = hbaseManager.getCluster( source );
+        HBaseConfig cluster = hbaseManager.getCluster( source );
         String clusterName = JsonUtil.toJson( cluster );
         return Response.status( Response.Status.OK ).entity( clusterName ).build();
     }
@@ -55,7 +55,7 @@ public class RestServiceImpl implements RestService
     {
 
 
-        HBaseClusterConfig hbcc = new HBaseClusterConfig();
+        HBaseConfig hbcc = new HBaseConfig();
         /*hbcc.setClusterName( clusterName );
         hbcc.setHbaseMaster( master );
         hbcc.setBackupMasters( backupMasters );
@@ -90,7 +90,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response destroyCluster( final String clusterName )
     {
-        UUID uuid = hbaseManager.destroyCluster( clusterName );
+        UUID uuid = hbaseManager.uninstallCluster( clusterName );
         String operationId = wrapUUID( uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
@@ -115,27 +115,18 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response addNode( final String clusterName, final String lxcHostname, final String nodeType )
+    public Response destroyNode( final String clusterName, final String containerId, final String nodeType )
     {
-        UUID uuid = hbaseManager.addNode( clusterName, lxcHostname, nodeType );
+        UUID uuid = hbaseManager.destroyNode( clusterName, containerId );
         String operationId = wrapUUID( uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
 
 
     @Override
-    public Response destroyNode( final String clusterName, final String lxcHostname, final String nodeType )
+    public Response checkNode( final String clusterName, final String containerId )
     {
-        UUID uuid = hbaseManager.destroyNode( clusterName, lxcHostname, nodeType );
-        String operationId = wrapUUID( uuid );
-        return Response.status( Response.Status.OK ).entity( operationId ).build();
-    }
-
-
-    @Override
-    public Response checkNode( final String clusterName, final String lxcHostname )
-    {
-        UUID uuid = hbaseManager.checkNode( clusterName, lxcHostname );
+        UUID uuid = hbaseManager.checkNode( clusterName, UUID.fromString( containerId ) );
         String operationId = wrapUUID( uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
@@ -144,5 +135,14 @@ public class RestServiceImpl implements RestService
     private String wrapUUID( UUID uuid )
     {
         return JsonUtil.toJson( "OPERATION_ID", uuid );
+    }
+
+
+    @Override
+    public Response addNode( final String clusterName, final String nodeType )
+    {
+        UUID uuid = hbaseManager.addNode( clusterName, nodeType );
+        String operationId = wrapUUID( uuid );
+        return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
 }

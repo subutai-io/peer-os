@@ -71,7 +71,7 @@ enum containerStatus { RUNNING, STOPPED, FROZEN };
 class SubutaiContainer
 {
     public:
-        SubutaiContainer(SubutaiLogger*, lxc_container* cont);
+        SubutaiContainer(SubutaiLogger*, lxc_container*);
         virtual ~SubutaiContainer(void);
         bool getContainerId();
         void tryLongCommand();

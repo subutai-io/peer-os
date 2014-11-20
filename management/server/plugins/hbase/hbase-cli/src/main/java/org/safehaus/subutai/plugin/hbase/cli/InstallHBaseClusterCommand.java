@@ -46,18 +46,6 @@ public class InstallHBaseClusterCommand extends OsgiCommandSupport
     protected Object doExecute()
     {
 
-        //        List<Config> configs = hbaseManager.getClusters();
-        //        Config config = new Config();
-        //        config.setClusterName(clusterName);
-        //        config.set
-        //        hbaseManager.installCluster()
-        //        StringBuilder sb = new StringBuilder();
-        //
-        //        for(Config config : configs) {
-        //            sb.append(config.getClusterName()).append("\n");
-        //        }
-        //
-        //        System.out.println(sb.toString());
         System.out.println( "install" );
         return null;
     }

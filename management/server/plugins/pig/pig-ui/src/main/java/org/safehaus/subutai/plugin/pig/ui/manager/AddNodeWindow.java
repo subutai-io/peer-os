@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.pig.api.Pig;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
@@ -33,8 +34,8 @@ public class AddNodeWindow extends Window
     private volatile boolean track = true;
 
 
-    public AddNodeWindow( final Pig pig, final ExecutorService executorService, final Tracker tracker,
-                          final PigConfig config, Set<Agent> nodes )
+    public AddNodeWindow( final Pig pig, final Tracker tracker, final ExecutorService executorService,
+                          final PigConfig config, Set<ContainerHost> nodes )
     {
         super( "Add New Node" );
         setModal( true );
@@ -60,10 +61,10 @@ public class AddNodeWindow extends Window
         hadoopNodes.setNullSelectionAllowed( false );
         hadoopNodes.setRequired( true );
         hadoopNodes.setWidth( 200, Unit.PIXELS );
-        for ( Agent node : nodes )
+        for ( ContainerHost host : nodes )
         {
-            hadoopNodes.addItem( node );
-            hadoopNodes.setItemCaption( node, node.getHostname() );
+            hadoopNodes.addItem( host);
+            hadoopNodes.setItemCaption( host, host.getHostname() );
         }
         hadoopNodes.setValue( nodes.iterator().next() );
 
@@ -84,8 +85,8 @@ public class AddNodeWindow extends Window
             {
                 addNodeBtn.setEnabled( false );
                 showProgress();
-                Agent agent = ( Agent ) hadoopNodes.getValue();
-                final UUID trackID = pig.addNode( config.getClusterName(), agent.getHostname() );
+                ContainerHost host = ( ContainerHost ) hadoopNodes.getValue();
+                final UUID trackID = pig.addNode( config.getClusterName(), host.getHostname() );
 
                 ok.setEnabled( false );
                 executorService.execute( new Runnable()

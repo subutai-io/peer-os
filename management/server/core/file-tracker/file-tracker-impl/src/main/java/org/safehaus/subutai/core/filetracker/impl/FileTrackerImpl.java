@@ -11,8 +11,8 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestType;
 import org.safehaus.subutai.common.command.Response;
-import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.broker.api.Broker;
@@ -33,7 +33,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 
-//TODO use proper RequestType and update RequestBuilder.RequestImpl after migration to new agent
 public class FileTrackerImpl implements FileTracker, ByteMessageListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( FileTrackerImpl.class.getName() );
@@ -104,8 +103,8 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
 
         try
         {
-            commandUtil.execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_CREATE_REQUEST )
-                                                            .withConfPoints( configPoints ), host );
+            commandUtil.execute( new RequestBuilder( "pwd" ).withType( RequestType.SET_INOTIFY_REQUEST )
+                                                            .withConfigPoints( configPoints ), host );
         }
         catch ( CommandException e )
         {
@@ -122,8 +121,8 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
 
         try
         {
-            commandUtil.execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_REMOVE_REQUEST )
-                                                            .withConfPoints( configPoints ), host );
+            commandUtil.execute( new RequestBuilder( "pwd" ).withType( RequestType.UNSET_INOTIFY_REQUEST )
+                                                            .withConfigPoints( configPoints ), host );
         }
         catch ( CommandException e )
         {
@@ -141,7 +140,7 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
 
         try
         {
-            host.execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_LIST_REQUEST ),
+            host.execute( new RequestBuilder( "pwd" ).withType( RequestType.LIST_INOTIFY_REQUEST ),
                     new CommandCallback()
                     {
                         @Override

@@ -1,204 +1,98 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.accumulo.impl;
 
 
-import java.util.Set;
-
-import org.safehaus.subutai.common.enums.OutputRedirection;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
-import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
 
 public class Commands
 {
 
-    private static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME.toLowerCase();
-    private final CommandRunnerBase commandRunner;
+    public static final String installCommand = "apt-get --force-yes --assume-yes install ";
+
+    public static final String uninstallCommand = "apt-get --force-yes --assume-yes purge ";
+
+    public static final String startCommand = "/etc/init.d/accumulo start";
+
+    public static final String stopCommand = "/etc/init.d/accumulo stop";
+
+    public static final String statusCommand = "/etc/init.d/accumulo status";
+
+    public static final String checkIfInstalled = "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH;
 
 
-    public Commands( CommandRunnerBase commandRunner )
+    public static String getAddMasterCommand( String hostname )
     {
-
-        Preconditions.checkNotNull( "Command Runner is null" );
-
-        this.commandRunner = commandRunner;
+        return ". /etc/profile && accumuloMastersConf.sh masters clear && accumuloMastersConf.sh masters add "
+                + hostname;
     }
 
 
-    public Command getInstallCommand( Set<Agent> agents )
+    public static String getAddTracersCommand( String serializedHostNames )
     {
-        return commandRunner.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 360 )
-                                                                                                .withStdOutRedirection(
-                                                                                                        OutputRedirection.NO ),
-                agents );
+        return ". /etc/profile && accumuloMastersConf.sh tracers clear && accumuloMastersConf.sh tracers add "
+                + serializedHostNames;
     }
 
 
-    public Command getUninstallCommand( Set<Agent> agents )
+    public static String getClearTracerCommand( String hostname )
     {
-        return commandRunner.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 60 ),
-                agents );
+        return ". /etc/profile && accumuloMastersConf.sh tracers clear " + hostname;
     }
 
 
-    public Command getCheckInstalledCommand( Set<Agent> agents )
+    public static String getAddGCCommand( String hostname )
     {
-        // grep subutai-
-        return commandRunner.createCommand(
-                new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH ), agents );
+        return ". /etc/profile && accumuloMastersConf.sh gc clear && accumuloMastersConf.sh gc add " + hostname;
     }
 
 
-    public Command getStartCommand( Agent agent )
+    public static String getAddMonitorCommand( String hostname )
     {
-        return commandRunner.createCommand( new RequestBuilder( "/etc/init.d/accumulo start" ).withTimeout( 60 ),
-                Sets.newHashSet( agent ) );
+        return ". /etc/profile && accumuloMastersConf.sh monitor clear && accumuloMastersConf.sh monitor add "
+                + hostname;
     }
 
 
-    public Command getStopCommand( Agent agent )
+    public static String getAddSlavesCommand( String serializedHostNames )
     {
-        return commandRunner
-                .createCommand( new RequestBuilder( "/etc/init.d/accumulo stop" ), Sets.newHashSet( agent ) );
+        return ". /etc/profile && accumuloSlavesConf.sh slaves clear && accumuloSlavesConf.sh slaves add "
+                + serializedHostNames;
     }
 
 
-    public Command getRestartCommand( Agent agent )
+    public static String getClearSlaveCommand( String hostname )
     {
-        return commandRunner
-                .createCommand( new RequestBuilder( "/etc/init.d/accumulo restart" ), Sets.newHashSet( agent ) );
+        return ". /etc/profile && accumuloSlavesConf.sh slaves clear " + hostname;
     }
 
 
-    public Command getStatusCommand( Agent agent )
+    public static String getBindZKClusterCommand( String zkNodesCommaSeparated )
     {
-        return commandRunner
-                .createCommand( new RequestBuilder( "/etc/init.d/accumulo status" ), Sets.newHashSet( agent ) );
+        return ". /etc/profile && accumulo-conf.sh remove accumulo-site.xml instance.zookeeper.host && "
+                + "accumulo-conf.sh add accumulo-site.xml instance.zookeeper.host " + zkNodesCommaSeparated;
     }
 
 
-    public Command getAddMasterCommand( Set<Agent> nodes, Agent masterNode )
+    public static String getInitCommand( String instanceName, String password )
     {
-        return commandRunner.createCommand( new RequestBuilder( String.format(
-                ". /etc/profile && accumuloMastersConf.sh masters clear && accumuloMastersConf.sh masters add %s",
-                masterNode.getHostname() ) ), nodes );
+        return ". /etc/profile && accumulo-init.sh " + instanceName + " " + password;
     }
 
 
-    public Command getAddTracersCommand( Set<Agent> nodes, Set<Agent> tracerNodes )
+    public static String getAddPropertyCommand( String propertyName, String propertyValue )
     {
-        StringBuilder tracersSpaceSeparated = new StringBuilder();
-        for ( Agent tracer : tracerNodes )
-        {
-            tracersSpaceSeparated.append( tracer.getHostname() ).append( " " );
-        }
-        return commandRunner.createCommand( new RequestBuilder( String.format(
-                ". /etc/profile && accumuloMastersConf.sh tracers clear && accumuloMastersConf.sh tracers add %s",
-                tracersSpaceSeparated ) ), nodes );
+        return ". /etc/profile && accumulo-property.sh add " + propertyName + " " + propertyValue;
     }
 
 
-    public Command getClearTracerCommand( Set<Agent> nodes, Agent tracerNode )
+    public static String getRemovePropertyCommand( String propertyName )
     {
-        return commandRunner.createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && accumuloMastersConf.sh tracers clear %s",
-                        tracerNode.getHostname() ) ), nodes );
+        return ". /etc/profile && accumulo-property.sh clear " + propertyName;
     }
 
 
-    public Command getAddGCCommand( Set<Agent> nodes, Agent gcNode )
+    public static String getRemoveAccumuloFromHFDSCommand()
     {
-        return commandRunner.createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && accumuloMastersConf.sh gc clear && accumuloMastersConf.sh gc add %s",
-                        gcNode.getHostname() ) ), nodes );
-    }
-
-
-    public Command getAddMonitorCommand( Set<Agent> nodes, Agent monitor )
-    {
-        return commandRunner.createCommand( new RequestBuilder( String.format(
-                ". /etc/profile && accumuloMastersConf.sh monitor clear && accumuloMastersConf.sh monitor add %s",
-                monitor.getHostname() ) ), nodes );
-    }
-
-
-    public Command getAddSlavesCommand( Set<Agent> nodes, Set<Agent> slaveNodes )
-    {
-        StringBuilder slavesSpaceSeparated = new StringBuilder();
-        for ( Agent tracer : slaveNodes )
-        {
-            slavesSpaceSeparated.append( tracer.getHostname() ).append( " " );
-        }
-        return commandRunner.createCommand( new RequestBuilder( String.format(
-                ". /etc/profile && accumuloSlavesConf.sh slaves clear && accumuloSlavesConf.sh slaves add %s",
-                slavesSpaceSeparated ) ), nodes );
-    }
-
-
-    public Command getClearSlaveCommand( Set<Agent> nodes, Agent slaveNode )
-    {
-        return commandRunner.createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && accumuloSlavesConf.sh slaves clear %s",
-                                slaveNode.getHostname() ) ), nodes );
-    }
-
-
-    public Command getBindZKClusterCommand( Set<Agent> nodes, Set<Agent> zkNodes )
-    {
-        StringBuilder zkNodesCommaSeparated = new StringBuilder();
-        for ( Agent zkNode : zkNodes )
-        {
-            zkNodesCommaSeparated.append( zkNode.getHostname() ).append( ":2181," );
-        }
-
-        zkNodesCommaSeparated.delete( zkNodesCommaSeparated.length() - 1, zkNodesCommaSeparated.length() );
-        return commandRunner.createCommand( new RequestBuilder( String.format(
-                ". /etc/profile && accumulo-conf.sh remove accumulo-site.xml instance.zookeeper.host && "
-                        + "accumulo-conf.sh add accumulo-site.xml instance.zookeeper.host %s",
-                zkNodesCommaSeparated ) ), nodes );
-    }
-
-
-    public Command getAddPropertyCommand( String propertyName, String propertyValue, Set<Agent> agents )
-    {
-        return commandRunner.createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && accumulo-property.sh add %s %s", propertyName,
-                                propertyValue ) ), agents );
-    }
-
-
-    public Command getRemovePropertyCommand( String propertyName, Set<Agent> agents )
-    {
-        return commandRunner.createCommand(
-                new RequestBuilder( String.format( ". /etc/profile && accumulo-property.sh clear %s", propertyName ) ),
-                agents );
-    }
-
-
-    public Command getInitCommand( String instanceName, String password, Agent agent )
-    {
-        return commandRunner.createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && accumulo-init.sh %s %s", instanceName, password ) ),
-                Sets.newHashSet( agent ) );
-    }
-
-
-    public Command getRemoveAccumuloFromHFDSCommand( Agent agent )
-    {
-        return commandRunner.createCommand( new RequestBuilder( ". /etc/profile && hadoop dfs -rmr /accumulo" ),
-                Sets.newHashSet( agent ) );
+        return ". /etc/profile && hadoop dfs -rmr /accumulo";
     }
 }

@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * Parent interface for host info
  */
-public interface HostInfo
+public interface HostInfo extends Comparable<HostInfo>
 {
     public UUID getId();
 

@@ -3,6 +3,7 @@ package org.safehaus.subutai.common.command;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -34,4 +35,6 @@ public interface Request
     public Integer getTimeout();
 
     public Integer isDaemon();
+
+    public Set<String> getConfigPoints();
 }

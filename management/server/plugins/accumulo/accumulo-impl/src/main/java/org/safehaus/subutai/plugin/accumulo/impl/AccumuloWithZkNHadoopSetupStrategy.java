@@ -1,18 +1,10 @@
 package org.safehaus.subutai.plugin.accumulo.impl;
 
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -82,6 +74,8 @@ public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy
                     accumuloClusterConfig.getZookeeperClusterName() ) );
         }
 
+        /*
+
         //get ZK nodes with Hadoop installed from environment
         Set<Agent> accumuloAgents = new HashSet<>();
         for ( EnvironmentContainer environmentContainer : environment.getContainers() )
@@ -89,7 +83,8 @@ public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy
             if ( environmentContainer.getTemplate().getProducts()
                                      .contains( Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME )
                     && environmentContainer.getTemplate().getProducts()
-                                           .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) )
+                                           .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig
+                                                   .PRODUCT_NAME ) )
             {
                 accumuloAgents.add( environmentContainer.getAgent() );
             }
@@ -102,7 +97,8 @@ public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy
         if ( numberOfNeededAccumuloNodes > accumuloAgents.size() )
         {
             throw new ClusterSetupException( String.format(
-                    "Number of needed Accumulo nodes (%d) exceeds number of available nodes with Hadoop installed (%d)",
+                    "Number of needed Accumulo nodes (%d) exceeds number of available nodes with Hadoop
+                    installed (%d)",
                     numberOfNeededAccumuloNodes, accumuloAgents.size() ) );
         }
 
@@ -136,6 +132,7 @@ public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy
             throw new ClusterSetupException( e.getMessage() );
         }
 
+        */
 
         return accumuloClusterConfig;
     }

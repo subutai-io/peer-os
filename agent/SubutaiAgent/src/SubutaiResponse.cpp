@@ -33,6 +33,7 @@ SubutaiResponse::SubutaiResponse()
     setHostname("");
     setParentHostname("");
     getInterfaces().clear();
+    getContainerSet().clear();
 }
 
 /**
