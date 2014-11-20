@@ -2,31 +2,32 @@ package org.safehaus.subutai.core.broker.impl;
 
 
 import java.io.PrintStream;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
+import javax.jms.BytesMessage;
 import javax.jms.JMSException;
-import javax.jms.Message;
+import javax.jms.TextMessage;
 import javax.jms.Topic;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.core.broker.api.ByteMessageListener;
 import org.safehaus.subutai.core.broker.api.MessageListener;
+import org.safehaus.subutai.core.broker.api.TextMessageListener;
 
 import com.google.common.collect.Sets;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 
@@ -37,15 +38,14 @@ public class MessageRoutingListenerTest
     Set<MessageListener> listeners;
 
     @Mock
-    Map<org.safehaus.subutai.core.broker.api.Topic, ExecutorService> notifiers;
+    ByteMessageListener byteMessageListener;
+    @Mock
+    TextMessageListener textMessageListener;
 
     @Mock
-    MessageListener listener;
-
+    BytesMessage bytesMessage;
     @Mock
-    Message message;
-    @Mock
-    ExecutorService notifier;
+    TextMessage textMessage;
 
 
     MessageRoutingListener router;
@@ -56,41 +56,52 @@ public class MessageRoutingListenerTest
     {
         router = new MessageRoutingListener();
         router.listeners = listeners;
-        router.notifiers = notifiers;
-        when( notifiers.get( any( org.safehaus.subutai.core.broker.api.Topic.class ) ) ).thenReturn( notifier );
     }
 
 
     @Test
     public void testAddListener() throws Exception
     {
-        router.addListener( listener );
+        router.addListener( byteMessageListener );
 
-        verify( listeners ).add( listener );
+        verify( listeners ).add( byteMessageListener );
     }
 
 
     @Test
     public void testRemoveListener() throws Exception
     {
-        router.removeListener( listener );
+        router.removeListener( byteMessageListener );
 
-        verify( listeners ).remove( listener );
+        verify( listeners ).remove( byteMessageListener );
     }
 
 
     @Test
     public void testNotifyListener() throws Exception
     {
+        when( bytesMessage.getBodyLength() ).thenReturn( 1L );
 
-        router.notifyListener( org.safehaus.subutai.core.broker.api.Topic.RESPONSE_TOPIC, listener, message );
+        router.notifyListener( byteMessageListener, bytesMessage );
 
-        ArgumentCaptor<MessageNotifier> captor = ArgumentCaptor.forClass( MessageNotifier.class );
+        verify( byteMessageListener ).onMessage( isA( byte[].class ) );
 
-        verify( notifier ).execute( captor.capture() );
+        router.notifyListener( textMessageListener, textMessage );
 
-        assertEquals( listener, captor.getValue().listener );
-        assertEquals( message, captor.getValue().message );
+        verify( textMessageListener ).onMessage( anyString() );
+
+        reset( byteMessageListener );
+
+        router.notifyListener( byteMessageListener, textMessage );
+
+        verifyZeroInteractions( byteMessageListener );
+
+        JMSException exception = mock( JMSException.class );
+        doThrow( exception ).when( bytesMessage ).getBodyLength();
+
+        router.notifyListener( byteMessageListener, bytesMessage );
+
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 
 
@@ -99,30 +110,23 @@ public class MessageRoutingListenerTest
     {
 
         Topic topic = mock( Topic.class );
-        when( message.getJMSDestination() ).thenReturn( topic );
-        when( listener.getTopic() ).thenReturn( org.safehaus.subutai.core.broker.api.Topic.HEARTBEAT_TOPIC );
+        when( bytesMessage.getJMSDestination() ).thenReturn( topic );
+        when( byteMessageListener.getTopic() ).thenReturn( org.safehaus.subutai.core.broker.api.Topic.HEARTBEAT_TOPIC );
         when( topic.getTopicName() ).thenReturn( org.safehaus.subutai.core.broker.api.Topic.HEARTBEAT_TOPIC.name() );
-        router.listeners = Sets.newHashSet( listener );
+        Set<MessageListener> listenerSet = Sets.newHashSet();
+        listenerSet.add( byteMessageListener );
+        router.listeners = listenerSet;
 
-        router.onMessage( message );
+        router.onMessage( bytesMessage );
 
-        verify( notifier ).execute( isA( MessageNotifier.class ) );
+        verify( byteMessageListener ).onMessage( isA( byte[].class ) );
 
         JMSException exception = mock( JMSException.class );
-        doThrow( exception ).when( message ).getJMSDestination();
+        doThrow( exception ).when( bytesMessage ).getJMSDestination();
 
-        router.onMessage( message );
+        router.onMessage( bytesMessage );
 
         verify( exception ).printStackTrace( any( PrintStream.class ) );
-    }
 
-
-    @Test
-    public void testDispose() throws Exception
-    {
-
-        router.dispose();
-
-        verify( notifier, times( org.safehaus.subutai.core.broker.api.Topic.values().length ) ).shutdown();
     }
 }

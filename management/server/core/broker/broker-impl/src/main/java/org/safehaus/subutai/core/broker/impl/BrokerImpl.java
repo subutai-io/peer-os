@@ -119,8 +119,6 @@ public class BrokerImpl implements Broker
         {
             pool.stop();
         }
-
-        messageRouter.dispose();
     }
 
 
