@@ -310,7 +310,6 @@ int main(int argc,char *argv[],char *envp[])
                         file.open("/etc/subutai-agent/commandQueue.txt",fstream::in | fstream::out | fstream::app);
                         file << input;
                         file.close();
-                        commandManager->addCommand(&command);
                     } else if (command.getType()=="PS_REQUEST") {
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","PS execution operation is starting.."));
                         SubutaiThread* subprocess = new SubutaiThread;
