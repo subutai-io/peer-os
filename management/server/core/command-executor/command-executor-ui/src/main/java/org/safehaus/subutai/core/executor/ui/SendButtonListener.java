@@ -142,6 +142,7 @@ public class SendButtonListener implements Button.ClickListener
             this.requestBuilder = requestBuilder;
             this.hosts = hosts;
             this.form = form;
+            form.getIndicator().setVisible( true );
         }
 
 
@@ -149,9 +150,6 @@ public class SendButtonListener implements Button.ClickListener
         {
             try
             {
-                form.getIndicator().setVisible( true );
-
-
                 for ( final HostInfo hostInfo : hosts )
                 {
 

@@ -8,6 +8,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
+import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
@@ -143,24 +144,25 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
                         for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
                         {
                             missingHosts.remove( containerHostInfo );
-                            if ( !presentHosts.contains( containerHostInfo ) )
+
+                            Item child = container.getItem( containerHostInfo.getId() );
+                            //child is not yet in the tree
+                            if ( child == null )
                             {
-                                Item child = container.getItem( containerHostInfo.getId() );
-                                //child is not yet in the tree
-                                if ( child == null )
-                                {
-                                    child = container.addItem( containerHostInfo.getId() );
-                                }
-                                if ( child != null )
-                                {
-                                    tree.setItemCaption( containerHostInfo.getId(), containerHostInfo.getHostname() );
-                                    child.getItemProperty( "value" ).setValue( containerHostInfo );
-                                    child.getItemProperty( "icon" )
-                                         .setValue( new ThemeResource( "img/lxc/virtual.png" ) );
-                                    container.setParent( containerHostInfo.getId(), resourceHostInfo.getId() );
-                                    container.setChildrenAllowed( containerHostInfo.getId(), false );
-                                }
+                                child = container.addItem( containerHostInfo.getId() );
                             }
+                            if ( child != null )
+                            {
+                                tree.setItemCaption( containerHostInfo.getId(), containerHostInfo.getHostname() );
+                                child.getItemProperty( "value" ).setValue( containerHostInfo );
+                                child.getItemProperty( "icon" ).setValue(
+                                        containerHostInfo.getStatus() == ContainerHostState.RUNNING ?
+                                        new ThemeResource( "img/lxc/virtual.png" ) :
+                                        new ThemeResource( "img/lxc/virtual_offline.png" ) );
+                                container.setParent( containerHostInfo.getId(), resourceHostInfo.getId() );
+                                container.setChildrenAllowed( containerHostInfo.getId(), false );
+                            }
+
                             presentHosts.add( containerHostInfo );
                         }
                     }
