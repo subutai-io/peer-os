@@ -30,13 +30,12 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
 
 /**
- * Command Runner UI - Terminal
+ * Terminal Form
  */
 public class TerminalForm extends CustomComponent implements Disposable
 {
@@ -197,12 +196,6 @@ public class TerminalForm extends CustomComponent implements Disposable
     protected AtomicInteger getTaskCount()
     {
         return taskCount;
-    }
-
-
-    protected void show( String msg )
-    {
-        Notification.show( msg );
     }
 
 
