@@ -47,6 +47,13 @@ else
         $accumuloHome/bin/accumulo-property.sh HADOOP_PREFIX $HADOOP_PREFIX
 fi
 
+if [ "x$HADOOP_CONF_DIR" = "x" ];
+then
+        $accumuloHome/bin/accumulo-property.sh HADOOP_CONF_DIR /etc/hadoop
+else
+        $accumuloHome/bin/accumulo-property.sh HADOOP_CONF_DIR $HADOOP_PREFIX/conf
+fi
+
 if [ "x$ZOOKEEPER_HOME" = "x" ];
 then
         $accumuloHome/bin/accumulo-property.sh ZOOKEEPER_HOME /opt/zookeeper-3.4.5
