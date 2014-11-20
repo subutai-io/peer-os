@@ -17,6 +17,7 @@ import javax.naming.NamingException;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -25,7 +26,11 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
+import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
+import org.safehaus.subutai.plugin.mongodb.api.MongoException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
+import org.safehaus.subutai.plugin.mongodb.api.MongoRouterNode;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -109,9 +114,8 @@ public class Manager
         routersTable.setId( "MongoRoutersTbl" );
         dataNodesTable = createTableTemplate( "Data Nodes" );
         dataNodesTable.setId( "MongoDataNodesTbl" );
-        //tables go here
 
-        HorizontalLayout controlsContent = new HorizontalLayout();
+        final HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
 
         Label clusterNameLabel = new Label( "Select the cluster" );
@@ -134,7 +138,7 @@ public class Manager
 
         controlsContent.addComponent( clusterCombo );
 
-        refreshClustersBtn = new Button( "Refresh clusters" );
+        refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
         refreshClustersBtn.setId( "MongoRefreshClustersBtn" );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
@@ -148,7 +152,7 @@ public class Manager
 
         controlsContent.addComponent( refreshClustersBtn );
 
-        checkAllBtn = new Button( "Check all" );
+        checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
         checkAllBtn.setId( "MongoCheckAllBtn" );
         checkAllBtn.addStyleName( "default" );
         checkAllBtn.addClickListener( new Button.ClickListener()
@@ -163,7 +167,7 @@ public class Manager
         } );
         controlsContent.addComponent( checkAllBtn );
 
-        startAllBtn = new Button( "Start all" );
+        startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
         startAllBtn.setId( "MongoStartAllBtn" );
         startAllBtn.addStyleName( "default" );
         startAllBtn.addClickListener( new Button.ClickListener()
@@ -171,14 +175,24 @@ public class Manager
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                startAllNodes( configServersTable );
-                startAllNodes( routersTable );
-                startAllNodes( dataNodesTable );
+                PROGRESS_ICON.setVisible( true );
+                try
+                {
+                    startAll();
+                }
+                catch ( MongoException e )
+                {
+                    e.printStackTrace();
+                }
+                PROGRESS_ICON.setVisible( false );
+//                startAllNodes( configServersTable );
+//                startAllNodes( dataNodesTable );
+//                startAllNodes( routersTable );
             }
         } );
         controlsContent.addComponent( startAllBtn );
 
-        stopAllBtn = new Button( "Stop all" );
+        stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
         stopAllBtn.setId( "MongoStopAllBtn" );
         stopAllBtn.addStyleName( "default" );
         stopAllBtn.addClickListener( new Button.ClickListener()
@@ -193,7 +207,7 @@ public class Manager
         } );
         controlsContent.addComponent( stopAllBtn );
 
-        destroyClusterBtn = new Button( "Destroy cluster" );
+        destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
         destroyClusterBtn.setId( "MongoDestroyClusterBtn" );
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
@@ -344,6 +358,10 @@ public class Manager
         configContent.addComponent( new Label( "Data node port:" ) );
         configContent.addComponent( dataNodePort );
 
+        PROGRESS_ICON.setVisible( false );
+        PROGRESS_ICON.setId( "indicator" );
+        controlsContent.addComponent( PROGRESS_ICON );
+
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( configContent, 0, 1 );
         contentRoot.addComponent( configServersTable, 0, 2, 0, 4 );
@@ -361,13 +379,6 @@ public class Manager
         table.addContainerProperty( STATUS_COLUMN_CAPTION, Label.class, null );
         table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
 
-
-//        table.addContainerProperty( "Host", String.class, null );
-//        table.addContainerProperty( "Check", Button.class, null );
-//        table.addContainerProperty( "Start", Button.class, null );
-//        table.addContainerProperty( "Stop", Button.class, null );
-//        table.addContainerProperty( "Destroy", Button.class, null );
-//        table.addContainerProperty( "Status", Embedded.class, null );
         table.setSizeFull();
         table.setPageLength( 10 );
         table.setSelectable( false );
@@ -467,12 +478,8 @@ public class Manager
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
             destroyBtn.setId( node.getAgent().getListIP().get( 0 ) + "mongoDestroy" );
 
-            final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-            progressIcon.setId( node.getAgent().getListIP().get( 0 ) + "mongoProgress" );
-
             stopBtn.setEnabled( false );
             startBtn.setEnabled( false );
-            progressIcon.setVisible( false );
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn, destroyBtn );
 
@@ -482,7 +489,9 @@ public class Manager
 
             addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn, destroyBtn );
 
-            table.addItem( new Object[] { node.getAgent().getHostname(), node.getAgent().getListIP().get( 0 ), "fill here",
+
+
+            table.addItem( new Object[] { node.getAgent().getHostname(), node.getAgent().getListIP().get( 0 ), nodeType.name(),
                     resultHolder, availableOperations
             }, null );
 
@@ -492,20 +501,17 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent clickEvent )
                 {
-                    progressIcon.setVisible( true );
-                    startBtn.setEnabled( false );
-                    stopBtn.setEnabled( false );
-                    destroyBtn.setEnabled( false );
-
+                    PROGRESS_ICON.setVisible( true );
+                    disableButtons( startBtn, stopBtn, destroyBtn, checkBtn );
                     executorService.execute(
                             new CheckTask( mongo, tracker, mongoClusterConfig.getClusterName(), node.getHostname(),
                                     new CompleteEvent()
                                     {
-
                                         public void onComplete( NodeState state )
                                         {
-                                            synchronized ( progressIcon )
+                                            synchronized ( PROGRESS_ICON )
                                             {
+
                                                 if ( state == NodeState.RUNNING )
                                                 {
                                                     stopBtn.setEnabled( true );
@@ -514,8 +520,9 @@ public class Manager
                                                 {
                                                     startBtn.setEnabled( true );
                                                 }
-                                                destroyBtn.setEnabled( true );
-                                                progressIcon.setVisible( false );
+                                                resultHolder.setValue( state.name() );
+                                                enableButtons( destroyBtn, checkBtn );
+                                                PROGRESS_ICON.setVisible( false );
                                             }
                                         }
                                     } ) );
@@ -527,30 +534,18 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent clickEvent )
                 {
-                    progressIcon.setVisible( true );
-                    startBtn.setEnabled( false );
-                    stopBtn.setEnabled( false );
-                    destroyBtn.setEnabled( false );
-
+                    PROGRESS_ICON.setVisible( true );
+                    disableButtons( startBtn, stopBtn, destroyBtn, checkBtn );
                     executorService.execute(
                             new StartTask( mongo, tracker, nodeType, mongoClusterConfig.getClusterName(),
                                     node.getHostname(), new CompleteEvent()
                             {
-
                                 public void onComplete( NodeState state )
                                 {
-                                    synchronized ( progressIcon )
+                                    synchronized ( PROGRESS_ICON )
                                     {
-                                        if ( state == NodeState.RUNNING )
-                                        {
-                                            stopBtn.setEnabled( true );
-                                        }
-                                        else
-                                        {
-                                            startBtn.setEnabled( true );
-                                        }
-                                        destroyBtn.setEnabled( true );
-                                        progressIcon.setVisible( false );
+                                        enableButtons( checkBtn, startBtn, stopBtn, destroyBtn );
+                                        checkBtn.click();
                                     }
                                 }
                             } ) );
@@ -562,30 +557,18 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent clickEvent )
                 {
-                    progressIcon.setVisible( true );
-                    startBtn.setEnabled( false );
-                    stopBtn.setEnabled( false );
-                    destroyBtn.setEnabled( false );
-
+                    PROGRESS_ICON.setVisible( true );
+                    disableButtons( startBtn, stopBtn, destroyBtn, checkBtn );
                     executorService.execute(
                             new StopTask( mongo, tracker, mongoClusterConfig.getClusterName(), node.getHostname(),
                                     new CompleteEvent()
                                     {
-
                                         public void onComplete( NodeState state )
                                         {
-                                            synchronized ( progressIcon )
+                                            synchronized ( PROGRESS_ICON )
                                             {
-                                                if ( state == NodeState.STOPPED )
-                                                {
-                                                    startBtn.setEnabled( true );
-                                                }
-                                                else
-                                                {
-                                                    stopBtn.setEnabled( true );
-                                                }
-                                                destroyBtn.setEnabled( true );
-                                                progressIcon.setVisible( false );
+                                                enableButtons( checkBtn, startBtn, stopBtn, destroyBtn );
+                                                checkBtn.click();
                                             }
                                         }
                                     } ) );
@@ -634,6 +617,7 @@ public class Manager
         }
     }
 
+
     private void addStyleNameToButtons( Button... buttons )
     {
         for ( Button b : buttons )
@@ -641,6 +625,7 @@ public class Manager
             b.addStyleName( BUTTON_STYLE_NAME );
         }
     }
+
 
     public void refreshClustersInfo()
     {
@@ -673,41 +658,124 @@ public class Manager
     }
 
 
-    public static void checkNodesStatus( Table table )
+    public void checkNodesStatus( Table table )
     {
         for ( Object o : table.getItemIds() )
         {
             int rowId = ( Integer ) o;
             Item row = table.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Check" ).getValue() );
-            checkBtn.click();
+            HorizontalLayout availableOperationsLayout =
+                    ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+            if ( availableOperationsLayout != null )
+            {
+                Button checkBtn = getButton( availableOperationsLayout, CHECK_BUTTON_CAPTION );
+                if ( checkBtn != null )
+                {
+                    checkBtn.click();
+                }
+            }
         }
     }
 
+    protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption )
+    {
+        if ( availableOperationsLayout == null )
+        {
+            return null;
+        }
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( caption ) )
+                {
+                    return ( Button ) component;
+                }
+            }
+            return null;
+        }
+    }
 
-    public static void startAllNodes( Table table )
+    public void startAll() throws MongoException
+    {
+        for ( MongoConfigNode configNode : mongoClusterConfig.getConfigServers() )
+        {
+            configNode.start();
+        }
+
+        for ( MongoRouterNode routerNode : mongoClusterConfig.getRouterServers() )
+        {
+            routerNode.start();
+        }
+
+        for ( MongoDataNode dataNode : mongoClusterConfig.getDataNodes() )
+        {
+            dataNode.start();
+        }
+    }
+
+    public void startAllNodes( Table table )
     {
         for ( Object o : table.getItemIds() )
         {
             int rowId = ( Integer ) o;
             Item row = table.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Start" ).getValue() );
-            checkBtn.click();
+            HorizontalLayout availableOperationsLayout =
+                    ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+            if ( availableOperationsLayout != null )
+            {
+                Button startBtn = getButton( availableOperationsLayout, START_BUTTON_CAPTION );
+                if ( startBtn != null )
+                {
+                    startBtn.click();
+                }
+            }
         }
     }
 
 
-    public static void stopAllNodes( Table table )
+    public void stopAllNodes( Table table )
     {
         for ( Object o : table.getItemIds() )
         {
             int rowId = ( Integer ) o;
             Item row = table.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Stop" ).getValue() );
-            checkBtn.click();
+            HorizontalLayout availableOperationsLayout =
+                    ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+            if ( availableOperationsLayout != null )
+            {
+                Button stopBtn = getButton( availableOperationsLayout, STOP_BUTTON_CAPTION );
+                if ( stopBtn != null )
+                {
+                    stopBtn.click();
+                }
+            }
         }
     }
 
+    public void checkAllNodes(){
+        checkNodesStatus( configServersTable );
+        checkNodesStatus( routersTable );
+        checkNodesStatus( dataNodesTable );
+    }
+
+
+    public void disableButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( false );
+        }
+    }
+
+
+    public void enableButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( true );
+        }
+    }
 
     public Component getContent()
     {

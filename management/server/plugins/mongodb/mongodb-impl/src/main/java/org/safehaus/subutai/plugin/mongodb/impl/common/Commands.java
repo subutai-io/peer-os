@@ -195,7 +195,7 @@ public class Commands
         appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( containerHost.getHostname() )
                    .append( "' >> '/etc/hosts';" );
 
-        return new CommandDef( "Add ip-host pair to /etc/hosts", appendHosts.toString(), 30 );
+        return new CommandDef( "Add ip-host pair to /etc/hosts", appendHosts.toString(), 60 );
     }
 
 
@@ -245,7 +245,7 @@ public class Commands
     {
         return new CommandDef( "Set replica set name",
                 String.format( "/bin/sed -i 's/# replSet = setname/replSet = %s/1' '%s'", replicaSetName,
-                        Constants.DATA_NODE_CONF_FILE ), 30 );
+                        Constants.DATA_NODE_CONF_FILE ), 60 );
     }
 
 
@@ -253,7 +253,7 @@ public class Commands
     {
         return commandRunnerBase.createCommand( "Set replica set name", new RequestBuilder(
                 String.format( "/bin/sed -i 's/# replSet = setname/replSet = %s/1' '%s'", replicaSetName,
-                        Constants.DATA_NODE_CONF_FILE ) ).withTimeout( 30 ), agents );
+                        Constants.DATA_NODE_CONF_FILE ) ).withTimeout( 60 ), agents );
     }
 
 

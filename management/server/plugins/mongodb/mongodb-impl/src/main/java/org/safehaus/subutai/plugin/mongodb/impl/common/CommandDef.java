@@ -1,14 +1,9 @@
 package org.safehaus.subutai.plugin.mongodb.impl.common;
 
 
-import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.core.peer.api.Host;
 
 
-/**
- * Created by timur on 11/7/14.
- */
 public class CommandDef
 {
     private String command;

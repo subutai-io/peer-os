@@ -32,7 +32,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
         try
         {
             CommandDef commandDef = Commands.getStartDataNodeCommandLine( port );
-            CommandResult commandResult = execute( commandDef.build( true ) );
+            CommandResult commandResult = execute( commandDef.build( true ).withTimeout( 15 ) );
 
             if ( !commandResult.getStdOut().contains( "child process started successfully, parent exiting" ) )
             {
@@ -53,7 +53,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
         try
         {
             CommandDef commandDef = Commands.getSetReplicaSetNameCommandLine( replicaSetName );
-            CommandResult commandResult = execute( commandDef.build() );
+            CommandResult commandResult = execute( commandDef.build().withTimeout( 90 ) );
             LOG.info( commandResult.toString() );
         }
         catch ( CommandException e )
@@ -69,7 +69,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
         CommandDef commandDef = Commands.getFindPrimaryNodeCommandLine( port );
         try
         {
-            CommandResult commandResult = execute( commandDef.build() );
+            CommandResult commandResult = execute( commandDef.build().withTimeout( 90 ) );
             Pattern p = Pattern.compile( "primary\" : \"(.*)\"" );
             Matcher m = p.matcher( commandResult.getStdOut() );
             if ( m.find() )
@@ -98,7 +98,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
                 Commands.getRegisterSecondaryNodeWithPrimaryCommandLine( dataNode.getHostname(), port, domainName );
         try
         {
-            CommandResult commandResult = execute( commandDef.build() );
+            CommandResult commandResult = execute( commandDef.build().withTimeout( 90 ) );
 
             if ( !commandResult.getStdOut().contains( "connecting to:" ) )
             {
@@ -120,7 +120,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
                 Commands.getUnregisterSecondaryNodeFromPrimaryCommandLine( port, dataNode.getHostname(), domainName );
         try
         {
-            CommandResult commandResult = execute( commandDef.build() );
+            CommandResult commandResult = execute( commandDef.build().withTimeout( 90 ) );
 
             if ( !commandResult.getStdOut().contains( "connecting to:" ) )
             {
@@ -141,7 +141,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
         CommandDef commandDef = Commands.getInitiateReplicaSetCommandLine( port );
         try
         {
-            CommandResult commandResult = execute( commandDef.build() );
+            CommandResult commandResult = execute( commandDef.build().withTimeout( 90 ) );
 
             if ( !commandResult.getStdOut().contains( "connecting to:" ) )
             {

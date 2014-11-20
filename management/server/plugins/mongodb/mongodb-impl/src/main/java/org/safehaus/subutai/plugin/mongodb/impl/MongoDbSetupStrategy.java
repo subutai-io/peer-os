@@ -259,129 +259,60 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
     {
 
         po.addLog( "Configuring cluster..." );
-//        try
-//        {
-//            for ( MongoDataNode dataNode : config.getDataNodes() )
-//            {
-//                po.addLog( "Setting replicaSetname: " + dataNode.getHostname() );
-//                dataNode.setReplicaSetName( config.getReplicaSetName() );
-//            }
-//
-//            for ( MongoConfigNode configNode : config.getConfigServers() )
-//            {
-//                po.addLog( "Starting config node: " + configNode.getHostname() );
-//                configNode.start();
-//            }
-//
-//            for ( MongoRouterNode routerNode : config.getRouterServers() )
-//            {
-//                po.addLog( "Starting router node: " + routerNode.getHostname() );
-//                routerNode.setConfigServers( config.getConfigServers() );
-//                routerNode.start();
-//            }
-//
-//            for ( MongoDataNode dataNode : config.getDataNodes() )
-//            {
-//                po.addLog( "Stopping data node: " + dataNode.getHostname() );
-//                dataNode.stop();
-//            }
-//
-//            MongoDataNode primaryDataNode = null;
-//            for ( MongoDataNode dataNode : config.getDataNodes() )
-//            {
-//                po.addLog( "Starting data node: " + dataNode.getHostname() );
-//                dataNode.start();
-//                if ( primaryDataNode == null )
-//                {
-//                    primaryDataNode = dataNode;
-//                    primaryDataNode.initiateReplicaSet();
-//                    po.addLog( "Primary data node: " + dataNode.getHostname() );
-//                }
-//                else
-//                {
-//                    po.addLog( "registering secondary data node: " + dataNode.getHostname() );
-//                    primaryDataNode.registerSecondaryNode( dataNode );
-//                }
-//            }
-//        }
-//        catch ( MongoException e )
-//        {
-//            e.printStackTrace();
-//            throw new ClusterConfigurationException( e );
-//        }
-        po.addLogDone( String.format( "Cluster %s configured successfully.", config.getClusterName() ) );
+        try
+        {
+            for ( MongoDataNode dataNode : config.getDataNodes() )
+            {
+                po.addLog( "Setting replicaSetname: " + dataNode.getHostname() );
+                dataNode.setReplicaSetName( config.getReplicaSetName() );
+            }
 
-        //                List<Command> installationCommands = mongoManager.getCommands().getInstallationCommands(
-        // config );
-        //
-        //        for ( Command command : installationCommands )
-        //        {
-        //            po.addLog( String.format( "Running command: %s", command.getDescription() ) );
-        //            final AtomicBoolean commandOK = new AtomicBoolean();
-        //
-        //            if ( command.getData() == CommandType.START_CONFIG_SERVERS || command.getData() == CommandType
-        // .START_ROUTERS
-        //                    || command.getData() == CommandType.START_DATA_NODES )
-        //            {
-        //                mongoManager.getCommandRunner().runCommand( command, new CommandCallback()
-        //                {
-        //
-        //                    @Override
-        //                    public void onResponse( Response response, AgentResult agentResult, Command command )
-        //                    {
-        //
-        //                        int count = 0;
-        //                        for ( AgentResult result : command.getResults().values() )
-        //                        {
-        //                            if ( result.getStdOut().contains( "child process started successfully,
-        // parent exiting" ) )
-        //                            {
-        //                                count++;
-        //                            }
-        //                        }
-        //                        if ( command.getData() == CommandType.START_CONFIG_SERVERS )
-        //                        {
-        //                            if ( count == config.getConfigServers().size() )
-        //                            {
-        //                                commandOK.set( true );
-        //                            }
-        //                        }
-        //                        else if ( command.getData() == CommandType.START_ROUTERS )
-        //                        {
-        //                            if ( count == config.getRouterServers().size() )
-        //                            {
-        //                                commandOK.set( true );
-        //                            }
-        //                        }
-        //                        else if ( command.getData() == CommandType.START_DATA_NODES )
-        //                        {
-        //                            if ( count == config.getDataNodes().size() )
-        //                            {
-        //                                commandOK.set( true );
-        //                            }
-        //                        }
-        //                        if ( commandOK.get() )
-        //                        {
-        //                            stop();
-        //                        }
-        //                    }
-        //                } );
-        //            }
-        //            else
-        //            {
-        //                mongoManager.getCommandRunner().runCommand( command );
-        //            }
-        //
-        //            if ( command.hasSucceeded() || commandOK.get() )
-        //            {
-        //                po.addLog( String.format( "Command %s succeeded", command.getDescription() ) );
-        //            }
-        //            else
-        //            {
-        //                throw new ClusterConfigurationException(
-        //                        String.format( "Command %s failed: %s", command.getDescription(),
-        // command.getAllErrors() ) );
-        //            }
-        //        }
+            for ( MongoConfigNode configNode : config.getConfigServers() )
+            {
+                po.addLog( "Starting config node: " + configNode.getHostname() );
+                configNode.start();
+            }
+
+            for ( MongoRouterNode routerNode : config.getRouterServers() )
+            {
+                po.addLog( "Starting router node: " + routerNode.getHostname() );
+                routerNode.setConfigServers( config.getConfigServers() );
+                routerNode.start();
+            }
+
+            for ( MongoDataNode dataNode : config.getDataNodes() )
+            {
+                po.addLog( "Stopping data node: " + dataNode.getHostname() );
+                dataNode.stop();
+            }
+
+            MongoDataNode primaryDataNode = null;
+            for ( MongoDataNode dataNode : config.getDataNodes() )
+            {
+                po.addLog( "Starting data node: " + dataNode.getHostname() );
+                dataNode.start();
+                if ( primaryDataNode == null )
+                {
+                    primaryDataNode = dataNode;
+                    primaryDataNode.initiateReplicaSet();
+                    po.addLog( "Primary data node: " + dataNode.getHostname() );
+                }
+                else
+                {
+                    po.addLog( "registering secondary data node: " + dataNode.getHostname() );
+                    primaryDataNode.registerSecondaryNode( dataNode );
+                }
+            }
+        }
+        catch ( MongoException e )
+        {
+            e.printStackTrace();
+            throw new ClusterConfigurationException( e );
+        }
+
+        config.setEnvironmentId( environment.getId() );
+        po.addLogDone( String.format( "Cluster %s configured successfully.", config.getClusterName() ) );
     }
+
+
 }
