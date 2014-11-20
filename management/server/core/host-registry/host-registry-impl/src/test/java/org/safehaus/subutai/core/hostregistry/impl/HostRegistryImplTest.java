@@ -45,6 +45,7 @@ public class HostRegistryImplTest
     private static final UUID CONTAINER_ID = UUID.randomUUID();
     private static final String CONTAINER_HOSTNAME = "container";
     private static final String DUMMY_HOSTNAME = "dummy";
+    private static final int HOST_EXPIRATION = 30;
 
     @Mock
     Broker broker;
@@ -79,7 +80,7 @@ public class HostRegistryImplTest
     @Before
     public void setUp() throws Exception
     {
-        registry = new HostRegistryImpl( broker );
+        registry = new HostRegistryImpl( broker, HOST_EXPIRATION );
         registry.hostListeners = hostListeners;
         registry.notifier = notifier;
         registry.heartBeatListener = heartBeatListener;
@@ -101,7 +102,14 @@ public class HostRegistryImplTest
     @Test( expected = NullPointerException.class )
     public void testConstructor() throws Exception
     {
-        new HostRegistryImpl( null );
+        new HostRegistryImpl( null, HOST_EXPIRATION );
+    }
+
+
+    @Test( expected = IllegalArgumentException.class )
+    public void testConstructor2() throws Exception
+    {
+        new HostRegistryImpl( broker, 0 );
     }
 
 

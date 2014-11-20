@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.git.impl;
+package org.safehaus.subutai.core.git.api;
 
 
 import org.junit.Test;
@@ -25,5 +25,6 @@ public class GitFileStatusTest
         assertEquals( GitFileStatus.UNMERGED, GitFileStatus.parse( "U" ) );
         assertEquals( GitFileStatus.UNVERSIONED, GitFileStatus.parse( "X" ) );
         assertEquals( GitFileStatus.UNMODIFIED, GitFileStatus.parse( "" ) );
+        assertEquals( GitFileStatus.UNKNOWN, GitFileStatus.parse( "-" ) );
     }
 }

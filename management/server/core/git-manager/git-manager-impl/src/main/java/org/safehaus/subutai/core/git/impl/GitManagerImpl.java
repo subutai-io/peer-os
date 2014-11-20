@@ -246,7 +246,7 @@ public class GitManagerImpl implements GitManager
             return m.group( 1 );
         }
 
-        return null;
+        throw new GitException( "Could not get commit id from command result" );
     }
 
 
@@ -277,7 +277,7 @@ public class GitManagerImpl implements GitManager
             return m.group( 1 );
         }
 
-        return null;
+        throw new GitException( "Could not get commit id from command result" );
     }
 
 
