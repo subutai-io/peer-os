@@ -31,8 +31,8 @@ function exitIfNoCommits {
   git_diff=$(git diff origin/$branch_name..HEAD)
   local status=$?
   if [ $status == "128" ]; then
-    echo "Please push your branch to continue!"
-    exit 1
+    echo "[WARN] Your branch does not exist on your remote git repository."
+    echo "[WARN] This causes make process to ignore version update!"
   fi
   isDiffEmpty=$(isEmpty $git_diff)
   echo "isDiffEmpty: $isDiffEmpty"

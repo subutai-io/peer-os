@@ -2,13 +2,13 @@ package org.safehaus.subutai.plugin.storm.impl;
 
 
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 
 
 public class Commands
 {
 
-    public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + StormConfig.PRODUCT_NAME.toLowerCase();
+    public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + StormClusterConfiguration.PRODUCT_NAME.toLowerCase();
     private static final String EXEC_PROFILE = ". /etc/profile";
 
 

@@ -46,16 +46,6 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hadoop-plugin-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>oozie-plugin-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
 
   <build>

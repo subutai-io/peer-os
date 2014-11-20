@@ -19,13 +19,12 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.sql.DataSource;
-
 import org.safehaus.subutai.common.exception.DaoException;
+import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.protocol.api.TemplateService;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.slf4j.Logger;
@@ -47,13 +46,18 @@ public class TemplateRegistryImpl implements TemplateRegistry
     private static final String LXC_ARCH_IS_NULL_MSG = "Lxc Arch is null or empty";
     private static final String TEMPLATE_NOT_FOUND_MSG = "Template %s not found";
 
-    protected TemplateDAO templateDAO;
 
-
-    public TemplateRegistryImpl( final DataSource dataSource ) throws DaoException
+    public void setTemplateService( final TemplateService templateDAO )
     {
-        Preconditions.checkNotNull( dataSource, "Data source is null" );
-        templateDAO = new TemplateDAO( dataSource );
+        this.templateService = templateDAO;
+    }
+
+
+    protected TemplateService templateService;
+
+
+    public TemplateRegistryImpl() throws DaoException
+    {
     }
 
 
@@ -79,10 +83,10 @@ public class TemplateRegistryImpl implements TemplateRegistry
         try
         {
 
-            templateDAO.saveTemplate( template );
+            templateService.saveTemplate( template );
             return true;
         }
-        catch ( DaoException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in registerTemplate", e );
             throw new RegistryException(
@@ -125,12 +129,12 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
             //check if template with supplied md5sum already exists
             List<Template> allTemplates = getAllTemplates( template.getLxcArch() );
-            for ( Template templ : allTemplates )
+            for ( Template template1 : allTemplates )
             {
-                if ( StringUtil.areStringsEqual( templ.getMd5sum(), template.getMd5sum() ) )
+                if ( StringUtil.areStringsEqual( template1.getMd5sum(), template.getMd5sum() ) )
                 {
                     throw new RegistryException( String.format( "Template %s with the same md5sum already exists",
-                            templ.getTemplateName() ) );
+                            template1.getTemplateName() ) );
                 }
             }
 
@@ -264,9 +268,9 @@ public class TemplateRegistryImpl implements TemplateRegistry
             //delete template from storage
             try
             {
-                templateDAO.removeTemplate( template );
+                templateService.removeTemplate( template );
             }
-            catch ( DaoException e )
+            catch ( Exception e )
             {
                 LOG.error( "Error in unregisterTemplate", e );
                 throw new RegistryException(
@@ -310,9 +314,9 @@ public class TemplateRegistryImpl implements TemplateRegistry
         //retrieve template from storage
         try
         {
-            return templateDAO.getTemplateByName( templateName, lxcArch );
+            return templateService.getTemplateByName( templateName, lxcArch );
         }
-        catch ( DaoException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in getTemplate", e );
             return null;
@@ -351,9 +355,9 @@ public class TemplateRegistryImpl implements TemplateRegistry
         //retrieve child templates from storage
         try
         {
-            return templateDAO.getChildTemplates( parentTemplateName, lxcArch );
+            return templateService.getChildTemplates( parentTemplateName, lxcArch );
         }
-        catch ( DaoException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in getChildTemplates", e );
             return Collections.emptyList();
@@ -413,13 +417,13 @@ public class TemplateRegistryImpl implements TemplateRegistry
         TemplateTree templateTree = new TemplateTree();
         try
         {
-            List<Template> allTemplates = templateDAO.getAllTemplates();
+            List<Template> allTemplates = templateService.getAllTemplates();
             for ( Template template : allTemplates )
             {
                 templateTree.addTemplate( template );
             }
         }
-        catch ( DaoException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in getTemplateTree", e );
         }
@@ -491,7 +495,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
         try
         {
-            List<Template> allTemplates = templateDAO.getAllTemplates();
+            List<Template> allTemplates = templateService.getAllTemplates();
             List<Template> result = new ArrayList<>();
             for ( Template template : allTemplates )
             {
@@ -502,7 +506,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
             }
             return result;
         }
-        catch ( DaoException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in getAllTemplates", e );
         }
@@ -536,9 +540,9 @@ public class TemplateRegistryImpl implements TemplateRegistry
             template.setInUseOnFAI( faiHostname, inUse );
             try
             {
-                templateDAO.saveTemplate( template );
+                templateService.saveTemplate( template );
             }
-            catch ( DaoException e )
+            catch ( Exception e )
             {
                 LOG.error( "Error in updateTemplateUsage", e );
                 throw new RegistryException( String.format( "Error saving template information, %s", e.getMessage() ) );
@@ -579,14 +583,39 @@ public class TemplateRegistryImpl implements TemplateRegistry
         try
         {
 
-            templateDAO.saveTemplate( template );
+            templateService.saveTemplate( template );
         }
-        catch ( DaoException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in registerTemplate", e );
             throw new RegistryException(
                     String.format( "Error saving template %s, %s", template.getTemplateName(), e.getMessage() ) );
         }
         return true;
+    }
+
+
+    public void init()
+    {
+        try
+        {
+            //            Template template = TestUtilsDuplicate.getParentTemplate();
+            //            templateService.saveTemplate( template );
+
+            LOG.warn( "Printing saved templates..." );
+            List<Template> templates = templateService.getAllTemplates();
+            for ( Template template1 : templates )
+            {
+                LOG.warn( template1.getTemplateName() );
+            }
+        }
+        //        catch ( IOException e )
+        //        {
+        //            LOG.error( "Error in TestUtilsDuplicate.getParentTemplate()@TemplateRegistryImpl service: ", e );
+        //        }
+        catch ( DaoException e )
+        {
+            LOG.error( "Error while saving template: ", e );
+        }
     }
 }

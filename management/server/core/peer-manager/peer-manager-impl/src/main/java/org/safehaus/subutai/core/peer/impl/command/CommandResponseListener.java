@@ -6,7 +6,7 @@ import java.util.concurrent.Semaphore;
 
 import org.safehaus.subutai.common.cache.EntryExpiryCallback;
 import org.safehaus.subutai.common.cache.ExpiringCache;
-import org.safehaus.subutai.common.protocol.CommandCallback;
+import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.RecipientType;

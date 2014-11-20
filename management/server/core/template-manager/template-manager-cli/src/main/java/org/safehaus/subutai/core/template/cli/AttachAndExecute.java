@@ -13,7 +13,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 public class AttachAndExecute extends OsgiCommandSupport
 {
 
-//    ContainerManager containerManager;
+    //    ContainerManager containerManager;
     AgentManager agentManager;
 
     @Argument( index = 0, required = true )
@@ -26,10 +26,10 @@ public class AttachAndExecute extends OsgiCommandSupport
     private int timeoutInSeconds = 60;
 
 
-//    public void setContainerManager( ContainerManager containerManager )
-//    {
-//        this.containerManager = containerManager;
-//    }
+    //    public void setContainerManager( ContainerManager containerManager )
+    //    {
+    //        this.containerManager = containerManager;
+    //    }
 
 
     public void setAgentManager( AgentManager agentManager )

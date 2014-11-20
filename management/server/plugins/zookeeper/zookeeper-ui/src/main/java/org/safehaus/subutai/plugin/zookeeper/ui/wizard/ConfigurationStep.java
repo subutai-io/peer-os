@@ -10,11 +10,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
@@ -150,7 +153,7 @@ public class ConfigurationStep extends Panel
             ComboBox hadoopClustersCombo = new ComboBox( "Hadoop cluster" );
             hadoopClustersCombo.setId( "ZookeeperConfHadoopCluster" );
 
-            final TwinColSelect hadoopNodesSelect = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
+            final TwinColSelect hadoopNodesSelect = new TwinColSelect( "Nodes", new ArrayList<ContainerHost>() );
             hadoopNodesSelect.setId( "ZookeeperConfHadoopNodesSelection" );
 
             hadoopClustersCombo.setImmediate( true );
@@ -188,7 +191,7 @@ public class ConfigurationStep extends Panel
                 HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
                 wizard.getConfig().setHadoopClusterName( hadoopInfo.getClusterName() );
                 hadoopNodesSelect
-                        .setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                        .setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopInfo.getAllNodes() ) );
             }
 
             hadoopClustersCombo.addValueChangeListener( new Property.ValueChangeListener()
@@ -201,9 +204,9 @@ public class ConfigurationStep extends Panel
                         HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                         hadoopNodesSelect.setValue( null );
                         hadoopNodesSelect.setContainerDataSource(
-                                new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                                new BeanItemContainer<>( ContainerHost.class, hadoopInfo.getAllNodes() ) );
                         wizard.getConfig().setHadoopClusterName( hadoopInfo.getClusterName() );
-                        wizard.getConfig().setNodes( new HashSet<Agent>() );
+                        wizard.getConfig().setNodes( new HashSet<ContainerHost>() );
                     }
                 }
             } );
@@ -228,8 +231,8 @@ public class ConfigurationStep extends Panel
                 {
                     if ( event.getProperty().getValue() != null )
                     {
-                        Set<Agent> agentList = new HashSet<>( ( Collection<Agent> ) event.getProperty().getValue() );
-                        wizard.getConfig().setNodes( agentList );
+                        Set<ContainerHost> containerHosts = new HashSet<>( ( Collection<ContainerHost> ) event.getProperty().getValue() );
+                        wizard.getConfig().setNodes( containerHosts );
                     }
                 }
             } );

@@ -1,0 +1,68 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+
+d = debian/subutai-cli-management
+BINDINGS=/etc/subutai/bindings
+SCRIPTS=/usr/bin
+LIBDIR=/usr/share/subutai-cli/subutai/lib
+BASHCOMPDIR=/etc/bash_completion.d/
+
+%:
+	dh $@
+
+build: build-stamp
+
+build-stamp:
+	rm -f debian/files
+	dh_testdir
+
+clean:
+	dh_testdir
+	dh_testroot
+	dh_prep 
+	$(MAKE) clean
+
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+	dh_install
+	mkdir -p ${d}${BINDINGS}
+	mkdir -p ${d}${SCRIPTS}
+	mkdir -p ${d}${LIBDIR}
+	mkdir -p ${d}${BASHCOMPDIR}
+	cp -a src/main/lib/* ${d}${LIBDIR}
+	cp -a src/main/bindings/* ${d}${BINDINGS}
+	cp -a ../cli/src/main/lib/bsfl ${d}${LIBDIR}
+	cp -a ../cli/src/main/scripts/subutai ${d}${SCRIPTS}
+	cp debian/subutai-cli-management.bash_completion ${d}${BASHCOMPDIR}
+	dh_link
+
+# build architecture-independent files
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installdirs -i
+	dh_install -i
+	dh_installcron
+	dh_installchangelogs
+	dh_installdocs
+	dh_installdebconf
+	dh_compress
+	dh_link
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+# build architecture-dependent files
+binary-arch: build install
+
+binary: binary-indep binary-arch
+
+.PHONY: build clean binary-indep binary-arch binary install
+

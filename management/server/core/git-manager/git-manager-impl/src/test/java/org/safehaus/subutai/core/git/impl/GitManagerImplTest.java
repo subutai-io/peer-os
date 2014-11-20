@@ -1,40 +1,46 @@
 package org.safehaus.subutai.core.git.impl;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.test.SystemOutRedirectTest;
 import org.safehaus.subutai.core.git.api.GitBranch;
 import org.safehaus.subutai.core.git.api.GitChangedFile;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitFileStatus;
+import org.safehaus.subutai.core.peer.api.CommandUtil;
+import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.ManagementHost;
+import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.times;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 /**
  * Test for GitManagerImpl
  */
-public class GitManagerImplTest
+@RunWith( MockitoJUnitRunner.class )
+public class GitManagerImplTest extends SystemOutRedirectTest
 {
     private static final String MASTER_BRANCH = "master";
     private static final String DUMMY_BRANCH = "dummy";
@@ -58,85 +64,69 @@ public class GitManagerImplTest
     private static final List<String> filePaths = Lists.newArrayList( FILE_PATH );
     private static final String STASH_NAME = "stash name";
 
-    private Agent agent;
-    private Command command;
-    private CommandRunner commandRunner;
+    @Mock
+    PeerManager peerManager;
+    @Mock
+    LocalPeer localPeer;
+    @Mock
+    ManagementHost managementHost;
+    @Mock
+    CommandUtil commandUtil;
+    @Mock
+    CommandResult commandResult;
+
     private GitManagerImpl gitManager;
-    private ByteArrayOutputStream myOut;
-    private boolean verifyCommandExecution;
 
 
     @Before
-    public void setUp()
+    public void setUp() throws CommandException, PeerException
     {
-        verifyCommandExecution = true;
-        agent = MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() );
-        command = MockUtils.getCommand( true, true, agent.getUuid(), SOME_DUMMY_OUTPUT, null, null );
-        commandRunner = MockUtils.getCommandRunner( command );
-        gitManager = new GitManagerImpl( commandRunner );
+        gitManager = new GitManagerImpl( peerManager );
+        gitManager.commandUtil = commandUtil;
+        when( peerManager.getLocalPeer() ).thenReturn( localPeer );
+        when( localPeer.getManagementHost() ).thenReturn( managementHost );
+        when( commandUtil.execute( any( RequestBuilder.class ), any( Host.class ) ) ).thenReturn( commandResult );
     }
 
 
-    @After
-    public void tearDown() throws CommandException
+    private void setOutput( String output )
     {
-        if ( verifyCommandExecution )
-        {
-            verify( command, times( 1 ) ).execute();
-        }
-        System.setOut( System.out );
+        when( commandResult.getStdOut() ).thenReturn( output );
     }
 
 
-    private void catchSysOut()
+    private void throwCommandException() throws CommandException
     {
-        myOut = new ByteArrayOutputStream();
-        System.setOut( new PrintStream( myOut ) );
-    }
-
-
-    private String getSysOut()
-    {
-        return myOut.toString().trim();
-    }
-
-
-    private void setCommandStatus( boolean completed, boolean succeeded, String output )
-    {
-        command = MockUtils.getCommand( completed, succeeded, agent.getUuid(), output, null, null );
-        commandRunner = MockUtils.getCommandRunner( command );
-        gitManager = new GitManagerImpl( commandRunner );
+        doThrow( new CommandException( "" ) ).when( commandUtil )
+                                             .execute( any( RequestBuilder.class ), any( Host.class ) );
     }
 
 
     @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullCommandRunner()
     {
-        verifyCommandExecution = false;
         new GitManagerImpl( null );
     }
 
 
     @Test
-    public void shouldPrintToSysOut() throws GitException
+    public void testInit() throws GitException, CommandException
     {
-        catchSysOut();
+        setOutput( SOME_DUMMY_OUTPUT );
 
+        gitManager.init( REPOSITORY_ROOT );
 
-        gitManager.init( agent, REPOSITORY_ROOT );
-
-
+        verify( commandUtil ).execute( new RequestBuilder( "git init" ).withCwd( REPOSITORY_ROOT ), managementHost );
         assertEquals( SOME_DUMMY_OUTPUT, getSysOut() );
     }
 
 
     @Test( expected = GitException.class )
-    public void shouldThrowGitException() throws GitException
+    public void shouldThrowGitException() throws GitException, CommandException
     {
-        setCommandStatus( true, false, SOME_DUMMY_OUTPUT );
+        throwCommandException();
 
-
-        gitManager.init( agent, REPOSITORY_ROOT );
+        gitManager.init( REPOSITORY_ROOT );
     }
 
 
@@ -144,10 +134,10 @@ public class GitManagerImplTest
     public void shouldReturnDiffBranchWithMasterBranch() throws GitException
     {
 
-        setCommandStatus( true, true, DIFF_BRANCH_OUTPUT );
+        setOutput( DIFF_BRANCH_OUTPUT );
 
 
-        List<GitChangedFile> changedFiles = gitManager.diffBranches( agent, REPOSITORY_ROOT, MASTER_BRANCH );
+        List<GitChangedFile> changedFiles = gitManager.diffBranches( REPOSITORY_ROOT, MASTER_BRANCH );
         GitChangedFile changedFile = changedFiles.get( 0 );
 
 
@@ -160,11 +150,10 @@ public class GitManagerImplTest
     @Test
     public void shouldReturnDiffBranches() throws GitException
     {
-        setCommandStatus( true, true, DIFF_BRANCH_OUTPUT );
+        setOutput( DIFF_BRANCH_OUTPUT );
 
 
-        List<GitChangedFile> changedFiles =
-                gitManager.diffBranches( agent, REPOSITORY_ROOT, MASTER_BRANCH, DUMMY_BRANCH );
+        List<GitChangedFile> changedFiles = gitManager.diffBranches( REPOSITORY_ROOT, MASTER_BRANCH, DUMMY_BRANCH );
         GitChangedFile changedFile = changedFiles.get( 0 );
 
 
@@ -177,11 +166,9 @@ public class GitManagerImplTest
     @Test
     public void shouldReturnDiffFile() throws GitException
     {
-        setCommandStatus( true, true, DIFF_FILE_OUTPUT );
+        setOutput( DIFF_FILE_OUTPUT );
 
-
-        String diffFile = gitManager.diffFile( agent, REPOSITORY_ROOT, MASTER_BRANCH, DUMMY_BRANCH, FILE_PATH );
-
+        String diffFile = gitManager.diffFile( REPOSITORY_ROOT, MASTER_BRANCH, DUMMY_BRANCH, FILE_PATH );
 
         assertEquals( diffFile, DIFF_FILE_OUTPUT );
     }
@@ -190,11 +177,9 @@ public class GitManagerImplTest
     @Test
     public void shouldReturnDiffFileWithMasterBranch() throws GitException
     {
-        setCommandStatus( true, true, DIFF_FILE_OUTPUT );
+        setOutput( DIFF_FILE_OUTPUT );
 
-
-        String diffFile = gitManager.diffFile( agent, REPOSITORY_ROOT, MASTER_BRANCH, FILE_PATH );
-
+        String diffFile = gitManager.diffFile( REPOSITORY_ROOT, MASTER_BRANCH, FILE_PATH );
 
         assertEquals( diffFile, DIFF_FILE_OUTPUT );
     }
@@ -203,50 +188,40 @@ public class GitManagerImplTest
     @Test
     public void shouldRunAddCommand() throws GitException, CommandException
     {
+        gitManager.add( REPOSITORY_ROOT, filePaths );
 
-        gitManager.add( agent, REPOSITORY_ROOT, filePaths );
-
-
-        verify( commandRunner )
-                .createCommand( new RequestBuilder( "git add" ).withCwd( REPOSITORY_ROOT ).withCmdArgs( filePaths ),
-                        Sets.newHashSet( agent ) );
+        verify( commandUtil )
+                .execute( new RequestBuilder( "git add" ).withCwd( REPOSITORY_ROOT ).withCmdArgs( filePaths ),
+                        managementHost );
     }
 
 
     @Test
     public void shouldRunAddAllCommand() throws GitException, CommandException
     {
+        gitManager.addAll( REPOSITORY_ROOT );
 
-        gitManager.addAll( agent, REPOSITORY_ROOT );
-
-
-        verify( commandRunner ).createCommand( new RequestBuilder( "git add -A" ).withCwd( REPOSITORY_ROOT ),
-                Sets.newHashSet( agent ) );
+        verify( commandUtil ).execute( new RequestBuilder( "git add -A" ).withCwd( REPOSITORY_ROOT ), managementHost );
     }
 
 
     @Test
     public void shouldRunDeleteCommand() throws GitException, CommandException
     {
+        gitManager.delete( REPOSITORY_ROOT, filePaths );
 
-        gitManager.delete( agent, REPOSITORY_ROOT, filePaths );
-
-
-        verify( commandRunner )
-                .createCommand( new RequestBuilder( "git rm" ).withCwd( REPOSITORY_ROOT ).withCmdArgs( filePaths ),
-                        Sets.newHashSet( agent ) );
+        verify( commandUtil )
+                .execute( new RequestBuilder( "git rm" ).withCwd( REPOSITORY_ROOT ).withCmdArgs( filePaths ),
+                        managementHost );
     }
 
 
     @Test
     public void shouldCommitAndReturnCommitId() throws GitException
     {
+        setOutput( COMMIT_OUTPUT );
 
-        setCommandStatus( true, true, COMMIT_OUTPUT );
-
-
-        String commitId = gitManager.commit( agent, REPOSITORY_ROOT, filePaths, COMMIT_MESSAGE, false );
-
+        String commitId = gitManager.commit( REPOSITORY_ROOT, filePaths, COMMIT_MESSAGE, false );
 
         assertEquals( COMMIT_ID, commitId );
     }
@@ -255,146 +230,120 @@ public class GitManagerImplTest
     @Test
     public void shouldCommitAllAndReturnCommitId() throws GitException
     {
+        setOutput( COMMIT_OUTPUT );
 
-        setCommandStatus( true, true, COMMIT_OUTPUT );
-
-
-        String commitId = gitManager.commitAll( agent, REPOSITORY_ROOT, COMMIT_MESSAGE );
-
+        String commitId = gitManager.commitAll( REPOSITORY_ROOT, COMMIT_MESSAGE );
 
         assertEquals( COMMIT_ID, commitId );
     }
 
 
     @Test
-    public void shouldSupplyProperRequestBuilder() throws GitException
+    public void shouldSupplyProperRequestBuilder() throws GitException, CommandException
     {
+        setOutput( COMMIT_OUTPUT );
 
-        setCommandStatus( true, true, COMMIT_OUTPUT );
+        gitManager.commitAll( REPOSITORY_ROOT, COMMIT_MESSAGE );
 
-
-        gitManager.commitAll( agent, REPOSITORY_ROOT, COMMIT_MESSAGE );
-
-
-        verify( commandRunner ).createCommand(
-                new RequestBuilder( String.format( "git commit -a -m \"%s\"", COMMIT_MESSAGE ) )
-                        .withCwd( REPOSITORY_ROOT ), Sets.newHashSet( agent ) );
+        verify( commandUtil ).execute( new RequestBuilder( String.format( "git commit -a -m \"%s\"", COMMIT_MESSAGE ) )
+                .withCwd( REPOSITORY_ROOT ), managementHost );
     }
 
 
     @Test
     public void shouldRunCloneCommand() throws GitException, CommandException
     {
+        gitManager.clone( DUMMY_BRANCH, FILE_PATH );
 
-        gitManager.clone( agent, DUMMY_BRANCH, FILE_PATH );
-
-
-        verify( commandRunner ).createCommand( new RequestBuilder(
+        verify( commandUtil ).execute( new RequestBuilder(
                 String.format( "git clone -b %s %s %s", DUMMY_BRANCH, Common.GIT_REPO_URL, FILE_PATH ) )
-                .withTimeout( 180 ), Sets.newHashSet( agent ) );
+                .withTimeout( 180 ), managementHost );
     }
 
 
     @Test
-    public void shouldRunCheckoutCommand() throws GitException
+    public void shouldRunCheckoutCommand() throws GitException, CommandException
     {
+        gitManager.checkout( REPOSITORY_ROOT, DUMMY_BRANCH, false );
 
-        gitManager.checkout( agent, REPOSITORY_ROOT, DUMMY_BRANCH, false );
-
-
-        verify( commandRunner ).createCommand(
+        verify( commandUtil ).execute(
                 new RequestBuilder( String.format( "git checkout %s", DUMMY_BRANCH ) ).withCwd( REPOSITORY_ROOT ),
-                Sets.newHashSet( agent ) );
+                managementHost );
     }
 
 
     @Test
-    public void shouldRunCheckoutCommandWithNewBranch() throws GitException
+    public void shouldRunCheckoutCommandWithNewBranch() throws GitException, CommandException
     {
+        gitManager.checkout( REPOSITORY_ROOT, DUMMY_BRANCH, true );
 
-        gitManager.checkout( agent, REPOSITORY_ROOT, DUMMY_BRANCH, true );
-
-
-        verify( commandRunner ).createCommand(
-                new RequestBuilder( String.format( "git checkout --track -b %s", DUMMY_BRANCH ) )
-                        .withCwd( REPOSITORY_ROOT ), Sets.newHashSet( agent ) );
+        verify( commandUtil ).execute( new RequestBuilder( String.format( "git checkout --track -b %s", DUMMY_BRANCH ) )
+                .withCwd( REPOSITORY_ROOT ), managementHost );
     }
 
 
     @Test
     public void shouldRunDeleteBranchCommand() throws GitException, CommandException
     {
+        gitManager.deleteBranch( REPOSITORY_ROOT, DUMMY_BRANCH );
 
-        gitManager.deleteBranch( agent, REPOSITORY_ROOT, DUMMY_BRANCH );
-
-
-        verify( commandRunner ).createCommand(
+        verify( commandUtil ).execute(
                 new RequestBuilder( String.format( "git branch -d %s", DUMMY_BRANCH ) ).withCwd( REPOSITORY_ROOT ),
-                Sets.newHashSet( agent ) );
+                managementHost );
     }
 
 
     @Test
-    public void shouldRunMergeCommand() throws GitException
+    public void shouldRunMergeCommand() throws GitException, CommandException
     {
 
-        gitManager.merge( agent, REPOSITORY_ROOT );
+        gitManager.merge( REPOSITORY_ROOT );
 
-
-        verify( commandRunner ).createCommand(
+        verify( commandUtil ).execute(
                 new RequestBuilder( String.format( "git merge %s", MASTER_BRANCH ) ).withCwd( REPOSITORY_ROOT ),
-                Sets.newHashSet( agent ) );
+                managementHost );
     }
 
 
     @Test
-    public void shouldRunMergeCommandWithBranch() throws GitException
+    public void shouldRunMergeCommandWithBranch() throws GitException, CommandException
     {
+        gitManager.merge( REPOSITORY_ROOT, DUMMY_BRANCH );
 
-        gitManager.merge( agent, REPOSITORY_ROOT, DUMMY_BRANCH );
-
-
-        verify( commandRunner ).createCommand(
+        verify( commandUtil ).execute(
                 new RequestBuilder( String.format( "git merge %s", DUMMY_BRANCH ) ).withCwd( REPOSITORY_ROOT ),
-                Sets.newHashSet( agent ) );
+                managementHost );
     }
 
 
     @Test
-    public void shouldRunPullCommand() throws GitException
+    public void shouldRunPullCommand() throws GitException, CommandException
     {
+        gitManager.pull( REPOSITORY_ROOT );
 
-        gitManager.pull( agent, REPOSITORY_ROOT );
-
-
-        verify( commandRunner ).createCommand(
+        verify( commandUtil ).execute(
                 new RequestBuilder( String.format( "git pull origin %s", MASTER_BRANCH ) ).withCwd( REPOSITORY_ROOT ),
-                Sets.newHashSet( agent ) );
+                managementHost );
     }
 
 
     @Test
-    public void shouldRunPullCommandWithBranch() throws GitException
+    public void shouldRunPullCommandWithBranch() throws GitException, CommandException
     {
+        gitManager.pull( REPOSITORY_ROOT, DUMMY_BRANCH );
 
-        gitManager.pull( agent, REPOSITORY_ROOT, DUMMY_BRANCH );
-
-
-        verify( commandRunner ).createCommand(
+        verify( commandUtil ).execute(
                 new RequestBuilder( String.format( "git pull origin %s", DUMMY_BRANCH ) ).withCwd( REPOSITORY_ROOT ),
-                Sets.newHashSet( agent ) );
+                managementHost );
     }
 
 
     @Test
     public void shouldReturnDummyBranch() throws GitException
     {
+        setOutput( GIT_BRANCH_DUMMY_OUTPUT );
 
-        setCommandStatus( true, true, GIT_BRANCH_DUMMY_OUTPUT );
-
-
-        GitBranch gitBranch = gitManager.currentBranch( agent, REPOSITORY_ROOT );
-
+        GitBranch gitBranch = gitManager.currentBranch( REPOSITORY_ROOT );
 
         assertEquals( new GitBranch( DUMMY_BRANCH, true ), gitBranch );
     }
@@ -403,12 +352,9 @@ public class GitManagerImplTest
     @Test
     public void shouldReturnMasterBranch() throws GitException
     {
+        setOutput( GIT_BRANCH_OUTPUT );
 
-        setCommandStatus( true, true, GIT_BRANCH_OUTPUT );
-
-
-        GitBranch gitBranch = gitManager.currentBranch( agent, REPOSITORY_ROOT );
-
+        GitBranch gitBranch = gitManager.currentBranch( REPOSITORY_ROOT );
 
         assertEquals( new GitBranch( MASTER_BRANCH, true ), gitBranch );
     }
@@ -417,12 +363,9 @@ public class GitManagerImplTest
     @Test
     public void shouldListLocalBranches() throws GitException
     {
+        setOutput( GIT_BRANCH_DUMMY_OUTPUT );
 
-        setCommandStatus( true, true, GIT_BRANCH_DUMMY_OUTPUT );
-
-
-        List<GitBranch> gitBranches = gitManager.listBranches( agent, REPOSITORY_ROOT, false );
-
+        List<GitBranch> gitBranches = gitManager.listBranches( REPOSITORY_ROOT, false );
 
         assertEquals( 2, gitBranches.size() );
         assertTrue( gitBranches.contains( new GitBranch( MASTER_BRANCH, false ) ) );
@@ -431,29 +374,32 @@ public class GitManagerImplTest
 
 
     @Test
-    public void shouldListRemoteBranches() throws GitException
+    public void shouldListRemoteBranches() throws GitException, CommandException
     {
+        setOutput( GIT_BRANCH_REMOTE_OUTPUT );
 
-        setCommandStatus( true, true, GIT_BRANCH_REMOTE_OUTPUT );
+        List<GitBranch> gitBranches = gitManager.listBranches( REPOSITORY_ROOT, true );
 
-
-        List<GitBranch> gitBranches = gitManager.listBranches( agent, REPOSITORY_ROOT, true );
-
-
-        verify( commandRunner ).createCommand( new RequestBuilder( "git branch -r" ).withCwd( REPOSITORY_ROOT ),
-                Sets.newHashSet( agent ) );
+        verify( commandUtil )
+                .execute( new RequestBuilder( "git branch -r" ).withCwd( REPOSITORY_ROOT ), managementHost );
         assertEquals( 3, gitBranches.size() );
         assertTrue( gitBranches.contains( new GitBranch( REMOTE_MASTER_BRANCH, false ) ) );
     }
 
 
     @Test
-    public void shouldFailPushToMaster()
+    public void testPush() throws GitException, CommandException
     {
-        verifyCommandExecution = false;
+
+        gitManager.push( REPOSITORY_ROOT, DUMMY_BRANCH );
+
+        verify( commandUtil ).execute(
+                new RequestBuilder( String.format( "git push origin %s", DUMMY_BRANCH ) ).withCwd( REPOSITORY_ROOT ),
+                managementHost );
+
         try
         {
-            gitManager.push( agent, REPOSITORY_ROOT, MASTER_BRANCH );
+            gitManager.push( REPOSITORY_ROOT, MASTER_BRANCH );
         }
         catch ( GitException e )
         {
@@ -463,91 +409,86 @@ public class GitManagerImplTest
 
 
     @Test
-    public void shouldRunUndoSoftCommand() throws GitException
+    public void shouldRunUndoSoftCommand() throws GitException, CommandException
     {
+        gitManager.undoSoft( REPOSITORY_ROOT, filePaths );
 
-        gitManager.undoSoft( agent, REPOSITORY_ROOT, filePaths );
-
-
-        verify( commandRunner ).createCommand(
-                new RequestBuilder( "git checkout --" ).withCwd( REPOSITORY_ROOT ).withCmdArgs( filePaths ),
-                Sets.newHashSet( agent ) );
+        verify( commandUtil )
+                .execute( new RequestBuilder( "git checkout --" ).withCwd( REPOSITORY_ROOT ).withCmdArgs( filePaths ),
+                        managementHost );
     }
 
 
     @Test
-    public void shouldRunUndoHardCommand() throws GitException
+    public void shouldRunUndoHardCommand() throws GitException, CommandException
     {
+        gitManager.undoHard( REPOSITORY_ROOT, DUMMY_BRANCH );
 
-        gitManager.undoHard( agent, REPOSITORY_ROOT, DUMMY_BRANCH );
-
-
-        verify( commandRunner ).createCommand(
+        verify( commandUtil ).execute(
                 new RequestBuilder( String.format( "git fetch origin && git reset --hard origin/%s", DUMMY_BRANCH ) )
-                        .withCwd( REPOSITORY_ROOT ), Sets.newHashSet( agent ) );
+                        .withCwd( REPOSITORY_ROOT ), managementHost );
     }
 
 
     @Test
-    public void shouldRunUndoHardCommandWithMasterBranch() throws GitException
+    public void shouldRunUndoHardCommandWithMasterBranch() throws GitException, CommandException
     {
+        gitManager.undoHard( REPOSITORY_ROOT );
 
-        gitManager.undoHard( agent, REPOSITORY_ROOT );
-
-
-        verify( commandRunner ).createCommand(
+        verify( commandUtil ).execute(
                 new RequestBuilder( String.format( "git fetch origin && git reset --hard origin/%s", MASTER_BRANCH ) )
-                        .withCwd( REPOSITORY_ROOT ), Sets.newHashSet( agent ) );
+                        .withCwd( REPOSITORY_ROOT ), managementHost );
     }
 
 
     @Test
-    public void shouldRunRevertCommitCommand() throws GitException
+    public void shouldRunRevertCommitCommand() throws GitException, CommandException
     {
+        gitManager.revertCommit( REPOSITORY_ROOT, COMMIT_ID );
 
-        gitManager.revertCommit( agent, REPOSITORY_ROOT, COMMIT_ID );
-
-
-        verify( commandRunner ).createCommand(
-                new RequestBuilder( String.format( "git revert %s", COMMIT_ID ) ).withCwd( REPOSITORY_ROOT ),
-                Sets.newHashSet( agent ) );
+        verify( commandUtil )
+                .execute( new RequestBuilder( String.format( "git revert %s", COMMIT_ID ) ).withCwd( REPOSITORY_ROOT ),
+                        managementHost );
     }
 
 
     @Test
-    public void shouldRunStashCommand() throws GitException
+    public void shouldRunStashCommand() throws GitException, CommandException
     {
+        gitManager.stash( REPOSITORY_ROOT );
 
-        gitManager.stash( agent, REPOSITORY_ROOT );
-
-
-        verify( commandRunner )
-                .createCommand( new RequestBuilder( String.format( "git stash" ) ).withCwd( REPOSITORY_ROOT ),
-                        Sets.newHashSet( agent ) );
+        verify( commandUtil ).execute( new RequestBuilder( String.format( "git stash" ) ).withCwd( REPOSITORY_ROOT ),
+                managementHost );
     }
 
 
     @Test
-    public void shouldRunUnstashCommand() throws GitException
+    public void shouldRunUnstashCommand() throws GitException, CommandException
     {
+        gitManager.unstash( REPOSITORY_ROOT, STASH_NAME );
 
-        gitManager.unstash( agent, REPOSITORY_ROOT, STASH_NAME );
-
-
-        verify( commandRunner ).createCommand(
+        verify( commandUtil ).execute(
                 new RequestBuilder( String.format( "git stash apply %s", STASH_NAME ) ).withCwd( REPOSITORY_ROOT ),
-                Sets.newHashSet( agent ) );
+                managementHost );
     }
 
 
     @Test
     public void shouldReturnStashesList() throws GitException
     {
+        setOutput( STASH_NAME );
 
-        setCommandStatus( true, true, STASH_NAME );
-
-        List<String> stashNames = gitManager.listStashes( agent, REPOSITORY_ROOT );
+        List<String> stashNames = gitManager.listStashes( REPOSITORY_ROOT );
 
         assertTrue( stashNames.contains( STASH_NAME ) );
+    }
+
+
+    @Test( expected = GitException.class )
+    public void testGetManagementHost() throws Exception
+    {
+        doThrow( new PeerException( "" ) ).when( localPeer ).getManagementHost();
+
+        gitManager.getManagementHost();
     }
 }

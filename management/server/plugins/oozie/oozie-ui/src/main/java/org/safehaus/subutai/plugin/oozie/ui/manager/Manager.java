@@ -11,17 +11,13 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.protocol.Agent;
+
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.api.NodeType;
-import org.safehaus.subutai.plugin.common.api.OperationType;
-import org.safehaus.subutai.plugin.common.ui.AddNodeWindow;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.common.ui.BaseManager;
-import org.safehaus.subutai.plugin.common.ui.OperationTask;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
@@ -29,10 +25,8 @@ import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.SetupType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -51,6 +45,22 @@ import com.vaadin.ui.Window;
 public class Manager extends BaseManager
 {
 
+    @Override
+    public void addRowComponents( final Table table, final ContainerHost containerHost )
+    {
+        Preconditions.checkNotNull( table, "Cannot add components to not existing table" );
+        Preconditions.checkNotNull( containerHost, "Cannot add null agent to the table" );
+        if ( table.getCaption().equals( SERVER_TABLE_CAPTION ) )
+        {
+            addServerRow( table, containerHost.getId() );
+        }
+        else
+        {
+            addClientRow( table, containerHost.getId() );
+        }
+    }
+
+
     public final static String SERVER_TABLE_CAPTION = "Server";
     public final static String CLIENT_TABLE_CAPTION = "Clients";
 
@@ -61,8 +71,6 @@ public class Manager extends BaseManager
     private final Hadoop hadoopManager;
     private final Tracker tracker;
     private final ExecutorService executorService;
-    private final CommandRunner commandRunner;
-    private final AgentManager agentManager;
     private OozieClusterConfig config;
 
 
@@ -73,8 +81,6 @@ public class Manager extends BaseManager
         this.tracker = serviceLocator.getService( Tracker.class );
         this.hadoopManager = serviceLocator.getService( Hadoop.class );
         this.oozieManager = serviceLocator.getService( Oozie.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -227,11 +233,11 @@ public class Manager extends BaseManager
                         HadoopClusterConfig info = hadoopManager.getCluster( hadoopClusterName );
                         if ( info != null )
                         {
-                            HashSet<Agent> nodes = new HashSet<>( info.getAllNodes() );
+                            HashSet<UUID> nodes = new HashSet<>( info.getAllNodes() );
                             nodes.removeAll( config.getAllOozieAgents() );
                             if ( !nodes.isEmpty() )
                             {
-                                AddNodeWindow addNodeWindow =
+                                /*AddNodeWindow addNodeWindow =
                                         new AddNodeWindow( oozieManager, executorService, tracker, config, nodes );
                                 contentRoot.getUI().addWindow( addNodeWindow );
                                 addNodeWindow.addCloseListener( new Window.CloseListener()
@@ -241,7 +247,7 @@ public class Manager extends BaseManager
                                     {
                                         refreshClustersInfo();
                                     }
-                                } );
+                                } );*/
                             }
                             else
                             {
@@ -292,23 +298,22 @@ public class Manager extends BaseManager
     }
 
 
-
-    private void populateServerTable( final Table table, final Agent agent )
+    private void populateServerTable( final Table table, final UUID agent )
     {
-        List<Agent> agentList = new ArrayList<>();
+        List<UUID> agentList = new ArrayList<>();
         agentList.add( agent );
         //agentList.add(config.getServer());
-        populateTable( table, agentList );
+//        populateTable( table, agentList );
     }
 
 
-    private void populateClientsTable( final Table table, Set<Agent> clientNodes )
+    private void populateClientsTable( final Table table, Set<UUID> clientNodes )
     {
 
         table.removeAllItems();
-        List<Agent> agentList = new ArrayList<>();
+        List<UUID> agentList = new ArrayList<>();
         agentList.addAll( clientNodes );
-        populateTable( table, agentList );
+//        populateTable( table, agentList );
     }
 
 
@@ -343,7 +348,7 @@ public class Manager extends BaseManager
     }
 
 
-    @Override
+    /*@Override
     public void addRowComponents( Table table, final Agent agent )
     {
         Preconditions.checkNotNull( table, "Cannot add components to not existing table" );
@@ -356,7 +361,7 @@ public class Manager extends BaseManager
         {
             addClientRow( table, agent );
         }
-    }
+    }*/
 
 
     public Table createTableTemplate( String caption )
@@ -386,18 +391,18 @@ public class Manager extends BaseManager
                 {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
+                    /*UUID lxcAgent = agentManager.getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null )
                     {
-                        TerminalWindow terminal =
+                        *//*TerminalWindow terminal =
                                 new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
                                         agentManager );
-                        contentRoot.getUI().addWindow( terminal.getWindow() );
+                        contentRoot.getUI().addWindow( terminal.getWindow() );*//*
                     }
                     else
                     {
                         show( "Agent is not connected" );
-                    }
+                    }*/
                 }
             }
         } );
@@ -439,7 +444,7 @@ public class Manager extends BaseManager
     }
 
 
-    private void addServerRow( final Table table, final Agent agent )
+    private void addServerRow( final Table table, final UUID agent )
     {
         // Layouts to be added to table
         final HorizontalLayout availableOperations = new HorizontalLayout();
@@ -452,11 +457,11 @@ public class Manager extends BaseManager
 
         // Buttons to be added to availableOperations
         final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
-        checkButton.setId( agent.getListIP().get( 0 ) + "-oozieCheck" );
+//        checkButton.setId( agent.getListIP().get( 0 ) + "-oozieCheck" );
         final Button startButton = new Button( START_BUTTON_CAPTION );
-        startButton.setId( agent.getListIP().get( 0 ) + "-oozieStart" );
+//        startButton.setId( agent.getListIP().get( 0 ) + "-oozieStart" );
         final Button stopButton = new Button( STOP_BUTTON_CAPTION );
-        stopButton.setId( agent.getListIP().get( 0 ) + "-oozieStop" );
+//        stopButton.setId( agent.getListIP().get( 0 ) + "-oozieStop" );
 
         checkButton.addStyleName( "default" );
         startButton.addStyleName( "default" );
@@ -474,19 +479,19 @@ public class Manager extends BaseManager
         availableOperations.addComponent( stopButton );
         statusGroup.addComponent( statusLabel );
 
-        table.addItem( new Object[] {
+        /*table.addItem( new Object[] {
                 agent.getHostname(), agent.getListIP().get( 0 ).toString(), statusGroup, availableOperations
-        }, null );
+        }, null );*/
 
-        Item row = getAgentRow( table, agent );
+        /*Item row = getAgentRow( table, agent );
 
         checkButton.addClickListener( checkButtonListener( row ) );
         startButton.addClickListener( startButtonListener( row ) );
-        stopButton.addClickListener( stopButtonListener( row ) );
+        stopButton.addClickListener( stopButtonListener( row ) );*/
     }
 
 
-    private void addClientRow( final Table table, final Agent agent )
+    private void addClientRow( final Table table, final UUID agent )
     {
         // Layouts to be added to table
         final HorizontalLayout availableOperations = new HorizontalLayout();
@@ -497,20 +502,20 @@ public class Manager extends BaseManager
 
         // Buttons to be added to availableOperations
         final Button destroyButton = new Button( DESTROY_BUTTON_CAPTION );
-        destroyButton.setId( agent.getListIP().get( 0 ) + "-oozieDestroy" );
+//        destroyButton.setId( agent.getListIP().get( 0 ) + "-oozieDestroy" );
 
         destroyButton.addStyleName( "default" );
         // Buttons to be added to availableOperations
 
         availableOperations.addComponent( destroyButton );
 
-        table.addItem( new Object[] {
+        /*table.addItem( new Object[] {
                 agent.getHostname(), agent.getListIP().get( 0 ).toString(), statusLayout, availableOperations
-        }, null );
+        }, null );*/
 
-        Item row = getAgentRow( table, agent );
+   /*     Item row = getAgentRow( table, agent );
 
-        destroyButton.addClickListener( destroyButtonListener( row ) );
+        destroyButton.addClickListener( destroyButtonListener( row ) );*/
     }
 
 
@@ -530,20 +535,20 @@ public class Manager extends BaseManager
                 enableProgressBar();
                 startStopButton.setEnabled( false );
                 checkButton.setEnabled( false );
-                Agent agent = getAgentByRow( row );
+                UUID agent = getAgentByRow( row );
 
-                OperationType operationType;
+                NodeOperationType operationType;
                 if ( !isRunning )
                 {
-                    operationType = OperationType.Start;
+                    operationType = NodeOperationType.START;
                 }
                 else
                 {
-                    operationType = OperationType.Stop;
+                    operationType = NodeOperationType.STOP;
                 }
-                executorService.execute(
+                /*executorService.execute(
                         new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
-                                startStopCheckCompleteEvent( row ), null, agent ) );
+                                startStopCheckCompleteEvent( row ), null, agent ) );*/
             }
         };
     }
@@ -597,22 +602,22 @@ public class Manager extends BaseManager
     }
 
 
-    protected Agent getAgentByRow( final Item row )
+    protected UUID getAgentByRow( final Item row )
     {
         if ( row == null )
         {
             return null;
         }
 
-        Set<Agent> clusterNodeList = config.getAllOozieAgents();
+        Set<UUID> clusterNodeList = config.getAllOozieAgents();
         String lxcHostname = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
 
-        for ( Agent agent : clusterNodeList )
+        for ( UUID agent : clusterNodeList )
         {
-            if ( agent.getHostname().equals( lxcHostname ) )
+            /*if ( agent.getHostname().equals( lxcHostname ) )
             {
                 return agent;
-            }
+            }*/
         }
         return null;
     }
@@ -628,9 +633,9 @@ public class Manager extends BaseManager
                 Button destroyButton = clickEvent.getButton();
                 //enableProgressBar();
                 destroyButton.setEnabled( false );
-                Agent agent = getAgentByRow( row );
+                UUID agent = getAgentByRow( row );
 
-                UUID trackID = oozieManager.destroyNode( config.getClusterName(), agent.getHostname() );
+                UUID trackID = oozieManager.destroyNode( config.getClusterName(), agent.toString() );
 
                 ProgressWindow window =
                         new ProgressWindow( executorService, tracker, trackID, OozieClusterConfig.PRODUCT_KEY );
@@ -669,16 +674,16 @@ public class Manager extends BaseManager
                 startButton.setEnabled( false );
                 stopButton.setEnabled( false );
                 checkButton.setEnabled( false );
-                Agent agent = getAgentByRow( row );
+                UUID agent = getAgentByRow( row );
 
-                OperationType operationType;
+                NodeOperationType operationType;
                 if ( !isRunning )
                 {
-                    operationType = OperationType.Start;
+                    operationType = NodeOperationType.START;
 
-                    executorService.execute(
+                    /*executorService.execute(
                             new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
-                                    startStopCheckCompleteEvent( row ), null, agent ) );
+                                    startStopCheckCompleteEvent( row ), null, agent ) );*/
                 }
             }
         };
@@ -704,16 +709,16 @@ public class Manager extends BaseManager
                 startButton.setEnabled( false );
                 stopButton.setEnabled( false );
                 checkButton.setEnabled( false );
-                Agent agent = getAgentByRow( row );
+                UUID agent = getAgentByRow( row );
 
-                OperationType operationType;
+                NodeOperationType operationType;
                 if ( !isRunning )
                 {
-                    operationType = OperationType.Stop;
+                    operationType = NodeOperationType.STOP;
 
-                    executorService.execute(
+                    /*executorService.execute(
                             new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
-                                    startStopCheckCompleteEvent( row ), null, agent ) );
+                                    startStopCheckCompleteEvent( row ), null, agent ) );*/
                 }
             }
         };
@@ -737,14 +742,13 @@ public class Manager extends BaseManager
                 startButton.setEnabled( false );
                 stopButton.setEnabled( false );
                 checkButton.setEnabled( false );
-                Agent agent = getAgentByRow( row );
+                UUID agent = getAgentByRow( row );
 
-                OperationType operationType = OperationType.Status;
-                executorService.execute(
+                NodeOperationType operationType = NodeOperationType.STATUS;
+                /*executorService.execute(
                         new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
-                                startStopCheckCompleteEvent( row ), null, agent ) );
+                                startStopCheckCompleteEvent( row ), null, agent ) );*/
             }
         };
     }
-
 }

@@ -6,7 +6,9 @@
 package org.safehaus.subutai.plugin.mongodb.impl;
 
 
+import java.lang.reflect.Type;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -17,20 +19,23 @@ import javax.sql.DataSource;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDao;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
+import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
+import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
+import org.safehaus.subutai.plugin.mongodb.api.MongoRouterNode;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 import org.safehaus.subutai.plugin.mongodb.impl.handler.AddNodeOperationHandler;
@@ -46,6 +51,14 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 
 /**
@@ -59,12 +72,13 @@ public class MongoImpl implements Mongo
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private Tracker tracker;
-    private ContainerManager containerManager;
+    //    private ContainerManager containerManager;
     private EnvironmentManager environmentManager;
     private ExecutorService executor;
     private Commands commands;
-    private PluginDao pluginDAO;
+    private PluginDAO pluginDAO;
     private DataSource dataSource;
+    private PeerManager peerManager;
 
 
     public MongoImpl( DataSource dataSource )
@@ -79,7 +93,7 @@ public class MongoImpl implements Mongo
     }
 
 
-    public PluginDao getPluginDAO()
+    public PluginDAO getPluginDAO()
     {
         return pluginDAO;
     }
@@ -91,10 +105,21 @@ public class MongoImpl implements Mongo
     }
 
 
-    public ContainerManager getContainerManager()
+    public PeerManager getPeerManager()
     {
-        return containerManager;
+        return peerManager;
     }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
+    }
+
+    //    public ContainerManager getContainerManager()
+    //    {
+    //        return containerManager;
+    //    }
 
 
     public CommandRunner getCommandRunner()
@@ -133,10 +158,10 @@ public class MongoImpl implements Mongo
     }
 
 
-    public void setContainerManager( final ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
-    }
+    //    public void setContainerManager( final ContainerManager containerManager )
+    //    {
+    //        this.containerManager = containerManager;
+    //    }
 
 
     public void setEnvironmentManager( final EnvironmentManager environmentManager )
@@ -161,7 +186,13 @@ public class MongoImpl implements Mongo
     {
         try
         {
-            this.pluginDAO = new PluginDao( dataSource );
+
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.registerTypeAdapter( MongoDataNode.class, new InterfaceAdapter<MongoDataNode>() ).create();
+            gsonBuilder.registerTypeAdapter( MongoConfigNode.class, new InterfaceAdapter<MongoConfigNode>() ).create();
+            gsonBuilder.registerTypeAdapter( MongoRouterNode.class, new InterfaceAdapter<MongoRouterNode>() ).create();
+
+            this.pluginDAO = new PluginDAO( dataSource, gsonBuilder );
         }
         catch ( SQLException e )
         {
@@ -207,8 +238,12 @@ public class MongoImpl implements Mongo
 
     public List<MongoClusterConfig> getClusters()
     {
+        List<MongoClusterConfigImpl> r =
+                pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, MongoClusterConfigImpl.class );
 
-        return pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, MongoClusterConfig.class );
+        List<MongoClusterConfig> result = new ArrayList<>();
+        result.addAll( r );
+        return result;
     }
 
 
@@ -217,7 +252,7 @@ public class MongoImpl implements Mongo
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
 
-        return pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, clusterName, MongoClusterConfig.class );
+        return pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, clusterName, MongoClusterConfigImpl.class );
     }
 
 
@@ -311,10 +346,10 @@ public class MongoImpl implements Mongo
 
 
     @Override
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( MongoClusterConfig config )
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( MongoClusterConfig config )
     {
         Preconditions.checkNotNull( config, "Mongo cluster config is null" );
-        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+        //        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint
@@ -348,7 +383,62 @@ public class MongoImpl implements Mongo
 
         environmentBlueprint.setNodeGroups( Sets.newHashSet( cfgServersGroup, routersGroup, dataNodesGroup ) );
 
-        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
-        return environmentBuildTask;
+        //        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
+        return environmentBlueprint;
+    }
+
+
+    @Override
+    public MongoClusterConfig newMongoClusterConfigInstance()
+    {
+        return new MongoClusterConfigImpl();
+    }
+
+
+    class InterfaceAdapter<T> implements JsonSerializer<T>, JsonDeserializer<T>
+    {
+        public JsonElement serialize( T object, Type interfaceType, JsonSerializationContext context )
+        {
+            final JsonObject wrapper = new JsonObject();
+            wrapper.addProperty( "type", object.getClass().getName() );
+            wrapper.add( "data", context.serialize( object ) );
+            return wrapper;
+        }
+
+
+        public T deserialize( JsonElement elem, Type interfaceType, JsonDeserializationContext context )
+                throws JsonParseException
+        {
+            final JsonObject wrapper = ( JsonObject ) elem;
+            final JsonElement typeName = get( wrapper, "type" );
+            final JsonElement data = get( wrapper, "data" );
+            final Type actualType = typeForName( typeName );
+            return context.deserialize( data, actualType );
+        }
+
+
+        private Type typeForName( final JsonElement typeElem )
+        {
+            try
+            {
+                return Class.forName( typeElem.getAsString() );
+            }
+            catch ( ClassNotFoundException e )
+            {
+                throw new JsonParseException( e );
+            }
+        }
+
+
+        private JsonElement get( final JsonObject wrapper, String memberName )
+        {
+            final JsonElement elem = wrapper.get( memberName );
+            if ( elem == null )
+            {
+                throw new JsonParseException(
+                        "no '" + memberName + "' member found in what was expected to be an interface wrapper" );
+            }
+            return elem;
+        }
     }
 }

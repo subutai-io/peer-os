@@ -10,6 +10,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
@@ -52,8 +53,9 @@ public class VerificationStep extends Panel
         else if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP )
         {
             cfgView.addStringCfg( "Hadoop cluster name", wizard.getConfig().getHadoopClusterName() );
-            for ( Agent node : wizard.getConfig().getNodes() )
+            for ( ContainerHost node : wizard.getConfig().getNodes() )
             {
+
                 cfgView.addStringCfg( "Nodes to install", node.getHostname() );
             }
         }

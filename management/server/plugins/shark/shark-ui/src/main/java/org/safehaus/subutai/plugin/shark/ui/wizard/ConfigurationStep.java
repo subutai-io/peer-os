@@ -118,7 +118,6 @@ public class ConfigurationStep extends Panel
                 {
                     SparkClusterConfig sparkConfig = ( SparkClusterConfig ) event.getProperty().getValue();
                     config.setSparkClusterName( sparkConfig.getClusterName() );
-                    config.setNodes( sparkConfig.getAllNodes() );
                 }
             }
         } );
@@ -256,14 +255,14 @@ public class ConfigurationStep extends Panel
         public void buttonClick( Button.ClickEvent event )
         {
             SharkClusterConfig config = wizard.getConfig();
-            if ( config.getClusterName() == null || config.getClusterName().isEmpty() )
+            if ( Strings.isNullOrEmpty( config.getClusterName() ) )
             {
                 show( "Enter cluster name" );
                 return;
             }
             if ( config.getSetupType() == SetupType.OVER_SPARK )
             {
-                if ( config.getSparkClusterName() == null || config.getSparkClusterName().isEmpty() )
+                if ( Strings.isNullOrEmpty( config.getSparkClusterName() ) )
                 {
                     show( "Select Spark cluster" );
                 }
@@ -275,7 +274,7 @@ public class ConfigurationStep extends Panel
             else if ( config.getSetupType() == SetupType.WITH_HADOOP_SPARK )
             {
                 HadoopClusterConfig hc = wizard.getHadoopConfig();
-                if ( hc.getClusterName() == null || hc.getClusterName().isEmpty() )
+                if ( Strings.isNullOrEmpty( hc.getClusterName() ) )
                 {
                     show( "Enter Hadoop cluster name" );
                 }
@@ -287,7 +286,7 @@ public class ConfigurationStep extends Panel
                 {
                     show( "Invalid replication factor" );
                 }
-                else if ( hc.getDomainName() == null || hc.getDomainName().isEmpty() )
+                else if ( Strings.isNullOrEmpty( hc.getDomainName() ) )
                 {
                     show( "Enter Hadoop domain name" );
                 }

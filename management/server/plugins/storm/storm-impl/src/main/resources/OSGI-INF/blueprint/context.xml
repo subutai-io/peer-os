@@ -7,27 +7,19 @@
     <property name="password" value="" />
   </bean>
 
-  <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
   <reference id="zookeeperManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.zookeeper.api.Zookeeper" />
-  <reference id="containerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.container.api.container.ContainerManager" />
   <reference id="environmentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
   <bean id="storm-impl" scope="singleton" class="org.safehaus.subutai.plugin.storm.impl.StormImpl"
         init-method="init" destroy-method="destroy">
-    <property name="commandRunner" ref="commandRunner" />
-    <property name="agentManager" ref="agentManager" />
     <property name="tracker" ref="tracker" />
     <property name="zookeeperManager" ref="zookeeperManager" />
-    <property name="containerManager" ref="containerManager" />
     <property name="environmentManager" ref="environmentManager" />
+    <argument ref="stormConfig" />
     <argument ref="dataSource" />
   </bean>
 

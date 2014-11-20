@@ -47,7 +47,7 @@ public class HostsCommand extends OsgiCommandSupport
         System.out.println( "Time:" + fmt.format( System.currentTimeMillis() ) );
         System.out.println( "List of hosts in local peer:" );
         print( managementHost, "" );
-        for ( ResourceHost resourceHost : managementHost.getResourceHosts() )
+        for ( ResourceHost resourceHost : localPeer.getResourceHosts() )
         {
             print( resourceHost, "\t" );
             for ( ContainerHost containerHost : resourceHost.getContainerHosts() )

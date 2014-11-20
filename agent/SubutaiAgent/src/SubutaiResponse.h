@@ -30,6 +30,9 @@
 #include <jsoncpp/json.h>
 #include <string>
 #include <fstream>
+#include "SubutaiContainer.h"
+#include "Message.pb.h"
+#include "SubutaiHelper.h"
 using namespace std;
 using std::stringstream;
 using std::string;
@@ -49,25 +52,22 @@ public:
 	int getPid();
 	string& getHostname();
 	string& getParentHostname();
-	string& getMacAddress();
-	string& getEnvironmentId();
-	string& getTaskUuid();
-	vector<string>& getIps();
-	string& getSource();
+	vector<Interface> getInterfaces();
+	string& getCommandId();
 	string& getconfigPoint();
 	string& getDateTime();
 	string& getChangeType();
 	vector<string>& getConfPoints();
-	void setSource(const string&);
+	vector<SubutaiContainer>& getContainerSet();
+	void setContainerSet(vector<SubutaiContainer>);
 	void setHostname(const string&);
 	void setParentHostname(const string&);
-	void setMacAddress(const string&);
-	void setTaskUuid(const string&);
-	void setIps(vector<string>);
+	void setCommandId(const string&);
+	void setInterfaces(vector<Interface>);
+	void addInterface(string, string, string);
 	void setPid(int);
 	void setType(const string&);
 	void setUuid(const string&);
-	void setEnvironmentId(const string&);
 	void setRequestSequenceNumber(int);
 	void setResponseSequenceNumber(int);
 	void setStandardError(const string&);
@@ -81,24 +81,23 @@ public:
 	void serializeDone(string&);					//Serializing a Last Done Response message to a Json string
 	void clear();
 private:
-	string        	type;
-	string		    uuid;
-	int			 	requestSequenceNumber;
-	int			 	responseSequenceNumber;
-	int				exitCode;
-	int				pid;
-	string       	stdOut;
-	string        	stdErr;
-	string			taskUuid;
-	string			macAddress;
-	string			hostname;
-	string			parentHostname;
-	string			environmentId;
-	vector<string>  ips;
-	string			source;
-	string 			configPoint;
-	string			dateTime;
-	string			changeType;
+	string        		type;
+	string		   	 	uuid;
+	int			 		requestSequenceNumber;
+	int			 		responseSequenceNumber;
+	int					exitCode;
+	int					pid;
+	string       		stdOut;
+	string        		stdErr;
+	string				commandId;
+	string				hostname;
+	string				parentHostname;
+	vector<Interface>  	interfaces;
+	string 				configPoint;
+	string				dateTime;
+	string				changeType;
+    string              topic;
 	vector<string>  confPoints;
+	vector<SubutaiContainer>  containers;
 };
 #endif /* SUBUTAIRESPONSE_H_ */

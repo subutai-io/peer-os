@@ -8,7 +8,8 @@ import java.util.Map;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.core.environment.api.TopologyEnum;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
+import org.safehaus.subutai.core.environment.api.topology.NodeGroup2PeerData;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.Peer;
 
@@ -32,7 +33,7 @@ public class NodeGroup2PeerWizard extends Window
     private Table peersTable;
     private Table ngTopgTable;
     private EnvironmentManagerPortalModule managerUI;
-    private Map<Object, NodeGroup> nodeGroupMap;
+    private Map<Integer, NodeGroup> nodeGroupMap;
     private EnvironmentBlueprint blueprint;
 
 
@@ -175,7 +176,7 @@ public class NodeGroup2PeerWizard extends Window
             comboBox.setNullSelectionAllowed( false );
             comboBox.setTextInputAllowed( false );
             comboBox.setItemCaptionPropertyId( "name" );
-            Object itemId = ngTopgTable.addItem( new Object[] {
+            Integer itemId = (Integer) ngTopgTable.addItem( new Object[] {
                     ng.getName(), comboBox
             }, null );
             nodeGroupMap.put( itemId, ng );
@@ -187,12 +188,19 @@ public class NodeGroup2PeerWizard extends Window
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                Map<Object, Peer> topology = topologySelection();
+                Map<Integer, Peer> topology = topologySelection();
                 if ( !topology.isEmpty() || ngTopgTable.getItemIds().size() != topology.size() )
                 {
-                    Map<Object, NodeGroup> map = getNodeGroupMap();
-                    managerUI.getEnvironmentManager()
-                             .saveBuildProcess( blueprint.getId(), topology, map, TopologyEnum.NODE_GROUP_2_PEER );
+                    Map<Integer, NodeGroup> map = getNodeGroupMap();
+                    try
+                    {
+                        managerUI.getEnvironmentManager()
+                                 .saveBuildProcess( new NodeGroup2PeerData( blueprint.getId(), topology, map ) );
+                    }
+                    catch ( EnvironmentManagerException e )
+                    {
+                        Notification.show( e.getMessage() );
+                    }
                 }
                 else
                 {
@@ -237,28 +245,28 @@ public class NodeGroup2PeerWizard extends Window
     }
 
 
-    public Map<Object, NodeGroup> getNodeGroupMap()
+    public Map<Integer, NodeGroup> getNodeGroupMap()
     {
         return nodeGroupMap;
     }
 
 
-    public void setNodeGroupMap( final Map<Object, NodeGroup> nodeGroupMap )
+    public void setNodeGroupMap( final Map<Integer, NodeGroup> nodeGroupMap )
     {
         this.nodeGroupMap = nodeGroupMap;
     }
 
 
-    public Map<Object, Peer> topologySelection()
+    public Map<Integer, Peer> topologySelection()
     {
-        Map<Object, Peer> topology = new HashMap<>();
+        Map<Integer, Peer> topology = new HashMap<>();
         for ( Object itemId : getNgTopgTable().getItemIds() )
         {
-            ComboBox selection =
-                    ( ComboBox ) getNgTopgTable().getItem( itemId ).getItemProperty( "Put" ).getValue();
+            ComboBox selection = ( ComboBox ) getNgTopgTable().getItem( (Integer) itemId ).getItemProperty(
+                    "Put" ).getValue();
             Peer peer = ( Peer ) selection.getValue();
 
-            topology.put( itemId, peer );
+            topology.put( (Integer) itemId, peer );
         }
         return topology;
     }

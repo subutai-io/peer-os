@@ -12,12 +12,4 @@
     </command>
   </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="shark/uninstall-cluster">
-      <action class="org.safehaus.subutai.plugin.shark.cli.UninstallClusterCommand">
-        <property name="sharkManager" ref="sharkManager" />
-      </action>
-    </command>
-  </command-bundle>
-
 </blueprint>

@@ -12,30 +12,21 @@ import javax.sql.DataSource;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDao;
+import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
-import org.safehaus.subutai.plugin.elasticsearch.impl.handler.AddNodeOperationHandler;
-import org.safehaus.subutai.plugin.elasticsearch.impl.handler.CheckClusterOperationHandler;
-import org.safehaus.subutai.plugin.elasticsearch.impl.handler.CheckNodeOperationHandler;
-import org.safehaus.subutai.plugin.elasticsearch.impl.handler.DestroyNodeOperationHandler;
-import org.safehaus.subutai.plugin.elasticsearch.impl.handler.InstallOperationHandler;
-import org.safehaus.subutai.plugin.elasticsearch.impl.handler.StartClusterOperationHandler;
-import org.safehaus.subutai.plugin.elasticsearch.impl.handler.StartNodeOperationHandler;
-import org.safehaus.subutai.plugin.elasticsearch.impl.handler.StopClusterOperationHandler;
-import org.safehaus.subutai.plugin.elasticsearch.impl.handler.StopNodeOperationHandler;
-import org.safehaus.subutai.plugin.elasticsearch.impl.handler.UninstallOperationHandler;
+import org.safehaus.subutai.plugin.elasticsearch.impl.handler.ClusterOperationHandler;
+import org.safehaus.subutai.plugin.elasticsearch.impl.handler.NodeOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,17 +38,11 @@ import com.google.common.collect.Sets;
 public class ElasticsearchImpl implements Elasticsearch
 {
     private static final Logger LOG = LoggerFactory.getLogger( ElasticsearchImpl.class.getName() );
-    DataSource dataSource;
     private Tracker tracker;
-    //    private LxcManager lxcManager;
     private ExecutorService executor;
-    //    private NetworkManager networkManager;
-    private CommandRunner commandRunner;
-    private AgentManager agentManager;
-    private PluginDao pluginDAO;
-    private ContainerManager containerManager;
     private EnvironmentManager environmentManager;
-    private Commands commands;
+    private PluginDAO pluginDAO;
+    private DataSource dataSource;
 
 
     public ElasticsearchImpl( DataSource dataSource )
@@ -66,27 +51,15 @@ public class ElasticsearchImpl implements Elasticsearch
     }
 
 
-    public PluginDao getPluginDAO()
+    public PluginDAO getPluginDAO()
     {
         return pluginDAO;
     }
 
 
-    public void setPluginDAO( final PluginDao pluginDAO )
+    public void setPluginDAO( final PluginDAO pluginDAO )
     {
         this.pluginDAO = pluginDAO;
-    }
-
-
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
-    public void setCommandRunner( final CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
     }
 
 
@@ -102,46 +75,10 @@ public class ElasticsearchImpl implements Elasticsearch
     }
 
 
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public void setAgentManager( final AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }
-
-
-    public ContainerManager getContainerManager()
-    {
-        return containerManager;
-    }
-
-
-    public void setContainerManager( final ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
-    }
-
-
-   /* public void setLxcManager( final LxcManager lxcManager )
-    {
-        this.lxcManager = lxcManager;
-    }*/
-
-
     public void setExecutor( final ExecutorService executor )
     {
         this.executor = executor;
     }
-
-
-    /*public void setNetworkManager( final NetworkManager networkManager )
-    {
-        this.networkManager = networkManager;
-    }*/
 
 
     public void setDataSource( final DataSource dataSource )
@@ -166,27 +103,13 @@ public class ElasticsearchImpl implements Elasticsearch
     {
         try
         {
-            this.pluginDAO = new PluginDao( dataSource );
+            this.pluginDAO = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
-        this.commands = new Commands( commandRunner );
-
         executor = Executors.newCachedThreadPool();
-    }
-
-
-    public Commands getCommands()
-    {
-        return commands;
-    }
-
-
-    public void setCommands( final Commands commands )
-    {
-        this.commands = commands;
     }
 
 
@@ -196,10 +119,9 @@ public class ElasticsearchImpl implements Elasticsearch
     }
 
 
-    public UUID installCluster( final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration )
+    public UUID installCluster( final ElasticsearchClusterConfiguration config )
     {
-        AbstractOperationHandler operationHandler =
-                new InstallOperationHandler( this, elasticsearchClusterConfiguration );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -208,9 +130,7 @@ public class ElasticsearchImpl implements Elasticsearch
     @Override
     public UUID uninstallCluster( String clusterName )
     {
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
+        return null;
     }
 
 
@@ -232,27 +152,27 @@ public class ElasticsearchImpl implements Elasticsearch
 
 
     @Override
-    public UUID startAllNodes( String clusterName )
+    public UUID startAllNodes( final ElasticsearchClusterConfiguration config )
     {
-        AbstractOperationHandler operationHandler = new StartClusterOperationHandler( this, clusterName );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.START_ALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID checkAllNodes( final String clusterName )
+    public UUID checkAllNodes( final ElasticsearchClusterConfiguration config )
     {
-        AbstractOperationHandler operationHandler = new CheckClusterOperationHandler( this, clusterName );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.STATUS_ALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID stopAllNodes( final String clusterName )
+    public UUID stopAllNodes( final ElasticsearchClusterConfiguration config )
     {
-        AbstractOperationHandler operationHandler = new StopClusterOperationHandler( this, clusterName );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.STOP_ALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -261,34 +181,36 @@ public class ElasticsearchImpl implements Elasticsearch
     @Override
     public UUID addNode( final String clusterName, final String lxcHostname )
     {
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName );
+        // TODO
+        return null;
+    }
+
+
+    @Override
+    public UUID checkNode( final String clusterName, final String hostname )
+    {
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, clusterName, hostname, NodeOperationType.STATUS );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID checkNode( final String clusterName, final String lxcHostname )
+    public UUID startNode( final String clusterName, final String hostname )
     {
-        AbstractOperationHandler operationHandler = new CheckNodeOperationHandler( this, clusterName, lxcHostname );
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, clusterName, hostname, NodeOperationType.START );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID startNode( final String clusterName, final String lxcHostname )
+    public UUID stopNode( final String clusterName, final String hostname )
     {
-        AbstractOperationHandler operationHandler = new StartNodeOperationHandler( this, clusterName, lxcHostname );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
-    }
-
-
-    @Override
-    public UUID stopNode( final String clusterName, final String lxcHostname )
-    {
-        AbstractOperationHandler operationHandler = new StopNodeOperationHandler( this, clusterName, lxcHostname );
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, clusterName, hostname, NodeOperationType.STOP );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -297,7 +219,15 @@ public class ElasticsearchImpl implements Elasticsearch
     @Override
     public UUID destroyNode( final String clusterName, final String lxcHostname )
     {
-        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
+        // TODO
+        return null;
+    }
+
+
+    @Override
+    public UUID uninstallCluster( final ElasticsearchClusterConfiguration config )
+    {
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -314,32 +244,35 @@ public class ElasticsearchImpl implements Elasticsearch
         Preconditions.checkNotNull( elasticsearchClusterConfiguration, "Zookeeper cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation is null" );
 
-        return new StandaloneSetupStrategy( environment, elasticsearchClusterConfiguration, po, this );
+        return new ESSetupStrategy( environment, elasticsearchClusterConfiguration, po, this );
     }
 
 
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint(
-            ElasticsearchClusterConfiguration elasticsearchClusterConfiguration )
+    @Override
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final ElasticsearchClusterConfiguration config )
     {
 
-        Preconditions.checkNotNull( elasticsearchClusterConfiguration, "Elasticsearch cluster config is null" );
+        EnvironmentBlueprint blueprint = new EnvironmentBlueprint();
+        blueprint.setName( String.format( "%s-%s", config.getProductKey(), UUIDUtil.generateTimeBasedUUID() ) );
 
-        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+        blueprint.setLinkHosts( true );
+        blueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
+        blueprint.setExchangeSshKeys( true );
 
-        EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", ElasticsearchClusterConfiguration.PRODUCT_KEY,
-                UUIDUtil.generateTimeBasedUUID() ) );
+        NodeGroup nodeGroup = new NodeGroup();
+        nodeGroup.setTemplateName( config.getTemplateName() );
+        nodeGroup.setPlacementStrategy( new PlacementStrategy("ROUND_ROBIN") );
+        nodeGroup.setNumberOfNodes( config.getNumberOfNodes() );
 
-        // Node group
-        NodeGroup nodesGroup = new NodeGroup();
-        nodesGroup.setName( "DEFAULT" );
-        nodesGroup.setNumberOfNodes( elasticsearchClusterConfiguration.getNumberOfNodes() );
-        nodesGroup.setTemplateName( ElasticsearchClusterConfiguration.getTemplateName() );
-        nodesGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        blueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
 
-        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodesGroup ) );
+        return blueprint;
+    }
 
-        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
-        return environmentBuildTask;
+
+    @Override
+    public UUID configureEnvironmentCluster( final ElasticsearchClusterConfiguration config )
+    {
+        return null;
     }
 }

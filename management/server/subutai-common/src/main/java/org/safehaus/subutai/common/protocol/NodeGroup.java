@@ -1,12 +1,15 @@
 package org.safehaus.subutai.common.protocol;
 
 
+import javax.persistence.Entity;
+
 import org.safehaus.subutai.common.settings.Common;
 
 
 /**
  * Node Group class
  */
+
 public class NodeGroup
 {
 

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.common.protocol.Criteria;
 
 
 /**
@@ -19,10 +19,11 @@ public class CreateContainerRequest
     private final int quantity;
     private final String strategyId;
     private final List<Criteria> criteria;
+    private final String nodeGroupName;
 
 
     public CreateContainerRequest( final UUID creatorPeerId, final UUID environmentId, final List<Template> templates,
-                                   final int quantity, final String strategyId, final List<Criteria> criteria )
+                                   final int quantity, final String strategyId, final List<Criteria> criteria, final String nodeGroupName )
     {
         this.creatorPeerId = creatorPeerId;
         this.environmentId = environmentId;
@@ -30,6 +31,13 @@ public class CreateContainerRequest
         this.quantity = quantity;
         this.strategyId = strategyId;
         this.criteria = criteria;
+        this.nodeGroupName = nodeGroupName;
+    }
+
+
+    public String getNodeGroupName()
+    {
+        return nodeGroupName;
     }
 
 

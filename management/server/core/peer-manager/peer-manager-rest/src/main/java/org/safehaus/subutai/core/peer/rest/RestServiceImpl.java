@@ -10,24 +10,24 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.CommandResult;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.PeerStatus;
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -77,6 +77,7 @@ public class RestServiceImpl implements RestService
         if ( config != null )
         {
             PeerInfo peerInfo = GSON.fromJson( config, PeerInfo.class );
+            peerInfo.setIp( getRequestIp() );
             try
             {
                 peerManager.register( peerInfo );
@@ -95,28 +96,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public String getCreateContainersMsgJsonFormat()
-    {
-        CloneContainersMessage ccm = new CloneContainersMessage( UUIDUtil.generateTimeBasedUUID() );
-        ccm.setEnvId( UUIDUtil.generateTimeBasedUUID() );
-        ccm.setStrategy( "ROUND_ROBIN" );
-        //        ccm.setEnvId( UUIDUtil.generateTimeBasedUUID() );
-        ccm.setNumberOfNodes( 2 );
-        //        ccm.setPeerId( UUIDUtil.generateTimeBasedUUID() );
-        ccm.setTemplate( "master" );
-        return GSON.toJson( ccm );
-    }
-
-
-    @Override
-    public String getPeerJsonFormat()
-    {
-        PeerInfo peerInfo = getSamplePeer();
-        return GSON.toJson( peerInfo );
-    }
-
-
-    @Override
     public Response ping()
     {
         return Response.ok().build();
@@ -127,6 +106,8 @@ public class RestServiceImpl implements RestService
     public Response processRegisterRequest( String peer )
     {
         PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
+
+        p.setIp( getRequestIp() );
         try
         {
             peerManager.register( p );
@@ -166,20 +147,9 @@ public class RestServiceImpl implements RestService
     public Response updatePeer( String peer )
     {
         PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
+        p.setIp( getRequestIp() );
         peerManager.update( p );
         return Response.ok( GSON.toJson( p ) ).build();
-    }
-
-
-    private PeerInfo getSamplePeer()
-    {
-        String localIp = getLocalIp();
-        PeerInfo peerInfo = new PeerInfo();
-        peerInfo.setName( "Peer on " + localIp );
-        peerInfo.setIp( localIp );
-        peerInfo.setId( peerManager.getLocalPeer().getId() );
-        peerInfo.setStatus( PeerStatus.REQUESTED );
-        return peerInfo;
     }
 
 
@@ -209,14 +179,22 @@ public class RestServiceImpl implements RestService
             System.out.println( e.getMessage() );
         }
 
-
         return "127.0.0.1";
+    }
+
+
+    private String getRequestIp()
+    {
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        HttpServletRequest request = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
+        return request.getRemoteAddr();
     }
 
 
     @Override
     public Response createContainers( final String ownerPeerId, final String environmentId, final String templates,
-                                      final int quantity, final String strategyId, final String criteria )
+                                      final int quantity, final String strategyId, final String criteria,
+                                      final String nodeGroupName )
     {
 
         //TODO: Implement criteria restoring
@@ -228,29 +206,11 @@ public class RestServiceImpl implements RestService
                     .createContainers( UUID.fromString( ownerPeerId ), UUID.fromString( environmentId ),
                             ( List<Template> ) JsonUtil.fromJson( templates, new TypeToken<List<Template>>()
                             {
-                            }.getType() ), quantity, strategyId, criteriaList );
+                            }.getType() ), quantity, strategyId, criteriaList, nodeGroupName );
             return Response.ok( JsonUtil.toJson( result ) ).build();
             //            return Response.ok().entity( result ).build();
         }
         catch ( PeerException e )
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response execute( final String requestBuilder, final String host )
-    {
-        try
-        {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            RequestBuilder rb = JsonUtil.fromJson( requestBuilder, RequestBuilder.class );
-            ContainerHost h = JsonUtil.fromJson( requestBuilder, ContainerHost.class );
-            CommandResult result = localPeer.execute( rb, h );
-            return Response.ok( JsonUtil.toJson( result ) ).build();
-        }
-        catch ( CommandException e )
         {
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
@@ -276,14 +236,17 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response destroyContainer( final String host )
+    public Response destroyContainer( final String hostId )
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
+            Host host = localPeer.bindHost( UUID.fromString( hostId ) );
+            if ( host instanceof ContainerHost )
+            {
+                localPeer.destroyContainer( ( ContainerHost ) host );
+            }
 
-            localPeer.destroyContainer( containerHost );
             return Response.ok().build();
         }
         catch ( PeerException e )
@@ -294,13 +257,16 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response startContainer( final String host )
+    public Response startContainer( final String hostId )
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
-            localPeer.startContainer( containerHost );
+            Host host = localPeer.bindHost( UUID.fromString( hostId ) );
+            if ( host instanceof ContainerHost )
+            {
+                localPeer.startContainer( ( ContainerHost ) host );
+            }
             return Response.ok().build();
         }
         catch ( PeerException e )
@@ -311,13 +277,16 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response stopContainer( final String host )
+    public Response stopContainer( final String hostId )
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
-            localPeer.stopContainer( containerHost );
+            Host host = localPeer.bindHost( UUID.fromString( hostId ) );
+            if ( host instanceof ContainerHost )
+            {
+                localPeer.stopContainer( ( ContainerHost ) host );
+            }
             return Response.ok().build();
         }
         catch ( PeerException e )
@@ -328,13 +297,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response isContainerConnected( final String host )
+    public Response isContainerConnected( final String hostId )
     {
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
-            Boolean result = localPeer.isConnected( containerHost );
+            Boolean result = localPeer.isConnected( localPeer.bindHost( UUID.fromString( hostId ) ) );
             return Response.ok( result.toString() ).build();
         }
         catch ( PeerException e )
@@ -358,40 +326,4 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
-
-
-    //
-    //    @Override
-    //    public Response getQuota( @FormParam( "host" ) final String host, @FormParam( "host" ) final String quota )
-    //    {
-    //        try
-    //        {
-    //            LocalPeer localPeer = peerManager.getLocalPeer();
-    //            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
-    //            String result = localPeer.getQuota( containerHost, QuotaEnum.valueOf( quota ) );
-    //            return Response.ok( result.toString() ).build();
-    //        }
-    //        catch ( PeerException e )
-    //        {
-    //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-    //        }
-    //    }
-    //
-    //
-    //    @Override
-    //    public Response setQuota( @FormParam( "host" ) final String host, @FormParam( "host" ) final String quota,
-    //                              @FormParam( "value" ) final String value )
-    //    {
-    //        try
-    //        {
-    //            LocalPeer localPeer = peerManager.getLocalPeer();
-    //            ContainerHost containerHost = JsonUtil.fromJson( host, ContainerHost.class );
-    //            localPeer.setQuota( containerHost, QuotaEnum.valueOf( quota ), value );
-    //            return Response.ok().build();
-    //        }
-    //        catch ( PeerException e )
-    //        {
-    //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-    //        }
-    //    }
 }

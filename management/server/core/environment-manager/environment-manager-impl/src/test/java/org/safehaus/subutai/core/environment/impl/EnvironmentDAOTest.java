@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenceException;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 
 import static org.junit.Assert.assertTrue;
@@ -35,8 +36,8 @@ public class EnvironmentDAOTest
     }
 
 
-    @Test
-    public void shoudSaveInfo()
+    @Test(expected = EnvironmentPersistenceException.class)
+    public void shoudSaveInfo() throws EnvironmentPersistenceException
     {
         assertTrue( environmentDAO.saveInfo( SOURCE, KEY, new DummyClass() ) );
     }

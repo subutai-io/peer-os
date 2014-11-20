@@ -1,0 +1,63 @@
+#!/bin/bash
+
+function package_manager_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Package manager wrapper
+  echo
+  echo "        "subutai \[-qh\] package_manager \[add full_package_path\|remove\|extract full_package_name \[-f full_file_paths\] \] \| \[list search_pattern\] \| \[info package_name\]
+  echo "          "parameters:
+  echo "                    "f -- full file paths seperated by ,
+  echo "                    "     e.g. lxc-data/tmpdir/test1/packages,lxc-data/tmpdir/test1/config
+  echo -----------------------------------------------------------------------
+}
+
+
+function package_manager {
+  operation=$1
+  if [ -z "$operation" ]; then
+    show_usage "`package_manager_usage`" 
+  fi
+
+  if [ $operation == "add" ]; then
+    add_package $2
+  elif [ $operation == "remove" ]; then
+    remove_package $2
+  elif [ $operation == "extract" ]; then
+    full_package_name=$2
+    shift
+    shift
+    while getopts ":f:" opt; do
+      case $opt in
+        f)
+          is_extract_files="true"
+          files="$OPTARG"
+	  ;;
+        \?)
+          msg_error "Unrecognized option -$OPTARG"
+          exit 1
+          ;;
+        :)
+          msg_error "Option -$OPTARG requires an argument." >&2
+          exit 1
+      esac
+    done
+    if [ "x$is_extract_files" == "xtrue" ]; then
+      extract_package $full_package_name "$files"
+    else
+      extract_package $full_package_name
+    fi
+  elif [ $operation == "list" ]; then
+    list_package $2
+  elif [ $operation == "info" ]; then
+    info_package $2
+  else
+    msg_error "Unrecognized operation $operation"
+    exit 1
+  fi
+}
+
+
+function package_manager_description {
+  echo "package-manager wrapper for subutai management application"
+}
+

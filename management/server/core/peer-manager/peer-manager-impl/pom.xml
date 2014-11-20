@@ -27,12 +27,12 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>command-runner-api</artifactId>
     </dependency>
-    <!--
+
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>container-manager-api</artifactId>
+      <artifactId>command-executor-api</artifactId>
     </dependency>
-    -->
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>template-registry-api</artifactId>
@@ -44,6 +44,10 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>lxc-quota-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>host-registry-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

@@ -17,12 +17,12 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command( scope = "hive", name = "uninstall-cluster", description = "Command to uninstall Hive cluster" )
+@Command(scope = "hive", name = "uninstall-cluster", description = "Command to uninstall Hive cluster")
 public class UninstallClusterCommand extends OsgiCommandSupport
 {
 
-    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false )
+    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false)
     String clusterName = null;
     private Hive hiveManager;
     private Tracker tracker;

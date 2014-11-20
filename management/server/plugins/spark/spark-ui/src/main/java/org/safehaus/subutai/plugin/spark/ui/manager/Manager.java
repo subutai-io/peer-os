@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.spark.ui.manager;
 
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -9,10 +8,10 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -24,6 +23,7 @@ import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -69,10 +69,11 @@ public class Manager
     private final Spark spark;
     private final Tracker tracker;
     private final Hadoop hadoop;
-    private final AgentManager agentManager;
-    private final CommandRunner commandRunner;
+
+    private final EnvironmentManager environmentManager;
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private SparkClusterConfig config;
+    private Environment environment;
 
 
     public Manager( final ExecutorService executor, final ServiceLocator serviceLocator ) throws NamingException
@@ -83,8 +84,7 @@ public class Manager
         this.spark = serviceLocator.getService( Spark.class );
         this.tracker = serviceLocator.getService( Tracker.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         this.executor = executor;
         contentRoot = new GridLayout();
@@ -190,22 +190,22 @@ public class Manager
                     return;
                 }
 
-                Set<Agent> set = null;
+                Set<ContainerHost> set = null;
                 if ( config.getSetupType() == SetupType.OVER_HADOOP )
                 {
                     String hn = config.getHadoopClusterName();
-                    if ( hn != null && !hn.isEmpty() )
+                    if ( !Strings.isNullOrEmpty( hn ) )
                     {
                         HadoopClusterConfig hci = hadoop.getCluster( hn );
                         if ( hci != null )
                         {
-                            set = new HashSet<>( hci.getAllNodes() );
+                            set = environment.getHostsByIds( Sets.newHashSet( hci.getAllNodes() ) );
                         }
                     }
                 }
                 else if ( config.getSetupType() == SetupType.WITH_HADOOP )
                 {
-                    set = new HashSet<>( config.getHadoopNodes() );
+                    set = environment.getHostsByIds( config.getHadoopNodeIds() );
                 }
 
                 if ( set == null )
@@ -213,7 +213,7 @@ public class Manager
                     show( "Hadoop cluster not found" );
                     return;
                 }
-                set.removeAll( config.getAllNodes() );
+                set.removeAll( environment.getHostsByIds( Sets.newHashSet(config.getAllNodesIds())) );
                 if ( set.isEmpty() )
                 {
                     show( "All nodes in Hadoop cluster have Spark installed" );
@@ -412,19 +412,17 @@ public class Manager
             {
                 if ( event.isDoubleClick() )
                 {
-                    String lxcHostname =
+                    String hostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
+                    ContainerHost node = environment.getContainerHostByHostname( hostname );
+                    if ( node != null )
                     {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executor, commandRunner,
-                                        agentManager );
+                        TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( node ) );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Container not found" );
                     }
                 }
             }
@@ -437,7 +435,10 @@ public class Manager
     {
         if ( config != null )
         {
-            populateTable( nodesTable, config.getSlaveNodes(), config.getMasterNode() );
+            environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+
+            populateTable( nodesTable, environment.getHostsByIds( config.getSlaveIds() ),
+                    environment.getContainerHostByUUID( config.getMasterNodeId() ) );
             checkAllNodesStatus();
         }
         else
@@ -478,14 +479,9 @@ public class Manager
     }
 
 
-    /**
-     * @param agent agent
-     *
-     * @return Yes if give agent is among seeds, otherwise returns No
-     */
-    public String checkIfMaster( Agent agent )
+    public String checkIfMaster( ContainerHost node )
     {
-        if ( config.getMasterNode().equals( agent ) )
+        if ( config.getMasterNodeId().equals( node.getId() ) )
         {
             return "Master";
         }
@@ -606,12 +602,12 @@ public class Manager
     }
 
 
-    private void populateTable( final Table table, Set<Agent> agents, final Agent master )
+    private void populateTable( final Table table, Set<ContainerHost> slaves, final ContainerHost master )
     {
 
         table.removeAllItems();
 
-        for ( final Agent agent : agents )
+        for ( final ContainerHost node : slaves )
         {
             final Label resultHolder = new Label();
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
@@ -619,10 +615,10 @@ public class Manager
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
 
-            checkBtn.setId( agent.getListIP().get( 0 ) + "-sparkCheck" );
-            startBtn.setId( agent.getListIP().get( 0 ) + "-sparkStart" );
-            stopBtn.setId( agent.getListIP().get( 0 ) + "-sparkStop" );
-            destroyBtn.setId( agent.getListIP().get( 0 ) + "-sparkDestroy" );
+            checkBtn.setId( node.getAgent().getListIP().get( 0 ) + "-sparkCheck" );
+            startBtn.setId( node.getAgent().getListIP().get( 0 ) + "-sparkStart" );
+            stopBtn.setId( node.getAgent().getListIP().get( 0 ) + "-sparkStop" );
+            destroyBtn.setId( node.getAgent().getListIP().get( 0 ) + "-sparkDestroy" );
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn, destroyBtn );
             enableButtons( startBtn, stopBtn );
@@ -635,15 +631,15 @@ public class Manager
             addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn, destroyBtn );
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), checkIfMaster( agent ), resultHolder,
+                    node.getHostname(), node.getAgent().getListIP().get( 0 ), checkIfMaster( node ), resultHolder,
                     availableOperations
             }, null );
 
 
-            addClickListenerToSlaveCheckButton( agent, resultHolder, startBtn, stopBtn, checkBtn, destroyBtn );
-            addClickListenerToStartButton( agent, false, startBtn, stopBtn, checkBtn, destroyBtn );
-            addClickListenerToStopButton( agent, false, startBtn, stopBtn, checkBtn, destroyBtn );
-            addClickListenerToDestroyButton( agent, destroyBtn );
+            addClickListenerToSlaveCheckButton( node, resultHolder, startBtn, stopBtn, checkBtn, destroyBtn );
+            addClickListenerToStartButton( node, false, startBtn, stopBtn, checkBtn, destroyBtn );
+            addClickListenerToStopButton( node, false, startBtn, stopBtn, checkBtn, destroyBtn );
+            addClickListenerToDestroyButton( node, destroyBtn );
         }
 
         //add master here
@@ -653,9 +649,9 @@ public class Manager
         final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
 
 
-        checkBtn.setId( master.getListIP().get( 0 ) + "-sparkCheck" );
-        startBtn.setId( master.getListIP().get( 0 ) + "-sparkStart" );
-        stopBtn.setId( master.getListIP().get( 0 ) + "-sparkStop" );
+        checkBtn.setId( master.getAgent().getListIP().get( 0 ) + "-sparkCheck" );
+        startBtn.setId( master.getAgent().getListIP().get( 0 ) + "-sparkStart" );
+        stopBtn.setId( master.getAgent().getListIP().get( 0 ) + "-sparkStop" );
 
         addStyleNameToButtons( checkBtn, startBtn, stopBtn );
 
@@ -669,7 +665,7 @@ public class Manager
         addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn );
 
         table.addItem( new Object[] {
-                master.getHostname(), master.getListIP().get( 0 ), checkIfMaster( master ), resultHolder,
+                master.getHostname(), master.getAgent().getListIP().get( 0 ), checkIfMaster( master ), resultHolder,
                 availableOperations
         }, null );
 
@@ -679,7 +675,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToSlaveCheckButton( final Agent agent, final Label resultHolder,
+    public void addClickListenerToSlaveCheckButton( final ContainerHost node, final Label resultHolder,
                                                     final Button... buttons )
     {
         getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
@@ -690,7 +686,7 @@ public class Manager
                 progressIcon.setVisible( true );
                 disableButtons( buttons );
 
-                executor.execute( new CheckTaskSlave( spark, tracker, config.getClusterName(), agent.getHostname(),
+                executor.execute( new CheckNodeTask( spark, tracker, config.getClusterName(), node.getHostname(),
                         new CompleteEvent()
                         {
                             @Override
@@ -720,13 +716,13 @@ public class Manager
                                     }
                                 }
                             }
-                        } ) );
+                        }, false ) );
             }
         } );
     }
 
 
-    public void addClickListenerToMasterCheckButton( final Agent agent, final Label resultHolder,
+    public void addClickListenerToMasterCheckButton( final ContainerHost node, final Label resultHolder,
                                                      final Button... buttons )
     {
         getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
@@ -737,7 +733,7 @@ public class Manager
                 progressIcon.setVisible( true );
                 disableButtons( buttons );
 
-                executor.execute( new CheckTaskMaster( spark, tracker, config.getClusterName(), agent.getHostname(),
+                executor.execute( new CheckNodeTask( spark, tracker, config.getClusterName(), node.getHostname(),
                         new CompleteEvent()
                         {
                             @Override
@@ -767,13 +763,14 @@ public class Manager
                                     }
                                 }
                             }
-                        } ) );
+                        }, true ) );
             }
         } );
     }
 
 
-    public void addClickListenerToStartButton( final Agent agent, final boolean isMaster, final Button... buttons )
+    public void addClickListenerToStartButton( final ContainerHost node, final boolean isMaster,
+                                               final Button... buttons )
     {
         getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -782,7 +779,7 @@ public class Manager
             {
                 progressIcon.setVisible( true );
                 disableButtons( buttons );
-                executor.execute( new StartTask( spark, tracker, config.getClusterName(), agent.getHostname(), isMaster,
+                executor.execute( new StartTask( spark, tracker, config.getClusterName(), node.getHostname(), isMaster,
                         new CompleteEvent()
                         {
                             @Override
@@ -800,7 +797,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToDestroyButton( final Agent agent, final Button... buttons )
+    public void addClickListenerToDestroyButton( final ContainerHost node, final Button... buttons )
     {
         getButton( DESTROY_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -808,13 +805,13 @@ public class Manager
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 ConfirmationDialog alert = new ConfirmationDialog(
-                        String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
+                        String.format( "Do you want to destroy the %s node?", node.getHostname() ), "Yes", "No" );
                 alert.getOk().addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( Button.ClickEvent clickEvent )
                     {
-                        UUID trackID = spark.destroySlaveNode( config.getClusterName(), agent.getHostname() );
+                        UUID trackID = spark.destroySlaveNode( config.getClusterName(), node.getHostname() );
                         ProgressWindow window =
                                 new ProgressWindow( executor, tracker, trackID, SparkClusterConfig.PRODUCT_KEY );
                         window.getWindow().addCloseListener( new Window.CloseListener()
@@ -835,7 +832,8 @@ public class Manager
     }
 
 
-    public void addClickListenerToStopButton( final Agent agent, final boolean isMaster, final Button... buttons )
+    public void addClickListenerToStopButton( final ContainerHost node, final boolean isMaster,
+                                              final Button... buttons )
     {
         getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -844,7 +842,7 @@ public class Manager
             {
                 progressIcon.setVisible( true );
                 disableButtons( buttons );
-                executor.execute( new StopTask( spark, tracker, config.getClusterName(), agent.getHostname(), isMaster,
+                executor.execute( new StopTask( spark, tracker, config.getClusterName(), node.getHostname(), isMaster,
                         new CompleteEvent()
                         {
                             @Override

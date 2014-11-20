@@ -6,8 +6,10 @@
 package org.safehaus.subutai.core.strategy.impl;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -71,9 +73,9 @@ public class MockUtils
     }
 
 
-    public static Map<Agent, ServerMetric> getServerMetrics()
+    public static List<ServerMetric> getServerMetrics()
     {
-        Map<Agent, ServerMetric> result = new HashMap<>();
+        List<ServerMetric> result = new ArrayList<>();
 
         Map<MetricType, Double> avgMetric = new HashMap<>();
         avgMetric.put( MetricType.CPU_USER, 1.0 );
@@ -83,8 +85,9 @@ public class MockUtils
         for ( Agent agent : physicalAgents )
         {
             ServerMetric metric =
-                    new ServerMetric( 20000 + ( i++ ), 40000 + ( i++ ), 30 + ( i++ ), 4 + ( i++ ), avgMetric );
-            result.put( agent, metric );
+                    new ServerMetric( agent.getHostname(), 20000 + ( i++ ), 40000 + ( i++ ), 30 + ( i++ ), 4 + ( i++ ),
+                            avgMetric );
+            result.add( metric );
         }
         return result;
     }

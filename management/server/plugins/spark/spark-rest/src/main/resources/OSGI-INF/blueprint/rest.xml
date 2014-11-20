@@ -4,26 +4,30 @@
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
+
   <cxf:bus id="cxfBusSpark">
     <cxf:features>
       <cxf:logging />
     </cxf:features>
   </cxf:bus>
 
-  <reference id="sparkManager" availability="mandatory"
-             interface="org.safehaus.subutai.plugin.spark.api.Spark" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
-
-  <bean id="sparkRestService" class="org.safehaus.subutai.plugin.spark.rest.RestService">
-    <property name="agentManager" ref="agentManager" />
-    <property name="sparkManager" ref="sparkManager" />
-  </bean>
-
   <jaxrs:server address="/spark" id="sparkRestServiceImpl">
     <jaxrs:serviceBeans>
       <ref component-id="sparkRestService" />
     </jaxrs:serviceBeans>
   </jaxrs:server>
+
+  <reference id="sparkManager" availability="mandatory"
+             interface="org.safehaus.subutai.plugin.spark.api.Spark" />
+  <reference id="hadoopManager" availability="mandatory"
+             interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
+  <reference id="environmentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
+
+  <bean id="sparkRestService" class="org.safehaus.subutai.plugin.spark.rest.RestService">
+    <argument ref="sparkManager" />
+    <argument ref="hadoopManager" />
+    <argument ref="environmentManager" />
+  </bean>
 
 </blueprint>

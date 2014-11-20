@@ -28,7 +28,7 @@ if [ -n "$TEST_MODE" -a "$TEST_MODE" == "true" ]; then
     echo "Missing directory $subutai_lib_base"
     exit 1
   fi
-
+  
   . $subutai_lib_base/funcs
   export TEST_MODE
   msg_warning "Operating in test mode!!!"

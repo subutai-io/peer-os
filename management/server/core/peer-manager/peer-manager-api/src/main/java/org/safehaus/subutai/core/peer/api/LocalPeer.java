@@ -13,13 +13,15 @@ import org.safehaus.subutai.common.protocol.Agent;
  */
 public interface LocalPeer extends Peer
 {
+    public Host bindHost( UUID id ) throws PeerException;
+
     public ResourceHost getResourceHostByName( String hostname ) throws PeerException;
 
     public ContainerHost getContainerHostByName( String hostname ) throws PeerException;
 
     public ManagementHost getManagementHost() throws PeerException;
 
-    public Set<ResourceHost> getResourceHosts() throws PeerException;
+    public Set<ResourceHost> getResourceHosts();
 
     /**
      * Returns the templates list
@@ -36,4 +38,6 @@ public interface LocalPeer extends Peer
             throws PeerException;
 
     Agent waitForAgent( String containerName, int timeout );
+
+    public void onPeerEvent( PeerEvent event );
 }

@@ -16,28 +16,33 @@
 
   <modules>
     <module>cassandra</module>
-    <!--<module>accumulo</module>
+    <module>elasticsearch</module>
     <module>hadoop</module>
+    <module>mongodb</module>
+    <module>hive</module>
+    <module>spark</module>
+    <module>shark</module>
+    <module>hbase</module>
+    <module>hipi</module>
+    <module>sqoop</module>
+    <module>oozie</module>
+    <!--<module>accumulo</module>
     <module>solr</module>
     <module>zookeeper</module>
     <module>mongodb</module>
     <module>flume</module>
-    <module>hive</module>
     <module>storm</module>
     <module>presto</module>
-    <module>spark</module>
     <module>shark</module>
     <module>sqoop</module>
     <module>lucene</module>
     <module>pig</module>
-    <module>elasticsearch</module>
-    <module>hbase</module>
     <module>mahout</module>
-    <module>oozie</module>
     <module>hipi</module>
     <module>nutch</module>
+    <module>plugin-common</module>
     <module>jetty</module>-->
-    <!--<module>plugin-common</module>-->
+    <module>plugin-common</module>
   </modules>
 
 </project>

@@ -1,28 +1,50 @@
 package org.safehaus.subutai.plugin.spark.impl;
 
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
-public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupStrategy
+
+public class SetupStrategyOverHadoop implements ClusterSetupStrategy
 {
+    final TrackerOperation po;
+    final SparkImpl manager;
+    final SparkClusterConfig config;
+    private Environment environment;
+    private Set<ContainerHost> allNodes;
 
-    public SetupStrategyOverHadoop( TrackerOperation po, SparkImpl sparkManager, SparkClusterConfig config )
+
+    public SetupStrategyOverHadoop( TrackerOperation po, SparkImpl manager, SparkClusterConfig config,
+                                    Environment environment )
     {
-        super( po, sparkManager, config );
+        Preconditions.checkNotNull( config, "Cluster config is null" );
+        Preconditions.checkNotNull( po, "Product operation tracker is null" );
+        Preconditions.checkNotNull( manager, "Manager is null" );
+        Preconditions.checkNotNull( environment, "Environment is null" );
+
+
+        this.po = po;
+        this.manager = manager;
+        this.config = config;
+        this.environment = environment;
     }
 
 
@@ -38,35 +60,42 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
     private void check() throws ClusterSetupException
     {
 
-        String m = "Malformed configuration: ";
-        if ( config.getClusterName() == null || config.getClusterName().isEmpty() )
-        {
-            throw new ClusterSetupException( m + "cluster name not specified" );
-        }
         if ( manager.getCluster( config.getClusterName() ) != null )
         {
-            throw new ClusterSetupException(
-                    m + String.format( "cluster %s already exists", config.getClusterName() ) );
+            throw new ClusterSetupException( String.format( "Cluster %s already exists", config.getClusterName() ) );
         }
-        if ( config.getMasterNode() == null )
+        if ( config.getMasterNodeId() == null )
         {
-            throw new ClusterSetupException( m + "master node not specified" );
+            throw new ClusterSetupException( "Master node not specified" );
         }
-        if ( config.getSlaveNodes().isEmpty() )
+        if ( CollectionUtil.isCollectionEmpty( config.getSlaveIds() ) )
         {
-            throw new ClusterSetupException( m + "no slave nodes" );
+            throw new ClusterSetupException( "No slave nodes" );
         }
 
-        // check if nodes are connected
-        if ( manager.agentManager.getAgentByHostname( config.getMasterNode().getHostname() ) == null )
+        ContainerHost master = environment.getContainerHostByUUID( config.getMasterNodeId() );
+        if ( master == null )
         {
-            throw new ClusterSetupException( "Master node is not connected" );
+            throw new ClusterSetupException( "Master not found in the environment" );
         }
-        for ( Agent a : config.getSlaveNodes() )
+        if ( !master.isConnected() )
         {
-            if ( manager.agentManager.getAgentByHostname( a.getHostname() ) == null )
+            throw new ClusterSetupException( "Master is not connected" );
+        }
+
+        Set<ContainerHost> slaves = environment.getHostsByIds( config.getSlaveIds() );
+
+        if ( slaves.size() > config.getSlaveIds().size() )
+        {
+            throw new ClusterSetupException( "Fewer slaves found in the environment than indicated" );
+        }
+
+        for ( ContainerHost slave : slaves )
+        {
+            if ( !slave.isConnected() )
             {
-                throw new ClusterSetupException( "Not all slave nodes are connected" );
+                throw new ClusterSetupException(
+                        String.format( "Container %s is not connected", slave.getHostname() ) );
             }
         }
 
@@ -76,52 +105,56 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
         {
             throw new ClusterSetupException( "Could not find Hadoop cluster " + config.getHadoopClusterName() );
         }
-        if ( !hc.getAllNodes().containsAll( config.getAllNodes() ) )
+        if ( !hc.getAllNodes().containsAll( config.getAllNodesIds() ) )
         {
             throw new ClusterSetupException(
                     "Not all nodes belong to Hadoop cluster " + config.getHadoopClusterName() );
         }
-        config.setHadoopNodes( new HashSet<>( hc.getAllNodes() ) );
+        //        config.setHadoopNodeIds( new HashSet<>( hc.getAllNodes() ) );
 
         po.addLog( "Checking prerequisites..." );
 
         //check installed subutai packages
-        Set<Agent> allNodes = config.getAllNodes();
-        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( allNodes );
-        manager.getCommandRunner().runCommand( checkInstalledCommand );
+        allNodes = Sets.newHashSet( master );
+        allNodes.addAll( slaves );
 
-        if ( !checkInstalledCommand.hasCompleted() )
+        RequestBuilder checkInstalledCommand = manager.getCommands().getCheckInstalledCommand();
+
+        for ( Iterator<ContainerHost> iterator = allNodes.iterator(); iterator.hasNext(); )
         {
-            throw new ClusterSetupException(
-                    "Failed to check presence of installed subutai packages\nInstallation aborted" );
-        }
-        for ( Iterator<Agent> it = allNodes.iterator(); it.hasNext(); )
-        {
-            Agent node = it.next();
-
-            AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
-            if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
+            final ContainerHost node = iterator.next();
+            try
             {
-                po.addLog( String.format( "Node %s already has Spark installed. Omitting this node from installation",
-                        node.getHostname() ) );
-                config.getSlaveNodes().remove( node );
-                it.remove();
+                CommandResult result = node.execute( checkInstalledCommand );
+                if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
+                {
+                    po.addLog(
+                            String.format( "Node %s already has Spark installed. Omitting this node from installation",
+                                    node.getHostname() ) );
+                    config.getSlaveIds().remove( node.getId() );
+                    iterator.remove();
+                }
+                else if ( !result.getStdOut()
+                                 .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME.toLowerCase() ) )
+                {
+                    po.addLog(
+                            String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
+                                    node.getHostname() ) );
+                    config.getSlaveIds().remove( node.getId() );
+                    iterator.remove();
+                }
             }
-            else if ( !result.getStdOut()
-                             .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME.toLowerCase() ) )
+            catch ( CommandException e )
             {
-                po.addLog( String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
-                        node.getHostname() ) );
-                config.getSlaveNodes().remove( node );
-                it.remove();
+                throw new ClusterSetupException( "Failed to check presence of installed subutai packages" );
             }
         }
 
-        if ( config.getSlaveNodes().isEmpty() )
+        if ( config.getSlaveIds().isEmpty() )
         {
             throw new ClusterSetupException( "No nodes eligible for installation\nInstallation aborted" );
         }
-        if ( !allNodes.contains( config.getMasterNode() ) )
+        if ( !allNodes.contains( master ) )
         {
             throw new ClusterSetupException( "Master node was omitted\nInstallation aborted" );
         }
@@ -130,26 +163,55 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
 
     private void configure() throws ClusterSetupException
     {
-        po.addLog( "Updating db..." );
-        //save to db
-        manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-        po.addLog( "Cluster info saved to DB\nInstalling Spark..." );
+        config.setEnvironmentId( environment.getId() );
+
+        po.addLog( "Installing Spark..." );
         //install spark
-        Command installCommand = manager.getCommands().getInstallCommand( config.getAllNodes() );
-        manager.getCommandRunner().runCommand( installCommand );
-
-        if ( installCommand.hasSucceeded() )
+        RequestBuilder installCommand = manager.getCommands().getInstallCommand();
+        for ( ContainerHost node : allNodes )
         {
-            po.addLog( "Installation succeeded" );
+            executeCommand( node, installCommand );
+        }
 
-            SetupHelper helper = new SetupHelper( manager, config, po );
-            helper.configureMasterIP( config.getSlaveNodes() );
-            helper.registerSlaves();
-            helper.startCluster();
-        }
-        else
+        po.addLog( "Configuring cluster..." );
+
+        ClusterConfiguration configuration = new ClusterConfiguration( manager, po );
+
+        try
         {
-            throw new ClusterSetupException( "Installation failed: " + installCommand.getAllErrors() );
+            configuration.configureCluster( config, environment );
         }
+        catch ( ClusterConfigurationException e )
+        {
+            throw new ClusterSetupException( e );
+        }
+
+        po.addLog( "Saving cluster info..." );
+
+        if ( !manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
+        {
+            throw new ClusterSetupException( "Could not save cluster info" );
+        }
+    }
+
+
+    public CommandResult executeCommand( ContainerHost host, RequestBuilder command ) throws ClusterSetupException
+    {
+
+        CommandResult result;
+        try
+        {
+            result = host.execute( command );
+        }
+        catch ( CommandException e )
+        {
+            throw new ClusterSetupException( e );
+        }
+        if ( !result.hasSucceeded() )
+        {
+            throw new ClusterSetupException( String.format( "Error on container %s: %s", host.getHostname(),
+                    result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
+        }
+        return result;
     }
 }

@@ -17,7 +17,7 @@
     </jaxrs:serviceBeans>
   </jaxrs:server>
 
-  <bean id="environmentRestServiceImpl" class="org.safehaus.subutai.environment.rest.RestServiceImpl">
+  <bean id="environmentRestServiceImpl" class="org.safehaus.subutai.core.environment.rest.RestServiceImpl">
     <property name="environmentManager" ref="environmentManager" />
   </bean>
 

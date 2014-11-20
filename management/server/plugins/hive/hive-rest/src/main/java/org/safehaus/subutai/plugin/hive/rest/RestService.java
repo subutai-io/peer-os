@@ -89,12 +89,14 @@ public class RestService
         config.setHadoopClusterName( hadoopClusterName );
 
         Agent serverAgent = agentManager.getAgentByHostname( server );
-        config.setServer( serverAgent );
+        // TODO fix here
+        config.setServer( serverAgent.getUuid() );
 
         for ( String client : clients.split( "," ) )
         {
             Agent agent = agentManager.getAgentByHostname( client );
-            config.getClients().add( agent );
+            // TODO fix here agent uuid
+            config.getClients().add( agent.getUuid() );
         }
 
         UUID uuid = hiveManager.installCluster( config );
@@ -141,7 +143,7 @@ public class RestService
         {
         }
 
-        UUID trackId = hiveManager.installCluster( config, hc );
+        UUID trackId = hiveManager.installCluster( config, hc.getClusterName() );
 
         String operationId = JsonUtil.toJson( OPERATION_ID, trackId );
         return Response.status( Response.Status.CREATED ).entity( operationId ).build();
@@ -176,7 +178,7 @@ public class RestService
     public Response destroyNode( @PathParam( "clusterName" ) String clusterName,
                                  @PathParam( "hostname" ) String hostname )
     {
-        UUID uuid = hiveManager.destroyNode( clusterName, hostname );
+        UUID uuid = hiveManager.uninstallNode( clusterName, hostname );
 
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();

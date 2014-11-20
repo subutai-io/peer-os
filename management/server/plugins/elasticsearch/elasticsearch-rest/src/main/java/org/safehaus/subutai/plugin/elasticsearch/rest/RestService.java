@@ -35,11 +35,10 @@ public class RestService
 
 
     @GET
-    @Path("clusters")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Path( "clusters" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     public Response listClusters()
     {
-
         List<ElasticsearchClusterConfiguration> elasticsearchClusterConfigurationList = elasticsearch.getClusters();
         ArrayList<String> clusterNames = new ArrayList();
 
@@ -55,23 +54,15 @@ public class RestService
 
 
     @POST
-    @Path("clusters")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response installCluster( @PathParam("clusterName") String clusterName,
-                                    @QueryParam("numberOfNodes") int numberOfNodes,
-                                    @QueryParam("numberOfMasterNodes") int numberOfMasterNodes,
-                                    @QueryParam("numberOfDataNodes") int numberOfDataNodes,
-                                    @QueryParam("numberOfShards") int numberOfShards,
-                                    @QueryParam("numberOfReplicas") int numberOfReplicas )
+    @Path( "clusters" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response installCluster( @PathParam( "clusterName" ) String clusterName,
+                                    @QueryParam( "numberOfNodes" ) int numberOfNodes )
     {
 
         ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = new ElasticsearchClusterConfiguration();
         elasticsearchClusterConfiguration.setClusterName( clusterName );
         elasticsearchClusterConfiguration.setNumberOfNodes( numberOfNodes );
-        elasticsearchClusterConfiguration.setNumberOfMasterNodes( numberOfMasterNodes );
-        elasticsearchClusterConfiguration.setNumberOfDataNodes( numberOfDataNodes );
-        elasticsearchClusterConfiguration.setNumberOfShards( numberOfShards );
-        elasticsearchClusterConfiguration.setNumberOfReplicas( numberOfReplicas );
 
         UUID uuid = elasticsearch.installCluster( elasticsearchClusterConfiguration );
 
@@ -81,76 +72,69 @@ public class RestService
 
 
     @DELETE
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response uninstallCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response uninstallCluster( @PathParam( "clusterName" ) String clusterName )
     {
-
         UUID uuid = elasticsearch.uninstallCluster( clusterName );
-
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
 
 
     @GET
-    @Path("clusters/{clusterName}/nodes")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response checkAllNodes( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}/nodes" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response checkAllNodes( @PathParam( "clusterName" ) String clusterName )
     {
-
-        UUID uuid = elasticsearch.checkAllNodes( clusterName );
-
+        ElasticsearchClusterConfiguration config = elasticsearch.getCluster( clusterName );
+        UUID uuid = elasticsearch.checkAllNodes( config );
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
 
 
     @PUT
-    @Path("clusters/{clusterName}/nodes/start")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response startAllNodes( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}/nodes/start" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response startAllNodes( @PathParam( "clusterName" ) String clusterName )
     {
-
-        UUID uuid = elasticsearch.startAllNodes( clusterName );
-
+        ElasticsearchClusterConfiguration config = elasticsearch.getCluster( clusterName );
+        UUID uuid = elasticsearch.startAllNodes( config );
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
 
 
     @PUT
-    @Path("clusters/{clusterName}/nodes/stop")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response stopAllNodes( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}/nodes/stop" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response stopAllNodes( @PathParam( "clusterName" ) String clusterName )
     {
-
-        UUID uuid = elasticsearch.stopAllNodes( clusterName );
-
+        ElasticsearchClusterConfiguration config = elasticsearch.getCluster( clusterName );
+        UUID uuid = elasticsearch.stopAllNodes( config );
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
 
 
     @POST
-    @Path("clusters/{clusterName}/nodes/{node}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response addNode( @PathParam("clusterName") String clusterName, @PathParam("node") String node )
+    @Path( "clusters/{clusterName}/nodes/{node}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response addNode( @PathParam( "clusterName" ) String clusterName, @PathParam( "node" ) String node )
     {
         UUID uuid = elasticsearch.addNode( clusterName, node );
-
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
         return Response.status( Response.Status.CREATED ).entity( operationId ).build();
     }
 
 
     @DELETE
-    @Path("clusters/{clusterName}/nodes/{node}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response destroyNode( @PathParam("clusterName") String clusterName, @PathParam("node") String node )
+    @Path( "clusters/{clusterName}/nodes/{node}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response destroyNode( @PathParam( "clusterName" ) String clusterName, @PathParam( "node" ) String node )
     {
         UUID uuid = elasticsearch.destroyNode( clusterName, node );
-
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }

@@ -8,9 +8,10 @@ package org.safehaus.subutai.plugin.zookeeper.api;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
 public class ZookeeperClusterConfig implements ConfigBase
@@ -21,9 +22,22 @@ public class ZookeeperClusterConfig implements ConfigBase
     private String templateName = PRODUCT_NAME;
     private String clusterName = "";
     private int numberOfNodes = 3;
-    private Set<Agent> nodes;
+    private Set<ContainerHost> nodes;
     private SetupType setupType;
     private String hadoopClusterName;
+    private UUID environmentId;
+
+
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
+    }
 
 
     public ZookeeperClusterConfig()
@@ -106,13 +120,13 @@ public class ZookeeperClusterConfig implements ConfigBase
     }
 
 
-    public Set<Agent> getNodes()
+    public Set<ContainerHost> getNodes()
     {
         return nodes;
     }
 
 
-    public void setNodes( Set<Agent> nodes )
+    public void setNodes( Set<ContainerHost> nodes )
     {
         this.nodes = nodes;
     }

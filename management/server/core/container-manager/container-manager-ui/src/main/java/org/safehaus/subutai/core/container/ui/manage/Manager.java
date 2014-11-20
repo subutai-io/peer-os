@@ -1,29 +1,44 @@
 package org.safehaus.subutai.core.container.ui.manage;
 
 
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.event.Action;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.*;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.container.api.ContainerState;
-import org.safehaus.subutai.core.container.ui.common.Buttons;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
-import org.safehaus.subutai.core.peer.api.*;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.container.api.ContainerState;
+import org.safehaus.subutai.core.container.ui.common.Buttons;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
+import com.vaadin.event.Action;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.AbsoluteLayout;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.TreeTable;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 
 @SuppressWarnings( "serial" )
@@ -378,37 +393,30 @@ public class Manager extends VerticalLayout
     {
         lxcTable.setEnabled( false );
         indicator.setVisible( true );
-        try
+        final Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
+        executorService.execute( new Runnable()
         {
-            final Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
-            executorService.execute( new Runnable()
+            public void run()
             {
-                public void run()
+                getUI().access( new Runnable()
                 {
-                    getUI().access( new Runnable()
+                    @Override
+                    public void run()
                     {
-                        @Override
-                        public void run()
-                        {
-                            populateTable( resourceHosts );
-                            lxcTable.setEnabled( true );
-                            indicator.setVisible( false );
-                        }
-                    } );
-                }
-            } );
-        }
-        catch ( PeerException e )
-        {
-            show( String.format( "Could not build container list. Error occurred: (%s)", e.toString() ) );
-        }
+                        populateTable( resourceHosts );
+                        lxcTable.setEnabled( true );
+                        indicator.setVisible( false );
+                    }
+                } );
+            }
+        } );
     }
 
 
     private void populateTable( Set<ResourceHost> resourceHosts )
     {
         final Button btnApplySettings = new Button();
-        btnApplySettings.addStyleName("default");
+        btnApplySettings.addStyleName( "default" );
 
         lxcTable.removeAllItems();
 
@@ -442,8 +450,8 @@ public class Manager extends VerticalLayout
                         containerCpu = containerHost.getQuota( QuotaEnum.CPUSET_CPUS );
                         containerCpuTextField.setValue( containerCpu );
 
-                        modifyQuota.setValueFormemoryTextField2(containerMemory);
-                        modifyQuota.setValueForCoresUsedTextField(containerCpu);
+                        modifyQuota.setValueFormemoryTextField2( containerMemory );
+                        modifyQuota.setValueForCoresUsedTextField( containerCpu );
 
                         memoryQuotaComponent.setValueForMemoryTextField( containerMemory );
                         updateQuota.addClickListener( new Button.ClickListener()
@@ -451,30 +459,32 @@ public class Manager extends VerticalLayout
                             @Override
                             public void buttonClick( final Button.ClickEvent clickEvent )
                             {
-                                Window subWindowModifyLXC = new Window("Modify LXC container");
+                                Window subWindowModifyLXC = new Window( "Modify LXC container" );
                                 AbsoluteLayout mainLayout = new AbsoluteLayout();
-                                subWindowModifyLXC.setModal(true);
+                                subWindowModifyLXC.setModal( true );
                                 subWindowModifyLXC.center();
-                                subWindowModifyLXC.setHeight("600px");
-                                subWindowModifyLXC.setWidth("550px");
+                                subWindowModifyLXC.setHeight( "600px" );
+                                subWindowModifyLXC.setWidth( "550px" );
 
-                                mainLayout.addComponent(modifyQuota, "top:0.0px;right:0.0px;left:0.0px;");
+                                mainLayout.addComponent( modifyQuota, "top:0.0px;right:0.0px;left:0.0px;" );
 
-                                btnApplySettings.addStyleName("default");
-                                btnApplySettings.setCaption("Apply");
-                                btnApplySettings.setImmediate(true);
-                                btnApplySettings.setWidth("-1px");
-                                btnApplySettings.setHeight("-1px");
-                                mainLayout.addComponent(btnApplySettings, "top:500.0px;left:450.0px;");
+                                btnApplySettings.addStyleName( "default" );
+                                btnApplySettings.setCaption( "Apply" );
+                                btnApplySettings.setImmediate( true );
+                                btnApplySettings.setWidth( "-1px" );
+                                btnApplySettings.setHeight( "-1px" );
+                                mainLayout.addComponent( btnApplySettings, "top:500.0px;left:450.0px;" );
 
-                                subWindowModifyLXC.setContent(mainLayout);
+                                subWindowModifyLXC.setContent( mainLayout );
 
-                                UI.getCurrent().addWindow(subWindowModifyLXC);
+                                UI.getCurrent().addWindow( subWindowModifyLXC );
                             }
                         } );
-                        btnApplySettings.addClickListener(new Button.ClickListener() {
+                        btnApplySettings.addClickListener( new Button.ClickListener()
+                        {
                             @Override
-                            public void buttonClick(final Button.ClickEvent clickEvent) {
+                            public void buttonClick( final Button.ClickEvent clickEvent )
+                            {
                                 try
                                 {
                                     String memoryLimit = modifyQuota.getMemoryLimitValue();
@@ -486,10 +496,9 @@ public class Manager extends VerticalLayout
                                 {
                                     show( pe.toString() );
                                 }
-                                Notification.show("Settings applied");
+                                Notification.show( "Settings applied" );
                             }
-                        });
-
+                        } );
                     }
                     catch ( PeerException pe )
                     {

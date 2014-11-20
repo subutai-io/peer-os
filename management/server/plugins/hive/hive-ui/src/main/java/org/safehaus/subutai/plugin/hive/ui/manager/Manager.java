@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.hive.ui.manager;
 
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -9,15 +10,18 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.OperationState;
-import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
+import org.safehaus.subutai.plugin.hive.api.HiveNodeOperationTask;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -66,11 +70,11 @@ public class Manager
     private final Table serverTable, clientsTable;
     private final Hive hive;
     private final ExecutorService executorService;
+    private final EnvironmentManager environmentManager;
     private final Tracker tracker;
-    private final CommandRunner commandRunner;
-    private final AgentManager agentManager;
     private GridLayout contentRoot;
     private HiveConfig config;
+    private Hadoop hadoop;
 
 
     public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -78,8 +82,8 @@ public class Manager
         this.executorService = executorService;
         this.hive = serviceLocator.getService( Hive.class );
         this.tracker = serviceLocator.getService( Tracker.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.hadoop = serviceLocator.getService( Hadoop.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -93,10 +97,6 @@ public class Manager
         serverTable.setId( "HiveTable" );
         clientsTable = createTableTemplate( CLIENT_TABLE_CAPTION );
         clientsTable.setId( "HiveClientsTable" );
-        /*
-        nodesTable = createTableTemplate( SERVER_TABLE_CAPTION );
-        nodesTable.setId("HiveTable");
-*/
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -179,7 +179,7 @@ public class Manager
                     show( "Select cluster" );
                     return;
                 }
-                Set<Agent> set = new HashSet<>( config.getHadoopNodes() );
+                Set<UUID> set = new HashSet<>( config.getHadoopNodes() );
                 set.remove( config.getServer() );
                 set.removeAll( config.getClients() );
                 if ( set.isEmpty() )
@@ -187,7 +187,17 @@ public class Manager
                     show( "All nodes in Hadoop cluster have Hive installed" );
                     return;
                 }
-                AddNodeWindow w = new AddNodeWindow( hive, executorService, tracker, config, set );
+
+                Set<ContainerHost> myHostSet = new HashSet<>();
+                for ( UUID uuid : set )
+                {
+                    myHostSet.add( environmentManager.getEnvironmentByUUID(
+                            hadoop.getCluster( config.getHadoopClusterName() ).getEnvironmentId() )
+                                                     .getContainerHostByUUID( uuid ) );
+                }
+
+                AddNodeWindow w = new AddNodeWindow( hive, executorService, tracker, config,
+                        hadoop.getCluster( config.getHadoopClusterName() ), myHostSet );
                 contentRoot.getUI().addWindow( w );
                 w.addCloseListener( new Window.CloseListener()
                 {
@@ -236,7 +246,9 @@ public class Manager
 
     private void destroyClusterHandler()
     {
+        hadoop.getCluster( config.getClusterName() );
         UUID trackID = hive.uninstallCluster( config.getClusterName() );
+
         ProgressWindow window = new ProgressWindow( executorService, tracker, trackID, HiveConfig.PRODUCT_KEY );
         window.getWindow().addCloseListener( new Window.CloseListener()
         {
@@ -317,13 +329,15 @@ public class Manager
             @Override
             public void itemClick( ItemClickEvent event )
             {
-                String lxcHostname = ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                if ( lxcAgent != null )
+                String containerId =
+                        ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION )
+                                        .getValue();
+                ContainerHost containerHost =
+                        environmentManager.getEnvironmentByUUID( hadoop.getCluster( config.getHadoopClusterName() ).getEnvironmentId() ).getContainerHostByHostname( containerId );
+
+                if ( containerHost != null )
                 {
-                    TerminalWindow terminal =
-                            new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
-                                    agentManager );
+                    TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( containerHost ) );
                     contentRoot.getUI().addWindow( terminal.getWindow() );
                 }
                 else
@@ -345,10 +359,12 @@ public class Manager
     {
         if ( config != null )
         {
-            Set<Agent> cli_agents = new HashSet<>();
-            cli_agents.add( config.getServer() );
-            populateTable( serverTable, cli_agents );
-            populateTable( clientsTable, config.getClients() );
+            populateTable( serverTable,
+                    getServers( environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers(),
+                            config ) );
+            populateTable( clientsTable,
+                    getClients( environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers(),
+                            config ) );
         }
         else
         {
@@ -358,20 +374,48 @@ public class Manager
     }
 
 
-    private void populateTable( final Table table, Set<Agent> agents )
+    public Set<ContainerHost> getServers( Set<ContainerHost> containerHosts, HiveConfig config )
+    {
+        Set<ContainerHost> list = new HashSet<>();
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            if ( config.getServer().equals( containerHost.getAgent().getUuid() ) )
+            {
+                list.add( containerHost );
+            }
+        }
+        return list;
+    }
+
+
+    public Set<ContainerHost> getClients( Set<ContainerHost> containerHosts, HiveConfig config )
+    {
+        Set<ContainerHost> list = new HashSet<>();
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            if ( config.getClients().contains( containerHost.getAgent().getUuid() ) )
+            {
+                list.add( containerHost );
+            }
+        }
+        return list;
+    }
+
+
+    private void populateTable( final Table table, Set<ContainerHost> containerHosts )
     {
         table.removeAllItems();
 
-        for ( final Agent agent : agents )
+        for ( final ContainerHost containerHost : containerHosts )
         {
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId( agent.getListIP().get( 0 ) + "-hiveCheck" );
+            checkBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hiveCheck" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.setId( agent.getListIP().get( 0 ) + "-hiveStart" );
+            startBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hiveStart" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.setId( agent.getListIP().get( 0 ) + "-hiveStop" );
+            stopBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hiveStop" );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( agent.getListIP().get( 0 ) + "-hiveDestroy" );
+            destroyBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hiveDestroy" );
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn, destroyBtn );
             disableButtons( startBtn, stopBtn );
@@ -380,7 +424,7 @@ public class Manager
             availableOperations.addStyleName( "default" );
             availableOperations.setSpacing( true );
 
-            if ( isServer( agent ) )
+            if ( isServer( containerHost.getAgent() ) )
             {
                 addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn );
             }
@@ -393,13 +437,15 @@ public class Manager
                     public void buttonClick( Button.ClickEvent clickEvent )
                     {
                         ConfirmationDialog alert = new ConfirmationDialog(
-                                String.format( "Do you want to destroy node  %s?", agent.getHostname() ), "Yes", "No" );
+                                String.format( "Do you want to destroy node  %s?",
+                                        containerHost.getAgent().getHostname() ), "Yes", "No" );
                         alert.getOk().addClickListener( new Button.ClickListener()
                         {
                             @Override
                             public void buttonClick( Button.ClickEvent clickEvent )
                             {
-                                UUID trackID = hive.destroyNode( config.getClusterName(), agent.getHostname() );
+                                UUID trackID = hive.uninstallNode( config.getClusterName(),
+                                        containerHost.getAgent().getHostname() );
                                 ProgressWindow window =
                                         new ProgressWindow( executorService, tracker, trackID, HiveConfig.PRODUCT_KEY );
                                 window.getWindow().addCloseListener( new Window.CloseListener()
@@ -422,12 +468,13 @@ public class Manager
             }
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), checkNodeRole( agent ), availableOperations
+                    containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ),
+                    checkNodeRole( containerHost.getAgent() ), availableOperations
             }, null );
 
-            addClickListenerToCheckButton( agent, startBtn, stopBtn, checkBtn, destroyBtn );
-            addClickListenerToStartButton( agent, startBtn, stopBtn, checkBtn, destroyBtn );
-            addClickListenerToStopButton( agent, startBtn, stopBtn, checkBtn, destroyBtn );
+            addClickListenerToCheckButton( containerHost, startBtn, stopBtn, checkBtn, destroyBtn );
+            addClickListenerToStartButton( containerHost, startBtn, stopBtn, checkBtn, destroyBtn );
+            addClickListenerToStopButton( containerHost, startBtn, stopBtn, checkBtn, destroyBtn );
         }
     }
 
@@ -435,7 +482,7 @@ public class Manager
     public String checkNodeRole( Agent agent )
     {
 
-        if ( config.getServer().equals( agent ) )
+        if ( config.getServer().equals( agent.getUuid() ) )
         {
             return "Server";
         }
@@ -448,7 +495,7 @@ public class Manager
 
     private boolean isServer( Agent agent )
     {
-        return config.getServer().equals( agent );
+        return config.getServer().equals( agent.getUuid() );
     }
 
 
@@ -479,36 +526,37 @@ public class Manager
     }
 
 
-    private void addClickListenerToStopButton( final Agent agent, final Button... buttons )
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
+    }
+
+
+    private void addClickListenerToStopButton( final ContainerHost containerHost, final Button... buttons )
     {
         getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                disableButtons( buttons );
-                final UUID trackID = hive.stopNode( config.getClusterName(), agent.getHostname() );
-                PROGRESS_ICON.setVisible( true );
-                executorService.execute( new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        TrackerOperationView po = null;
-                        while ( po == null || po.getState() == OperationState.RUNNING )
+                executorService.execute(
+                        new HiveNodeOperationTask( hive, tracker, config.getClusterName(), containerHost,
+                                NodeOperationType.STOP, new CompleteEvent()
                         {
-                            po = tracker.getTrackerOperation( HiveConfig.PRODUCT_KEY, trackID );
-                        }
-                        getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                        checkServer();
-                    }
-                } );
+
+                            @Override
+                            public void onComplete( final NodeState state )
+                            {
+                                getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                checkServer();
+                            }
+                        }, null ) );
             }
         } );
     }
 
 
-    private void addClickListenerToStartButton( final Agent agent, final Button... buttons )
+    private void addClickListenerToStartButton( final ContainerHost containerHost, final Button... buttons )
     {
         getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -516,28 +564,24 @@ public class Manager
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 disableButtons( buttons );
-                final UUID trackID = hive.startNode( config.getClusterName(), agent.getHostname() );
-                PROGRESS_ICON.setVisible( true );
-                executorService.execute( new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        TrackerOperationView po = null;
-                        while ( po == null || po.getState() == OperationState.RUNNING )
+                executorService.execute(
+                        new HiveNodeOperationTask( hive, tracker, config.getClusterName(), containerHost,
+                                NodeOperationType.START, new CompleteEvent()
                         {
-                            po = tracker.getTrackerOperation( HiveConfig.PRODUCT_KEY, trackID );
-                        }
-                        getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                        checkServer();
-                    }
-                } );
+
+                            @Override
+                            public void onComplete( final NodeState state )
+                            {
+                                getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                checkServer();
+                            }
+                        }, null ) );
             }
         } );
     }
 
 
-    private void addClickListenerToCheckButton( final Agent agent, final Button... buttons )
+    private void addClickListenerToCheckButton( final ContainerHost containerHost, final Button... buttons )
     {
         getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -545,30 +589,33 @@ public class Manager
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 disableButtons( buttons );
-                final UUID trackId = hive.statusCheck( config.getClusterName(), agent.getHostname() );
                 PROGRESS_ICON.setVisible( true );
-                executorService.execute( new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        TrackerOperationView po = null;
-                        while ( po == null || po.getState() == OperationState.RUNNING )
+                executorService.execute(
+                        new HiveNodeOperationTask( hive, tracker, config.getClusterName(), containerHost,
+                                NodeOperationType.STATUS, new CompleteEvent()
                         {
-                            po = tracker.getTrackerOperation( HiveConfig.PRODUCT_KEY, trackId );
-                        }
-                        PROGRESS_ICON.setVisible( false );
-                        boolean running = po.getState() == OperationState.SUCCEEDED;
-                        getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( !running );
-                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( running );
 
-                        if ( getButton( DESTROY_BUTTON_CAPTION, buttons ) != null )
-                        {
-                            getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
-                        }
-                    }
-                } );
+                            @Override
+                            public void onComplete( final NodeState state )
+                            {
+                                if ( state == NodeState.RUNNING )
+                                {
+                                    getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                    getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                }
+                                else if ( state == NodeState.STOPPED )
+                                {
+                                    getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                }
+                                PROGRESS_ICON.setVisible( false );
+                                getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                if ( getButton( DESTROY_BUTTON_CAPTION, buttons ) != null )
+                                {
+                                    getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                }
+                            }
+                        }, null ) );
             }
         } );
     }

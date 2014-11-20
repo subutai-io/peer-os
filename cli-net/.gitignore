@@ -1,0 +1,5 @@
+*.log
+*.substvars
+files
+subutai-cli-net-debian-build
+debian/subutai-cli-net

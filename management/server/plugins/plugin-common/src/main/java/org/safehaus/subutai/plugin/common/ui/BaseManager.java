@@ -2,8 +2,11 @@ package org.safehaus.subutai.plugin.common.ui;
 
 
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.BaseManagerInterface;
 
 import com.vaadin.data.Item;
@@ -179,20 +182,20 @@ public abstract class BaseManager implements BaseManagerInterface
     }
 
 
-    protected void populateTable( final Table table, List<Agent> agents )
+    protected void populateTable( final Table table, List<ContainerHost> containerHosts )
     {
 
         table.removeAllItems();
 
         // Add UI components into relevant fields according to its role in cluster
-        for ( final Agent agent : agents )
+        for ( final ContainerHost containerHost : containerHosts )
         {
-            addRowComponents( table, agent );
+            addRowComponents( table, containerHost );
         }
     }
 
 
-    public Item getAgentRow( final Table table, final Agent agent )
+    public Item getAgentRow( final Table table, final UUID agent )
     {
 
         int rowId = getAgentRowId( table, agent );
@@ -210,7 +213,7 @@ public abstract class BaseManager implements BaseManagerInterface
     }
 
 
-    protected int getAgentRowId( final Table table, final Agent agent )
+    protected int getAgentRowId( final Table table, final UUID agent )
     {
         if ( table != null && agent != null )
         {
@@ -219,7 +222,7 @@ public abstract class BaseManager implements BaseManagerInterface
                 int rowId = ( Integer ) o;
                 Item row = table.getItem( rowId );
                 String hostName = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
-                if ( hostName.equals( agent.getHostname() ) )
+                if ( hostName.equals( agent.toString() ) )
                 {
                     return rowId;
                 }

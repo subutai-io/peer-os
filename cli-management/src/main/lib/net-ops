@@ -1,0 +1,130 @@
+#!/bin/bash
+
+# ==========================================================================
+# Set of functions that checks networking functionality with a mix of utility
+# functions.
+# ==========================================================================
+
+function net_check_tunnelPortName {
+  local tunnelPortName="$1"
+  local list=$(ovs-vsctl list-ports br-tun)
+  local result=$(echo $list | grep $tunnelPortName)
+  
+  #checking TunnelPortname is duplicated or not
+  if [ "$result" ]; then
+    msg_error "TunnelPortName \"$tunnelPortName\" might be already exist or wrong pattern..
+     Try opening a tunnel for instance: tunnel2, tunnel3, tunnel4"
+    show_usage "`management_network_usage`"
+  fi
+
+  #checking portname has tunnel tag inside or not  
+  if [[ "$tunnelPortName" == *"tunnel"* ]]; then
+     echo ""
+  else
+    msg_error "TunnelPortName \"$tunnelPortName\" is not valid.. It should contain tunnel tag inside"
+    show_usage "`management_network_usage`"
+  fi
+}
+
+function net_check_ip_validation {
+  local ipcheck="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([0-9]\
+|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
+  local ip="`echo $1 | cut -d "/" -f1`"
+
+  local list=$(subutai management_network -l)
+  local result=$(echo $list | grep $ip)
+  
+  #Checking IP Address Duplication
+  if [ "$result" ]; then
+    msg_error "Tunnel IpAddress \"$ip\" is already exist.."
+    show_usage "`management_network_usage`"
+  fi
+  #Checking IP Address Validation
+  echo $ip | grep -w -E -o $ipcheck > /dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    msg_info "IP Address: OK"
+  else
+    msg_error "Invalid IP Address: $ip. Aborting..."
+    show_usage "`management_network_usage`"
+  fi
+}
+
+function net_check_tunnel_type {
+  local tunnelType="$1"
+  #Checking tunnelType is valid or not
+  case "$tunnelType" in "vxlan" | "gre")
+     msg_info "TunnelType: OK"
+     ;;
+  *)
+     msg_error "TunnelType must be vxlan or gre. Aborting ..."
+     show_usage "`management_network_usage`"
+     ;;
+  esac
+}
+
+function net_check_tunnelPortName_exist {
+  local tunnelPortName="$1"
+  local list=$(ovs-vsctl list-ports br-tun)
+  local result=$(echo $list | grep $tunnelPortName)
+
+  #checking TunnelPortname is exist or not 
+  if [ -z "$result" ]; then
+    msg_error "TunnelPortName \"$tunnelPortName\" does not exist.. Could not be deleted.."
+    show_usage "`management_network_usage`"
+  fi
+}
+
+function net_check_bridgeName {
+  local bridgeName="$1"
+  local list=$(ovs-vsctl list-br)
+  local result=$(echo $list | grep $bridgeName)
+
+  #checking bridgeName is valid or not
+  if [ -z "$result" ]; then
+    msg_error "BridgeName \"$bridgeName\" does not exist.."
+    show_usage "`management_network_usage`"
+  fi
+}
+
+function net_check_N2N_IpAddress {
+  local ipcheck="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([0-9]\
+|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
+  local superNodeIp="$1"
+  local localPeerIp="$2"
+
+  #Checking superNode IP Address Validation
+  echo $superNodeIp | grep -w -E -o $ipcheck > /dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    msg_info "SuperNode IP Address: OK"
+  else
+    msg_error "Invalid SuperNode IP Address: $superNodeIp. Aborting..."
+    show_usage "`management_network_usage`"
+  fi
+
+  #Checking LocalPeer IP Address Validation
+  echo $localPeerIp | grep -w -E -o $ipcheck > /dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    msg_info "LocalPeer IP Address: OK"
+  else
+    msg_error "Invalid LocalPeer IP Address: $localPeerIp. Aborting..."
+    show_usage "`management_network_usage`"
+  fi
+}
+
+function net_check_portNumber {
+  local port="$1"
+
+  if expr "$port" : '-\?[0-9]\+$' >/dev/null
+  then
+     if [ $port -gt "65535" ]; then
+       msg_error "Port value \"$port\" is greater than maximum-65535 value.."
+       show_usage "`management_network_usage`"
+     else
+       echo "Port Number: OK"
+     fi
+  else
+     msg_error "Port value \"$port\" is not valid.."
+     show_usage "`management_network_usage`"
+  fi
+}
+

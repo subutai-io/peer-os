@@ -1,0 +1,16 @@
+<persistence xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0"
+             xmlns="http://java.sun.com/xml/ns/persistence"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+  <persistence-unit name="default">
+    <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
+    <class>org.safehaus.subutai.common.protocol.Template</class>
+    <!--<class>org.safehaus.subutai.common.protocol.Template.TemplatePK</class>-->
+    <properties>
+      <!--<property name="openjpa.ConnectionURL" value="jdbc:h2:mem:defaultDb;create=true" />-->
+      <!--<property name="openjpa.ConnectionDriverName" value="org.h2.Driver" />-->
+      <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver" />
+      <property name="javax.persistence.jdbc.url" value="jdbc:derby:memory:StudentsDB;create=true" />
+      <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
+    </properties>
+  </persistence-unit>
+</persistence>

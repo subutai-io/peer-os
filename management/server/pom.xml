@@ -16,6 +16,8 @@
   <modules>
     <module>core</module>
     <module>subutai-common</module>
+    <module>subutai-common-implementation</module>
+    <module>subutai-common-datasource</module>
     <module>vaadin</module>
     <module>plugins</module>
 

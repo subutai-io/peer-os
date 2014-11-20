@@ -7,6 +7,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 
 import com.google.gson.Gson;
@@ -89,7 +90,7 @@ public class BlueprintUploadForm
         nodeGroup1.setLinkHosts( true );
         nodeGroup1.setExchangeSshKeys( true );
         nodeGroup1.setNumberOfNodes( 2 );
-        nodeGroup1.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        nodeGroup1.setPlacementStrategy( new PlacementStrategy( "ROUND_ROBIN" ) );
         nodeGroup1.setTemplateName( "cassandra" );
 
         NodeGroup nodeGroup2 = new NodeGroup();
@@ -98,7 +99,7 @@ public class BlueprintUploadForm
         nodeGroup2.setLinkHosts( true );
         nodeGroup2.setExchangeSshKeys( true );
         nodeGroup2.setNumberOfNodes( 2 );
-        nodeGroup2.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        nodeGroup2.setPlacementStrategy( new PlacementStrategy( "ROUND_ROBIN" ) );
         nodeGroup2.setTemplateName( "master" );
 
         groups.add( nodeGroup1 );
@@ -125,14 +126,14 @@ public class BlueprintUploadForm
         String content = textArea.getValue().trim();
         if ( content.length() > 0 )
         {
-            boolean result = managerUI.getEnvironmentManager().saveBlueprint( content );
-            if ( !result )
+            try
+            {
+                managerUI.getEnvironmentManager().saveBlueprint( content );
+                Notification.show( BLUEPRINT_SAVED );
+            }
+            catch ( EnvironmentManagerException e )
             {
                 Notification.show( ERROR_SAVING_BLUEPRINT );
-            }
-            else
-            {
-                Notification.show( BLUEPRINT_SAVED );
             }
         }
         else

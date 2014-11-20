@@ -7,17 +7,17 @@ package org.safehaus.subutai.core.environment.api;
 
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
+import org.safehaus.subutai.core.environment.api.topology.TopologyData;
 import org.safehaus.subutai.core.peer.api.Peer;
 
 
@@ -31,11 +31,11 @@ public interface EnvironmentManager
 
     List<Environment> getEnvironments();
 
-    Environment getEnvironment( String environmentName );
+    Environment getEnvironment( String environmentId );
 
     boolean destroyEnvironment( UUID environmentId ) throws EnvironmentDestroyException;
 
-    boolean saveBlueprint( String blueprint );
+    UUID saveBlueprint( String blueprint ) throws EnvironmentManagerException;
 
     List<EnvironmentBuildTask> getBlueprintTasks();
 
@@ -45,25 +45,28 @@ public interface EnvironmentManager
 
     boolean deleteBlueprint( UUID blueprintId );
 
-    void saveEnvironment( final Environment environment );
+    void saveEnvironment( final Environment environment ) throws EnvironmentManagerException;
 
-    boolean saveBuildProcess( EnvironmentBuildProcess buildProgress );
+    boolean saveBuildProcess( EnvironmentBuildProcess buildProgress ) throws EnvironmentManagerException;
 
     List<EnvironmentBuildProcess> getBuildProcesses();
 
-    Environment buildEnvironment( EnvironmentBuildProcess environmentBuildProcess ) throws EnvironmentBuildException;
+    public Environment buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException;
 
     void deleteBuildProcess( EnvironmentBuildProcess environmentBuildProcess );
 
 
     Environment getEnvironmentByUUID( UUID environmentId );
 
-    boolean saveBuildProcess( UUID blueprintId, Map<Object, Peer> topology, Map<Object, NodeGroup> map,
-                              TopologyEnum topologyEnum );
 
-    boolean saveBuildProcessB2PG( UUID blueprintId, UUID peerGroupId ) throws EnvironmentManagerException;
+    UUID saveBuildProcess( TopologyData topologyData ) throws EnvironmentManagerException;
 
     EnvironmentBlueprint getEnvironmentBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
 
+    void createAdditionalContainers( UUID id, String ngJson, Peer peer ) throws EnvironmentBuildException;
 
+    public UUID addContainers( final UUID environmentId, final String template, PlacementStrategy strategy,
+                               String nodeGroupName, final Peer peer ) throws EnvironmentManagerException;
+
+    void removeContainer( UUID environmentId, UUID hostId ) throws EnvironmentManagerException;
 }

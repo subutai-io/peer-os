@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
+import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -49,12 +50,12 @@ public class PeerManagerImpl implements PeerManager
     private static final String PEER_GROUP = "PEER_GROUP";
     private AgentManager agentManager;
     private PeerDAO peerDAO;
-//    private ContainerManager containerManager;
     private CommandRunner commandRunner;
     private QuotaManager quotaManager;
     private TemplateRegistry templateRegistry;
     private DataSource dataSource;
     private CommunicationManager communicationManager;
+    private CommandExecutor commandExecutor;
     private LocalPeer localPeer;
     private StrategyManager strategyManager;
     private PeerInfo peerInfo;
@@ -130,6 +131,12 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    public void setCommandExecutor( final CommandExecutor commandExecutor )
+    {
+        this.commandExecutor = commandExecutor;
+    }
+
+
     public void setStrategyManager( final StrategyManager strategyManager )
     {
         this.strategyManager = strategyManager;
@@ -152,12 +159,6 @@ public class PeerManagerImpl implements PeerManager
     {
         this.templateRegistry = templateRegistry;
     }
-
-    //
-    //    public void setContainerManager( final ContainerManager containerManager )
-    //    {
-    //        this.containerManager = containerManager;
-    //    }
 
 
     public void setQuotaManager( final QuotaManager quotaManager )

@@ -18,7 +18,7 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
+import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -365,11 +365,10 @@ public class ZookeeperImpl implements Zookeeper
     }
 
 
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( ZookeeperClusterConfig config )
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( ZookeeperClusterConfig config )
     {
         Preconditions.checkNotNull( config, "Zookeeper cluster config is null" );
 
-        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint.setName(
@@ -384,8 +383,7 @@ public class ZookeeperImpl implements Zookeeper
 
         environmentBlueprint.setNodeGroups( Sets.newHashSet( nodesGroup ) );
 
-        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
 
-        return environmentBuildTask;
+        return environmentBlueprint;
     }
 }

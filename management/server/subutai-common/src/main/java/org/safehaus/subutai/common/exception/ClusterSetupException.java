@@ -11,4 +11,10 @@ public class ClusterSetupException extends SubutaiException
     {
         super( message );
     }
+
+
+    public ClusterSetupException( final Throwable cause )
+    {
+        super( cause );
+    }
 }

@@ -6,11 +6,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
-import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.protocol.CommandCallback;
-import org.safehaus.subutai.common.protocol.CommandResult;
-import org.safehaus.subutai.common.protocol.CommandStatus;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.CommandStatus;
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.messenger.api.Message;
@@ -26,12 +26,13 @@ import org.safehaus.subutai.core.peer.api.RemotePeer;
 import org.safehaus.subutai.core.peer.impl.command.BlockingCommandCallback;
 import org.safehaus.subutai.core.peer.impl.command.CommandRequest;
 import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
+import org.safehaus.subutai.core.peer.impl.command.CommandResultImpl;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequest;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequest;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,15 +128,15 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
                                                 final List<Template> templates, final int quantity,
-                                                final String strategyId, final List<Criteria> criteria )
-            throws PeerException
+                                                final String strategyId, final List<Criteria> criteria,
+                                                String nodeGroupName ) throws PeerException
     {
         try
         {
             //send create request
             CreateContainerRequest request =
-                    new CreateContainerRequest( creatorPeerId, environmentId, templates, quantity, strategyId,
-                            criteria );
+                    new CreateContainerRequest( creatorPeerId, environmentId, templates, quantity, strategyId, criteria,
+                            nodeGroupName );
 
             CreateContainerResponse response = sendRequest( request, RecipientType.CONTAINER_CREATE_REQUEST.name(),
                     Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainerResponse.class );
@@ -193,9 +194,6 @@ public class RemotePeerImpl implements RemotePeer
     public String getQuota( final ContainerHost host, final QuotaEnum quota ) throws PeerException
     {
         throw new PeerException( "Operation not allowed." );
-        //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(),
-        // "8181" );
-        //        return remotePeerRestClient.getQuota( host, quota );
     }
 
 
@@ -203,16 +201,12 @@ public class RemotePeerImpl implements RemotePeer
     public void setQuota( final ContainerHost host, final QuotaEnum quota, final String value ) throws PeerException
     {
         throw new PeerException( "Operation not allowed." );
-        //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(),
-        // "8181" );
-        //        remotePeerRestClient.setQuota( host, quota, value );
     }
 
 
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
-
         return execute( requestBuilder, host, null );
     }
 
@@ -225,13 +219,11 @@ public class RemotePeerImpl implements RemotePeer
 
         executeAsync( requestBuilder, host, blockingCommandCallback, blockingCommandCallback.getCompletionSemaphore() );
 
-        blockingCommandCallback.waitCompletion();
-
         CommandResult commandResult = blockingCommandCallback.getCommandResult();
 
         if ( commandResult == null )
         {
-            commandResult = new CommandResult( null, null, null, CommandStatus.TIMEOUT );
+            commandResult = new CommandResultImpl( null, null, null, CommandStatus.TIMEOUT );
         }
 
         return commandResult;

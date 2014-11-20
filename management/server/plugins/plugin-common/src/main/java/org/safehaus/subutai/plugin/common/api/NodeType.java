@@ -1,9 +1,6 @@
 package org.safehaus.subutai.plugin.common.api;
 
 
-/**
- * Created by frkn on 08.10.2014.
- */
 public enum NodeType
 {
     MASTER_NODE,
@@ -14,5 +11,8 @@ public enum NodeType
     TASKTRACKER,
     DATANODE,
     SERVER,
-    CLIENT
+    CLIENT,
+    STORM_NIMBUS,
+    STORM_SUPERVISOR,
+    STORM_UI
 }

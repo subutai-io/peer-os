@@ -17,7 +17,7 @@
  *  @brief     SubutaiCommand.h
  *  @class     SubutaiCommand.h
  *  @details   SubutaiCommand Class is designed for marshaling and unmarshalling command instance.
- *  		   This class's instance can serialize and deserialize JSON/string datas.
+ *  	       This class's instance can serialize and deserialize JSON/string datas.
  *  @author    Emin INAL
  *  @author    Bilal BAL
  *  @version   1.1.0
@@ -33,6 +33,9 @@
 #include <cstdlib>
 #include <sstream>
 #include <list>
+#if USE_PROTOBUF
+#include "Message.pb.h"
+#endif
 using namespace std;
 using std::stringstream;
 using std::string;
@@ -47,25 +50,22 @@ public:
 	vector<string>& getWatchArguments();
 	string& getUuid();
 	string& getWorkingDirectory();
-	string& getProgram();
+	string& getCommand();
 	string& getRunAs();
 	string& getStandardError();
 	string& getStandardOutput();
 	string& getType();
-	string& getStandardOutputPath();
-	string& getStandardErrPath();
 	int getPid();
+    int getIsDaemon();
 	string& getHostname();
 	string& getMacAddress();
-	string& getTaskUuid();
+	string& getCommandId();
 	vector<string>& getIps();
 	int getTimeout();
 	int getRequestSequenceNumber();
-	string& getSource();
-	void setSource(const string&);
 	void setHostname(const string&);
 	void setMacAddress(const string&);
-	void setTaskUuid(const string&);
+	void setCommandId(const string&);
 	void setIps(vector<string>);
 	void setTimeout(int);
 	void setPid(int);
@@ -73,14 +73,13 @@ public:
 	void setArguments(vector<string>);
 	void setUuid(const string&);
 	void setWorkingDirectory(const string&);
-	void setProgram(const string&);
+	void setCommand(const string&);
 	void setRequestSequenceNumber(int);
 	void setRunAs(const string&);
 	void setStandardError(const string&);
 	void setStandardOutput(const string&);
-	void setStandardErrPath(const string&);
-	void setStandardOutPath(const string&);
 	void setType(const string&);
+        void setIsDaemon(int);
 	bool deserialize(string&);					//Deserializing Json String to Command Instance
 	bool checkCommandString(const string&);
 	void clear();
@@ -95,15 +94,13 @@ private:
 	string        	stdErr;
 	string       	workingDirectory;
 	string        	runAs;
-	string 			stdOuthPath;
-	string 			stdErrPath;
 	vector<string>	args;
 	list<pair<string,string> > environment;
 	string			taskUuid;
 	string			macAddress;
 	string			hostname;
 	vector<string>  ips;
-	string			source;
 	vector<string>	watchArgs;
+        int             _isDaemon;
 };
 #endif /* SUBUTAICOMMAND_H_ */

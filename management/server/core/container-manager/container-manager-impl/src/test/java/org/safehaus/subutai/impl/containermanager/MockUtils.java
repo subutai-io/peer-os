@@ -19,7 +19,7 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;

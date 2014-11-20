@@ -1,57 +1,45 @@
 package org.safehaus.subutai.common.protocol;
 
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-
-import com.google.gson.reflect.TypeToken;
 
 
 /**
  * Created by bahadyr on 9/19/14.
  */
-public class CloneContainersMessage extends PeerCommandMessage
+public class CloneContainersMessage
 {
-    private UUID envId;
-    private String template;
     private int numberOfNodes;
-    private String Strategy;
-    private List<String> criteria;
+    private PlacementStrategy strategy;
     private List<Template> templates = new ArrayList();
     private String nodeGroupName;
+    private UUID targetPeerId;
+
+
+    public UUID getTargetPeerId()
+    {
+        return targetPeerId;
+    }
+
+
+    public void setTargetPeerId( final UUID targetPeerId )
+    {
+        this.targetPeerId = targetPeerId;
+    }
 
 
     public String getNodeGroupName()
     {
         return nodeGroupName;
     }
+    //    private Set<Agent> agents;
 
 
     public void setNodeGroupName( final String nodeGroupName )
     {
         this.nodeGroupName = nodeGroupName;
-    }
-    //    private Set<Agent> agents;
-
-
-    public CloneContainersMessage( /*UUID envId, */UUID peerId )
-    {
-        super( PeerCommandType.CLONE,/* envId, */peerId, null );
-    }
-
-
-    public String getTemplate()
-    {
-        return template;
-    }
-
-
-    public void setTemplate( final String template )
-    {
-        this.template = template;
     }
 
 
@@ -67,57 +55,26 @@ public class CloneContainersMessage extends PeerCommandMessage
     }
 
 
-    public String getStrategy()
+    public PlacementStrategy getStrategy()
     {
-        return Strategy;
+        return strategy;
     }
 
 
-    public void setStrategy( final String strategy )
+    public void setStrategy( final PlacementStrategy strategy )
     {
-        Strategy = strategy;
-    }
-
-
-    public List<String> getCriteria()
-    {
-        return criteria;
-    }
-
-
-    public void setCriteria( final List<String> criteria )
-    {
-        this.criteria = criteria;
-    }
-
-
-    public UUID getEnvId()
-    {
-        return envId;
-    }
-
-
-    public void setEnvId( final UUID envId )
-    {
-        this.envId = envId;
+        this.strategy = strategy;
     }
 
 
     @Override
-    public Type getResultObjectType()
+    public String toString()
     {
-        return new TypeToken<Set<Agent>>()
-        {
-        }.getType();
-    }
-
-
-    @Override
-    public Type getInputObjectType()
-    {
-        return new TypeToken<String>()
-        {
-        }.getType();
+        return "CloneContainersMessage{" +
+                ", numberOfNodes=" + numberOfNodes +
+                ", Strategy='" + strategy + '\'' +
+                ", templates=" + templates +
+                '}';
     }
 
 
@@ -133,6 +90,12 @@ public class CloneContainersMessage extends PeerCommandMessage
     }
 
 
+    public void setTemplates( final List<Template> templates )
+    {
+        this.templates = templates;
+    }
+
+
     public void addTemplate( Template t )
     {
         if ( t == null )
@@ -140,18 +103,5 @@ public class CloneContainersMessage extends PeerCommandMessage
             throw new IllegalArgumentException( "Template could not be null." );
         }
         this.templates.add( t );
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "CloneContainersMessage{" +
-                "template='" + template + '\'' +
-                ", numberOfNodes=" + numberOfNodes +
-                ", Strategy='" + Strategy + '\'' +
-                ", criteria=" + criteria +
-                ", templates=" + templates +
-                '}';
     }
 }

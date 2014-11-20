@@ -13,11 +13,11 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.ui.SqoopComponent;
@@ -50,7 +50,8 @@ public class Manager
     protected static final String HOST_COLUMN_CAPTION = "Host";
     protected static final String IP_COLUMN_CAPTION = "IP List";
     protected static final String BUTTON_STYLE_NAME = "default";
-    final Button refreshClustersBtn, destroyClusterBtn, addNodeBtn;
+
+    private final Button refreshClustersBtn, destroyClusterBtn;
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
@@ -59,10 +60,11 @@ public class Manager
     private final Sqoop sqoop;
     private final ExecutorService executorService;
     private final Tracker tracker;
-    private final AgentManager agentManager;
-    private final CommandRunner commandRunner;
+    private final EnvironmentManager environmentManager;
     private final SqoopComponent sqoopComponent;
+
     private SqoopConfig config;
+    private Environment environment;
     private Hadoop hadoop;
 
 
@@ -74,8 +76,7 @@ public class Manager
         this.sqoopComponent = sqoopComponent;
         this.sqoop = serviceLocator.getService( Sqoop.class );
         this.tracker = serviceLocator.getService( Tracker.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
 
         contentRoot = new GridLayout();
@@ -98,7 +99,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
 
-        /**  Combo box  */
+        /** Combo box */
         clusterCombo = new ComboBox();
         clusterCombo.setId( "sqoopMngClusterCombo" );
         clusterCombo.setImmediate( true );
@@ -139,13 +140,6 @@ public class Manager
         controlsContent.addComponent( destroyClusterBtn );
 
 
-        /** Add Node button */
-        addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
-        addNodeBtn.setId( "sqoopMngAddNode" );
-        addNodeBtn.addStyleName( "default" );
-        addClickListenerToAddNodeButton();
-        controlsContent.addComponent( addNodeBtn );
-
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
 
@@ -154,7 +148,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToDestorClusterButton()
+    private void addClickListenerToDestorClusterButton()
     {
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -172,8 +166,8 @@ public class Manager
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
                             UUID trackID = sqoop.uninstallCluster( config.getClusterName() );
-                            ProgressWindow window =
-                                    new ProgressWindow( executorService, tracker, trackID, SqoopConfig.PRODUCT_KEY );
+                            ProgressWindow window
+                                    = new ProgressWindow( executorService, tracker, trackID, SqoopConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -187,53 +181,6 @@ public class Manager
                     } );
 
                     contentRoot.getUI().addWindow( alert.getAlert() );
-                }
-                else
-                {
-                    show( "Please, select cluster" );
-                }
-            }
-        } );
-    }
-
-
-    public void addClickListenerToAddNodeButton()
-    {
-        addNodeBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config != null )
-                {
-                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( config.getHadoopClusterName() );
-                    if ( hadoopConfig != null )
-                    {
-                        Set<Agent> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
-                        nodes.removeAll( config.getNodes() );
-                        if ( !nodes.isEmpty() )
-                        {
-                            AddNodeWindow addNodeWindow =
-                                    new AddNodeWindow( sqoop, tracker, executorService, config, nodes );
-                            contentRoot.getUI().addWindow( addNodeWindow );
-                            addNodeWindow.addCloseListener( new Window.CloseListener()
-                            {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
-                                    refreshClustersInfo();
-                                }
-                            } );
-                        }
-                        else
-                        {
-                            show( "All nodes in corresponding Hadoop cluster have Lucene installed" );
-                        }
-                    }
-                    else
-                    {
-                        show( "Hadoop cluster info not found" );
-                    }
                 }
                 else
                 {
@@ -262,7 +209,7 @@ public class Manager
     }
 
 
-    public void addItemClickListenerToTable( final Table table )
+    private void addItemClickListenerToTable( final Table table )
     {
         table.addItemClickListener( new ItemClickEvent.ItemClickListener()
         {
@@ -271,19 +218,18 @@ public class Manager
             {
                 if ( event.isDoubleClick() )
                 {
-                    String lxcHostname =
-                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
+                    String hostname
+                            = ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
+                    ContainerHost host = environment.getContainerHostByHostname( hostname );
+                    if ( host != null && host.isConnected() )
                     {
-                        Set<Agent> set = new HashSet<>( Arrays.asList( lxcAgent ) );
-                        TerminalWindow terminal =
-                                new TerminalWindow( set, executorService, commandRunner, agentManager );
+                        HashSet<ContainerHost> set = new HashSet<>( Arrays.asList( host ) );
+                        TerminalWindow terminal = new TerminalWindow( set );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Node not found or is not connected" );
                     }
                 }
             }
@@ -301,7 +247,9 @@ public class Manager
     {
         if ( config != null )
         {
-            populateTable( nodesTable, config.getNodes() );
+            environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+            Set<ContainerHost> nodes = environment.getHostsByIds( config.getNodes() );
+            populateTable( nodesTable, nodes );
         }
         else
         {
@@ -310,9 +258,7 @@ public class Manager
     }
 
 
-
-
-    public void addStyleNameToButtons( Button... buttons )
+    private void addStyleNameToButtons( Button... buttons )
     {
         for ( Button b : buttons )
         {
@@ -321,7 +267,7 @@ public class Manager
     }
 
 
-    public void addGivenComponents( Layout layout, Button... buttons )
+    private void addGivenComponents( Layout layout, Button... buttons )
     {
         for ( Button b : buttons )
         {
@@ -329,19 +275,22 @@ public class Manager
         }
     }
 
-    private void populateTable( final Table table, Collection<Agent> agents )
+
+    private void populateTable( final Table table, Collection<ContainerHost> nodes )
     {
 
         table.removeAllItems();
 
-        for ( final Agent agent : agents )
+        for ( final ContainerHost node : nodes )
         {
+            String ip = getIPofHost( node );
+
             final Button importBtn = new Button( "Import" );
-            importBtn.setId( agent.getListIP().get( 0 ) + "-sqoopImport" );
+            importBtn.setId( ip + "-sqoopImport" );
             final Button exportBtn = new Button( "Export" );
-            exportBtn.setId( agent.getListIP().get( 0 ) + "-sqoopExport" );
+            exportBtn.setId( ip + "-sqoopExport" );
             final Button destroyBtn = new Button( "Destroy" );
-            destroyBtn.setId( agent.getListIP().get( 0 ) + "-sqoopDestroy" );
+            destroyBtn.setId( ip + "-sqoopDestroy" );
 
             addStyleNameToButtons( importBtn, exportBtn, destroyBtn );
 
@@ -351,8 +300,9 @@ public class Manager
 
             addGivenComponents( availableOperations, importBtn, exportBtn, destroyBtn );
 
-            table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), availableOperations
+            table.addItem( new Object[]
+            {
+                node.getHostname(), ip, availableOperations
             }, null );
 
 
@@ -361,7 +311,7 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent event )
                 {
-                    importPanel.setAgent( agent );
+                    importPanel.setHost( node );
                     importPanel.setType( null );
                     sqoopComponent.addTab( importPanel );
                 }
@@ -372,19 +322,28 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent event )
                 {
-                    exportPanel.setAgent( agent );
+                    exportPanel.setHost( node );
                     sqoopComponent.addTab( exportPanel );
                 }
             } );
 
-            addClickListenerToDestroyButton( agent, destroyBtn );
+            addClickListenerToDestroyButton( node, destroyBtn );
         }
     }
 
 
+    private String getIPofHost( ContainerHost host )
+    {
+        Agent agent = host.getAgent();
+        if ( agent != null && agent.getListIP() != null && agent.getListIP().size() > 0 )
+        {
+            return agent.getListIP().get( 0 );
+        }
+        return null;
+    }
 
 
-    public void addClickListenerToDestroyButton( final Agent agent, Button destroyBtn )
+    private void addClickListenerToDestroyButton( final ContainerHost node, Button destroyBtn )
     {
         destroyBtn.addClickListener( new Button.ClickListener()
         {
@@ -394,15 +353,15 @@ public class Manager
             {
 
                 ConfirmationDialog alert = new ConfirmationDialog(
-                        String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
+                        String.format( "Do you want to destroy the %s node?", node.getHostname() ), "Yes", "No" );
                 alert.getOk().addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( Button.ClickEvent clickEvent )
                     {
-                        UUID trackId = sqoop.destroyNode( config.getClusterName(), agent.getHostname() );
-                        ProgressWindow window =
-                                new ProgressWindow( executorService, tracker, trackId, SqoopConfig.PRODUCT_KEY );
+                        UUID trackId = sqoop.destroyNode( config.getClusterName(), node.getHostname() );
+                        ProgressWindow window
+                                = new ProgressWindow( executorService, tracker, trackId, SqoopConfig.PRODUCT_KEY );
                         window.getWindow().addCloseListener( new Window.CloseListener()
                         {
                             @Override
@@ -461,3 +420,4 @@ public class Manager
         return contentRoot;
     }
 }
+

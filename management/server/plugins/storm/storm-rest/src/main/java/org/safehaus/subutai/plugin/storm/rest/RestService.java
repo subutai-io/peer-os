@@ -20,7 +20,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.storm.api.Storm;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 
 
 public class RestService
@@ -50,10 +50,10 @@ public class RestService
     public Response getClusters()
     {
 
-        List<StormConfig> configs = stormManager.getClusters();
+        List<StormClusterConfiguration> configs = stormManager.getClusters();
         ArrayList<String> clusterNames = new ArrayList();
 
-        for ( StormConfig config : configs )
+        for ( StormClusterConfiguration config : configs )
         {
             clusterNames.add( config.getClusterName() );
         }
@@ -69,7 +69,7 @@ public class RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getCluster( @PathParam( "clusterName" ) String clusterName )
     {
-        StormConfig config = stormManager.getCluster( clusterName );
+        StormClusterConfiguration config = stormManager.getCluster( clusterName );
         String clusterInfo = JsonUtil.GSON.toJson( config );
         return Response.status( Response.Status.OK ).entity( clusterInfo ).build();
         //        return JsonUtil.GSON.toJson(config);
@@ -86,7 +86,7 @@ public class RestService
                                     @QueryParam( "supervisorsCount" ) String supervisorsCount )
     {
 
-        StormConfig config = new StormConfig();
+        StormClusterConfiguration config = new StormClusterConfiguration();
         config.setClusterName( clusterName );
         config.setExternalZookeeper( externalZookeeper );
         config.setZookeeperClusterName( zookeeperClusterName );

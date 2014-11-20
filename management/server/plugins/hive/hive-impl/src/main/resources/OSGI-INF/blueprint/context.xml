@@ -7,28 +7,16 @@
     <property name="password" value="" />
   </bean>
 
-  <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
-  <reference id="tracker" availability="mandatory"
-             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
-  <reference id="environmentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
-  <reference id="containerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.container.api.container.ContainerManager" />
-  <reference id="hadoopManager" availability="mandatory"
-             interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
+  <reference id="hadoopManager" interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
+  <reference id="tracker" interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+  <reference id="environmentManager" interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
   <bean id="hive-impl" scope="singleton" class="org.safehaus.subutai.plugin.hive.impl.HiveImpl"
         init-method="init" destroy-method="destroy">
-    <property name="commandRunner" ref="commandRunner" />
-    <property name="agentManager" ref="agentManager" />
+    <argument ref="dataSource" />
+    <property name="hadoopManager" ref="hadoopManager" />
     <property name="tracker" ref="tracker" />
     <property name="environmentManager" ref="environmentManager" />
-    <property name="containerManager" ref="containerManager" />
-    <property name="hadoopManager" ref="hadoopManager" />
-    <argument ref="dataSource" />
   </bean>
 
   <service ref="hive-impl" interface="org.safehaus.subutai.plugin.hive.api.Hive" />

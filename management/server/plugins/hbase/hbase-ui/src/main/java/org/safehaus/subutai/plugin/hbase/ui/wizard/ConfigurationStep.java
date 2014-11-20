@@ -11,12 +11,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
 
 import com.google.common.base.Strings;
@@ -38,12 +40,15 @@ import com.vaadin.ui.VerticalLayout;
 public class ConfigurationStep extends Panel
 {
     private final Hadoop hadoop;
+    private final Wizard wizard;
 
 
     public ConfigurationStep( final Hadoop hadoop, final Wizard wizard )
     {
 
         this.hadoop = hadoop;
+        this.wizard = wizard;
+
         setSizeFull();
 
         GridLayout content = new GridLayout( 1, 4 );
@@ -102,23 +107,29 @@ public class ConfigurationStep extends Panel
         {
             addOverHadoopComponents( content, wizard.getConfig() );
         }
-        //        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP )
-        //        {
-        //            addWithHadoopComponents( content, wizard.getConfig(), wizard.getHadoopConfig() );
-        //        }
+        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP )
+        {
+            addWithHadoopComponents( content, wizard.getConfig() );
+        }
         content.addComponent( buttons );
 
         setContent( layout );
     }
 
 
-    private void addOverHadoopComponents( ComponentContainer parent, final HBaseClusterConfig config )
+    private void addWithHadoopComponents( final GridLayout content, final HBaseConfig config )
+    {
+
+    }
+
+
+    private void addOverHadoopComponents( ComponentContainer parent, final HBaseConfig config )
     {
         final ComboBox hadoopClustersCombo = new ComboBox( "Hadoop cluster" );
         final ComboBox masterNodeCombo = new ComboBox( "Master node" );
-        final TwinColSelect regionServers = new TwinColSelect( "Region Servers", new ArrayList<Agent>() );
-        final TwinColSelect quorumPeers = new TwinColSelect( "Quroum Peers", new ArrayList<Agent>() );
-        final TwinColSelect backUpMasters = new TwinColSelect( "Backup Masters", new ArrayList<Agent>() );
+        final TwinColSelect regionServers = new TwinColSelect( "Region Servers", new ArrayList<ContainerHost>() );
+        final TwinColSelect quorumPeers = new TwinColSelect( "Quroum Peers", new ArrayList<ContainerHost>() );
+        final TwinColSelect backUpMasters = new TwinColSelect( "Backup Masters", new ArrayList<ContainerHost>() );
 
         hadoopClustersCombo.setId( "HbaseConfHadoopCluster" );
         masterNodeCombo.setId( "HbaseMasters" );
@@ -201,19 +212,26 @@ public class ConfigurationStep extends Panel
         if ( hadoopClustersCombo.getValue() != null )
         {
             HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
+
+
             config.setHadoopClusterName( hadoopInfo.getClusterName() );
-            config.setHadoopNameNode( hadoopInfo.getNameNode().getHostname() );
+            config.setHadoopNameNode( hadoopInfo.getNameNode() );
 
             /** fill all tables  */
-            regionServers.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
-            quorumPeers.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
-            backUpMasters.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
-            for ( Agent agent : hadoopInfo.getAllNodes() )
+
+
+            Set<ContainerHost> hadoopHosts = getHadoopContainerHosts( hadoopInfo );
+            config.setEnvironmentId( hadoopInfo.getEnvironmentId() );
+            regionServers.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopHosts ) );
+            quorumPeers.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopHosts ) );
+            backUpMasters.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopHosts ) );
+            for ( ContainerHost host : hadoopHosts )
             {
-                masterNodeCombo.addItem( agent );
-                masterNodeCombo.setItemCaption( agent, agent.getHostname() );
+                masterNodeCombo.addItem( host );
+                masterNodeCombo.setItemCaption( host, host.getHostname() );
             }
         }
+
 
         hadoopClustersCombo.addValueChangeListener( new Property.ValueChangeListener()
         {
@@ -223,29 +241,30 @@ public class ConfigurationStep extends Panel
                 if ( event.getProperty().getValue() != null )
                 {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
+                    Environment environment =
+                            wizard.getEnvironmentManager().getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
+
+                    Set<ContainerHost> hadoopHosts = getHadoopContainerHosts( hadoopInfo );
                     regionServers.setValue( null );
-                    regionServers
-                            .setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                    regionServers.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopHosts ) );
 
                     quorumPeers.setValue( null );
-                    quorumPeers
-                            .setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                    quorumPeers.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopHosts ) );
 
                     backUpMasters.setValue( null );
-                    backUpMasters
-                            .setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                    backUpMasters.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopHosts ) );
 
                     masterNodeCombo.setValue( null );
                     masterNodeCombo.removeAllItems();
-                    for ( Agent agent : hadoopInfo.getAllNodes() )
+                    for ( ContainerHost host : hadoopHosts )
                     {
-                        masterNodeCombo.addItem( agent );
-                        masterNodeCombo.setItemCaption( agent, agent.getHostname() );
+                        masterNodeCombo.addItem( host );
+                        masterNodeCombo.setItemCaption( host, host.getHostname() );
                     }
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
-                    config.setRegionServers( new HashSet<Agent>() );
-                    config.setQuorumPeers( new HashSet<Agent>() );
-                    config.setBackupMasters( new HashSet<Agent>() );
+                    config.setRegionServers( new HashSet<UUID>() );
+                    config.setQuorumPeers( new HashSet<UUID>() );
+                    config.setBackupMasters( new HashSet<UUID>() );
                     config.setHbaseMaster( null );
                 }
             }
@@ -258,8 +277,8 @@ public class ConfigurationStep extends Panel
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Agent master = ( Agent ) event.getProperty().getValue();
-                    config.setHbaseMaster( master );
+                    ContainerHost master = ( ContainerHost ) event.getProperty().getValue();
+                    config.setHbaseMaster( master.getId() );
 
 
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
@@ -267,14 +286,15 @@ public class ConfigurationStep extends Panel
                     {
                         config.getBackupMasters().remove( master );
                     }
-                    List<Agent> hadoopNodes = hadoopInfo.getAllNodes();
-                    hadoopNodes.remove( master );
+                    //                    List<UUID> hadoopNodes = hadoopInfo.getAllNodes();
+                    Set<ContainerHost> hadoopHosts = getHadoopContainerHosts( hadoopInfo );
+                    hadoopHosts.remove( master );
 
                     /** fill region servers table */
                     regionServers.getContainerDataSource().removeAllItems();
-                    for ( Agent agent : hadoopNodes )
+                    for ( ContainerHost host : hadoopHosts )
                     {
-                        regionServers.getContainerDataSource().addItem( agent );
+                        regionServers.getContainerDataSource().addItem( host );
                     }
 
                     Collection ls = regionServers.getListeners( Property.ValueChangeListener.class );
@@ -292,9 +312,9 @@ public class ConfigurationStep extends Panel
 
                     /** fill quorum peers servers table */
                     quorumPeers.getContainerDataSource().removeAllItems();
-                    for ( Agent agent : hadoopNodes )
+                    for ( ContainerHost host : hadoopHosts )
                     {
-                        quorumPeers.getContainerDataSource().addItem( agent );
+                        quorumPeers.getContainerDataSource().addItem( host );
                     }
 
                     ls = quorumPeers.getListeners( Property.ValueChangeListener.class );
@@ -311,7 +331,7 @@ public class ConfigurationStep extends Panel
 
                     /** fill back up master servers table */
                     backUpMasters.getContainerDataSource().removeAllItems();
-                    for ( Agent agent : hadoopNodes )
+                    for ( ContainerHost agent : hadoopHosts )
                     {
                         backUpMasters.getContainerDataSource().addItem( agent );
                     }
@@ -358,8 +378,14 @@ public class ConfigurationStep extends Panel
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Set<Agent> agentList = new HashSet<>( ( Collection<Agent> ) event.getProperty().getValue() );
-                    config.setRegionServers( agentList );
+                    Set<ContainerHost> hosts =
+                            new HashSet<>( ( Collection<ContainerHost> ) event.getProperty().getValue() );
+                    Set<UUID> hostIds = new HashSet<UUID>();
+                    for ( ContainerHost host : hosts )
+                    {
+                        hostIds.add( host.getId() );
+                    }
+                    config.setRegionServers( hostIds );
                 }
             }
         } );
@@ -371,8 +397,14 @@ public class ConfigurationStep extends Panel
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Set<Agent> agentList = new HashSet<>( ( Collection<Agent> ) event.getProperty().getValue() );
-                    config.setQuorumPeers( agentList );
+                    Set<ContainerHost> hosts =
+                            new HashSet<>( ( Collection<ContainerHost> ) event.getProperty().getValue() );
+                    Set<UUID> hostIds = new HashSet<UUID>();
+                    for ( ContainerHost host : hosts )
+                    {
+                        hostIds.add( host.getId() );
+                    }
+                    config.setQuorumPeers( hostIds );
                 }
             }
         } );
@@ -385,8 +417,14 @@ public class ConfigurationStep extends Panel
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Set<Agent> agentList = new HashSet<>( ( Collection<Agent> ) event.getProperty().getValue() );
-                    config.setBackupMasters( agentList );
+                    Set<ContainerHost> hosts =
+                            new HashSet<>( ( Collection<ContainerHost> ) event.getProperty().getValue() );
+                    Set<UUID> hostIds = new HashSet<UUID>();
+                    for ( ContainerHost host : hosts )
+                    {
+                        hostIds.add( host.getId() );
+                    }
+                    config.setBackupMasters( hostIds );
                 }
             }
         } );
@@ -399,9 +437,28 @@ public class ConfigurationStep extends Panel
     }
 
 
+    private Set<ContainerHost> getHadoopContainerHosts( HadoopClusterConfig hadoopInfo )
+    {
+        Environment hadoopEnvironment =
+                wizard.getEnvironmentManager().getEnvironment( hadoopInfo.getEnvironmentId().toString() );
+        Set<ContainerHost> hadoopHosts = new HashSet<>();
+        for ( ContainerHost host : hadoopEnvironment.getContainers() )
+        {
+            if ( host.getNodeGroupName().toLowerCase().contains( hadoopInfo.getProductName().toLowerCase() ) )
+            {
+                if ( hadoopInfo.getAllNodes().contains( host.getId() ) )
+                {
+                    hadoopHosts.add( host );
+                }
+            }
+        }
+        return hadoopHosts;
+    }
+
+
     private void nextClickHandler( Wizard wizard )
     {
-        HBaseClusterConfig config = wizard.getConfig();
+        HBaseConfig config = wizard.getConfig();
         if ( config.getClusterName() == null || config.getClusterName().isEmpty() )
         {
             show( "Enter cluster name" );

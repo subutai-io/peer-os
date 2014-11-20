@@ -1,18 +1,19 @@
 package org.safehaus.subutai.core.peer.api;
 
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.SubutaiException;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.CommandCallback;
-import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.NullAgent;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.ServiceLocator;
 
 import com.google.common.base.Preconditions;
@@ -27,6 +28,9 @@ public abstract class SubutaiHost implements Host
     private Agent agent = NullAgent.getInstance();
     private Agent parentAgent = NullAgent.getInstance();
     protected long lastHeartbeat = System.currentTimeMillis();
+    //    private UUID id;
+    //    private String hostname;
+    //    private Set<Interface> interfaces;
 
 
     protected SubutaiHost( final Agent agent, UUID peerId )
@@ -35,7 +39,19 @@ public abstract class SubutaiHost implements Host
 
         this.agent = agent;
         this.peerId = peerId;
+        //        this.id = agent.getUuid();
+        //        this.hostname = agent.getHostname();
+        //        this.interfaces = new HashSet<>();
     }
+
+    //
+    //    protected SubutaiHost( ResourceHostInfo resourceHostInfo )
+    //    {
+    //        Preconditions.checkNotNull( resourceHostInfo, "ResourceHostInfo is null" );
+    //        hostname = resourceHostInfo.getHostname();
+    //        id = resourceHostInfo.getId();
+    //        interfaces = resourceHostInfo.getInterfaces();
+    //    }
 
 
     public Agent getAgent()
@@ -131,6 +147,13 @@ public abstract class SubutaiHost implements Host
 
 
     @Override
+    public void setPeerId( final UUID peerId )
+    {
+        this.peerId = peerId;
+    }
+
+
+    @Override
     public UUID getId()
     {
         return agent.getUuid();
@@ -188,5 +211,101 @@ public abstract class SubutaiHost implements Host
     }
 
 
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
 
+        final SubutaiHost that = ( SubutaiHost ) o;
+
+        if ( !agent.equals( that.agent ) )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return agent.hashCode();
+    }
+
+
+    @Override
+    public String getIpByMask( String mask )
+    {
+        for ( String ip : agent.getListIP() )
+        {
+            if ( ip.matches( mask ) )
+            {
+                return ip;
+            }
+        }
+        return null;
+    }
+
+
+    @Override
+    public void addIpHostToEtcHosts( String domainName, Set<Host> others, String mask ) throws SubutaiException
+    {
+        StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
+        StringBuilder appendHosts = new StringBuilder();
+        for ( Host otherHost : others )
+        {
+            if ( getId().equals( otherHost.getId() ) )
+            {
+                continue;
+            }
+
+            String ip = otherHost.getIpByMask( Common.IP_MASK );
+            String hostname = otherHost.getHostname();
+            cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
+            appendHosts.append( "/bin/echo '" ).
+                    append( ip ).append( " " ).
+                               append( hostname ).append( "." ).append( domainName ).
+                               append( " " ).append( hostname ).
+                               append( "' >> '/etc/hosts'; " );
+        }
+        if ( cleanHosts.length() > 0 )
+        {
+            //drop pipe | symbol
+            cleanHosts.setLength( cleanHosts.length() - 1 );
+            cleanHosts.insert( 0, "egrep -v '" );
+            cleanHosts.append( "' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;" );
+            appendHosts.insert( 0, cleanHosts );
+        }
+
+        appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( getHostname() ).append( "' >> '/etc/hosts';" );
+
+        try
+        {
+            execute( new RequestBuilder( appendHosts.toString() ).withTimeout( 30 ) );
+        }
+        catch ( CommandException e )
+        {
+            throw new SubutaiException( "Could not add to /etc/hosts: " + e.toString() );
+        }
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "SubutaiHost{" +
+                "peerId=" + peerId +
+                ", agent=" + agent +
+                ", parentAgent=" + parentAgent +
+                ", lastHeartbeat=" + lastHeartbeat +
+                '}';
+    }
 }

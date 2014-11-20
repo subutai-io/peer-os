@@ -2,10 +2,12 @@ package org.safehaus.subutai.plugin.storm.impl.handler;
 
 
 import java.util.Iterator;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 
 
@@ -18,9 +20,12 @@ abstract class AbstractHandler extends AbstractOperationHandler<StormImpl>
     }
 
 
-    boolean isNimbusNode( StormConfig config, String hostname )
+    boolean isNimbusNode( StormClusterConfiguration config, String hostname )
     {
-        return config.getNimbus().getHostname().equalsIgnoreCase( hostname );
+        Environment environment =
+                manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+        ContainerHost containerHost = environment.getContainerHostByUUID( config.getNimbus() );
+        return containerHost.getHostname().equalsIgnoreCase( hostname );
     }
 
 
@@ -29,14 +34,16 @@ abstract class AbstractHandler extends AbstractOperationHandler<StormImpl>
      *
      * @return number of connected nodes
      */
-    int checkSupervisorNodes( StormConfig config, boolean removeDisconnected )
+    int checkSupervisorNodes( StormClusterConfiguration config, boolean removeDisconnected )
     {
         int connected = 0;
-        Iterator<Agent> it = config.getSupervisors().iterator();
+        Iterator<UUID> it = config.getSupervisors().iterator();
+        Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+
         while ( it.hasNext() )
         {
-            Agent a = it.next();
-            if ( isNodeConnected( a.getHostname() ) )
+            UUID uuid = it.next();
+            if ( isNodeConnected( config, uuid ) )
             {
                 connected++;
             }
@@ -49,8 +56,12 @@ abstract class AbstractHandler extends AbstractOperationHandler<StormImpl>
     }
 
 
-    boolean isNodeConnected( String hostname )
+    boolean isNodeConnected( StormClusterConfiguration config, UUID uuid )
     {
-        return manager.getAgentManager().getAgentByHostname( hostname ) != null;
+        Environment environment =
+                manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+        ContainerHost containerHost = environment.getContainerHostByUUID( uuid );
+
+        return containerHost.isConnected();
     }
 }

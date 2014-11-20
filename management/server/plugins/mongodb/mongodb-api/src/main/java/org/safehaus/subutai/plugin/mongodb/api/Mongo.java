@@ -82,5 +82,8 @@ public interface Mongo extends ApiBase<MongoClusterConfig>
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, MongoClusterConfig config,
                                                          TrackerOperation po );
 
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( MongoClusterConfig config );
+    public org.safehaus.subutai.common.protocol.EnvironmentBlueprint getDefaultEnvironmentBlueprint(
+            MongoClusterConfig config );
+
+    public MongoClusterConfig newMongoClusterConfigInstance();
 }

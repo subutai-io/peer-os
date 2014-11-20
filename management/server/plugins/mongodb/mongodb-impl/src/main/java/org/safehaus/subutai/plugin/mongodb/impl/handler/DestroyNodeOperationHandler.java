@@ -2,29 +2,25 @@ package org.safehaus.subutai.plugin.mongodb.impl.handler;
 
 
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
+import org.safehaus.subutai.plugin.mongodb.api.MongoException;
+import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
+import org.safehaus.subutai.plugin.mongodb.api.MongoRouterNode;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
-
-import com.google.common.base.Strings;
 
 
 /**
  * Handles destroy mongo node operation
  */
-public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
+public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoImpl, MongoClusterConfig>
 {
     private final TrackerOperation po;
     private final String lxcHostname;
@@ -56,20 +52,21 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
             return;
         }
 
-        Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( agent == null )
+        //        Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
+        MongoNode node = config.findNode( lxcHostname );
+        if ( node == null )
         {
-            po.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            po.addLogFailed( String.format( "Node with hostname %s is not connected", lxcHostname ) );
             return;
         }
-        if ( !config.getAllNodes().contains( agent ) )
+        if ( !config.getAllNodes().contains( node ) )
         {
             po.addLogFailed(
-                    String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
+                    String.format( "Node with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
 
-        final NodeType nodeType = config.getNodeType( agent );
+        final NodeType nodeType = config.getNodeType( node );
         if ( nodeType == NodeType.CONFIG_NODE && config.getConfigServers().size() == 1 )
         {
             po.addLogFailed( "This is the last configuration server in the cluster. Please, destroy cluster instead" );
@@ -85,129 +82,122 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
             po.addLogFailed( "This is the last router in the cluster. Please, destroy cluster instead" );
             return;
         }
-
-        if ( nodeType == NodeType.CONFIG_NODE )
+        try
         {
-            config.getConfigServers().remove( agent );
-            config.setNumberOfConfigServers( config.getNumberOfConfigServers() - 1 );
-            //restart routers
-            po.addLog( "Restarting routers..." );
-            Command stopRoutersCommand = manager.getCommands().getStopNodeCommand( config.getRouterServers() );
-            manager.getCommandRunner().runCommand( stopRoutersCommand );
-            //don't check status of this command since it always ends with execute_timeouted
-            if ( stopRoutersCommand.hasCompleted() )
+            if ( nodeType == NodeType.CONFIG_NODE )
             {
-                final AtomicInteger okCount = new AtomicInteger();
-                manager.getCommandRunner().runCommand( manager.getCommands()
-                                                              .getStartRouterCommand( config.getRouterPort(),
-                                                                      config.getCfgSrvPort(), config.getDomainName(),
-                                                                      config.getConfigServers(),
-                                                                      config.getRouterServers() ), new CommandCallback()
+
+                config.getConfigServers().remove( node );
+                config.setNumberOfConfigServers( config.getNumberOfConfigServers() - 1 );
+                //restart routers
+                po.addLog( "Restarting routers..." );
+
+                try
                 {
-
-                    @Override
-                    public void onResponse( Response response, AgentResult agentResult, Command command )
+                    for ( MongoRouterNode routerNode : config.getRouterServers() )
                     {
-                        for ( AgentResult result : command.getResults().values() )
-                        {
-                            if ( result.getStdOut().contains( "child process started successfully, parent exiting" )
-                                    && okCount.incrementAndGet() == config.getRouterServers().size() )
-                            {
-                                stop();
-                            }
-                        }
+                        routerNode.stop();
+                        routerNode.start();
                     }
-                } );
-
-                if ( okCount.get() != config.getRouterServers().size() )
+                }
+                catch ( MongoException me )
                 {
                     po.addLog( "Not all routers restarted. Use Terminal module to restart them, skipping..." );
                 }
             }
-            else
+            else if ( nodeType == NodeType.DATA_NODE )
             {
-                po.addLog( "Could not restart routers. Use Terminal module to restart them, skipping..." );
-            }
-        }
-        else if ( nodeType == NodeType.DATA_NODE )
-        {
-            config.getDataNodes().remove( agent );
-            config.setNumberOfDataNodes( config.getNumberOfDataNodes() - 1 );
-            //unregister from primary
-            po.addLog( "Unregistering this node from replica set..." );
-            Command findPrimaryNodeCommand =
-                    manager.getCommands().getFindPrimaryNodeCommand( agent, config.getDataNodePort() );
-            manager.getCommandRunner().runCommand( findPrimaryNodeCommand );
+                MongoDataNode dataNode = ( MongoDataNode ) node;
+                dataNode.stop();
+                config.getDataNodes().remove( dataNode );
+                config.setNumberOfDataNodes( config.getNumberOfDataNodes() - 1 );
+                //unregister from primary
+                po.addLog( "Unregistering this node from replica set..." );
+                MongoDataNode primaryDataNode = config.findPrimaryNode();
+                primaryDataNode.unRegisterSecondaryNode( dataNode );
 
-            if ( findPrimaryNodeCommand.hasCompleted() && !findPrimaryNodeCommand.getResults().isEmpty() )
-            {
-                Pattern p = Pattern.compile( "primary\" : \"(.*)\"" );
-                Matcher m = p.matcher( findPrimaryNodeCommand.getResults().get( agent.getUuid() ).getStdOut() );
-                Agent primaryNodeAgent = null;
-                if ( m.find() )
-                {
-                    String primaryNodeHost = m.group( 1 );
-                    if ( !Strings.isNullOrEmpty( primaryNodeHost ) )
-                    {
-                        String hostname = primaryNodeHost.split( ":" )[0].replace( "." + config.getDomainName(), "" );
-                        primaryNodeAgent = manager.getAgentManager().getAgentByHostname( hostname );
-                    }
-                }
-                if ( primaryNodeAgent != null )
-                {
-                    if ( primaryNodeAgent != agent )
-                    {
-                        Command unregisterSecondaryNodeFromPrimaryCommand = manager.getCommands()
-                                                                                   .getUnregisterSecondaryNodeFromPrimaryCommand(
-                                                                                           primaryNodeAgent,
-                                                                                           config.getDataNodePort(),
-                                                                                           agent,
-                                                                                           config.getDomainName() );
 
-                        manager.getCommandRunner().runCommand( unregisterSecondaryNodeFromPrimaryCommand );
-                        if ( !unregisterSecondaryNodeFromPrimaryCommand.hasCompleted() )
-                        {
-                            po.addLog( "Could not unregister this node from replica set, skipping..." );
-                        }
-                    }
-                }
-                else
-                {
-                    po.addLog( "Could not determine primary node for unregistering from replica set, skipping..." );
-                }
+                //            config.getDataNodes().remove( agent );
+                //            config.setNumberOfDataNodes( config.getNumberOfDataNodes() - 1 );
+                //            //unregister from primary
+                //            po.addLog( "Unregistering this node from replica set..." );
+                //            Command findPrimaryNodeCommand =
+                //                    manager.getCommands().getFindPrimaryNodeCommand( agent, config.getDataNodePort
+                // () );
+                //            manager.getCommandRunner().runCommand( findPrimaryNodeCommand );
+                //
+                //            if ( findPrimaryNodeCommand.hasCompleted() && !findPrimaryNodeCommand.getResults()
+                // .isEmpty() )
+                //            {
+                //                Pattern p = Pattern.compile( "primary\" : \"(.*)\"" );
+                //                Matcher m = p.matcher( findPrimaryNodeCommand.getResults().get( agent.getUuid() )
+                // .getStdOut() );
+                //                Agent primaryNodeAgent = null;
+                //                if ( m.find() )
+                //                {
+                //                    String primaryNodeHost = m.group( 1 );
+                //                    if ( !Strings.isNullOrEmpty( primaryNodeHost ) )
+                //                    {
+                //                        String hostname = primaryNodeHost.split( ":" )[0].replace( "." + config
+                // .getDomainName(), "" );
+                //                        primaryNodeAgent = manager.getAgentManager().getAgentByHostname( hostname );
+                //                    }
+                //                }
+                //                if ( primaryNodeAgent != null )
+                //                {
+                //                    if ( primaryNodeAgent != agent )
+                //                    {
+                //                        Command unregisterSecondaryNodeFromPrimaryCommand = manager.getCommands()
+                //
+                // .getUnregisterSecondaryNodeFromPrimaryCommand(
+                //
+                // primaryNodeAgent,
+                //                                                                                           config
+                // .getDataNodePort(),
+                //                                                                                           agent,
+                //                                                                                           config
+                // .getDomainName() );
+                //
+                //                        manager.getCommandRunner().runCommand(
+                // unregisterSecondaryNodeFromPrimaryCommand );
+                //                        if ( !unregisterSecondaryNodeFromPrimaryCommand.hasCompleted() )
+                //                        {
+                //                            po.addLog( "Could not unregister this node from replica set, skipping..
+                // ." );
+                //                        }
+                //                    }
+                //                }
+                //                else
+                //                {
+                //                    po.addLog( "Could not determine primary node for unregistering from replica set,
+                // skipping..." );
+                //                }
+                //            }
+                //            else
+                //            {
+                //                po.addLog( "Could not determine primary node for unregistering from replica set,
+                // skipping..." );
+                //            }
             }
-            else
+            else if ( nodeType == NodeType.ROUTER_NODE )
             {
-                po.addLog( "Could not determine primary node for unregistering from replica set, skipping..." );
+                config.setNumberOfRouters( config.getNumberOfRouters() - 1 );
+                config.getRouterServers().remove( node );
             }
+            //destroy lxc
+            po.addLog( "Destroying lxc container..." );
+
+            Peer peer = manager.getPeerManager().getPeer( node.getPeerId() );
+
+            peer.destroyContainer( ( ContainerHost ) node );
+            po.addLog( "Lxc container destroyed successfully" );
         }
-        else if ( nodeType == NodeType.ROUTER_NODE )
+        catch ( PeerException | MongoException e )
         {
-            config.setNumberOfRouters( config.getNumberOfRouters() - 1 );
-            config.getRouterServers().remove( agent );
+            po.addLog( String.format( "Could not destroy lxc container %s. Use LXC module to cleanup, skipping...",
+                    e.getMessage() ) );
         }
-        //destroy lxc
-        po.addLog( "Destroying lxc container..." );
-        Agent physicalAgent = manager.getAgentManager().getAgentByHostname( agent.getParentHostName() );
-        if ( physicalAgent == null )
-        {
-            po.addLog(
-                    String.format( "Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
-                            agent.getHostname() ) );
-        }
-        else
-        {
-            try
-            {
-                manager.getContainerManager().cloneDestroy( physicalAgent.getHostname(), agent.getHostname() );
-                po.addLog( "Lxc container destroyed successfully" );
-            }
-            catch ( LxcDestroyException e )
-            {
-                po.addLog( String.format( "Could not destroy lxc container %s. Use LXC module to cleanup, skipping...",
-                        e.getMessage() ) );
-            }
-        }
+
         //update db
         po.addLog( "Updating cluster information in database..." );
         manager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );

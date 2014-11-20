@@ -9,8 +9,7 @@ target
 *.mk
 *.a
 *.deb
-agent/agent/KiskisAgent/Debug/*
-agent/agent/KiskisAgent/Release/*
+*~
 
 /management/server/core/communication-manager/communication-manager-impl/activemq-data/
 /management/server/vaadin/vaadin-ui/src/main/webapp/VAADIN/gwt-unitCache/*

@@ -17,7 +17,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command( scope = "peer", name = "remote-clone" )
+@Command(scope = "peer", name = "remote-clone")
 public class RemoteCloneCommand extends OsgiCommandSupport
 {
 
@@ -43,21 +43,24 @@ public class RemoteCloneCommand extends OsgiCommandSupport
     }
 
 
-    @Argument( index = 0, name = "peerId", multiValued = false, description = "Remote peer UUID" )
+    @Argument(index = 0, name = "peerId", multiValued = false, description = "Remote peer UUID")
     private String peerId;
 
 
-    @Argument( index = 1, name = "envId", multiValued = false, description = "Environment UUID" )
+    @Argument(index = 1, name = "envId", multiValued = false, description = "Environment UUID")
     private String envId;
 
-    @Argument( index = 2, name = "templateName", multiValued = false, description = "Remote template name" )
+    @Argument(index = 2, name = "templateName", multiValued = false, description = "Remote template name")
     private String templateName;
 
-    @Argument( index = 3, name = "quantity", multiValued = false, description = "Number of containers to clone" )
+    @Argument(index = 3, name = "quantity", multiValued = false, description = "Number of containers to clone")
     private int quantity;
 
-    @Argument( index = 4, name = "strategyId", multiValued = false, description = "Container placement strategy" )
+    @Argument(index = 4, name = "strategyId", multiValued = false, description = "Container placement strategy")
     private String strategyId;
+
+    @Argument( index = 5, name = "nodeGroupName", multiValued = false, description = "Node group name" )
+    private String nodeGroupName;
 
 
     @Override
@@ -77,7 +80,7 @@ public class RemoteCloneCommand extends OsgiCommandSupport
         templates.add( template );
         Set<ContainerHost> containers =
                 peer.createContainers( peerManager.getLocalPeer().getId(), environmentId, templates, quantity,
-                        strategyId, null );
+                        strategyId, null, nodeGroupName );
 
         System.out.println(
                 String.format( "Containers successfully created.\nList of new %d containers:\n", containers.size() ) );

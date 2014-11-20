@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.container.ui.clone;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,8 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-import org.safehaus.subutai.common.exception.CommandException;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.container.ui.ContainerTree;
@@ -28,7 +28,7 @@ import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.core.strategy.api.CriteriaDef;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
@@ -88,7 +88,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                     + "61}[0-9A-Za-z])?)*\\.?$";
     AtomicInteger countProcessed = null;
     AtomicInteger errorProcessed = null;
-    Map<ContainerPlacementStrategy, BeanItemContainer<Criteria>> criteriaBeansMap = new HashMap<>();
+    Map<ContainerPlacementStrategy, BeanItemContainer<CriteriaDef>> criteriaBeansMap = new HashMap<>();
     List<ContainerPlacementStrategy> placementStrategies;
 
 
@@ -105,8 +105,8 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
         placementStrategies = strategyManager.getPlacementStrategies();
         for ( ContainerPlacementStrategy st : placementStrategies )
         {
-            BeanItemContainer<Criteria> beanItems = new BeanItemContainer<>( Criteria.class );
-            beanItems.addAll( st.getCriteria() );
+            BeanItemContainer<CriteriaDef> beanItems = new BeanItemContainer<>( CriteriaDef.class );
+            beanItems.addAll( st.getCriteriaDef() );
             criteriaBeansMap.put( st, beanItems );
         }
 
@@ -207,7 +207,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                 criteriaLayout.removeAllComponents();
                 ContainerPlacementStrategy st = ( ContainerPlacementStrategy ) event.getProperty().getValue();
 
-                BeanItemContainer<Criteria> criteriaBeans = criteriaBeansMap.get( st );
+                BeanItemContainer<CriteriaDef> criteriaBeans = criteriaBeansMap.get( st );
 
                 final Table criteriaTable = new Table( "Strategy criteria", criteriaBeans );
                 criteriaTable.setColumnHeaders( "ID", "Name", "Value" );
@@ -285,9 +285,9 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
 
         Set<Host> resourceHosts =
                 containerTree.getSelectedHosts(); //AgentUtil.filterPhysicalAgents( agentTree.getSelectedAgents() );
-        final Map<Agent, List<String>> agentFamilies = new HashMap<>();
+        final Map<Host, List<String>> resourceHostFamilies = new HashMap<>();
         final double count = slider.getValue();
-        List<Criteria> criteria = new ArrayList<>();
+        List<CriteriaDef> criteria = new ArrayList<>();
         if ( resourceHosts.isEmpty() )
         { // process cloning by selected strategy
 
@@ -300,15 +300,15 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                     placementStrategies.get( placementStrategies.indexOf( strategy.getValue() ) );
             if ( selectedStrategy.hasCriteria() )
             {
-                BeanItemContainer<Criteria> beans = criteriaBeansMap.get( selectedStrategy );
+                BeanItemContainer<CriteriaDef> beans = criteriaBeansMap.get( selectedStrategy );
                 criteria = Lists.newArrayList( beans.getItemIds() );
-                for ( Criteria c : criteria )
+                for ( CriteriaDef c : criteria )
                 {
                     LOG.info( String.format( "%s %s %s", c.getId(), c.getTitle(), c.getValue() ) );
                 }
             }
-            Map<Agent, Integer> bestServers;
-            Map<Agent, ServerMetric> metricMap = new HashMap();
+
+            List<ServerMetric> serverMetrics = new ArrayList<>();
 
             for ( Host host : localPeer.getResourceHosts() )
             {
@@ -317,7 +317,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                     ResourceHost rh = ( ResourceHost ) host;
                     try
                     {
-                        metricMap.put( rh.getAgent(), rh.getMetric() );
+                        serverMetrics.add( rh.getMetric() );
                     }
                     catch ( PeerException e )
                     {
@@ -325,31 +325,53 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                     }
                 }
             }
+            Map<ServerMetric, Integer> bestServers = null;
             try
             {
+                List<Criteria> cl = new ArrayList<>();
+                for ( CriteriaDef c : criteria )
+                {
+                    cl.add( c );
+                }
                 bestServers = strategyManager
-                        .getPlacementDistribution( metricMap, ( int ) count, selectedStrategy.getId(), criteria );
+                        .getPlacementDistribution( serverMetrics, ( int ) count, selectedStrategy.getId(), cl );
             }
             catch ( StrategyException e )
             {
                 show( e.toString() );
                 return;
             }
+            Map<ServerMetric, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( bestServers );
 
-            for ( int i = 1; i <= count; i++ )
+            Iterator<ServerMetric> serverMetricIterator = sortedBestServers.keySet().iterator();
+            while ( serverMetricIterator.hasNext() )
             {
-                Map<Agent, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( bestServers );
-                final Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
-                bestServers.put( entry.getKey(), entry.getValue() - 1 );
-                List<String> lxcHostNames = agentFamilies.get( entry.getKey() );
-                if ( lxcHostNames == null )
+                ServerMetric serverMetric = serverMetricIterator.next();
+                ResourceHost rh = localPeer.getResourceHostByName( serverMetric.getHostname() );
+                List<String> lxcHostNames = new ArrayList<>();
+                for ( int i = 0; i < sortedBestServers.get( serverMetric ); i++ )
                 {
-                    lxcHostNames = new ArrayList<>();
-                    agentFamilies.put( entry.getKey(), lxcHostNames );
+                    lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
+                            UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 11 ) );
                 }
-                lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
-                        UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 11 ) );
+                resourceHostFamilies.put( rh, lxcHostNames );
             }
+            //            for ( int i = 1; i <= count; i++ )
+            //            {
+            //                final Map.Entry<ServerMetric, Integer> entry = sortedBestServers.entrySet().iterator()
+            // .next();
+            //                bestServers.put( entry.getKey(), entry.getValue() - 1 );
+            //                List<String> lxcHostNames = resourceHostFamilies.get( entry.getKey() );
+            //                if ( lxcHostNames == null )
+            //                {
+            //                    lxcHostNames = new ArrayList<>();
+            //                    ResourceHost rh = localPeer.getResourceHostByName( entry.getKey().getHostname() );
+            //                    resourceHostFamilies.put( rh, lxcHostNames );
+            //                }
+            //                lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
+            //                        UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0,
+            // 11 ) );
+            //            }
         }
         else
         { // process cloning in selected hosts
@@ -361,21 +383,21 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                     lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
                             UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 11 ) );
                 }
-                agentFamilies.put( physAgent.getAgent(), lxcHostNames );
+                resourceHostFamilies.put( physAgent, lxcHostNames );
             }
         }
 
         indicator.setVisible( true );
-        populateLxcTable( agentFamilies );
+        populateLxcTable( resourceHostFamilies );
         countProcessed = new AtomicInteger( ( int ) ( count ) );
         errorProcessed = new AtomicInteger( 0 );
-        UUID envId = UUIDUtil.generateMACBasedUUID();
-        for ( final Map.Entry<Agent, List<String>> agent : agentFamilies.entrySet() )
+        UUID envId = UUIDUtil.generateRandomUUID();
+        for ( final Map.Entry<Host, List<String>> host : resourceHostFamilies.entrySet() )
         {
-            AgentExecutor agentExecutor = new AgentExecutorImpl( agent.getKey().getHostname(), agent.getValue() );
+            AgentExecutor agentExecutor = new AgentExecutorImpl( host.getKey().getHostname(), host.getValue() );
             agentExecutor.addListener( this );
             ExecutorService executor = Executors.newFixedThreadPool( 1 );
-            agentExecutor.execute( executor, new CloneCommandFactory( localPeer, envId, agent.getKey().getHostname(),
+            agentExecutor.execute( executor, new CloneCommandFactory( localPeer, envId, host.getKey().getHostname(),
                     ( String ) template.getValue() ) );
             executor.shutdown();
         }
@@ -388,17 +410,17 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
     }
 
 
-    private void populateLxcTable( Map<Agent, List<String>> agents )
+    private void populateLxcTable( Map<Host, List<String>> agents )
     {
 
-        for ( final Map.Entry<Agent, List<String>> entry : agents.entrySet() )
+        for ( final Map.Entry<Host, List<String>> entry : agents.entrySet() )
         {
-            Agent agent = entry.getKey();
-            if ( lxcTable.getItem( agent.getHostname() ) == null )
+            Host host = entry.getKey();
+            if ( lxcTable.getItem( host.getHostname() ) == null )
             {
-                lxcTable.addItem( new Object[] { agent.getHostname(), null, null }, agent.getHostname() );
+                lxcTable.addItem( new Object[] { host.getHostname(), null, null }, host.getHostname() );
             }
-            lxcTable.setCollapsed( agent.getHostname(), false );
+            lxcTable.setCollapsed( host.getHostname(), false );
             for ( String lxc : entry.getValue() )
             {
                 //                Embedded progressIcon = new Embedded("", new ThemeResource(loadIconSource));
@@ -407,7 +429,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                         null, lxc, null /*progressIcon*/
                 }, lxc );
 
-                lxcTable.setParent( lxc, agent.getHostname() );
+                lxcTable.setParent( lxc, host.getHostname() );
                 lxcTable.setChildrenAllowed( lxc, false );
             }
         }

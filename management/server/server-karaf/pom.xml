@@ -140,6 +140,12 @@
             <feature>war</feature>
             <feature>ssh</feature>
             <feature>subutai-application</feature>
+            <feature>openjpa</feature>
+            <!--<feature>osgi</feature>-->
+            <feature>aries-annotation</feature>
+            <feature>http</feature>
+            <feature>jndi</feature>
+            <feature>transaction</feature>
           </bootFeatures>
         </configuration>
         <executions>
@@ -164,6 +170,7 @@
                 <feature>ssh</feature>
                 <feature>cxf</feature>
                 <feature>jdbc</feature>
+                <feature>openjpa</feature>
                 <feature>subutai-application</feature>
               </features>
               <repository>${assembly.directory}/system</repository>

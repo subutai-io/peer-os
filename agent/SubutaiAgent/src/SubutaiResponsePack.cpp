@@ -34,12 +34,11 @@ SubutaiResponsePack::~SubutaiResponsePack()
  *  \details   This method creates default chunk message.
  */
 string SubutaiResponsePack::createResponseMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
-		string error,string output,string source,string taskuuid)
+		string error,string output,string commandid)
 {
 	clear();
 	this->setType("EXECUTE_RESPONSE");			//creating Response chunk message
-	this->setSource(source);
-	this->setTaskUuid(taskuuid);
+	this->setCommandId(commandid);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(responseSeqNum);
@@ -54,12 +53,11 @@ string SubutaiResponsePack::createResponseMessage(string uuid,int pid,int reques
  *  \details   This method creates Exit done message.
  */
 string SubutaiResponsePack::createExitMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
-		string source, string taskuuid,int exitcode)	//Creating Exit message
+		string commandid,int exitcode)	//Creating Exit message
 {
 	clear();
-	this->setType("EXECUTE_RESPONSE_DONE");
-	this->setSource(source);
-	this->setTaskUuid(taskuuid);
+	this->setType("EXECUTE_RESPONSE");
+	this->setCommandId(commandid);
 	this->setUuid(uuid);
 	this->setPid(pid);
 	this->setRequestSequenceNumber(requestSeqNum);
@@ -69,100 +67,119 @@ string SubutaiResponsePack::createExitMessage(string uuid,int pid,int requestSeq
 	return sendout;
 }
 
-/**
- *  \details   This method creates Registration message.
- */
-string SubutaiResponsePack::createRegistrationMessage(string uuid, string macaddress, string hostname, string parenthostname
-		,string environmentID ,vector<string> ips)
-{
-	this->setType("REGISTRATION_REQUEST");
-	this->setIps(ips);
-	this->setMacAddress(macaddress);
-	this->setHostname(hostname);
-	this->setParentHostname(parenthostname);
-	this->setUuid(uuid);
-	this->setEnvironmentId(environmentID);
-	this->serialize(sendout);
-	return sendout;
-}
 
 /**
  *  \details   This method creates IN_QUEUE Message
  */
-string SubutaiResponsePack::createInQueueMessage(string uuid,string taskuuid)	//Creating IN_QUEUE Message
+string SubutaiResponsePack::createInQueueMessage(string uuid,string commandid)	//Creating IN_QUEUE Message
 {
 	clear();
 	this->setType("IN_QUEUE");
-	this->setTaskUuid(taskuuid);
+	this->setCommandId(commandid);
 	this->setUuid(uuid);
 	this->serialize(sendout);
 	return sendout;
 }
 
+string SubutaiResponsePack::createPsResponse(string id, string commandId) {
+    clear();
+    this->setType("PS_RESPONSE");
+    this->setUuid(id);
+    this->setCommandId(commandId);
+    this->serializeDone(sendout);
+    return sendout;
+}
+
 /**
  *  \details   This method creates HeartBeat message.
+ *  {
+   "response":
+
+    {
+
+        "type":"HEARTBEAT_TOPIC",
+
+        "id":"56b0ac88-5140-4a32-8691-916d75d62f1c",
+
+        "hostname":"resource_host",
+
+        "ips":["10.10.10.13","172.16.11.89","127.0.0.1"],
+
+        "macAddress":"08:00:27:f2:9b:aa",
+
+        "containers":[
+
+            {
+                "hostname" : "container1",
+
+                "id":"56b0ac88-5140-4a32-8691-916d75d62f1c",
+
+                "ips":["10.10.10.12","127.0.0.1"],
+
+                "status":"RUNNING"
+
+            },
+
+            {
+                "hostname" : "container1",
+
+                "id":"56b0ac88-5140-4a32-8691-916d75d62f1c",
+
+                "ips":["10.10.10.14","127.0.0.1"],
+
+                "status":"FROZEN"
+
+            }
+        ]
+    }
+
+}
  */
-string SubutaiResponsePack::createHeartBeatMessage(string uuid,int requestSeqNum,string environmentID,string macaddress,
-		string hostname,string parenthostname,string source,string taskuuid)	//Creating HeartBeat Message
+string SubutaiResponsePack::createHeartBeatMessage(string uuid,	string hostname)	//Creating HeartBeat Message
 {
-	this->setType("HEARTBEAT_RESPONSE");
-	this->setSource(source);
-	this->setTaskUuid(taskuuid);
-	this->setMacAddress(macaddress);
-	this->setHostname(hostname);
-	this->setParentHostname(parenthostname);
-	this->setEnvironmentId(environmentID);
+	//clear();
+	this->setType("HEARTBEAT");
 	this->setUuid(uuid);
-	this->setRequestSequenceNumber(requestSeqNum);
-	this->setResponseSequenceNumber(1);
+	this->setHostname(hostname);
 	this->serialize(sendout);
 	return sendout;
 }
 
 /**
  *  \details   This method creates  SuccessTermination message.
+ *          "type":"TERMINATE_RESPONSE",
+
+        "id":"56b0ac88-5140-4a32-8691-916d75d62f1c"
+
+        "commandId":"c6cd5988-ceac-11e3-82b2-ebd389e743a3",
+
+        "pid":1234,
+
+        "exitCode" : 0
  */
-string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string source,string taskuuid)	//Creating Terminate Message
+string SubutaiResponsePack::createTerminateMessage(string uuid,string commandid, int pid, int exitCode)	//Creating Terminate Message
 {
 	clear();
-	this->setType("TERMINATE_RESPONSE_DONE");
-	this->setSource(source);
-	this->setExitCode(0);
+	this->setType("TERMINATE_RESPONSE");
+	this->setExitCode(exitCode);
 	this->setUuid(uuid);
-	this->setRequestSequenceNumber(requestSeqNum);
-	this->setResponseSequenceNumber(1);
-	this->setTaskUuid(taskuuid);
+	this->setCommandId(commandid);
+	this->setPid(pid);
+
 	this->serialize(sendout);
 	return sendout;
 }
 
-/**
- *  \details   This method creates Fail Termination message.
- */
-string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,string source,string taskuuid)
-{
-	clear();
-	this->setType("TERMINATE_RESPONSE_FAILED");
-	this->setSource(source);
-	this->setExitCode(1);
-	this->setUuid(uuid);
-	this->setRequestSequenceNumber(requestSeqNum);
-	this->setResponseSequenceNumber(1);
-	this->setTaskUuid(taskuuid);
-	this->serialize(sendout);
-	return sendout;
-}
 
 /**
  *  \details   This method creates Timeout message.
  */
 string SubutaiResponsePack::createTimeoutMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
-		string stdOut,string stdErr,string source,string taskuuid)	//Creating Timeout Message
+		string stdOut,string stdErr,string commandid)	//Creating Timeout Message
 {
 	clear();
 	this->setType("EXECUTE_TIMEOUT");
-	this->setSource(source);
-	this->setTaskUuid(taskuuid);
+	this->setCommandId(commandid);
 	this->setPid(pid);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
@@ -179,9 +196,28 @@ string SubutaiResponsePack::createTimeoutMessage(string uuid,int pid,int request
 string SubutaiResponsePack::createInotifyMessage(string uuid ,string configPoint,string dateTime,string changeType)
 {
 	clear();
-	this->setType("INOTIFY_ACTION_RESPONSE");
+	string path = configPoint;
+	vector<string> hierarchy = helper.splitResult(configPoint, "/");
+	if(hierarchy.at(2) == "lxc" && hierarchy.at(4) == "rootfs")
+	{
+		vector<SubutaiContainer> containerSet = getContainerSet();
+		for (vector<SubutaiContainer>::iterator it = containerSet.begin(); it != containerSet.end(); it++) {
+			if((*it).getContainerHostnameValue() == hierarchy.at(3))
+			{
+				uuid = (*it).getContainerIdValue(); break;
+			}
+		}
+		path = "";
+		int i=0;
+		for (vector<string>::iterator it_h = hierarchy.begin()+5; it_h != hierarchy.end(); it_h++) {
+			if(i++!=0) path.append("/");
+			path.append((*it_h));
+		}
+	}
+
+	this->setType("INOTIFY_EVENT");
 	this->setUuid(uuid);
-	this->setconfigPoint(configPoint);
+	this->setconfigPoint(path);
 	this->setDateTime(dateTime);
 	this->setChangeType(changeType);
 	this->getConfPoints().clear();
@@ -192,12 +228,42 @@ string SubutaiResponsePack::createInotifyMessage(string uuid ,string configPoint
 /**
  *  \details   This method creates Inotify showing all watcher message.
  */
-string SubutaiResponsePack::createInotifyShowMessage(string uuid ,vector<string>  configPoint)
+string SubutaiResponsePack::createInotifyShowMessage(string uuid, string commandId, vector<string>  configPoint)
 {
 	clear();
-	this->setType("INOTIFY_LIST_RESPONSE");
+	this->setType("LIST_INOTIFY_RESPONSE");
 	this->setUuid(uuid);
+    this->setCommandId(commandId);
 	this->setConfPoints(configPoint);
+	this->serialize(sendout);
+	return sendout;
+}
+
+
+
+/**
+ *  \details   This method sets Inotify message which show notifications are enabled.
+ */
+string SubutaiResponsePack::setInotifyResponse(string uuid, string commandId)
+{
+	clear();
+	this->setType("SET_INOTIFY_RESPONSE");
+	this->setUuid(uuid);
+    this->setCommandId(commandId);
+	this->serialize(sendout);
+	return sendout;
+}
+
+
+/**
+ *  \details   This method sets Inotify message which show notifications are enabled.
+ */
+string SubutaiResponsePack::unsetInotifyResponse(string uuid, string commandId)
+{
+	clear();
+	this->setType("UNSET_INOTIFY_RESPONSE");
+	this->setUuid(uuid);
+    this->setCommandId(commandId);
 	this->serialize(sendout);
 	return sendout;
 }

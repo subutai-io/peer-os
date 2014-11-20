@@ -4,8 +4,8 @@ package org.safehaus.subutai.plugin.hive.api;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
 
@@ -18,9 +18,16 @@ public class HiveConfig implements ConfigBase
     private SetupType setupType;
     private String clusterName = "";
     private String hadoopClusterName = "";
-    private Agent server;
-    private Set<Agent> clients = new HashSet();
-    private Set<Agent> hadoopNodes = new HashSet<>();
+    private UUID server;
+    private Set<UUID> clients = new HashSet();
+    private Set<UUID> hadoopNodes = new HashSet<>();
+    private UUID environmentId;
+
+
+    public static String getTemplateName()
+    {
+        return TEMPLATE_NAME;
+    }
 
 
     public SetupType getSetupType()
@@ -32,6 +39,24 @@ public class HiveConfig implements ConfigBase
     public void setSetupType( SetupType setupType )
     {
         this.setupType = setupType;
+    }
+
+
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
+    }
+
+
+    public int getNumberOfNodes()
+    {
+        return clients.size() + 1;
     }
 
 
@@ -74,45 +99,45 @@ public class HiveConfig implements ConfigBase
     }
 
 
-    public Agent getServer()
+    public UUID getServer()
     {
         return server;
     }
 
 
-    public void setServer( Agent server )
+    public void setServer( UUID server )
     {
         this.server = server;
     }
 
 
-    public Set<Agent> getClients()
+    public Set<UUID> getClients()
     {
         return clients;
     }
 
 
-    public void setClients( Set<Agent> clients )
+    public void setClients( Set<UUID> clients )
     {
         this.clients = clients;
     }
 
 
-    public Set<Agent> getHadoopNodes()
+    public Set<UUID> getHadoopNodes()
     {
         return hadoopNodes;
     }
 
 
-    public void setHadoopNodes( Set<Agent> hadoopNodes )
+    public void setHadoopNodes( Set<UUID> hadoopNodes )
     {
         this.hadoopNodes = hadoopNodes;
     }
 
 
-    public Set<Agent> getAllNodes()
+    public Set<UUID> getAllNodes()
     {
-        Set<Agent> allNodes = new HashSet<>();
+        Set<UUID> allNodes = new HashSet<>();
         if ( clients != null )
         {
             allNodes.addAll( clients );

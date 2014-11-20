@@ -1,17 +1,26 @@
 package org.safehaus.subutai.plugin.zookeeper.impl;
 
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CommandCallback;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 import com.google.common.base.Strings;
@@ -39,40 +48,62 @@ public class ClusterConfiguration
 
         po.addLog( "Configuring cluster..." );
 
-        Command configureClusterCommand;
-        try
-        {
-            configureClusterCommand = manager.getCommands().getConfigureClusterCommand( config.getNodes(),
-                    ConfigParams.DATA_DIR.getParamValue() + "/" + ConfigParams.MY_ID_FILE.getParamValue(),
-                    prepareConfiguration( config.getNodes() ), ConfigParams.CONFIG_FILE_PATH.getParamValue() );
-        }
-        catch ( ClusterConfigurationException e )
-        {
-            throw new ClusterConfigurationException( String.format( "Error configuring cluster %s", e.getMessage() ) );
+        Environment environment =
+                manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+
+        String configureClusterCommand;
+        Iterator<ContainerHost> iterator = config.getNodes().iterator();
+
+        int nodeNumber=0;
+        List<CommandResult> commandsResultList = new ArrayList<>();
+        while( iterator.hasNext() ) {
+            ContainerHost zookeeperNode = environment.getContainerHostByUUID( iterator.next().getId() );
+            configureClusterCommand = manager.getCommands().getConfigureClusterCommand(
+                    prepareConfiguration( config.getNodes() ), ConfigParams.CONFIG_FILE_PATH.getParamValue(), ++nodeNumber );
+            CommandResult commandResult = null;
+            try
+            {
+                commandResult = zookeeperNode.execute( new RequestBuilder( configureClusterCommand ).withTimeout( 60 ) );
+            }
+            catch ( CommandException e )
+            {
+                po.addLogFailed("Could not run command " + configureClusterCommand + ": " + e);
+                e.printStackTrace();
+            }
+            commandsResultList.add( commandResult );
         }
 
-        manager.getCommandRunner().runCommand( configureClusterCommand );
-
-        if ( configureClusterCommand.hasSucceeded() )
+        boolean isSuccesful = true;
+        for ( int i = 0 ; i < commandsResultList.size(); i++ ) {
+            if ( ! commandsResultList.get( i ).hasSucceeded() )
+            {
+                isSuccesful = false;
+            }
+        }
+        if ( isSuccesful )
         {
             po.addLog( "Cluster configured\nRestarting cluster..." );
             //restart all other nodes with new configuration
-            Command restartCommand = manager.getCommands().getRestartCommand( config.getNodes() );
+            String restartCommand = manager.getCommands().getRestartCommand( );
             final AtomicInteger count = new AtomicInteger();
-            manager.getCommandRunner().runCommand( restartCommand, new CommandCallback()
-            {
-                @Override
-                public void onResponse( Response response, AgentResult agentResult, Command command )
+            iterator = config.getNodes().iterator();
+            commandsResultList = new ArrayList<>();
+            while( iterator.hasNext() ) {
+                ContainerHost zookeeperNode = environment.getContainerHostByUUID( iterator.next().getId() );
+                configureClusterCommand = manager.getCommands().getConfigureClusterCommand(
+                        prepareConfiguration( config.getNodes() ), ConfigParams.CONFIG_FILE_PATH.getParamValue(), ++nodeNumber );
+                CommandResult commandResult = null;
+                try
                 {
-                    if ( agentResult.getStdOut().contains( "STARTED" ) )
-                    {
-                        if ( count.incrementAndGet() == config.getNodes().size() )
-                        {
-                            stop();
-                        }
-                    }
+                    commandResult = zookeeperNode.execute( new RequestBuilder( restartCommand ).withTimeout( 60 ) );
                 }
-            } );
+                catch ( CommandException e )
+                {
+                    po.addLogFailed("Could not run command " + configureClusterCommand + ": " + e);
+                    e.printStackTrace();
+                }
+                commandsResultList.add( commandResult );
+            }
 
             if ( count.get() == config.getNodes().size() )
             {
@@ -80,21 +111,19 @@ public class ClusterConfiguration
             }
             else
             {
-                po.addLog(
-                        String.format( "Failed to restart cluster, %s, skipping...", restartCommand.getAllErrors() ) );
+                po.addLog( String.format( "Failed to restart cluster, skipping..." ) );
             }
         }
         else
         {
 
-            throw new ClusterConfigurationException(
-                    String.format( "Cluster configuration failed, %s", configureClusterCommand.getAllErrors() ) );
+            throw new ClusterConfigurationException( String.format( "Cluster configuration failed" ) );
         }
     }
 
 
     //temporary workaround until we get full configuration injection working
-    private String prepareConfiguration( Set<Agent> nodes ) throws ClusterConfigurationException
+    private String prepareConfiguration( Set<ContainerHost> nodes ) throws ClusterConfigurationException
     {
         String zooCfgFile = FileUtil.getContent( "conf/zoo.cfg", ZookeeperStandaloneSetupStrategy.class );
 
@@ -114,7 +143,7 @@ public class ClusterConfiguration
 
         StringBuilder serversBuilder = new StringBuilder();
         int id = 0;
-        for ( Agent agent : nodes )
+        for ( ContainerHost agent : nodes )
         {
             serversBuilder.append( "server." ).append( ++id ).append( "=" ).append( agent.getHostname() )
                           .append( ConfigParams.PORTS.getParamValue() ).append( "\n" );

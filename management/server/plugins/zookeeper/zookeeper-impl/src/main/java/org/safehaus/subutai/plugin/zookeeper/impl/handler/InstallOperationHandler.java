@@ -165,6 +165,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
             ClusterSetupStrategy zkClusterSetupStrategy =
                     manager.getClusterSetupStrategy( env, config, trackerOperation );
             zkClusterSetupStrategy.setup();
+            config.setEnvironmentId( env.getId() );
 
             trackerOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }

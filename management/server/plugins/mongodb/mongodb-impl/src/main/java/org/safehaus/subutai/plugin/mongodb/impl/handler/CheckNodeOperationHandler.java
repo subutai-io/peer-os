@@ -5,18 +5,16 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 
 
 /**
  * Handles check mongo node status operation
  */
-public class CheckNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
+public class CheckNodeOperationHandler extends AbstractOperationHandler<MongoImpl, MongoClusterConfig>
 {
     private final TrackerOperation po;
     private final String lxcHostname;
@@ -48,44 +46,64 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<MongoImp
             return;
         }
 
-        Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
+
+        MongoNode node = config.findNode( lxcHostname );
         if ( node == null )
         {
-            po.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            po.addLogFailed( String.format( "Node on %s is not found", lxcHostname ) );
             return;
         }
-        if ( !config.getAllNodes().contains( node ) )
+        NodeState nodeState;
+        if ( node.isRunning() )
         {
-            po.addLogFailed(
-                    String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
-            return;
+            nodeState = NodeState.RUNNING;
         }
-        po.addLog( "Checking node..." );
-        Command checkNodeCommand = manager.getCommands().
-                getCheckInstanceRunningCommand( node, config.getDomainName(), config.getNodePort( node ) );
-        manager.getCommandRunner().runCommand( checkNodeCommand );
+        else
+        {
+            nodeState = NodeState.STOPPED;
+        }
+        po.addLogDone( String.format( "Node on %s is %s", lxcHostname, nodeState ) );
 
-        if ( checkNodeCommand.hasCompleted() )
-        {
-            AgentResult agentResult = checkNodeCommand.getResults().get( node.getUuid() );
-            if ( agentResult != null )
-            {
-                if ( agentResult.getStdOut().contains( "couldn't connect to server" ) )
-                {
-                    po.addLogDone( String.format( "Node on %s is %s", lxcHostname, NodeState.STOPPED ) );
-                }
-                else if ( agentResult.getStdOut().contains( "connecting to" ) )
-                {
-                    po.addLogDone( String.format( "Node on %s is %s", lxcHostname, NodeState.RUNNING ) );
-                }
-                else
-                {
-                    po.addLogFailed( String.format( "Node on %s is not found", lxcHostname ) );
-                }
-                return;
-            }
-        }
-        po.addLogFailed( String.format( "Error checking status of node %s : %s", node.getHostname(),
-                checkNodeCommand.getAllErrors() ) );
+        //        Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
+        //        if ( node == null )
+        //        {
+        //            po.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+        //            return;
+        //        }
+        //        if ( !config.getAllNodes().contains( node ) )
+        //        {
+        //            po.addLogFailed(
+        //                    String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname,
+        // clusterName ) );
+        //            return;
+        //        }
+        //        po.addLog( "Checking node..." );
+        //                Command checkNodeCommand = manager.getCommands().
+        //                        getCheckInstanceRunningCommand( node, config.getDomainName(), config.getNodePort(
+        // node ) );
+        //        manager.getCommandRunner().runCommand( checkNodeCommand );
+        //
+        //        if ( checkNodeCommand.hasCompleted() )
+        //        {
+        //            AgentResult agentResult = checkNodeCommand.getResults().get( node.getUuid() );
+        //            if ( agentResult != null )
+        //            {
+        //                if ( agentResult.getStdOut().contains( "couldn't connect to server" ) )
+        //                {
+        //                    po.addLogDone( String.format( "Node on %s is %s", lxcHostname, NodeState.STOPPED ) );
+        //                }
+        //                else if ( agentResult.getStdOut().contains( "connecting to" ) )
+        //                {
+        //                    po.addLogDone( String.format( "Node on %s is %s", lxcHostname, NodeState.RUNNING ) );
+        //                }
+        //                else
+        //                {
+        //                    po.addLogFailed( String.format( "Node on %s is not found", lxcHostname ) );
+        //                }
+        //                return;
+        //            }
+        //        }
+        //        po.addLogFailed( String.format( "Error checking status of node %s : %s", node.getHostname(),
+        //                checkNodeCommand.getAllErrors() ) );
     }
 }

@@ -154,13 +154,13 @@ public abstract class PeerCommandMessage
     }
 
 
-    //    public UUID getEnvId()
+    //    public UUID getEnvironmentId()
     //    {
     //        return envId;
     //    }
     //
     //
-    //    public void setEnvId( final UUID envId )
+    //    public void setEnvironmentId( final UUID envId )
     //    {
     //        this.envId = envId;
     //    }

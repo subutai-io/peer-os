@@ -53,12 +53,6 @@ public interface RestService
     @Produces({ MediaType.APPLICATION_JSON })
     public Response stopNameNode( @PathParam("clusterName") String clusterName );
 
-    //restartNameNode
-    @PUT
-    @Path("clusters/{clusterName}/restart")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response restartNameNode( @PathParam("clusterName") String clusterName );
-
     //statusNameNode
     @GET
     @Path("clusters/{clusterName}/status")
@@ -83,12 +77,6 @@ public interface RestService
     @Produces({ MediaType.APPLICATION_JSON })
     public Response stopJobTracker( @PathParam("clusterName") String clusterName );
 
-    //restartJobTracker
-    @PUT
-    @Path("clusters/job/{clusterName}/restart")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response restartJobTracker( @PathParam("clusterName") String clusterName );
-
     //statusJobTracker
     @GET
     @Path("clusters/job/{clusterName}/status")
@@ -108,38 +96,10 @@ public interface RestService
     public Response statusDataNode( @PathParam("clusterName") String clusterName,
                                     @PathParam("hostname") String hostname );
 
-    //blockDataNode
-    @PUT
-    @Path("clusters/{clusterName}/node/{lxcHostName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response blockDataNode( @PathParam("clusterName") String clusterName,
-                                   @PathParam("lxcHostName") String lxcHostName );
-
-    //unblockDataNode
-    @PUT
-    @Path("clusters/{clusterName}/node/{lxcHostName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response unblockDataNode( @PathParam("clusterName") String clusterName,
-                                     @PathParam("lxcHostName") String lxcHostName );
-
     //statusTaskTracker
     @GET
     @Path("clusters/{clusterName}/task/{hostname}/status")
     @Produces({ MediaType.APPLICATION_JSON })
     public Response statusTaskTracker( @PathParam("clusterName") String clusterName,
                                        @PathParam("hostname") String hostname );
-
-    //blockTaskTracker
-    @PUT
-    @Path("clusters/{clusterName}/task/{lxcHostName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response blockTaskTracker( @PathParam("clusterName") String clusterName,
-                                      @PathParam("lxcHostName") String lxcHostName );
-
-    //unblockTaskTracker
-    @PUT
-    @Path("clusters/{clusterName}/node/{lxcHostName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response unblockTaskTracker( @PathParam("clusterName") String clusterName,
-                                        @PathParam("lxcHostName") String lxcHostName );
 }

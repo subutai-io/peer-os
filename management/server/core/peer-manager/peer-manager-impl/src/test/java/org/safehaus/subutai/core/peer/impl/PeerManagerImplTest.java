@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.peer.impl;
 import javax.sql.DataSource;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -14,6 +15,7 @@ import org.safehaus.subutai.core.messenger.api.Messenger;
 /**
  * Created by bahadyr on 9/25/14.
  */
+@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class PeerManagerImplTest
 {

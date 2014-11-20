@@ -18,17 +18,17 @@ public class JsonUtil
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
 
-    public static String toJson( Object key, Object value )
+    public static <T, V> String toJson( T key, V value )
     {
 
-        Map map = new HashMap();
+        Map<T, V> map = new HashMap<>();
         map.put( key, value );
 
         return GSON.toJson( map );
     }
 
 
-    public static String toJson( Object value )
+    public static <T> String toJson( T value )
     {
 
         return GSON.toJson( value );
@@ -49,7 +49,35 @@ public class JsonUtil
     }
 
 
-    public static String toJson( Object value, Type type )
+    public static <T> String toJson( T value, Type type )
+    {
+
+        return GSON.toJson( value, type );
+    }
+
+
+    public <T> T from( String value, Class<T> clazz )
+    {
+
+        return GSON.fromJson( value, clazz );
+    }
+
+
+    public static <T> String to( T value )
+    {
+
+        return GSON.toJson( value );
+    }
+
+
+    public static <T> T from( String value, Type type )
+    {
+
+        return GSON.fromJson( value, type );
+    }
+
+
+    public <T> String to( T value, Type type )
     {
 
         return GSON.toJson( value, type );

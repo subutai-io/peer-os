@@ -54,6 +54,9 @@ public class CloneCommand extends OsgiCommandSupport
     @Argument( index = 3, name = "strategyId", multiValued = false, description = "Container placement strategy" )
     private String strategyId;
 
+    @Argument( index = 4, name = "nodeGroupName", multiValued = false, description = "Node group name" )
+    private String nodeGroupName;
+
 
     @Override
     protected Object doExecute() throws Exception
@@ -68,7 +71,7 @@ public class CloneCommand extends OsgiCommandSupport
         templates.add( template );
         Set<ContainerHost> containers = localPeer
                 .createContainers( peerManager.getLocalPeer().getId(), environmentId, templates, quantity, strategyId,
-                        null );
+                        null, nodeGroupName );
 
         System.out.println(
                 String.format( "Containers successfully created.\nList of new %d containers:\n", containers.size() ) );

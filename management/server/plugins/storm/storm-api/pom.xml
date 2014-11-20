@@ -50,6 +50,10 @@
     </dependency>
     <dependency>
       <groupId>org.safehaus.subutai</groupId>
+      <artifactId>plugin-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.safehaus.subutai</groupId>
       <artifactId>subutai-common</artifactId>
       <version>2.0.0</version>
     </dependency>

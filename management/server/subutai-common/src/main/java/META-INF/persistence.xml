@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" version="2.1">
+
+  <persistence-unit name="NewPersistenceUnit">
+    <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
+    <properties>
+      <property name="openjpa.ConnectionURL" value="jdbc:h2:mem:" />
+      <property name="openjpa.ConnectionDriverName" value="org.h2.Driver" />
+      <property name="openjpa.ConnectionUserName" value="" />
+      <property name="openjpa.ConnectionPassword" value="" />
+      <property name="openjpa.Log" value="DefaultLevel=TRACE, Tool=INFO" />
+    </properties>
+  </persistence-unit>
+</persistence>

@@ -5,10 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.strategy.api.AbstractContainerPlacementStrategy;
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,15 +51,15 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
      * @param serverMetrics - map where key is a physical agent and value is a metric
      */
     @Override
-    public void calculatePlacement( int nodesCount, Map<Agent, ServerMetric> serverMetrics, List<Criteria> criteria )
+    public void calculatePlacement( int nodesCount, List<ServerMetric> serverMetrics, List<Criteria> criteria )
     {
 
-        Map<Agent, Integer> serversWithSlots = calculateSlots( nodesCount, serverMetrics );
+        Map<ServerMetric, Integer> serversWithSlots = calculateSlots( nodesCount, serverMetrics );
 
         if ( !serversWithSlots.isEmpty() )
         {
             int numOfAvailableLxcSlots = 0;
-            for ( Map.Entry<Agent, Integer> srv : serversWithSlots.entrySet() )
+            for ( Map.Entry<ServerMetric, Integer> srv : serversWithSlots.entrySet() )
             {
                 numOfAvailableLxcSlots += srv.getValue();
             }
@@ -70,10 +69,11 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
 
                 for ( int i = 0; i < nodesCount; i++ )
                 {
-                    Map<Agent, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( serversWithSlots );
+                    Map<ServerMetric, Integer> sortedBestServers =
+                            CollectionUtil.sortMapByValueDesc( serversWithSlots );
 
-                    Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
-                    Agent physicalNode = entry.getKey();
+                    Map.Entry<ServerMetric, Integer> entry = sortedBestServers.entrySet().iterator().next();
+                    ServerMetric physicalNode = entry.getKey();
                     Integer numOfLxcSlots = entry.getValue();
                     serversWithSlots.put( physicalNode, numOfLxcSlots - 1 );
 
@@ -101,27 +101,27 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
      * @return map where key is a physical agent and value is a number of lxcs this physical server can accommodate
      */
     @Override
-    public Map<Agent, Integer> calculateSlots( int nodesCount, Map<Agent, ServerMetric> serverMetrics )
+    public Map<ServerMetric, Integer> calculateSlots( int nodesCount, List<ServerMetric> serverMetrics )
     {
-        Map<Agent, Integer> serverSlots = new HashMap<Agent, Integer>();
+        Map<ServerMetric, Integer> serverSlots = new HashMap<>();
 
         if ( serverMetrics != null && !serverMetrics.isEmpty() )
         {
-            for ( Map.Entry<Agent, ServerMetric> entry : serverMetrics.entrySet() )
+            for ( ServerMetric metric : serverMetrics )
             {
-                ServerMetric metric = entry.getValue();
-                LOG.warn( metric.toString() );
+                //                ServerMetric metric = entry.getValue();
+                LOG.debug( metric.toString() );
                 int numOfLxcByRam = ( int ) ( ( metric.getFreeRamMb() - MIN_RAM_IN_RESERVE_MB ) / MIN_RAM_LXC_MB );
                 int numOfLxcByHdd = ( int ) ( ( metric.getFreeHddMb() - MIN_HDD_IN_RESERVE_MB ) / MIN_HDD_LXC_MB );
                 int numOfLxcByCpu = ( int ) (
                         ( ( 100 - metric.getCpuLoadPercent() ) - ( MIN_CPU_IN_RESERVE_PERCENT / metric
                                 .getNumOfProcessors() ) ) / ( MIN_CPU_LXC_PERCENT / metric.getNumOfProcessors() ) );
-                LOG.warn( numOfLxcByRam + " | " + numOfLxcByHdd + " | " + numOfLxcByCpu );
+                LOG.debug( numOfLxcByRam + " | " + numOfLxcByHdd + " | " + numOfLxcByCpu );
 
                 if ( numOfLxcByHdd > 0 && numOfLxcByRam > 0 )
                 {
                     int minNumOfLxcs = Math.min( numOfLxcByHdd, numOfLxcByRam );
-                    serverSlots.put( entry.getKey(), minNumOfLxcs );
+                    serverSlots.put( metric, minNumOfLxcs );
                 }
             }
         }

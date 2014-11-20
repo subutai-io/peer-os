@@ -106,7 +106,7 @@ function promote {
   # ---------------------------------------------------------------------------
 
   # check to make sure the container is NOT already a template
-  if [ "`zfs_is_template $lxc`" == "true" ]; then
+  if [ "`fs_is_template $lxc`" == "true" ]; then
     msg_error "Container \"$lxc\" is already a template. Aborting ..."
     unlock_container_read $lxc
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
@@ -129,10 +129,10 @@ function promote {
     msg_info "    - check passed: \"$templatename\" is NOT registered"
   fi
 
-  parent=`zfs_get_parent $lxc`
+  parent=`fs_get_parent $lxc`
   lxc_assert $parent
   # check to make sure the parent is a template
-  if [ "`zfs_is_template $parent`" == "false" ]; then
+  if [ "`fs_is_template $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
     unlock_container_read $lxc
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
@@ -212,23 +212,8 @@ function promote {
   ovs-vsctl --if-exist del-port br-int "$ovs_port_name-1" > /dev/null 2>&1
   ovs-vsctl --if-exist del-port br-int "$ovs_port_name-2" > /dev/null 2>&1
   ovs_revert_configuration $lxc_template
-
-  zfs snapshot lxc/$lxc_template@template
-  zfs hold keep lxc/$lxc_template@template
-  zfs set readonly=on lxc/$lxc_template
-
-  zfs snapshot lxc/$lxc_template-opt@template
-  zfs hold keep lxc/$lxc_template-opt@template
-  zfs set readonly=on lxc/$lxc_template-opt
-
-  zfs snapshot lxc-data/$lxc_template-var@template
-  zfs hold keep lxc-data/$lxc_template-var@template
-  zfs set readonly=on lxc-data/$lxc_template-var
-
-  zfs snapshot lxc-data/$lxc_template-home@template
-  zfs hold keep lxc-data/$lxc_template-home@template
-  zfs set readonly=on lxc-data/$lxc_template-home
-
+  fs_snap_hold_readonly $lxc_template
+  destroy_monitor $lxc_template
   msg_ok "Successfully promoted $lxc_template"
   unlock_container_read $lxc
   if [ $? != 0 ]; then msg_error "Release read lock of $lxc"; exit 1; fi

@@ -3,11 +3,15 @@ package org.safehaus.subutai.plugin.common.api;
 
 public enum OperationType
 {
-    Start,
-    Stop,
-    Restart,
-    Status,
-    Destroy,
-    Install,
-    Uninstall
+    START,
+    STOP,
+    RESTART,
+    STATUS,
+    DESTROY,
+    INSTALL,
+    UNINSTALL,
+    EXCLUDE,
+    INCLUDE,
+    DECOMISSION_STATUS,
+    CHANGE_MASTER
 }

@@ -4,13 +4,11 @@ package org.safehaus.subutai.plugin.spark.rest;
 import java.util.Set;
 
 
-/**
- * Created by daralbaev on 13.08.14.
- */
 public class TrimmedSparkConfig
 {
 
     private String clusterName;
+    private String hadoopClusterName;
 
     private String masterNodeHostName;
     private Set<String> slavesHostName;
@@ -31,5 +29,11 @@ public class TrimmedSparkConfig
     public Set<String> getSlavesHostName()
     {
         return slavesHostName;
+    }
+
+
+    public String getHadoopClusterName()
+    {
+        return hadoopClusterName;
     }
 }

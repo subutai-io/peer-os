@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -46,7 +47,6 @@ import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.monitor.api.Monitoring;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
@@ -164,11 +164,21 @@ public class ContainerManagerImpl extends ContainerManagerBase
                              final String strategyId, final List<Criteria> criteria ) throws ContainerCreateException
     {
 
-        Map<Agent, Integer> slots = null;
+        Map<Agent, Integer> slots = new HashMap<>();
         try
         {
-            slots = strategyManager
+            Map<ServerMetric, Integer> distribution = strategyManager
                     .getPlacementDistribution( getPhysicalServerMetrics(), numOfContainers, strategyId, criteria );
+            for ( Map.Entry<ServerMetric, Integer> e : distribution.entrySet() )
+            {
+                Agent agent = agentManager.getAgentByHostname( e.getKey().getHostname() );
+                if ( agent == null )
+                {
+                    throw new ContainerCreateException(
+                            String.format( "Resource host %s unavailable.", e.getKey().getHostname() ) );
+                }
+                slots.put( agent, e.getValue() );
+            }
         }
         catch ( StrategyException e )
         {
@@ -236,28 +246,28 @@ public class ContainerManagerImpl extends ContainerManagerBase
     public Agent clone( UUID envId, String hostName, String templateName, String cloneName )
             throws ContainerCreateException
     {
-        fireEvent( new ContainerEvent( ContainerEventType.CLONING_STARTED, envId, hostName, cloneName ) );
+        fireEvent( new ContainerEvent( ContainerEventType.CLONING_STARTED, hostName, cloneName ) );
         try
         {
             templateManager.clone( hostName, templateName, cloneName, envId.toString() );
         }
         catch ( TemplateException te )
         {
-            fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, envId, hostName, cloneName ) );
+            fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, hostName, cloneName ) );
             throw new ContainerCreateException(
                     String.format( "Couldn't create container %s : %s. %s", hostName, cloneName, te.toString() ) );
         }
         Agent agent = agentManager.waitForRegistration( cloneName, Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000 );
         if ( agent == null )
         {
-            fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, envId, hostName, cloneName ) );
+            fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, hostName, cloneName ) );
             throw new ContainerCreateException(
                     String.format( "Couldn't create container %s : %s. Could not get response from container.",
                             hostName, cloneName ) );
         }
         else
         {
-            fireEvent( new ContainerEvent( ContainerEventType.CLONING_SUCCEED, envId, hostName, cloneName ) );
+            fireEvent( new ContainerEvent( ContainerEventType.CLONING_SUCCEED, hostName, cloneName ) );
             return agent;
         }
     }
@@ -266,25 +276,16 @@ public class ContainerManagerImpl extends ContainerManagerBase
     @Override
     public void destroy( String hostName, String cloneName ) throws ContainerDestroyException
     {
-        UUID envId = null;
-
-        Agent agent = agentManager.getAgentByHostname( cloneName );
-
-        if ( agent != null )
-        {
-            envId = agent.getEnvironmentId();
-        }
-
-        fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_STARTED, envId, hostName, cloneName ) );
+        fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_STARTED, hostName, cloneName ) );
         if ( !templateManager.cloneDestroy( hostName, cloneName ) )
         {
-            fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_FAILED, envId, hostName, cloneName ) );
+            fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_FAILED, hostName, cloneName ) );
             throw new ContainerDestroyException(
                     String.format( "Could not destroy container %s : %s.", hostName, cloneName ) );
         }
         else
         {
-            fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_SUCCEED, envId, hostName, cloneName ) );
+            fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_SUCCEED, hostName, cloneName ) );
         }
     }
 
@@ -403,9 +404,9 @@ public class ContainerManagerImpl extends ContainerManagerBase
      * @return map of metrics where key is a physical agent and value is a metric
      */
     @Override
-    public Map<Agent, ServerMetric> getPhysicalServerMetrics()
+    public List<ServerMetric> getPhysicalServerMetrics()
     {
-        final Map<Agent, ServerMetric> serverMetrics = new HashMap<>();
+        final List<ServerMetric> serverMetrics = new ArrayList<>();
         Set<Agent> agents = agentManager.getPhysicalAgents();
         //omit management server
         for ( Iterator<Agent> it = agents.iterator(); it.hasNext(); )
@@ -430,13 +431,14 @@ public class ContainerManagerImpl extends ContainerManagerBase
             for ( AgentResult result : getMetricsCommand.getResults().values() )
             {
                 String[] metrics = result.getStdOut().split( "\n" );
-                ServerMetric serverMetric = gatherMetrics( metrics );
+                ServerMetric serverMetric = gatherMetrics( "", metrics );
                 if ( serverMetric != null )
                 {
                     Agent agent = agentManager.getAgentByUUID( result.getAgentUUID() );
                     Map<MetricType, Double> averageMetrics = gatherAvgMetrics( agent );
+                    serverMetric.setHostname( agent.getHostname() );
                     serverMetric.setAverageMetrics( averageMetrics );
-                    serverMetrics.put( agent, serverMetric );
+                    serverMetrics.add( serverMetric );
                 }
             }
         }
@@ -445,10 +447,11 @@ public class ContainerManagerImpl extends ContainerManagerBase
         {
             //get number of lxcs currently present on servers
             Map<String, EnumMap<ContainerState, List<String>>> lxcInfo = getContainersOnPhysicalServers();
-            for ( Iterator<Map.Entry<Agent, ServerMetric>> it = serverMetrics.entrySet().iterator(); it.hasNext(); )
+            for ( Iterator<ServerMetric> it = serverMetrics.iterator(); it.hasNext(); )
             {
-                Map.Entry<Agent, ServerMetric> entry = it.next();
-                EnumMap<ContainerState, List<String>> info = lxcInfo.get( entry.getKey().getHostname() );
+                //                Map.Entry<Agent, ServerMetric> entry = it.next();
+                ServerMetric serverMetric = it.next();
+                EnumMap<ContainerState, List<String>> info = lxcInfo.get( serverMetric.getHostname() );
                 if ( info != null )
                 {
                     int numOfExistingLxcs =
@@ -457,7 +460,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
                                       info.get( ContainerState.STOPPED ).size() : 0 ) + (
                                     info.get( ContainerState.FROZEN ) != null ?
                                     info.get( ContainerState.FROZEN ).size() : 0 );
-                    entry.getValue().setNumOfLxcs( numOfExistingLxcs );
+                    serverMetric.setNumOfLxcs( numOfExistingLxcs );
                 }
                 else
                 {
@@ -617,7 +620,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
     /**
      * Gather metrics from linux commands outputs.
      */
-    private ServerMetric gatherMetrics( String[] metrics )
+    private ServerMetric gatherMetrics( String hostname, String[] metrics )
     {
         int freeRamMb = 0;
         int freeHddMb = 0;
@@ -712,7 +715,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
         if ( parseOk )
         {
             ServerMetric serverMetric =
-                    new ServerMetric( freeHddMb, freeRamMb, ( int ) cpuLoadPercent, numOfProc, null );
+                    new ServerMetric( hostname, freeHddMb, freeRamMb, ( int ) cpuLoadPercent, numOfProc, null );
             return serverMetric;
         }
         else

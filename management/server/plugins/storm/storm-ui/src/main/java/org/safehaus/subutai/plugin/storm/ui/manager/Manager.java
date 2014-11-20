@@ -2,7 +2,9 @@ package org.safehaus.subutai.plugin.storm.ui.manager;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
@@ -12,11 +14,12 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.storm.api.Storm;
-import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -48,9 +51,8 @@ public class Manager
     private final Storm storm;
     private final ExecutorService executorService;
     private final Tracker tracker;
-    private final AgentManager agentManager;
-    private final CommandRunner commandRunner;
-    private StormConfig config;
+    private StormClusterConfiguration config;
+    private final EnvironmentManager environmentManager;
 
 
     public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -58,8 +60,7 @@ public class Manager
         this.executorService = executorService;
         this.storm = serviceLocator.getService( Storm.class );
         this.tracker = serviceLocator.getService( Tracker.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
 
         contentRoot = new GridLayout();
@@ -93,7 +94,7 @@ public class Manager
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                config = ( StormConfig ) event.getProperty().getValue();
+                config = ( StormClusterConfiguration ) event.getProperty().getValue();
                 refreshUI();
             }
         } );
@@ -158,7 +159,7 @@ public class Manager
                 }
 
                 UUID trackId = storm.addNode( config.getClusterName() );
-                ProgressWindow pw = new ProgressWindow( executorService, tracker, trackId, StormConfig.PRODUCT_NAME );
+                ProgressWindow pw = new ProgressWindow( executorService, tracker, trackId, StormClusterConfiguration.PRODUCT_NAME );
                 pw.getWindow().addCloseListener( new Window.CloseListener()
                 {
 
@@ -218,14 +219,15 @@ public class Manager
             {
                 if ( event.isDoubleClick() )
                 {
-                    String lxcHostname =
+                    String containerName =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
+                    Environment environment =
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+                    ContainerHost containerHost = environment.getContainerHostByHostname( containerName );
+                    if ( containerHost != null )
                     {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
-                                        agentManager );
+                                new TerminalWindow( Sets.newHashSet( containerHost ) );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
@@ -249,8 +251,16 @@ public class Manager
     {
         if ( config != null )
         {
-            populateTable( masterTable, true, config.getNimbus() );
-            populateTable( workersTable, false, config.getSupervisors().toArray( new Agent[0] ) );
+            Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+            Set<ContainerHost> nimbusHost = new HashSet<>();
+            nimbusHost.add( environment.getContainerHostByUUID( config.getNimbus() ) );
+            populateTable( masterTable, true, nimbusHost );
+
+            Set<ContainerHost> supervisorHosts = new HashSet<>();
+            for ( UUID uuid : config.getSupervisors() ) {
+                supervisorHosts.add( environment.getContainerHostByUUID( uuid ) );
+            }
+            populateTable( workersTable, false, supervisorHosts );
         }
         else
         {
@@ -260,12 +270,12 @@ public class Manager
     }
 
 
-    private void populateTable( final Table table, boolean server, Agent... agents )
+    private void populateTable( final Table table, boolean server, Set<ContainerHost> containerHosts )
     {
 
         table.removeAllItems();
 
-        for ( final Agent agent : agents )
+        for ( final ContainerHost uuid : containerHosts )
         {
             final Button checkBtn = new Button( "Check" );
             checkBtn.addStyleName( "default" );
@@ -288,7 +298,7 @@ public class Manager
             icon.setVisible( false );
 
             final List<java.io.Serializable> items = new ArrayList<>();
-            items.add( agent.getHostname() );
+            items.add( uuid.getHostname() );
             items.add( checkBtn );
             items.add( startBtn );
             items.add( stopBtn );
@@ -304,16 +314,16 @@ public class Manager
                     {
 
                         ConfirmationDialog alert = new ConfirmationDialog(
-                                String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes",
+                                String.format( "Do you want to destroy the %s node?", uuid.getHostname() ), "Yes",
                                 "No" );
                         alert.getOk().addClickListener( new Button.ClickListener()
                         {
                             @Override
                             public void buttonClick( Button.ClickEvent clickEvent )
                             {
-                                UUID trackID = storm.destroyNode( config.getClusterName(), agent.getHostname() );
+                                UUID trackID = storm.destroyNode( config.getClusterName(), uuid.getHostname() );
                                 ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
-                                        StormConfig.PRODUCT_NAME );
+                                        StormClusterConfiguration.PRODUCT_NAME );
                                 window.getWindow().addCloseListener( new Window.CloseListener()
                                 {
                                     @Override
@@ -347,7 +357,7 @@ public class Manager
                             ( ( Button ) e ).setEnabled( false );
                         }
                     }
-                    final UUID trackId = storm.statusCheck( config.getClusterName(), agent.getHostname() );
+                    final UUID trackId = storm.checkNode( config.getClusterName(), uuid.getHostname() );
                     executorService.execute( new Runnable()
                     {
 
@@ -357,7 +367,7 @@ public class Manager
                             TrackerOperationView po = null;
                             while ( po == null || po.getState() == OperationState.RUNNING )
                             {
-                                po = tracker.getTrackerOperation( StormConfig.PRODUCT_NAME, trackId );
+                                po = tracker.getTrackerOperation( StormClusterConfiguration.PRODUCT_NAME, trackId );
                             }
                             boolean running = po.getState() == OperationState.SUCCEEDED;
                             checkBtn.setEnabled( true );
@@ -388,7 +398,7 @@ public class Manager
                             ( ( Button ) e ).setEnabled( false );
                         }
                     }
-                    final UUID trackId = storm.startNode( config.getClusterName(), agent.getHostname() );
+                    final UUID trackId = storm.startNode( config.getClusterName(), uuid.getHostname() );
 
                     executorService.execute( new Runnable()
                     {
@@ -399,7 +409,7 @@ public class Manager
                             TrackerOperationView po = null;
                             while ( po == null || po.getState() == OperationState.RUNNING )
                             {
-                                po = tracker.getTrackerOperation( StormConfig.PRODUCT_NAME, trackId );
+                                po = tracker.getTrackerOperation( StormClusterConfiguration.PRODUCT_NAME, trackId );
                             }
                             boolean started = po.getState() == OperationState.SUCCEEDED;
                             checkBtn.setEnabled( true );
@@ -430,7 +440,7 @@ public class Manager
                             ( ( Button ) e ).setEnabled( false );
                         }
                     }
-                    final UUID trackId = storm.stopNode( config.getClusterName(), agent.getHostname() );
+                    final UUID trackId = storm.stopNode( config.getClusterName(), uuid.getHostname() );
 
                     executorService.execute( new Runnable()
                     {
@@ -441,7 +451,7 @@ public class Manager
                             TrackerOperationView po = null;
                             while ( po == null || po.getState() == OperationState.RUNNING )
                             {
-                                po = tracker.getTrackerOperation( StormConfig.PRODUCT_NAME, trackId );
+                                po = tracker.getTrackerOperation( StormClusterConfiguration.PRODUCT_NAME, trackId );
                             }
                             boolean stopped = po.getState() == OperationState.SUCCEEDED;
                             checkBtn.setEnabled( true );
@@ -472,7 +482,7 @@ public class Manager
                             ( ( Button ) e ).setEnabled( false );
                         }
                     }
-                    final UUID trackId = storm.restartNode( config.getClusterName(), agent.getHostname() );
+                    final UUID trackId = storm.restartNode( config.getClusterName(), uuid.getHostname() );
 
                     executorService.execute( new Runnable()
                     {
@@ -483,7 +493,7 @@ public class Manager
                             TrackerOperationView po = null;
                             while ( po == null || po.getState() == OperationState.RUNNING )
                             {
-                                po = tracker.getTrackerOperation( StormConfig.PRODUCT_NAME, trackId );
+                                po = tracker.getTrackerOperation( StormClusterConfiguration.PRODUCT_NAME, trackId );
                             }
                             boolean ok = po.getState() == OperationState.SUCCEEDED;
                             checkBtn.setEnabled( true );
@@ -505,12 +515,12 @@ public class Manager
 
     public void refreshClustersInfo()
     {
-        StormConfig current = ( StormConfig ) clusterCombo.getValue();
+        StormClusterConfiguration current = ( StormClusterConfiguration ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        List<StormConfig> clustersInfo = storm.getClusters();
+        List<StormClusterConfiguration> clustersInfo = storm.getClusters();
         if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
-            for ( StormConfig ci : clustersInfo )
+            for ( StormClusterConfiguration ci : clustersInfo )
             {
                 clusterCombo.addItem( ci );
                 clusterCombo.setItemCaption( ci, ci.getClusterName() );
@@ -525,7 +535,7 @@ public class Manager
 
         UUID trackID = storm.uninstallCluster( config.getClusterName() );
 
-        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID, StormConfig.PRODUCT_NAME );
+        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID, StormClusterConfiguration.PRODUCT_NAME );
         window.getWindow().addCloseListener( new Window.CloseListener()
         {
             @Override
