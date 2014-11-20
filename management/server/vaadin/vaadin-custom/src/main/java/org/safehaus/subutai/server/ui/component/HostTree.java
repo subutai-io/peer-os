@@ -118,43 +118,33 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
 
     private void refreshTree( Set<ResourceHostInfo> hosts )
     {
-        if ( !CollectionUtil.isCollectionEmpty( hosts ) )
+
+        try
         {
-            try
+            Set<HostInfo> missingHosts = Sets.newHashSet( presentHosts );
+            presentHosts.clear();
+
+            for ( ResourceHostInfo resourceHostInfo : hosts )
             {
-                presentHosts.removeAll( hosts );
-
-                if ( !presentHosts.isEmpty() )
+                missingHosts.remove( resourceHostInfo );
+                Item parent = container.getItem( resourceHostInfo.getId() );
+                //host is not yet in the tree
+                if ( parent == null )
                 {
-                    for ( HostInfo host : presentHosts )
-                    {
-                        container.removeItemRecursively( host.getId() );
-                    }
+                    parent = container.addItem( resourceHostInfo.getId() );
                 }
-
-                presentHosts.clear();
-
-                for ( ResourceHostInfo resourceHostInfo : hosts )
+                if ( parent != null )
                 {
-
-                    presentHosts.add( resourceHostInfo );
-                    Item parent = container.getItem( resourceHostInfo.getId() );
-                    //host is not yet in the tree
-                    if ( parent == null )
+                    tree.setItemCaption( resourceHostInfo.getId(), resourceHostInfo.getHostname() );
+                    parent.getItemProperty( "value" ).setValue( resourceHostInfo );
+                    if ( !CollectionUtil.isCollectionEmpty( resourceHostInfo.getContainers() ) )
                     {
-                        parent = container.addItem( resourceHostInfo.getId() );
-                    }
-                    if ( parent != null )
-                    {
-                        tree.setItemCaption( resourceHostInfo.getId(), resourceHostInfo.getHostname() );
-                        parent.getItemProperty( "value" ).setValue( resourceHostInfo );
-                        if ( !CollectionUtil.isCollectionEmpty( resourceHostInfo.getContainers() ) )
+                        container.setChildrenAllowed( resourceHostInfo.getId(), true );
+                        for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
                         {
-                            container.setChildrenAllowed( resourceHostInfo.getId(), true );
-                            for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
+                            missingHosts.remove( containerHostInfo );
+                            if ( !presentHosts.contains( containerHostInfo ) )
                             {
-                                presentHosts.add( containerHostInfo );
-
                                 Item child = container.getItem( containerHostInfo.getId() );
                                 //child is not yet in the tree
                                 if ( child == null )
@@ -171,20 +161,29 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
                                     container.setChildrenAllowed( containerHostInfo.getId(), false );
                                 }
                             }
-                        }
-                        else
-                        {
-                            container.setChildrenAllowed( resourceHostInfo.getId(), false );
+                            presentHosts.add( containerHostInfo );
                         }
                     }
+                    else
+                    {
+                        container.setChildrenAllowed( resourceHostInfo.getId(), false );
+                    }
                 }
+                presentHosts.add( resourceHostInfo );
+            }
 
-                container.sort( new Object[] { "value" }, new boolean[] { true } );
-            }
-            catch ( Property.ReadOnlyException | Converter.ConversionException ex )
+            //remove missing hosts from tree
+            for ( HostInfo host : missingHosts )
             {
-                LOG.error( "Error in refreshTree", ex );
+                container.removeItemRecursively( host.getId() );
             }
+
+            //sort hosts
+            container.sort( new Object[] { "value" }, new boolean[] { true } );
+        }
+        catch ( Property.ReadOnlyException | Converter.ConversionException ex )
+        {
+            LOG.error( "Error in refreshTree", ex );
         }
     }
 
@@ -204,6 +203,13 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
-        refreshTree( hostRegistry.getResourceHostsInfo() );
+        executeUpdate( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                refreshTree( hostRegistry.getResourceHostsInfo() );
+            }
+        } );
     }
 }
