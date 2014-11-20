@@ -36,7 +36,7 @@ public class ScriptManagerRestImpl implements ScriptManagerRest
         File scriptsDirectory = new File( scriptsDirectoryPath );
         scriptsDirectory.mkdirs();
 
-        Path path = Paths.get( scriptsDirectory + scriptFileName );
+        Path path = Paths.get( scriptsDirectoryPath, scriptFileName );
 
 
         InputStream in = scriptFile.getObject( InputStream.class );
@@ -130,6 +130,4 @@ public class ScriptManagerRestImpl implements ScriptManagerRest
 
         return Response.ok( JsonUtil.toJson( scriptNames ) ).build();
     }
-
-
 }
