@@ -14,7 +14,13 @@ public class InotifyEvent
     private EventDetails response;
 
 
-    class EventDetails
+    public EventDetails getResponse()
+    {
+        return response;
+    }
+
+
+    static class EventDetails
     {
         private UUID id;
         private String configPoint;
@@ -38,11 +44,5 @@ public class InotifyEvent
         {
             return eventType;
         }
-    }
-
-
-    public EventDetails getResponse()
-    {
-        return response;
     }
 }
