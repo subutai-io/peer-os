@@ -70,9 +70,16 @@ public class ClusterConfiguration implements ClusterConfigurationInterface<Spark
 
         RequestBuilder startAllCommand = manager.getCommands().getStartAllCommand();
 
-        executeCommand( master, startAllCommand );
+        CommandResult result = executeCommand( master, startAllCommand );
 
-        po.addLog( "Cluster successfully started" );
+        if ( !result.getStdOut().contains( "starting" ) )
+        {
+            po.addLog( "Failed to start cluster, skipping..." );
+        }
+        else
+        {
+            po.addLog( "Cluster successfully started" );
+        }
     }
 
 

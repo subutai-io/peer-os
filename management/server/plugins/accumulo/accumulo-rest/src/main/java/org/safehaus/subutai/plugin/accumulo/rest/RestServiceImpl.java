@@ -9,12 +9,13 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
-import org.safehaus.subutai.plugin.accumulo.api.NodeType;
+import org.safehaus.subutai.plugin.common.api.NodeType;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 
 
 /**
@@ -25,19 +26,8 @@ public class RestServiceImpl implements RestService
 {
 
     private Accumulo accumuloManager;
-    private AgentManager agentManager;
-
-
-    public void setAgentManager( final AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }
-
-
-    public void setAccumuloManager( final Accumulo accumuloManager )
-    {
-        this.accumuloManager = accumuloManager;
-    }
+    private Hadoop hadoop;
+    private EnvironmentManager environmentManager;
 
 
     @Override
@@ -70,19 +60,24 @@ public class RestServiceImpl implements RestService
         expandedConfig.setClusterName( trimmedAccumuloConfig.getClusterName() );
         expandedConfig.setInstanceName( trimmedAccumuloConfig.getInstanceName() );
         expandedConfig.setPassword( trimmedAccumuloConfig.getPassword() );
-        expandedConfig.setMasterNode( agentManager.getAgentByHostname( trimmedAccumuloConfig.getMasterNode() ) );
-        expandedConfig.setGcNode( agentManager.getAgentByHostname( trimmedAccumuloConfig.getGcNode() ) );
-        expandedConfig.setMonitor( agentManager.getAgentByHostname( trimmedAccumuloConfig.getMonitor() ) );
+        expandedConfig.setHadoopClusterName( trimmedAccumuloConfig.getHadoopClusterName() );
+        Environment environment = environmentManager
+                .getEnvironmentByUUID( hadoop.getCluster( expandedConfig.getHadoopClusterName() ).getEnvironmentId() );
+        expandedConfig.setMasterNode(
+                environment.getContainerHostByHostname( trimmedAccumuloConfig.getMasterNode() ).getId() );
+        expandedConfig.setGcNode( environment.getContainerHostByHostname( trimmedAccumuloConfig.getGcNode() ).getId() );
+        expandedConfig
+                .setMonitor( environment.getContainerHostByHostname( trimmedAccumuloConfig.getMonitor() ).getId() );
 
-        Set<Agent> tracers = new HashSet<>();
-        Set<Agent> slaves = new HashSet<>();
+        Set<UUID> tracers = new HashSet<>();
+        Set<UUID> slaves = new HashSet<>();
         for ( String tracer : trimmedAccumuloConfig.getTracers() )
         {
-            tracers.add( agentManager.getAgentByHostname( tracer ) );
+            tracers.add( environment.getContainerHostByHostname( tracer ).getId() );
         }
         for ( String slave : trimmedAccumuloConfig.getSlaves() )
         {
-            slaves.add( agentManager.getAgentByHostname( slave ) );
+            slaves.add( environment.getContainerHostByHostname( slave ).getId() );
         }
 
         expandedConfig.setTracers( tracers );
@@ -148,5 +143,41 @@ public class RestServiceImpl implements RestService
     private String wrapUUID( UUID uuid )
     {
         return JsonUtil.toJson( "OPERATION_ID", uuid );
+    }
+
+
+    public Accumulo getAccumuloManager()
+    {
+        return accumuloManager;
+    }
+
+
+    public void setAccumuloManager( final Accumulo accumuloManager )
+    {
+        this.accumuloManager = accumuloManager;
+    }
+
+
+    public Hadoop getHadoop()
+    {
+        return hadoop;
+    }
+
+
+    public void setHadoop( final Hadoop hadoop )
+    {
+        this.hadoop = hadoop;
+    }
+
+
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
     }
 }

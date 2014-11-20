@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
@@ -36,9 +36,9 @@ public class ExportPanel extends ImportExportBase
 
 
     @Override
-    public void setAgent( Agent agent )
+    public void setHost( ContainerHost host )
     {
-        super.setAgent( agent );
+        super.setHost( host );
         init();
     }
 
@@ -48,7 +48,7 @@ public class ExportPanel extends ImportExportBase
     {
         ExportSetting s = new ExportSetting();
         s.setClusterName( clusterName );
-        s.setHostname( agent.getHostname() );
+        s.setHostname( host.getHostname() );
         s.setConnectionString( connStringField.getValue() );
         s.setTableName( tableField.getValue() );
         s.setUsername( usernameField.getValue() );
@@ -64,7 +64,7 @@ public class ExportPanel extends ImportExportBase
     {
         removeAllComponents();
 
-        if ( agent == null )
+        if ( host == null )
         {
             addComponent( UIUtil.getLabel( "<h1>No node selected</h1>", 200 ) );
             return;

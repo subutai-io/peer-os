@@ -84,4 +84,6 @@ public interface Mongo extends ApiBase<MongoClusterConfig>
 
     public org.safehaus.subutai.common.protocol.EnvironmentBlueprint getDefaultEnvironmentBlueprint(
             MongoClusterConfig config );
+
+    public MongoClusterConfig newMongoClusterConfigInstance();
 }

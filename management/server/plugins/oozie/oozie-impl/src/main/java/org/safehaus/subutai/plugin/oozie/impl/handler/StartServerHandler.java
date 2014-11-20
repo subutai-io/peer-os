@@ -13,7 +13,7 @@ import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
 
-public class StartServerHandler extends AbstractOperationHandler<OozieImpl>
+public class StartServerHandler extends AbstractOperationHandler<OozieImpl, OozieClusterConfig>
 {
     private final TrackerOperation trackerOperation;
 
@@ -37,7 +37,7 @@ public class StartServerHandler extends AbstractOperationHandler<OozieImpl>
     public void run()
     {
 
-        manager.getExecutor().execute( new Runnable()
+        /*manager.getExecutor().execute( new Runnable()
         {
 
             public void run()
@@ -88,6 +88,6 @@ public class StartServerHandler extends AbstractOperationHandler<OozieImpl>
                             .addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
                 }
             }
-        } );
+        } );*/
     }
 }

@@ -45,7 +45,6 @@ public class Node2PeerBuilder extends EnvironmentBuildProcessFactory
                 CloneContainersMessage ccm = new CloneContainersMessage();
                 ccm.setTargetPeerId( peer.getId() );
                 ccm.setNodeGroupName( nodeGroup.getName() );
-                ccm.setCriteria( null );
                 ccm.setNumberOfNodes( 1 );
                 ccm.setStrategy( nodeGroup.getPlacementStrategy() );
                 List<Template> templates =

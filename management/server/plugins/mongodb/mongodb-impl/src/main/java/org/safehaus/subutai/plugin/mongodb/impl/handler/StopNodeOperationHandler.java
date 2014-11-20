@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 
 
@@ -37,7 +38,29 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<MongoImpl
     @Override
     public void run()
     {
-        po.addLog( "Not implemented yet." );
+        MongoClusterConfig config = manager.getCluster( clusterName );
+        if ( config == null )
+        {
+            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            return;
+        }
+
+
+        po.addLog( "Stopping node..." );
+
+        MongoNode node = config.findNode( lxcHostname );
+
+        try
+        {
+            node.stop();
+            po.addLogDone( String.format( "Node on %s stopped", lxcHostname ) );
+        }
+        catch ( Exception e )
+        {
+            po.addLogFailed( String.format( "Failed to stop node %s, %s", lxcHostname, e ) );
+        }
+
+
         //        MongoClusterConfig config = manager.getCluster( clusterName );
         //        if ( config == null )
         //        {
@@ -70,7 +93,8 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<MongoImpl
         //        else
         //        {
         //            po.addLogFailed(
-        //                    String.format( "Failed to stop node %s, %s", lxcHostname, stopNodeCommand.getAllErrors() ) );
+        //                    String.format( "Failed to stop node %s, %s", lxcHostname, stopNodeCommand.getAllErrors
+        // () ) );
         //        }
     }
 }

@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +40,7 @@ public class HostRegistryImpl implements HostRegistry
 
     protected Set<HostListener> hostListeners =
             Collections.newSetFromMap( new ConcurrentHashMap<HostListener, Boolean>() );
-    protected Executor notifier = Executors.newCachedThreadPool();
+    protected ExecutorService notifier = Executors.newCachedThreadPool();
     protected HeartBeatListener heartBeatListener;
     protected Cache<UUID, ResourceHostInfo> hosts;
 
@@ -224,5 +224,6 @@ public class HostRegistryImpl implements HostRegistry
     {
         broker.removeMessageListener( heartBeatListener );
         hosts.invalidateAll();
+        notifier.shutdown();
     }
 }

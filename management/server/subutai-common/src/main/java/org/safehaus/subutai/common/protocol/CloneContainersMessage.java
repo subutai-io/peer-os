@@ -13,7 +13,6 @@ public class CloneContainersMessage
 {
     private int numberOfNodes;
     private PlacementStrategy strategy;
-    private List<String> criteria;
     private List<Template> templates = new ArrayList();
     private String nodeGroupName;
     private UUID targetPeerId;
@@ -68,25 +67,12 @@ public class CloneContainersMessage
     }
 
 
-    public List<String> getCriteria()
-    {
-        return criteria;
-    }
-
-
-    public void setCriteria( final List<String> criteria )
-    {
-        this.criteria = criteria;
-    }
-
-
     @Override
     public String toString()
     {
         return "CloneContainersMessage{" +
                 ", numberOfNodes=" + numberOfNodes +
                 ", Strategy='" + strategy + '\'' +
-                ", criteria=" + criteria +
                 ", templates=" + templates +
                 '}';
     }

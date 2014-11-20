@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
 
@@ -18,16 +17,15 @@ public class AccumuloClusterConfig implements ConfigBase
 {
 
     public static final String PRODUCT_KEY = "Accumulo";
-    public static final int DEFAULT_ACCUMULO_MASTER_NODES_QUANTITY = 3;
     public static final String PRODUCT_NAME = "accumulo";
     private String clusterName = "";
     private String instanceName = "";
     private String password = "";
-    private Agent masterNode;
-    private Agent gcNode;
-    private Agent monitor;
-    private Set<Agent> tracers;
-    private Set<Agent> slaves;
+    private UUID masterNode;
+    private UUID gcNode;
+    private UUID monitor;
+    private Set<UUID> tracers;
+    private Set<UUID> slaves;
     private int numberOfTracers = 1;
     private int numberOfSlaves = 3;
     private SetupType setupType;
@@ -40,6 +38,12 @@ public class AccumuloClusterConfig implements ConfigBase
     public UUID getEnvironmentId()
     {
         return environmentId;
+    }
+
+
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
     }
 
 
@@ -115,9 +119,9 @@ public class AccumuloClusterConfig implements ConfigBase
     }
 
 
-    public Set<Agent> getAllNodes()
+    public Set<UUID> getAllNodes()
     {
-        Set<Agent> allNodes = new HashSet<>();
+        Set<UUID> allNodes = new HashSet<>();
 
         if ( masterNode != null )
         {
@@ -144,61 +148,61 @@ public class AccumuloClusterConfig implements ConfigBase
     }
 
 
-    public Agent getMasterNode()
+    public UUID getMasterNode()
     {
         return masterNode;
     }
 
 
-    public void setMasterNode( Agent masterNode )
+    public void setMasterNode( UUID masterNode )
     {
         this.masterNode = masterNode;
     }
 
 
-    public Agent getGcNode()
+    public UUID getGcNode()
     {
         return gcNode;
     }
 
 
-    public void setGcNode( Agent gcNode )
+    public void setGcNode( UUID gcNode )
     {
         this.gcNode = gcNode;
     }
 
 
-    public Agent getMonitor()
+    public UUID getMonitor()
     {
         return monitor;
     }
 
 
-    public void setMonitor( Agent monitor )
+    public void setMonitor( UUID monitor )
     {
         this.monitor = monitor;
     }
 
 
-    public Set<Agent> getTracers()
+    public Set<UUID> getTracers()
     {
         return tracers;
     }
 
 
-    public void setTracers( Set<Agent> tracers )
+    public void setTracers( Set<UUID> tracers )
     {
         this.tracers = tracers;
     }
 
 
-    public Set<Agent> getSlaves()
+    public Set<UUID> getSlaves()
     {
         return slaves;
     }
 
 
-    public void setSlaves( Set<Agent> slaves )
+    public void setSlaves( Set<UUID> slaves )
     {
         this.slaves = slaves;
     }

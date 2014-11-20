@@ -3,11 +3,11 @@ package org.safehaus.subutai.plugin.spark.impl.handler;
 
 import java.util.Set;
 
-import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.ClusterException;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -113,8 +113,13 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
     public void startNode() throws ClusterException
     {
-        executeCommand( node, nodeType == NodeType.MASTER_NODE ? manager.getCommands().getStartMasterCommand() :
-                              manager.getCommands().getStartSlaveCommand() );
+        CommandResult result = executeCommand( node,
+                nodeType == NodeType.MASTER_NODE ? manager.getCommands().getStartMasterCommand() :
+                manager.getCommands().getStartSlaveCommand() );
+        if ( !result.getStdOut().contains( "starting" ) )
+        {
+            throw new ClusterException( String.format( "Failed to start node %s", node.getHostname() ) );
+        }
     }
 
 
@@ -183,12 +188,6 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
         config.getSlaveIds().add( node.getId() );
 
-        trackerOperation.addLog( "Updating db..." );
-
-        //save to db
-        manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-        trackerOperation.addLog( "Cluster info updated in DB" );
-
         //install spark
         if ( install )
         {
@@ -211,12 +210,31 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
         trackerOperation.addLog( "Restarting master..." );
 
         RequestBuilder restartMasterCommand = manager.getCommands().getRestartMasterCommand();
-        executeCommand( master, restartMasterCommand );
+        result = executeCommand( master, restartMasterCommand );
+
+
+        if ( !result.getStdOut().contains( "starting" ) )
+        {
+            trackerOperation.addLog( "Master restart failed, skipping..." );
+        }
+
 
         trackerOperation.addLog( "Starting Spark on new node..." );
 
         RequestBuilder startSlaveCommand = manager.getCommands().getStartSlaveCommand();
-        executeCommand( node, startSlaveCommand );
+        result = executeCommand( node, startSlaveCommand );
+
+        if ( !result.getStdOut().contains( "starting" ) )
+        {
+            trackerOperation.addLog( "Slave start failed, skipping..." );
+        }
+
+
+        trackerOperation.addLog( "Updating db..." );
+        if ( !manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, clusterName, config ) )
+        {
+            throw new ClusterException( "Could not update cluster info" );
+        }
     }
 
 
@@ -264,7 +282,12 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
         RequestBuilder restartMasterCommand = manager.getCommands().getRestartMasterCommand();
 
-        executeCommand( master, restartMasterCommand );
+        CommandResult result = executeCommand( master, restartMasterCommand );
+
+        if ( !result.getStdOut().contains( "starting" ) )
+        {
+            trackerOperation.addLog( "Master restart failed, skipping..." );
+        }
 
 
         boolean uninstall = !node.getId().equals( config.getMasterNodeId() );
@@ -290,7 +313,10 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
         trackerOperation.addLog( "Updating db..." );
 
-        manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        if ( !manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, clusterName, config ) )
+        {
+            throw new ClusterException( "Could not update cluster info" );
+        }
     }
 
 
@@ -393,12 +419,20 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
         RequestBuilder startNodesCommand = manager.getCommands().getStartAllCommand();
 
-        executeCommand( node, startNodesCommand, true );
+        CommandResult result = executeCommand( node, startNodesCommand, true );
+
+        if ( !result.getStdOut().contains( "starting" ) )
+        {
+            trackerOperation.addLog( "Failed to start cluster, skipping..." );
+        }
 
 
         trackerOperation.addLog( "Updating db..." );
         //update db
-        manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, clusterName, config );
+        if ( !manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, clusterName, config ) )
+        {
+            throw new ClusterException( "Could not update cluster info" );
+        }
     }
 
 

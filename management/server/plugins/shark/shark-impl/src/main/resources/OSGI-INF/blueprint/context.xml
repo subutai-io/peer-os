@@ -7,10 +7,6 @@
     <property name="password" value="" />
   </bean>
 
-  <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
   <reference id="environmentManager" availability="mandatory"
@@ -22,12 +18,10 @@
 
   <bean id="shark-impl" scope="singleton" class="org.safehaus.subutai.plugin.shark.impl.SharkImpl"
         init-method="init" destroy-method="destroy">
-    <property name="commandRunner" ref="commandRunner" />
-    <property name="agentManager" ref="agentManager" />
-    <property name="tracker" ref="tracker" />
-    <property name="environmentManager" ref="environmentManager" />
-    <property name="hadoopManager" ref="hadoopManager" />
-    <property name="sparkManager" ref="sparkManager" />
+    <argument ref="tracker" />
+    <argument ref="environmentManager" />
+    <argument ref="hadoopManager" />
+    <argument ref="sparkManager" />
     <argument ref="dataSource" />
   </bean>
 

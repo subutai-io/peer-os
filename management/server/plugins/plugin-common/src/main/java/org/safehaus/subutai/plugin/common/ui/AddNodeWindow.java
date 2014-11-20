@@ -5,11 +5,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
 import com.google.common.base.Strings;
@@ -34,7 +34,7 @@ public class AddNodeWindow extends Window
 
 
     public AddNodeWindow( final ApiBase product, final ExecutorService executorService, final Tracker tracker,
-                          final ConfigBase config, Set<Agent> nodes )
+                          final ConfigBase config, Set<ContainerHost> nodes )
     {
         super( "Add New Node" );
         setModal( true );
@@ -60,10 +60,11 @@ public class AddNodeWindow extends Window
         availableNodesComboBox.setNullSelectionAllowed( false );
         availableNodesComboBox.setRequired( true );
         availableNodesComboBox.setWidth( 200, Unit.PIXELS );
-        for ( Agent node : nodes )
+
+        for ( ContainerHost node : nodes )
         {
             availableNodesComboBox.addItem( node );
-            availableNodesComboBox.setItemCaption( node, node.getHostname() );
+            availableNodesComboBox.setItemCaption( node, node.toString() );
         }
         availableNodesComboBox.setValue( nodes.iterator().next() );
 
@@ -84,7 +85,7 @@ public class AddNodeWindow extends Window
             {
                 addNodeBtn.setEnabled( false );
                 showProgress();
-                Agent agent = ( Agent ) availableNodesComboBox.getValue();
+                ContainerHost agent = ( ContainerHost ) availableNodesComboBox.getValue();
                 // TODO make relevant addNode calls according to product type !!!
                 // TODO e.g. for hadoop, call addNode that creates the lxc container
                 // TODO and for hive, call addNode that installs package to an existing lxc container

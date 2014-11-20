@@ -1,9 +1,10 @@
 package org.safehaus.subutai.plugin.hbase.cli;
 
 
-import org.safehaus.subutai.common.protocol.Agent;
+import java.util.UUID;
+
 import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
@@ -37,7 +38,7 @@ public class DescribeClusterCommand extends OsgiCommandSupport
 
     protected Object doExecute()
     {
-        HBaseClusterConfig config = hbaseManager.getCluster( clusterName );
+        HBaseConfig config = hbaseManager.getCluster( clusterName );
         if ( config != null )
         {
             StringBuilder sb = new StringBuilder();
@@ -46,12 +47,12 @@ public class DescribeClusterCommand extends OsgiCommandSupport
             sb.append( "Master node: " ).append( config.getHbaseMaster() ).append( "\n" );
             sb.append( "Backup master node: " ).append( config.getBackupMasters() ).append( "\n" );
             sb.append( "Region nodes:" ).append( "\n" );
-            for ( Agent agent : config.getRegionServers() )
+            for ( UUID agent : config.getRegionServers() )
             {
                 sb.append( agent ).append( "\n" );
             }
             sb.append( "Quorum nodes:" ).append( "\n" );
-            for ( Agent agent : config.getQuorumPeers() )
+            for ( UUID agent : config.getQuorumPeers() )
             {
                 sb.append( agent ).append( "\n" );
             }

@@ -15,8 +15,6 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
@@ -32,15 +30,13 @@ import com.vaadin.ui.Component;
 public class OoziePortalModule implements PortalModule
 {
 
-    public static final String MODULE_IMAGE = "oozie.png";
     protected static final Logger LOG = Logger.getLogger( OoziePortalModule.class.getName() );
+    public static final String MODULE_IMAGE = "oozie.png";
     private final ServiceLocator serviceLocator;
-    Oozie oozieManager;
-    AgentManager agentManager;
-    Tracker tracker;
-    Hadoop hadoopManager;
-    CommandRunner commandRunner;
-    ExecutorService executor;
+    private Oozie oozieManager;
+    private Tracker tracker;
+    private Hadoop hadoopManager;
+    private ExecutorService executor;
 
 
     public OoziePortalModule()
@@ -58,18 +54,6 @@ public class OoziePortalModule implements PortalModule
     public void setOozieManager( final Oozie oozieManager )
     {
         this.oozieManager = oozieManager;
-    }
-
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public void setAgentManager( final AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
     }
 
 
@@ -97,18 +81,6 @@ public class OoziePortalModule implements PortalModule
     }
 
 
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
-    public void setCommandRunner( final CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
-    }
-
-
     public ExecutorService getExecutor()
     {
         return executor;
@@ -124,7 +96,6 @@ public class OoziePortalModule implements PortalModule
     public void destroy()
     {
         oozieManager = null;
-        agentManager = null;
         tracker = null;
         hadoopManager = null;
         executor.shutdown();

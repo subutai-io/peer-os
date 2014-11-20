@@ -314,7 +314,7 @@ char* SubutaiWatch::getBuffer()
  *  \details   	 This method checks the notification for file system watchers
  *  			 This method also understands the type of events and changes(Create/Delete/Modify) of files
  */
-bool SubutaiWatch::checkNotification()
+bool SubutaiWatch::checkNotification(SubutaiContainerManager* cman)
 {
 	bool status=false;
 	int length = 0;
@@ -356,6 +356,7 @@ bool SubutaiWatch::checkNotification()
 
 			if ( event->len )
 			{
+				watchRepsonse->setContainerSet(cman->getAllContainers());
 				if ( event->mask & IN_IGNORED )
 				{
 					watchLogger->writeLog(3,watchLogger->setLogData("<SubutaiWatch::checkNotification>","IN_IGNORED!!"));

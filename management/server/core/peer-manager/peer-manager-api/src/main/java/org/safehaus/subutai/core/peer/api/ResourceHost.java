@@ -31,10 +31,10 @@ import com.google.common.collect.Sets;
  */
 public class ResourceHost extends SubutaiHost
 {
-    private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
-    private static final Pattern LOAD_AVERAGE_PATTERN = Pattern.compile( "load average: (.*)" );
-    private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
-    private ExecutorService executor;
+    transient private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
+    transient private static final Pattern LOAD_AVERAGE_PATTERN = Pattern.compile( "load average: (.*)" );
+    transient private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
+    transient private ExecutorService executor;
 
     Set<ContainerHost> containersHosts = Sets.newConcurrentHashSet();
 
@@ -43,6 +43,12 @@ public class ResourceHost extends SubutaiHost
     {
         super( agent, peerId );
     }
+
+
+    //    public ResourceHost( ResourceHostInfo resourceHostinfo )
+    //    {
+    //        super( resourceHostinfo );
+    //    }
 
 
     public synchronized void addContainerHost( ContainerHost host )
@@ -404,34 +410,6 @@ public class ResourceHost extends SubutaiHost
                 }
             }
         } );
-
-        //        ExecutorCompletionService completionService = new ExecutorCompletionService<>( getExecutor() );
-        //        completionService.submit( new Callable()
-        //        {
-        //            @Override
-        //            public ContainerHost call() throws Exception
-        //            {
-        //                return create( creatorPeerId, environmentId, templates, containerName );
-        //            }
-        //        } );
-        //
-        //        ContainerHost result = null;
-        //        try
-        //        {
-        //            Future<ContainerHost> future = completionService.take();
-        //            result = future.get();
-        //            if ( !result.getHostname().equals( containerName ) )
-        //            {
-        //                throw new PeerException(
-        //                        String.format( "Invalid host name. Requested %s <> actual %", result.getHostname(),
-        //                                containerName ) );
-        //            }
-        //            return result;
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            throw new PeerException( e.toString() );
-        //        }
     }
 
 
@@ -652,6 +630,20 @@ public class ResourceHost extends SubutaiHost
                     String.format( "Could not execute script/command %s", String.format( command.script, args ) ),
                     e.toString() );
         }
+    }
+
+
+    public Set<ContainerHost> getContainerHostsByNameList( final Set<String> cloneNames )
+    {
+        Set<ContainerHost> result = new HashSet<>();
+        for ( ContainerHost containerHost : getContainerHosts() )
+        {
+            if ( cloneNames.contains( containerHost.getHostname() ) )
+            {
+                result.add( containerHost );
+            }
+        }
+        return result;
     }
 
 

@@ -11,11 +11,12 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
@@ -30,8 +31,9 @@ public class Wizard
     private final Tracker tracker;
     private final Hadoop hadoop;
     private final HBase hbase;
+    private final EnvironmentManager environmentManager;
     private int step = 1;
-    private HBaseClusterConfig config = new HBaseClusterConfig();
+    private HBaseConfig config = new HBaseConfig();
     private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
 
 
@@ -43,6 +45,7 @@ public class Wizard
         this.tracker = serviceLocator.getService( Tracker.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
         this.hbase = serviceLocator.getService( HBase.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
@@ -108,13 +111,13 @@ public class Wizard
     protected void init()
     {
         step = 1;
-        config = new HBaseClusterConfig();
+        config = new HBaseConfig();
         hadoopConfig = new HadoopClusterConfig();
         putForm();
     }
 
 
-    public HBaseClusterConfig getConfig()
+    public HBaseConfig getConfig()
     {
         return config;
     }
@@ -123,5 +126,11 @@ public class Wizard
     public HadoopClusterConfig getHadoopConfig()
     {
         return hadoopConfig;
+    }
+
+
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
     }
 }

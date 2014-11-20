@@ -6,7 +6,6 @@
 package org.safehaus.subutai.plugin.accumulo.ui.manager;
 
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,14 +18,14 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
-import org.safehaus.subutai.plugin.accumulo.api.NodeType;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -59,9 +58,7 @@ public class Manager
     protected static final String CHECK_ALL_BUTTON_CAPTION = "Check All";
     protected static final String CHECK_BUTTON_CAPTION = "Check";
     protected static final String START_ALL_BUTTON_CAPTION = "Start All";
-    protected static final String START_BUTTON_CAPTION = "Start";
     protected static final String STOP_ALL_BUTTON_CAPTION = "Stop All";
-    protected static final String STOP_BUTTON_CAPTION = "Stop";
     protected static final String DESTROY_BUTTON_CAPTION = "Destroy";
     protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
     protected static final String ADD_TRACER_BUTTON_CAPTION = "Add Tracer";
@@ -71,8 +68,6 @@ public class Manager
     protected static final String NODE_ROLE_COLUMN_CAPTION = "Node Role";
     protected static final String STATUS_COLUMN_CAPTION = "Status";
     protected static final String STYLE_NAME = "default";
-    private static final String MESSAGE = "No cluster is installed !";
-    private static final String MASTER = NodeType.Master.name();
     private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final GridLayout contentRoot;
     private final Table mastersTable;
@@ -87,9 +82,8 @@ public class Manager
     private final Accumulo accumulo;
     private final Hadoop hadoop;
     private final Tracker tracker;
-    private final AgentManager agentManager;
     private final ExecutorService executorService;
-    private final CommandRunner commandRunner;
+    private final EnvironmentManager environmentManager;
     private ComboBox clusterCombo;
     private AccumuloClusterConfig accumuloClusterConfig;
     private Button refreshClustersBtn, checkAllBtn, startClusterBtn, stopClusterBtn, destroyClusterBtn, addTracerBtn,
@@ -103,8 +97,8 @@ public class Manager
         this.accumulo = serviceLocator.getService( Accumulo.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
         this.tracker = serviceLocator.getService( Tracker.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -326,43 +320,42 @@ public class Manager
             @Override
             public void buttonClick( Button.ClickEvent event )
             {
-                if ( accumuloClusterConfig != null )
+                if ( accumuloClusterConfig == null )
                 {
-
-                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( accumuloClusterConfig.getClusterName() );
-                    if ( hadoopConfig != null )
-                    {
-                        Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
-                        availableNodes.removeAll( accumuloClusterConfig.getSlaves() );
-                        if ( availableNodes.isEmpty() )
-                        {
-                            Notification.show( "All Hadoop nodes already have slaves installed" );
-                            return;
-                        }
-
-                        AddNodeWindow addNodeWindow =
-                                new AddNodeWindow( accumulo, executorService, tracker, accumuloClusterConfig,
-                                        availableNodes, NodeType.Logger );
-                        contentRoot.getUI().addWindow( addNodeWindow );
-                        addNodeWindow.addCloseListener( new Window.CloseListener()
-                        {
-                            @Override
-                            public void windowClose( Window.CloseEvent closeEvent )
-                            {
-                                refreshClustersInfo();
-                            }
-                        } );
-                    }
-                    else
-                    {
-                        Notification.show( String
-                                .format( "Hadoop cluster %s not found", accumuloClusterConfig.getClusterName() ) );
-                    }
+                    Notification.show( "Select cluster" );
+                    return;
                 }
-                else
+                Set<UUID> set = new HashSet<>(
+                        hadoop.getCluster( accumuloClusterConfig.getHadoopClusterName() ).getAllNodes() );
+                set.removeAll( accumuloClusterConfig.getAllNodes() );
+                if ( set.isEmpty() )
                 {
-                    Notification.show( "Please, select cluster" );
+                    Notification.show( "All nodes in Hadoop cluster have Accumulo installed" );
+                    return;
                 }
+
+                Set<ContainerHost> myHostSet = new HashSet<>();
+                for ( UUID uuid : set )
+                {
+                    myHostSet.add( environmentManager.getEnvironmentByUUID(
+                            hadoop.getCluster( accumuloClusterConfig.getHadoopClusterName() ).getEnvironmentId() )
+                                                     .getContainerHostByUUID( uuid ) );
+                }
+
+                AddNodeWindow w =
+                        new AddNodeWindow( accumulo, executorService, tracker, accumuloClusterConfig, myHostSet,
+                                NodeType.ACCUMULO_TABLET_SERVER );
+                contentRoot.getUI().addWindow( w );
+                w.addCloseListener( new Window.CloseListener()
+                {
+                    @Override
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
+                        refreshClustersInfo();
+                        refreshUI();
+                        checkAll();
+                    }
+                } );
             }
         } );
         return addTabletServerButton;
@@ -379,44 +372,42 @@ public class Manager
             @Override
             public void buttonClick( Button.ClickEvent event )
             {
-                if ( accumuloClusterConfig != null )
+                if ( accumuloClusterConfig == null )
                 {
-
-                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( accumuloClusterConfig.getClusterName() );
-
-                    if ( hadoopConfig != null )
-                    {
-                        Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
-                        availableNodes.removeAll( accumuloClusterConfig.getTracers() );
-                        if ( availableNodes.isEmpty() )
-                        {
-                            Notification.show( "All Hadoop nodes already have tracers installed" );
-                            return;
-                        }
-
-                        AddNodeWindow addNodeWindow =
-                                new AddNodeWindow( accumulo, executorService, tracker, accumuloClusterConfig,
-                                        availableNodes, NodeType.Tracer );
-                        contentRoot.getUI().addWindow( addNodeWindow );
-                        addNodeWindow.addCloseListener( new Window.CloseListener()
-                        {
-                            @Override
-                            public void windowClose( Window.CloseEvent closeEvent )
-                            {
-                                refreshClustersInfo();
-                            }
-                        } );
-                    }
-                    else
-                    {
-                        Notification.show( String
-                                .format( "Hadoop cluster %s not found", accumuloClusterConfig.getClusterName() ) );
-                    }
+                    Notification.show( "Select cluster" );
+                    return;
                 }
-                else
+                Set<UUID> set = new HashSet<>(
+                        hadoop.getCluster( accumuloClusterConfig.getHadoopClusterName() ).getAllNodes() );
+                set.removeAll( accumuloClusterConfig.getAllNodes() );
+                if ( set.isEmpty() )
                 {
-                    Notification.show( "Please, select cluster" );
+                    Notification.show( "All nodes in Hadoop cluster have Accumulo installed" );
+                    return;
                 }
+
+                Set<ContainerHost> myHostSet = new HashSet<>();
+                for ( UUID uuid : set )
+                {
+                    myHostSet.add( environmentManager.getEnvironmentByUUID(
+                            hadoop.getCluster( accumuloClusterConfig.getHadoopClusterName() ).getEnvironmentId() )
+                                                     .getContainerHostByUUID( uuid ) );
+                }
+
+                AddNodeWindow w =
+                        new AddNodeWindow( accumulo, executorService, tracker, accumuloClusterConfig, myHostSet,
+                                NodeType.ACCUMULO_TRACER );
+                contentRoot.getUI().addWindow( w );
+                w.addCloseListener( new Window.CloseListener()
+                {
+                    @Override
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
+                        refreshClustersInfo();
+                        refreshUI();
+                        checkAll();
+                    }
+                } );
             }
         } );
         return addTracerBtn;
@@ -443,6 +434,7 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
+                            stopClusterBtn.click();
                             UUID trackID = accumulo.uninstallCluster( accumuloClusterConfig.getClusterName() );
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     AccumuloClusterConfig.PRODUCT_KEY );
@@ -603,22 +595,20 @@ public class Manager
             @Override
             public void itemClick( ItemClickEvent event )
             {
-                if ( event.isDoubleClick() )
+                String containerId =
+                        ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION ).getValue();
+                ContainerHost containerHost = environmentManager.getEnvironmentByUUID(
+                        hadoop.getCluster( accumuloClusterConfig.getHadoopClusterName() ).getEnvironmentId() )
+                                                                .getContainerHostByHostname( containerId );
+
+                if ( containerHost != null )
                 {
-                    String lxcHostname =
-                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
-                    {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
-                                        agentManager );
-                        table.getUI().addWindow( terminal.getWindow() );
-                    }
-                    else
-                    {
-                        Notification.show( "Agent is not connected" );
-                    }
+                    TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( containerHost ) );
+                    contentRoot.getUI().addWindow( terminal.getWindow() );
+                }
+                else
+                {
+                    Notification.show( "Agent is not connected" );
                 }
             }
         } );
@@ -629,12 +619,16 @@ public class Manager
     {
         if ( accumuloClusterConfig != null )
         {
-            populateTable( slavesTable, new ArrayList<>( accumuloClusterConfig.getSlaves() ), false );
-            populateTable( tracersTable, new ArrayList<>( accumuloClusterConfig.getTracers() ), false );
-            List<Agent> masters = new ArrayList<>();
-            masters.add( accumuloClusterConfig.getMasterNode() );
-            masters.add( accumuloClusterConfig.getGcNode() );
-            masters.add( accumuloClusterConfig.getMonitor() );
+            Environment environment = environmentManager.getEnvironmentByUUID(
+                    hadoop.getCluster( accumuloClusterConfig.getHadoopClusterName() ).getEnvironmentId() );
+            populateTable( slavesTable, environment.getHostsByIds( accumuloClusterConfig.getSlaves() ), false );
+            populateTable( tracersTable, environment.getHostsByIds( accumuloClusterConfig.getTracers() ), false );
+
+
+            Set<ContainerHost> masters = new HashSet<>();
+            masters.add( environment.getContainerHostByUUID( accumuloClusterConfig.getMasterNode() ) );
+            masters.add( environment.getContainerHostByUUID( accumuloClusterConfig.getGcNode() ) );
+            masters.add( environment.getContainerHostByUUID( accumuloClusterConfig.getMonitor() ) );
             populateTable( mastersTable, masters, true );
         }
         else
@@ -646,17 +640,17 @@ public class Manager
     }
 
 
-    private void populateTable( final Table table, List<Agent> agents, final boolean masters )
+    private void populateTable( final Table table, Set<ContainerHost> containerHosts, final boolean masters )
     {
         table.removeAllItems();
-        for ( final Agent agent : agents )
+        for ( final ContainerHost containerHost : containerHosts )
         {
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId( agent.getListIP().get( 0 ) + "-accumuloCheck" );
+            checkBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-accumuloCheck" );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( agent.getListIP().get( 0 ) + "-accumuloDestroy" );
+            destroyBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-accumuloDestroy" );
             final Label resultHolder = new Label();
-            resultHolder.setId( agent.getListIP().get( 0 ) + "accumuloResult" );
+            resultHolder.setId( containerHost.getAgent().getListIP().get( 0 ) + "accumuloResult" );
 
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );
@@ -665,9 +659,10 @@ public class Manager
             addGivenComponents( availableOperations, checkBtn );
             addStyleName( checkBtn, destroyBtn, availableOperations );
 
-            final String nodeRole = findNodeRoles( agent );
+            final String nodeRole = findNodeRoles( containerHost.getAgent() );
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), nodeRole, resultHolder, availableOperations
+                    containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ), nodeRole, resultHolder,
+                    availableOperations
             }, null );
 
             checkBtn.addClickListener( new Button.ClickListener()
@@ -678,7 +673,7 @@ public class Manager
                     PROGRESS_ICON.setVisible( true );
                     disableButtons( checkBtn, destroyBtn );
                     executorService.execute( new CheckTask( accumulo, tracker, accumuloClusterConfig.getClusterName(),
-                            agent.getHostname(), new CompleteEvent()
+                            containerHost.getHostname(), new CompleteEvent()
                     {
                         public void onComplete( String result )
                         {
@@ -699,15 +694,16 @@ public class Manager
                 public void buttonClick( Button.ClickEvent event )
                 {
                     ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
+                            String.format( "Do you want to destroy the %s node?", containerHost.getHostname() ), "Yes",
+                            "No" );
                     alert.getOk().addClickListener( new Button.ClickListener()
                     {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID =
-                                    accumulo.destroyNode( accumuloClusterConfig.getClusterName(), agent.getHostname(),
-                                            table == tracersTable ? NodeType.Tracer : NodeType.Logger );
+                            UUID trackID = accumulo.destroyNode( accumuloClusterConfig.getClusterName(),
+                                    containerHost.getHostname(),
+                                    table == tracersTable ? NodeType.ACCUMULO_TRACER : NodeType.ACCUMULO_LOGGER );
 
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     AccumuloClusterConfig.PRODUCT_KEY );
@@ -838,25 +834,25 @@ public class Manager
     private String findNodeRoles( Agent node )
     {
         StringBuilder sb = new StringBuilder();
-        if ( accumuloClusterConfig.getMasterNode().equals( node ) )
+        if ( accumuloClusterConfig.getMasterNode().equals( node.getUuid() ) )
         {
-            sb.append( NodeType.Master.name() ).append( ", " );
+            sb.append( "Master" ).append( ", " );
         }
-        if ( accumuloClusterConfig.getGcNode() == node )
+        if ( accumuloClusterConfig.getGcNode().equals( node.getUuid() ) )
         {
-            sb.append( NodeType.GC.name() ).append( ", " );
+            sb.append( "GC" ).append( ", " );
         }
-        if ( accumuloClusterConfig.getMonitor().equals( node ) )
+        if ( accumuloClusterConfig.getMonitor().equals( node.getUuid() ) )
         {
-            sb.append( NodeType.Monitor.name() ).append( ", " );
+            sb.append( "Monitor" ).append( ", " );
         }
-        if ( accumuloClusterConfig.getTracers().contains( node ) )
+        if ( accumuloClusterConfig.getTracers().contains( node.getUuid() ) )
         {
-            sb.append( NodeType.Tracer.name() ).append( ", " );
+            sb.append( "Tracer" ).append( ", " );
         }
-        if ( accumuloClusterConfig.getSlaves().contains( node ) )
+        if ( accumuloClusterConfig.getSlaves().contains( node.getUuid() ) )
         {
-            sb.append( NodeType.Tablet_Server.name() ).append( ", " );
+            sb.append( "Tablet_Server" ).append( ", " );
         }
         if ( sb.length() > 0 )
         {

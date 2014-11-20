@@ -10,6 +10,8 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 
 
@@ -41,47 +43,59 @@ class WithHadoopSetupStrategy extends FlumeSetupStrategy
     public ConfigBase setup() throws ClusterSetupException
     {
 
-        checkConfig();
-
-        if ( environment == null )
+        try
         {
-            throw new ClusterSetupException( "Environment not specified" );
-        }
+            checkConfig();
 
-        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
-        {
-            throw new ClusterSetupException( "Environment has no nodes" );
-        }
-
-        Set<Agent> flumeNodes = new HashSet<>(), allNodes = new HashSet<>();
-        for ( EnvironmentContainer n : environment.getContainers() )
-        {
-            allNodes.add( n.getAgent() );
-            if ( n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
+            if ( environment == null )
             {
-                flumeNodes.add( n.getAgent() );
+                throw new ClusterSetupException( "Environment not specified" );
             }
-        }
-        if ( flumeNodes.isEmpty() )
-        {
-            throw new ClusterSetupException( "Environment has no nodes with Flume installed" );
-        }
 
-        config.setNodes( flumeNodes );
-        config.setHadoopNodes( allNodes );
-
-        for ( Agent a : config.getNodes() )
-        {
-            if ( manager.getAgentManager().getAgentByHostname( a.getHostname() ) == null )
+            if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
             {
-                throw new ClusterSetupException( "Node is not connected: " + a.getHostname() );
+                throw new ClusterSetupException( "Environment has no nodes" );
             }
+
+
+            if ( config.getNodes().isEmpty() )
+            {
+                throw new ClusterSetupException( "Environment has no nodes with Pig installed" );
+            }
+            config.getHadoopNodes().clear();
+            config.setEnvironmentId( environment.getId() );
+
+
+            for ( ContainerHost container : environment.getContainers() )
+            {
+                if ( !container.isConnected() )
+                {
+                    throw new ClusterSetupException(
+                            String.format( "Container %s is not connected", container.getHostname() ) );
+                }
+
+                config.getHadoopNodes().add( container.getId() );
+
+                if ( container.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
+                {
+                    config.getNodes().add( container.getId() );
+                }
+            }
+
+            if ( config.getNodes().isEmpty() )
+            {
+                throw new ClusterSetupException( "Environment has no nodes" );
+            }
+
+            po.addLog( "Saving to db..." );
+            manager.getPluginDao().saveInfo( FlumeConfig.PRODUCT_KEY, config.getClusterName(), config );
+            po.addLog( "Cluster info successfully saved" );
+
         }
-
-        po.addLog( "Saving to db..." );
-        manager.getPluginDao().saveInfo( FlumeConfig.PRODUCT_KEY, config.getClusterName(), config );
-        po.addLog( "Cluster info successfully saved" );
-
+        catch ( PeerException e )
+        {
+            e.printStackTrace();
+        }
         return config;
     }
 }

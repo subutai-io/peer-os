@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.sqoop.impl;
 
 
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.api.setting.CommonSetting;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
@@ -16,19 +17,19 @@ public class CommandFactory
     private static final String EXEC_PROFILE = ". /etc/profile";
 
 
-    public static String build( CommandType type, CommonSetting settings )
+    public static String build( NodeOperationType type, CommonSetting settings )
     {
         String s = null;
         boolean use_opt = false;
         switch ( type )
         {
-            case LIST:
+            case STATUS:
                 s = "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH;
                 break;
             case INSTALL:
-            case PURGE:
+            case UNINSTALL:
                 StringBuilder sb = new StringBuilder( "apt-get --force-yes --assume-yes " );
-                sb.append( type.toString().toLowerCase() ).append( " " );
+                sb.append( type == NodeOperationType.INSTALL ? "install" : "purge" ).append( " " );
                 sb.append( PACKAGE_NAME );
                 s = sb.toString();
                 break;
@@ -47,7 +48,7 @@ public class CommandFactory
                 use_opt = true;
                 break;
             default:
-                throw new AssertionError( type.name() );
+                throw new IllegalArgumentException( "Unsupported operation type: " + type );
         }
         if ( use_opt && settings != null && settings.getOptionalParameters() != null )
         {

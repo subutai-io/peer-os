@@ -40,10 +40,8 @@ class AgentTest : public CppUnit::TestFixture
 	CPPUNIT_TEST(testUserIDCheekRootUser);
 	CPPUNIT_TEST(testResponsePackCreateResponse);
 	CPPUNIT_TEST(testResponsePackCreateExit);
-	CPPUNIT_TEST(testResponsePackCreateRegistration);
 	CPPUNIT_TEST(testResponsePackCreateHeartbeat);
 	CPPUNIT_TEST(testResponsePackCreateTerminate);
-	CPPUNIT_TEST(testResponsePackCreateTerminateFail);
 	CPPUNIT_TEST(testResponsePackCreateTimeout);
 	CPPUNIT_TEST_SUITE_END();
 
@@ -102,19 +100,19 @@ void AgentTest::tearDown(void)
 void AgentTest::testCommandDeserialize(void)
 {
 	//Test string for deserialization
-	string input = "{\"command\":{\"type\": \"EXECUTE_REQUEST\","
-			"\"id\": \"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
-			"\"commandId\": \"a7349720-9e2f-11e3-b9d6-080027b00009\","
-			"\"workingDirectory\": \"/home\","
-			"\"program\": \"ls\","
-			"\"args\": [\"-l\"],"
-			"\"stdOut\": \"RETURN\","
-			"\"stdErr\": \"RETURN\","
-			"\"runAs\": \"root\","
-			"\"timeout\": 30,"
-			"\"isDeamon\": 0}}";
+	string input = "{\"request\":{\"type\":\"EXECUTE_REQUEST\","
+			"\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
+			"\"commandId\":\"a7349720-9e2f-11e3-b9d6-080027b00009\","
+			"\"workingDirectory\":\"/home\","
+			"\"command\":\"ls\","
+			"\"stdOut\":\"RETURN\","
+			"\"stdErr\":\"RETURN\","
+			"\"runAs\":\"root\","
+			"\"timeout\":30,"
+			"\"isDeamon\":0}}";
 
 	cmd->deserialize(input);
+
 
 	CPPUNIT_ASSERT("EXECUTE_REQUEST"== cmd->getType());
 	CPPUNIT_ASSERT("5373b7c4-a039-44a9-9270-9e0e45d549cf"== cmd->getUuid());
@@ -169,17 +167,17 @@ void AgentTest::testResponseSerialize(void)
 	//Test string for serialization
 	string input =	"{\"response\":{"
 				"\"hostname\":\"management\","
-				"\"interfaces\":[ { 	 \"interfaceName\":\"eth0\", "
-							"\"ip\" : \"10.10.10.1\","
-							"\"mac\": \"08:00:27:59:3b:2e\"},"
-						 "{ 	 \"interfaceName\":\"eth0\", "
-							"\"ip\" : \"172.16.11.4\","
-							"\"mac\": \"07:01:25:57:3c:2d\"},"
-						 "{ 	 \"interfaceName\":\"eth0\", "
-							"\"ip\" : \"127.0.0.1\","
-							"\"mac\": \"06:02:23:53:3d:2c\"}],"
-				"\"type\":\"HEARTBEAT\","
-				"\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
+			    "\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
+				"\"interfaces\":[{\"interfaceName\":\"eth0\","
+							"\"ip\":\"10.10.10.1\","
+							"\"mac\":\"08:00:27:59:3b:2e\"},"
+						 "{\"interfaceName\":\"eth0\","
+							"\"ip\":\"172.16.11.4\","
+							"\"mac\":\"07:01:25:57:3c:2d\"},"
+						 "{\"interfaceName\":\"eth0\","
+							"\"ip\":\"127.0.0.1\","
+							"\"mac\":\"06:02:23:53:3d:2c\"}],"
+				"\"type\":\"HEARTBEAT\"}}\n";
 
 	string result;
 	resp->setHostname("management");
@@ -197,10 +195,12 @@ void AgentTest::testResponseSerialize(void)
 void AgentTest::testResponseSerializeDone(void)
 {
 	//Test string for serialization
-	string input = "{\"response\":{\"exitCode\":0,\"pid\":2584,\"responseNumber\":1,"
-			"\"commandId\":\"a7349720-9e2f-11e3-b9d6-080027b00009\","
-			"\"stdOut\":\"Command execution is successful\","
-			"\"type\":\"EXECUTE_RESPONSE\",\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
+	string input = "{\"response\":{\"commandId\":\"a7349720-9e2f-11e3-b9d6-080027b00009\","
+			"\"exitCode\":0,"
+			"\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
+			"\"pid\":2584,"
+			"\"responseSequenceNumber\":1,"
+			"\"type\":\"EXECUTE_RESPONSE\"}}\n";
 
 	string result;
 
@@ -308,12 +308,16 @@ void AgentTest::testUserIDCheekRootUser(void)
 void AgentTest::testResponsePackCreateResponse(void)
 {
 	//Test string for serialization
-	string input =	"{\"response\":{\"pid\":8762,\"requestSequenceNumber\":1,"
-			"\"responseSequenceNumber\":2,"
+	string input =	"{\"response\":{"
+			"\"commandId\":\"9abddb80-9ee5-11e3-b9d6-080027b00009\","
+			"\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
+			"\"pid\":8762,"
+			"\"requestNumber\":1,"
+			"\"responseNumber\":2,"
 			"\"stdErr\":\"error\","
 			"\"stdOut\":\"test\","
-			"\"taskUuid\":\"9abddb80-9ee5-11e3-b9d6-080027b00009\","
-			"\"type\":\"EXECUTE_RESPONSE\",\"uuid\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
+			"\"type\":\"EXECUTE_RESPONSE\""
+			"}}\n";
 
 	string uuid = "5373b7c4-a039-44a9-9270-9e0e45d549cf" ;
 	string type = "EXECUTE_RESPONSE" ;
@@ -333,9 +337,12 @@ void AgentTest::testResponsePackCreateResponse(void)
 void AgentTest::testResponsePackCreateExit(void)
 {
 	//Test string for serialization
-	string input =	"{\"response\":{\"exitCode\":0,\"pid\":14601,\"requestSequenceNumber\":1,\"responseSequenceNumber\":1,"
-			",\"taskUuid\":\"dca7e550-9f8e-11e3-b9d6-080027b00009\","
-			"\"type\":\"EXECUTE_RESPONSE_DONE\",\"uuid\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
+	string input =	"{\"response\":{"
+					"\"commandId\":\"dca7e550-9f8e-11e3-b9d6-080027b00009\","
+					"\"exitCode\":0,"
+					"\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
+					"\"pid\":14601,\"requestSequenceNumber\":1,\"responseSequenceNumber\":1,"
+					"\"type\":\"EXECUTE_RESPONSE\"}}\n";
 
 	string uuid = "5373b7c4-a039-44a9-9270-9e0e45d549cf" ;
 	string type = "EXECUTE_RESPONSE_DONE";
@@ -356,17 +363,17 @@ void AgentTest::testResponsePackCreateHeartbeat(void)
 //Test string for serialization
 	string input =	"{\"response\":{"
 				"\"hostname\":\"management\","
-				"\"interfaces\":[ { 	 \"interfaceName\":\"eth0\", "
-							"\"ip\" : \"10.10.10.1\","
-							"\"mac\": \"08:00:27:59:3b:2e\"},"
-						 "{ 	 \"interfaceName\":\"eth0\", "
-							"\"ip\" : \"172.16.11.4\","
-							"\"mac\": \"07:01:25:57:3c:2d\"},"
-						 "{ 	 \"interfaceName\":\"eth0\", "
-							"\"ip\" : \"127.0.0.1\","
-							"\"mac\": \"06:02:23:53:3d:2c\"}],"
-				"\"type\":\"HEARTBEAT\","
-				"\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
+				"\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
+				"\"interfaces\":[{\"interfaceName\":\"eth0\","
+							"\"ip\":\"10.10.10.1\","
+							"\"mac\":\"08:00:27:59:3b:2e\"},"
+						 "{\"interfaceName\":\"eth0\","
+							"\"ip\":\"172.16.11.4\","
+							"\"mac\":\"07:01:25:57:3c:2d\"},"
+						 "{\"interfaceName\":\"eth0\","
+							"\"ip\":\"127.0.0.1\","
+							"\"mac\":\"06:02:23:53:3d:2c\"}],"
+				"\"type\":\"HEARTBEAT\"}}\n";
 
 	string result;
 	string hostname = "management";
@@ -383,9 +390,10 @@ void AgentTest::testResponsePackCreateHeartbeat(void)
 void AgentTest::testResponsePackCreateTerminate(void)
 {
 	//Test string for serialization
-	string input =	"{\"response\":{\"pid\": 1234, \"exitCode\":0,"
+	string input =	"{\"response\":{"
 			"\"commandId\":\"4573n9c4-a051-44a9-9660-9e0e45d54add\","
-                        "\"type\":\"TERMINATE_RESPONSE\",\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
+			"\"exitCode\":0,\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\",\"pid\":1234,"
+            "\"type\":\"TERMINATE_RESPONSE\"}}\n";
 
 	string uuid = "5373b7c4-a039-44a9-9270-9e0e45d549cf";
         string taskuuid = "4573n9c4-a051-44a9-9660-9e0e45d54add";
@@ -397,9 +405,10 @@ void AgentTest::testResponsePackCreateTerminate(void)
 void AgentTest::testResponsePackCreateTimeout(void)
 {
 	//Test string for serialization
-	string input ="{\"response\":{\"pid\":15020,"
+	string input ="{\"response\":{"
 			"\"commandId\":\"58e7f9d0-9f98-11e3-b9d6-080027b00009\","
-			"\"type\":\"EXECUTE_TIMEOUT\",\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
+			"\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\",\"pid\":15020,"
+			"\"type\":\"EXECUTE_TIMEOUT\"}}\n";
 
 	string result;
 	int pid = 15020;

@@ -5,8 +5,12 @@ public enum ClusterOperationType
 {
     INSTALL,
     UNINSTALL,
+    DESTROY,
     START_ALL,
     STOP_ALL,
     STATUS_ALL,
-    DECOMISSION_STATUS
+    DECOMISSION_STATUS,
+    ADD,
+    REMOVE,
+    CUSTOM
 }

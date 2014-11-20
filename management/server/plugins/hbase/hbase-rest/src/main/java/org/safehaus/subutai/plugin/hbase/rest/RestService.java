@@ -54,22 +54,21 @@ public interface RestService
 
     //add node
     @POST
-    @Path("clusters/{clusterName}/nodes/{lxcHostname}/{nodeType}")
+    @Path("clusters/{clusterName}/nodes/{containerId}/{nodeType}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public Response addNode( @PathParam("clusterName") String clusterName, @PathParam("lxcHostname") String lxcHostname,
-                             @PathParam("nodeType") String nodeType );
+    public Response addNode( @PathParam("clusterName") String clusterName, @PathParam("nodeType") String nodeType );
 
     //destroy node
     @DELETE
-    @Path("clusters/{clusterName}/nodes/{lxcHostname}/{nodeType}")
+    @Path("clusters/{clusterName}/nodes/{containerId}/{nodeType}")
     @Produces({ MediaType.APPLICATION_JSON })
     public Response destroyNode( @PathParam("clusterName") String clusterName,
-                                 @PathParam("lxcHostname") String lxcHostname, @PathParam("nodeType") String nodeType );
+                                 @PathParam("containerId") String containerId, @PathParam("nodeType") String nodeType );
 
     //check node status
     @GET
-    @Path("clusters/{clusterName}/nodes/{lxcHostname}")
+    @Path("clusters/{clusterName}/nodes/{containerId}")
     @Produces({ MediaType.APPLICATION_JSON })
     public Response checkNode( @PathParam("clusterName") String clusterName,
-                               @PathParam("lxcHostname") String lxcHostname );
+                               @PathParam("containerId") String containerId );
 }

@@ -4,9 +4,14 @@ package org.safehaus.subutai.plugin.sqoop.ui.wizard;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.SetupType;
@@ -29,12 +34,14 @@ import com.vaadin.ui.VerticalLayout;
 public class NodeSelectionStep extends VerticalLayout
 {
     private final Hadoop hadoop;
+    private final EnvironmentManager environmentManager;
 
 
-    public NodeSelectionStep( final Hadoop hadoop, final Wizard wizard )
+    public NodeSelectionStep( final Hadoop hadoop, EnvironmentManager environmentManager, final Wizard wizard )
     {
 
         this.hadoop = hadoop;
+        this.environmentManager = environmentManager;
 
         setSizeFull();
 
@@ -132,15 +139,17 @@ public class NodeSelectionStep extends VerticalLayout
                 if ( event.getProperty().getValue() != null )
                 {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
+                    Environment env = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
+                    Set<ContainerHost> allNodes = env.getHostsByIds( new HashSet<>( hadoopInfo.getAllNodes() ) );
                     select.setValue( null );
-                    select.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                    select.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, allNodes ) );
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
+                    config.setEnvironmentId( hadoopInfo.getEnvironmentId() );
                 }
             }
         } );
 
-        Hadoop hadoopManager = hadoop;
-        List<HadoopClusterConfig> clusters = hadoopManager.getClusters();
+        List<HadoopClusterConfig> clusters = hadoop.getClusters();
         if ( clusters != null )
         {
             for ( HadoopClusterConfig hadoopClusterInfo : clusters )
@@ -153,7 +162,7 @@ public class NodeSelectionStep extends VerticalLayout
         String hcn = config.getHadoopClusterName();
         if ( hcn != null && !hcn.isEmpty() )
         {
-            HadoopClusterConfig info = hadoopManager.getCluster( hcn );
+            HadoopClusterConfig info = hadoop.getCluster( hcn );
             if ( info != null )
             {
                 hadoopClusters.setValue( info );
@@ -174,7 +183,16 @@ public class NodeSelectionStep extends VerticalLayout
         select.setRequired( true );
         if ( config.getNodes() != null && !config.getNodes().isEmpty() )
         {
-            select.setValue( config.getNodes() );
+            HadoopClusterConfig hadoopConfig = hadoop.getCluster( config.getHadoopClusterName() );
+            if ( hadoopConfig != null )
+            {
+                Environment env = environmentManager.getEnvironmentByUUID( hadoopConfig.getEnvironmentId() );
+                if ( env != null )
+                {
+                    Set<ContainerHost> hosts = env.getHostsByIds( config.getNodes() );
+                    select.setValue( hosts );
+                }
+            }
         }
         select.addValueChangeListener( new Property.ValueChangeListener()
         {
@@ -184,8 +202,14 @@ public class NodeSelectionStep extends VerticalLayout
                 config.getNodes().clear();
                 if ( event.getProperty().getValue() != null )
                 {
-                    Collection agentList = ( Collection ) event.getProperty().getValue();
-                    config.getNodes().addAll( agentList );
+                    Collection selected = ( Collection ) event.getProperty().getValue();
+                    for ( Object obj : selected )
+                    {
+                        if ( obj instanceof ContainerHost )
+                        {
+                            config.getNodes().add( ( ( ContainerHost ) obj ).getId() );
+                        }
+                    }
                 }
             }
         } );
