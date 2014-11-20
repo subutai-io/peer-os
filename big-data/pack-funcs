@@ -59,7 +59,7 @@ checkPackageVersion() {
   versionSecond_new=$(echo $version_new | awk -F"." '{print $2}')
   versionThird_new=$(echo $version_new | awk -F"." '{print $3}')
 
-  deb_name=`ls -lt $TARGET | awk '{ print $9 }' | grep .deb`
+  deb_name=`ls -lt $TARGET | awk '{ print $9 }' | grep .deb | head -1`
   version_prev=$(echo $deb_name | awk -F"_" '{print $2}')
   versionFirst_prev=$(echo $version_prev | awk -F"." '{print $1}')
   versionSecond_prev=$(echo $version_prev | awk -F"." '{print $2}')
@@ -178,7 +178,7 @@ generateRepoPackage() {
   pushd $BASE
   
   #get package full name, for example:subutai-hadoop_1.0.12_all.deb
-  currentPackage=`ls -lt $TARGET | awk '{ print $9 }' | grep .deb` 
+  currentPackage=`ls -lt $TARGET | awk '{ print $9 }' | grep .deb | head -1` 
   echo "CurrentPackageName: $currentPackage"
   
   #delete repo package: subutai-repo-hadoop_1.0.12_all.deb
