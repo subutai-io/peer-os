@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.executor.ui;
 
 
-import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -26,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.vaadin.ui.Button;
 
 
@@ -72,34 +72,38 @@ public class SendButtonListener implements Button.ClickListener
         }
         else
         {
-            for ( Iterator<HostInfo> iterator = hosts.iterator(); iterator.hasNext(); )
+            Set<HostInfo> connectedHosts = Sets.newHashSet();
+            for ( final HostInfo hostInfo : hosts )
             {
-                final HostInfo hostInfo = iterator.next();
                 try
                 {
                     if ( hostInfo instanceof ResourceHostInfo )
                     {
                         hostRegistry.getResourceHostInfoById( hostInfo.getId() );
+                        connectedHosts.add( hostInfo );
                     }
                     else
                     {
                         ContainerHostInfo containerHostInfo = hostRegistry.getContainerHostInfoById( hostInfo.getId() );
                         if ( containerHostInfo.getStatus() != ContainerHostState.RUNNING )
                         {
-                            throw new HostDisconnectedException( null );
+                            form.addOutput( String.format( "Host %s is disconnected%n", hostInfo.getHostname() ) );
+                        }
+                        else
+                        {
+                            connectedHosts.add( hostInfo );
                         }
                     }
                 }
                 catch ( HostDisconnectedException e )
                 {
                     form.addOutput( String.format( "Host %s is disconnected%n", hostInfo.getHostname() ) );
-                    iterator.remove();
                 }
             }
 
-            if ( !hosts.isEmpty() )
+            if ( !connectedHosts.isEmpty() )
             {
-                executeCommand( hosts );
+                executeCommand( connectedHosts );
             }
         }
     }
