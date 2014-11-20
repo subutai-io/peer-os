@@ -26,7 +26,7 @@ public interface Host extends Serializable
     @Deprecated
     public void setParentAgent( Agent agent );
 
-    public UUID getPeerId();
+    public String getPeerId();
 
     //    public void setPeerId( UUID peerId );
 

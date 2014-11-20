@@ -108,4 +108,23 @@ public class ManagementHostDataService implements DataService<String, Management
             }
         }
     }
+
+
+    @Override
+    public void update( final ManagementHostEntity item )
+    {
+        try
+        {
+            em.getTransaction().begin();
+            em.merge( item );
+            em.getTransaction().commit();
+        }
+        catch ( Exception e )
+        {
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
+        }
+    }
 }

@@ -431,33 +431,33 @@ public class Commands
     }
 
 
-    public void getAddRouterCommands( MongoClusterConfig config, MongoRouterNode newRouterAgent )
-    {
-
-
-        Set<Host> clusterMembers = new HashSet<Host>( config.getAllNodes() );
-        clusterMembers.add( newRouterAgent );
-        try
-        {
-            for ( Host c : clusterMembers )
-            {
-                CommandDef commandDef = getAddIpHostToEtcHostsCommand( config.getDomainName(), c, clusterMembers );
-
-                c.execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
-            }
-
-            CommandDef commandDef =
-                    getStartRouterCommandLine( config.getRouterPort(), config.getCfgSrvPort(), config.getDomainName(),
-                            config.getConfigServers() );
-
-            newRouterAgent
-                    .execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
-        }
-        catch ( CommandException e )
-        {
-            e.printStackTrace();
-        }
-    }
+//    public void getAddRouterCommands( MongoClusterConfig config, MongoRouterNode newRouterAgent )
+//    {
+//
+//
+//        Set<Host> clusterMembers = new HashSet<Host>( config.getAllNodes() );
+//        clusterMembers.add( newRouterAgent );
+//        try
+//        {
+//            for ( Host c : clusterMembers )
+//            {
+//                CommandDef commandDef = getAddIpHostToEtcHostsCommand( config.getDomainName(), c, clusterMembers );
+//
+//                c.execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
+//            }
+//
+//            CommandDef commandDef =
+//                    getStartRouterCommandLine( config.getRouterPort(), config.getCfgSrvPort(), config.getDomainName(),
+//                            config.getConfigServers() );
+//
+//            newRouterAgent
+//                    .execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
+//        }
+//        catch ( CommandException e )
+//        {
+//            e.printStackTrace();
+//        }
+//    }
 
 
     public List<Command> getAddRouterCommandsOld( MongoClusterConfig config, Agent newRouterAgent )
@@ -482,43 +482,43 @@ public class Commands
     }
 
 
-    public void getAddDataNodeCommands( MongoClusterConfig config, MongoDataNode newDataNode )
-    {
-
-
-        Set<Host> clusterMembers = new HashSet<Host>( config.getAllNodes() );
-        clusterMembers.add( newDataNode );
-        try
-        {
-            for ( Host c : clusterMembers )
-            {
-                CommandDef commandDef = getAddIpHostToEtcHostsCommand( config.getDomainName(), c, clusterMembers );
-
-                c.execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
-            }
-
-            CommandDef commandDef = getSetReplicaSetNameCommandLine( config.getReplicaSetName() );
-
-            newDataNode.execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
-
-            commandDef = getStartDataNodeCommandLine( config.getDataNodePort() );
-
-            newDataNode.execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
-
-            commandDef = getStartDataNodeCommandLine( config.getDataNodePort() );
-
-            newDataNode.execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
-
-            commandDef = getFindPrimaryNodeCommandLine( config.getDataNodePort() );
-
-            config.getDataNodes().iterator().next()
-                  .execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
-        }
-        catch ( CommandException e )
-        {
-            e.printStackTrace();
-        }
-    }
+//    public void getAddDataNodeCommands( MongoClusterConfig config, MongoDataNode newDataNode )
+//    {
+//
+//
+//        Set<Host> clusterMembers = new HashSet<Host>( config.getAllNodes() );
+//        clusterMembers.add( newDataNode );
+//        try
+//        {
+//            for ( Host c : clusterMembers )
+//            {
+//                CommandDef commandDef = getAddIpHostToEtcHostsCommand( config.getDomainName(), c, clusterMembers );
+//
+//                c.execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
+//            }
+//
+//            CommandDef commandDef = getSetReplicaSetNameCommandLine( config.getReplicaSetName() );
+//
+//            newDataNode.execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
+//
+//            commandDef = getStartDataNodeCommandLine( config.getDataNodePort() );
+//
+//            newDataNode.execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
+//
+//            commandDef = getStartDataNodeCommandLine( config.getDataNodePort() );
+//
+//            newDataNode.execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
+//
+//            commandDef = getFindPrimaryNodeCommandLine( config.getDataNodePort() );
+//
+//            config.getDataNodes().iterator().next()
+//                  .execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
+//        }
+//        catch ( CommandException e )
+//        {
+//            e.printStackTrace();
+//        }
+//    }
 
 
     public List<Command> getAddDataNodeCommandsOld( MongoClusterConfig config, Agent newDataNodeAgent )

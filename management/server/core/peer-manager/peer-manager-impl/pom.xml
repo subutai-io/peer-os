@@ -55,7 +55,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>communication-manager-api</artifactId>
+      <artifactId>host-registry-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>

@@ -1,33 +1,54 @@
 package org.safehaus.subutai.core.peer.impl.model;
 
 
-import java.util.UUID;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.ContainerState;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
-import org.safehaus.subutai.core.peer.api.SubutaiHost;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 
 /**
  * ContainerHost class.
  */
-public class ContainerHostEntity extends SubutaiHost
+@Entity
+@DiscriminatorValue( "C" )
+@Access( AccessType.FIELD )
+public class ContainerHostEntity extends AbstractSubutaiHost implements ContainerHost
 {
-    private UUID environmentId;
-    private UUID creatorPeerId;
+    @OneToMany
+    @JoinColumn( name = "parent_id" )
+    private ResourceHost parent;
+    @Column( name = "env_id", nullable = false )
+    private String environmentId;
+    @Column( name = "creator_id", nullable = false )
+    private String creatorPeerId;
+    @Column( name = "template_name", nullable = false )
     private String templateName;
+    @Column( name = "template_arch", nullable = false )
     private String templateArch;
+    @Enumerated( EnumType.STRING )
     private ContainerState state = ContainerState.UNKNOWN;
+    @Column( name = "node_group_name", nullable = false )
     private String nodeGroupName;
 
 
-    public ContainerHostEntity( final Agent agent, UUID peerId, UUID creatorPeerId, UUID environmentId )
+    public ContainerHostEntity( String peerId, String creatorPeerId, String environmentId, HostInfo hostInfo )
     {
-        super( agent, peerId );
+        super( peerId, hostInfo );
         this.creatorPeerId = creatorPeerId;
         this.environmentId = environmentId;
     }
@@ -45,25 +66,25 @@ public class ContainerHostEntity extends SubutaiHost
     }
 
 
-    public UUID getEnvironmentId()
+    public String getEnvironmentId()
     {
         return environmentId;
     }
 
 
-    public void setEnvironmentId( final UUID environmentId )
+    public void setEnvironmentId( final String environmentId )
     {
         this.environmentId = environmentId;
     }
 
 
-    public UUID getCreatorPeerId()
+    public String getCreatorPeerId()
     {
         return creatorPeerId;
     }
 
 
-    public void setCreatorPeerId( final UUID creatorPeerId )
+    public void setCreatorPeerId( final String creatorPeerId )
     {
         this.creatorPeerId = creatorPeerId;
     }
@@ -105,10 +126,15 @@ public class ContainerHostEntity extends SubutaiHost
     }
 
 
-    public void updateHeartbeat()
+    public ResourceHost getParent()
     {
-        lastHeartbeat = System.currentTimeMillis();
-        setState( ContainerState.RUNNING );
+        return parent;
+    }
+
+
+    public void setParent( final ResourceHost parent )
+    {
+        this.parent = parent;
     }
 
 

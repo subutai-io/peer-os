@@ -11,9 +11,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -52,11 +51,10 @@ public class PeerManagerImpl implements PeerManager
     private static final String PEER_GROUP = "PEER_GROUP";
     private AgentManager agentManager;
     private PeerDAO peerDAO;
-    private CommandRunner commandRunner;
     private QuotaManager quotaManager;
     private TemplateRegistry templateRegistry;
     private DataSource dataSource;
-    private CommunicationManager communicationManager;
+    //    private CommunicationManager communicationManager;
     private CommandExecutor commandExecutor;
     private LocalPeer localPeer;
     private StrategyManager strategyManager;
@@ -66,6 +64,7 @@ public class PeerManagerImpl implements PeerManager
     private Set<RequestListener> requestListeners = Sets.newHashSet();
     private MessageResponseListener messageResponseListener;
     private EntityManager entityManager;
+    private HostRegistry hostRegistry;
 
 
     public PeerManagerImpl( final DataSource dataSource, final Messenger messenger )
@@ -79,6 +78,12 @@ public class PeerManagerImpl implements PeerManager
     public void setEntityManagerFactory( EntityManagerFactory entityManagerFactory )
     {
         this.entityManager = entityManagerFactory.createEntityManager();
+    }
+
+
+    public void setHostRegistry( final HostRegistry hostRegistry )
+    {
+        this.hostRegistry = hostRegistry;
     }
 
 
@@ -112,9 +117,8 @@ public class PeerManagerImpl implements PeerManager
         {
             peerInfo = result.get( 0 );
         }
-        localPeer =
-                new LocalPeerImpl( this, agentManager, templateRegistry, peerDAO, communicationManager, quotaManager,
-                        strategyManager, requestListeners, commandExecutor );
+        localPeer = new LocalPeerImpl( this, agentManager, templateRegistry, peerDAO, quotaManager, strategyManager,
+                requestListeners, commandExecutor, hostRegistry );
         localPeer.init();
 
         //add command request listener
@@ -138,12 +142,12 @@ public class PeerManagerImpl implements PeerManager
     {
         localPeer.shutdown();
     }
-
-
-    public void setCommunicationManager( final CommunicationManager communicationManager )
-    {
-        this.communicationManager = communicationManager;
-    }
+    //
+    //
+    //    public void setCommunicationManager( final CommunicationManager communicationManager )
+    //    {
+    //        this.communicationManager = communicationManager;
+    //    }
 
 
     public void setCommandExecutor( final CommandExecutor commandExecutor )
@@ -161,12 +165,6 @@ public class PeerManagerImpl implements PeerManager
     public void setAgentManager( final AgentManager agentManager )
     {
         this.agentManager = agentManager;
-    }
-
-
-    public void setCommandRunner( final CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
     }
 
 

@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
+import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.Interface;
 
 import com.google.common.base.Objects;
@@ -62,5 +63,12 @@ public class ContainerHostInfoImpl implements ContainerHostInfo
     {
         return Objects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
                       .add( "interfaces", interfaces ).add( "status", status ).toString();
+    }
+
+
+    @Override
+    public int compareTo( final HostInfo o )
+    {
+        return 0;
     }
 }

@@ -6,12 +6,12 @@ import java.util.Collection;
 import javax.persistence.EntityManager;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
-import org.safehaus.subutai.core.peer.impl.model.ManagementHostEntity;
+import org.safehaus.subutai.core.peer.impl.model.ResourceHostEntity;
 
 import com.google.common.collect.Lists;
 
 
-public class ResourceHostDataService implements DataService<String, ManagementHostEntity>
+public class ResourceHostDataService implements DataService<String, ResourceHostEntity>
 {
     EntityManager em;
 
@@ -29,13 +29,13 @@ public class ResourceHostDataService implements DataService<String, ManagementHo
 
 
     @Override
-    public ManagementHostEntity find( final String id )
+    public ResourceHostEntity find( final String id )
     {
-        ManagementHostEntity result = null;
+        ResourceHostEntity result = null;
         try
         {
             em.getTransaction().begin();
-            result = em.find( ManagementHostEntity.class, id );
+            result = em.find( ResourceHostEntity.class, id );
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -50,14 +50,13 @@ public class ResourceHostDataService implements DataService<String, ManagementHo
 
 
     @Override
-    public Collection<ManagementHostEntity> getAll()
+    public Collection<ResourceHostEntity> getAll()
     {
-        Collection<ManagementHostEntity> result = Lists.newArrayList();
+        Collection<ResourceHostEntity> result = Lists.newArrayList();
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery( "select h from ManagementHostEntity h", ManagementHostEntity.class )
-                       .getResultList();
+            result = em.createQuery( "select h from ResourceHostEntity h", ResourceHostEntity.class ).getResultList();
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -72,7 +71,7 @@ public class ResourceHostDataService implements DataService<String, ManagementHo
 
 
     @Override
-    public void persist( final ManagementHostEntity item )
+    public void persist( final ResourceHostEntity item )
     {
         try
         {
@@ -92,12 +91,31 @@ public class ResourceHostDataService implements DataService<String, ManagementHo
 
 
     @Override
-    public void remove( final ManagementHostEntity item )
+    public void remove( final ResourceHostEntity item )
     {
         try
         {
             em.getTransaction().begin();
             em.remove( item );
+            em.getTransaction().commit();
+        }
+        catch ( Exception e )
+        {
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
+        }
+    }
+
+
+    @Override
+    public void update( final ResourceHostEntity item )
+    {
+        try
+        {
+            em.getTransaction().begin();
+            em.merge( item );
             em.getTransaction().commit();
         }
         catch ( Exception e )

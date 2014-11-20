@@ -1,17 +1,16 @@
 package org.safehaus.subutai.core.peer.impl.model;
 
 
-import java.util.UUID;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.SubutaiInitException;
@@ -19,11 +18,12 @@ import org.safehaus.subutai.core.peer.impl.Commands;
 
 
 @Entity
+@DiscriminatorValue( "M" )
 @Access( AccessType.FIELD )
 public class ManagementHostEntity extends AbstractSubutaiHost implements ManagementHost
 {
     @Column
-    String name;
+    String name = "Subutai Management Host";
 
 
     private ManagementHostEntity()
@@ -40,9 +40,9 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     //
 
 
-    public ManagementHostEntity( final Agent agent, final UUID peerId )
+    public ManagementHostEntity( final String peerId, final ResourceHostInfo resourceHostInfo )
     {
-        super( agent, peerId );
+        super( peerId, resourceHostInfo );
     }
 
 
@@ -122,5 +122,4 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
             throw new PeerException( "Could not add remote host as apt source", e.toString() );
         }
     }
-
 }

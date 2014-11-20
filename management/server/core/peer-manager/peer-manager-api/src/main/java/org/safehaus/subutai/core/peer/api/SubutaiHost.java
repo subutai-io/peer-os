@@ -140,17 +140,17 @@ public abstract class SubutaiHost implements Host
 
 
     @Override
-    public UUID getPeerId()
+    public String getPeerId()
     {
-        return peerId;
+        return peerId.toString();
     }
 
-//
-//    @Override
-//    public void setPeerId( final UUID peerId )
-//    {
-//        this.peerId = peerId;
-//    }
+    //
+    //    @Override
+    //    public void setPeerId( final UUID peerId )
+    //    {
+    //        this.peerId = peerId;
+    //    }
 
 
     @Override

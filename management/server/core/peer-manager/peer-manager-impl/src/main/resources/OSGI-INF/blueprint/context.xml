@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint
     xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-    xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.1.0"
-    xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.0.0">
+    >
 
   <reference id="emFactory" interface="javax.persistence.EntityManagerFactory"
              filter="(osgi.unit.name=peerManagerUnit)" />
@@ -16,9 +15,6 @@
   <reference id="messenger" availability="mandatory"
              interface="org.safehaus.subutai.core.messenger.api.Messenger" />
 
-  <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
-
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
@@ -26,7 +22,7 @@
 
   <reference id="templateRegistry" interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
 
-  <reference id="communicationManager" interface="org.safehaus.subutai.core.communication.api.CommunicationManager" />
+  <reference id="hostRegistry" interface="org.safehaus.subutai.core.hostregistry.api.HostRegistry" />
 
   <reference id="strategyManager" interface="org.safehaus.subutai.core.strategy.api.StrategyManager" />
 
@@ -35,14 +31,11 @@
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
     <property name="agentManager" ref="agentManager" />
-    <!--<property name="containerManager" ref="containerManager" />-->
-    <property name="commandRunner" ref="commandRunner" />
     <property name="templateRegistry" ref="templateRegistry" />
-    <property name="communicationManager" ref="communicationManager" />
+    <property name="hostRegistry" ref="hostRegistry" />
     <property name="strategyManager" ref="strategyManager" />
     <property name="quotaManager" ref="quotaManager" />
     <property name="commandExecutor" ref="commandExecutor" />
-    <!--<property name="managementHostDataService" ref="managementHostEntityService" />-->
     <property name="entityManagerFactory" ref="emFactory" />
     <argument ref="dataSource" />
     <argument ref="messenger" />

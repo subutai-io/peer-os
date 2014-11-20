@@ -13,4 +13,6 @@ public interface DataService<K, T>
     void persist( T item );
 
     void remove( T item );
+
+    void update( T resourceHost );
 }

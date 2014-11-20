@@ -7,8 +7,11 @@
     <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/peerManagerDS)
     </non-jta-data-source>
+    <class>org.safehaus.subutai.core.peer.impl.model.HostInterface</class>
     <class>org.safehaus.subutai.core.peer.impl.model.AbstractSubutaiHost</class>
     <class>org.safehaus.subutai.core.peer.impl.model.ManagementHostEntity</class>
+    <class>org.safehaus.subutai.core.peer.impl.model.ResourceHostEntity</class>
+    <class>org.safehaus.subutai.core.peer.impl.model.ContainerHostEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.Log" value="slf4j" />

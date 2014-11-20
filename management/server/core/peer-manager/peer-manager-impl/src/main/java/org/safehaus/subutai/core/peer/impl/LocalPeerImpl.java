@@ -21,16 +21,12 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.enums.ResponseType;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Criteria;
-import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
@@ -50,13 +46,12 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
-import org.safehaus.subutai.core.peer.api.SubutaiHost;
 import org.safehaus.subutai.core.peer.api.SubutaiInitException;
-import org.safehaus.subutai.core.peer.impl.command.CommandResultImpl;
-import org.safehaus.subutai.core.peer.impl.command.TempResponseConverter;
 import org.safehaus.subutai.core.peer.impl.dao.ManagementHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
+import org.safehaus.subutai.core.peer.impl.dao.ResourceHostDataService;
 import org.safehaus.subutai.core.peer.impl.model.ManagementHostEntity;
+import org.safehaus.subutai.core.peer.impl.model.ResourceHostEntity;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
@@ -74,7 +69,7 @@ import com.google.common.collect.Sets;
 /**
  * Local peer implementation
  */
-public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener, PeerEventListener
+public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
@@ -84,7 +79,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     private static final int MAX_LXC_NAME = 15;
     private PeerManager peerManager;
     private TemplateRegistry templateRegistry;
-    private CommunicationManager communicationManager;
+    //    private CommunicationManager communicationManager;
     private PeerDAO peerDAO;
     private ManagementHost managementHost;
     private Set<ResourceHost> resourceHosts = Sets.newHashSet();
@@ -93,16 +88,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private ConcurrentMap<String, AtomicInteger> sequences;
-    private Map<UUID, List> peerEvents = new ConcurrentHashMap<>();
     private ManagementHostDataService managementHostDataService;
-
+    private ResourceHostDataService resourceHostDataService;
+    private HostRegistry hostRegistry;
     private Set<RequestListener> requestListeners;
 
 
     public LocalPeerImpl( PeerManager peerManager, AgentManager agentManager, TemplateRegistry templateRegistry,
-                          PeerDAO peerDao, CommunicationManager communicationManager, QuotaManager quotaManager,
-                          StrategyManager strategyManager, Set<RequestListener> requestListeners,
-                          CommandExecutor commandExecutor )
+                          PeerDAO peerDao, QuotaManager quotaManager, StrategyManager strategyManager,
+                          Set<RequestListener> requestListeners, CommandExecutor commandExecutor,
+                          HostRegistry hostRegistry )
 
     {
         this.agentManager = agentManager;
@@ -111,11 +106,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
         //        this.containerManager = containerManager;
         this.templateRegistry = templateRegistry;
         this.peerDAO = peerDao;
-        this.communicationManager = communicationManager;
+        //        this.communicationManager = communicationManager;
         this.quotaManager = quotaManager;
         this.requestListeners = requestListeners;
         //        this.managementHostDataService = managementHostDataService;
         this.commandExecutor = commandExecutor;
+        this.hostRegistry = hostRegistry;
     }
 
 
@@ -135,13 +131,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
         {
             managementHost = ( ManagementHost ) allManagementHostEntity.iterator().next();
         }
+
+        resourceHostDataService = new ResourceHostDataService( peerManager.getEntityManager() );
+
         resourceHosts = Sets.newHashSet( peerDAO.getInfo( SOURCE_RESOURCE_HOST, ResourceHost.class ) );
 
         for ( ResourceHost resourceHost : resourceHosts )
         {
             resourceHost.resetHeartbeat();
         }
-        communicationManager.addListener( this );
+        //        communicationManager.addListener( this );
+        hostRegistry.addHostListener( this );
         sequences = new ConcurrentHashMap<>();
     }
 
@@ -149,7 +149,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     @Override
     public void shutdown()
     {
-        communicationManager.removeListener( this );
+        //        communicationManager.removeListener( this );
+        hostRegistry.removeHostListener( this );
     }
 
 
@@ -187,9 +188,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     {
         String nodeGroup = UUID.randomUUID().toString();
         ResourceHost resourceHost = getResourceHostByName( hostName );
-        resourceHost
-                .createContainer( this, getId(), envId, Lists.newArrayList( getTemplate( templateName ) ), cloneName,
-                        nodeGroup );
+        resourceHost.createContainer( this, getId().toString(), envId.toString(),
+                Lists.newArrayList( getTemplate( templateName ) ), cloneName, nodeGroup );
 
         Set<String> cloneNames = new HashSet<>();
         cloneNames.add( cloneName );
@@ -296,8 +296,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
                 {
                     LOG.info(
                             String.format( "+++++++++++++++++++++> Ordered: %s on %s", cloneName, rh.getHostname() ) );
-                    resourceHost
-                            .createContainer( this, creatorPeerId, environmentId, templates, cloneName, nodeGroupName );
+                    resourceHost.createContainer( this, creatorPeerId.toString(), environmentId.toString(), templates,
+                            cloneName, nodeGroupName );
                 }
             }
             HashSet<ContainerHost> result = new HashSet<>();
@@ -336,12 +336,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
                         {
                             throw new PeerException( "Resource host not found to register container." );
                         }
-                        LOG.info( String.format( "Resource host %s. Containers count: =%d", resourceHost.getHostname(),
-                                resourceHost.getContainerHosts().size() ) );
-                        resourceHost.addContainerHost( containerHost );
-                        LOG.info( String.format( "Registered new container: %s %s %s", containerHost.getHostname(),
-                                containerHost.getEnvironmentId(), containerHost.getNodeGroupName() ) );
-                        peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
+                        //                        LOG.info( String.format( "Resource host %s. Containers count: =%d",
+                        // resourceHost.getHostname(),
+                        //                                resourceHost.getContainerHosts().size() ) );
+                        //                        resourceHost.addContainerHost( containerHost );
+                        //                        LOG.info( String.format( "Registered new container: %s %s %s",
+                        // containerHost.getHostname(),
+                        //                                containerHost.getEnvironmentId(), containerHost
+                        // .getNodeGroupName() ) );
+                        //                        peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId()
+                        // .toString(), resourceHost );
+
+                        resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
                         LOG.info( String.format( "Resource host %s saved. Containers count: =%d",
                                 resourceHost.getHostname(), resourceHost.getContainerHosts().size() ) );
                     }
@@ -459,8 +465,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     }
 
 
-    @Override
-    public Host bindHost( UUID id ) throws PeerException
+    public Host bindHost( String id ) throws PeerException
     {
         Host result = null;
         ManagementHost managementHost = getManagementHost();
@@ -492,6 +497,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     }
 
 
+    public Host bindHost( UUID id ) throws PeerException
+    {
+        return bindHost( id.toString() );
+    }
+
+
     @Override
     public void startContainer( final ContainerHost containerHost ) throws PeerException
     {
@@ -503,7 +514,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
                 containerHost.setState( ContainerState.RUNNING );
             }
         }
-        catch ( CommandException e )
+        catch ( ResourceHostException e )
         {
             containerHost.setState( ContainerState.UNKNOWN );
             throw new PeerException( String.format( "Could not start LXC container [%s]", e.toString() ) );
@@ -526,7 +537,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
                 containerHost.setState( ContainerState.STOPPED );
             }
         }
-        catch ( CommandException e )
+        catch ( ResourceHostException e )
         {
             containerHost.setState( ContainerState.UNKNOWN );
             throw new PeerException( String.format( "Could not stop LXC container [%s]", e.toString() ) );
@@ -659,114 +670,72 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     }
 
 
-    @Override
-    public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
-    {
-        if ( resourceHostInfo.getHostname().equals( "management" ) )
-        {
-            if ( managementHost == null )
-            {
-                //                managementHost = new ManagementHost( resourceHostInfo );
-                //                managementHost.setParentAgent( NullAgent.getInstance() );
-                //                try
-                //                {
-                //                    managementHost.init();
-                //                }
-                //                catch ( SubutaiInitException e )
-                //                {
-                //                    LOG.error( e.toString() );
-                //                }
-            }
-            //            managementHost.updateHeartbeat();
-            //            peerDAO.saveInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId().toString(), managementHost );
-            return;
-        }
-
-        if ( resourceHostInfo.getHostname().startsWith( "py" ) )
-        {
-            ResourceHost host;
-            try
-            {
-                host = getResourceHostByName( resourceHostInfo.getHostname() );
-            }
-            catch ( PeerException e )
-            {
-                //                host = new ResourceHost( resourceHostInfo );
-                //                host.setParentAgent( NullAgent.getInstance() );
-                //                addResourceHost( host );
-            }
-            //            host.updateHeartbeat();
-            //            peerDAO.saveInfo( SOURCE_RESOURCE_HOST, host.getId().toString(), host );
-            return;
-        }
-    }
-
-
-    @Override
-    public void onResponse( final Response response )
-    {
-        if ( response == null || response.getType() == null )
-        {
-            return;
-        }
-
-        if ( response.getType().equals( ResponseType.REGISTRATION_REQUEST ) || response.getType().equals(
-                ResponseType.HEARTBEAT_RESPONSE ) )
-        {
-            if ( response.getHostname().equals( "management" ) )
-            {
-                if ( managementHost == null )
-                {
-                    Agent agent = PeerUtils.buildAgent( response );
-                    managementHost =
-                            new ManagementHostEntity( agent, getId() );//new ManagementHostImpl( agent, getId() );
-                    //                    managementHost.setParentAgent( NullAgent.getInstance() );
-                    try
-                    {
-                        managementHost.init();
-                        //                        peerDAO.saveInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId()
-                        // .toString(), managementHost );
-
-                        managementHostDataService.persist( ( ManagementHostEntity ) managementHost );
-                    }
-                    catch ( SubutaiInitException e )
-                    {
-                        LOG.error( e.toString() );
-                    }
-                }
-                managementHost.updateHeartbeat();
-                return;
-            }
-
-            if ( response.getHostname().startsWith( "py" ) )
-            {
-                ResourceHost host;
-                try
-                {
-                    host = getResourceHostByName( response.getHostname() );
-                }
-                catch ( PeerException e )
-                {
-                    host = new ResourceHost( PeerUtils.buildAgent( response ), getId() );
-                    //                    host.setParentAgent( NullAgent.getInstance() );
-                    addResourceHost( host );
-                    peerDAO.saveInfo( SOURCE_RESOURCE_HOST, host.getId().toString(), host );
-                }
-                host.updateHeartbeat();
-                return;
-            }
-
-            try
-            {
-                SubutaiHost host = ( SubutaiHost ) bindHost( response.getUuid() );
-                host.updateHeartbeat();
-            }
-            catch ( PeerException p )
-            {
-                LOG.warn( p.toString() );
-            }
-        }
-    }
+    //    @Override
+    //    public void onResponse( final Response response )
+    //    {
+    //        if ( response == null || response.getType() == null )
+    //        {
+    //            return;
+    //        }
+    //
+    //        if ( response.getType().equals( ResponseType.REGISTRATION_REQUEST ) || response.getType().equals(
+    //                ResponseType.HEARTBEAT_RESPONSE ) )
+    //        {
+    //            if ( response.getHostname().equals( "management" ) )
+    //            {
+    //                if ( managementHost == null )
+    //                {
+    //                    Agent agent = PeerUtils.buildAgent( response );
+    //                    managementHost =
+    //                            new ManagementHostEntity( agent, getId().toString() );//new ManagementHostImpl(
+    // agent, getId() );
+    //                    //                    managementHost.setParentAgent( NullAgent.getInstance() );
+    //                    try
+    //                    {
+    //                        managementHost.init();
+    //                        //                        peerDAO.saveInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId()
+    //                        // .toString(), managementHost );
+    //
+    //                        managementHostDataService.persist( ( ManagementHostEntity ) managementHost );
+    //                    }
+    //                    catch ( SubutaiInitException e )
+    //                    {
+    //                        LOG.error( e.toString() );
+    //                    }
+    //                }
+    //                managementHost.updateHeartbeat();
+    //                return;
+    //            }
+    //
+    //            if ( response.getHostname().startsWith( "py" ) )
+    //            {
+    //                ResourceHost host;
+    //                try
+    //                {
+    //                    host = getResourceHostByName( response.getHostname() );
+    //                }
+    //                catch ( PeerException e )
+    //                {
+    //                    host = new ResourceHost( PeerUtils.buildAgent( response ), getId() );
+    //                    //                    host.setParentAgent( NullAgent.getInstance() );
+    //                    addResourceHost( host );
+    //                    peerDAO.saveInfo( SOURCE_RESOURCE_HOST, host.getId().toString(), host );
+    //                }
+    //                host.updateHeartbeat();
+    //                return;
+    //            }
+    //
+    //            try
+    //            {
+    //                SubutaiHost host = ( SubutaiHost ) bindHost( response.getUuid() );
+    //                host.updateHeartbeat();
+    //            }
+    //            catch ( PeerException p )
+    //            {
+    //                LOG.warn( p.toString() );
+    //            }
+    //        }
+    //    }
 
 
     @Override
@@ -937,11 +906,55 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     }
 
 
-    @Deprecated
     @Override
-    public Agent waitForAgent( final String containerName, final int timeout )
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
-        return agentManager.waitForRegistration( containerName, timeout );
+        if ( resourceHostInfo.getHostname().equals( "management" ) )
+        {
+            if ( managementHost == null )
+            {
+                managementHost = new ManagementHostEntity( getId().toString(), resourceHostInfo );
+                try
+                {
+                    managementHost.init();
+                    managementHostDataService.persist( ( ManagementHostEntity ) managementHost );
+                }
+                catch ( SubutaiInitException e )
+                {
+                    LOG.error( e.toString() );
+                }
+            }
+            //            managementHost.updateHeartbeat();
+            //            peerDAO.saveInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId().toString(), managementHost );
+            return;
+        }
+        else
+        {
+            ResourceHost host;
+            try
+            {
+                host = getResourceHostByName( resourceHostInfo.getHostname() );
+
+                if ( host == null )
+                {
+                    host = new ResourceHostEntity( getId().toString(), resourceHostInfo );
+                    resourceHostDataService.persist( ( ResourceHostEntity ) host );
+                }
+                else
+                {
+                    host.onHeartbeat( resourceHostInfo );
+                }
+            }
+            catch ( PeerException e )
+            {
+                //                host = new ResourceHost( resourceHostInfo );
+                //                host.setParentAgent( NullAgent.getInstance() );
+                //                addResourceHost( host );
+            }
+            //            host.updateHeartbeat();
+            //            peerDAO.saveInfo( SOURCE_RESOURCE_HOST, host.getId().toString(), host );
+            return;
+        }
     }
 }
 

@@ -10,9 +10,16 @@ import java.util.UUID;
 import javax.naming.NamingException;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.safehaus.subutai.common.command.CommandCallback;
@@ -23,6 +30,8 @@ import org.safehaus.subutai.common.exception.SubutaiException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.Interface;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -35,74 +44,54 @@ import com.google.common.base.Preconditions;
 /**
  * Base Subutai host class.
  */
-@MappedSuperclass
+@Entity
+@Table( name = "host" )
+@Inheritance( strategy = InheritanceType.SINGLE_TABLE )
+@DiscriminatorColumn( name = "host_type", discriminatorType = DiscriminatorType.STRING, length = 1 )
 @Access( AccessType.FIELD )
 public abstract class AbstractSubutaiHost implements Host
 {
-
     @Id
-    private String id;
-    @Column
+    @Column( name = "host_id" )
+    private String hostId;
+    @Column( name = "peer_id", nullable = false )
     private String peerId;
-    @Column
+    @Column( name = "host_name", nullable = false )
     private String hostname;
-    @Column
-    private String parentHostname;
-    @Column
+
+    @Column( name = "net_intf" )
     private String netInterfaces;
+
+    @OneToMany( mappedBy = "host", cascade = CascadeType.ALL )
+    private Set<HostInterface> interfaces = new HashSet<>();
 
     @Transient
     protected long lastHeartbeat = System.currentTimeMillis();
-    @Transient
-    private Set<Interface> interfaces = new HashSet<>();
 
 
-    protected AbstractSubutaiHost( final Agent agent, UUID peerId )
+    protected AbstractSubutaiHost( final String peerId, final HostInfo hostInfo )
     {
-        Preconditions.checkNotNull( agent, "Agent is null" );
+        Preconditions.checkNotNull( hostInfo, "HostInfo is null" );
+        Preconditions.checkNotNull( peerId, "PeerId is null" );
 
-        //        this.agent = agent;
-        this.id = agent.getUuid().toString();
-        this.peerId = peerId.toString();
-        this.hostname = agent.getHostname();
-        this.parentHostname = agent.getParentHostName();
+        this.hostId = hostInfo.getId().toString();
+        this.peerId = peerId;
+        this.hostname = hostInfo.getHostname();
+
         StringBuilder sb = new StringBuilder();
 
-        for ( String s : agent.getListIP() )
+        for ( Interface s : hostInfo.getInterfaces() )
         {
-            sb.append( s + ";" );
+            sb.append( s.getIp() + ";" );
+            addInterface( new HostInterface( s ) );
         }
         this.netInterfaces = sb.toString();
-        //        this.id = agent.getUuid();
-        //        this.hostname = agent.getHostname();
-        //        this.interfaces = new HashSet<>();
     }
 
 
     protected AbstractSubutaiHost()
     {
     }
-
-    //
-    //    protected SubutaiHost( ResourceHostInfo resourceHostInfo )
-    //    {
-    //        Preconditions.checkNotNull( resourceHostInfo, "ResourceHostInfo is null" );
-    //        hostname = resourceHostInfo.getHostname();
-    //        id = resourceHostInfo.getId();
-    //        interfaces = resourceHostInfo.getInterfaces();
-    //    }
-
-
-    //        public Agent getParentAgent()
-    //        {
-    //            return parentAgent;
-    //        }
-    //
-    //
-    //        public void setParentAgent( final Agent parentAgent )
-    //        {
-    //            this.parentAgent = parentAgent;
-    //        }
 
 
     public Peer getPeer() throws PeerException
@@ -123,6 +112,20 @@ public abstract class AbstractSubutaiHost implements Host
         }
 
         return result;
+    }
+
+
+    public HostRegistry getHostRegistry() throws PeerException
+    {
+        HostRegistry result;
+        try
+        {
+            return ServiceLocator.getServiceNoCache( HostRegistry.class );
+        }
+        catch ( NamingException e )
+        {
+            throw new PeerException( "Could not locate PeerManager" );
+        }
     }
 
 
@@ -173,22 +176,22 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     @Override
-    public UUID getPeerId()
+    public UUID getId()
     {
-        return UUID.fromString( peerId );
+        return UUID.fromString( hostId );
+    }
+
+
+    @Override
+    public String getPeerId()
+    {
+        return peerId;
     }
 
 
     public void setPeerId( final String peerId )
     {
         this.peerId = peerId;
-    }
-
-
-    @Override
-    public UUID getId()
-    {
-        return UUID.fromString( id );
     }
 
 
@@ -259,7 +262,7 @@ public abstract class AbstractSubutaiHost implements Host
 
         final AbstractSubutaiHost that = ( AbstractSubutaiHost ) o;
 
-        if ( !id.equals( that.id ) )
+        if ( !hostId.equals( that.hostId ) )
         {
             return false;
         }
@@ -271,13 +274,19 @@ public abstract class AbstractSubutaiHost implements Host
     @Override
     public int hashCode()
     {
-        return id != null ? id.hashCode() : 0;
+        return hostId != null ? hostId.hashCode() : 0;
     }
 
 
-    public Set<Interface> getInterfaces()
+    public Set<HostInterface> getInterfaces()
     {
         return this.interfaces;
+    }
+
+
+    public void setInterfaces( final Set<HostInterface> interfaces )
+    {
+        this.interfaces = interfaces;
     }
 
 
@@ -341,7 +350,7 @@ public abstract class AbstractSubutaiHost implements Host
 
     public Agent getAgent()
     {
-        return new Agent( UUID.fromString( id ), hostname, parentHostname, null, getIps(), false, null );
+        return new Agent( getId(), hostname, null, null, getIps(), false, null );
     }
 
 
@@ -369,6 +378,36 @@ public abstract class AbstractSubutaiHost implements Host
     public void setParentAgent( final Agent agent )
     {
         throw new UnsupportedOperationException();
+    }
+
+
+    public String getHostId()
+    {
+        return hostId;
+    }
+
+
+    public void setHostId( final String hostId )
+    {
+        this.hostId = hostId;
+    }
+
+
+    public void setHostname( final String hostname )
+    {
+        this.hostname = hostname;
+    }
+
+
+    public void addInterface( HostInterface hostInterface )
+    {
+        if ( hostInterface == null )
+        {
+            throw new IllegalArgumentException( "HostInterface could not be null." );
+        }
+
+        hostInterface.setHost( this );
+        interfaces.add( hostInterface );
     }
 
 

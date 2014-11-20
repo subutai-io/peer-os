@@ -12,8 +12,8 @@ import java.util.concurrent.Executors;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -310,10 +310,10 @@ public class MonitorImpl implements Monitor
             if ( containerHost != null )
             {
                 //set metric's environment id for future reference on the receiving end
-                containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
+                containerHostMetric.setEnvironmentId( UUID.fromString( containerHost.getEnvironmentId() ) );
 
                 //find container's owner peer
-                Peer ownerPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
+                Peer ownerPeer = peerManager.getPeer( UUID.fromString( containerHost.getCreatorPeerId() ) );
 
                 //if container is "owned" by local peer, alert local peer
                 if ( ownerPeer.isLocal() )

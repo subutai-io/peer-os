@@ -12,14 +12,25 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
+import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.HostListener;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.ContainerState;
@@ -28,45 +39,36 @@ import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerEvent;
 import org.safehaus.subutai.core.peer.api.PeerEventType;
 import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
-import org.safehaus.subutai.core.peer.api.SubutaiHost;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
-import com.google.common.collect.Sets;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 
 /**
  * Resource host implementation.
  */
-public class ResourceHostEntity extends SubutaiHost
+@Entity
+@DiscriminatorValue( "R" )
+@Access( AccessType.FIELD )
+public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost, HostListener
 {
     transient private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
     transient private static final Pattern LOAD_AVERAGE_PATTERN = Pattern.compile( "load average: (.*)" );
     transient private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
+    transient private static final int HOST_EXPIRATION = 60;
     transient private ExecutorService executor;
+    protected Cache<UUID, ContainerHostInfo> hostCache;
 
-    Set<ContainerHost> containersHosts = Sets.newConcurrentHashSet();
+    @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL )
+    Set<ContainerHost> containersHosts = new HashSet();
 
 
-    public ResourceHostEntity( final Agent agent, UUID peerId )
+    public ResourceHostEntity( final String peerId, final HostInfo resourceHostInfo )
     {
-        super( agent, peerId );
-    }
-
-
-    //    public ResourceHost( ResourceHostInfo resourceHostinfo )
-    //    {
-    //        super( resourceHostinfo );
-    //    }
-
-
-    public synchronized void addContainerHost( ContainerHost host )
-    {
-        if ( host == null )
-        {
-            throw new IllegalArgumentException( "Container host could not be null." );
-        }
-        containersHosts.add( host );
+        super( peerId, resourceHostInfo );
     }
 
 
@@ -81,13 +83,32 @@ public class ResourceHostEntity extends SubutaiHost
     }
 
 
-    public boolean startContainerHost( final ContainerHost container ) throws CommandException
+    private Cache<UUID, ContainerHostInfo> getHostCache()
+    {
+        if ( hostCache == null )
+        {
+            hostCache = CacheBuilder.newBuilder().
+                    expireAfterWrite( HOST_EXPIRATION, TimeUnit.SECONDS ).
+                                            build();
+        }
+        return hostCache;
+    }
+
+
+    public boolean startContainerHost( final ContainerHost container ) throws ResourceHostException
     {
 
         RequestBuilder requestBuilder =
                 new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d &", container.getHostname() ) )
                         .withTimeout( 180 );
-        execute( requestBuilder );
+        try
+        {
+            execute( requestBuilder );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( "Error on starting container.", e.getMessage() );
+        }
         try
         {
             Thread.sleep( WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS );
@@ -100,12 +121,20 @@ public class ResourceHostEntity extends SubutaiHost
     }
 
 
-    private ContainerState getContainerHostState( final ContainerHost container ) throws CommandException
+    private ContainerState getContainerHostState( final ContainerHost container ) throws ResourceHostException
     {
         RequestBuilder requestBuilder =
                 new RequestBuilder( String.format( "/usr/bin/lxc-info -n %s", container.getHostname() ) )
                         .withTimeout( 30 );
-        CommandResult result = execute( requestBuilder );
+        CommandResult result = null;
+        try
+        {
+            result = execute( requestBuilder );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( "Error on fetching container state.", e.getMessage() );
+        }
 
         String stdOut = result.getStdOut();
 
@@ -267,12 +296,19 @@ public class ResourceHostEntity extends SubutaiHost
     }
 
 
-    public boolean stopContainerHost( final ContainerHost container ) throws CommandException
+    public boolean stopContainerHost( final ContainerHost container ) throws ResourceHostException
     {
         RequestBuilder requestBuilder =
                 new RequestBuilder( String.format( "/usr/bin/lxc-stop -n %s &", container.getHostname() ) )
                         .withTimeout( 180 );
-        execute( requestBuilder );
+        try
+        {
+            execute( requestBuilder );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( "Error on stopping container.", e.getMessage() );
+        }
 
         try
         {
@@ -286,9 +322,9 @@ public class ResourceHostEntity extends SubutaiHost
     }
 
 
-    public boolean destroyContainerHost( final ContainerHost containerHost ) throws ResourceHostException
+    public void destroyContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
-        return run( Command.DESTROY, containerHost.getHostname() );
+        run( Command.DESTROY, containerHost.getHostname() );
     }
 
 
@@ -337,7 +373,7 @@ public class ResourceHostEntity extends SubutaiHost
     }
 
 
-    public Host getContainerHostById( final UUID id )
+    public ContainerHost getContainerHostById( final String id )
     {
         ContainerHost result = null;
         Iterator iterator = containersHosts.iterator();
@@ -355,31 +391,16 @@ public class ResourceHostEntity extends SubutaiHost
     }
 
 
-    private ContainerHost create( final UUID creatorPeerId, final UUID environmentId, final List<Template> templates,
-                                  final String containerName ) throws PeerException
+    private ContainerHost create( final String creatorPeerId, final String environmentId,
+                                  final List<Template> templates, final String containerName ) throws PeerException
     {
         Template template = templates.get( templates.size() - 1 );
-        //        boolean cloneResult = false;
-        //        try
-        //        {
-        //            cloneResult = run( Command.CLONE, template.getTemplateName(), containerName,
-        // environmentId.toString() );
-        //        }
-        //        catch ( ResourceHostException ignore )
-        //        {
-        //
-        //        }
-        //
-        //        if ( cloneResult )
-        //        {
-        //            return waitAgentAndCreateContainerHost( containerName, template.getTemplateName(), environmentId,
-        //                    creatorPeerId );
-        //        }
+
         prepareTemplates( templates );
         boolean cloneResult = run( Command.CLONE, template.getTemplateName(), containerName, environmentId.toString() );
         if ( cloneResult )
         {
-            return waitAgentAndCreateContainerHost( containerName, template.getTemplateName(), environmentId,
+            return waitHeartbeatAndCreateContainerHost( containerName, template.getTemplateName(), environmentId,
                     creatorPeerId );
         }
         else
@@ -391,14 +412,11 @@ public class ResourceHostEntity extends SubutaiHost
     }
 
 
-    public void createContainer( final LocalPeer localPeer, final UUID creatorPeerId, final UUID environmentId,
+    public void createContainer( final LocalPeer localPeer, final String creatorPeerId, final String environmentId,
                                  final List<Template> templates, final String containerName,
                                  final String nodeGroupName )
 
     {
-
-        //        if (containerName.length() > 0)
-        //            throw new PeerException("Test");
 
         getExecutor().execute( new Runnable()
         {
@@ -409,7 +427,7 @@ public class ResourceHostEntity extends SubutaiHost
                 {
                     ContainerHost containerHost = create( creatorPeerId, environmentId, templates, containerName );
                     containerHost.setNodeGroupName( nodeGroupName );
-                    containerHost.setEnvironmentId( environmentId );
+                    containerHost.setEnvironmentId( environmentId.toString() );
                     localPeer.onPeerEvent( new PeerEvent( PeerEventType.CONTAINER_CREATE_SUCCESS, containerHost ) );
                 }
                 catch ( Exception e )
@@ -421,18 +439,16 @@ public class ResourceHostEntity extends SubutaiHost
     }
 
 
-    private ContainerHost waitAgentAndCreateContainerHost( final String containerName, final String templateName,
-                                                           final UUID envId, final UUID creatorPeerId )
+    private ContainerHost waitHeartbeatAndCreateContainerHost( final String containerName, final String templateName,
+                                                               final String envId, final String creatorPeerId )
             throws PeerException
     {
-        LocalPeer peer = ( LocalPeer ) getPeer();
-        Agent agent = peer.waitForAgent( containerName, 120000 );
-        if ( agent == null )
+        HostInfo hostInfo = waitHeartbeat( containerName, 120 );
+        if ( hostInfo == null )
         {
-            throw new ResourceHostException( "Container successfully created by agent not respond.", null );
+            throw new ResourceHostException( "Container successfully created, but heartbeat not received.", null );
         }
-        ContainerHost containerHost = new ContainerHost( agent, getPeerId(), creatorPeerId, envId );
-        //        containerHost.setParentAgent( getAgent() );
+        ContainerHost containerHost = new ContainerHostEntity( getPeerId(), creatorPeerId, envId, hostInfo );
         containerHost.setCreatorPeerId( creatorPeerId );
         containerHost.setTemplateName( templateName );
         containerHost.updateHeartbeat();
@@ -652,6 +668,61 @@ public class ResourceHostEntity extends SubutaiHost
             }
         }
         return result;
+    }
+
+
+    public void addContainerHost( ContainerHost host )
+    {
+        if ( host == null )
+        {
+            throw new IllegalArgumentException( "Container host could not be null." );
+        }
+
+        host.setParent( this );
+        containersHosts.add( host );
+    }
+
+
+    @Override
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
+    {
+        for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
+        {
+            getHostCache().put( containerHostInfo.getId(), containerHostInfo );
+        }
+    }
+
+
+    private HostInfo waitHeartbeat( String hostname, int timeoutInSeconds )
+    {
+        long threshold = System.currentTimeMillis() + timeoutInSeconds * 1000;
+        HostInfo result = getHeartbeat( hostname );
+        while ( result == null && System.currentTimeMillis() < threshold )
+        {
+            try
+            {
+                Thread.sleep( 2000 );
+            }
+            catch ( InterruptedException ignore )
+            {
+                break;
+            }
+            result = getHeartbeat( hostname );
+        }
+        return result;
+    }
+
+
+    private HostInfo getHeartbeat( final String hostname )
+    {
+        for ( HostInfo hostInfo : getHostCache().asMap().values() )
+        {
+            if ( hostname.equals( hostInfo.getHostname() ) )
+            {
+                return hostInfo;
+            }
+        }
+        return null;
     }
 
 
