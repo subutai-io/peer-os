@@ -42,6 +42,5 @@ SubutaiCommand* SubutaiCommandManager::firstCommand() {
 
 void SubutaiCommandManager::finishCommand(string commandId) {
     for (deque<SubutaiCommand*>::iterator it = _commands.begin(); it != _commands.end(); it++) {
-        if (command)
     }
 }
