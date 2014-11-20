@@ -83,9 +83,6 @@ echo $version_new $version_prev
      fi
   fi
 
-  echo $deb_name
-  rm $TARGET/$deb_name
-
 }
 
 

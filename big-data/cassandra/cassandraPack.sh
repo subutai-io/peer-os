@@ -33,7 +33,7 @@ downloadHadoopAndMakeChanges() {
 	popd
 }
 
-# 1) Check if the version is cahnged or not. If not changed, dont create a new debian.
+# 1) Check if the version is changed or not. If not changed, dont create a new debian.
 checkPackageVersion $productName
 # 2) Get the sources which are downloaded from version control system
 #    to local machine to relevant directories to generate the debian package
@@ -42,3 +42,5 @@ getSourcesToRelevantDirectories $productName
 downloadHadoopAndMakeChanges $productName
 # 4) Create the Debian package
 generateDebianPackage $productName
+# 5) Create the Wrapper Repo Debian Package
+generateRepoPackage $productName
