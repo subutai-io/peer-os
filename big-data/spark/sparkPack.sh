@@ -32,10 +32,13 @@ downloadFileAndMakeChanges() {
 	mv spark-$sparkVersion/conf/* $confDirectory
 	popd
 }
-# 1) Get the sources which are downloaded from version control system
+
+# 1) Check if the version is cahnged or not. If not changed, dont create a new debian.
+checkPackageVersion $productName
+# 2) Get the sources which are downloaded from version control system
 #    to local machine to relevant directories to generate the debian package
 getSourcesToRelevantDirectories $productName
-# 2) Download tar file and make necessary changes
+# 3) Download tar file and make necessary changes
 downloadFileAndMakeChanges $productName
-# 3) Create the Debian package
+# 4) Create the Debian package
 generateDebianPackage $productName
