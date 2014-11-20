@@ -1,116 +1,90 @@
 package org.safehaus.subutai.plugin.hbase.impl;
 
 
-import java.util.Set;
-
-import org.safehaus.subutai.common.enums.OutputRedirection;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.command.OutputRedirection;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.common.protocol.RequestBuilder;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 
 
 public class Commands
 {
 
-    protected final static String PACKAGE_NAME = Common.PACKAGE_PREFIX + HBaseClusterConfig.PRODUCT_KEY.toLowerCase();
-    private final CommandRunnerBase commandRunner;
+    public final static String PACKAGE_NAME = Common.PACKAGE_PREFIX + HBaseConfig.PRODUCT_KEY.toLowerCase();
 
 
-    public Commands( CommandRunnerBase commandRunner )
+    public RequestBuilder getInstallDialogCommand()
     {
-        this.commandRunner = commandRunner;
+
+        return new RequestBuilder( "apt-get --assume-yes --force-yes install dialog" ).withTimeout( 360 )
+                                                                                      .withStdOutRedirection(
+                                                                                              OutputRedirection.NO );
     }
 
 
-    public Command getInstallDialogCommand( Set<Agent> agents )
+    public static RequestBuilder getInstallCommand()
     {
 
-        return commandRunner.createCommand(
-                new RequestBuilder( "apt-get --assume-yes --force-yes install dialog" ).withTimeout( 360 )
-                                                                                       .withStdOutRedirection(
-                                                                                               OutputRedirection.NO ),
-                agents );
+        return new RequestBuilder( "apt-get --assume-yes --force-yes install " + PACKAGE_NAME ).withTimeout( 360 )
+                                                                                               .withStdOutRedirection(
+                                                                                                       OutputRedirection.NO );
     }
 
 
-    public Command getInstallCommand( Set<Agent> agents )
+    public RequestBuilder getUninstallCommand()
     {
 
-        return commandRunner.createCommand(
-                new RequestBuilder( "apt-get --assume-yes --force-yes install " + PACKAGE_NAME ).withTimeout( 360 )
-                                                                                                .withStdOutRedirection(
-                                                                                                        OutputRedirection.NO ),
-                agents );
+        return new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 360 )
+                                                                                             .withStdOutRedirection(
+                                                                                                     OutputRedirection.NO );
     }
 
 
-    public Command getUninstallCommand( Set<Agent> agents )
+    public static RequestBuilder getStartCommand()
     {
-
-        return commandRunner.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 360 )
-                                                                                              .withStdOutRedirection(
-                                                                                                      OutputRedirection.NO ),
-                agents );
+        return new RequestBuilder( "service hbase start &" );
     }
 
 
-    public Command getStartCommand( Set<Agent> agents )
+    public static RequestBuilder getStopCommand()
     {
-        return commandRunner.createCommand( new RequestBuilder( "service hbase start &" ), agents );
+        return new RequestBuilder( "service hbase stop" ).withTimeout( 360 );
     }
 
 
-    public Command getStopCommand( Set<Agent> agents )
+    public static RequestBuilder getStatusCommand()
     {
-        return commandRunner.createCommand( new RequestBuilder( "service hbase stop" ).withTimeout( 360 ), agents );
+        return new RequestBuilder( "service hbase status" );
     }
 
 
-    public Command getStatusCommand( Set<Agent> agents )
+    public RequestBuilder getConfigBackupMastersCommand( String backUpMasters )
     {
-        return commandRunner.createCommand( new RequestBuilder( "service hbase status" ), agents );
+        return new RequestBuilder( String.format( ". /etc/profile && backUpMasters.sh %s", backUpMasters ) );
     }
 
 
-    public Command getConfigBackupMastersCommand( Set<Agent> agents, String backUpMasters )
+    public RequestBuilder getConfigQuorumCommand( String quorumPeers )
     {
-        return commandRunner.createCommand(
-                new RequestBuilder( String.format( ". /etc/profile && backUpMasters.sh %s", backUpMasters ) ), agents );
+        return new RequestBuilder( String.format( ". /etc/profile && quorum.sh %s", quorumPeers ) );
     }
 
 
-    public Command getConfigQuorumCommand( Set<Agent> agents, String quorumPeers )
+    public RequestBuilder getConfigRegionCommand( String regionServers )
     {
-        return commandRunner
-                .createCommand( new RequestBuilder( String.format( ". /etc/profile && quorum.sh %s", quorumPeers ) ),
-                        agents );
+        return new RequestBuilder( String.format( ". /etc/profile && region.sh %s", regionServers ) );
     }
 
 
-    public Command getConfigRegionCommand( Set<Agent> agents, String regionServers )
+    public RequestBuilder getConfigMasterCommand( String hadoopNameNodeHostname, String hMasterMachineHostname )
     {
-        return commandRunner
-                .createCommand( new RequestBuilder( String.format( ". /etc/profile && region.sh %s", regionServers ) ),
-                        agents );
+        return new RequestBuilder(
+                String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname, hMasterMachineHostname ) );
     }
 
 
-    public Command getConfigMasterCommand( Set<Agent> agents, String hadoopNameNodeHostname,
-                                           String hMasterMachineHostname )
+    public RequestBuilder getCheckInstalledCommand()
     {
-        return commandRunner.createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname,
-                                hMasterMachineHostname ) ), agents );
-    }
-
-
-    public Command getCheckInstalledCommand( Set<Agent> agents )
-    {
-        return commandRunner.createCommand(
-                new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH ), agents );
+        return new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH );
     }
 }

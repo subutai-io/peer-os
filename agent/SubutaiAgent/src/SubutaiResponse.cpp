@@ -33,6 +33,7 @@ SubutaiResponse::SubutaiResponse()
     setHostname("");
     setParentHostname("");
     getInterfaces().clear();
+    getContainerSet().clear();
 }
 
 /**
@@ -63,6 +64,7 @@ void SubutaiResponse::clear()
     setconfigPoint("");
     setDateTime("");
     setChangeType("");
+    setExitCode(-1);
 }
 
 /**
@@ -195,18 +197,20 @@ void SubutaiResponse::serialize(string& output)
     }
     if(this->getExitCode() >= 0)
     {
-        root["response"]["exitCode"] = this->getExitCode();										//check the pid is assigned or not
+    	if(this->getType()!= "INOTIFY_EVENT")
+    		root["response"]["exitCode"] = this->getExitCode();										//check the pid is assigned or not
     }
     if(this->getResponseSequenceNumber() >= 0)										//check the responseSequenceNumber is assigned or not
     {
         root["response"]["responseNumber"] = this->getResponseSequenceNumber();
     }
     for(unsigned int index=0; index < this->getInterfaces().size(); index++)
-    {
-        root["response"]["interfaces"][index]["interfaceName"]=this->getInterfaces()[index].name;
-        root["response"]["interfaces"][index]["ip"]=this->getInterfaces()[index].ip;
-        root["response"]["interfaces"][index]["mac"]=this->getInterfaces()[index].mac;
-    }
+	{
+		root["response"]["interfaces"][index]["interfaceName"]=this->getInterfaces()[index].name;
+		root["response"]["interfaces"][index]["ip"]=this->getInterfaces()[index].ip;
+		root["response"]["interfaces"][index]["mac"]=this->getInterfaces()[index].mac;
+	}
+
     if(!(this->getCommandId().empty()))											//check the taskuuid is assigned or not
     {
         root["response"]["commandId"] = this->getCommandId();
@@ -221,7 +225,8 @@ void SubutaiResponse::serialize(string& output)
     }
     if(!(this->getconfigPoint().empty()))
     {
-        root["response"]["configPoints"] = this->getconfigPoint();
+    	if(this->getType() == "INOTIFY_EVENT") root["response"]["configPoint"] = this->getconfigPoint();
+    	else root["response"]["configPoints"] = this->getconfigPoint();
     }
     if(!(this->getDateTime().empty()))
     {
@@ -229,21 +234,25 @@ void SubutaiResponse::serialize(string& output)
     }
     if(!(this->getChangeType().empty()))
     {
-        root["response"]["changeType"] = this->getChangeType();
+        root["response"]["eventType"] = this->getChangeType();
     }
-    for(unsigned int index = 0; index < this->containers.size(); index++) {
-        root["response"]["containers"][index]["hostname"]	= this->containers[index].getContainerHostnameValue();
-        root["response"]["containers"][index]["id"]		= this->containers[index].getContainerIdValue();
-        root["response"]["containers"][index]["status"]		= this->containers[index].getContainerStatus();
-        vector<Interface> interfaceValues	=	this->containers[index].getContainerInterfaceValues();
-        for(unsigned int i=0; i < interfaceValues.size(); i++) {
-            root["response"]["containers"][index]["interfaces"][i]["interfaceName"]=interfaceValues[i].name;
-            root["response"]["containers"][index]["interfaces"][i]["ip"]=interfaceValues[i].ip;
-            root["response"]["containers"][index]["interfaces"][i]["mac"]=interfaceValues[i].mac;
-        }
+
+    if(this->getType()!= "INOTIFY_EVENT")
+    {
+		for(unsigned int index = 0; index < this->containers.size(); index++) {
+			root["response"]["containers"][index]["hostname"]	= this->containers[index].getContainerHostnameValue();
+			root["response"]["containers"][index]["id"]		= this->containers[index].getContainerIdValue();
+			root["response"]["containers"][index]["status"]		= this->containers[index].getContainerStatus();
+			vector<Interface> interfaceValues	=	this->containers[index].getContainerInterfaceValues();
+			for(unsigned int i=0; i < interfaceValues.size(); i++) {
+				root["response"]["containers"][index]["interfaces"][i]["interfaceName"]=interfaceValues[i].name;
+				root["response"]["containers"][index]["interfaces"][i]["ip"]=interfaceValues[i].ip;
+				root["response"]["containers"][index]["interfaces"][i]["mac"]=interfaceValues[i].mac;
+			}
+		}
     }
     for(unsigned int index = 0; index < this->getConfPoints().size(); index++) {
-        if (this->getType() == "INOTIFY_LIST_RESPONSE") {
+        if (this->getType() == "LIST_INOTIFY_RESPONSE") {
             root["response"]["configPoints"][index]=this->getConfPoints()[index];
         } else if (this->getType() == "INOTIFY_EVENT") {
             root["response"]["configPoint"][index]=this->getConfPoints()[index];
@@ -322,11 +331,11 @@ void SubutaiResponse::serializeDone(string& output)
     }
     if(this->getRequestSequenceNumber() >= 0)											//check the requestSequenceNumber is assigned or not
     {
-        root["response"]["requestSequenceNumber"] = this->getRequestSequenceNumber();
+        root["response"]["requestNumber"] = this->getRequestSequenceNumber();
     }
     if(this->getResponseSequenceNumber() >= 0)										//check the responseSequenceNumber is assigned or not
     {
-        root["response"]["responseSequenceNumber"] = this->getResponseSequenceNumber();
+        root["response"]["responseNumber"] = this->getResponseSequenceNumber();
     }
     if(this->getPid() >= 0)
     {
@@ -642,4 +651,12 @@ vector<string>& SubutaiResponse::getConfPoints()
 {					//getting ips vector
 
     return this->confPoints;
+}
+
+/**
+ *  \details   getting "containers" private vector variable of SubutaiResponse instance.
+ */
+vector<SubutaiContainer>& SubutaiResponse::getContainerSet()
+{
+	return this->containers;
 }

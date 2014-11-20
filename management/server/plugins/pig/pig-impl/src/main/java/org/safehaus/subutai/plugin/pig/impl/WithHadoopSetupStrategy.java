@@ -1,15 +1,12 @@
 package org.safehaus.subutai.plugin.pig.impl;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
 
 
@@ -35,47 +32,59 @@ class WithHadoopSetupStrategy extends PigSetupStrategy
     public ConfigBase setup() throws ClusterSetupException
     {
 
-        checkConfig();
-
-        if ( environment == null )
+        try
         {
-            throw new ClusterSetupException( "Environment not specified" );
-        }
+            checkConfig();
 
-        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
-        {
-            throw new ClusterSetupException( "Environment has no nodes" );
-        }
-
-        Set<Agent> pigNodes = new HashSet<>(), allNodes = new HashSet<>();
-        for ( EnvironmentContainer n : environment.getContainers() )
-        {
-            allNodes.add( n.getAgent() );
-            if ( n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
+            if ( environment == null )
             {
-                pigNodes.add( n.getAgent() );
+                throw new ClusterSetupException( "Environment not specified" );
             }
-        }
-        if ( pigNodes.isEmpty() )
-        {
-            throw new ClusterSetupException( "Environment has no nodes with Pig installed" );
-        }
 
-        config.setNodes( pigNodes );
-        config.setHadoopNodes( allNodes );
-
-        for ( Agent a : config.getNodes() )
-        {
-            if ( manager.getAgentManager().getAgentByHostname( a.getHostname() ) == null )
+            if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
             {
-                throw new ClusterSetupException( "Node is not connected: " + a.getHostname() );
+                throw new ClusterSetupException( "Environment has no nodes" );
             }
+
+
+            if ( config.getNodes().isEmpty() )
+            {
+                throw new ClusterSetupException( "Environment has no nodes with Pig installed" );
+            }
+            config.getHadoopNodes().clear();
+            config.setEnvironmentId( environment.getId() );
+
+
+            for ( ContainerHost container : environment.getContainers() )
+            {
+                if ( !container.isConnected() )
+                {
+                    throw new ClusterSetupException(
+                            String.format( "Container %s is not connected", container.getHostname() ) );
+                }
+
+                config.getHadoopNodes().add( container.getId() );
+
+                if ( container.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
+                {
+                    config.getNodes().add( container.getId() );
+                }
+            }
+
+            if ( config.getNodes().isEmpty() )
+            {
+                throw new ClusterSetupException( "Environment has no nodes" );
+            }
+
+            trackerOperation.addLog( "Saving to db..." );
+            manager.getPluginDao().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config );
+            trackerOperation.addLog( "Cluster info successfully saved" );
+
         }
-
-        trackerOperation.addLog( "Saving to db..." );
-        manager.getPluginDao().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config );
-        trackerOperation.addLog( "Cluster info successfully saved" );
-
+        catch ( PeerException e )
+        {
+            e.printStackTrace();
+        }
         return config;
     }
-}
+ }

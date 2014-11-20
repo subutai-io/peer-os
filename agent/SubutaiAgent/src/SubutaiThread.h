@@ -81,9 +81,9 @@ class SubutaiThread
         int optionReadSend(message_queue*, SubutaiCommand*, int, int*);
         void checkAndWrite(message_queue*, SubutaiCommand*);
         void checkAndSend(message_queue*, SubutaiCommand*);
-        void retrieveDaemonOutput(SubutaiCommand* command);
+        void retrieveDaemonOutput(SubutaiCommand*);
         void lastCheckAndSend(message_queue*, SubutaiCommand*);
-        void captureOutputBuffer(message_queue*, SubutaiCommand*, bool output_buffer, bool error_buffer);
+        void captureOutputBuffer(message_queue*, SubutaiCommand*, bool, bool);
         bool checkExecutionTimeout(unsigned int*, bool*, unsigned int*, unsigned int*);
     private:
         SubutaiUserID           uid;
@@ -92,6 +92,7 @@ class SubutaiThread
         SubutaiStreamReader     errorStream;
         SubutaiStreamReader     outputStream;
         SubutaiHelper 			helper;
+        SubutaiContainer*       _container;          // container attached to this thread
         string                  argument, exec, sendout, environment;
         string                  outBuff, errBuff;   //general buffers for error and output
         pid_t                   pid;

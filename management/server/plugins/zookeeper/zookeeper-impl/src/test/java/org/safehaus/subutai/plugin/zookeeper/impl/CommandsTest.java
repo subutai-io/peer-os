@@ -16,80 +16,72 @@ public class CommandsTest
 
     private static Commands commands;
 
-
-    @BeforeClass
-    public static void setUp()
-    {
-        commands = new Commands( new CommandRunnerMock() );
-    }
-
-
     @Test
     public void testInstallCommand()
     {
-        Command command = commands.getInstallCommand( null );
+        String command = Commands.getInstallCommand();
 
         assertNotNull( command );
-        assertEquals( "apt-get --force-yes --assume-yes install " + Commands.PACKAGE_NAME, command.getDescription() );
+        assertEquals( "apt-get --force-yes --assume-yes install " + Commands.PACKAGE_NAME, command );
     }
 
 
     @Test
     public void getStartCommand()
     {
-        Command command = commands.getStartCommand( null );
+        String command = Commands.getStartCommand();
 
         assertNotNull( command );
-        assertEquals( "service zookeeper start", command.getDescription() );
+        assertEquals( "service zookeeper start &", command );
     }
 
 
     @Test
     public void getRestartCommand()
     {
-        Command command = commands.getRestartCommand( null );
+        String command = Commands.getRestartCommand();
 
         assertNotNull( command );
-        assertEquals( "service zookeeper restart", command.getDescription() );
+        assertEquals( "service zookeeper restart &", command );
     }
 
 
     @Test
     public void getStatusCommand()
     {
-        Command command = commands.getStatusCommand( null );
+        String command = Commands.getStatusCommand();
 
         assertNotNull( command );
-        assertEquals( "service zookeeper status", command.getDescription() );
+        assertEquals( "service zookeeper status", command );
     }
 
 
     @Test
     public void getStopCommand()
     {
-        Command command = commands.getStopCommand( null );
+        String command = Commands.getStopCommand();
 
         assertNotNull( command );
-        assertEquals( "service zookeeper stop", command.getDescription() );
+        assertEquals( "service zookeeper stop", command );
     }
 
 
     @Test
     public void testUninstallCommand()
     {
-        Command command = commands.getUninstallCommand( null );
+        String command = Commands.getUninstallCommand();
 
         assertNotNull( command );
-        assertEquals( "apt-get --force-yes --assume-yes purge " + Commands.PACKAGE_NAME, command.getDescription() );
+        assertEquals( "apt-get --force-yes --assume-yes purge " + Commands.PACKAGE_NAME, command );
     }
 
 
     @Test
     public void testCheckCommand()
     {
-        Command command = commands.getCheckInstalledCommand( null );
+        String command = Commands.getCheckInstalledCommand();
 
         assertNotNull( command );
-        assertEquals( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH, command.getDescription() );
+        assertEquals( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH, command );
     }
 }

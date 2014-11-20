@@ -3,7 +3,6 @@ package org.safehaus.subutai.plugin.oozie.impl.handler;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
@@ -17,7 +16,7 @@ import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 import com.google.common.collect.Sets;
 
 
-public class AddNodeHandler extends AbstractOperationHandler<OozieImpl>
+public class AddNodeHandler extends AbstractOperationHandler<OozieImpl, OozieClusterConfig>
 {
 
     private final String hostname;
@@ -35,7 +34,7 @@ public class AddNodeHandler extends AbstractOperationHandler<OozieImpl>
     @Override
     public void run()
     {
-        TrackerOperation po = trackerOperation;
+        /*TrackerOperation po = trackerOperation;
         OozieClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -71,11 +70,11 @@ public class AddNodeHandler extends AbstractOperationHandler<OozieImpl>
         {
             po.addLog( ex.getMessage() );
             po.addLogFailed( "Add client node failed" );
-        }
+        }*/
     }
 
 
-    public Agent setupHost( OozieClusterConfig config ) throws ClusterSetupException
+   /* public Agent setupHost( OozieClusterConfig config ) throws ClusterSetupException
     {
         TrackerOperation po = trackerOperation;
 
@@ -138,5 +137,5 @@ public class AddNodeHandler extends AbstractOperationHandler<OozieImpl>
     {
 
         return null;
-    }
+    }*/
 }

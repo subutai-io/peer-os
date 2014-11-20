@@ -21,4 +21,5 @@
     <module>cassandra-cli</module>
     <module>cassandra-rest</module>
   </modules>
+
 </project>

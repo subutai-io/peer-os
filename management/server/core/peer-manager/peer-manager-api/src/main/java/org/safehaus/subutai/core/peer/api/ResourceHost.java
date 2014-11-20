@@ -20,7 +20,6 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
@@ -46,10 +45,10 @@ public class ResourceHost extends SubutaiHost
     }
 
 
-//    public ResourceHost( ResourceHostInfo resourceHostinfo )
-//    {
-//        super( resourceHostinfo );
-//    }
+    //    public ResourceHost( ResourceHostInfo resourceHostinfo )
+    //    {
+    //        super( resourceHostinfo );
+    //    }
 
 
     public synchronized void addContainerHost( ContainerHost host )
@@ -631,6 +630,20 @@ public class ResourceHost extends SubutaiHost
                     String.format( "Could not execute script/command %s", String.format( command.script, args ) ),
                     e.toString() );
         }
+    }
+
+
+    public Set<ContainerHost> getContainerHostsByNameList( final Set<String> cloneNames )
+    {
+        Set<ContainerHost> result = new HashSet<>();
+        for ( ContainerHost containerHost : getContainerHosts() )
+        {
+            if ( cloneNames.contains( containerHost.getHostname() ) )
+            {
+                result.add( containerHost );
+            }
+        }
+        return result;
     }
 
 

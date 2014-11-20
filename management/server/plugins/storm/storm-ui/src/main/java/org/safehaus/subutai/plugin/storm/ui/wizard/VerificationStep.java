@@ -4,9 +4,13 @@ package org.safehaus.subutai.plugin.storm.ui.wizard;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.storm.api.Storm;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
 import com.vaadin.shared.ui.label.ContentMode;
@@ -22,7 +26,7 @@ public class VerificationStep extends Panel
 {
 
     public VerificationStep( final Storm storm, final ExecutorService executorService, final Tracker tracker,
-                             final Wizard wizard )
+                             final Wizard wizard, final EnvironmentManager environmentManager )
     {
 
         setSizeFull();
@@ -41,8 +45,10 @@ public class VerificationStep extends Panel
         cfgView.addStringCfg( "Cluster Name", config.getClusterName() );
         if ( config.isExternalZookeeper() )
         {
-
-            cfgView.addStringCfg( "Master node", config.getNimbus().getHostname() );
+            ZookeeperClusterConfig zookeeperClusterConfig = wizard.getZookeeperClusterConfig();
+            Environment zookeeperEnvironment = environmentManager.getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
+            ContainerHost nimbusHost = zookeeperEnvironment.getContainerHostByUUID( config.getNimbus() );
+            cfgView.addStringCfg( "Master node", nimbusHost.getHostname() );
         }
         cfgView.addStringCfg( "Supervisor nodes count", config.getSupervisorsCount() + "" );
 

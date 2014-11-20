@@ -100,11 +100,11 @@ void AgentTest::tearDown(void)
 void AgentTest::testCommandDeserialize(void)
 {
 	//Test string for deserialization
-	string input = "{\"command\":{\"type\":\"EXECUTE_REQUEST\","
+	string input = "{\"request\":{\"type\":\"EXECUTE_REQUEST\","
 			"\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
 			"\"commandId\":\"a7349720-9e2f-11e3-b9d6-080027b00009\","
 			"\"workingDirectory\":\"/home\","
-			"\"program\":\"ls\","
+			"\"command\":\"ls\","
 			"\"stdOut\":\"RETURN\","
 			"\"stdErr\":\"RETURN\","
 			"\"runAs\":\"root\","
@@ -112,6 +112,7 @@ void AgentTest::testCommandDeserialize(void)
 			"\"isDeamon\":0}}";
 
 	cmd->deserialize(input);
+
 
 	CPPUNIT_ASSERT("EXECUTE_REQUEST"== cmd->getType());
 	CPPUNIT_ASSERT("5373b7c4-a039-44a9-9270-9e0e45d549cf"== cmd->getUuid());

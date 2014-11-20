@@ -98,8 +98,8 @@ public class PeerManagerImpl implements PeerManager
             peerInfo = result.get( 0 );
         }
         localPeer =
-                new LocalPeerImpl( this, agentManager, templateRegistry, peerDAO, communicationManager, commandRunner,
-                        quotaManager, strategyManager, requestListeners );
+                new LocalPeerImpl( this, agentManager, templateRegistry, peerDAO, communicationManager, quotaManager,
+                        strategyManager, requestListeners, commandExecutor );
         localPeer.init();
 
         //add command request listener

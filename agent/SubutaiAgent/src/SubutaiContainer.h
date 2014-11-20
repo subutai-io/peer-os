@@ -71,7 +71,7 @@ enum containerStatus { RUNNING, STOPPED, FROZEN };
 class SubutaiContainer
 {
     public:
-        SubutaiContainer(SubutaiLogger*, lxc_container* cont);
+        SubutaiContainer(SubutaiLogger*, lxc_container*);
         virtual ~SubutaiContainer(void);
         bool getContainerId();
         void tryLongCommand();
@@ -86,20 +86,17 @@ class SubutaiContainer
         bool checkUser(string username);
         int getRunAsUserId(string username);
         void PutToFile(string filename, string text);
-
         vector<Interface> getContainerInterfaceValues();
         lxc_container* getLxcContainerValue();
         string getContainerStatus();
         string getContainerIdValue();
         string getContainerHostnameValue();
         string RunPsCommand();
-
         string findFullProgramPath(string );
         string RunProgram(string , vector<string>);
         ExecutionResult RunCommand(SubutaiCommand* command);
         ExecutionResult RunDaemon(SubutaiCommand* command);
         ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT, bool captureOutput = true);
-
 
     protected:
         vector<string> ExplodeCommandArguments(SubutaiCommand* command);

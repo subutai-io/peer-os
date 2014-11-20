@@ -69,6 +69,7 @@ abstract class HiveSetupStrategy implements ClusterSetupStrategy
 
         if ( hiveManager.getCluster( config.getClusterName() ) != null )
         {
+            trackerOperation.addLogFailed( "Installation already exists" );
             throw new ClusterSetupException( message + String
                     .format( HiveConfig.PRODUCT_KEY + " installation already exists: %s", config.getClusterName() ) );
         }

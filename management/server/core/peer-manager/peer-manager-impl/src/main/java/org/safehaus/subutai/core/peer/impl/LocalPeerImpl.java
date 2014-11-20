@@ -1,7 +1,10 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,7 +19,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -26,10 +28,8 @@ import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
+import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
@@ -52,8 +52,6 @@ import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.peer.api.SubutaiHost;
 import org.safehaus.subutai.core.peer.api.SubutaiInitException;
-import org.safehaus.subutai.core.peer.impl.command.CommandResultImpl;
-import org.safehaus.subutai.core.peer.impl.command.TempResponseConverter;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -81,26 +79,24 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60; // 5 min
     private static final int MAX_LXC_NAME = 15;
     private PeerManager peerManager;
-    //    private ContainerManager containerManager;
     private TemplateRegistry templateRegistry;
     private CommunicationManager communicationManager;
     private PeerDAO peerDAO;
     private ManagementHost managementHost;
     private Set<ResourceHost> resourceHosts = Sets.newHashSet();
-    private CommandRunner commandRunner;
+    private CommandExecutor commandExecutor;
     private AgentManager agentManager;
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private ConcurrentMap<String, AtomicInteger> sequences;
-    private Map<UUID, List> peerEvents = new ConcurrentHashMap<>();
 
     private Set<RequestListener> requestListeners;
 
 
     public LocalPeerImpl( PeerManager peerManager, AgentManager agentManager, TemplateRegistry templateRegistry,
-                          PeerDAO peerDao, CommunicationManager communicationManager, CommandRunner commandRunner,
-                          QuotaManager quotaManager, StrategyManager strategyManager,
-                          Set<RequestListener> requestListeners )
+                          PeerDAO peerDao, CommunicationManager communicationManager, QuotaManager quotaManager,
+                          StrategyManager strategyManager, Set<RequestListener> requestListeners,
+                          CommandExecutor commandExecutor )
 
     {
         this.agentManager = agentManager;
@@ -110,9 +106,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
         this.templateRegistry = templateRegistry;
         this.peerDAO = peerDao;
         this.communicationManager = communicationManager;
-        this.commandRunner = commandRunner;
         this.quotaManager = quotaManager;
         this.requestListeners = requestListeners;
+        this.commandExecutor = commandExecutor;
     }
 
 
@@ -182,89 +178,44 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
                 .createContainer( this, getId(), envId, Lists.newArrayList( getTemplate( templateName ) ), cloneName,
                         nodeGroup );
 
-        Set<ContainerHost> containerHosts = waitContainerHosts( envId, nodeGroup, 1 );
+        Set<String> cloneNames = new HashSet<>();
+        cloneNames.add( cloneName );
+        Set<ContainerHost> containerHosts = waitContainerHosts( resourceHost, cloneNames );
 
         return containerHosts.iterator().next();
-        //        resourceHost.addContainerHost( containerHost );
-        //        peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
-        //        return containerHost;
     }
 
 
-    private Set<ContainerHost> waitContainerHosts( UUID environmentId, String nodeGroup, int quantity )
+    private Set<ContainerHost> waitContainerHosts( ResourceHost resourceHost, Set<String> cloneNames )
             throws PeerException
     {
 
         Set<ContainerHost> result = new HashSet<>();
+        int quantity = cloneNames.size();
         long threshold = System.currentTimeMillis() + 120 * quantity * 1000;
         while ( result.size() != quantity && threshold - System.currentTimeMillis() > 0 )
         {
             try
             {
+                Date date = new Date( threshold - System.currentTimeMillis() );
+                DateFormat formatter = new SimpleDateFormat( "HH:mm:ss:SSS" );
+                LOG.info( String.format( "Waiting for container(s) on %s: %d. Ready: %d container(s). Timeout: %s ",
+                        resourceHost.getHostname(), quantity, result.size(), formatter.format( date ) ) );
                 Thread.sleep( 5000 );
             }
             catch ( InterruptedException ignore )
             {
             }
-            result = getContainerHostsByEnvironmentIdAndNodeGroupName( environmentId, nodeGroup );
+            result = resourceHost.getContainerHostsByNameList( cloneNames );
         }
         if ( result.size() != quantity )
         {
-            throw new PeerException(
-                    String.format( "Not all containers created (%s count=%d).", nodeGroup, quantity ) );
+            throw new PeerException( String.format(
+                    "Not all containers created for %s. Count of cloned container=%d. Expected count=%d).",
+                    resourceHost, result.size(), quantity ) );
         }
         return result;
     }
-
-
-    //    public ContainerHost createContainer( final ResourceHost resourceHost, final UUID creatorPeerId,
-    //                                          final UUID environmentId, final List<Template> templates,
-    //                                          final String containerName ) throws PeerException
-    //    {
-    //        return resourceHost.createContainer( creatorPeerId, environmentId, templates, containerName );
-    //    }
-
-
-    //    @Override
-    //    public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
-    //                                                final List<Template> templates, final int quantity,
-    //                                                final String strategyId, final List<Criteria> criteria )
-    //            throws ContainerCreateException
-    //    {
-    //        Set<ContainerHost> result = new HashSet<>();
-    //        try
-    //        {
-    //            for ( Template t : templates )
-    //            {
-    //                if ( t.isRemote() )
-    //                {
-    //                    tryToRegister( t );
-    //                }
-    //            }
-    //            String templateName = templates.get( templates.size() - 1 ).getTemplateName();
-    //            Set<Agent> agents = containerManager.clone( environmentId, templateName, quantity, strategyId,
-    // criteria );
-    //
-    //
-    //            for ( Agent agent : agents )
-    //            {
-    //                ResourceHost resourceHost = getResourceHostByName( agent.getParentHostName() );
-    //                ContainerHost containerHost = new ContainerHost( agent, getId(), environmentId );
-    //                containerHost.setParentAgent( resourceHost.getAgent() );
-    //                containerHost.setCreatorPeerId( creatorPeerId );
-    //                containerHost.setTemplateName( templateName );
-    //                containerHost.updateHeartbeat();
-    //                resourceHost.addContainerHost( containerHost );
-    //                result.add( containerHost );
-    //                peerDAO.saveInfo( SOURCE_MANAGEMENT, managementHost.getId().toString(), managementHost );
-    //            }
-    //        }
-    //        catch ( PeerException | RegistryException e )
-    //        {
-    //            throw new ContainerCreateException( e.toString() );
-    //        }
-    //        return result;
-    //    }
 
 
     @Override
@@ -336,8 +287,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
                             .createContainer( this, creatorPeerId, environmentId, templates, cloneName, nodeGroupName );
                 }
             }
+            HashSet<ContainerHost> result = new HashSet<>();
 
-            return waitContainerHosts( environmentId, nodeGroupName, quantity );
+            for ( final Map.Entry<ResourceHost, Set<String>> e : cloneNames.entrySet() )
+            {
+                ResourceHost rh = e.getKey();
+                Set<String> clones = e.getValue();
+                result.addAll( waitContainerHosts( rh, clones ) );
+            }
+            return result;
         }
         catch ( Exception e )
         {
@@ -351,21 +309,43 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     @Override
     public void onPeerEvent( PeerEvent event )
     {
-        switch ( event.getType() )
+        LOG.info( String.format( "Received onPeerEvent: %s %s.", event.getType(), event.getObject() ) );
+        try
         {
-            case CONTAINER_CREATE_SUCCESS:
-                ContainerHost containerHost = ( ContainerHost ) event.getObject();
-                try
-                {
-                    ResourceHost resourceHost = getResourceHostByName( containerHost.getParentHostname() );
-                    resourceHost.addContainerHost( containerHost );
-                    peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
-                }
-                catch ( PeerException e )
-                {
-                    LOG.error( "Error in onPeerEvent", e );
-                }
-                break;
+            switch ( event.getType() )
+            {
+                case CONTAINER_CREATE_SUCCESS:
+                    ContainerHost containerHost = ( ContainerHost ) event.getObject();
+                    try
+                    {
+                        ResourceHost resourceHost = getResourceHostByName( containerHost.getParentHostname() );
+                        if ( resourceHost == null )
+                        {
+                            throw new PeerException( "Resource host not found to register container." );
+                        }
+                        LOG.info( String.format( "Resource host %s. Containers count: =%d", resourceHost.getHostname(),
+                                resourceHost.getContainerHosts().size() ) );
+                        resourceHost.addContainerHost( containerHost );
+                        LOG.info( String.format( "Registered new container: %s %s %s", containerHost.getHostname(),
+                                containerHost.getEnvironmentId(), containerHost.getNodeGroupName() ) );
+                        peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
+                        LOG.info( String.format( "Resource host %s saved. Containers count: =%d",
+                                resourceHost.getHostname(), resourceHost.getContainerHosts().size() ) );
+                    }
+                    catch ( PeerException e )
+                    {
+                        LOG.error( "Error in onPeerEvent", e );
+                    }
+                    break;
+                case CONTAINER_CREATE_FAIL:
+                    Exception e = ( Exception ) event.getObject();
+                    LOG.error( "Container clone failed.", e );
+                    break;
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "onPeerEvent: unhandled exception.", e );
         }
     }
 
@@ -461,26 +441,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
             result.addAll( resourceHost.getContainerHostsByEnvironmentId( environmentId ) );
-        }
-        return result;
-    }
-
-
-    private Set<ContainerHost> getContainerHostsByEnvironmentIdAndNodeGroupName( final UUID environmentId,
-                                                                                 String nodeGroupName )
-            throws PeerException
-    {
-        Set<ContainerHost> result = new HashSet<>();
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            Set<ContainerHost> containerHosts = resourceHost.getContainerHostsByEnvironmentId( environmentId );
-            for ( ContainerHost containerHost : containerHosts )
-            {
-                if ( nodeGroupName.equals( containerHost.getNodeGroupName() ) )
-                {
-                    result.add( containerHost );
-                }
-            }
         }
         return result;
     }
@@ -800,47 +760,36 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     public CommandResult execute( final RequestBuilder requestBuilder, final Host aHost,
                                   final CommandCallback callback ) throws CommandException
     {
-        Host host = null;
+        Preconditions.checkNotNull( requestBuilder );
+        Preconditions.checkNotNull( hashCode() );
+
+        Host host;
         try
         {
             host = bindHost( aHost.getId() );
         }
         catch ( PeerException e )
         {
-            throw new CommandException( "Host not register." );
+            throw new CommandException( "Host is not registered" );
         }
         if ( !host.isConnected() )
         {
-            throw new CommandException( "Host disconnected." );
+            throw new CommandException( "Host is not connected" );
         }
-        Agent agent = host.getAgent();
-        Command command = commandRunner.createCommand( requestBuilder, Sets.newHashSet( agent ) );
-        command.execute( new org.safehaus.subutai.core.command.api.command.CommandCallback()
-        {
-            @Override
-            public void onResponse( final Response response, final AgentResult agentResult, final Command command )
-            {
-                if ( callback != null )
-                {
-                    //TODO after migration to command executor pass response without conversion
-                    callback.onResponse( TempResponseConverter.convertResponse( response ),
-                            new CommandResultImpl( agentResult.getExitCode(), agentResult.getStdOut(),
-                                    agentResult.getStdErr(), command.getCommandStatus() ) );
-                }
-            }
-        } );
 
-        AgentResult agentResult = command.getResults().get( agent.getUuid() );
 
-        if ( agentResult != null )
+        CommandResult result;
+
+        if ( callback == null )
         {
-            return new CommandResultImpl( agentResult.getExitCode(), agentResult.getStdOut(), agentResult.getStdErr(),
-                    command.getCommandStatus() );
+            result = commandExecutor.execute( host.getId(), requestBuilder );
         }
         else
         {
-            return new CommandResultImpl( null, null, null, CommandStatus.TIMEOUT );
+            result = commandExecutor.execute( host.getId(), requestBuilder, callback );
         }
+
+        return result;
     }
 
 
@@ -848,7 +797,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     public void executeAsync( final RequestBuilder requestBuilder, final Host aHost, final CommandCallback callback )
             throws CommandException
     {
-        Host host = null;
+        Host host;
         try
         {
             host = bindHost( aHost.getId() );
@@ -861,22 +810,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
         {
             throw new CommandException( "Host disconnected." );
         }
-        final Agent agent = host.getAgent();
-        Command command = commandRunner.createCommand( requestBuilder, Sets.newHashSet( agent ) );
-        command.executeAsync( new org.safehaus.subutai.core.command.api.command.CommandCallback()
+
+
+        if ( callback == null )
         {
-            @Override
-            public void onResponse( final Response response, final AgentResult agentResult, final Command command )
-            {
-                if ( callback != null )
-                {
-                    //TODO after migration to command executor pass response without conversion
-                    callback.onResponse( TempResponseConverter.convertResponse( response ),
-                            new CommandResultImpl( agentResult.getExitCode(), agentResult.getStdOut(),
-                                    agentResult.getStdErr(), command.getCommandStatus() ) );
-                }
-            }
-        } );
+            commandExecutor.executeAsync( host.getId(), requestBuilder );
+        }
+        else
+        {
+            commandExecutor.executeAsync( host.getId(), requestBuilder, callback );
+        }
     }
 
 
@@ -974,6 +917,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     }
 
 
+    @Deprecated
     @Override
     public Agent waitForAgent( final String containerName, final int timeout )
     {

@@ -6,10 +6,12 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.storm.api.Storm;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
@@ -23,8 +25,11 @@ public class Wizard
     private final Storm storm;
     private final Tracker tracker;
     private final Zookeeper zookeeper;
+    private final EnvironmentManager environmentManager;
     private int step = 1;
     private StormClusterConfiguration config = new StormClusterConfiguration();
+    private ZookeeperClusterConfig zookeeperClusterConfig = new ZookeeperClusterConfig();
+
 
 
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -34,6 +39,7 @@ public class Wizard
         this.storm = serviceLocator.getService( Storm.class );
         this.tracker = serviceLocator.getService( Tracker.class );
         this.zookeeper = serviceLocator.getService( Zookeeper.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
@@ -56,12 +62,12 @@ public class Wizard
             }
             case 2:
             {
-                component = new NodeSelectionStep( zookeeper, this );
+                component = new NodeSelectionStep( zookeeper, this, environmentManager );
                 break;
             }
             case 3:
             {
-                component = new VerificationStep( storm, executorService, tracker, this );
+                component = new VerificationStep( storm, executorService, tracker, this, environmentManager );
                 break;
             }
             default:
@@ -109,5 +115,17 @@ public class Wizard
     public StormClusterConfiguration getConfig()
     {
         return config;
+    }
+
+
+    public ZookeeperClusterConfig getZookeeperClusterConfig()
+    {
+        return zookeeperClusterConfig;
+    }
+
+
+    public void setZookeeperClusterConfig( final ZookeeperClusterConfig zookeeperClusterConfig )
+    {
+        this.zookeeperClusterConfig = zookeeperClusterConfig;
     }
 }

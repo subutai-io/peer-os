@@ -1,13 +1,10 @@
 package org.safehaus.subutai.core.filetracker.api;
 
 
-import org.safehaus.subutai.common.exception.SubutaiException;
-
-
-public class FileTrackerException extends SubutaiException
+public class FileTrackerException extends Exception
 {
-    public FileTrackerException( final String message )
+    public FileTrackerException( final Throwable cause )
     {
-        super( message );
+        super( cause );
     }
 }

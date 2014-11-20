@@ -1,8 +1,9 @@
 #!/bin/bash 
 set -e
+accumuloVer=1.6.1
 # Remove Accumulo Files and Folders
-if [ -d "/opt/accumulo-1.4.2" ]; then
-	rm -r /opt/accumulo-1.4.2
+if [ -d "/opt/accumulo-$accumuloVer" ]; then
+	rm -r /opt/accumulo-$accumuloVer
 fi
 
 #Remove paths and exports from relevant files

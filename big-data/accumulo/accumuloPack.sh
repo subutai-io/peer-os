@@ -9,7 +9,7 @@ downloadFileAndMakeChanges() {
 	tempDirectory=$BASE/$fileName/opt
 	confDirectory=$BASE/$fileName/etc/accumulo
 
-	accumuloVersion=1.4.2
+	accumuloVersion=1.6.1
 
 	# Create directories that are required for the debian package
 	mkdir -p $tempDirectory	
@@ -17,7 +17,7 @@ downloadFileAndMakeChanges() {
 
 	# download accumulo
 	# wget http://archive.apache.org/dist/accumulo/$accumuloVersion/accumulo-$accumuloVersion-bin.tar.gz -P $tempDirectory
-	wget http://archive.apache.org/dist/accumulo/1.4.2/accumulo-1.4.2-dist.tar.gz -P $tempDirectory
+	wget http://archive.apache.org/dist/accumulo/1.6.1/accumulo-1.6.1-bin.tar.gz -P $tempDirectory
 	
 	pushd $tempDirectory
 	tar -xzpf accumulo-*.tar.gz
@@ -29,7 +29,7 @@ downloadFileAndMakeChanges() {
 	mv accumulo-$accumuloVersion/conf/* $confDirectory
 
 	# copy sample configuration files
-	cp -a $confDirectory/examples/1GB/native-standalone/* $confDirectory/
+	cp -a $confDirectory/examples/3GB/native-standalone/* $confDirectory/
 	popd
 }
 # 1) Get the sources which are downloaded from version control system

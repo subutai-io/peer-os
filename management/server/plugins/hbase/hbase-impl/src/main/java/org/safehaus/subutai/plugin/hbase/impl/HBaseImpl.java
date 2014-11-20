@@ -11,25 +11,19 @@ import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDao;
+import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
+import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
-import org.safehaus.subutai.plugin.hbase.impl.handler.CheckClusterHandler;
-import org.safehaus.subutai.plugin.hbase.impl.handler.CheckNodeHandler;
-import org.safehaus.subutai.plugin.hbase.impl.handler.InstallHandler;
-import org.safehaus.subutai.plugin.hbase.impl.handler.StartClusterHandler;
-import org.safehaus.subutai.plugin.hbase.impl.handler.StopClusterHandler;
-import org.safehaus.subutai.plugin.hbase.impl.handler.UninstallHandler;
+import org.safehaus.subutai.plugin.hbase.impl.handler.ClusterOperationHandler;
+import org.safehaus.subutai.plugin.hbase.impl.handler.NodeOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,16 +34,13 @@ public class HBaseImpl implements HBase
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( HBaseImpl.class.getName() );
-    private AgentManager agentManager;
     private Hadoop hadoopManager;
     private Tracker tracker;
     private ExecutorService executor;
-    private CommandRunner commandRunner;
     private EnvironmentManager environmentManager;
-    private ContainerManager containerManager;
-    private PluginDao pluginDAO;
-    private Commands commands;
+    private PluginDAO pluginDAO;
     private DataSource dataSource;
+    private Commands commands;
 
 
     public HBaseImpl( DataSource dataSource )
@@ -58,27 +49,15 @@ public class HBaseImpl implements HBase
     }
 
 
-    public PluginDao getPluginDAO()
+    public PluginDAO getPluginDAO()
     {
         return pluginDAO;
     }
 
 
-    public void setPluginDAO( final PluginDao pluginDAO )
+    public void setPluginDAO( final PluginDAO pluginDAO )
     {
         this.pluginDAO = pluginDAO;
-    }
-
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
     }
 
 
@@ -106,18 +85,6 @@ public class HBaseImpl implements HBase
     }
 
 
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
-    public void setCommandRunner( CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
-    }
-
-
     public EnvironmentManager getEnvironmentManager()
     {
         return environmentManager;
@@ -130,32 +97,19 @@ public class HBaseImpl implements HBase
     }
 
 
-    public ContainerManager getContainerManager()
-    {
-        return containerManager;
-    }
-
-
-    public void setContainerManager( final ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
-    }
-
-
     public void init()
     {
         try
         {
-            this.pluginDAO = new PluginDao( dataSource );
+            this.pluginDAO = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
-        this.commands = new Commands( commandRunner );
 
-        commands = new Commands( commandRunner );
-        executor = Executors.newCachedThreadPool();
+        this.commands = new Commands();
+        this.executor = Executors.newCachedThreadPool();
     }
 
 
@@ -183,118 +137,117 @@ public class HBaseImpl implements HBase
     }
 
 
-    public UUID installCluster( final HBaseClusterConfig config )
+    @Override
+    public UUID installCluster( final HBaseConfig config )
     {
         Preconditions.checkNotNull( config, "Configuration is null" );
-        AbstractOperationHandler operationHandler = new InstallHandler( this, config );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
-    }
-
-
-    public List<HBaseClusterConfig> getClusters()
-    {
-        return pluginDAO.getInfo( HBaseClusterConfig.PRODUCT_KEY, HBaseClusterConfig.class );
     }
 
 
     @Override
-    public UUID startCluster( final String clusterName )
+    public UUID destroyNode( final String clusterName, final String hostname )
     {
-        AbstractOperationHandler operationHandler = new StartClusterHandler( this, clusterName );
+        Preconditions.checkNotNull( clusterName );
+        Preconditions.checkNotNull( hostname );
+        HBaseConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, config, hostname, OperationType.EXCLUDE );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public ClusterSetupStrategy getClusterSetupStrategy( final TrackerOperation po, final HBaseConfig config,
+                                                         final Environment environment )
+    {
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
+        {
+
+            return new OverHadoopSetupStrategy( this, config, environment, po );
+        }
+        else
+        {
+            return new WithHadoopSetupStrategy( this, config, environment, po );
+        }
     }
 
 
     @Override
     public UUID stopCluster( final String clusterName )
     {
-        AbstractOperationHandler operationHandler = new StopClusterHandler( this, clusterName );
-        executor.execute( operationHandler );
+        Preconditions.checkNotNull( clusterName );
+        HBaseConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.STOP_ALL );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID checkCluster( final String clusterName )
+    public UUID startCluster( final String clusterName )
     {
-        AbstractOperationHandler operationHandler = new CheckClusterHandler( this, clusterName );
-        executor.execute( operationHandler );
+        Preconditions.checkNotNull( clusterName );
+        HBaseConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.START_ALL );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final HBaseClusterConfig config,
-                                                         final TrackerOperation po )
+    public UUID checkNode( final String clusterName, final UUID hostId )
     {
-        if ( config.getSetupType() == SetupType.OVER_HADOOP )
-        {
-            return new OverHadoopSetupStrategy( this, po, config );
-        }
-        else
-        {
-            return new WithHadoopSetupStrategy( environment, this, po, config );
-        }
-    }
-
-
-    @Override
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( final HBaseClusterConfig config )
-    {
-        return null;
-    }
-
-
-    @Override
-    public UUID checkNode( final String clustername, final String lxchostname )
-    {
-        AbstractOperationHandler operationHandler = new CheckNodeHandler( this, clustername, lxchostname );
-        executor.execute( operationHandler );
+        Preconditions.checkNotNull( clusterName );
+        HBaseConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler = new NodeOperationHandler( this, config, hostId, OperationType.STATUS );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID destroyNode( final String clustername, final String lxchostname, final String nodetype )
-    {
-        return null;
-    }
-
-
-    @Override
-    public UUID addNode( final String clustername, final String lxchostname, final String nodetype )
-    {
-        return null;
-    }
-
-
-    @Override
-    public UUID destroyCluster( final String clusterName )
-    {
-        return null;
-    }
-
-
     public UUID uninstallCluster( final String clusterName )
     {
-        AbstractOperationHandler operationHandler = new UninstallHandler( this, clusterName );
-        executor.execute( operationHandler );
+        Preconditions.checkNotNull( clusterName );
+        HBaseConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public HBaseClusterConfig getCluster( String clusterName )
+    public List<HBaseConfig> getClusters()
     {
-        return pluginDAO.getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName, HBaseClusterConfig.class );
+        return pluginDAO.getInfo( HBaseConfig.PRODUCT_KEY, HBaseConfig.class );
     }
 
 
     @Override
-    public UUID addNode( final String clusterName, final String agentHostName )
+    public HBaseConfig getCluster( String clusterName )
     {
-        return null;
+        Preconditions.checkNotNull( clusterName );
+        return pluginDAO.getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
     }
+
+
+    @Override
+    public UUID addNode( final String clusterName, final String nodeType )
+    {
+        Preconditions.checkNotNull( clusterName );
+        Preconditions.checkNotNull( nodeType );
+        HBaseConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, config, nodeType, OperationType.INCLUDE );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+
 }
+

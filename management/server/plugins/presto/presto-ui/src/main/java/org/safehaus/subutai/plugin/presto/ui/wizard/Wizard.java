@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -25,6 +26,7 @@ public class Wizard
     private final ExecutorService executorService;
     private final Tracker tracker;
     private int step = 1;
+    private final EnvironmentManager environmentManager;
     private PrestoClusterConfig config = new PrestoClusterConfig();
     private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
 
@@ -33,10 +35,10 @@ public class Wizard
     {
 
         this.executorService = executorService;
-
         this.hadoop = serviceLocator.getService( Hadoop.class );
         this.presto = serviceLocator.getService( Presto.class );
         this.tracker = serviceLocator.getService( Tracker.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
@@ -59,12 +61,12 @@ public class Wizard
             }
             case 2:
             {
-                component = new ConfigurationStep( hadoop, this );
+                component = new ConfigurationStep( hadoop, this, environmentManager  );
                 break;
             }
             case 3:
             {
-                component = new VerificationStep( presto, executorService, tracker, this );
+                component = new VerificationStep( presto, executorService, tracker, environmentManager, this );
                 break;
             }
             default:
@@ -118,5 +120,10 @@ public class Wizard
     public HadoopClusterConfig getHadoopConfig()
     {
         return hadoopConfig;
+    }
+
+
+    public void setHadoopConfig(HadoopClusterConfig hadoopConfig) {
+        this.hadoopConfig = hadoopConfig;
     }
 }
