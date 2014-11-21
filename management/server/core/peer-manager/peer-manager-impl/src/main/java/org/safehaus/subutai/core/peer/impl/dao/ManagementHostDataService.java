@@ -4,27 +4,31 @@ package org.safehaus.subutai.core.peer.impl.dao;
 import java.util.Collection;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.core.peer.impl.model.ManagementHostEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
 
 public class ManagementHostDataService implements DataService<String, ManagementHostEntity>
 {
-    EntityManager em;
+    private static final Logger LOG = LoggerFactory.getLogger( ManagementHostDataService.class );
+    EntityManagerFactory emf;
 
 
-    public ManagementHostDataService( EntityManager entityManager )
+    public ManagementHostDataService( EntityManagerFactory entityManagerFactory )
     {
-        this.em = entityManager;
+        this.emf = entityManagerFactory;
     }
 
 
-    public void setEntityManager( final EntityManager em )
+    public void setEntityManagerFactory( final EntityManagerFactory emf )
     {
-        this.em = em;
+        this.emf = emf;
     }
 
 
@@ -32,6 +36,7 @@ public class ManagementHostDataService implements DataService<String, Management
     public ManagementHostEntity find( final String id )
     {
         ManagementHostEntity result = null;
+        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -40,10 +45,15 @@ public class ManagementHostDataService implements DataService<String, Management
         }
         catch ( Exception e )
         {
+            LOG.error( e.toString(), e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
             }
+        }
+        finally
+        {
+            em.close();
         }
         return result;
     }
@@ -53,6 +63,7 @@ public class ManagementHostDataService implements DataService<String, Management
     public Collection<ManagementHostEntity> getAll()
     {
         Collection<ManagementHostEntity> result = Lists.newArrayList();
+        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -62,10 +73,15 @@ public class ManagementHostDataService implements DataService<String, Management
         }
         catch ( Exception e )
         {
+            LOG.error( e.toString(), e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
             }
+        }
+        finally
+        {
+            em.close();
         }
         return result;
     }
@@ -74,6 +90,7 @@ public class ManagementHostDataService implements DataService<String, Management
     @Override
     public void persist( final ManagementHostEntity item )
     {
+        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -83,10 +100,15 @@ public class ManagementHostDataService implements DataService<String, Management
         }
         catch ( Exception e )
         {
+            LOG.error( e.toString(), e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
             }
+        }
+        finally
+        {
+            em.close();
         }
     }
 
@@ -94,6 +116,7 @@ public class ManagementHostDataService implements DataService<String, Management
     @Override
     public void remove( final ManagementHostEntity item )
     {
+        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -102,10 +125,15 @@ public class ManagementHostDataService implements DataService<String, Management
         }
         catch ( Exception e )
         {
+            LOG.error( e.toString(), e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
             }
+        }
+        finally
+        {
+            em.close();
         }
     }
 
@@ -113,6 +141,7 @@ public class ManagementHostDataService implements DataService<String, Management
     @Override
     public void update( final ManagementHostEntity item )
     {
+        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -121,10 +150,15 @@ public class ManagementHostDataService implements DataService<String, Management
         }
         catch ( Exception e )
         {
+            LOG.error( e.toString(), e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
             }
+        }
+        finally
+        {
+            em.close();
         }
     }
 }

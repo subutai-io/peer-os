@@ -54,6 +54,13 @@ public abstract class SubutaiHost implements Host
     //    }
 
 
+    @Override
+    public String getHostId()
+    {
+        return this.getId() != null ? this.getId().toString() : null;
+    }
+
+
     public Agent getAgent()
     {
         return agent;

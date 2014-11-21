@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
@@ -63,7 +62,7 @@ public class PeerManagerImpl implements PeerManager
     private CommandResponseListener commandResponseListener;
     private Set<RequestListener> requestListeners = Sets.newHashSet();
     private MessageResponseListener messageResponseListener;
-    private EntityManager entityManager;
+    private EntityManagerFactory entityManagerFactory;
     private HostRegistry hostRegistry;
 
 
@@ -77,7 +76,7 @@ public class PeerManagerImpl implements PeerManager
 
     public void setEntityManagerFactory( EntityManagerFactory entityManagerFactory )
     {
-        this.entityManager = entityManagerFactory.createEntityManager();
+        this.entityManagerFactory = entityManagerFactory;
     }
 
 
@@ -87,9 +86,9 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    public EntityManager getEntityManager()
+    public EntityManagerFactory getEntityManagerFactory()
     {
-        return entityManager;
+        return entityManagerFactory;
     }
 
 

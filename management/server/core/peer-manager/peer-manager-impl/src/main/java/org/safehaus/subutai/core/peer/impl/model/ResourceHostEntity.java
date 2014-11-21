@@ -19,9 +19,10 @@ import java.util.regex.Pattern;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
@@ -51,19 +52,31 @@ import com.google.common.cache.CacheBuilder;
  * Resource host implementation.
  */
 @Entity
-@DiscriminatorValue( "R" )
+@Table( name = "resource_host" )
 @Access( AccessType.FIELD )
 public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost, HostListener
 {
+    @javax.persistence.Transient
     transient private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
+    @javax.persistence.Transient
     transient private static final Pattern LOAD_AVERAGE_PATTERN = Pattern.compile( "load average: (.*)" );
+    @javax.persistence.Transient
     transient private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
+    @javax.persistence.Transient
     transient private static final int HOST_EXPIRATION = 60;
+    @javax.persistence.Transient
     transient private ExecutorService executor;
+    @javax.persistence.Transient
     protected Cache<UUID, ContainerHostInfo> hostCache;
 
-    @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL )
+    @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity =
+            ContainerHostEntity.class )
     Set<ContainerHost> containersHosts = new HashSet();
+
+
+    private ResourceHostEntity()
+    {
+    }
 
 
     public ResourceHostEntity( final String peerId, final HostInfo resourceHostInfo )
@@ -382,7 +395,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             ContainerHost host = ( ContainerHost ) iterator.next();
 
-            if ( host.getId().equals( id ) )
+            if ( host.getHostId().equals( id ) )
             {
                 result = host;
             }
@@ -679,7 +692,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
         host.setParent( this );
-        containersHosts.add( host );
+        containersHosts.add( ( ContainerHostEntity ) host );
     }
 
 

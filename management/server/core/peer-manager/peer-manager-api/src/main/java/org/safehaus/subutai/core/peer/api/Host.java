@@ -32,6 +32,8 @@ public interface Host extends Serializable
 
     public UUID getId();
 
+    public String getHostId();
+
     public String getParentHostname();
 
     public String getHostname();

@@ -4,27 +4,31 @@ package org.safehaus.subutai.core.peer.impl.dao;
 import java.util.Collection;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.core.peer.impl.model.ResourceHostEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
 
 public class ResourceHostDataService implements DataService<String, ResourceHostEntity>
 {
-    EntityManager em;
+    private static final Logger LOG = LoggerFactory.getLogger( ResourceHostDataService.class );
+    EntityManagerFactory emf;
 
 
-    public ResourceHostDataService( EntityManager entityManager )
+    public ResourceHostDataService( EntityManagerFactory entityManagerFactory )
     {
-        this.em = entityManager;
+        this.emf = entityManagerFactory;
     }
 
 
-    public void setEntityManager( final EntityManager em )
+    public void setEntityManagerFactory( final EntityManagerFactory emf )
     {
-        this.em = em;
+        this.emf = emf;
     }
 
 
@@ -32,6 +36,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
     public ResourceHostEntity find( final String id )
     {
         ResourceHostEntity result = null;
+        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -40,10 +45,15 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
         }
         catch ( Exception e )
         {
+            LOG.error( e.toString(), e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
             }
+        }
+        finally
+        {
+            em.close();
         }
         return result;
     }
@@ -53,6 +63,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
     public Collection<ResourceHostEntity> getAll()
     {
         Collection<ResourceHostEntity> result = Lists.newArrayList();
+        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -61,10 +72,15 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
         }
         catch ( Exception e )
         {
+            LOG.error( e.toString(), e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
             }
+        }
+        finally
+        {
+            em.close();
         }
         return result;
     }
@@ -73,6 +89,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
     @Override
     public void persist( final ResourceHostEntity item )
     {
+        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -82,10 +99,15 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
         }
         catch ( Exception e )
         {
+            LOG.error( e.toString(), e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
             }
+        }
+        finally
+        {
+            em.close();
         }
     }
 
@@ -93,6 +115,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
     @Override
     public void remove( final ResourceHostEntity item )
     {
+        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -101,10 +124,15 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
         }
         catch ( Exception e )
         {
+            LOG.error( e.toString(), e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
             }
+        }
+        finally
+        {
+            em.close();
         }
     }
 
@@ -112,6 +140,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
     @Override
     public void update( final ResourceHostEntity item )
     {
+        EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
@@ -120,10 +149,15 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
         }
         catch ( Exception e )
         {
+            LOG.error( e.toString(), e );
             if ( em.getTransaction().isActive() )
             {
                 em.getTransaction().rollback();
             }
+        }
+        finally
+        {
+            em.close();
         }
     }
 }

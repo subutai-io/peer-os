@@ -19,7 +19,6 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.safehaus.subutai.common.command.CommandCallback;
@@ -45,9 +44,7 @@ import com.google.common.base.Preconditions;
  * Base Subutai host class.
  */
 @Entity
-@Table( name = "host" )
-@Inheritance( strategy = InheritanceType.SINGLE_TABLE )
-@DiscriminatorColumn( name = "host_type", discriminatorType = DiscriminatorType.STRING, length = 1 )
+@Inheritance( strategy = InheritanceType.TABLE_PER_CLASS )
 @Access( AccessType.FIELD )
 public abstract class AbstractSubutaiHost implements Host
 {
@@ -82,7 +79,7 @@ public abstract class AbstractSubutaiHost implements Host
 
         for ( Interface s : hostInfo.getInterfaces() )
         {
-            sb.append( s.getIp() + ";" );
+            sb.append( s.getIp().replace( "addr:", "" ) + ";" );
             addInterface( new HostInterface( s ) );
         }
         this.netInterfaces = sb.toString();

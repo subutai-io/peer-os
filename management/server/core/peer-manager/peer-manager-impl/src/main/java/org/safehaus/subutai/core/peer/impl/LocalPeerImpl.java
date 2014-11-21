@@ -125,16 +125,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
         //            managementHost.resetHeartbeat();
         //        }
 
-        managementHostDataService = new ManagementHostDataService( peerManager.getEntityManager() );
+        managementHostDataService = new ManagementHostDataService( peerManager.getEntityManagerFactory() );
         Collection allManagementHostEntity = managementHostDataService.getAll();
         if ( allManagementHostEntity != null && allManagementHostEntity.size() > 0 )
         {
             managementHost = ( ManagementHost ) allManagementHostEntity.iterator().next();
         }
 
-        resourceHostDataService = new ResourceHostDataService( peerManager.getEntityManager() );
+        resourceHostDataService = new ResourceHostDataService( peerManager.getEntityManagerFactory() );
 
-        resourceHosts = Sets.newHashSet( peerDAO.getInfo( SOURCE_RESOURCE_HOST, ResourceHost.class ) );
+        resourceHosts = Sets.newHashSet();
+        resourceHosts.addAll( resourceHostDataService.getAll() );
 
         for ( ResourceHost resourceHost : resourceHosts )
         {
@@ -469,7 +470,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
     {
         Host result = null;
         ManagementHost managementHost = getManagementHost();
-        if ( managementHost != null && managementHost.getId().equals( id ) )
+        if ( managementHost != null && managementHost.getHostId().equals( id ) )
         {
             result = managementHost;
         }
@@ -479,7 +480,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
             while ( result == null && iterator.hasNext() )
             {
                 ResourceHost rh = iterator.next();
-                if ( rh.getId().equals( id ) )
+                if ( rh.getHostId().equals( id ) )
                 {
                     result = rh;
                 }
@@ -924,7 +925,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
                     LOG.error( e.toString() );
                 }
             }
-            //            managementHost.updateHeartbeat();
+            managementHost.updateHeartbeat();
             //            peerDAO.saveInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId().toString(), managementHost );
             return;
         }
@@ -934,24 +935,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
             try
             {
                 host = getResourceHostByName( resourceHostInfo.getHostname() );
-
-                if ( host == null )
-                {
-                    host = new ResourceHostEntity( getId().toString(), resourceHostInfo );
-                    resourceHostDataService.persist( ( ResourceHostEntity ) host );
-                }
-                else
-                {
-                    host.onHeartbeat( resourceHostInfo );
-                }
+                host.onHeartbeat( resourceHostInfo );
             }
             catch ( PeerException e )
             {
-                //                host = new ResourceHost( resourceHostInfo );
-                //                host.setParentAgent( NullAgent.getInstance() );
-                //                addResourceHost( host );
+                host = new ResourceHostEntity( getId().toString(), resourceHostInfo );
+                resourceHostDataService.persist( ( ResourceHostEntity ) host );
+                addResourceHost( host );
             }
-            //            host.updateHeartbeat();
+            host.updateHeartbeat();
             //            peerDAO.saveInfo( SOURCE_RESOURCE_HOST, host.getId().toString(), host );
             return;
         }

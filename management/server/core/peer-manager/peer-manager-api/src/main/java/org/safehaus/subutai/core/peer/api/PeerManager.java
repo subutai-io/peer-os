@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 
 public interface PeerManager
@@ -44,5 +45,5 @@ public interface PeerManager
 
     public void removeRequestListener( RequestListener listener );
 
-    EntityManager getEntityManager();
+    EntityManagerFactory getEntityManagerFactory();
 }

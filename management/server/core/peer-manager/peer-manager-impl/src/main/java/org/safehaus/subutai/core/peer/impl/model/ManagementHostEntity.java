@@ -4,8 +4,8 @@ package org.safehaus.subutai.core.peer.impl.model;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
@@ -18,7 +18,7 @@ import org.safehaus.subutai.core.peer.impl.Commands;
 
 
 @Entity
-@DiscriminatorValue( "M" )
+@Table( name = "management_host" )
 @Access( AccessType.FIELD )
 public class ManagementHostEntity extends AbstractSubutaiHost implements ManagementHost
 {

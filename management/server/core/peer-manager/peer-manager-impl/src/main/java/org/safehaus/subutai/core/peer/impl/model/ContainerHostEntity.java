@@ -4,12 +4,12 @@ package org.safehaus.subutai.core.peer.impl.model;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
@@ -25,11 +25,11 @@ import org.safehaus.subutai.core.peer.api.ResourceHost;
  * ContainerHost class.
  */
 @Entity
-@DiscriminatorValue( "C" )
+@Table( name = "container_host" )
 @Access( AccessType.FIELD )
 public class ContainerHostEntity extends AbstractSubutaiHost implements ContainerHost
 {
-    @OneToMany
+    @ManyToOne( targetEntity = ResourceHostEntity.class )
     @JoinColumn( name = "parent_id" )
     private ResourceHost parent;
     @Column( name = "env_id", nullable = false )
@@ -44,6 +44,11 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     private ContainerState state = ContainerState.UNKNOWN;
     @Column( name = "node_group_name", nullable = false )
     private String nodeGroupName;
+
+
+    private ContainerHostEntity()
+    {
+    }
 
 
     public ContainerHostEntity( String peerId, String creatorPeerId, String environmentId, HostInfo hostInfo )
@@ -134,7 +139,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public void setParent( final ResourceHost parent )
     {
-        this.parent = parent;
+        this.parent = ( ResourceHostEntity ) parent;
     }
 
 
