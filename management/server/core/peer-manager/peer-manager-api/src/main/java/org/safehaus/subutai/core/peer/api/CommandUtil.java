@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
@@ -88,6 +89,49 @@ public class CommandUtil
                 }
             }
         } );
+    }
+
+
+    /**
+     * Allows to execute the same command on multiple hosts in parallel, with the same callback for reponses from each
+     * host
+     *
+     * @param requestBuilder - request
+     * @param hosts - hosts
+     * @param callback - callback
+     *
+     * @throws CommandException - exception thrown if something went wrong
+     */
+
+    public void executeAsync( RequestBuilder requestBuilder, Set<Host> hosts, final CommandCallback callback )
+            throws CommandException
+    {
+
+        Preconditions.checkNotNull( requestBuilder );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( hosts ) );
+        Preconditions.checkNotNull( callback );
+
+        final ReentrantLock lock = new ReentrantLock( true );
+
+        for ( Host host : hosts )
+        {
+            host.executeAsync( requestBuilder, new CommandCallback()
+            {
+                @Override
+                public void onResponse( final Response response, final CommandResult commandResult )
+                {
+                    lock.lock();
+                    try
+                    {
+                        callback.onResponse( response, commandResult );
+                    }
+                    finally
+                    {
+                        lock.unlock();
+                    }
+                }
+            } );
+        }
     }
 
 

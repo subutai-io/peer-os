@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.messenger.impl;
 
 
+import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
@@ -22,7 +23,6 @@ import org.safehaus.subutai.core.messenger.api.MessageListener;
 import org.safehaus.subutai.core.messenger.api.MessageStatus;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.slf4j.Logger;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -58,8 +58,6 @@ public class MessengerImplTest
     @Mock
     ExecutorService notificationExecutor;
     @Mock
-    Logger logger;
-    @Mock
     MessengerDao messengerDao;
     @Mock
     LocalPeer localPeer;
@@ -81,7 +79,6 @@ public class MessengerImplTest
         messenger.messageSender = messageSender;
         messenger.notificationExecutor = notificationExecutor;
         messenger.messengerDao = messengerDao;
-        messenger.LOG = logger;
         when( localPeer.getId() ).thenReturn( LOCAL_PEER_ID );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
     }
@@ -128,8 +125,8 @@ public class MessengerImplTest
         messenger.sendMessage( localPeer, message, RECIPIENT, TIME_TO_LIVE );
 
         verify( messengerDao ).saveEnvelope( isA( Envelope.class ) );
-
-        doThrow( new DaoException( "" ) ).when( messengerDao ).saveEnvelope( any( Envelope.class ) );
+        DaoException exception = mock( DaoException.class );
+        doThrow( exception ).when( messengerDao ).saveEnvelope( any( Envelope.class ) );
 
         try
         {
@@ -139,7 +136,7 @@ public class MessengerImplTest
         catch ( MessageException e )
         {
         }
-        verify( logger ).error( anyString(), isA( DaoException.class ) );
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 
 
@@ -184,7 +181,8 @@ public class MessengerImplTest
         assertEquals( MessageStatus.SENT, status );
 
         //test exception
-        doThrow( new DaoException( "" ) ).when( messengerDao ).getEnvelope( MESSAGE_ID );
+        DaoException exception = mock( DaoException.class );
+        doThrow( exception ).when( messengerDao ).getEnvelope( MESSAGE_ID );
         try
         {
             messenger.getMessageStatus( MESSAGE_ID );
@@ -194,7 +192,7 @@ public class MessengerImplTest
         {
         }
 
-        verify( logger ).error( anyString(), isA( DaoException.class ) );
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 
 
@@ -237,7 +235,5 @@ public class MessengerImplTest
         catch ( MessageException e )
         {
         }
-
-        verify( logger ).error( anyString(), any( Exception.class ) );
     }
 }

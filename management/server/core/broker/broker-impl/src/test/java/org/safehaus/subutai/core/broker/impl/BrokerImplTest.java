@@ -80,6 +80,8 @@ public class BrokerImplTest
         when( session.createProducer( any( Destination.class ) ) ).thenReturn( producer );
         when( session.createConsumer( any( Destination.class ) ) ).thenReturn( consumer );
         when( session.createBytesMessage() ).thenReturn( mock( BytesMessage.class ) );
+        when( byteMessageListener.getTopic() ).thenReturn( Topic.RESPONSE_TOPIC );
+        when( textMessageListener.getTopic() ).thenReturn( Topic.RESPONSE_TOPIC );
         broker.pool = pool;
         broker.messageRouter = messageRouter;
     }

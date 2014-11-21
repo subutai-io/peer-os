@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.shark.rest;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.DELETE;
@@ -41,7 +40,7 @@ public class RestService
     {
 
         List<SharkClusterConfig> configList = sharkManager.getClusters();
-        ArrayList<String> clusterNames = Lists.newArrayList();
+        List<String> clusterNames = Lists.newArrayList();
 
         for ( SharkClusterConfig config : configList )
         {

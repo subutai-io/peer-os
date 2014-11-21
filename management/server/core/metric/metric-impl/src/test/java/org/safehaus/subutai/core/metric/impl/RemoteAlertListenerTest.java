@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.metric.impl;
 
 
+import java.io.PrintStream;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,16 +10,15 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.peer.api.Payload;
-import org.slf4j.Logger;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.isA;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith( MockitoJUnitRunner.class )
 public class RemoteAlertListenerTest
 {
 
@@ -27,8 +28,7 @@ public class RemoteAlertListenerTest
     Payload payload;
     @Mock
     ContainerHostMetricImpl metric;
-    @Mock
-    Logger logger;
+
 
     RemoteAlertListener remoteAlertListener;
 
@@ -37,7 +37,6 @@ public class RemoteAlertListenerTest
     public void setUp() throws Exception
     {
         remoteAlertListener = new RemoteAlertListener( monitor );
-        remoteAlertListener.LOG = logger;
     }
 
 
@@ -50,10 +49,12 @@ public class RemoteAlertListenerTest
 
         verify( monitor ).alertThresholdExcess( metric );
 
-        doThrow( new MonitorException( "" ) ).when( monitor ).alertThresholdExcess( metric );
+        MonitorException exception = mock( MonitorException.class );
+
+        doThrow( exception ).when( monitor ).alertThresholdExcess( metric );
 
         remoteAlertListener.onRequest( payload );
 
-        verify( logger ).error( anyString(), isA( MonitorException.class ) );
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 }
