@@ -38,15 +38,15 @@ import com.vaadin.ui.TextField;
 public class TerminalForm extends CustomComponent implements Disposable
 {
 
-    private final HostTree hostTree;
     private final TextField programTxtFld;
     private final TextField timeoutTxtFld;
     private final TextField workDirTxtFld;
     private final TextField runAsTxtFld;
     private final ComboBox requestTypeCombo;
     private final Label indicator;
-    private TextArea commandOutputTxtArea;
-    private AtomicInteger taskCount = new AtomicInteger();
+    private final AtomicInteger taskCount = new AtomicInteger();
+    protected HostTree hostTree;
+    protected TextArea commandOutputTxtArea;
 
 
     public TerminalForm( final CommandExecutor commandExecutor, final HostRegistry hostRegistry )
