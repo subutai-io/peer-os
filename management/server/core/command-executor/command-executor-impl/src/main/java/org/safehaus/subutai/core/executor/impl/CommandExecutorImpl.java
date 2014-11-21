@@ -20,8 +20,6 @@ import com.google.common.base.Preconditions;
 
 /**
  * Implementation of CommandExecutor
- *
- * TODO refactor RequestBuilder and its build method after migration to new agent
  */
 public class CommandExecutorImpl implements CommandExecutor
 {

@@ -13,6 +13,7 @@ import org.safehaus.subutai.core.broker.api.Broker;
 import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
+import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistryException;
@@ -33,6 +34,7 @@ import com.google.common.collect.Sets;
 public class HostRegistryImpl implements HostRegistry
 {
     private static final Logger LOG = LoggerFactory.getLogger( HostRegistryImpl.class.getName() );
+    private static final String HOST_NOT_CONNECTED_MSG = "Host %s is not connected";
     //timeout after which host expires in seconds
     private final int hostExpiration;
 
@@ -72,7 +74,7 @@ public class HostRegistryImpl implements HostRegistry
             }
         }
 
-        throw new HostDisconnectedException( String.format( "Host %s is not connected", id.toString() ) );
+        throw new HostDisconnectedException( String.format( HOST_NOT_CONNECTED_MSG, id.toString() ) );
     }
 
 
@@ -92,7 +94,7 @@ public class HostRegistryImpl implements HostRegistry
             }
         }
 
-        throw new HostDisconnectedException( String.format( "Host %s is not connected", hostname ) );
+        throw new HostDisconnectedException( String.format( HOST_NOT_CONNECTED_MSG, hostname ) );
     }
 
 
@@ -123,7 +125,7 @@ public class HostRegistryImpl implements HostRegistry
             }
         }
 
-        throw new HostDisconnectedException( String.format( "Host %s is not connected", id.toString() ) );
+        throw new HostDisconnectedException( String.format( HOST_NOT_CONNECTED_MSG, id.toString() ) );
     }
 
 
@@ -140,7 +142,7 @@ public class HostRegistryImpl implements HostRegistry
             }
         }
 
-        throw new HostDisconnectedException( String.format( "Host %s is not connected", hostname ) );
+        throw new HostDisconnectedException( String.format( HOST_NOT_CONNECTED_MSG, hostname ) );
     }
 
 
@@ -169,6 +171,22 @@ public class HostRegistryImpl implements HostRegistry
         }
 
         throw new HostDisconnectedException( "Host is not connected" );
+    }
+
+
+    @Override
+    public HostInfo getHostInfoById( final UUID hostId ) throws HostDisconnectedException
+    {
+        try
+        {
+            return getContainerHostInfoById( hostId );
+        }
+        catch ( HostDisconnectedException e )
+        {
+            LOG.debug( "Host not found among containers", e );
+
+            return getResourceHostInfoById( hostId );
+        }
     }
 
 
