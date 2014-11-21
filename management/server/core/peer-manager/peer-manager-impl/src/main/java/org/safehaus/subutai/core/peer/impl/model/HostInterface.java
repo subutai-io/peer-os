@@ -45,7 +45,7 @@ public class HostInterface implements Interface, Serializable
     public HostInterface( final Interface s )
     {
         this.interfaceName = s.getInterfaceName();
-        this.ip = s.getIp();
+        this.ip = s.getIp().replace( "addr:", "" );
         this.mac = s.getMac();
     }
 

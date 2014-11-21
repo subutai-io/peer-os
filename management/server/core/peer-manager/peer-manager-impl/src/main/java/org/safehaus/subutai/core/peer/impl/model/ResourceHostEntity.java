@@ -410,17 +410,21 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         Template template = templates.get( templates.size() - 1 );
 
         prepareTemplates( templates );
-        boolean cloneResult = run( Command.CLONE, template.getTemplateName(), containerName, environmentId.toString() );
-        if ( cloneResult )
-        {
-            return waitHeartbeatAndCreateContainerHost( containerName, template.getTemplateName(), environmentId,
-                    creatorPeerId );
-        }
-        else
+        boolean cloneResult = run( Command.CLONE, template.getTemplateName(), containerName );
+
+        ContainerHost result =
+                waitHeartbeatAndCreateContainerHost( containerName, template.getTemplateName(), environmentId,
+                        creatorPeerId );
+
+        if ( result == null )
         {
             throw new ResourceHostException(
                     String.format( "Unable create container %s on %s using template %s", containerName, getHostname(),
                             template.getTemplateName() ), null );
+        }
+        else
+        {
+            return result;
         }
     }
 
@@ -456,15 +460,18 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                                                                final String envId, final String creatorPeerId )
             throws PeerException
     {
-        HostInfo hostInfo = waitHeartbeat( containerName, 120 );
+        HostInfo hostInfo = waitHeartbeat( containerName, 5 );
         if ( hostInfo == null )
         {
-            throw new ResourceHostException( "Container successfully created, but heartbeat not received.", null );
+            throw new ResourceHostException( "Heartbeat from container not received.", null );
         }
-        ContainerHost containerHost = new ContainerHostEntity( getPeerId(), creatorPeerId, envId, hostInfo );
+        ContainerHost containerHost =
+                new ContainerHostEntity( getPeerId(), creatorPeerId, envId, this.getHostname(), hostInfo );
         containerHost.setCreatorPeerId( creatorPeerId );
         containerHost.setTemplateName( templateName );
+        containerHost.setTemplateArch( "amd64" );
         containerHost.updateHeartbeat();
+        addContainerHost( containerHost );
         return containerHost;
     }
 
@@ -691,8 +698,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throw new IllegalArgumentException( "Container host could not be null." );
         }
 
-        host.setParent( this );
-        containersHosts.add( ( ContainerHostEntity ) host );
+        ( ( ContainerHostEntity ) host ).setParent( this );
+        containersHosts.add( host );
     }
 
 
@@ -742,7 +749,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     enum Command
     {
         LIST_TEMPLATES( "subutai list -t %s" ),
-        CLONE( "subutai clone %s %s -e %s &" ),
+        CLONE( "subutai clone %s %s", 100 ),
         DESTROY( "subutai destroy %s" ),
         IMPORT( "subutai import %s" ),
         PROMOTE( "promote %s" ),
@@ -757,6 +764,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         APT_GET_UPDATE( "apt-get update", 240 );
 
         String script;
+        boolean daemon = false;
         int timeout = 180;
 
 
@@ -773,11 +781,23 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
 
+        Command( String script, int timeout, boolean daemon )
+        {
+            this.script = script;
+            this.timeout = timeout;
+            this.daemon = daemon;
+        }
+
+
         public RequestBuilder build( String... args )
         {
             String s = String.format( this.script, args );
             RequestBuilder rb = new RequestBuilder( s );
             rb.withTimeout( timeout );
+            if ( daemon )
+            {
+                rb.daemon();
+            }
             return rb;
         }
     }

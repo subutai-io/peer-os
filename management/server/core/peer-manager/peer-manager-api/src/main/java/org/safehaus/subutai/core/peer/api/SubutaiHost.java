@@ -166,12 +166,12 @@ public abstract class SubutaiHost implements Host
         return agent.getUuid();
     }
 
-
-    @Override
-    public String getParentHostname()
-    {
-        return agent.getParentHostName();
-    }
+//
+//    @Override
+//    public String getParentHostname()
+//    {
+//        return agent.getParentHostName();
+//    }
 
 
     @Override

@@ -11,15 +11,52 @@ import java.util.UUID;
  */
 public interface LocalPeer extends Peer
 {
-    public Host bindHost( String id ) throws PeerException;
+    /**
+     * Binds host with given ID
+     *
+     * @param id ID of the host
+     *
+     * @return if host is registered and connected returns implementation of this host, otherwise throws exception.
+     */
+    public Host bindHost( String id ) throws HostNotFoundException, HostNotConnectedException;
 
-    public Host bindHost( UUID id ) throws PeerException;
+    /**
+     * Binds host with given ID
+     *
+     * @param id ID of the host
+     *
+     * @return if host is registered and connected returns implementation of this host, otherwise throws exception.
+     */
+    public Host bindHost( UUID id ) throws HostNotFoundException, HostNotConnectedException;
 
-    public ResourceHost getResourceHostByName( String hostname ) throws PeerException;
+    /**
+     * Returns implementation of ResourceHost interface.
+     *
+     * @param hostname name of the resource host
+     */
 
-    public ContainerHost getContainerHostByName( String hostname ) throws PeerException;
+    public ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException;
 
-    public ManagementHost getManagementHost() throws PeerException;
+    public ResourceHost getResourceHostByContainerName( String containerName ) throws HostNotFoundException;
+
+    /**
+     * Returns implementation of ContainerHost interface.
+     *
+     * @param hostname name of the container
+     */
+
+    public ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException;
+
+    /**
+     * Returns implementation of ContainerHost interface.
+     *
+     * @param hostId ID of the container
+     */
+    public ContainerHost getContainerHostById( String hostId ) throws HostNotFoundException;
+
+    <T extends Host> T bindHost( T host ) throws HostNotFoundException;
+
+    public ManagementHost getManagementHost() throws HostNotFoundException;
 
     public Set<ResourceHost> getResourceHosts();
 

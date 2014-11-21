@@ -11,6 +11,8 @@ import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 public interface ContainerHost extends Host
 {
 
+    public String getParentHostname();
+
     public String getEnvironmentId();
 
     public void setNodeGroupName( String nodeGroupName );
@@ -25,9 +27,13 @@ public interface ContainerHost extends Host
 
     public String getNodeGroupName();
 
+    String getTemplateArch();
+
+    void setTemplateArch( String templateArch );
+
     public ContainerState getState();
 
-    public void setParent( ResourceHost resourceHost );
+//    public void setParent( ResourceHost resourceHost );
 
     String getQuota( QuotaEnum memoryLimitInBytes ) throws PeerException;
 

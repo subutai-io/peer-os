@@ -31,10 +31,11 @@ import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
-import org.safehaus.subutai.core.peer.api.BindHostException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.ContainerState;
 import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.HostNotConnectedException;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.Payload;
@@ -50,6 +51,7 @@ import org.safehaus.subutai.core.peer.api.SubutaiInitException;
 import org.safehaus.subutai.core.peer.impl.dao.ManagementHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.dao.ResourceHostDataService;
+import org.safehaus.subutai.core.peer.impl.model.ContainerHostEntity;
 import org.safehaus.subutai.core.peer.impl.model.ManagementHostEntity;
 import org.safehaus.subutai.core.peer.impl.model.ResourceHostEntity;
 import org.safehaus.subutai.core.registry.api.RegistryException;
@@ -212,7 +214,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
             try
             {
                 Date date = new Date( threshold - System.currentTimeMillis() );
-                DateFormat formatter = new SimpleDateFormat( "HH:mm:ss:SSS" );
+                DateFormat formatter = new SimpleDateFormat( "HH:mm:ss" );
                 LOG.info( String.format( "Waiting for container(s) on %s: %d. Ready: %d container(s). Timeout: %s ",
                         resourceHost.getHostname(), quantity, result.size(), formatter.format( date ) ) );
                 Thread.sleep( 5000 );
@@ -329,10 +331,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
             switch ( event.getType() )
             {
                 case CONTAINER_CREATE_SUCCESS:
-                    ContainerHost containerHost = ( ContainerHost ) event.getObject();
+                    ContainerHostEntity containerHost = ( ContainerHostEntity ) event.getObject();
                     try
                     {
-                        ResourceHost resourceHost = getResourceHostByName( containerHost.getParentHostname() );
+                        ResourceHost resourceHost = containerHost.getParent();
                         if ( resourceHost == null )
                         {
                             throw new PeerException( "Resource host not found to register container." );
@@ -415,7 +417,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
 
 
     @Override
-    public ContainerHost getContainerHostByName( String hostname ) throws PeerException
+    public ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException
     {
         ContainerHost result = null;
         Iterator<ResourceHost> iterator = getResourceHosts().iterator();
@@ -425,14 +427,31 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
         }
         if ( result == null )
         {
-            throw new PeerException( "Container host not found" );
+            throw new HostNotFoundException( String.format( "Container host %s not found.", hostname ) );
         }
         return result;
     }
 
 
     @Override
-    public ResourceHost getResourceHostByName( String hostname ) throws PeerException
+    public ContainerHost getContainerHostById( final String hostId ) throws HostNotFoundException
+    {
+        ContainerHost result = null;
+        Iterator<ResourceHost> iterator = getResourceHosts().iterator();
+        while ( result == null && iterator.hasNext() )
+        {
+            result = iterator.next().getContainerHostById( hostId );
+        }
+        if ( result == null )
+        {
+            throw new HostNotFoundException( String.format( "Container host by id %s not found.", hostId ) );
+        }
+        return result;
+    }
+
+
+    @Override
+    public ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException
     {
         ResourceHost result = null;
         Iterator iterator = getResourceHosts().iterator();
@@ -448,14 +467,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
         }
         if ( result == null )
         {
-            throw new PeerException( "Resource host not found" );
+            throw new HostNotFoundException( String.format( "Resource host %s not found.", hostname ) );
         }
         return result;
     }
 
 
     @Override
-    public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId ) throws PeerException
+    public ResourceHost getResourceHostByContainerName( final String containerName ) throws HostNotFoundException
+    {
+        ContainerHost c = getContainerHostByName( containerName );
+        ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) c;
+        return containerHostEntity.getParent();
+    }
+
+
+    @Override
+    public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId )
     {
         Set<ContainerHost> result = new HashSet<>();
         for ( ResourceHost resourceHost : getResourceHosts() )
@@ -466,48 +494,96 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
     }
 
 
-    public Host bindHost( String id ) throws PeerException
+    @Override
+    public Host bindHost( String id ) throws HostNotFoundException, HostNotConnectedException
     {
         Host result = null;
-        ManagementHost managementHost = getManagementHost();
-        if ( managementHost != null && managementHost.getHostId().equals( id ) )
+        Iterator<ResourceHost> iterator = getResourceHosts().iterator();
+        while ( result == null && iterator.hasNext() )
         {
-            result = managementHost;
-        }
-        else
-        {
-            Iterator<ResourceHost> iterator = getResourceHosts().iterator();
-            while ( result == null && iterator.hasNext() )
+            ResourceHost rh = iterator.next();
+            if ( rh.getHostId().equals( id ) )
             {
-                ResourceHost rh = iterator.next();
-                if ( rh.getHostId().equals( id ) )
-                {
-                    result = rh;
-                }
-                else
-                {
-                    result = rh.getContainerHostById( id );
-                }
+                result = rh;
+            }
+            else
+            {
+                result = rh.getContainerHostById( id );
             }
         }
+
+
         if ( result == null )
         {
-            throw new BindHostException( id );
+            try
+            {
+                if ( getManagementHost().getHostId().equals( id ) )
+                {
+                    result = managementHost;
+                }
+            }
+            catch ( HostNotFoundException e )
+            {
+                throw new HostNotFoundException( String.format( "Host by id %s is not registered.", id ) );
+            }
         }
+
         return result;
     }
 
 
-    public Host bindHost( UUID id ) throws PeerException
+    @Override
+    public Host bindHost( UUID id ) throws HostNotFoundException, HostNotConnectedException
     {
         return bindHost( id.toString() );
     }
 
 
     @Override
-    public void startContainer( final ContainerHost containerHost ) throws PeerException
+    public <T extends Host> T bindHost( T host ) throws HostNotFoundException
     {
-        ResourceHost resourceHost = getResourceHostByName( containerHost.getParentHostname() );
+        Host result = null;
+        Iterator<ResourceHost> iterator = getResourceHosts().iterator();
+        while ( result == null && iterator.hasNext() )
+        {
+            ResourceHost rh = iterator.next();
+            if ( rh.getHostId().equals( host.getHostId() ) )
+            {
+                result = rh;
+            }
+            else
+            {
+                result = rh.getContainerHostById( host.getHostId() );
+            }
+        }
+
+
+        if ( result == null )
+        {
+            try
+            {
+                if ( getManagementHost().getHostId().equals( host.getHostId() ) )
+                {
+                    result = getManagementHost();
+                }
+            }
+            catch ( HostNotFoundException e )
+            {
+                throw new HostNotFoundException(
+                        String.format( "Host by id %s is not registered.", host.getHostId() ) );
+            }
+        }
+
+        return ( T ) result;
+    }
+
+
+    @Override
+    public void startContainer( final ContainerHost host ) throws PeerException
+    {
+        Host c = bindHost( host );
+        ContainerHostEntity containerHost = ( ContainerHostEntity ) c;
+        ResourceHost resourceHost = containerHost.getParent();
         try
         {
             if ( resourceHost.startContainerHost( containerHost ) )
@@ -528,9 +604,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
 
 
     @Override
-    public void stopContainer( final ContainerHost containerHost ) throws PeerException
+    public void stopContainer( final ContainerHost host ) throws PeerException
     {
-        ResourceHost resourceHost = getResourceHostByName( containerHost.getParentHostname() );
+        Host c = bindHost( host.getHostId() );
+        ContainerHostEntity containerHost = ( ContainerHostEntity ) c;
+        ResourceHost resourceHost = containerHost.getParent();
         try
         {
             if ( resourceHost.stopContainerHost( containerHost ) )
@@ -578,18 +656,30 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
 
 
     @Override
-    public boolean isConnected( final Host ahost ) throws PeerException
+    public boolean isConnected( final Host host ) throws PeerException
     {
-        Host host = bindHost( ahost.getId() );
-        if ( host instanceof ContainerHost )
+        try
         {
-            return ContainerState.RUNNING.equals( ( ( ContainerHost ) host ).getState() ) && checkHeartbeat(
-                    host.getLastHeartbeat() );
+            Host h = bindHost( host.getId() );
+            if ( isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME ) )
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
-        else
+        catch ( HostNotFoundException e )
         {
-            return checkHeartbeat( host.getLastHeartbeat() );
+            return false;
         }
+    }
+
+
+    private boolean isTimedOut( long lastHeartbeat, long timeoutInMillis )
+    {
+        return ( System.currentTimeMillis() - lastHeartbeat ) > timeoutInMillis;
     }
 
 
@@ -598,8 +688,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
     {
         try
         {
-            return quotaManager.getQuota( host.getHostname(), quota,
-                    getResourceHostByName( host.getParentHostname() ).getAgent() );
+            Host c = bindHost( host.getHostId() );
+            ContainerHostEntity containerHost = ( ContainerHostEntity ) c;
+            ResourceHost resourceHost = containerHost.getParent();
+            return quotaManager.getQuota( host.getHostname(), quota, resourceHost.getAgent() );
         }
         catch ( QuotaException e )
         {
@@ -613,8 +705,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
     {
         try
         {
-            quotaManager.setQuota( host.getHostname(), quota, value,
-                    getResourceHostByName( host.getParentHostname() ).getAgent() );
+            Host c = bindHost( host.getHostId() );
+            ContainerHostEntity containerHost = ( ContainerHostEntity ) c;
+            ResourceHost resourceHost = containerHost.getParent();
+            quotaManager.setQuota( host.getHostname(), quota, value, resourceHost.getAgent() );
         }
         catch ( QuotaException e )
         {
@@ -623,18 +717,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
     }
 
 
-    private boolean checkHeartbeat( long lastHeartbeat )
-    {
-        return ( System.currentTimeMillis() - lastHeartbeat ) < HOST_INACTIVE_TIME;
-    }
-
-
     @Override
-    public ManagementHost getManagementHost() throws PeerException
+    public ManagementHost getManagementHost() throws HostNotFoundException
     {
         if ( managementHost == null )
         {
-            throw new PeerException( "Management host not found" );
+            throw new HostNotFoundException( "Management host not found." );
         }
         return managementHost;
     }
@@ -910,6 +998,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
+        LOG.info( String.format( "Received heartbeat: %s", resourceHostInfo ) );
         if ( resourceHostInfo.getHostname().equals( "management" ) )
         {
             if ( managementHost == null )

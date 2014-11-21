@@ -34,8 +34,6 @@ public interface Host extends Serializable
 
     public String getHostId();
 
-    public String getParentHostname();
-
     public String getHostname();
 
     public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException;

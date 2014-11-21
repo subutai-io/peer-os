@@ -32,6 +32,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @ManyToOne( targetEntity = ResourceHostEntity.class )
     @JoinColumn( name = "parent_id" )
     private ResourceHost parent;
+
     @Column( name = "env_id", nullable = false )
     private String environmentId;
     @Column( name = "creator_id", nullable = false )
@@ -44,6 +45,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     private ContainerState state = ContainerState.UNKNOWN;
     @Column( name = "node_group_name", nullable = false )
     private String nodeGroupName;
+    @Column( name = "parent_host_name", nullable = false )
+    protected String parentHostname;
 
 
     private ContainerHostEntity()
@@ -51,11 +54,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public ContainerHostEntity( String peerId, String creatorPeerId, String environmentId, HostInfo hostInfo )
+    public ContainerHostEntity( String peerId, String creatorPeerId, String environmentId, String parentHostname,
+                                HostInfo hostInfo )
     {
         super( peerId, hostInfo );
         this.creatorPeerId = creatorPeerId;
         this.environmentId = environmentId;
+        this.parentHostname = parentHostname;
     }
 
 
@@ -107,12 +112,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    @Override
     public String getTemplateArch()
     {
         return templateArch;
     }
 
-
+    @Override
     public void setTemplateArch( final String templateArch )
     {
         this.templateArch = templateArch;
@@ -168,5 +174,12 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         Peer peer = getPeer();
         peer.destroyContainer( this );
+    }
+
+
+    @Override
+    public String getParentHostname()
+    {
+        return parent.getHostname();
     }
 }

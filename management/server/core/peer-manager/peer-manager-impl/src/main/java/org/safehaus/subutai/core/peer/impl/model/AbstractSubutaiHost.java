@@ -12,8 +12,6 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
@@ -50,17 +48,19 @@ public abstract class AbstractSubutaiHost implements Host
 {
     @Id
     @Column( name = "host_id" )
-    private String hostId;
+    protected String hostId;
+
     @Column( name = "peer_id", nullable = false )
-    private String peerId;
+    protected String peerId;
+
     @Column( name = "host_name", nullable = false )
-    private String hostname;
+    protected String hostname;
 
     @Column( name = "net_intf" )
     private String netInterfaces;
 
     @OneToMany( mappedBy = "host", cascade = CascadeType.ALL )
-    private Set<HostInterface> interfaces = new HashSet<>();
+    protected Set<HostInterface> interfaces = new HashSet<>();
 
     @Transient
     protected long lastHeartbeat = System.currentTimeMillis();
@@ -193,13 +193,6 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     @Override
-    public String getParentHostname()
-    {
-        return getAgent().getParentHostName();
-    }
-
-
-    @Override
     public String getHostname()
     {
         return getAgent().getHostname();
@@ -233,7 +226,6 @@ public abstract class AbstractSubutaiHost implements Host
         }
         catch ( PeerException e )
         {
-
             return false;
         }
     }
