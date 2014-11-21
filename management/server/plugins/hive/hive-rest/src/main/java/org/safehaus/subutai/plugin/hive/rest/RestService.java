@@ -17,7 +17,8 @@ import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
@@ -26,23 +27,10 @@ import org.safehaus.subutai.plugin.hive.api.SetupType;
 
 public class RestService
 {
-
     private static final String OPERATION_ID = "OPERATION_ID";
-
     private Hive hiveManager;
-    private AgentManager agentManager;
-
-
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }
-
-
-    public void setHiveManager( Hive hiveManager )
-    {
-        this.hiveManager = hiveManager;
-    }
+    private EnvironmentManager environmentManager;
+    private Hadoop hadoop;
 
 
     @GET
@@ -88,13 +76,15 @@ public class RestService
         config.setClusterName( clusterName );
         config.setHadoopClusterName( hadoopClusterName );
 
-        Agent serverAgent = agentManager.getAgentByHostname( server );
+        Agent serverAgent = environmentManager.getEnvironmentByUUID( hadoop.getCluster( hadoopClusterName )
+                .getEnvironmentId() ).getContainerHostByHostname( server ).getAgent();
         // TODO fix here
         config.setServer( serverAgent.getUuid() );
 
         for ( String client : clients.split( "," ) )
         {
-            Agent agent = agentManager.getAgentByHostname( client );
+            Agent agent = environmentManager.getEnvironmentByUUID( hadoop.getCluster( hadoopClusterName )
+                                                                               .getEnvironmentId() ).getContainerHostByHostname( client ).getAgent();
             // TODO fix here agent uuid
             config.getClients().add( agent.getUuid() );
         }
@@ -183,4 +173,22 @@ public class RestService
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
+
+    public void setHiveManager( Hive hiveManager )
+    {
+        this.hiveManager = hiveManager;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
+    }
+
+
+    public void setHadoop( final Hadoop hadoop )
+    {
+        this.hadoop = hadoop;
+    }
+
 }

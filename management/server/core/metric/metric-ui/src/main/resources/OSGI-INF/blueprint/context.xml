@@ -3,8 +3,7 @@
     default-activation="eager"
     xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.metric.ui.MonitorPortalModule"
-        init-method="init" destroy-method="destroy">
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.metric.ui.MonitorPortalModule">
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />

@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.filetracker.impl;
 
 
+import java.io.PrintStream;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -14,7 +15,6 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.broker.api.Broker;
 import org.safehaus.subutai.core.broker.api.BrokerException;
@@ -37,6 +37,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,12 +45,13 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class FileTrackerImplTest
 {
-    private static final  UUID ID = UUIDUtil.generateRandomUUID();
+    private static final UUID ID = UUIDUtil.generateRandomUUID();
     private static final String CONFIG_POINT = "/etc/approx";
-    private static final InotifyEventType EVENT_TYPE= InotifyEventType.CREATE_FOLDER;
+    private static final InotifyEventType EVENT_TYPE = InotifyEventType.CREATE_FOLDER;
     private static final String INOTIFY_RESPONSE = String.format(
-            "{ \"response\": {" + "  \"type\": \"INOTIFY_EVENT\"," + "  \"id\": \"%s\"," + "  \"configPoint\":\"%s\", \"dateTime\":\"18.11.2014 11:42:39\", \"eventType\":\"%s\"  } }",
-            ID, CONFIG_POINT,EVENT_TYPE );
+            "{ \"response\": {" + "  \"type\": \"INOTIFY_EVENT\"," + "  \"id\": \"%s\","
+                    + "  \"configPoint\":\"%s\", \"dateTime\":\"18.11.2014 11:42:39\", \"eventType\":\"%s\"  } }", ID,
+            CONFIG_POINT, EVENT_TYPE );
     @Mock
     Broker broker;
     @Mock
@@ -218,5 +220,13 @@ public class FileTrackerImplTest
 
         verify( peerManager ).getLocalPeer();
         verify( notifier ).execute( isA( Runnable.class ) );
+
+
+        RuntimeException exception = mock( RuntimeException.class );
+        doThrow( exception ).when( jsonUtil ).from( anyString(), any( Class.class ) );
+
+        fileTracker.onMessage( INOTIFY_RESPONSE.getBytes() );
+
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 }

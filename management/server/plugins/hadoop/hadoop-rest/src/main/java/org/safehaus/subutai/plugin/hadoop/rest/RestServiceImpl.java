@@ -9,34 +9,17 @@ import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
-
-/**
- * Created by bahadyr on 5/6/14.
- */
 
 public class RestServiceImpl implements RestService
 {
 
     private static final String OPERATION_ID = "OPERATION_ID";
     private Hadoop hadoopManager;
-    private AgentManager agentManager;
-
-
-    public Hadoop getHadoopManager()
-    {
-        return hadoopManager;
-    }
-
-
-    public void setHadoopManager( Hadoop hadoopManager )
-    {
-        this.hadoopManager = hadoopManager;
-    }
-
+    private EnvironmentManager environmentManager;
 
     @Override
     public Response listClusters()
@@ -163,7 +146,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response statusDataNode( String clusterName, String hostname )
     {
-        Agent agent = agentManager.getAgentByHostname( hostname );
+        Agent agent = environmentManager.getEnvironmentByUUID( hadoopManager.getCluster( clusterName ).getEnvironmentId() ).getContainerHostByHostname( hostname ).getAgent();
         String operationId = JsonUtil.toJson( OPERATION_ID,
                 hadoopManager.statusDataNode( hadoopManager.getCluster( clusterName ), agent.getHostname() ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
@@ -173,10 +156,33 @@ public class RestServiceImpl implements RestService
     @Override
     public Response statusTaskTracker( String clusterName, String hostname )
     {
-        Agent agent = agentManager.getAgentByHostname( hostname );
+        Agent agent = environmentManager.getEnvironmentByUUID( hadoopManager.getCluster( clusterName ).getEnvironmentId() ).getContainerHostByHostname( hostname ).getAgent();
         HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( clusterName );
         String operationId = JsonUtil.toJson( OPERATION_ID,
                 hadoopManager.statusTaskTracker( hadoopClusterConfig, agent.getHostname() ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
+    }
+
+    public Hadoop getHadoopManager()
+    {
+        return hadoopManager;
+    }
+
+
+    public void setHadoopManager( Hadoop hadoopManager )
+    {
+        this.hadoopManager = hadoopManager;
+    }
+
+
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
     }
 }

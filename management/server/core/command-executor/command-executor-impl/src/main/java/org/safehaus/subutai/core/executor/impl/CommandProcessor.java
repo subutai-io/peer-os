@@ -82,7 +82,11 @@ public class CommandProcessor implements ByteMessageListener
         {
             commandProcess.start();
 
-            broker.sendTextMessage( targetHost.getId().toString(), JsonUtil.toJson( new RequestWrapper( request ) ) );
+            String command = JsonUtil.toJson( new RequestWrapper( request ) );
+
+            LOG.info( String.format( "Sending:%n%s", command ) );
+
+            broker.sendTextMessage( targetHost.getId().toString(), command );
         }
         catch ( BrokerException e )
         {
@@ -119,7 +123,10 @@ public class CommandProcessor implements ByteMessageListener
         {
             String responseString = new String( message, "UTF-8" );
 
+
             ResponseWrapper responseWrapper = JsonUtil.fromJson( responseString, ResponseWrapper.class );
+
+            LOG.info( String.format( "Received:%n%s", JsonUtil.toJson( responseWrapper ) ) );
 
             ResponseImpl response = responseWrapper.getResponse();
 

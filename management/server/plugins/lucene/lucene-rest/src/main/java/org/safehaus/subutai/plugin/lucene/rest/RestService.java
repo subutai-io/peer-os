@@ -16,7 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
 import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 

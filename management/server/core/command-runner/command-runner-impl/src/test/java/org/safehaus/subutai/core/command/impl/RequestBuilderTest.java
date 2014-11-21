@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Test;
-import org.safehaus.subutai.common.enums.OutputRedirection;
-import org.safehaus.subutai.common.enums.RequestType;
-import org.safehaus.subutai.common.protocol.Request;
-import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.common.command.OutputRedirection;
+import org.safehaus.subutai.common.command.Request;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestType;
+import org.safehaus.subutai.common.util.UUIDUtil;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -25,8 +25,7 @@ import static org.junit.Assert.assertNotEquals;
 public class RequestBuilderTest
 {
 
-    private static final UUID AGENT_ID = UUIDUtil.generateTimeBasedUUID();
-    private static final UUID TASK_ID = UUIDUtil.generateTimeBasedUUID();
+    private static final UUID CONTAINER_ID = UUIDUtil.generateTimeBasedUUID();
     private static final String COMMAND = "cmd";
     private static final String CWD = "/";
     private static final String RUN_AS = "user";
@@ -51,20 +50,18 @@ public class RequestBuilderTest
                 }
             } );
 
-    private static final String ERR_PATH = "err/path";
-    private static final String STD_OUT_PATH = "out/path";
     private static final OutputRedirection STD_REDIRECTION = OutputRedirection.RETURN;
     private static final OutputRedirection ERR_REDIRECTION = OutputRedirection.RETURN;
     RequestBuilder requestBuilder =
             new RequestBuilder( COMMAND ).withCwd( CWD ).withRunAs( RUN_AS ).withTimeout( TIMEOUT ).withPid( PID )
                                          .withType( REQUEST_TYPE ).withCmdArgs( CMD_ARGS ).withEnvVars( ENV_VARS )
-                                         .withErrPath( ERR_PATH ).withStdOutPath( STD_OUT_PATH )
+
                                          .withStdErrRedirection( ERR_REDIRECTION )
                                          .withStdOutRedirection( STD_REDIRECTION );
     RequestBuilder requestBuilder2 =
             new RequestBuilder( COMMAND ).withCwd( CWD ).withRunAs( RUN_AS ).withTimeout( TIMEOUT ).withPid( PID )
                                          .withType( REQUEST_TYPE ).withCmdArgs( CMD_ARGS ).withEnvVars( ENV_VARS )
-                                         .withErrPath( ERR_PATH ).withStdOutPath( STD_OUT_PATH )
+
                                          .withStdErrRedirection( ERR_REDIRECTION )
                                          .withStdOutRedirection( STD_REDIRECTION );
 
@@ -79,21 +76,17 @@ public class RequestBuilderTest
     @Test
     public void shouldReturnSameProperties()
     {
-        Request request = requestBuilder.build( AGENT_ID, TASK_ID );
+        Request request = requestBuilder.build2( CONTAINER_ID );
 
-        assertEquals( AGENT_ID, request.getUuid() );
-        assertEquals( TASK_ID, request.getTaskUuid() );
-        assertEquals( COMMAND, request.getProgram() );
+        assertEquals( CONTAINER_ID, request.getId() );
+        assertEquals( COMMAND, request.getCommand() );
         assertEquals( CWD, request.getWorkingDirectory() );
         assertEquals( RUN_AS, request.getRunAs() );
         assertEquals( TIMEOUT, requestBuilder.getTimeout() );
         assertEquals( TIMEOUT, request.getTimeout() );
-        assertEquals( PID, request.getPid() );
         assertEquals( REQUEST_TYPE, request.getType() );
         assertEquals( CMD_ARGS, request.getArgs() );
         assertEquals( ENV_VARS, request.getEnvironment() );
-        assertEquals( ERR_PATH, request.getStdErrPath() );
-        assertEquals( STD_OUT_PATH, request.getStdOutPath() );
         assertEquals( ERR_REDIRECTION, request.getStdErr() );
         assertEquals( STD_REDIRECTION, request.getStdOut() );
     }
@@ -113,9 +106,8 @@ public class RequestBuilderTest
         RequestBuilder requestBuilder3 =
                 new RequestBuilder( COMMAND ).withCwd( CWD ).withRunAs( RUN_AS ).withTimeout( TIMEOUT ).withPid( PID )
                                              .withType( REQUEST_TYPE ).withCmdArgs( CMD_ARGS ).withEnvVars( ENV_VARS )
-                                             .withErrPath( ERR_PATH ).withStdOutPath( STD_OUT_PATH )
-                                             .withStdErrRedirection( OutputRedirection.CAPTURE )
-                                             .withStdOutRedirection( STD_REDIRECTION );
+                                             .withStdErrRedirection( STD_REDIRECTION )
+                                             .withStdOutRedirection( OutputRedirection.NO );
 
         assertNotEquals( requestBuilder, requestBuilder3 );
     }

@@ -34,15 +34,6 @@ public class RestService
 
     private Sqoop sqoopManager;
 
-    private AgentManager agentManager;
-
-
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }
-
-
     public void setSqoopManager( Sqoop sqoopManager )
     {
         this.sqoopManager = sqoopManager;

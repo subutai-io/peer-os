@@ -76,7 +76,7 @@ public class Envelope
 
     public Timestamp getCreateDate()
     {
-        return createDate;
+        return ( Timestamp ) createDate.clone();
     }
 
 

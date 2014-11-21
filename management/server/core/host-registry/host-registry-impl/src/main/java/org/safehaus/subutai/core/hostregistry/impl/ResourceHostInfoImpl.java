@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
+import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.Interface;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 
@@ -69,5 +70,46 @@ public class ResourceHostInfoImpl implements ResourceHostInfo
     {
         return Objects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
                       .add( "interfaces", interfaces ).add( "containers", containers ).toString();
+    }
+
+
+    @Override
+    public int compareTo( final HostInfo o )
+    {
+        if ( hostname != null && o != null )
+        {
+            return hostname.compareTo( o.getHostname() );
+        }
+        return -1;
+    }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof ResourceHostInfoImpl ) )
+        {
+            return false;
+        }
+
+        final ResourceHostInfoImpl that = ( ResourceHostInfoImpl ) o;
+
+        if ( id != null ? !id.equals( that.id ) : that.id != null )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return id != null ? id.hashCode() : 0;
     }
 }

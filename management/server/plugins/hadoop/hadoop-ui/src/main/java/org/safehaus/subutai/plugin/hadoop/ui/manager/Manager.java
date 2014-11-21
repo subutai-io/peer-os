@@ -228,7 +228,7 @@ public class Manager
         table.setSelectable( false );
         table.setImmediate( true );
 
-        //        table.addItemClickListener( managerListener.getTableClickListener( table ) );
+        table.addItemClickListener( managerListener.getTableClickListener( table ) );
 
         return table;
     }
