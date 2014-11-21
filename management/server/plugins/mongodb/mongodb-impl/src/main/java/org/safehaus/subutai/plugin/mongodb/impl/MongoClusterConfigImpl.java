@@ -47,26 +47,6 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
     private UUID environmentId;
 
 
-    public Set<MongoNode> getAllNodes()
-    {
-        Set<MongoNode> nodes = new HashSet<>();
-        if ( configServers != null )
-        {
-            nodes.addAll( configServers );
-        }
-        if ( dataNodes != null )
-        {
-            nodes.addAll( dataNodes );
-        }
-        if ( routerServers != null )
-        {
-            nodes.addAll( routerServers );
-        }
-
-        return nodes;
-    }
-
-
     @Override
     public String getTemplateName()
     {
@@ -77,18 +57,6 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
     public void setTemplateName( final String templateName )
     {
         this.templateName = templateName;
-    }
-
-
-    public String getDomainName()
-    {
-        return domainName;
-    }
-
-
-    public void setDomainName( String domainName )
-    {
-        this.domainName = domainName;
     }
 
 
@@ -131,6 +99,42 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
     }
 
 
+    public int getDataNodePort()
+    {
+        return dataNodePort;
+    }
+
+
+    public void setDataNodePort( int dataNodePort )
+    {
+        this.dataNodePort = dataNodePort;
+    }
+
+
+    public int getRouterPort()
+    {
+        return routerPort;
+    }
+
+
+    public void setRouterPort( int routerPort )
+    {
+        this.routerPort = routerPort;
+    }
+
+
+    public String getDomainName()
+    {
+        return domainName;
+    }
+
+
+    public void setDomainName( String domainName )
+    {
+        this.domainName = domainName;
+    }
+
+
     public String getReplicaSetName()
     {
         return replicaSetName;
@@ -143,15 +147,59 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
     }
 
 
-    public String getClusterName()
+    public int getCfgSrvPort()
     {
-        return clusterName;
+        return cfgSrvPort;
     }
 
 
-    public void setClusterName( String clusterName )
+    public void setCfgSrvPort( int cfgSrvPort )
     {
-        this.clusterName = clusterName;
+        this.cfgSrvPort = cfgSrvPort;
+    }
+
+
+    public Set<MongoConfigNode> getConfigServers()
+    {
+        return configServers;
+    }
+
+
+    public void setConfigServers( Set<MongoConfigNode> configServers )
+    {
+        this.configServers = configServers;
+    }
+
+
+    public Set<MongoNode> getAllNodes()
+    {
+        Set<MongoNode> nodes = new HashSet<>();
+        if ( configServers != null )
+        {
+            nodes.addAll( configServers );
+        }
+        if ( dataNodes != null )
+        {
+            nodes.addAll( dataNodes );
+        }
+        if ( routerServers != null )
+        {
+            nodes.addAll( routerServers );
+        }
+
+        return nodes;
+    }
+
+
+    public Set<MongoDataNode> getDataNodes()
+    {
+        return dataNodes;
+    }
+
+
+    public void setDataNodes( Set<MongoDataNode> dataNodes )
+    {
+        this.dataNodes = dataNodes;
     }
 
 
@@ -167,17 +215,40 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
     }
 
 
-    @Override
-    public String getProductName()
+    public void addNode( final MongoNode host, final NodeType nodeType )
     {
-        return PRODUCT_NAME;
+        switch ( nodeType )
+        {
+            case DATA_NODE:
+                getDataNodes().add( ( MongoDataNode ) host );
+                setNumberOfDataNodes( getNumberOfDataNodes() + 1 );
+                break;
+            case ROUTER_NODE:
+                getRouterServers().add( ( MongoRouterNode ) host );
+                setNumberOfRouters( getNumberOfRouters() + 1 );
+                break;
+            case CONFIG_NODE:
+                getConfigServers().add( ( MongoConfigNode ) host );
+                setNumberOfConfigServers( getNumberOfConfigServers() + 1 );
+                break;
+        }
     }
 
 
-    @Override
-    public String getProductKey()
+    public Set<MongoRouterNode> getRouterServers()
     {
-        return PRODUCT_KEY;
+        return routerServers;
+    }
+
+
+    public void setRouterServers( Set<MongoRouterNode> routerServers )
+    {
+        //        Set<MongoRouterNodeImpl> routers = new HashSet<>();
+        //        for ( MongoRouterNode node : routerServers )
+        //        {
+        //            routers.add( new MongoRouterNodeImpl( node ) );
+        //        }
+        this.routerServers = routerServers;
     }
 
 
@@ -202,116 +273,15 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
     }
 
 
-    public Set<MongoRouterNode> getRouterServers()
+    public String getClusterName()
     {
-        return routerServers;
+        return clusterName;
     }
 
 
-    public void setRouterServers( Set<MongoRouterNode> routerServers )
+    public void setClusterName( String clusterName )
     {
-        //        Set<MongoRouterNodeImpl> routers = new HashSet<>();
-        //        for ( MongoRouterNode node : routerServers )
-        //        {
-        //            routers.add( new MongoRouterNodeImpl( node ) );
-        //        }
-        this.routerServers = routerServers;
-    }
-
-
-    public Set<MongoConfigNode> getConfigServers()
-    {
-        return configServers;
-    }
-
-
-    public void setConfigServers( Set<MongoConfigNode> configServers )
-    {
-        this.configServers = configServers;
-    }
-
-
-    public Set<MongoDataNode> getDataNodes()
-    {
-        return dataNodes;
-    }
-
-
-    public void setDataNodes( Set<MongoDataNode> dataNodes )
-    {
-        this.dataNodes = dataNodes;
-    }
-
-
-    public int getNodePort( Agent node )
-    {
-
-        if ( getRouterServers().contains( node ) )
-        {
-            return getRouterPort();
-        }
-        else if ( getConfigServers().contains( node ) )
-        {
-            return getCfgSrvPort();
-        }
-
-        return getDataNodePort();
-    }
-
-
-    public int getRouterPort()
-    {
-        return routerPort;
-    }
-
-
-    public void setRouterPort( int routerPort )
-    {
-        this.routerPort = routerPort;
-    }
-
-
-    public int getCfgSrvPort()
-    {
-        return cfgSrvPort;
-    }
-
-
-    public void setCfgSrvPort( int cfgSrvPort )
-    {
-        this.cfgSrvPort = cfgSrvPort;
-    }
-
-
-    public int getDataNodePort()
-    {
-        return dataNodePort;
-    }
-
-
-    public void setDataNodePort( int dataNodePort )
-    {
-        this.dataNodePort = dataNodePort;
-    }
-
-
-    public void addNode( final MongoNode host, final NodeType nodeType )
-    {
-        switch ( nodeType )
-        {
-            case DATA_NODE:
-                getDataNodes().add( ( MongoDataNode ) host );
-                setNumberOfDataNodes( getNumberOfDataNodes() + 1 );
-                break;
-            case ROUTER_NODE:
-                getRouterServers().add( ( MongoRouterNode ) host );
-                setNumberOfRouters( getNumberOfRouters() + 1 );
-                break;
-            case CONFIG_NODE:
-                getConfigServers().add( ( MongoConfigNode ) host );
-                setNumberOfConfigServers( getNumberOfConfigServers() + 1 );
-                break;
-        }
+        this.clusterName = clusterName;
     }
 
 
@@ -359,6 +329,36 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
         }
 
         return result;
+    }
+
+
+    @Override
+    public String getProductName()
+    {
+        return PRODUCT_NAME;
+    }
+
+
+    @Override
+    public String getProductKey()
+    {
+        return PRODUCT_KEY;
+    }
+
+
+    public int getNodePort( Agent node )
+    {
+
+        if ( getRouterServers().contains( node ) )
+        {
+            return getRouterPort();
+        }
+        else if ( getConfigServers().contains( node ) )
+        {
+            return getCfgSrvPort();
+        }
+
+        return getDataNodePort();
     }
 
 

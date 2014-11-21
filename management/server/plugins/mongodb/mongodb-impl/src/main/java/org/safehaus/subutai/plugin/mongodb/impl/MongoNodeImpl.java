@@ -48,7 +48,7 @@ public abstract class MongoNodeImpl extends ContainerHost implements MongoNode
         CommandDef commandDef = Commands.getCheckInstanceRunningCommand( getHostname(), domainName, port );
         try
         {
-            CommandResult commandResult = execute( commandDef.build().withTimeout( 10 ));
+            CommandResult commandResult = execute( commandDef.build().withTimeout( 10 ) );
             if ( commandResult.getStdOut().contains( "couldn't connect to server" ) )
             {
                 return false;

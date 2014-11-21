@@ -58,6 +58,72 @@ public class Commands
     }
 
 
+    public static CommandDef getUnregisterSecondaryNodeFromPrimaryCommandLine( int dataNodePort,
+                                                                               String removeNodehostname,
+                                                                               String domainName )
+    {
+        return new CommandDef( "Unregister node from replica",
+                String.format( "mongo --port %s --eval \"rs.remove('%s.%s:%s');\"", dataNodePort, removeNodehostname,
+                        domainName, dataNodePort ), 300 );
+    }
+
+
+    public static CommandDef getStopNodeCommand()
+    {
+        return new CommandDef( "Stop node", "/usr/bin/pkill -2 mongo", Timeouts.STOP_NODE_TIMEOUT_SEC );
+    }
+
+
+    public static CommandDef getStopMongodbService()
+    {
+        return new CommandDef( "Stop mongodb service", "service mongodb stop", Timeouts.STOP_NODE_TIMEOUT_SEC );
+    }
+
+
+    // LIFECYCLE COMMANDS =======================================================
+    public static CommandDef getStartConfigServerCommand( int cfgSrvPort )
+    {
+        return new CommandDef( "Start config server(s)", String.format(
+                "/bin/mkdir -p %s ; mongod --configsvr --dbpath %s --port %s --fork --logpath %s/mongodb.log",
+                Constants.CONFIG_DIR, Constants.CONFIG_DIR, cfgSrvPort, Constants.LOG_DIR ),
+                Timeouts.START_CONFIG_SERVER_TIMEOUT_SEC );
+    }
+
+
+    public static CommandDef getInitiateReplicaSetCommandLine( int port )
+    {
+        return new CommandDef( "Initiate replica set",
+                String.format( "mongo --port %d --eval \"rs.initiate();\" ; sleep 30", port ), 180 );
+    }
+
+
+    public static CommandDef getRegisterReplicaWithRouterCommandLine( MongoRouterNode routerNode,
+                                                                      Set<MongoDataNode> dataNodes,
+                                                                      String replicaSetName )
+    {
+        String domainName = routerNode.getDomainName();
+        StringBuilder shard = new StringBuilder();
+        for ( MongoDataNode dataNode : dataNodes )
+        {
+            shard.append( "sh.addShard('" ).append( replicaSetName ).
+                    append( "/" ).append( dataNode.getHostname() ).append( "." ).append( domainName ).
+                         append( ":" ).append( dataNode.getPort() ).append( "');" );
+        }
+
+        return new CommandDef( "Register replica with router",
+                String.format( "sleep 30 ; mongo --port %s --eval \"%s\"", routerNode.getPort(), shard.toString() ),
+                120 );
+    }
+
+
+    public static CommandDef getCheckInstanceRunningCommand( String hostname, String domainName, int port )
+    {
+        return new CommandDef( "Check node(s)",
+                String.format( "mongo --host %s.%s --port %s", hostname, domainName, port ),
+                Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC );
+    }
+
+
     public Command getRegisterSecondaryNodeWithPrimaryCommandOld( Agent secondaryNodeAgent, int dataNodePort,
                                                                   String domainName, Agent primaryNodeAgent )
     {
@@ -66,16 +132,6 @@ public class Commands
                 String.format( "mongo --port %s --eval \"%s\"", dataNodePort,
                         "rs.add('" + secondaryNodeAgent.getHostname() + "." + domainName + ":" + dataNodePort
                                 + "');" ) ).withTimeout( 900 ), Sets.newHashSet( primaryNodeAgent ) );
-    }
-
-
-    public static CommandDef getUnregisterSecondaryNodeFromPrimaryCommandLine( int dataNodePort,
-                                                                               String removeNodehostname,
-                                                                               String domainName )
-    {
-        return new CommandDef( "Unregister node from replica",
-                String.format( "mongo --port %s --eval \"rs.remove('%s.%s:%s');\"", dataNodePort, removeNodehostname,
-                        domainName, dataNodePort ), 300 );
     }
 
 
@@ -94,12 +150,6 @@ public class Commands
         return commandRunnerBase.createCommand( "Check node(s)", new RequestBuilder(
                 String.format( "mongo --host %s.%s --port %s", node.getHostname(), domainName, port ) )
                 .withTimeout( Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC ), Sets.newHashSet( node ) );
-    }
-
-
-    public static CommandDef getStopNodeCommand()
-    {
-        return new CommandDef( "Stop node", "/usr/bin/pkill -2 mongo", Timeouts.STOP_NODE_TIMEOUT_SEC );
     }
 
 
@@ -149,53 +199,11 @@ public class Commands
     }
 
 
-    public static CommandDef getStopMongodbService()
-    {
-        return new CommandDef( "Stop mongodb service", "service mongodb stop", Timeouts.STOP_NODE_TIMEOUT_SEC );
-    }
-
-
     public Command getStopMongodbServiceOld( Set<Agent> dataNodes )
     {
         return commandRunnerBase.createCommand( "Stop mongodb service",
                 new RequestBuilder( "service mongodb stop" ).withTimeout( Timeouts.START_DATE_NODE_TIMEOUT_SEC ),
                 dataNodes );
-    }
-
-
-    public CommandDef getAddIpHostToEtcHostsCommand( String domainName, Host containerHost, Set<Host> others )
-    {
-        StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
-        StringBuilder appendHosts = new StringBuilder();
-        for ( Host otherAgent : others )
-        {
-            if ( containerHost.getId().equals( otherAgent.getId() ) )
-            {
-                continue;
-            }
-
-            String ip = AgentUtil.getAgentIpByMask( otherAgent.getAgent(), Common.IP_MASK );
-            String hostname = otherAgent.getHostname();
-            cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
-            appendHosts.append( "/bin/echo '" ).
-                    append( ip ).append( " " ).
-                               append( hostname ).append( "." ).append( domainName ).
-                               append( " " ).append( hostname ).
-                               append( "' >> '/etc/hosts'; " );
-        }
-        if ( cleanHosts.length() > 0 )
-        {
-            //drop pipe | symbol
-            cleanHosts.setLength( cleanHosts.length() - 1 );
-            cleanHosts.insert( 0, "egrep -v '" );
-            cleanHosts.append( "' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;" );
-            appendHosts.insert( 0, cleanHosts );
-        }
-
-        appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( containerHost.getHostname() )
-                   .append( "' >> '/etc/hosts';" );
-
-        return new CommandDef( "Add ip-host pair to /etc/hosts", appendHosts.toString(), 60 );
     }
 
 
@@ -241,29 +249,11 @@ public class Commands
     }
 
 
-    public static CommandDef getSetReplicaSetNameCommandLine( String replicaSetName )
-    {
-        return new CommandDef( "Set replica set name",
-                String.format( "/bin/sed -i 's/# replSet = setname/replSet = %s/1' '%s'", replicaSetName,
-                        Constants.DATA_NODE_CONF_FILE ), 60 );
-    }
-
-
     public Command getSetReplicaSetNameCommandOld( String replicaSetName, Set<Agent> agents )
     {
         return commandRunnerBase.createCommand( "Set replica set name", new RequestBuilder(
                 String.format( "/bin/sed -i 's/# replSet = setname/replSet = %s/1' '%s'", replicaSetName,
                         Constants.DATA_NODE_CONF_FILE ) ).withTimeout( 60 ), agents );
-    }
-
-
-    // LIFECYCLE COMMANDS =======================================================
-    public static CommandDef getStartConfigServerCommand( int cfgSrvPort )
-    {
-        return new CommandDef( "Start config server(s)", String.format(
-                "/bin/mkdir -p %s ; mongod --configsvr --dbpath %s --port %s --fork --logpath %s/mongodb.log",
-                Constants.CONFIG_DIR, Constants.CONFIG_DIR, cfgSrvPort, Constants.LOG_DIR ),
-                Timeouts.START_CONFIG_SERVER_TIMEOUT_SEC );
     }
 
 
@@ -282,29 +272,6 @@ public class Commands
 
         StringBuilder configServersArg = new StringBuilder();
         for ( ContainerHost c : configServers )
-        {
-            configServersArg.append( c.getHostname() ).append( "." ).append( domainName ).
-                    append( ":" ).append( cfgSrvPort ).append( "," );
-        }
-        //drop comma
-        if ( configServersArg.length() > 0 )
-        {
-            configServersArg.setLength( configServersArg.length() - 1 );
-        }
-
-        return new CommandDef( "Start router(s)",
-                String.format( "mongos --configdb %s --port %s --fork --logpath %s/mongodb.log",
-                        configServersArg.toString(), routerPort, Constants.LOG_DIR ),
-                Timeouts.START_ROUTER_TIMEOUT_SEC );
-    }
-
-
-    public static CommandDef getStartRouterCommandLine( int routerPort, int cfgSrvPort, String domainName,
-                                                        Set<MongoConfigNode> configServers )
-    {
-
-        StringBuilder configServersArg = new StringBuilder();
-        for ( MongoConfigNode c : configServers )
         {
             configServersArg.append( c.getHostname() ).append( "." ).append( domainName ).
                     append( ":" ).append( cfgSrvPort ).append( "," );
@@ -346,16 +313,6 @@ public class Commands
     }
 
 
-    public static CommandDef getStartDataNodeCommandLine( int dataNodePort )
-    {
-        return new CommandDef( "Start data node", String.format(
-                "export LANGUAGE=en_US.UTF-8 && export LANG=en_US.UTF-8 && "
-                        + "export LC_ALL=en_US.UTF-8 && mongod --config %s --port %s --fork --logpath %s/mongodb.log",
-                Constants.DATA_NODE_CONF_FILE, dataNodePort, Constants.LOG_DIR ),
-                Timeouts.START_DATE_NODE_TIMEOUT_SEC );
-    }
-
-
     public Command getStartDataNodeCommandOld( int dataNodePort, Set<Agent> dataNodes )
     {
         return commandRunnerBase.createCommand( "Start data node(s)", new RequestBuilder( String.format(
@@ -363,13 +320,6 @@ public class Commands
                         + "export LC_ALL=en_US.UTF-8 && mongod --config %s --port %s --fork --logpath %s/mongodb.log",
                 Constants.DATA_NODE_CONF_FILE, dataNodePort, Constants.LOG_DIR ) )
                 .withTimeout( Timeouts.START_DATE_NODE_TIMEOUT_SEC ), dataNodes );
-    }
-
-
-    public static CommandDef getInitiateReplicaSetCommandLine( int port )
-    {
-        return new CommandDef( "Initiate replica set",
-                String.format( "mongo --port %d --eval \"rs.initiate();\" ; sleep 30", port ), 180 );
     }
 
 
@@ -392,25 +342,6 @@ public class Commands
                         "mongo --port %s --eval \"rs.initiate();\" ; sleep 30 ; mongo --port %s --eval \"%s\"",
                         dataNodePort, dataNodePort, secondaryStr.toString() ) ).withTimeout( 180 ),
                 Sets.newHashSet( primaryNodeAgent ) );
-    }
-
-
-    public static CommandDef getRegisterReplicaWithRouterCommandLine( MongoRouterNode routerNode,
-                                                                      Set<MongoDataNode> dataNodes,
-                                                                      String replicaSetName )
-    {
-        String domainName = routerNode.getDomainName();
-        StringBuilder shard = new StringBuilder();
-        for ( MongoDataNode dataNode : dataNodes )
-        {
-            shard.append( "sh.addShard('" ).append( replicaSetName ).
-                    append( "/" ).append( dataNode.getHostname() ).append( "." ).append( domainName ).
-                         append( ":" ).append( dataNode.getPort() ).append( "');" );
-        }
-
-        return new CommandDef( "Register replica with router",
-                String.format( "sleep 30 ; mongo --port %s --eval \"%s\"", routerNode.getPort(), shard.toString() ),
-                120 );
     }
 
 
@@ -457,6 +388,65 @@ public class Commands
         {
             e.printStackTrace();
         }
+    }
+
+
+    public CommandDef getAddIpHostToEtcHostsCommand( String domainName, Host containerHost, Set<Host> others )
+    {
+        StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
+        StringBuilder appendHosts = new StringBuilder();
+        for ( Host otherAgent : others )
+        {
+            if ( containerHost.getId().equals( otherAgent.getId() ) )
+            {
+                continue;
+            }
+
+            String ip = AgentUtil.getAgentIpByMask( otherAgent.getAgent(), Common.IP_MASK );
+            String hostname = otherAgent.getHostname();
+            cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
+            appendHosts.append( "/bin/echo '" ).
+                    append( ip ).append( " " ).
+                               append( hostname ).append( "." ).append( domainName ).
+                               append( " " ).append( hostname ).
+                               append( "' >> '/etc/hosts'; " );
+        }
+        if ( cleanHosts.length() > 0 )
+        {
+            //drop pipe | symbol
+            cleanHosts.setLength( cleanHosts.length() - 1 );
+            cleanHosts.insert( 0, "egrep -v '" );
+            cleanHosts.append( "' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;" );
+            appendHosts.insert( 0, cleanHosts );
+        }
+
+        appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( containerHost.getHostname() )
+                   .append( "' >> '/etc/hosts';" );
+
+        return new CommandDef( "Add ip-host pair to /etc/hosts", appendHosts.toString(), 60 );
+    }
+
+
+    public static CommandDef getStartRouterCommandLine( int routerPort, int cfgSrvPort, String domainName,
+                                                        Set<MongoConfigNode> configServers )
+    {
+
+        StringBuilder configServersArg = new StringBuilder();
+        for ( MongoConfigNode c : configServers )
+        {
+            configServersArg.append( c.getHostname() ).append( "." ).append( domainName ).
+                    append( ":" ).append( cfgSrvPort ).append( "," );
+        }
+        //drop comma
+        if ( configServersArg.length() > 0 )
+        {
+            configServersArg.setLength( configServersArg.length() - 1 );
+        }
+
+        return new CommandDef( "Start router(s)",
+                String.format( "mongos --configdb %s --port %s --fork --logpath %s/mongodb.log",
+                        configServersArg.toString(), routerPort, Constants.LOG_DIR ),
+                Timeouts.START_ROUTER_TIMEOUT_SEC );
     }
 
 
@@ -521,6 +511,31 @@ public class Commands
     }
 
 
+    public static CommandDef getSetReplicaSetNameCommandLine( String replicaSetName )
+    {
+        return new CommandDef( "Set replica set name",
+                String.format( "/bin/sed -i 's/# replSet = setname/replSet = %s/1' '%s'", replicaSetName,
+                        Constants.DATA_NODE_CONF_FILE ), 60 );
+    }
+
+
+    public static CommandDef getStartDataNodeCommandLine( int dataNodePort )
+    {
+        return new CommandDef( "Start data node", String.format(
+                "export LANGUAGE=en_US.UTF-8 && export LANG=en_US.UTF-8 && "
+                        + "export LC_ALL=en_US.UTF-8 && mongod --config %s --port %s --fork --logpath %s/mongodb.log",
+                Constants.DATA_NODE_CONF_FILE, dataNodePort, Constants.LOG_DIR ),
+                Timeouts.START_DATE_NODE_TIMEOUT_SEC );
+    }
+
+
+    public static CommandDef getFindPrimaryNodeCommandLine( int dataNodePort )
+    {
+        return new CommandDef( "Find primary node",
+                String.format( "/bin/echo 'db.isMaster()' | mongo --port %s", dataNodePort ), 30 );
+    }
+
+
     public List<Command> getAddDataNodeCommandsOld( MongoClusterConfig config, Agent newDataNodeAgent )
     {
         return null;
@@ -546,21 +561,6 @@ public class Commands
         //        commands.add( findPrimaryNodeCommand );
         //
         //        return commands;
-    }
-
-
-    public static CommandDef getFindPrimaryNodeCommandLine( int dataNodePort )
-    {
-        return new CommandDef( "Find primary node",
-                String.format( "/bin/echo 'db.isMaster()' | mongo --port %s", dataNodePort ), 30 );
-    }
-
-
-    public static CommandDef getCheckInstanceRunningCommand( String hostname, String domainName, int port )
-    {
-        return new CommandDef( "Check node(s)",
-                String.format( "mongo --host %s.%s --port %s", hostname, domainName, port ),
-                Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC );
     }
 
 

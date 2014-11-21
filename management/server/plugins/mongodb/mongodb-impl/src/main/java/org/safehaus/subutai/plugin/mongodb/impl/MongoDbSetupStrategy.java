@@ -64,19 +64,14 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
             case CONFIG_NODE:
                 return new PlacementStrategy( "BEST_SERVER", Sets.newHashSet( new Criteria( "MORE_RAM", true ) ) );
 
-            //return PlacementStrategy.MORE_RAM;
             case ROUTER_NODE:
                 return new PlacementStrategy( "BEST_SERVER", Sets.newHashSet( new Criteria( "MORE_CPU", true ) ) );
 
-            //                return PlacementStrategy.MORE_CPU;
             case DATA_NODE:
                 return new PlacementStrategy( "BEST_SERVER", Sets.newHashSet( new Criteria( "MORE_HDD", true ) ) );
 
-            //                return PlacementStrategy.MORE_HDD;
             default:
                 return new PlacementStrategy( "ROUND_ROBIN" );
-
-            //                return PlacementStrategy.ROUND_ROBIN;
         }
     }
 
@@ -313,6 +308,4 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
         config.setEnvironmentId( environment.getId() );
         po.addLogDone( String.format( "Cluster %s configured successfully.", config.getClusterName() ) );
     }
-
-
 }

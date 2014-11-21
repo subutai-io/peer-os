@@ -34,7 +34,6 @@ import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
-import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoRouterNode;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
@@ -93,6 +92,12 @@ public class MongoImpl implements Mongo
     }
 
 
+    public void setCommands( final Commands commands )
+    {
+        this.commands = commands;
+    }
+
+
     public PluginDAO getPluginDAO()
     {
         return pluginDAO;
@@ -103,6 +108,17 @@ public class MongoImpl implements Mongo
     {
         return environmentManager;
     }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
+    }
+
+    //    public ContainerManager getContainerManager()
+    //    {
+    //        return containerManager;
+    //    }
 
 
     public PeerManager getPeerManager()
@@ -116,27 +132,10 @@ public class MongoImpl implements Mongo
         this.peerManager = peerManager;
     }
 
-    //    public ContainerManager getContainerManager()
-    //    {
-    //        return containerManager;
-    //    }
-
 
     public CommandRunner getCommandRunner()
     {
         return commandRunner;
-    }
-
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public Tracker getTracker()
-    {
-        return tracker;
     }
 
 
@@ -146,15 +145,15 @@ public class MongoImpl implements Mongo
     }
 
 
-    public void setAgentManager( final AgentManager agentManager )
+    public AgentManager getAgentManager()
     {
-        this.agentManager = agentManager;
+        return agentManager;
     }
 
 
-    public void setTracker( final Tracker tracker )
+    public void setAgentManager( final AgentManager agentManager )
     {
-        this.tracker = tracker;
+        this.agentManager = agentManager;
     }
 
 
@@ -164,21 +163,21 @@ public class MongoImpl implements Mongo
     //    }
 
 
-    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    public Tracker getTracker()
     {
-        this.environmentManager = environmentManager;
+        return tracker;
+    }
+
+
+    public void setTracker( final Tracker tracker )
+    {
+        this.tracker = tracker;
     }
 
 
     public void setExecutor( final ExecutorService executor )
     {
         this.executor = executor;
-    }
-
-
-    public void setCommands( final Commands commands )
-    {
-        this.commands = commands;
     }
 
 

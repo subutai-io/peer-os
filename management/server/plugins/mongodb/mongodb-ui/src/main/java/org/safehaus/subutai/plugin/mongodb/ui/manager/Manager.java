@@ -15,22 +15,14 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
-import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
-import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
-import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
-import org.safehaus.subutai.plugin.mongodb.api.MongoException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
-import org.safehaus.subutai.plugin.mongodb.api.MongoRouterNode;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -88,8 +80,8 @@ public class Manager
     private final ExecutorService executorService;
     private final Tracker tracker;
     private final Mongo mongo;
-    private MongoClusterConfig mongoClusterConfig;
     private final EnvironmentManager environmentManager;
+    private MongoClusterConfig mongoClusterConfig;
 
 
     public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -176,18 +168,17 @@ public class Manager
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 PROGRESS_ICON.setVisible( true );
-                try
+                executorService.execute( new StartAllTask( mongo, tracker, mongoClusterConfig, new CompleteEvent()
                 {
-                    startAll();
-                }
-                catch ( MongoException e )
-                {
-                    e.printStackTrace();
-                }
-                PROGRESS_ICON.setVisible( false );
-//                startAllNodes( configServersTable );
-//                startAllNodes( dataNodesTable );
-//                startAllNodes( routersTable );
+                    public void onComplete( NodeState state )
+                    {
+                        synchronized ( PROGRESS_ICON )
+                        {
+                            PROGRESS_ICON.setVisible( false );
+                            checkAllNodes();
+                        }
+                    }
+                } ) );
             }
         } );
         controlsContent.addComponent( startAllBtn );
@@ -395,7 +386,8 @@ public class Manager
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION )
                                             .getValue();
                     Set<ContainerHost> containerHosts =
-                            environmentManager.getEnvironmentByUUID( mongoClusterConfig.getEnvironmentId() ).getContainers();
+                            environmentManager.getEnvironmentByUUID( mongoClusterConfig.getEnvironmentId() )
+                                              .getContainers();
                     Iterator iterator = containerHosts.iterator();
                     ContainerHost containerHost = null;
                     while ( iterator.hasNext() )
@@ -490,9 +482,9 @@ public class Manager
             addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn, destroyBtn );
 
 
-
-            table.addItem( new Object[] { node.getAgent().getHostname(), node.getAgent().getListIP().get( 0 ), nodeType.name(),
-                    resultHolder, availableOperations
+            table.addItem( new Object[] {
+                    node.getAgent().getHostname(), node.getAgent().getListIP().get( 0 ), nodeType.name(), resultHolder,
+                    availableOperations
             }, null );
 
 
@@ -658,6 +650,24 @@ public class Manager
     }
 
 
+    public void disableButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( false );
+        }
+    }
+
+
+    public void enableButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( true );
+        }
+    }
+
+
     public void checkNodesStatus( Table table )
     {
         for ( Object o : table.getItemIds() )
@@ -677,6 +687,7 @@ public class Manager
         }
     }
 
+
     protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption )
     {
         if ( availableOperationsLayout == null )
@@ -693,43 +704,6 @@ public class Manager
                 }
             }
             return null;
-        }
-    }
-
-    public void startAll() throws MongoException
-    {
-        for ( MongoConfigNode configNode : mongoClusterConfig.getConfigServers() )
-        {
-            configNode.start();
-        }
-
-        for ( MongoRouterNode routerNode : mongoClusterConfig.getRouterServers() )
-        {
-            routerNode.start();
-        }
-
-        for ( MongoDataNode dataNode : mongoClusterConfig.getDataNodes() )
-        {
-            dataNode.start();
-        }
-    }
-
-    public void startAllNodes( Table table )
-    {
-        for ( Object o : table.getItemIds() )
-        {
-            int rowId = ( Integer ) o;
-            Item row = table.getItem( rowId );
-            HorizontalLayout availableOperationsLayout =
-                    ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
-            if ( availableOperationsLayout != null )
-            {
-                Button startBtn = getButton( availableOperationsLayout, START_BUTTON_CAPTION );
-                if ( startBtn != null )
-                {
-                    startBtn.click();
-                }
-            }
         }
     }
 
@@ -753,29 +727,34 @@ public class Manager
         }
     }
 
-    public void checkAllNodes(){
+
+    public void checkAllNodes()
+    {
         checkNodesStatus( configServersTable );
         checkNodesStatus( routersTable );
         checkNodesStatus( dataNodesTable );
     }
 
 
-    public void disableButtons( Button... buttons )
+    public void startAllNodes( Table table )
     {
-        for ( Button b : buttons )
+        for ( Object o : table.getItemIds() )
         {
-            b.setEnabled( false );
+            int rowId = ( Integer ) o;
+            Item row = table.getItem( rowId );
+            HorizontalLayout availableOperationsLayout =
+                    ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+            if ( availableOperationsLayout != null )
+            {
+                Button startBtn = getButton( availableOperationsLayout, START_BUTTON_CAPTION );
+                if ( startBtn != null )
+                {
+                    startBtn.click();
+                }
+            }
         }
     }
 
-
-    public void enableButtons( Button... buttons )
-    {
-        for ( Button b : buttons )
-        {
-            b.setEnabled( true );
-        }
-    }
 
     public Component getContent()
     {

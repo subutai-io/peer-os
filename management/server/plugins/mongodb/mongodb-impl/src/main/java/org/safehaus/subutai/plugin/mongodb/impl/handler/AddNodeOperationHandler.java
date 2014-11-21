@@ -208,7 +208,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
             newRouter.setConfigServers( config.getConfigServers() );
             newRouter.start();
             return true;
-                   }
+        }
         catch ( SubutaiException e )
         {
             po.addLog( String.format( "Could not add router node: %s", e.toString() ) );
