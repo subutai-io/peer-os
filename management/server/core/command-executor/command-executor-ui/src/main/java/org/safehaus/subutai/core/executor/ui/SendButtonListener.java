@@ -71,7 +71,7 @@ public class SendButtonListener implements Button.ClickListener, CommandCallback
             Set<HostInfo> connectedHosts = Sets.newHashSet();
             for ( final HostInfo hostInfo : hosts )
             {
-                checkIfHostConnected( connectedHosts, hostInfo );
+                addIfHostConnected( connectedHosts, hostInfo );
             }
 
             if ( !connectedHosts.isEmpty() )
@@ -82,7 +82,7 @@ public class SendButtonListener implements Button.ClickListener, CommandCallback
     }
 
 
-    protected void checkIfHostConnected( Set<HostInfo> connectedHosts, HostInfo hostInfo )
+    protected void addIfHostConnected( Set<HostInfo> connectedHosts, HostInfo hostInfo )
     {
         try
         {

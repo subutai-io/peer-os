@@ -45,7 +45,7 @@ public class StringUtil
             Double.parseDouble( str );
             return true;
         }
-        catch ( NumberFormatException e )
+        catch ( NullPointerException | NumberFormatException e )
         {
             return false;
         }
