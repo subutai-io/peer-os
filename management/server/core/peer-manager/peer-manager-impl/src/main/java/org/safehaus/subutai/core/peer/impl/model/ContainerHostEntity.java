@@ -45,8 +45,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     private ContainerState state = ContainerState.UNKNOWN;
     @Column( name = "node_group_name", nullable = false )
     private String nodeGroupName;
-    @Column( name = "parent_host_name", nullable = false )
-    protected String parentHostname;
+    //    @Column( name = "parent_host_name", nullable = false )
+    //    protected String parentHostname;
 
 
     private ContainerHostEntity()
@@ -54,13 +54,27 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public ContainerHostEntity( String peerId, String creatorPeerId, String environmentId, String parentHostname,
-                                HostInfo hostInfo )
+    public ContainerHostEntity( String peerId, HostInfo hostInfo )
+    {
+        super( peerId, hostInfo );
+        this.creatorPeerId = "UNKNOWN";
+        this.environmentId = "UNKNOWN";
+        this.nodeGroupName = "UNKNOWN";
+        this.templateArch = "amd64";
+        this.templateName = "UNKNOWN";
+        //        this.parentHostname = parentHostname;
+    }
+
+
+    public ContainerHostEntity( final String peerId, final String creatorPeerId, final String environmentId,
+                                final String nodeGroupName, final HostInfo hostInfo )
     {
         super( peerId, hostInfo );
         this.creatorPeerId = creatorPeerId;
         this.environmentId = environmentId;
-        this.parentHostname = parentHostname;
+        this.nodeGroupName = nodeGroupName;
+        this.templateArch = "amd64";
+        this.templateName = "UNKNOWN";
     }
 
 
@@ -117,6 +131,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         return templateArch;
     }
+
 
     @Override
     public void setTemplateArch( final String templateArch )

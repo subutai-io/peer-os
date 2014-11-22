@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+
 
 /**
  * Local peer interface
@@ -18,7 +20,7 @@ public interface LocalPeer extends Peer
      *
      * @return if host is registered and connected returns implementation of this host, otherwise throws exception.
      */
-    public Host bindHost( String id ) throws HostNotFoundException, HostNotConnectedException;
+    public Host bindHost( String id ) throws HostNotFoundException;
 
     /**
      * Binds host with given ID
@@ -27,7 +29,7 @@ public interface LocalPeer extends Peer
      *
      * @return if host is registered and connected returns implementation of this host, otherwise throws exception.
      */
-    public Host bindHost( UUID id ) throws HostNotFoundException, HostNotConnectedException;
+    public Host bindHost( UUID id ) throws HostNotFoundException;
 
     /**
      * Returns implementation of ResourceHost interface.
@@ -76,5 +78,7 @@ public interface LocalPeer extends Peer
 
     //    Agent waitForAgent( String containerName, int timeout );
 
+    public ContainerHost getContainerHost( final HostInfo hostInfo, final String creatorPeerId,
+                                           final String environmentId, final String nodeGroupName );
     public void onPeerEvent( PeerEvent event );
 }

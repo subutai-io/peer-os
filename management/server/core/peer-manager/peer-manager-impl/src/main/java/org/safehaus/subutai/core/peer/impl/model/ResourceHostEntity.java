@@ -33,17 +33,17 @@ import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.monitor.api.MetricType;
+import org.safehaus.subutai.core.peer.api.ContainerCreateOrder;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.ContainerState;
 import org.safehaus.subutai.core.peer.api.Host;
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.PeerEvent;
-import org.safehaus.subutai.core.peer.api.PeerEventType;
-import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -56,6 +56,8 @@ import com.google.common.cache.CacheBuilder;
 @Access( AccessType.FIELD )
 public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost, HostListener
 {
+    @javax.persistence.Transient
+    transient protected static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
     @javax.persistence.Transient
     transient private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
     @javax.persistence.Transient
@@ -182,7 +184,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( CommandException e )
         {
-            throw new ResourceHostException( "unable retrieve host metric", e.toString() );
+            throw new ResourceHostException( "Unable retrieve host metric", e.toString() );
         }
     }
 
@@ -404,36 +406,18 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    private ContainerHost create( final String creatorPeerId, final String environmentId,
-                                  final List<Template> templates, final String containerName ) throws PeerException
+    private void create( final ContainerCreateOrder containerCreateOrder ) throws ResourceHostException
     {
-        Template template = templates.get( templates.size() - 1 );
-
-        prepareTemplates( templates );
-        boolean cloneResult = run( Command.CLONE, template.getTemplateName(), containerName );
-
-        ContainerHost result =
-                waitHeartbeatAndCreateContainerHost( containerName, template.getTemplateName(), environmentId,
-                        creatorPeerId );
-
-        if ( result == null )
-        {
-            throw new ResourceHostException(
-                    String.format( "Unable create container %s on %s using template %s", containerName, getHostname(),
-                            template.getTemplateName() ), null );
-        }
-        else
-        {
-            return result;
-        }
+        prepareTemplates( containerCreateOrder.getTemplates() );
+        run( Command.CLONE, containerCreateOrder.getTemplateName(), containerCreateOrder.getHostname() );
     }
 
 
-    public void createContainer( final LocalPeer localPeer, final String creatorPeerId, final String environmentId,
-                                 final List<Template> templates, final String containerName,
-                                 final String nodeGroupName )
+    @Override
+    public void createContainer( final ContainerCreateOrder containerCreateOrder )
 
     {
+        Preconditions.checkNotNull( containerCreateOrder, "Container create order is null." );
 
         getExecutor().execute( new Runnable()
         {
@@ -442,38 +426,43 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             {
                 try
                 {
-                    ContainerHost containerHost = create( creatorPeerId, environmentId, templates, containerName );
-                    containerHost.setNodeGroupName( nodeGroupName );
-                    containerHost.setEnvironmentId( environmentId.toString() );
-                    localPeer.onPeerEvent( new PeerEvent( PeerEventType.CONTAINER_CREATE_SUCCESS, containerHost ) );
+                    /*ContainerHost containerHost =*/
+                    create( containerCreateOrder );
+                    containerCreateOrder.setState( ContainerCreateOrder.State.SUCCESS );
+                    containerCreateOrder.setDescription( "Container successfully cloned." );
+                    //                    containerHost.setNodeGroupName( nodeGroupName );
+                    //                    containerHost.setEnvironmentId( environmentId.toString() );
+                    //                    localPeer.onPeerEvent( new PeerEvent( PeerEventType
+                    // .CONTAINER_CREATE_SUCCESS, containerHost ) );
                 }
                 catch ( Exception e )
                 {
-                    localPeer.onPeerEvent( new PeerEvent( PeerEventType.CONTAINER_CREATE_FAIL, e ) );
+                    containerCreateOrder.setState( ContainerCreateOrder.State.FAIL );
+                    containerCreateOrder.setDescription( e.toString() );
                 }
             }
         } );
     }
 
 
-    private ContainerHost waitHeartbeatAndCreateContainerHost( final String containerName, final String templateName,
-                                                               final String envId, final String creatorPeerId )
-            throws PeerException
-    {
-        HostInfo hostInfo = waitHeartbeat( containerName, 5 );
-        if ( hostInfo == null )
-        {
-            throw new ResourceHostException( "Heartbeat from container not received.", null );
-        }
-        ContainerHost containerHost =
-                new ContainerHostEntity( getPeerId(), creatorPeerId, envId, this.getHostname(), hostInfo );
-        containerHost.setCreatorPeerId( creatorPeerId );
-        containerHost.setTemplateName( templateName );
-        containerHost.setTemplateArch( "amd64" );
-        containerHost.updateHeartbeat();
-        addContainerHost( containerHost );
-        return containerHost;
-    }
+    //    private ContainerHost waitHeartbeatAndCreateContainerHost( final String containerName, final String
+    // templateName,
+    //                                                               final String envId, final String creatorPeerId )
+    //            throws PeerException
+    //    {
+    //        HostInfo hostInfo = waitHeartbeat( containerName, 15 );
+    //        if ( hostInfo == null )
+    //        {
+    //            throw new ResourceHostException( "Heartbeat from container not received.", null );
+    //        }
+    //        ContainerHost containerHost = new ContainerHostEntity( getPeerId(), creatorPeerId, envId, hostInfo );
+    //        containerHost.setCreatorPeerId( creatorPeerId );
+    //        containerHost.setTemplateName( templateName );
+    //        containerHost.setTemplateArch( "amd64" );
+    //        containerHost.updateHeartbeat();
+    //        addContainerHost( containerHost );
+    //        return containerHost;
+    //    }
 
 
     protected void prepareTemplates( List<Template> templates ) throws ResourceHostException
@@ -719,6 +708,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         HostInfo result = getHeartbeat( hostname );
         while ( result == null && System.currentTimeMillis() < threshold )
         {
+            LOG.info( String.format( "Waiting for host: %s... Left seconds: %d", hostname,
+                    ( threshold - System.currentTimeMillis() ) / 1000 ) );
             try
             {
                 Thread.sleep( 2000 );
@@ -749,7 +740,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     enum Command
     {
         LIST_TEMPLATES( "subutai list -t %s" ),
-        CLONE( "subutai clone %s %s", 100 ),
+        CLONE( "subutai clone %s %s", 20 ),
         DESTROY( "subutai destroy %s" ),
         IMPORT( "subutai import %s" ),
         PROMOTE( "promote %s" ),

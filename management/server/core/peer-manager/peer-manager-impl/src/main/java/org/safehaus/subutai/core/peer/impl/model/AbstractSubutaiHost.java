@@ -68,8 +68,8 @@ public abstract class AbstractSubutaiHost implements Host
 
     protected AbstractSubutaiHost( final String peerId, final HostInfo hostInfo )
     {
-        Preconditions.checkNotNull( hostInfo, "HostInfo is null" );
-        Preconditions.checkNotNull( peerId, "PeerId is null" );
+        Preconditions.checkNotNull( hostInfo, "Host information is null" );
+        Preconditions.checkNotNull( peerId, "Peer ID is null" );
 
         this.hostId = hostInfo.getId().toString();
         this.peerId = peerId;

@@ -1,11 +1,9 @@
 package org.safehaus.subutai.core.peer.api;
 
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
@@ -15,8 +13,7 @@ import org.safehaus.subutai.core.strategy.api.ServerMetric;
  */
 public interface ResourceHost extends Host
 {
-    public void createContainer( LocalPeer localPeer, String creatorPeerId, String envId, List<Template> templates,
-                                 String cloneName, String nodeGroup );
+    public void createContainer( ContainerCreateOrder contanerCreateOrder );
 
     public Set<ContainerHost> getContainerHostsByNameList( Set<String> cloneNames );
 
