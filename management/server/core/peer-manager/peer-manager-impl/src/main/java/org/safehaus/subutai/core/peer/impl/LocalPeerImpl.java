@@ -191,6 +191,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
     public ContainerHost createContainer( final String hostName, final String templateName, final String cloneName,
                                           final UUID environmentId ) throws PeerException
     {
+        Preconditions.checkNotNull( hostName, "Host name is null." );
+        Preconditions.checkNotNull( environmentId, "Environment ID is null." );
+        Preconditions.checkNotNull( templateName, "Template list is null." );
+
         String nodeGroup = UUID.randomUUID().toString();
 
         ContainerCreateOrder containerCreateOrder =
@@ -203,6 +207,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
         Set<ContainerHost> containerHosts =
                 waitContainerOrders( resourceHost, Lists.newArrayList( containerCreateOrder ) );
         ContainerHost result = containerHosts.iterator().next();
+        result.setEnvironmentId( environmentId.toString() );
+        result.setNodeGroupName( nodeGroup );
+        result.setCreatorPeerId( getId().toString() );
+        result.setTemplateName( templateName );
+        resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
         return result;
     }
 
@@ -215,6 +224,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
         int quantity = orders.size();
         long threshold = System.currentTimeMillis() + 120 * quantity * 1000;
         Set<String> cloneNames = new HashSet<>();
+        for ( ContainerCreateOrder containerCreateOrder : orders )
+        {
+            cloneNames.add( containerCreateOrder.getHostname() );
+        }
         while ( result.size() != quantity && threshold - System.currentTimeMillis() > 0 )
         {
             try
@@ -248,6 +261,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
                                                 final String strategyId, final List<Criteria> criteria,
                                                 String nodeGroupName ) throws PeerException
     {
+        Preconditions.checkNotNull( creatorPeerId, "Creator peer ID is null." );
+        Preconditions.checkNotNull( nodeGroupName, "Node group name is null." );
+        Preconditions.checkNotNull( environmentId, "Environment ID is null." );
+        Preconditions.checkNotNull( templates, "Template list is null." );
+        Preconditions.checkState( templates.size() > 0, "Template list is empty" );
+
         LOG.info( String.format( "=============> Received: %s %d %s", nodeGroupName, quantity,
                 creatorPeerId.toString() ) );
 
@@ -338,7 +357,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
                     containerHost.setCreatorPeerId( containerCreateOrder.getCustomerId() );
                     containerHost.setNodeGroupName( containerCreateOrder.getNodeGroupName() );
                     containerHost.setEnvironmentId( containerCreateOrder.getEnvironmentId() );
+                    containerHost.setTemplateName( containerCreateOrder.getTemplateName() );
                 }
+                resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
             }
 
             return result;
@@ -571,21 +592,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
             }
         }
 
-
         if ( result == null )
         {
-            try
-            {
-                if ( getManagementHost().getHostId().equals( id ) )
-                {
-                    result = managementHost;
-                }
-            }
-            catch ( HostNotFoundException e )
+            if ( !getManagementHost().getHostId().equals( id ) )
             {
                 throw new HostNotFoundException( String.format( "Host by id %s is not registered.", id ) );
             }
+            else
+            {
+                result = getManagementHost();
+            }
         }
+
 
         return result;
     }
@@ -616,23 +634,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
             }
         }
 
-
         if ( result == null )
         {
-            try
-            {
-                if ( getManagementHost().getHostId().equals( host.getHostId() ) )
-                {
-                    result = getManagementHost();
-                }
-            }
-            catch ( HostNotFoundException e )
+            if ( !getManagementHost().getHostId().equals( host.getHostId() ) )
             {
                 throw new HostNotFoundException(
                         String.format( "Host by id %s is not registered.", host.getHostId() ) );
             }
+            else
+            {
+                result = getManagementHost();
+            }
         }
-
         return ( T ) result;
     }
 
@@ -690,18 +703,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
     @Override
     public void destroyContainer( final ContainerHost containerHost ) throws PeerException
     {
-        Host result = bindHost( containerHost.getId() );
-        if ( result == null )
-        {
-            throw new PeerException( "Container Host not found." );
-        }
-
         try
         {
-            ResourceHost resourceHost = getResourceHostByName( containerHost.getAgent().getParentHostName() );
+            ContainerHost result = bindHost( containerHost );
+
+            ContainerHostEntity entity = ( ContainerHostEntity ) result;
+            ResourceHost resourceHost =
+                    entity.getParent(); //getResourceHostByName( containerHost.getAgent().getParentHostName() );
             resourceHost.destroyContainerHost( containerHost );
             resourceHost.removeContainerHost( result );
-            peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
+            resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
+            //            peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
         }
         catch ( ResourceHostException e )
         {
@@ -1088,23 +1100,29 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
                     boolean newContainer = false;
                     for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
                     {
+                        if ( containerHostInfo.getInterfaces().size() == 0 )
+                        {
+                            continue;
+                        }
+                        Host containerHost;
                         try
                         {
-                            bindHost( containerHostInfo.getId() );
+                            containerHost = bindHost( containerHostInfo.getId() );
                         }
                         catch ( HostNotFoundException hnfe )
                         {
-                            Host containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
+                            containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
                             host.addContainerHost( ( ContainerHostEntity ) containerHost );
                             newContainer = true;
                         }
+                        containerHost.updateHeartbeat();
                     }
                     if ( newContainer )
                     {
                         resourceHostDataService.update( ( ResourceHostEntity ) host );
                     }
                 }
-                host.onHeartbeat( resourceHostInfo );
+                //                host.onHeartbeat( resourceHostInfo );
             }
             catch ( PeerException e )
             {

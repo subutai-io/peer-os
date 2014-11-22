@@ -1,8 +1,10 @@
 package org.safehaus.subutai.core.peer.ui.container;
 
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -10,9 +12,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
-import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -43,6 +43,7 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
     private Set<Host> selectedHosts = new HashSet<>();
     private final ScheduledExecutorService scheduler;
     private HostRegistry hostRegistry;
+    private Item managementHostItem;
 
 
     public ContainerTree( LocalPeer localPeer, HostRegistry hostRegistry )
@@ -54,7 +55,11 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
         setMargin( true );
 
         tree = new Tree( "List of nodes" );
-//        tree.setContainerDataSource( getNodeContainer() );
+        container = new HierarchicalContainer();
+        container.addContainerProperty( "value", Host.class, null );
+        container.addContainerProperty( "icon", Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
+
+        tree.setContainerDataSource( getNodeContainer() );
         tree.setItemIconPropertyId( "icon" );
         tree.setItemDescriptionGenerator( new AbstractSelect.ItemDescriptionGenerator()
         {
@@ -135,106 +140,133 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
 
     public HierarchicalContainer getNodeContainer()
     {
-        container = new HierarchicalContainer();
-        container.addContainerProperty( "value", Host.class, null );
-        container.addContainerProperty( "icon", Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
 
-        tree.removeAllItems();
-        tree.setContainerDataSource( container );
+        //        tree.removeAllItems();
+        //        tree.setContainerDataSource( container );
 
         try
         {
             ManagementHost managementHost = localPeer.getManagementHost();
             if ( managementHost != null )
             {
-                Item managementHostItem = container.addItem( managementHost.getId() );
-                container.setChildrenAllowed( managementHost.getId(), true );
-                managementHostItem.getItemProperty( "value" ).setValue( managementHost );
-                tree.setItemCaption( managementHost.getId(),
-                        String.format( localPeer.getPeerInfo().getName(), localPeer.getPeerInfo().getId() ) );
-                for ( ResourceHost rh : localPeer.getResourceHosts() )
+                managementHostItem = container.getItem( managementHost.getId() );
+                if ( managementHostItem == null )
                 {
-                    Item resourceHostItem = container.addItem( rh.getId() );
-                    tree.setItemCaption( rh.getId(), rh.getHostname() );
-                    resourceHostItem.getItemProperty( "value" ).setValue( rh );
-                    container.setParent( rh.getId(), managementHost.getId() );
-                    if ( rh.getContainerHosts().size() > 0 )
-                    {
-                        container.setChildrenAllowed( rh.getId(), rh.getContainerHosts().size() > 0 );
-
-                        for ( ContainerHost ch : rh.getContainerHosts() )
-                        {
-                            Item containerHostItem = container.addItem( ch.getId() );
-                            if ( containerHostItem != null )
-                            {
-                                container.setChildrenAllowed( ch.getId(), false );
-                                tree.setItemCaption( ch.getId(), ch.getHostname() );
-                                containerHostItem.getItemProperty( "value" ).setValue( ch );
-                                container.setParent( ch.getId(), rh.getId() );
-                            }
-                            else
-                            {
-                                LOG.error( "Error in ContainerTree" );
-                            }
-                        }
-                    }
-                    else
-                    {
-                        container.setChildrenAllowed( rh.getId(), false );
-                    }
-                }
-
-
-                // not registered containers
-                for ( ResourceHostInfo resourceHostInfo : hostRegistry.getResourceHostsInfo() )
-                {
-                    if ( resourceHostInfo.getContainers() != null )
-                    {
-                        Item parentItem = container.getItem( resourceHostInfo.getId() );
-                        if ( parentItem != null )
-                        {
-                            for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
-                            {
-                                container.setChildrenAllowed( resourceHostInfo.getId(), true );
-                                Item containerHostItem = container.getItem( containerHostInfo.getId() );
-                                if ( containerHostItem == null )
-                                {
-                                    ContainerHost containerHost = localPeer
-                                            .getContainerHost( containerHostInfo, localPeer.getId().toString(),
-                                                    "UNKNOWN" );
-
-                                    containerHostItem = container.addItem( containerHost.getId() );
-                                    if ( containerHostItem != null )
-                                    {
-                                        container.setChildrenAllowed( containerHost.getId(), false );
-                                        tree.setItemCaption( containerHost.getId(),
-                                                "NOT REGISTERED!!!" + containerHost.getHostname() );
-                                        containerHostItem.getItemProperty( "value" ).setValue( containerHost );
-                                        container.setParent( containerHost.getId(), resourceHostInfo.getId() );
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            LOG.warn( String.format( "Resource host %s not registered.",
-                                    resourceHostInfo.getHostname() ) );
-                        }
-                    }
+                    managementHostItem = container.addItem( managementHost.getId() );
+                    container.setChildrenAllowed( managementHost.getId(), true );
+                    managementHostItem.getItemProperty( "value" ).setValue( managementHost );
+                    tree.setItemCaption( managementHost.getId(),
+                            String.format( localPeer.getPeerInfo().getName(), localPeer.getPeerInfo().getId() ) );
                 }
             }
-            else
+
+            for ( ResourceHost rh : localPeer.getResourceHosts() )
             {
-                LOG.warn( "ManagementHost is null" );
+                Item resourceHostItem = container.getItem( rh.getId() );
+
+                if ( resourceHostItem == null )
+                {
+                    resourceHostItem = container.addItem( rh.getId() );
+                }
+
+                tree.setItemCaption( rh.getId(), rh.getHostname() );
+                resourceHostItem.getItemProperty( "value" ).setValue( rh );
+                if ( managementHostItem != null )
+                {
+                    container.setParent( rh.getId(), managementHost.getId() );
+                }
+
+                if ( rh.getContainerHosts().size() > 0 )
+                {
+                    container.setChildrenAllowed( rh.getId(), true );
+
+                    for ( ContainerHost ch : rh.getContainerHosts() )
+                    {
+
+                        Item containerHostItem = container.getItem( ch.getId() );
+                        if ( containerHostItem == null )
+                        {
+                            containerHostItem = container.addItem( ch.getId() );
+                            container.setChildrenAllowed( ch.getId(), false );
+                        }
+
+                        tree.setItemCaption( ch.getId(), ch.getHostname() );
+                        containerHostItem.getItemProperty( "value" ).setValue( ch );
+                        container.setParent( ch.getId(), rh.getId() );
+                    }
+                }
+                else
+                {
+                    container.setChildrenAllowed( rh.getId(), false );
+                }
+
+                // removing destroyed containers
+                Collection children = container.getChildren( rh.getId() );
+                if ( children != null )
+                {
+                    Iterator iterator = children.iterator();
+                    while ( iterator.hasNext() )
+                    {
+                        Object id = iterator.next();
+                        Item item = container.getItem( id );
+                        ContainerHost containerHost = ( ContainerHost ) item.getItemProperty( "value" ).getValue();
+                        if ( !rh.getContainerHosts().contains( containerHost ) )
+                        {
+                            container.removeItem( item );
+                            tree.removeItem( id );
+                        }
+                    }
+                }
             }
+
+
+            // not registered containers
+            //                for ( ResourceHostInfo resourceHostInfo : hostRegistry.getResourceHostsInfo() )
+            //                {
+            //                    if ( resourceHostInfo.getContainers() != null )
+            //                    {
+            //                        Item parentItem = container.getItem( resourceHostInfo.getId() );
+            //                        if ( parentItem != null )
+            //                        {
+            //                            for ( ContainerHostInfo containerHostInfo : resourceHostInfo
+            // .getContainers() )
+            //                            {
+            //                                container.setChildrenAllowed( resourceHostInfo.getId(), true );
+            //                                Item containerHostItem = container.getItem( containerHostInfo.getId
+            // () );
+            //                                if ( containerHostItem == null )
+            //                                {
+            //                                    ContainerHost containerHost = localPeer
+            //                                            .getContainerHost( containerHostInfo, localPeer.getId()
+            // .toString() );
+            //
+            //                                    containerHostItem = container.addItem( containerHost.getId() );
+            //                                    if ( containerHostItem != null )
+            //                                    {
+            //                                        container.setChildrenAllowed( containerHost.getId(), false );
+            //                                        tree.setItemCaption( containerHost.getId(),
+            //                                                "NOT REGISTERED!!!" + containerHost.getHostname() );
+            //                                        containerHostItem.getItemProperty( "value" ).setValue(
+            // containerHost );
+            //                                        container.setParent( containerHost.getId(),
+            // resourceHostInfo.getId() );
+            //                                    }
+            //                                }
+            //                            }
+            //                        }
+            //                        else
+            //                        {
+            //                            LOG.warn( String.format( "Resource host %s not registered.",
+            //                                    resourceHostInfo.getHostname() ) );
+            //                        }
+            //                    }
+            //                }
         }
 
 
         catch ( PeerException e )
-
-
         {
-            LOG.error( "Error on building container tree: " + e.toString() );
+            LOG.error( "Error on building container tree.", e );
         }
 
 

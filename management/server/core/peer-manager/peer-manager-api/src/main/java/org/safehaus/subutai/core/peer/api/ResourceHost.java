@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.peer.api;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
 
@@ -37,5 +36,5 @@ public interface ResourceHost extends Host
 
     public void removeContainerHost( Host result ) throws ResourceHostException;
 
-    void onHeartbeat( ResourceHostInfo resourceHostInfo );
+    //    void onHeartbeat( ResourceHostInfo resourceHostInfo );
 }

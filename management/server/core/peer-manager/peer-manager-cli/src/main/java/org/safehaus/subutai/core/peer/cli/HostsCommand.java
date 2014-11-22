@@ -76,7 +76,7 @@ public class HostsCommand extends OsgiCommandSupport
 
             if ( c.getCreatorPeerId() != null )
             {
-                Peer peer = peerManager.getPeer( UUID.fromString( c.getCreatorPeerId() ) );
+                Peer peer = peerManager.getPeer( UUID.fromString( c.getPeerId() ) );
                 if ( peer != null )
                 {
                     containerInfo += " " + peer.getPeerInfo().getIp();

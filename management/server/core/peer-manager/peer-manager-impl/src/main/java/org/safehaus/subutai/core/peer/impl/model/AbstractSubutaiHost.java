@@ -63,7 +63,7 @@ public abstract class AbstractSubutaiHost implements Host
     protected Set<HostInterface> interfaces = new HashSet<>();
 
     @Transient
-    protected long lastHeartbeat = System.currentTimeMillis();
+    protected long lastHeartbeat = 0;
 
 
     protected AbstractSubutaiHost( final String peerId, final HostInfo hostInfo )

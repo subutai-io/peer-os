@@ -27,12 +27,12 @@ public class ContainerCreateOrder
     public ContainerCreateOrder( final String customerId, final String hostname, final String nodeGroupName,
                                  final String environmentId, String ip, List<Template> templates )
     {
-        Preconditions.checkNotNull( customerId, "Customer ID is null." );
-        Preconditions.checkNotNull( hostname, "Host name is null." );
-        Preconditions.checkNotNull( nodeGroupName, "Node group name is null." );
-        Preconditions.checkNotNull( environmentId, "Environment ID is null." );
-        Preconditions.checkNotNull( templates, "Template list is null." );
-        Preconditions.checkState( templates.size() == 0, "Template list is empty" );
+//        Preconditions.checkNotNull( customerId, "Customer ID is null." );
+//        Preconditions.checkNotNull( hostname, "Host name is null." );
+//        Preconditions.checkNotNull( nodeGroupName, "Node group name is null." );
+//        Preconditions.checkNotNull( environmentId, "Environment ID is null." );
+//        Preconditions.checkNotNull( templates, "Template list is null." );
+//        Preconditions.checkState( templates.size() > 0, "Template list is empty" );
 
         this.hostname = hostname;
         this.nodeGroupName = nodeGroupName;

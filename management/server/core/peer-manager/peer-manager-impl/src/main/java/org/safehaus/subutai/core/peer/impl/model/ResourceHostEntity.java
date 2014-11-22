@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,12 +25,10 @@ import javax.persistence.Table;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostListener;
-import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.peer.api.ContainerCreateOrder;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -44,8 +41,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 
 
 /**
@@ -54,7 +49,7 @@ import com.google.common.cache.CacheBuilder;
 @Entity
 @Table( name = "resource_host" )
 @Access( AccessType.FIELD )
-public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost, HostListener
+public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost/*, HostListener*/
 {
     @javax.persistence.Transient
     transient protected static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
@@ -68,8 +63,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     transient private static final int HOST_EXPIRATION = 60;
     @javax.persistence.Transient
     transient private ExecutorService executor;
-    @javax.persistence.Transient
-    protected Cache<UUID, ContainerHostInfo> hostCache;
+    //    @javax.persistence.Transient
+    //    protected Cache<UUID, ContainerHostInfo> hostCache;
 
     @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity =
             ContainerHostEntity.class )
@@ -97,24 +92,24 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         return executor;
     }
 
-
-    private Cache<UUID, ContainerHostInfo> getHostCache()
-    {
-        if ( hostCache == null )
-        {
-            hostCache = CacheBuilder.newBuilder().
-                    expireAfterWrite( HOST_EXPIRATION, TimeUnit.SECONDS ).
-                                            build();
-        }
-        return hostCache;
-    }
+    //
+    //    private Cache<UUID, ContainerHostInfo> getHostCache()
+    //    {
+    //        if ( hostCache == null )
+    //        {
+    //            hostCache = CacheBuilder.newBuilder().
+    //                    expireAfterWrite( HOST_EXPIRATION, TimeUnit.SECONDS ).
+    //                                            build();
+    //        }
+    //        return hostCache;
+    //    }
 
 
     public boolean startContainerHost( final ContainerHost container ) throws ResourceHostException
     {
 
         RequestBuilder requestBuilder =
-                new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d &", container.getHostname() ) )
+                new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d", container.getHostname() ) )
                         .withTimeout( 180 );
         try
         {
@@ -314,7 +309,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public boolean stopContainerHost( final ContainerHost container ) throws ResourceHostException
     {
         RequestBuilder requestBuilder =
-                new RequestBuilder( String.format( "/usr/bin/lxc-stop -n %s &", container.getHostname() ) )
+                new RequestBuilder( String.format( "/usr/bin/lxc-stop -n %s", container.getHostname() ) )
                         .withTimeout( 180 );
         try
         {
@@ -655,7 +650,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         try
         {
             CommandResult commandResult = execute( command.build( args ) );
-            return commandResult.hasSucceeded();
+
+            if ( commandResult.getStatus().equals( CommandStatus.SUCCEEDED ) )
+            {
+                return true;
+            }
+            throw new ResourceHostException(
+                    String.format( "Execution failed %s", String.format( command.script, args ) ),
+                    commandResult.toString() );
         }
         catch ( CommandException e )
         {
@@ -692,55 +694,55 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    @Override
-    public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
-    {
-        for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
-        {
-            getHostCache().put( containerHostInfo.getId(), containerHostInfo );
-        }
-    }
+    //    @Override
+    //    public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
+    //    {
+    //        for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
+    //        {
+    //            getHostCache().put( containerHostInfo.getId(), containerHostInfo );
+    //        }
+    //    }
 
 
-    private HostInfo waitHeartbeat( String hostname, int timeoutInSeconds )
-    {
-        long threshold = System.currentTimeMillis() + timeoutInSeconds * 1000;
-        HostInfo result = getHeartbeat( hostname );
-        while ( result == null && System.currentTimeMillis() < threshold )
-        {
-            LOG.info( String.format( "Waiting for host: %s... Left seconds: %d", hostname,
-                    ( threshold - System.currentTimeMillis() ) / 1000 ) );
-            try
-            {
-                Thread.sleep( 2000 );
-            }
-            catch ( InterruptedException ignore )
-            {
-                break;
-            }
-            result = getHeartbeat( hostname );
-        }
-        return result;
-    }
+    //    private HostInfo waitHeartbeat( String hostname, int timeoutInSeconds )
+    //    {
+    //        long threshold = System.currentTimeMillis() + timeoutInSeconds * 1000;
+    //        HostInfo result = getHeartbeat( hostname );
+    //        while ( result == null && System.currentTimeMillis() < threshold )
+    //        {
+    //            LOG.info( String.format( "Waiting for host: %s... Left seconds: %d", hostname,
+    //                    ( threshold - System.currentTimeMillis() ) / 1000 ) );
+    //            try
+    //            {
+    //                Thread.sleep( 2000 );
+    //            }
+    //            catch ( InterruptedException ignore )
+    //            {
+    //                break;
+    //            }
+    //            result = getHeartbeat( hostname );
+    //        }
+    //        return result;
+    //    }
 
 
-    private HostInfo getHeartbeat( final String hostname )
-    {
-        for ( HostInfo hostInfo : getHostCache().asMap().values() )
-        {
-            if ( hostname.equals( hostInfo.getHostname() ) )
-            {
-                return hostInfo;
-            }
-        }
-        return null;
-    }
+    //    private HostInfo getHeartbeat( final String hostname )
+    //    {
+    //        for ( HostInfo hostInfo : getHostCache().asMap().values() )
+    //        {
+    //            if ( hostname.equals( hostInfo.getHostname() ) )
+    //            {
+    //                return hostInfo;
+    //            }
+    //        }
+    //        return null;
+    //    }
 
 
     enum Command
     {
         LIST_TEMPLATES( "subutai list -t %s" ),
-        CLONE( "subutai clone %s %s", 20 ),
+        CLONE( "subutai clone %s %s", 180, true ),
         DESTROY( "subutai destroy %s" ),
         IMPORT( "subutai import %s" ),
         PROMOTE( "promote %s" ),
