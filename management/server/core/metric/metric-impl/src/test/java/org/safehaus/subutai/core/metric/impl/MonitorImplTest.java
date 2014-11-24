@@ -25,6 +25,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MonitorException;
+import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -95,6 +96,9 @@ public class MonitorImplTest
     ContainerHost containerHost;
     @Mock
     ResourceHost resourceHost;
+
+    @Mock
+    MonitoringSettings monitoringSettings;
 
 
     static class MonitorImplExt extends MonitorImpl
@@ -537,5 +541,93 @@ public class MonitorImplTest
 
 
         verify( exception ).printStackTrace( any( PrintStream.class ) );
+    }
+
+
+    @Test
+    public void testActivateMonitoringAtRemoteContainers() throws Exception
+    {
+        monitor.activateMonitoringAtRemoteContainers( remotePeer, Sets.newHashSet( containerHost ),
+                monitoringSettings );
+
+        verify( remotePeer ).sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt() );
+
+
+        PeerException exception = mock( PeerException.class );
+        doThrow( exception ).when( remotePeer )
+                            .sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt() );
+
+        monitor.activateMonitoringAtRemoteContainers( remotePeer, Sets.newHashSet( containerHost ),
+                monitoringSettings );
+
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
+    }
+
+
+    @Test
+    public void testActivateMonitoringAtLocalContainers() throws Exception
+    {
+        when( localPeer.getResourceHostByName( RESOURCE_HOST ) ).thenReturn( resourceHost );
+        when( containerHost.getParentHostname() ).thenReturn( RESOURCE_HOST );
+        CommandResult commandResult = mock( CommandResult.class );
+        when( commandResult.hasSucceeded() ).thenReturn( true );
+        when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
+
+        monitor.activateMonitoringAtLocalContainers( Sets.newHashSet( containerHost ), monitoringSettings );
+
+        verify( resourceHost ).execute( any( RequestBuilder.class ) );
+
+
+        when( commandResult.hasSucceeded() ).thenReturn( false );
+
+        monitor.activateMonitoringAtLocalContainers( Sets.newHashSet( containerHost ), monitoringSettings );
+
+        verify( commandResult ).getStdErr();
+
+
+        PeerException exception = mock( PeerException.class );
+        doThrow( exception ).when( localPeer ).getResourceHostByName( RESOURCE_HOST );
+
+        monitor.activateMonitoringAtLocalContainers( Sets.newHashSet( containerHost ), monitoringSettings );
+
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
+    }
+
+
+    @Test( expected = MonitorException.class )
+    public void testActivateMonitoring() throws Exception
+    {
+        when( containerHost.getPeer() ).thenReturn( localPeer );
+        when( localPeer.getResourceHostByName( RESOURCE_HOST ) ).thenReturn( resourceHost );
+        when( containerHost.getParentHostname() ).thenReturn( RESOURCE_HOST );
+        CommandResult commandResult = mock( CommandResult.class );
+        when( commandResult.hasSucceeded() ).thenReturn( true );
+        when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
+
+        monitor.activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings );
+
+        verify( resourceHost ).execute( any( RequestBuilder.class ) );
+
+
+        when( containerHost.getPeer() ).thenReturn( remotePeer );
+
+        monitor.activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings );
+
+        verify( remotePeer ).sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt() );
+
+
+        monitor.activateMonitoring( containerHost, monitoringSettings );
+
+        verify( remotePeer, times( 2 ) ).sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt() );
+
+        monitor.activateMonitoring( containerHost );
+
+        verify( remotePeer, times( 3 ) ).sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt() );
+
+
+        PeerException exception = mock( PeerException.class );
+        doThrow( exception ).when( containerHost ).getPeer();
+
+        monitor.activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings );
     }
 }
