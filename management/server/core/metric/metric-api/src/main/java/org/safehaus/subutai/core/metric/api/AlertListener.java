@@ -4,14 +4,14 @@ package org.safehaus.subutai.core.metric.api;
 /**
  * Interface for MetricListener
  */
-public interface MetricListener
+public interface AlertListener
 {
     /**
      * Notifies listeners about threshold excess on the container
      *
      * @param metric - {@code ContainerHostMetric} metric of the host where thresholds are being exceeded
      */
-    public void alertThresholdExcess( ContainerHostMetric metric );
+    public void onAlert( ContainerHostMetric metric );
 
     /**
      * Returns unique id of subscriber module for routing notifications

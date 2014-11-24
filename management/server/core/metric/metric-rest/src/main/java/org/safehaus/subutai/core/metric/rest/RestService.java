@@ -21,14 +21,14 @@ public interface RestService
     @GET
     @Path( "metrics/resource-hosts" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getResourceHostMetrics();
+    public Response getResourceHostsMetrics();
 
     @GET
     @Path( "metrics/containers-hosts/{environmentId}" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getContainerHostMetrics( @PathParam( "environmentId" ) String uuid );
+    public Response getContainerHostsMetrics( @PathParam( "environmentId" ) String uuid );
 
     @POST
     @Path( "alert" )
-    public Response alertThresholdExcess( @FormParam( "metric" ) String alertMetric );
+    public Response alert( @FormParam( "metric" ) String alertMetric );
 }

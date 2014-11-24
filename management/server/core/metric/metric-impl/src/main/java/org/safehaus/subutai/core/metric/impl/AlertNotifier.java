@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.metric.impl;
 
 
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
-import org.safehaus.subutai.core.metric.api.MetricListener;
+import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,17 +10,17 @@ import com.google.common.base.Preconditions;
 
 
 /**
- * Notifies listener on alert
+ * Notifies listener on notifyOnAlert
  */
 public class AlertNotifier implements Runnable
 {
     protected Logger LOG = LoggerFactory.getLogger( AlertNotifier.class.getName() );
 
     protected ContainerHostMetric metric;
-    protected MetricListener listener;
+    protected AlertListener listener;
 
 
-    public AlertNotifier( final ContainerHostMetric metric, final MetricListener listener )
+    public AlertNotifier( final ContainerHostMetric metric, final AlertListener listener )
     {
         Preconditions.checkNotNull( metric, "Metric is null" );
         Preconditions.checkNotNull( listener, "Listener is null" );
@@ -35,7 +35,7 @@ public class AlertNotifier implements Runnable
     {
         try
         {
-            listener.alertThresholdExcess( metric );
+            listener.onAlert( metric );
         }
         catch ( Exception e )
         {

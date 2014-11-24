@@ -18,7 +18,7 @@ public interface Monitor
      *
      * @return set of metrics, one per each container within an environment
      */
-    public Set<ContainerHostMetric> getContainerMetrics( Environment environment ) throws MonitorException;
+    public Set<ContainerHostMetric> getContainerHostsMetrics( Environment environment ) throws MonitorException;
 
 
     /**
@@ -31,26 +31,26 @@ public interface Monitor
      *
      * @return set of metrics, one per each resource host within the local peer
      */
-    public Set<ResourceHostMetric> getResourceHostMetrics() throws MonitorException;
+    public Set<ResourceHostMetric> getResourceHostsMetrics() throws MonitorException;
 
 
     /**
-     * Enables {@code MetricListener} to be triggered if thresholds on some containers within the given environment are
+     * Enables {@code AlertListener} to be triggered if thresholds on some containers within the given environment are
      * exceeded
      *
-     * @param metricListener metricListener  to trigger
+     * @param alertListener alertListener  to trigger
      * @param environment environment to monitor
      */
 
-    public void startMonitoring( MetricListener metricListener, Environment environment ) throws MonitorException;
+    public void startMonitoring( AlertListener alertListener, Environment environment ) throws MonitorException;
 
     /**
-     * Disables {@code MetricListener} to be triggered for the given environment
+     * Disables {@code AlertListener} to be triggered for the given environment
      *
-     * @param metricListener metricListener  to trigger
+     * @param alertListener alertListener  to trigger
      * @param environment environment to monitor
      */
-    public void stopMonitoring( MetricListener metricListener, Environment environment ) throws MonitorException;
+    public void stopMonitoring( AlertListener alertListener, Environment environment ) throws MonitorException;
 
     /**
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
@@ -58,10 +58,10 @@ public interface Monitor
      *
      * @param alertMetric - body of alert in JSON
      */
-    public void alertThresholdExcess( String alertMetric ) throws MonitorException;
+    public void alert( String alertMetric ) throws MonitorException;
 
 
-    public void addMetricListener( MetricListener listener );
+    public void addAlertListener( AlertListener listener );
 
-    public void removeMetricListener( MetricListener listener );
+    public void removeAlertListener( AlertListener listener );
 }

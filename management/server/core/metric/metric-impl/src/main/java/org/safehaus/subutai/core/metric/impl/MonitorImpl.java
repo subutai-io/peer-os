@@ -12,13 +12,13 @@ import java.util.concurrent.Executors;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
-import org.safehaus.subutai.core.metric.api.MetricListener;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
@@ -41,12 +41,12 @@ import com.google.gson.JsonSyntaxException;
 public class MonitorImpl implements Monitor
 {
     private static final String ENVIRONMENT_IS_NULL_MSG = "Environment is null";
-    private static final String METRIC_IS_NULL_MSG = "Metric listener is null";
+    private static final String ALERT_LISTENER_IS_NULL = "Alert listener is null";
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class.getName() );
 
     //set of metric subscribers
-    protected Set<MetricListener> metricListeners =
-            Collections.newSetFromMap( new ConcurrentHashMap<MetricListener, Boolean>() );
+    protected Set<AlertListener> alertListeners =
+            Collections.newSetFromMap( new ConcurrentHashMap<AlertListener, Boolean>() );
     private final Commands commands = new Commands();
     private final PeerManager peerManager;
 
@@ -67,7 +67,7 @@ public class MonitorImpl implements Monitor
 
 
     @Override
-    public Set<ContainerHostMetric> getContainerMetrics( final Environment environment ) throws MonitorException
+    public Set<ContainerHostMetric> getContainerHostsMetrics( final Environment environment ) throws MonitorException
     {
         Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
 
@@ -97,7 +97,7 @@ public class MonitorImpl implements Monitor
             if ( peer.isLocal() )
             {
                 //dispatch locally
-                metrics.addAll( getLocalContainerHostMetrics( environment.getId() ) );
+                metrics.addAll( getLocalContainerHostsMetrics( environment.getId() ) );
             }
             else
             {
@@ -137,7 +137,7 @@ public class MonitorImpl implements Monitor
     }
 
 
-    protected Set<ContainerHostMetricImpl> getLocalContainerHostMetrics( UUID environmentId )
+    protected Set<ContainerHostMetricImpl> getLocalContainerHostsMetrics( UUID environmentId )
     {
 
         Set<ContainerHostMetricImpl> metrics = Sets.newHashSet();
@@ -152,27 +152,28 @@ public class MonitorImpl implements Monitor
                 //get container's resource host
                 ResourceHost resourceHost =
                         peerManager.getLocalPeer().getResourceHostByName( localContainer.getParentHostname() );
-                getContainerMetrics( environmentId, resourceHost, localContainer, metrics );
+                addLocalContainerHostMetric( environmentId, resourceHost, localContainer, metrics );
             }
         }
         catch ( PeerException e )
         {
-            LOG.error( "Error in getLocalContainerHostMetrics", e );
+            LOG.error( "Error in getLocalContainerHostsMetrics", e );
         }
         return metrics;
     }
 
 
-    protected void getContainerMetrics( final UUID environmentId, final ResourceHost resourceHost,
-                                        final ContainerHost localContainer, Set<ContainerHostMetricImpl> metrics )
+    protected void addLocalContainerHostMetric( final UUID environmentId, final ResourceHost resourceHost,
+                                                final ContainerHost localContainer,
+                                                Set<ContainerHostMetricImpl> metrics )
     {
         if ( resourceHost != null )
         {
             try
             {
                 //execute metrics command
-                CommandResult result = resourceHost
-                        .execute( commands.getReadContainerHostMetricCommand( localContainer.getHostname() ) );
+                CommandResult result =
+                        resourceHost.execute( commands.getCurrentMetricCommand( localContainer.getHostname() ) );
                 if ( result.hasSucceeded() )
                 {
                     ContainerHostMetricImpl metric =
@@ -188,7 +189,7 @@ public class MonitorImpl implements Monitor
             }
             catch ( CommandException | JsonSyntaxException e )
             {
-                LOG.error( "Error in getContainerMetrics", e );
+                LOG.error( "Error in addLocalContainerHostMetric", e );
             }
         }
         else
@@ -199,7 +200,7 @@ public class MonitorImpl implements Monitor
 
 
     @Override
-    public Set<ResourceHostMetric> getResourceHostMetrics() throws MonitorException
+    public Set<ResourceHostMetric> getResourceHostsMetrics() throws MonitorException
     {
         Set<ResourceHostMetric> metrics = new HashSet<>();
         //obtain resource hosts
@@ -207,7 +208,7 @@ public class MonitorImpl implements Monitor
         //iterate resource hosts and get their metrics
         for ( ResourceHost resourceHost : resourceHosts )
         {
-            getResourceMetrics( resourceHost, metrics );
+            addResourceHostMetric( resourceHost, metrics );
         }
 
 
@@ -215,11 +216,12 @@ public class MonitorImpl implements Monitor
     }
 
 
-    protected void getResourceMetrics( ResourceHost resourceHost, Set<ResourceHostMetric> metrics )
+    protected void addResourceHostMetric( ResourceHost resourceHost, Set<ResourceHostMetric> metrics )
     {
         try
         {
-            CommandResult result = resourceHost.execute( commands.getReadResourceHostMetricCommand() );
+            CommandResult result =
+                    resourceHost.execute( commands.getCurrentMetricCommand( resourceHost.getHostname() ) );
             if ( result.hasSucceeded() )
             {
                 ResourceHostMetricImpl metric = JsonUtil.fromJson( result.getStdOut(), ResourceHostMetricImpl.class );
@@ -235,19 +237,19 @@ public class MonitorImpl implements Monitor
         }
         catch ( CommandException | JsonSyntaxException e )
         {
-            LOG.error( "Error in getResourceMetrics", e );
+            LOG.error( "Error in addResourceHostMetric", e );
         }
     }
 
 
     @Override
-    public void startMonitoring( final MetricListener metricListener, final Environment environment )
+    public void startMonitoring( final AlertListener alertListener, final Environment environment )
             throws MonitorException
     {
-        Preconditions.checkNotNull( metricListener, METRIC_IS_NULL_MSG );
+        Preconditions.checkNotNull( alertListener, ALERT_LISTENER_IS_NULL );
         Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
         //make sure subscriber id is truncated to 100 characters
-        String subscriberId = metricListener.getSubscriberId();
+        String subscriberId = alertListener.getSubscriberId();
         if ( subscriberId.length() > Constants.MAX_SUBSCRIBER_ID_LEN )
         {
             subscriberId = subscriberId.substring( 0, Constants.MAX_SUBSCRIBER_ID_LEN );
@@ -266,13 +268,13 @@ public class MonitorImpl implements Monitor
 
 
     @Override
-    public void stopMonitoring( final MetricListener metricListener, final Environment environment )
+    public void stopMonitoring( final AlertListener alertListener, final Environment environment )
             throws MonitorException
     {
-        Preconditions.checkNotNull( metricListener, METRIC_IS_NULL_MSG );
+        Preconditions.checkNotNull( alertListener, ALERT_LISTENER_IS_NULL );
         Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
         //make sure subscriber id is truncated to 100 characters
-        String subscriberId = metricListener.getSubscriberId();
+        String subscriberId = alertListener.getSubscriberId();
         if ( subscriberId.length() > Constants.MAX_SUBSCRIBER_ID_LEN )
         {
             subscriberId = subscriberId.substring( 0, Constants.MAX_SUBSCRIBER_ID_LEN );
@@ -294,10 +296,10 @@ public class MonitorImpl implements Monitor
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
      * stress.
      *
-     * @param alertMetric - body of alert in JSON
+     * @param alertMetric - body of notifyOnAlert in JSON
      */
     @Override
-    public void alertThresholdExcess( final String alertMetric ) throws MonitorException
+    public void alert( final String alertMetric ) throws MonitorException
     {
         try
         {
@@ -315,10 +317,10 @@ public class MonitorImpl implements Monitor
                 //find container's owner peer
                 Peer ownerPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
 
-                //if container is "owned" by local peer, alert local peer
+                //if container is "owned" by local peer, notifyOnAlert local peer
                 if ( ownerPeer.isLocal() )
                 {
-                    alertThresholdExcess( containerHostMetric );
+                    notifyOnAlert( containerHostMetric );
                 }
                 //send metric to owner peer
                 else
@@ -330,19 +332,19 @@ public class MonitorImpl implements Monitor
         }
         catch ( PeerException | JsonSyntaxException e )
         {
-            LOG.error( "Error in alertThresholdExcess", e );
+            LOG.error( "Error in onAlert", e );
             throw new MonitorException( e );
         }
     }
 
 
     /**
-     * This methods is called by REST endpoint when a remote peer sends an alert from one of its hosted containers
-     * belonging to this peer or when local "own" container is under stress
+     * This methods is called by REST endpoint when a remote peer sends an notifyOnAlert from one of its hosted
+     * containers belonging to this peer or when local "own" container is under stress
      *
      * @param metric - {@code ContainerHostMetric} metric of the host where thresholds are being exceeded
      */
-    public void alertThresholdExcess( final ContainerHostMetric metric ) throws MonitorException
+    public void notifyOnAlert( final ContainerHostMetric metric ) throws MonitorException
     {
         try
         {
@@ -351,13 +353,13 @@ public class MonitorImpl implements Monitor
             //search for subscriber if not found then no-op
             for ( String subscriberId : subscribersIds )
             {
-                //notify subscriber on alert
+                //notify subscriber on notifyOnAlert
                 notifyListener( metric, subscriberId );
             }
         }
         catch ( DaoException e )
         {
-            LOG.error( "Error in alertThresholdExcess", e );
+            LOG.error( "Error in onAlert", e );
             throw new MonitorException( e );
         }
     }
@@ -365,7 +367,7 @@ public class MonitorImpl implements Monitor
 
     protected void notifyListener( final ContainerHostMetric metric, String subscriberId )
     {
-        for ( final MetricListener listener : metricListeners )
+        for ( final AlertListener listener : alertListeners )
         {
             if ( subscriberId.equalsIgnoreCase( listener.getSubscriberId() ) )
             {
@@ -384,21 +386,19 @@ public class MonitorImpl implements Monitor
 
 
     @Override
-    public void addMetricListener( MetricListener metricListener )
+    public void addAlertListener( AlertListener alertListener )
     {
-        if ( metricListener != null )
-        {
-            metricListeners.add( metricListener );
-        }
+        Preconditions.checkNotNull( alertListener );
+
+        alertListeners.add( alertListener );
     }
 
 
     @Override
-    public void removeMetricListener( MetricListener metricListener )
+    public void removeAlertListener( AlertListener alertListener )
     {
-        if ( metricListener != null )
-        {
-            metricListeners.remove( metricListener );
-        }
+        Preconditions.checkNotNull( alertListener );
+
+        alertListeners.remove( alertListener );
     }
 }

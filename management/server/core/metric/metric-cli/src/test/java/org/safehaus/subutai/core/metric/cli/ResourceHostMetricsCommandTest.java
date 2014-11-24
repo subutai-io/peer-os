@@ -37,7 +37,7 @@ public class ResourceHostMetricsCommandTest extends SystemOutRedirectTest
     {
         ResourceHostMetric resourceHostMetric = mock( ResourceHostMetric.class );
         when( resourceHostMetric.toString() ).thenReturn( METRIC_TO_STRING );
-        when( monitor.getResourceHostMetrics() ).thenReturn( Sets.newHashSet( resourceHostMetric ) );
+        when( monitor.getResourceHostsMetrics() ).thenReturn( Sets.newHashSet( resourceHostMetric ) );
         resourceHostMetricsCommand = new ResourceHostMetricsCommand( monitor );
     }
 
