@@ -80,17 +80,6 @@ public class ClusterOperationHandlerTest {
         clusterOperationHandler1.run();
     }
 
-
-//    @Test
-//    public void testRunClusterOperationTypeStatusAll() throws Exception {
-//        clusterOperationHandler2.run();
-//    }
-
-//    @Test
-//    public void testRunClusterOperationTypeDecomissionStatus() throws Exception {
-//        clusterOperationHandler3.run();
-//    }
-
     @Test
     public void testRunOperationOnContainers() throws Exception {
 

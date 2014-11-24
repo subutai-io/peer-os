@@ -452,14 +452,6 @@ public class HadoopImplTest {
         assertEquals(uuid,hadoop.includeNode(hadoopClusterConfig, hostname));
     }
 
-//    @Test
-//    public void testGetClusterSetupStrategy() throws Exception {
-//        Environment environment = mock(Environment.class);
-//        HadoopImpl hadoop = new HadoopImpl(dataSource);
-//        hadoop.getClusterSetupStrategy(environment,hadoopClusterConfig,trackerOperation);
-//        assertNotNull(hadoop.getClusterSetupStrategy(environment, hadoopClusterConfig, trackerOperation));
-//    }
-
     @Test
     public void testGetDefaultEnvironmentBlueprint() throws Exception {
         HadoopImpl hadoop = new HadoopImpl(dataSource);

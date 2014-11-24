@@ -78,25 +78,4 @@ public class ClusterConfigurationTest {
     public void testConstructorConfigureCluster() throws  Exception {
         clusterConfiguration = new ClusterConfiguration(trackerOperation,hadoopImpl);
     }
-
-//    @Test
-//    public void shouldThrowCommandExceptionInExecuteCommandOnContainer() throws Exception {
-//        ContainerHost containerHost = mock(ContainerHost.class);
-//        when(containerHost.execute(any(RequestBuilder.class))).thenThrow(CommandException.class);
-//        CommandException commandException = mock(CommandException.class);
-//
-//
-//        PluginDAO pluginDAO = mock(PluginDAO.class);
-//        HadoopClusterConfig hadoopClusterConfig = mock(HadoopClusterConfig.class);
-//        when(environment.getContainerHostByUUID(hadoopClusterConfig.getNameNode())).thenReturn(containerHost);
-//        when(environment.getContainerHostByUUID(hadoopClusterConfig.getJobTracker())).thenReturn(containerHost);
-//        when(environment.getContainerHostByUUID(hadoopClusterConfig.getSecondaryNameNode())).thenReturn(containerHost);
-//
-//
-//        when(hadoopImpl.getPluginDAO()).thenReturn(pluginDAO);
-//        when(pluginDAO.saveInfo(HadoopClusterConfig.PRODUCT_KEY, configBase.getClusterName(), configBase)).thenReturn(true);
-//
-//        clusterConfiguration.configureCluster(configBase,environment);
-//        verify(commandException).printStackTrace();
-//    }
 }
