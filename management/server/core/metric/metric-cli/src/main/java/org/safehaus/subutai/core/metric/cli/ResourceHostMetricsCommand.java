@@ -33,7 +33,7 @@ public class ResourceHostMetricsCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Set<ResourceHostMetric> metrics = monitor.getResourceHostMetrics();
+        Set<ResourceHostMetric> metrics = monitor.getResourceHostsMetrics();
         for ( ResourceHostMetric metric : metrics )
         {
             System.out.println( metric );

@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
+import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.Interface;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
@@ -19,10 +20,11 @@ import com.google.common.collect.Sets;
  */
 public class ResourceHostInfoImpl implements ResourceHostInfo
 {
-    UUID id;
-    String hostname;
-    Set<InterfaceImpl> interfaces;
-    Set<ContainerHostInfoImpl> containers;
+    private UUID id;
+    private String hostname;
+    private Set<InterfaceImpl> interfaces;
+    private Set<ContainerHostInfoImpl> containers;
+    private HostArchitecture arch;
 
 
     @Override
@@ -62,6 +64,13 @@ public class ResourceHostInfoImpl implements ResourceHostInfo
         }
 
         return result;
+    }
+
+
+    @Override
+    public HostArchitecture getArch()
+    {
+        return arch;
     }
 
 

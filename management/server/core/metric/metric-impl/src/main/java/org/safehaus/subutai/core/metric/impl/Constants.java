@@ -15,6 +15,6 @@ public class Constants
     //metric request timeout in seconds
     public static final int METRIC_REQUEST_TIMEOUT = 60;
 
-    //alert timeout in seconds
+    //notifyOnAlert timeout in seconds
     public static final int ALERT_TIMEOUT = 30;
 }

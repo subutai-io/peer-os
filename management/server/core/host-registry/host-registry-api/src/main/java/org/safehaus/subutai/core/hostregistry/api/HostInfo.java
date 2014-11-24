@@ -17,4 +17,7 @@ public interface HostInfo extends Comparable<HostInfo>
 
 
     public Set<Interface> getInterfaces();
+
+
+    public HostArchitecture getArch();
 }

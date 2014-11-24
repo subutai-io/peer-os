@@ -33,7 +33,7 @@ public class RemoteAlertListener extends RequestListener
 
         try
         {
-            monitor.alertThresholdExcess( containerHostMetric );
+            monitor.notifyOnAlert( containerHostMetric );
         }
         catch ( MonitorException e )
         {
