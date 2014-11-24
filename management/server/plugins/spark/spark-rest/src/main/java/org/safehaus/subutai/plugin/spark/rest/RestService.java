@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.spark.rest;
 
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -57,7 +56,7 @@ public class RestService
     {
 
         List<SparkClusterConfig> configList = sparkManager.getClusters();
-        ArrayList<String> clusterNames = Lists.newArrayList();
+        List<String> clusterNames = Lists.newArrayList();
 
         for ( SparkClusterConfig config : configList )
         {

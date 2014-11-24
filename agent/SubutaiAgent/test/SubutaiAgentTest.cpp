@@ -199,7 +199,7 @@ void AgentTest::testResponseSerializeDone(void)
 			"\"exitCode\":0,"
 			"\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
 			"\"pid\":2584,"
-			"\"responseSequenceNumber\":1,"
+			"\"responseNumber\":1,"
 			"\"type\":\"EXECUTE_RESPONSE\"}}\n";
 
 	string result;
@@ -341,7 +341,7 @@ void AgentTest::testResponsePackCreateExit(void)
 					"\"commandId\":\"dca7e550-9f8e-11e3-b9d6-080027b00009\","
 					"\"exitCode\":0,"
 					"\"id\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\","
-					"\"pid\":14601,\"requestSequenceNumber\":1,\"responseSequenceNumber\":1,"
+					"\"pid\":14601,\"requestNumber\":1,\"responseNumber\":1,"
 					"\"type\":\"EXECUTE_RESPONSE\"}}\n";
 
 	string uuid = "5373b7c4-a039-44a9-9270-9e0e45d549cf" ;

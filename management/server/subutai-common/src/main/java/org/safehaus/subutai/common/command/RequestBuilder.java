@@ -239,6 +239,7 @@ public class RequestBuilder
     }
 
 
+    //TODO remove this methods once all modules are migrated to new agent
     @Deprecated
     public org.safehaus.subutai.common.protocol.Request build( UUID agentUUID, UUID taskUUID )
     {
@@ -247,6 +248,7 @@ public class RequestBuilder
     }
 
 
+    //TODO rename this method to "build" once all modules are migrated to new agent
     public Request build2( UUID id )
     {
         return new RequestImpl( type, id, cwd, command, cmdArgs, envVars, outputRedirection, errRedirection, runAs,

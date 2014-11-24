@@ -803,7 +803,7 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                 string execCmd = createExecString(command);
                 if (command->getIsDaemon()) {
                     stringstream execCmdStream;
-                    execCmdStream << "subutai-run" << execCmd << " " << command->getCommandId();
+                    execCmdStream << "subutai-run " << execCmd << " " << command->getCommandId();
                     execCmd = execCmdStream.str();
                 }
                 val = system(execCmd.c_str());

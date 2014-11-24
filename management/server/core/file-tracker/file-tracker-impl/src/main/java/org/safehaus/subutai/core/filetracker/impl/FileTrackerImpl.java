@@ -36,6 +36,7 @@ import com.google.common.collect.Sets;
 public class FileTrackerImpl implements FileTracker, ByteMessageListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( FileTrackerImpl.class.getName() );
+    private static final String HOST_IS_NULL_MSG = "Host is null";
 
     protected Set<ConfigPointListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<ConfigPointListener, Boolean>() );
@@ -98,7 +99,7 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
     @Override
     public void createConfigPoints( Host host, Set<String> configPoints ) throws FileTrackerException
     {
-        Preconditions.checkNotNull( host, "Host is null" );
+        Preconditions.checkNotNull( host, HOST_IS_NULL_MSG );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( configPoints ), "Invalid config points" );
 
         try
@@ -116,7 +117,7 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
     @Override
     public void removeConfigPoints( Host host, Set<String> configPoints ) throws FileTrackerException
     {
-        Preconditions.checkNotNull( host, "Host is null" );
+        Preconditions.checkNotNull( host, HOST_IS_NULL_MSG );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( configPoints ), "Invalid config points" );
 
         try
@@ -134,7 +135,7 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
     @Override
     public Set<String> listConfigPoints( final Host host ) throws FileTrackerException
     {
-        Preconditions.checkNotNull( host, "Host is null" );
+        Preconditions.checkNotNull( host, HOST_IS_NULL_MSG );
 
         final Set<String> configPoints = Sets.newHashSet();
 

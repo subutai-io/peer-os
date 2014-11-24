@@ -18,9 +18,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
@@ -58,7 +58,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test for MonitorImpl
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith( MockitoJUnitRunner.class )
 public class MonitorImplTest
 {
     private static final String SUBSCRIBER_ID = "subscriber";
@@ -145,14 +145,14 @@ public class MonitorImplTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void testConstructorShouldFailOnNullDataSource() throws Exception
     {
         new MonitorImpl( null, peerManager );
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void testConstructorShouldFailOnNullPeerManager() throws Exception
     {
         new MonitorImpl( dataSource, null );
@@ -214,7 +214,7 @@ public class MonitorImplTest
     }
 
 
-    @Test(expected = MonitorException.class)
+    @Test( expected = MonitorException.class )
     public void testAlertThresholdExcessException() throws Exception
     {
         doThrow( new DaoException( "" ) ).when( monitorDao ).getEnvironmentSubscribersIds( ENVIRONMENT_ID );
@@ -257,7 +257,7 @@ public class MonitorImplTest
     }
 
 
-    @Test(expected = MonitorException.class)
+    @Test( expected = MonitorException.class )
     public void testAlertThresholdExcessException2() throws Exception
     {
 
@@ -281,7 +281,7 @@ public class MonitorImplTest
     }
 
 
-    @Test(expected = MonitorException.class)
+    @Test( expected = MonitorException.class )
     public void testStartMonitoringException() throws Exception
     {
         doThrow( new DaoException( "" ) ).when( monitorDao ).addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
@@ -304,7 +304,7 @@ public class MonitorImplTest
     }
 
 
-    @Test(expected = MonitorException.class)
+    @Test( expected = MonitorException.class )
     public void testStopMonitoringException() throws Exception
     {
         doThrow( new DaoException( "" ) ).when( monitorDao ).removeSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
@@ -327,16 +327,6 @@ public class MonitorImplTest
         assertEquals( LOCAL_PEER_ID, metric.getPeerId() );
         assertEquals( HOST, metric.getHost() );
         assertEquals( METRIC_VALUE, metric.getTotalRam() );
-    }
-
-
-    @Ignore
-    @Test(expected = MonitorException.class)
-    public void testGetResourceHostMetricsWithMonitorException2() throws Exception
-    {
-        when( localPeer.getResourceHosts() ).thenThrow( new PeerException( "" ) );
-
-        monitor.getResourceHostMetrics();
     }
 
 
@@ -433,7 +423,7 @@ public class MonitorImplTest
     }
 
 
-    @Ignore
+    //    @Ignore
     @Test
     public void testGetLocalContainerHostMetricsWithException2() throws Exception
     {

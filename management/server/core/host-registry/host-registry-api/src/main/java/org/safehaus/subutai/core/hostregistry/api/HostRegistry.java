@@ -28,4 +28,6 @@ public interface HostRegistry
 
     public ResourceHostInfo getResourceHostByContainerHost( ContainerHostInfo containerHostInfo )
             throws HostDisconnectedException;
+
+    public HostInfo getHostInfoById( UUID hostId ) throws HostDisconnectedException;
 }

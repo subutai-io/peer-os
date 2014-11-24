@@ -7,8 +7,6 @@ package org.safehaus.subutai.core.executor.ui;
 
 
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.command.RequestType;
@@ -40,16 +38,15 @@ import com.vaadin.ui.TextField;
 public class TerminalForm extends CustomComponent implements Disposable
 {
 
-    private final HostTree hostTree;
     private final TextField programTxtFld;
     private final TextField timeoutTxtFld;
     private final TextField workDirTxtFld;
     private final TextField runAsTxtFld;
     private final ComboBox requestTypeCombo;
     private final Label indicator;
-    private TextArea commandOutputTxtArea;
-    private AtomicInteger taskCount = new AtomicInteger();
-    private ExecutorService executor;
+    private final AtomicInteger taskCount = new AtomicInteger();
+    protected HostTree hostTree;
+    protected TextArea commandOutputTxtArea;
 
 
     public TerminalForm( final CommandExecutor commandExecutor, final HostRegistry hostRegistry )
@@ -59,8 +56,6 @@ public class TerminalForm extends CustomComponent implements Disposable
         Preconditions.checkNotNull( hostRegistry );
 
         setSizeFull();
-
-        executor = Executors.newCachedThreadPool();
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
@@ -138,7 +133,7 @@ public class TerminalForm extends CustomComponent implements Disposable
             }
         } );
 
-        sendBtn.addClickListener( new SendButtonListener( this, commandExecutor, executor, hostRegistry ) );
+        sendBtn.addClickListener( new SendButtonListener( this, commandExecutor, hostRegistry ) );
 
         clearBtn.addClickListener( new Button.ClickListener()
         {
@@ -212,6 +207,5 @@ public class TerminalForm extends CustomComponent implements Disposable
     public void dispose()
     {
         hostTree.dispose();
-        executor.shutdown();
     }
 }

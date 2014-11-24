@@ -4,14 +4,16 @@ package org.safehaus.subutai.core.broker.impl;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
+import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import javax.jms.TextMessage;
 import javax.jms.Topic;
 
+import org.safehaus.subutai.core.broker.api.ByteMessageListener;
+import org.safehaus.subutai.core.broker.api.TextMessageListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +27,6 @@ public class MessageRoutingListener implements MessageListener
 
     protected Set<org.safehaus.subutai.core.broker.api.MessageListener> listeners = Collections
             .newSetFromMap( new ConcurrentHashMap<org.safehaus.subutai.core.broker.api.MessageListener, Boolean>() );
-
-    protected ExecutorService notifier = Executors.newCachedThreadPool();
 
 
     public void addListener( org.safehaus.subutai.core.broker.api.MessageListener listener )
@@ -66,12 +66,28 @@ public class MessageRoutingListener implements MessageListener
 
     protected void notifyListener( org.safehaus.subutai.core.broker.api.MessageListener listener, Message message )
     {
-        notifier.execute( new MessageNotifier( listener, message ) );
-    }
-
-
-    protected void dispose()
-    {
-        notifier.shutdown();
+        try
+        {
+            if ( message instanceof BytesMessage && listener instanceof ByteMessageListener )
+            {
+                BytesMessage msg = ( BytesMessage ) message;
+                byte[] bytes = new byte[( int ) msg.getBodyLength()];
+                msg.readBytes( bytes );
+                ( ( ByteMessageListener ) listener ).onMessage( bytes );
+            }
+            else if ( message instanceof TextMessage && listener instanceof TextMessageListener )
+            {
+                TextMessage msg = ( TextMessage ) message;
+                ( ( TextMessageListener ) listener ).onMessage( msg.getText() );
+            }
+            else
+            {
+                LOG.warn( String.format( "Message type %s and listener type %s didn't match", message, listener ) );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in notifyListener", e );
+        }
     }
 }

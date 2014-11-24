@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.filetracker.impl;
 
 
+import java.io.PrintStream;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -36,6 +37,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -218,5 +220,13 @@ public class FileTrackerImplTest
 
         verify( peerManager ).getLocalPeer();
         verify( notifier ).execute( isA( Runnable.class ) );
+
+
+        RuntimeException exception = mock( RuntimeException.class );
+        doThrow( exception ).when( jsonUtil ).from( anyString(), any( Class.class ) );
+
+        fileTracker.onMessage( INOTIFY_RESPONSE.getBytes() );
+
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 }
