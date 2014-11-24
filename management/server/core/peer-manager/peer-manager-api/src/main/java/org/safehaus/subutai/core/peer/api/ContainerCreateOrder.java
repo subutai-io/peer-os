@@ -5,15 +5,13 @@ import java.util.List;
 
 import org.safehaus.subutai.common.protocol.Template;
 
-import com.google.common.base.Preconditions;
-
 
 /**
  * Order for container cloning process.
  */
 public class ContainerCreateOrder
 {
-    private String customerId;
+    private String creatorPeerId;
     private String hostname;
     private String nodeGroupName;
     private String environmentId;
@@ -24,10 +22,10 @@ public class ContainerCreateOrder
     private String description;
 
 
-    public ContainerCreateOrder( final String customerId, final String hostname, final String nodeGroupName,
+    public ContainerCreateOrder( final String creatorPeerId, final String hostname, final String nodeGroupName,
                                  final String environmentId, String ip, List<Template> templates )
     {
-//        Preconditions.checkNotNull( customerId, "Customer ID is null." );
+//        Preconditions.checkNotNull( creatorPeerId, "Customer ID is null." );
 //        Preconditions.checkNotNull( hostname, "Host name is null." );
 //        Preconditions.checkNotNull( nodeGroupName, "Node group name is null." );
 //        Preconditions.checkNotNull( environmentId, "Environment ID is null." );
@@ -37,7 +35,7 @@ public class ContainerCreateOrder
         this.hostname = hostname;
         this.nodeGroupName = nodeGroupName;
         this.environmentId = environmentId;
-        this.customerId = customerId;
+        this.creatorPeerId = creatorPeerId;
         this.ip = ip;
         this.templates = templates;
     }
@@ -61,9 +59,9 @@ public class ContainerCreateOrder
     }
 
 
-    public String getCustomerId()
+    public String getCreatorPeerId()
     {
-        return customerId;
+        return creatorPeerId;
     }
 
 

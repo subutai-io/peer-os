@@ -354,7 +354,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, PeerEventListener
                 {
                     ContainerHost containerHost =
                             resourceHost.getContainerHostByName( containerCreateOrder.getHostname() );
-                    containerHost.setCreatorPeerId( containerCreateOrder.getCustomerId() );
+                    containerHost.setCreatorPeerId( containerCreateOrder.getCreatorPeerId() );
                     containerHost.setNodeGroupName( containerCreateOrder.getNodeGroupName() );
                     containerHost.setEnvironmentId( containerCreateOrder.getEnvironmentId() );
                     containerHost.setTemplateName( containerCreateOrder.getTemplateName() );
