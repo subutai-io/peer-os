@@ -7,12 +7,15 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.*;
 
 public class HadoopSetupStrategyTest {
@@ -31,10 +34,12 @@ public class HadoopSetupStrategyTest {
 
     @Before
     public void setUp() throws Exception {
+        PluginDAO pluginDAO = mock(PluginDAO.class);
         environment = mock(Environment.class);
         hadoopClusterConfig = mock(HadoopClusterConfig.class);
         trackerOperation = mock(TrackerOperation.class);
         hadoopImpl = mock(HadoopImpl.class);
+        when(hadoopImpl.getPluginDAO()).thenReturn(pluginDAO);
         agent = mock(Agent.class);
         iterator = mock(Iterator.class);
 
@@ -45,40 +50,44 @@ public class HadoopSetupStrategyTest {
 
     }
 
-//    @Test
-//    public void testSetup() throws Exception {
-//        Set<UUID> myUUID = mock(Set.class);
-//        myUUID.add(UUID.randomUUID());
-//        myUUID.add(UUID.randomUUID());
-//        myUUID.add(UUID.randomUUID());
-//
-//        Agent agent = mock(Agent.class);
-//        ContainerHost containerHost = mock(ContainerHost.class);
-//        ContainerHost containerHost2 = mock(ContainerHost.class);
-//        ContainerHost containerHost3 = mock(ContainerHost.class);
-//        ContainerHost containerHost4 = mock(ContainerHost.class);
-//        Set<ContainerHost> mySet = mock(Set.class);
-//        mySet.add(containerHost);
-//        mySet.add(containerHost2);
-//        mySet.add(containerHost3);
-//        mySet.add(containerHost4);
-//
-//        when(environment.getContainers()).thenReturn(mySet);
-//        when(hadoopClusterConfig.getAllMasterNodes()).thenReturn(myUUID);
-//        Iterator<ContainerHost> iterator = mock(Iterator.class);
-//        when(mySet.iterator()).thenReturn(iterator);
-//        when(iterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(false);
-//        when(iterator.next()).thenReturn(containerHost).thenReturn(containerHost2).thenReturn(containerHost3).thenReturn(containerHost4);
-//        when(mySet.size()).thenReturn(5);
-//        when(containerHost.getAgent()).thenReturn(agent);
-//        when(containerHost2.getAgent()).thenReturn(agent);
-//        when(containerHost3.getAgent()).thenReturn(agent);
-//        when(containerHost4.getAgent()).thenReturn(agent);
-//        when(agent.getUuid()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID());
-//
-//        hadoopSetupStrategy = new HadoopSetupStrategy(environment,hadoopClusterConfig,trackerOperation,hadoopImpl);
-//        hadoopSetupStrategy.setup();
-//    }
+    @Test
+    public void testSetup() throws Exception {
+        when(environment.getContainerHostByUUID(hadoopClusterConfig.getNameNode())).thenReturn(containerHost);
+        when(environment.getContainerHostByUUID(hadoopClusterConfig.getJobTracker())).thenReturn(containerHost);
+        when(environment.getContainerHostByUUID(hadoopClusterConfig.getSecondaryNameNode())).thenReturn(containerHost);
+
+        Set<UUID> myUUID = mock(Set.class);
+        myUUID.add(UUID.randomUUID());
+        myUUID.add(UUID.randomUUID());
+        myUUID.add(UUID.randomUUID());
+
+        Agent agent = mock(Agent.class);
+        ContainerHost containerHost = mock(ContainerHost.class);
+        ContainerHost containerHost2 = mock(ContainerHost.class);
+        ContainerHost containerHost3 = mock(ContainerHost.class);
+        ContainerHost containerHost4 = mock(ContainerHost.class);
+        Set<ContainerHost> mySet = mock(Set.class);
+        mySet.add(containerHost);
+        mySet.add(containerHost2);
+        mySet.add(containerHost3);
+        mySet.add(containerHost4);
+
+        when(environment.getContainers()).thenReturn(mySet).thenReturn(mySet);
+        when(hadoopClusterConfig.getAllMasterNodes()).thenReturn(myUUID);
+        Iterator<ContainerHost> iterator = mock(Iterator.class);
+        when(mySet.iterator()).thenReturn(iterator);
+        when(iterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(false).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(false);
+        when(iterator.next()).thenReturn(containerHost).thenReturn(containerHost2).thenReturn(containerHost3).thenReturn(containerHost4).thenReturn(containerHost).thenReturn(containerHost2).thenReturn(containerHost3).thenReturn(containerHost4);
+        when(mySet.size()).thenReturn(5);
+        when(containerHost.getAgent()).thenReturn(agent);
+        when(containerHost2.getAgent()).thenReturn(agent);
+        when(containerHost3.getAgent()).thenReturn(agent);
+        when(containerHost4.getAgent()).thenReturn(agent);
+        when(agent.getUuid()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID());
+        hadoopSetupStrategy = new HadoopSetupStrategy(environment,hadoopClusterConfig,trackerOperation,hadoopImpl);
+
+        assertEquals(hadoopClusterConfig,hadoopSetupStrategy.setup());
+    }
 
     @Test
     public void testSetMasterNodes () throws Exception {
@@ -106,6 +115,11 @@ public class HadoopSetupStrategyTest {
         hadoopSetupStrategy = new HadoopSetupStrategy(environment,hadoopClusterConfig,trackerOperation,hadoopImpl);
         hadoopSetupStrategy.setMasterNodes();
 
+        assertEquals(uuid4,agent.getUuid());
+        verify(containerHost).getAgent();
+        verify(containerHost2).getAgent();
+        verify(containerHost3).getAgent();
+        verify(environment).getContainers();
         verify(hadoopClusterConfig).setNameNode(uuid);
         verify(hadoopClusterConfig).setJobTracker(uuid2);
         verify(hadoopClusterConfig).setSecondaryNameNode(uuid3);
@@ -113,8 +127,9 @@ public class HadoopSetupStrategyTest {
 
     @Test
     public void testSetSlaveNodes() throws Exception {
+        UUID uuid = new UUID(50,50);
         Set<UUID> myUUID = mock(Set.class);
-        myUUID.add(UUID.randomUUID());
+        myUUID.add(uuid);
         myUUID.add(UUID.randomUUID());
         myUUID.add(UUID.randomUUID());
         Set<ContainerHost> mySet = mock(Set.class);
@@ -124,16 +139,18 @@ public class HadoopSetupStrategyTest {
         when(environment.getContainers()).thenReturn(mySet);
         when(hadoopClusterConfig.getAllMasterNodes()).thenReturn(myUUID);
         when(mySet.iterator()).thenReturn(iterator);
-        when(iterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(false);
-        when(iterator.next()).thenReturn(containerHost).thenReturn(containerHost2);
-        when(mySet.size()).thenReturn(5);
+        when(iterator.hasNext()).thenReturn(true).thenReturn(false);
+        when(iterator.next()).thenReturn(containerHost);
         when(containerHost.getAgent()).thenReturn(agent);
         when(containerHost2.getAgent()).thenReturn(agent);
-        when(agent.getUuid()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID()).thenReturn(UUID.randomUUID());
+        when(agent.getUuid()).thenReturn(uuid);
         hadoopSetupStrategy = new HadoopSetupStrategy(environment, hadoopClusterConfig, trackerOperation, hadoopImpl);
         hadoopSetupStrategy.setSlaveNodes();
 
+        assertEquals(uuid,agent.getUuid());
         verify(environment).getContainers();
+        verify(hadoopClusterConfig).setDataNodes(anyList());
+        verify(hadoopClusterConfig).setTaskTrackers(anyList());
     }
 
 

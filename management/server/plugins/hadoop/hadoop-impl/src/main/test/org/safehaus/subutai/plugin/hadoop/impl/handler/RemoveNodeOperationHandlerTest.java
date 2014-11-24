@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -39,6 +40,10 @@ public class RemoveNodeOperationHandlerTest {
 
         removeNodeOperationHandler = new RemoveNodeOperationHandler(hadoop, clusterName, lxcHostName);
 
+        assertEquals(uuid,trackerOperation.getId());
+        assertEquals(tracker,hadoop.getTracker());
+        assertEquals(executorService,hadoop.getExecutor());
+
     }
 
     @Test
@@ -51,6 +56,11 @@ public class RemoveNodeOperationHandlerTest {
         hadoop.setTracker(tracker);
         hadoop.setExecutor(executorService);
         removeNodeOperationHandler.run();
+
+        assertEquals(uuid,trackerOperation.getId());
+        assertEquals(tracker,hadoop.getTracker());
+        assertEquals(executorService,hadoop.getExecutor());
+
     }
 
 }

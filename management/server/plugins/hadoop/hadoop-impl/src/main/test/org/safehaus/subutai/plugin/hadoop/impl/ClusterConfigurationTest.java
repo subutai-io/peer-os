@@ -24,7 +24,6 @@ public class ClusterConfigurationTest {
     public void setUp() throws Exception {
         trackerOperation = mock(TrackerOperation.class);
         hadoopImpl = mock(HadoopImpl.class);
-//        configBase = mock(ConfigBase.class);
         configBase = mock(HadoopClusterConfig.class);
         environment = mock(Environment.class);
         clusterConfiguration = new ClusterConfiguration(trackerOperation,hadoopImpl);
@@ -66,12 +65,13 @@ public class ClusterConfigurationTest {
         when(hadoopImpl.getPluginDAO()).thenReturn(pluginDAO);
         when(pluginDAO.saveInfo(HadoopClusterConfig.PRODUCT_KEY, configBase.getClusterName(), configBase)).thenReturn(true);
 
+        UUID uuid1 = new UUID(50,50);
+        when(environment.getId()).thenReturn(uuid1);
         clusterConfiguration.configureCluster(configBase, environment);
 
         assertEquals(containerHost, environment.getContainerHostByUUID(hadoopClusterConfig.getNameNode()));
         assertEquals(containerHost,environment.getContainerHostByUUID(hadoopClusterConfig.getJobTracker()));
         assertEquals(containerHost,environment.getContainerHostByUUID(hadoopClusterConfig.getSecondaryNameNode()));
-
     }
 
     @Test

@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.hadoop.impl;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.core.container.api.ContainerManager;
@@ -454,8 +455,10 @@ public class HadoopImplTest {
 
     @Test
     public void testGetDefaultEnvironmentBlueprint() throws Exception {
+        EnvironmentBlueprint environmentBlueprint = mock(EnvironmentBlueprint.class);
         HadoopImpl hadoop = new HadoopImpl(dataSource);
         hadoop.getDefaultEnvironmentBlueprint(hadoopClusterConfig);
+
         assertNotNull(hadoop.getDefaultEnvironmentBlueprint(hadoopClusterConfig));
     }
 }
