@@ -66,7 +66,7 @@ public class Wizard
             }
             case 3:
             {
-                component = new VerificationStep( tracker, spark, executor, environmentManager, this );
+                component = new VerificationStep( hadoop, tracker, spark, executor, environmentManager, this );
                 break;
             }
             default:

@@ -1,0 +1,3 @@
+subutai-run
+    This script is used to run daemons on containers (when isDaemon = 1) and must be included on every container
+    https://confluence.critical-factor.com/display/STC/Script+for+starting+daemons+on+containers+and+FAIs

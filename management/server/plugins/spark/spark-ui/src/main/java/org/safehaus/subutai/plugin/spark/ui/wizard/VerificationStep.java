@@ -10,6 +10,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.ui.ConfigView;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.Spark;
@@ -28,8 +29,9 @@ import com.vaadin.ui.Window;
 public class VerificationStep extends Panel
 {
 
-    public VerificationStep( final Tracker tracker, final Spark spark, final ExecutorService executor,
-                             EnvironmentManager environmentManager, final Wizard wizard )
+    public VerificationStep( final Hadoop hadoop, final Tracker tracker, final Spark spark,
+                             final ExecutorService executor, EnvironmentManager environmentManager,
+                             final Wizard wizard )
     {
 
         setSizeFull();
@@ -47,13 +49,14 @@ public class VerificationStep extends Panel
         final HadoopClusterConfig hc = wizard.getHadoopConfig();
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
-        cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
+        cfgView.addStringCfg( "Cluster Name", config.getClusterName() );
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            Environment hadoopEnvironment = environmentManager.getEnvironmentByUUID( hc.getEnvironmentId() );
-            ContainerHost master = hadoopEnvironment.getContainerHostByUUID( wizard.getConfig().getMasterNodeId() );
-            Set<ContainerHost> slaves = hadoopEnvironment.getHostsByIds( wizard.getConfig().getSlaveIds() );
-            cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getHadoopClusterName() );
+            HadoopClusterConfig hadoopCluster = hadoop.getCluster( config.getHadoopClusterName() );
+            Environment hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopCluster.getEnvironmentId() );
+            ContainerHost master = hadoopEnvironment.getContainerHostByUUID( config.getMasterNodeId() );
+            Set<ContainerHost> slaves = hadoopEnvironment.getHostsByIds( config.getSlaveIds() );
+            cfgView.addStringCfg( "Hadoop cluster Name", config.getHadoopClusterName() );
             cfgView.addStringCfg( "Master Node", master.getHostname() );
             for ( ContainerHost slave : slaves )
             {
