@@ -25,5 +25,5 @@ public interface MonitoringSettings
     public double getCpuAlertThreshold();
 
     //Disk threshold upon reaching which an alert is generated (percentage)
-    public double getDiskThreshold();
+    public double getDiskAlertThreshold();
 }
