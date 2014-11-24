@@ -144,6 +144,7 @@ int main(int argc,char *argv[],char *envp[])
     environment.getAgentInterfaces();
     environment.getAgentHostname();
     environment.getAgentEnvironmentId();
+    environment.getAgentArch();
     clientAddress = environment.getAgentUuidValue();
 
     /*

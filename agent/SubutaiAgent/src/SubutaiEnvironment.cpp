@@ -30,8 +30,6 @@ SubutaiEnvironment::~SubutaiEnvironment()
     // TODO Auto-generated destructor stub
 }
 
-
-
 /**
  *  \details   KiskisAgent's settings.xml is read by this function.
  *  		   url: Broker address is fetched. (for instance: url = "localhost:8883))
@@ -155,6 +153,17 @@ bool SubutaiEnvironment::getAgentEnvironmentId()
         cout << error.what()<< endl;
     }
     return false;
+}
+
+string SubutaiEnvironment::getAgentArch() {
+    utsname info;
+    if (uname(&info) != 0) {
+        environmentLogger->writeLog(3, environmentLogger->setLogData("<SubutaiAgent>", "Error: Failed to extract machine information"));
+        return "unknown";
+    } else {
+        environmentLogger->writeLog(3, environmentLogger->setLogData("<SubutaiAgent>", "Machine architecture:", info.machine));
+        return info.machine;
+    }
 }
 
 /**

@@ -215,6 +215,9 @@ void SubutaiResponse::serialize(string& output)
     {
         root["response"]["commandId"] = this->getCommandId();
     }
+    if (!(this->getArch().empty())) {
+        root["response"]["arch"] = this->getArch();
+    }
     if(!(this->getHostname().empty()))											//check the hostname is assigned or not
     {
         root["response"]["hostname"] = this->getHostname();
@@ -243,6 +246,9 @@ void SubutaiResponse::serialize(string& output)
 			root["response"]["containers"][index]["hostname"]	= this->containers[index].getContainerHostnameValue();
 			root["response"]["containers"][index]["id"]		= this->containers[index].getContainerIdValue();
 			root["response"]["containers"][index]["status"]		= this->containers[index].getContainerStatus();
+            if (this->containers[index].getContainerArch() != "") {
+                root["response"]["containers"][index]["arch"] = this->containers[index].getContainerArch();
+            }
 			vector<Interface> interfaceValues	=	this->containers[index].getContainerInterfaceValues();
 			for(unsigned int i=0; i < interfaceValues.size(); i++) {
 				root["response"]["containers"][index]["interfaces"][i]["interfaceName"]=interfaceValues[i].name;
@@ -451,6 +457,10 @@ void SubutaiResponse::setUuid(const string& uuid)
     this->uuid = uuid;
 }
 
+void SubutaiResponse::setArch(const string& arch) {
+    this->arch = arch;
+}
+
 /**
  *  \details   getting "requestSequenceNumber" private variable of SubutaiResponse instance
  */
@@ -537,6 +547,10 @@ void SubutaiResponse::setParentHostname(const string& parenthostname)
 string& SubutaiResponse::getHostname()
 {
     return this->hostname;
+}
+
+string& SubutaiResponse::getArch() {
+    return this->arch;
 }
 
 /**

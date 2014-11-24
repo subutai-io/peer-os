@@ -13,17 +13,10 @@ public class CommandsTest
 
 
     @Test
-    public void testGetReadResourceHostMetricCommand() throws Exception
-    {
-        assertEquals( new RequestBuilder( "subutai monitor -p" ), commands.getReadResourceHostMetricCommand() );
-    }
-
-
-    @Test
     public void testGetReadContainerHostMetricCommand() throws Exception
     {
         String hostname = "host";
         assertEquals( new RequestBuilder( String.format( "subutai monitor %s", hostname ) ),
-                commands.getReadContainerHostMetricCommand( hostname ) );
+                commands.getCurrentMetricCommand( hostname ) );
     }
 }

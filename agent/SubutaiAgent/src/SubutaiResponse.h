@@ -51,6 +51,7 @@ public:
 	string& getStandardOutput();
 	int getPid();
 	string& getHostname();
+    string& getArch();
 	string& getParentHostname();
 	vector<Interface> getInterfaces();
 	string& getCommandId();
@@ -68,6 +69,7 @@ public:
 	void setPid(int);
 	void setType(const string&);
 	void setUuid(const string&);
+    void setArch(const string&);
 	void setRequestSequenceNumber(int);
 	void setResponseSequenceNumber(int);
 	void setStandardError(const string&);
@@ -97,6 +99,7 @@ private:
 	string				dateTime;
 	string				changeType;
     string              topic;
+    string              arch;
 	vector<string>  confPoints;
 	vector<SubutaiContainer>  containers;
 };

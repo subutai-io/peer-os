@@ -88,6 +88,7 @@ class SubutaiContainer
         void PutToFile(string filename, string text);
         vector<Interface> getContainerInterfaceValues();
         lxc_container* getLxcContainerValue();
+        string getContainerArch();
         string getContainerStatus();
         string getContainerIdValue();
         string getContainerHostnameValue();
@@ -109,6 +110,7 @@ class SubutaiContainer
         vector<Interface> 	interfaces;
         SubutaiLogger*		containerLogger;
         SubutaiHelper 		_helper;
+        string              _arch;
 };
 #endif /* SUBUTAICONTAINER_H_ */
 
