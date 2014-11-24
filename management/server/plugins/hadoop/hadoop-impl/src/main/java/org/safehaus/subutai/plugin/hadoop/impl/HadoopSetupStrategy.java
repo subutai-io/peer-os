@@ -107,7 +107,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     }
 
 
-    private void setMasterNodes() throws ClusterSetupException
+    protected void setMasterNodes() throws ClusterSetupException
     {
         Set<UUID> masterNodes = new HashSet<>();
         int masterCount = 0;
@@ -133,7 +133,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     }
 
 
-    private void setSlaveNodes() throws ClusterSetupException
+    protected void setSlaveNodes() throws ClusterSetupException
     {
         Set<UUID> slaveNodes = new HashSet<>();
         for ( ContainerHost containerHost : environment.getContainers() )
