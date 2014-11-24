@@ -99,7 +99,7 @@ public class MonitorImplTest
 
     static class MonitorImplExt extends MonitorImpl
     {
-        public MonitorImplExt( final DataSource dataSource, final PeerManager peerManager ) throws DaoException
+        public MonitorImplExt( final DataSource dataSource, final PeerManager peerManager ) throws MonitorException
         {
             super( dataSource, peerManager );
         }
@@ -273,6 +273,13 @@ public class MonitorImplTest
         String longSubscriberId = StringUtils.repeat( "s", 101 );
         String subscriberId = StringUtils.repeat( "s", 100 );
         when( alertListener.getSubscriberId() ).thenReturn( longSubscriberId );
+        when( containerHost.getPeer() ).thenReturn( localPeer );
+        when( localPeer.getResourceHostByName( RESOURCE_HOST ) ).thenReturn( resourceHost );
+        when( containerHost.getParentHostname() ).thenReturn( RESOURCE_HOST );
+        CommandResult commandResult = mock( CommandResult.class );
+        when( commandResult.hasSucceeded() ).thenReturn( true );
+        when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
+
 
         monitor.startMonitoring( alertListener, environment );
 
@@ -381,15 +388,13 @@ public class MonitorImplTest
     }
 
 
-    @Test
+    @Test( expected = MonitorException.class )
     public void testGetContainerHostMetricsWithException() throws Exception
     {
         PeerException exception = mock( PeerException.class );
         doThrow( exception ).when( containerHost ).getPeer();
 
         monitor.getContainerHostsMetrics( environment );
-
-        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 
 

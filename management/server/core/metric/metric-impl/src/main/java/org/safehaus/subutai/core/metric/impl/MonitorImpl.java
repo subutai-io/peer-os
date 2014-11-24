@@ -69,7 +69,7 @@ public class MonitorImpl implements Monitor
             this.peerManager = peerManager;
             peerManager.addRequestListener( new RemoteAlertListener( this ) );
             peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
-            peerManager.addRequestListener( new MonitoringActivationListener( this ) );
+            peerManager.addRequestListener( new MonitoringActivationListener( this, peerManager ) );
         }
         catch ( DaoException e )
         {
@@ -453,18 +453,18 @@ public class MonitorImpl implements Monitor
                 //set metric's environment id for future reference on the receiving end
                 containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
 
-                //find container's hosting peer
-                Peer hostingPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
+                //find container's creator peer
+                Peer creatorPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
 
-                //if container is "hosted" by local peer, notifyOnAlert local peer
-                if ( hostingPeer.isLocal() )
+                //if container is "created" by local peer, notifyOnAlert local peer
+                if ( creatorPeer.isLocal() )
                 {
                     notifyOnAlert( containerHostMetric );
                 }
-                //send metric to remote hosting peer
+                //send metric to remote creator peer
                 else
                 {
-                    hostingPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
+                    creatorPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
                             Constants.ALERT_TIMEOUT );
                 }
             }
