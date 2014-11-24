@@ -21,6 +21,7 @@ import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
+import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -248,6 +249,11 @@ public class MonitorImpl implements Monitor
     {
         Preconditions.checkNotNull( alertListener, ALERT_LISTENER_IS_NULL );
         Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
+
+        //TODO
+        // send activation request to environment hosting peers
+
+
         //make sure subscriber id is truncated to 100 characters
         String subscriberId = alertListener.getSubscriberId();
         if ( subscriberId.length() > Constants.MAX_SUBSCRIBER_ID_LEN )
@@ -264,6 +270,15 @@ public class MonitorImpl implements Monitor
             LOG.error( "Error in startMonitoring", e );
             throw new MonitorException( e );
         }
+    }
+
+
+    @Override
+    public void startMonitoring( final AlertListener alertListener, final Environment environment,
+                                 final MonitoringSettings monitoringSettings ) throws MonitorException
+    {
+        //TODO
+        //send activation request to environment hosting peers
     }
 
 
@@ -292,6 +307,23 @@ public class MonitorImpl implements Monitor
     }
 
 
+    @Override
+    public void activateMonitoring( final ContainerHost containerHost, final MonitoringSettings monitoringSettings )
+            throws MonitorException
+    {
+        //TODO
+        //send activation request to hosting peer
+    }
+
+
+    @Override
+    public void activateMonitoring( final ContainerHost containerHost ) throws MonitorException
+    {
+        //TODO
+        //send activation request to hosting peer
+    }
+
+
     /**
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
      * stress.
@@ -314,18 +346,18 @@ public class MonitorImpl implements Monitor
                 //set metric's environment id for future reference on the receiving end
                 containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
 
-                //find container's owner peer
-                Peer ownerPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
+                //find container's hosting peer
+                Peer hostingPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
 
-                //if container is "owned" by local peer, notifyOnAlert local peer
-                if ( ownerPeer.isLocal() )
+                //if container is "hosted" by local peer, notifyOnAlert local peer
+                if ( hostingPeer.isLocal() )
                 {
                     notifyOnAlert( containerHostMetric );
                 }
-                //send metric to owner peer
+                //send metric to remote hosting peer
                 else
                 {
-                    ownerPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
+                    hostingPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
                             Constants.ALERT_TIMEOUT );
                 }
             }
@@ -353,7 +385,7 @@ public class MonitorImpl implements Monitor
             //search for subscriber if not found then no-op
             for ( String subscriberId : subscribersIds )
             {
-                //notify subscriber on notifyOnAlert
+                //notify subscriber on alert
                 notifyListener( metric, subscriberId );
             }
         }

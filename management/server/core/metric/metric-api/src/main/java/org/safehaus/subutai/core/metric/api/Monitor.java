@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.metric.api;
 import java.util.Set;
 
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
 /**
@@ -36,13 +37,26 @@ public interface Monitor
 
     /**
      * Enables {@code AlertListener} to be triggered if thresholds on some containers within the given environment are
-     * exceeded
+     * exceeded. Monitoring infrastructure is initialized with default monitoring settings
      *
      * @param alertListener alertListener  to trigger
      * @param environment environment to monitor
      */
 
     public void startMonitoring( AlertListener alertListener, Environment environment ) throws MonitorException;
+
+
+    /**
+     * Enables {@code AlertListener} to be triggered if thresholds on some containers within the given environment are
+     * exceeded. Monitoring infrastructure is initialized with custom monitoring settings
+     *
+     * @param alertListener alertListener  to trigger
+     * @param environment environment to monitor
+     * @param monitoringSettings monitoring settings
+     */
+
+    public void startMonitoring( AlertListener alertListener, Environment environment,
+                                 MonitoringSettings monitoringSettings ) throws MonitorException;
 
     /**
      * Disables {@code AlertListener} to be triggered for the given environment
@@ -51,6 +65,26 @@ public interface Monitor
      * @param environment environment to monitor
      */
     public void stopMonitoring( AlertListener alertListener, Environment environment ) throws MonitorException;
+
+
+    /**
+     * Activates monitoring on a given container with custom monitoring settings
+     *
+     * @param containerHost container host to activate monitoring on
+     * @param monitoringSettings monitoring settings
+     */
+
+    public void activateMonitoring( ContainerHost containerHost, MonitoringSettings monitoringSettings )
+            throws MonitorException;
+
+    /**
+     * Activates monitoring on a given container with default monitoring settings
+     *
+     * @param containerHost container host to activate monitoring on
+     */
+
+    public void activateMonitoring( ContainerHost containerHost ) throws MonitorException;
+
 
     /**
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under

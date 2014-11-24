@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.metric.api;
 
 
 /**
- * Interface for MetricListener
+ * AlertListener
  */
 public interface AlertListener
 {
