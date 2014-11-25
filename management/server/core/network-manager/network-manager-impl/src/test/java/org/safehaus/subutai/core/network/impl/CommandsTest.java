@@ -19,6 +19,7 @@ public class CommandsTest
     private static final String GATEWAY_IP = "gateway.ip";
     private static final int VLAN_ID = 100;
     private static final String CONTAINER_NAME = "container";
+    private static final String PATH_TO_KEY_FILE = "/path/to/key/file";
     private static final int NET_MASK = 24;
     Commands commands = new Commands();
 
@@ -28,7 +29,7 @@ public class CommandsTest
     {
         assertNotNull(
                 commands.getSetupN2NConnectionCommand( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME,
-                        LOCAL_IP ) );
+                        LOCAL_IP, PATH_TO_KEY_FILE ) );
     }
 
 

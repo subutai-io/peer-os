@@ -10,7 +10,7 @@ public interface NetworkManager
      * Sets up an N2N connection to super node
      */
     public void setupN2NConnection( String superNodeIp, int superNodePort, String interfaceName, String communityName,
-                                    String localIp ) throws NetworkManagerException;
+                                    String localIp, String pathToKeyFile ) throws NetworkManagerException;
 
     /**
      * Removes N2N connection to super node

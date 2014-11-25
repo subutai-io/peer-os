@@ -16,11 +16,11 @@ public class Commands
 
 
     public RequestBuilder getSetupN2NConnectionCommand( String superNodeIp, int superNodePort, String interfaceName,
-                                                        String communityName, String localIp )
+                                                        String communityName, String localIp, String pathToKeyFile )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
                 Lists.newArrayList( "-N", superNodeIp, String.valueOf( superNodePort ), interfaceName, communityName,
-                        localIp ) );
+                        localIp, "file", pathToKeyFile ) );
     }
 
 

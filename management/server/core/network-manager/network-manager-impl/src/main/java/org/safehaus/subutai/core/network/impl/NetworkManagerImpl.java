@@ -43,11 +43,12 @@ public class NetworkManagerImpl implements NetworkManager
 
     @Override
     public void setupN2NConnection( final String superNodeIp, final int superNodePort, final String interfaceName,
-                                    final String communityName, final String localIp ) throws NetworkManagerException
+                                    final String communityName, final String localIp, final String pathToKeyFile )
+            throws NetworkManagerException
     {
         execute( getManagementHost(),
                 commands.getSetupN2NConnectionCommand( superNodeIp, superNodePort, interfaceName, communityName,
-                        localIp ) );
+                        localIp, pathToKeyFile ) );
     }
 
 
