@@ -6,5 +6,5 @@ package org.safehaus.subutai.core.metric.impl;
  */
 public enum RecipientType
 {
-    ALERT_RECIPIENT, METRIC_REQUEST_RECIPIENT
+    ALERT_RECIPIENT, METRIC_REQUEST_RECIPIENT, MONITORING_ACTIVATION_RECIPIENT
 }

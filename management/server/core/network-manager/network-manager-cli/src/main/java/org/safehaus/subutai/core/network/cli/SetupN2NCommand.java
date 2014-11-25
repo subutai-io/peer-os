@@ -35,6 +35,9 @@ public class SetupN2NCommand extends OsgiCommandSupport
     @Argument( index = 4, name = "local peer IP", required = true, multiValued = false,
             description = "local peer IP" )
     String localIp;
+    @Argument( index = 5, name = "key file path", required = true, multiValued = false,
+            description = "path to key file" )
+    String pathToKeyFile;
 
 
     public SetupN2NCommand( final NetworkManager networkManager )
@@ -51,7 +54,8 @@ public class SetupN2NCommand extends OsgiCommandSupport
 
         try
         {
-            networkManager.setupN2NConnection( superNodeIp, superNodePort, interfaceName, communityName, localIp );
+            networkManager.setupN2NConnection( superNodeIp, superNodePort, interfaceName, communityName, localIp,
+                    pathToKeyFile );
             System.out.println( "OK" );
         }
         catch ( NetworkManagerException e )

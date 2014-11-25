@@ -6,9 +6,18 @@ package org.safehaus.subutai.core.hostregistry.api;
  */
 public interface Interface
 {
+    /**
+     * returns network interface name
+     */
     public String getInterfaceName();
 
+    /**
+     * returns ip address
+     */
     public String getIp();
 
+    /**
+     * returns MAC address
+     */
     public String getMac();
 }
