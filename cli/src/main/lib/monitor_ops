@@ -7,6 +7,7 @@
 metric_list=("ram" "cpu")
 parameter_list=("metricCollectionIntervalInMin" "maxSampleCount" "metricCountToAverageToAlert" "intervalBetweenAlertsInMin" "ramAlertThreshold" "cpuAlertThreshold" "diskAlertThreshold")
 
+
 function get_total_ram {
   local lxc="$1"
   lxc_assert $lxc > /dev/null
@@ -567,4 +568,32 @@ function assert_no_config {
 }
 
 
+function get_ram_threshold {
+  if [ -z $ramAlertThreshold ]; then
+    echo "80"
+    return
+  fi
+  echo $ramAlertThreshold
+  return
+}
+
+
+function get_cpu_threshold {
+  if [ -z $cpuAlertThreshold ]; then
+    echo "80"
+    return
+  fi
+  echo $cpuAlertThreshold
+  return
+}
+
+
+function get_disk_threshold {
+  if [ -z $diskAlertThreshold ]; then
+    echo "80"
+    return
+  fi
+  echo $diskAlertThreshold
+  return
+}
 
