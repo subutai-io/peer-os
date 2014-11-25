@@ -24,7 +24,7 @@ public class RemoveNodeOperationHandlerTest {
 
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         dataSource = mock(DataSource.class);
         executorService = mock(ExecutorService.class);
         trackerOperation = mock(TrackerOperation.class);
@@ -47,7 +47,7 @@ public class RemoveNodeOperationHandlerTest {
     }
 
     @Test
-    public void testRun() throws Exception {
+    public void testRun() {
         Tracker tracker = mock(Tracker.class);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         HadoopImpl hadoop = new HadoopImpl(dataSource);

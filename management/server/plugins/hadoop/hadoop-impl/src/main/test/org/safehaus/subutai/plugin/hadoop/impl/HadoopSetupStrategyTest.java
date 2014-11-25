@@ -33,7 +33,7 @@ public class HadoopSetupStrategyTest {
     ContainerHost containerHost4;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp()  {
         PluginDAO pluginDAO = mock(PluginDAO.class);
         environment = mock(Environment.class);
         hadoopClusterConfig = mock(HadoopClusterConfig.class);
@@ -51,7 +51,7 @@ public class HadoopSetupStrategyTest {
     }
 
     @Test
-    public void testSetup() throws Exception {
+    public void testSetup() throws ClusterSetupException {
         when(environment.getContainerHostByUUID(hadoopClusterConfig.getNameNode())).thenReturn(containerHost);
         when(environment.getContainerHostByUUID(hadoopClusterConfig.getJobTracker())).thenReturn(containerHost);
         when(environment.getContainerHostByUUID(hadoopClusterConfig.getSecondaryNameNode())).thenReturn(containerHost);
@@ -90,7 +90,7 @@ public class HadoopSetupStrategyTest {
     }
 
     @Test
-    public void testSetMasterNodes () throws Exception {
+    public void testSetMasterNodes () throws ClusterSetupException {
         Set<ContainerHost> mySet = mock(Set.class);
         mySet.add(containerHost);
         mySet.add(containerHost2);
@@ -126,7 +126,7 @@ public class HadoopSetupStrategyTest {
     }
 
     @Test
-    public void testSetSlaveNodes() throws Exception {
+    public void testSetSlaveNodes() throws ClusterSetupException {
         UUID uuid = new UUID(50,50);
         Set<UUID> myUUID = mock(Set.class);
         myUUID.add(uuid);
@@ -155,7 +155,7 @@ public class HadoopSetupStrategyTest {
 
 
     @Test(expected = ClusterSetupException.class)
-    public void testexception() throws Exception {
+    public void testexception() throws ClusterSetupException {
         Set<ContainerHost> mySet = mock(Set.class);
         mySet.add(containerHost);
         mySet.add(containerHost2);
@@ -180,7 +180,7 @@ public class HadoopSetupStrategyTest {
     }
 
     @Test(expected = ClusterSetupException.class)
-    public void testexception2() throws Exception {
+    public void testexception2() throws ClusterSetupException {
         Set<ContainerHost> mySet = mock(Set.class);
         mySet.add(containerHost);
         mySet.add(containerHost2);

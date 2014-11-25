@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.hadoop.impl;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -21,7 +22,7 @@ public class ClusterConfigurationTest {
     HadoopClusterConfig configBase;
     Environment environment;
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         trackerOperation = mock(TrackerOperation.class);
         hadoopImpl = mock(HadoopImpl.class);
         configBase = mock(HadoopClusterConfig.class);
@@ -31,7 +32,7 @@ public class ClusterConfigurationTest {
 
 
     @Test
-    public void testConfigureCluster() throws Exception {
+    public void testConfigureCluster() throws ClusterConfigurationException {
         ContainerHost containerHost = mock(ContainerHost.class);
         ContainerHost containerHost2 = mock(ContainerHost.class);
         Set<ContainerHost> mySet = mock(Set.class);
@@ -75,7 +76,7 @@ public class ClusterConfigurationTest {
     }
 
     @Test
-    public void testConstructorConfigureCluster() throws  Exception {
+    public void testConstructorConfigureCluster() {
         clusterConfiguration = new ClusterConfiguration(trackerOperation,hadoopImpl);
     }
 }

@@ -2,11 +2,14 @@ package org.safehaus.subutai.plugin.hadoop.impl.handler;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -44,7 +47,7 @@ public class ClusterOperationHandlerTest {
     CommandResult commandResult;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws ClusterSetupException, EnvironmentBuildException {
         containerHost = mock(ContainerHost.class);
         containerHost2 = mock(ContainerHost.class);
         Set<ContainerHost> mySet = mock(Set.class);
@@ -80,25 +83,25 @@ public class ClusterOperationHandlerTest {
     }
 
     @Test
-    public void testRun_ClusterOperationType_Install_cluster_already_exist() throws Exception {
+    public void testRunWithClusterOperationTypeInstallCluster() {
         when(hadoopClusterConfig.getClusterName()).thenReturn("test");
         when(hadoop.getCluster("test")).thenReturn(hadoopClusterConfig);
         clusterOperationHandler.run();
     }
 
     @Test
-    public void testRun_ClusterOperationType_Install_malformed_configuration() throws Exception {
+    public void testRunClusterOperationTypeInstall() {
         when(hadoopClusterConfig.getClusterName()).thenReturn(null);
         clusterOperationHandler.run();
     }
 
     @Test
-    public void testRun_ClusterOperationTypeUninstall() throws Exception {
+    public void testRunClusterOperationTypeUninstall() {
         clusterOperationHandler1.run();
     }
 
     @Test
-    public void testRunOperationOnContainers() throws Exception {
+    public void testRunOperationOnContainers() throws CommandException {
         when(hadoopClusterConfig.getEnvironmentId()).thenReturn(uuid);
         when(hadoopClusterConfig.getNameNode()).thenReturn(uuid);
         when(hadoopClusterConfig.getJobTracker()).thenReturn(uuid);
@@ -139,7 +142,7 @@ public class ClusterOperationHandlerTest {
     }
 
     @Test
-    public void testLogStatusResultsWithNodeTypeNONAME() throws Exception {
+    public void testLogStatusResultsWithNodeTypeNONAME() {
         when(commandResult.getStdOut()).thenReturn("NameNode");
         clusterOperationHandler.logStatusResults(trackerOperation, commandResult, NodeType.NAMENODE);
 
@@ -147,7 +150,7 @@ public class ClusterOperationHandlerTest {
     }
 
     @Test
-    public void testLogStatusResultsWithNodeTypeJOBTRACKER() throws Exception {
+    public void testLogStatusResultsWithNodeTypeJOBTRACKER() {
         CommandResult commandResult = mock(CommandResult.class);
         when(commandResult.getStdOut()).thenReturn("JobTracker");
         clusterOperationHandler.logStatusResults(trackerOperation,commandResult,NodeType.JOBTRACKER);
@@ -156,7 +159,7 @@ public class ClusterOperationHandlerTest {
     }
 
     @Test
-    public void testLogStatusResultsWithNodeTypeSECONDARY_NAMENODE() throws Exception {
+    public void testLogStatusResultsWithNodeTypeSECONDARY_NAMENODE() {
         CommandResult commandResult = mock(CommandResult.class);
         when(commandResult.getStdOut()).thenReturn("SecondaryNameNode");
         clusterOperationHandler.logStatusResults(trackerOperation,commandResult,NodeType.SECONDARY_NAMENODE);
@@ -165,7 +168,7 @@ public class ClusterOperationHandlerTest {
     }
 
     @Test
-    public void testLogStatusResultsWithNodeTypeDATANODE() throws Exception {
+    public void testLogStatusResultsWithNodeTypeDATANODE() {
         CommandResult commandResult = mock(CommandResult.class);
         when(commandResult.getStdOut()).thenReturn("DataNode");
         clusterOperationHandler.logStatusResults(trackerOperation, commandResult, NodeType.DATANODE);
@@ -174,7 +177,7 @@ public class ClusterOperationHandlerTest {
     }
 
     @Test
-    public void testLogStatusResultsWithNodeTypeTASKTRACKER() throws Exception {
+    public void testLogStatusResultsWithNodeTypeTASKTRACKER() {
         CommandResult commandResult = mock(CommandResult.class);
         when(commandResult.getStdOut()).thenReturn("TaskTracker");
         clusterOperationHandler.logStatusResults(trackerOperation,commandResult,NodeType.TASKTRACKER);
@@ -183,14 +186,14 @@ public class ClusterOperationHandlerTest {
     }
 
     @Test
-    public void testLogStatusResultsWithNodeTypeSLAVE_NODE() throws Exception {
+    public void testLogStatusResultsWithNodeTypeSLAVE_NODE() {
         CommandResult commandResult = mock(CommandResult.class);
         clusterOperationHandler.logStatusResults(trackerOperation,commandResult,NodeType.SLAVE_NODE);
 
     }
 
     @Test
-    public void testDestroyCluster() throws Exception {
+    public void testDestroyCluster() {
         PluginDAO pluginDAO = mock(PluginDAO.class);
         when(hadoopClusterConfig.getEnvironmentId()).thenReturn(uuid);
         when(hadoop.getPluginDAO()).thenReturn(pluginDAO);

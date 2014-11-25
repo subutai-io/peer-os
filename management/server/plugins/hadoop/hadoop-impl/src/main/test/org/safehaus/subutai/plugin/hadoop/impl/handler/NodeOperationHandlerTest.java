@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.hadoop.impl.handler;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -18,10 +19,8 @@ import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
 import java.util.*;
 
-import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 
 public class NodeOperationHandlerTest {
@@ -39,7 +38,7 @@ public class NodeOperationHandlerTest {
     RequestBuilder requestBuilder;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         tracker = mock(Tracker.class);
         hadoopImpl = mock(HadoopImpl.class);
         when(hadoopImpl.getTracker()).thenReturn(tracker);
@@ -60,7 +59,7 @@ public class NodeOperationHandlerTest {
     }
 
     @Test
-    public void testRun() throws Exception {
+    public void testRun() {
         UUID uuid = new UUID(50,50);
         Set<ContainerHost> mySet = mock(Set.class);
         mySet.add(containerHost);
@@ -92,7 +91,7 @@ public class NodeOperationHandlerTest {
     }
 
     @Test()
-    public void testRunCommandWithNodeOperationType_START() throws Exception {
+    public void testRunCommandWithNodeOperationTypeSTART() throws CommandException {
         when(hadoopImpl.getTracker()).thenReturn(tracker);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         when(containerHost.execute(any(RequestBuilder.class))).thenReturn(commandResult);
@@ -110,7 +109,7 @@ public class NodeOperationHandlerTest {
     }
 
     @Test()
-    public void testRunCommandWithNodeOperationType_STOP() throws Exception {
+    public void testRunCommandWithNodeOperationTypeSTOP() throws CommandException {
         when(hadoopImpl.getTracker()).thenReturn(tracker);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         when(containerHost.execute(any(RequestBuilder.class))).thenReturn(commandResult);
@@ -127,7 +126,7 @@ public class NodeOperationHandlerTest {
     }
 
     @Test()
-    public void testRunCommandWithNodeOperationType_STATUS() throws Exception {
+    public void testRunCommandWithNodeOperationTypeSTATUS() throws CommandException {
         when(hadoopImpl.getTracker()).thenReturn(tracker);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         when(containerHost.execute(any(RequestBuilder.class))).thenReturn(commandResult);
@@ -144,36 +143,8 @@ public class NodeOperationHandlerTest {
         assertEquals(commandResult,containerHost.execute(any(RequestBuilder.class)));
     }
 
-    @Test()
-    public void testRunCommandWithNodeOperationType_EXCLUDE() throws Exception {
-        when(hadoopImpl.getTracker()).thenReturn(tracker);
-        when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
-        when(containerHost.execute(any(RequestBuilder.class))).thenReturn(commandResult);
-        when(hadoopImpl.getCluster(anyString())).thenReturn(hadoopClusterConfig);
-        when(commandResult.getStdOut()).thenReturn("NameNode");
-
-        nodeOperationHandler = new NodeOperationHandler(hadoopImpl,"test","test", NodeOperationType.INSTALL, NodeType.NAMENODE);
-        nodeOperationHandler.runCommand(containerHost,NodeOperationType.EXCLUDE,NodeType.NAMENODE);
-
-        assertEquals(commandResult,containerHost.execute(any(RequestBuilder.class)));
-    }
-
-    @Test()
-    public void testRunCommandWithNodeOperationType_INCLUDE() throws Exception {
-        when(hadoopImpl.getTracker()).thenReturn(tracker);
-        when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
-        when(containerHost.execute(any(RequestBuilder.class))).thenReturn(commandResult);
-        when(hadoopImpl.getCluster(anyString())).thenReturn(hadoopClusterConfig);
-        when(commandResult.getStdOut()).thenReturn("NameNode");
-
-        nodeOperationHandler = new NodeOperationHandler(hadoopImpl,"test","test", NodeOperationType.INSTALL, NodeType.NAMENODE);
-        nodeOperationHandler.runCommand(containerHost,NodeOperationType.INCLUDE,NodeType.NAMENODE);
-
-        assertEquals(commandResult,containerHost.execute(any(RequestBuilder.class)));
-    }
-
     @Test
-    public void testFindNodeInCluster() throws Exception {
+    public void testFindNodeInCluster() throws CommandException {
         UUID uuid = new UUID(50, 50);
         Set<ContainerHost> mySet = mock(Set.class);
         mySet.add(containerHost);
@@ -207,7 +178,7 @@ public class NodeOperationHandlerTest {
     }
 
     @Test
-    public void testExcludeNode() throws Exception {
+    public void testExcludeNode() throws CommandException {
         UUID uuid = new UUID(50, 50);
         Set<ContainerHost> mySet = mock(Set.class);
         mySet.add(containerHost);
@@ -254,7 +225,7 @@ public class NodeOperationHandlerTest {
     }
 
     @Test
-    public void testIncludeNode() throws Exception {
+    public void testIncludeNode() throws CommandException {
         UUID uuid = new UUID(50, 50);
         Set<ContainerHost> mySet = mock(Set.class);
         mySet.add(containerHost);
@@ -298,8 +269,5 @@ public class NodeOperationHandlerTest {
         assertEquals("test", containerHost.getHostname());
         assertEquals(hadoopClusterConfig, hadoopImpl.getCluster("test"));
         verify(hadoopClusterConfig).getBlockedAgents();
-
     }
-
-
 }

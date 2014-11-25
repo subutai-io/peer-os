@@ -23,7 +23,7 @@ public class AddOperationHandlerTest {
     ExecutorService executorService;
     Tracker tracker;
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         dataSource = mock(DataSource.class);
         executorService = mock(ExecutorService.class);
         trackerOperation = mock(TrackerOperation.class);
@@ -45,7 +45,7 @@ public class AddOperationHandlerTest {
     }
 
     @Test
-    public void testRun() throws Exception {
+    public void testRun() {
         HadoopImpl hadoop = new HadoopImpl(dataSource);
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
