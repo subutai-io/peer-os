@@ -12,8 +12,7 @@ import java.util.UUID;
 public class CloneContainersMessage
 {
     private int numberOfNodes;
-    private String Strategy;
-    private List<String> criteria;
+    private PlacementStrategy strategy;
     private List<Template> templates = new ArrayList();
     private String nodeGroupName;
     private UUID targetPeerId;
@@ -56,27 +55,15 @@ public class CloneContainersMessage
     }
 
 
-    public String getStrategy()
+    public PlacementStrategy getStrategy()
     {
-        return Strategy;
+        return strategy;
     }
 
 
-    public void setStrategy( final String strategy )
+    public void setStrategy( final PlacementStrategy strategy )
     {
-        Strategy = strategy;
-    }
-
-
-    public List<String> getCriteria()
-    {
-        return criteria;
-    }
-
-
-    public void setCriteria( final List<String> criteria )
-    {
-        this.criteria = criteria;
+        this.strategy = strategy;
     }
 
 
@@ -85,8 +72,7 @@ public class CloneContainersMessage
     {
         return "CloneContainersMessage{" +
                 ", numberOfNodes=" + numberOfNodes +
-                ", Strategy='" + Strategy + '\'' +
-                ", criteria=" + criteria +
+                ", Strategy='" + strategy + '\'' +
                 ", templates=" + templates +
                 '}';
     }

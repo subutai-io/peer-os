@@ -18,18 +18,19 @@
     <module>cassandra</module>
     <module>elasticsearch</module>
     <module>hadoop</module>
+    <module>mongodb</module>
     <module>hive</module>
     <module>spark</module>
+    <module>shark</module>
     <module>hbase</module>
-    <!--<module>accumulo</module>
+    <module>hipi</module>
+    <module>sqoop</module>
     <module>oozie</module>
+    <!--<module>accumulo</module>
     <module>solr</module>
-
     <module>zookeeper</module>
-
     <module>mongodb</module>
     <module>flume</module>
-
     <module>storm</module>
     <module>presto</module>
     <module>shark</module>

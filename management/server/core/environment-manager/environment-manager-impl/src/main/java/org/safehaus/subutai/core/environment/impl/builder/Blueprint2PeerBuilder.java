@@ -36,17 +36,24 @@ public class Blueprint2PeerBuilder extends EnvironmentBuildProcessFactory
         {
             EnvironmentBlueprint blueprint = environmentManager.getEnvironmentBlueprint( data.getBlueprintId() );
             Set<NodeGroup> groupSet = blueprint.getNodeGroups();
+
+            int i=0;
             for ( NodeGroup nodeGroup : groupSet )
             {
-                String key = data.getPeerId().toString() + "-" + nodeGroup.getTemplateName();
+                String key = data.getPeerId().toString() + "-" + nodeGroup.getTemplateName()+"-"+(i++);
                 CloneContainersMessage ccm = new CloneContainersMessage();
                 ccm.setTargetPeerId( data.getPeerId() );
                 ccm.setNodeGroupName( nodeGroup.getName() );
                 ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
-                ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );
+                ccm.setStrategy( nodeGroup.getPlacementStrategy() );
                 List<Template> templates =
                         fetchRequiredTemplates( environmentManager.getPeerManager().getLocalPeer().getId(),
                                 nodeGroup.getTemplateName() );
+                if ( templates.isEmpty() )
+                {
+                    throw new ProcessBuilderException( "No templates provided" );
+                }
+
                 ccm.setTemplates( templates );
                 process.putCloneContainerMessage( key, ccm );
             }

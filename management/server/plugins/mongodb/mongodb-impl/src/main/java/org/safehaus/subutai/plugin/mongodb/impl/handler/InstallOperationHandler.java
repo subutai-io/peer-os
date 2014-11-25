@@ -16,7 +16,7 @@ import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 /**
  * Handles install mongo cluster operation
  */
-public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
+public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl, MongoClusterConfig>
 {
 
     private final TrackerOperation po;
@@ -49,7 +49,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
         {
             Environment env = manager.getEnvironmentManager()
                                      .buildEnvironment( manager.getDefaultEnvironmentBlueprint( config ) );
-
+            config.setEnvironmentId(env.getId());
             ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( env, config, po );
             clusterSetupStrategy.setup();
 

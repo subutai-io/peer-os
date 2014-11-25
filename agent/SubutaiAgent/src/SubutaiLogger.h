@@ -25,16 +25,16 @@
 
 #ifndef SUBUTAILOGGER_H_
 #define SUBUTAILOGGER_H_
-#include<stdio.h>
-#include<string>
-#include<boost/date_time/posix_time/posix_time_types.hpp>
+#include <stdio.h>
+#include <string>
+#include "SubutaiHelper.h"
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 using namespace std;
 class SubutaiLogger {
 public:
 	SubutaiLogger();
 	virtual ~SubutaiLogger();
 	string getLocaltime();
-	string toString(int);
 	void writeLog(int,string);
 	bool openLogFile(int,int);
 	bool openLogFileWithName(string);
@@ -43,6 +43,7 @@ public:
 	int getLogLevel();
 	void setLogLevel(int loglevel);
 private:
+	SubutaiHelper _helper;
 	FILE* logFile;
 	int loglevel;
 };

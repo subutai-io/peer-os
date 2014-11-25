@@ -9,7 +9,7 @@ downloadFileAndMakeChanges() {
 	tempDirectory=$BASE/$fileName/opt
 	confDirectory=$BASE/$fileName/etc/accumulo
 
-	accumuloVersion=1.4.2
+	accumuloVersion=1.6.1
 
 	# Create directories that are required for the debian package
 	mkdir -p $tempDirectory	
@@ -17,7 +17,7 @@ downloadFileAndMakeChanges() {
 
 	# download accumulo
 	# wget http://archive.apache.org/dist/accumulo/$accumuloVersion/accumulo-$accumuloVersion-bin.tar.gz -P $tempDirectory
-	wget http://archive.apache.org/dist/accumulo/1.4.2/accumulo-1.4.2-dist.tar.gz -P $tempDirectory
+	wget http://archive.apache.org/dist/accumulo/1.6.1/accumulo-1.6.1-bin.tar.gz -P $tempDirectory
 	
 	pushd $tempDirectory
 	tar -xzpf accumulo-*.tar.gz

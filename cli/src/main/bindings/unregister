@@ -45,7 +45,7 @@ function unregister {
   fi
 
   lxc_assert_no $template
-  zfs_assert_nods lxc/$template
+  fs_assert_nods lxc/$template
 
   if [ "`are_containers_readable $template`" == "true" ]
   then

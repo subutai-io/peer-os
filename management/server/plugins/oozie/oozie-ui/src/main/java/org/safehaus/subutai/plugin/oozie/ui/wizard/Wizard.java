@@ -6,7 +6,6 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
@@ -26,7 +25,6 @@ public class Wizard
     private int step = 1;
     private OozieClusterConfig config = new OozieClusterConfig();
     private Hadoop hadoopManager;
-    private AgentManager agentManager;
 
 
     public Wizard( final ExecutorService executorService, final ServiceLocator serviceLocator ) throws NamingException
@@ -34,7 +32,6 @@ public class Wizard
 
         tracker = serviceLocator.getService( Tracker.class );
         hadoopManager = serviceLocator.getService( Hadoop.class );
-        agentManager = serviceLocator.getService( AgentManager.class );
         oozieManager = serviceLocator.getService( Oozie.class );
         executor = executorService;
         vlayout = new VerticalLayout();
@@ -141,11 +138,5 @@ public class Wizard
     public Oozie getOozieManager()
     {
         return oozieManager;
-    }
-
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
     }
 }

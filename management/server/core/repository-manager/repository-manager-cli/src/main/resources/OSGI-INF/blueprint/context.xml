@@ -25,6 +25,13 @@
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="repo/extract-files">
+      <action class="org.safehaus.subutai.core.repository.cli.ExtractFilesCommand">
+        <argument ref="repositoryManager" />
+      </action>
+    </command>
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="repo/list">
       <action class="org.safehaus.subutai.core.repository.cli.ListPackagesCommand">
         <argument ref="repositoryManager" />

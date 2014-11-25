@@ -8,6 +8,7 @@ package org.safehaus.subutai.core.environment.impl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -17,6 +18,7 @@ import javax.sql.DataSource;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
@@ -280,16 +282,32 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void saveEnvironment( final Environment environment )
+    public void saveEnvironment( final Environment environment ) throws EnvironmentManagerException
     {
-        environmentDAO.saveInfo( ENVIRONMENT, environment.getId().toString(), environment );
+        try
+        {
+            environmentDAO.saveInfo( ENVIRONMENT, environment.getId().toString(), environment );
+        }
+        catch ( EnvironmentPersistenceException e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new EnvironmentManagerException( e.getMessage() );
+        }
     }
 
 
     @Override
-    public boolean saveBuildProcess( final EnvironmentBuildProcess buildProgress )
+    public boolean saveBuildProcess( final EnvironmentBuildProcess buildProgress ) throws EnvironmentManagerException
     {
-        return environmentDAO.saveInfo( PROCESS, buildProgress.getId().toString(), buildProgress );
+        try
+        {
+            return environmentDAO.saveInfo( PROCESS, buildProgress.getId().toString(), buildProgress );
+        }
+        catch ( EnvironmentPersistenceException e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new EnvironmentManagerException( e.getMessage() );
+        }
     }
 
 
@@ -307,6 +325,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBlueprintId() );
+            if ( blueprint == null )
+            {
+                throw new EnvironmentBuildException( "Blueprint not found..." );
+            }
             Environment environment = environmentBuilder.build( blueprint, process );
             saveEnvironment( environment );
 
@@ -319,6 +341,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             return environment;
         }
         catch ( EnvironmentPersistenceException | BuildException | EnvironmentConfigureException e )
+        {
+            throw new EnvironmentBuildException( e.getMessage() );
+        }
+        catch ( EnvironmentManagerException e )
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
@@ -464,7 +490,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             Set<ContainerHost> containers = peerManager.getPeer( peer.getId() ).
                     createContainers( peerId, environment.getId(), templatesData, nodeGroup.getNumberOfNodes(),
-                            nodeGroup.getPlacementStrategy().toString(), null, nodeGroup.getName() );
+                            nodeGroup.getPlacementStrategy().getStrategyId(),
+                            nodeGroup.getPlacementStrategy().getCriteriaAsList(), nodeGroup.getName() );
             if ( !containers.isEmpty() )
             {
                 for ( ContainerHost container : containers )
@@ -477,12 +504,68 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 throw new EnvironmentBuildException( String.format( "FAILED create container on %s", peer.getId() ) );
             }
+            saveEnvironment( environment );
         }
         catch ( PeerException e )
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
-        saveEnvironment( environment );
+        catch ( EnvironmentManagerException e )
+        {
+            throw new EnvironmentBuildException( e.getMessage() );
+        }
+    }
+
+
+    @Override
+    public UUID addContainers( final UUID environmentId, final String template, PlacementStrategy strategy,
+                               String nodeGroupName, final Peer peer ) throws EnvironmentManagerException
+    {
+        EnvironmentBuildProcessFactory builder = new Node2PeerBuilder( this );
+        try
+        {
+
+            List<Template> templates = builder.fetchRequiredTemplates( peer.getId(), template );
+            Set<ContainerHost> hosts = peerManager.getPeer( peer.getId() )
+                                                  .createContainers( peerManager.getLocalPeer().getId(), environmentId,
+                                                          templates, 1, strategy.getStrategyId(),
+                                                          strategy.getCriteriaAsList(), nodeGroupName );
+            if ( hosts.isEmpty() )
+            {
+                throw new EnvironmentManagerException( "Containers not created" );
+            }
+            else
+            {
+                ContainerHost newHost = ( ContainerHost ) Arrays.asList( hosts ).get( 0 );
+                Environment environment = getEnvironmentByUUID( environmentId );
+                environment.addContainer( newHost );
+                saveEnvironment( environment );
+                return newHost.getId();
+            }
+        }
+        catch ( ProcessBuilderException | PeerException e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new EnvironmentManagerException( e.getMessage() );
+        }
+    }
+
+
+    @Override
+    public void removeContainer( final UUID environmentId, final UUID hostId ) throws EnvironmentManagerException
+    {
+        Environment environment = getEnvironmentByUUID( environmentId );
+        ContainerHost host = environment.getContainerHostByUUID( hostId );
+        try
+        {
+            host.dispose();
+            environment.removeContainer( host );
+            saveEnvironment( environment );
+        }
+        catch ( PeerException e )
+        {
+            throw new EnvironmentManagerException( e.getMessage() );
+        }
     }
 
 

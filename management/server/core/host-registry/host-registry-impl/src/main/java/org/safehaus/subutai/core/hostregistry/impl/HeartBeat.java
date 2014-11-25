@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.hostregistry.impl;
 
 
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 
 
 /**
@@ -9,10 +9,10 @@ import org.safehaus.subutai.core.hostregistry.api.HostInfo;
  */
 public class HeartBeat
 {
-    HostInfoImpl response;
+    ResourceHostInfoImpl response;
 
 
-    public HostInfo getHostInfo()
+    public ResourceHostInfo getHostInfo()
     {
         return response;
     }

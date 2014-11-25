@@ -4,6 +4,7 @@
 
 d = debian/subutai-cli-dev
 BINDINGS=/usr/share/subutai-cli-dev/bindings
+LIBDIR=/usr/share/subutai-cli/subutai/lib
 
 %:
 	dh $@
@@ -28,7 +29,9 @@ install: build
 	dh_installdirs
 	dh_install
 	mkdir -p ${d}${BINDINGS}
+	mkdir -p ${d}${LIBDIR}
 	cp -a src/main/bindings/* ${d}${BINDINGS}
+	cp -a src/main/lib/* ${d}${LIBDIR}
 	dh_link
 
 # build architecture-independent files

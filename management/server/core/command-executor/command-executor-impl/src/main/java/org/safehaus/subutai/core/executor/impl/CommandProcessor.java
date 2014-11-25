@@ -15,8 +15,10 @@ import org.safehaus.subutai.core.broker.api.BrokerException;
 import org.safehaus.subutai.core.broker.api.ByteMessageListener;
 import org.safehaus.subutai.core.broker.api.Topic;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
+import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,17 +31,16 @@ import com.google.common.base.Preconditions;
 public class CommandProcessor implements ByteMessageListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
-
-    private ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
-    private int inactiveCommandDropTimeout = Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC;
     private final Broker broker;
     private final HostRegistry hostRegistry;
+
+    protected ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
 
 
     public CommandProcessor( final Broker broker, final HostRegistry hostRegistry )
     {
-        Preconditions.checkNotNull( broker);
-        Preconditions.checkNotNull( hostRegistry);
+        Preconditions.checkNotNull( broker );
+        Preconditions.checkNotNull( hostRegistry );
 
         this.broker = broker;
         this.hostRegistry = hostRegistry;
@@ -56,16 +57,21 @@ public class CommandProcessor implements ByteMessageListener
     public void execute( final Request request, CommandCallback callback ) throws CommandException
     {
         //find target host
-        HostInfo targetHost = getTargetHost( request.getId() );
-        if ( targetHost == null )
+        ResourceHostInfo targetHost;
+        try
         {
-            throw new CommandException( "Host is not connected" );
+            targetHost = getTargetHost( request.getId() );
+        }
+        catch ( HostDisconnectedException e )
+        {
+            throw new CommandException( e );
         }
 
         //create command process
         CommandProcess commandProcess = new CommandProcess( this, callback );
-        boolean queued = commands.put( request.getCommandId(), commandProcess, inactiveCommandDropTimeout * 1000,
-                new CommandProcessExpiryCallback() );
+        boolean queued =
+                commands.put( request.getCommandId(), commandProcess, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000,
+                        new CommandProcessExpiryCallback() );
         if ( !queued )
         {
             throw new CommandException( "This command is already queued for execution" );
@@ -76,7 +82,7 @@ public class CommandProcessor implements ByteMessageListener
         {
             commandProcess.start();
 
-            broker.sendTextMessage( targetHost.getId().toString(), JsonUtil.toJson( request ) );
+            broker.sendTextMessage( targetHost.getId().toString(), JsonUtil.toJson( new RequestWrapper( request ) ) );
         }
         catch ( BrokerException e )
         {
@@ -86,29 +92,6 @@ public class CommandProcessor implements ByteMessageListener
 
             throw new CommandException( e );
         }
-    }
-
-
-    private HostInfo getTargetHost( UUID hostId )
-    {
-        HostInfo targetHost = hostRegistry.getHostInfoById( hostId );
-        if ( targetHost == null )
-        {
-            ContainerHostInfo containerHostInfo = hostRegistry.getContainerInfoById( hostId );
-            if ( containerHostInfo != null )
-            {
-                targetHost = hostRegistry.getParentByChild( containerHostInfo );
-            }
-        }
-        return targetHost;
-    }
-
-
-    protected void remove( UUID commandId )
-    {
-        Preconditions.checkNotNull( commandId );
-
-        commands.remove( commandId );
     }
 
 
@@ -136,9 +119,11 @@ public class CommandProcessor implements ByteMessageListener
         {
             String responseString = new String( message, "UTF-8" );
 
-            final ResponseImpl response = JsonUtil.fromJson( responseString, ResponseImpl.class );
+            ResponseWrapper responseWrapper = JsonUtil.fromJson( responseString, ResponseWrapper.class );
 
-            final CommandProcess commandProcess = commands.get( response.getCommandId() );
+            ResponseImpl response = responseWrapper.getResponse();
+
+            CommandProcess commandProcess = commands.get( response.getCommandId() );
 
             if ( commandProcess != null )
             {
@@ -154,5 +139,36 @@ public class CommandProcessor implements ByteMessageListener
         {
             LOG.error( "Error processing response", e );
         }
+    }
+
+
+    protected ResourceHostInfo getTargetHost( UUID hostId ) throws HostDisconnectedException
+    {
+        ResourceHostInfo targetHost;
+
+        try
+        {
+            targetHost = hostRegistry.getResourceHostInfoById( hostId );
+        }
+        catch ( HostDisconnectedException e )
+        {
+            ContainerHostInfo containerHostInfo = hostRegistry.getContainerHostInfoById( hostId );
+            if ( containerHostInfo.getStatus() != ContainerHostState.RUNNING )
+            {
+                throw new HostDisconnectedException(
+                        String.format( "Container state is %s", containerHostInfo.getStatus() ) );
+            }
+            targetHost = hostRegistry.getResourceHostByContainerHost( containerHostInfo );
+        }
+
+        return targetHost;
+    }
+
+
+    protected void remove( UUID commandId )
+    {
+        Preconditions.checkNotNull( commandId );
+
+        commands.remove( commandId );
     }
 }

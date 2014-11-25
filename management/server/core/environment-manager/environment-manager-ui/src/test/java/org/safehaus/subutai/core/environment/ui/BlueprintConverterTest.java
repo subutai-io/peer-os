@@ -64,8 +64,10 @@ public class BlueprintConverterTest
     private EnvironmentBlueprint environmentBlueprint()
     {
         EnvironmentBlueprint blueprint = new EnvironmentBlueprint( "name", "domain.name", true, true );
-        NodeGroup ng1 = nodeGroup( "name1", "template1", "domain.name", 2, PlacementStrategy.BEST_SERVER, true );
-        NodeGroup ng2 = nodeGroup( "name2", "template2", "domain.name", 2, PlacementStrategy.BEST_SERVER, true );
+        NodeGroup ng1 =
+                nodeGroup( "name1", "template1", "domain.name", 2, new PlacementStrategy( "BEST_SERVER" ), true );
+        NodeGroup ng2 =
+                nodeGroup( "name2", "template2", "domain.name", 2, new PlacementStrategy( "BEST_SERVER" ), true );
         blueprint.addNodeGroup( ng1 );
         blueprint.addNodeGroup( ng2 );
         return blueprint;

@@ -26,7 +26,7 @@ public class Node2PeerBuilder extends EnvironmentBuildProcessFactory
 
 
     @Override
-    public EnvironmentBuildProcess prepareBuildProcess( final TopologyData topologyData )
+    public EnvironmentBuildProcess prepareBuildProcess( final TopologyData topologyData ) throws ProcessBuilderException
     {
         Node2PeerData data = ( Node2PeerData ) topologyData;
         EnvironmentBuildProcess process = new EnvironmentBuildProcess( data.getBlueprintId() );
@@ -45,12 +45,18 @@ public class Node2PeerBuilder extends EnvironmentBuildProcessFactory
                 CloneContainersMessage ccm = new CloneContainersMessage();
                 ccm.setTargetPeerId( peer.getId() );
                 ccm.setNodeGroupName( nodeGroup.getName() );
-                ccm.setCriteria( null );
                 ccm.setNumberOfNodes( 1 );
-                ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );
+                ccm.setStrategy( nodeGroup.getPlacementStrategy() );
                 List<Template> templates =
                         fetchRequiredTemplates( environmentManager.getPeerManager().getLocalPeer().getId(),
                                 nodeGroup.getTemplateName() );
+
+                if ( templates.isEmpty() )
+                {
+                    throw new ProcessBuilderException( "No templates provided" );
+                }
+
+
                 ccm.setTemplates( templates );
                 process.putCloneContainerMessage( key.toString(), ccm );
             }
@@ -59,6 +65,8 @@ public class Node2PeerBuilder extends EnvironmentBuildProcessFactory
                 process.getMessageMap().get( key.toString() ).incrementNumberOfNodes();
             }
         }
+
+
 
         return process;
     }

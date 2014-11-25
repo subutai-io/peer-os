@@ -43,10 +43,16 @@ public class NodeGroup2PeerBuilder extends EnvironmentBuildProcessFactory
                 ccm.setTargetPeerId( peer.getId() );
                 ccm.setNodeGroupName( nodeGroup.getName() );
                 ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
-                ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );
+                ccm.setStrategy( nodeGroup.getPlacementStrategy() );
                 List<Template> templates =
                         fetchRequiredTemplates( environmentManager.getPeerManager().getLocalPeer().getId(),
                                 nodeGroup.getTemplateName() );
+
+                if ( templates.isEmpty() )
+                {
+                    throw new ProcessBuilderException( "No templates provided" );
+                }
+
                 ccm.setTemplates( templates );
                 process.putCloneContainerMessage( key, ccm );
             }

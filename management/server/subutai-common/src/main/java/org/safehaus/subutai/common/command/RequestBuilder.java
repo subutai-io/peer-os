@@ -6,14 +6,15 @@
 package org.safehaus.subutai.common.command;
 
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.NumUtil;
 
 import com.google.common.base.Preconditions;
@@ -70,7 +71,9 @@ public class RequestBuilder
     private int pid;
 
     // Config points for inotify
-    private String[] confPoints;
+    private Set<String> confPoints;
+
+    private int isDaemon = 0;
 
 
     /**
@@ -263,10 +266,19 @@ public class RequestBuilder
      * Sets configuration points to track. This is actual for command with type INOTIFY_CREATE_REQUEST or
      * INOTIFY_REMOVE_REQUEST
      */
-    public RequestBuilder withConfPoints( String[] confPoints )
+    public RequestBuilder withConfPoints( Set<String> confPoints )
     {
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( confPoints ), "Config points are empty" );
 
-        this.confPoints = confPoints.clone();
+        this.confPoints = confPoints;
+
+        return this;
+    }
+
+
+    public RequestBuilder daemon()
+    {
+        this.isDaemon = 1;
 
         return this;
     }
@@ -292,7 +304,7 @@ public class RequestBuilder
         //TODO pass proper arguments after migration to new agent
         return new RequestImpl( org.safehaus.subutai.common.command.RequestType.EXECUTE_REQUEST, id, cwd, command,
                 cmdArgs, envVars, org.safehaus.subutai.common.command.OutputRedirection.RETURN,
-                org.safehaus.subutai.common.command.OutputRedirection.RETURN, runAs, timeout, 0 );
+                org.safehaus.subutai.common.command.OutputRedirection.RETURN, runAs, timeout, isDaemon );
     }
 
 
@@ -322,7 +334,7 @@ public class RequestBuilder
         {
             return false;
         }
-        if ( !Arrays.equals( confPoints, that.confPoints ) )
+        if ( confPoints != null ? !confPoints.equals( that.confPoints ) : that.confPoints != null )
         {
             return false;
         }
@@ -382,7 +394,7 @@ public class RequestBuilder
         result = 31 * result + ( cmdArgs != null ? cmdArgs.hashCode() : 0 );
         result = 31 * result + ( envVars != null ? envVars.hashCode() : 0 );
         result = 31 * result + pid;
-        result = 31 * result + ( confPoints != null ? Arrays.hashCode( confPoints ) : 0 );
+        result = 31 * result + ( confPoints != null ? confPoints.hashCode() : 0 );
         return result;
     }
 

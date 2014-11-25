@@ -47,14 +47,14 @@ function demote {
 
   # various sanity checks: lxc exists, it's a template, no kids, not registered
   lxc_assert "$temp"
-  if [ "false" == "`zfs_is_template $temp`" ]; then
+  if [ "false" == "`fs_is_template $temp`" ]; then
     msg_error "Supplied template name \"$temp\" is not a template. Aborting ..."
     unlock_container_read $temp
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
-  zfs_get_children "$temp"
+  fs_get_children "$temp"
   local child_count="$?"
   if [ "$child_count" -gt 0 ]; then
     msg_error "Template \"$temp\" cannot be demoted with $child_count children."
@@ -70,34 +70,7 @@ function demote {
     msg_info "    - Demoting template \"$temp\" with no children."
   fi
 
-  # actual code to demote the template here
-  local lxc_path="/var/lib/lxc/$temp"
-  cat $lxc_path/config | \
-    grep -v "lxc.hook.pre-start" | \
-    grep -v "subutai.template.package" | \
-    grep -v "subutai.git.uuid" >> $lxc_path/config.new
-  rm $lxc_path/config
-  mv $lxc_path/config.new $lxc_path/config
- 
-  local var_snap="lxc-data/$temp-var@template"
-  zfs release keep "$var_snap"
-  zfs destroy "$var_snap"
-  zfs set readonly=off "lxc-data/$temp-var"
-
-  local home_snap="lxc-data/$temp-home@template"
-  zfs release keep "$home_snap"
-  zfs destroy "$home_snap"
-  zfs set readonly=off "lxc-data/$temp-home"
-
-  local opt_snap="lxc/$temp-opt@template"
-  zfs release keep "$opt_snap"
-  zfs destroy "$opt_snap"
-  zfs set readonly=off "lxc/$temp-opt"
-
-  local root_snap="lxc/$temp@template"
-  zfs release keep "$root_snap"
-  zfs destroy "$root_snap"
-  zfs set readonly=off "lxc/$temp"
+  fs_demote_template $temp
   ovs_configure_lxc $temp
   lxc_install_agent $temp
   msg_ok "Successfully demoted $temp"

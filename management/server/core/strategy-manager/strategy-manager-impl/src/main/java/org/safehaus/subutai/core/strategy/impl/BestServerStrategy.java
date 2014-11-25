@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.common.protocol.Criteria;
+import org.safehaus.subutai.core.strategy.api.CriteriaDef;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 
@@ -115,14 +116,14 @@ public class BestServerStrategy extends RoundRobinStrategy
 
 
     @Override
-    public List<Criteria> getCriteria()
+    public List<CriteriaDef> getCriteriaDef()
     {
-        List<Criteria> list = new ArrayList<Criteria>();
-        Criteria c = new Criteria( "MORE_HDD", "More HDD", Boolean.valueOf( false ) );
+        List<CriteriaDef> list = new ArrayList<>();
+        CriteriaDef c = new CriteriaDef( "MORE_HDD", "More HDD", Boolean.valueOf( false ) );
         list.add( c );
-        c = new Criteria( "MORE_RAM", "More RAM", Boolean.valueOf( false ) );
+        c = new CriteriaDef( "MORE_RAM", "More RAM", Boolean.valueOf( false ) );
         list.add( c );
-        c = new Criteria( "MORE_CPU", "More CPU", Boolean.valueOf( false ) );
+        c = new CriteriaDef( "MORE_CPU", "More CPU", Boolean.valueOf( false ) );
         list.add( c );
 
         return Collections.unmodifiableList( list );

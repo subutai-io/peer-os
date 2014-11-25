@@ -2,13 +2,15 @@ package org.safehaus.subutai.core.peer.api;
 
 
 import java.io.Serializable;
+import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.SubutaiException;
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
@@ -23,6 +25,8 @@ public interface Host extends Serializable
     public void setParentAgent( Agent agent );
 
     public UUID getPeerId();
+
+    public void setPeerId( UUID peerId );
 
     public UUID getId();
 
@@ -41,4 +45,8 @@ public interface Host extends Serializable
     public boolean isConnected();
 
     public long getLastHeartbeat();
+
+    String getIpByMask( String mask );
+
+    void addIpHostToEtcHosts( String domainName, Set<Host> others, String mask ) throws SubutaiException;
 }

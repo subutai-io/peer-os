@@ -16,8 +16,8 @@
 
   <modules>
     <module>hbase-api</module>
-    <!--<module>hbase-impl</module>-->
-    <!--<module>hbase-ui</module>-->
+    <module>hbase-impl</module>
+    <module>hbase-ui</module>
     <!--<module>hbase-cli</module>-->
     <!--<module>hbase-rest</module>-->
   </modules>

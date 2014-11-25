@@ -26,14 +26,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>command-runner-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>agent-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>vaadin-api</artifactId>
     </dependency>
     <dependency>
@@ -57,6 +49,16 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>shark-plugin-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>environment-manager-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>peer-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

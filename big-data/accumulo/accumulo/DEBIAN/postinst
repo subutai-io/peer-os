@@ -2,7 +2,7 @@
 set -e
 FilePath="/etc/profile"
 
-accumuloVersion=1.4.2
+accumuloVersion=1.6.1
 accumuloHome="/opt/accumulo-$accumuloVersion"
 accumuloConf="/etc/accumulo"
 
@@ -38,6 +38,13 @@ then
 	$accumuloHome/bin/accumulo-property.sh HADOOP_HOME /opt/hadoop-1.2.1
 else
         $accumuloHome/bin/accumulo-property.sh HADOOP_HOME $HADOOP_HOME
+fi
+
+if [ "x$HADOOP_PREFIX" = "x" ];
+then
+	$accumuloHome/bin/accumulo-property.sh HADOOP_PREFIX /opt/hadoop-1.2.1
+else
+        $accumuloHome/bin/accumulo-property.sh HADOOP_PREFIX $HADOOP_PREFIX
 fi
 
 if [ "x$ZOOKEEPER_HOME" = "x" ];

@@ -26,10 +26,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>plugin-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
     </dependency>
     <dependency>
@@ -48,6 +44,10 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>environment-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>plugin-common</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>

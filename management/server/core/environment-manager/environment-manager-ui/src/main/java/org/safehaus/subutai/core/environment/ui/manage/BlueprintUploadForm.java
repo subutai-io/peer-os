@@ -18,7 +18,7 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 public class BlueprintUploadForm
 {
 
@@ -90,7 +90,7 @@ public class BlueprintUploadForm
         nodeGroup1.setLinkHosts( true );
         nodeGroup1.setExchangeSshKeys( true );
         nodeGroup1.setNumberOfNodes( 2 );
-        nodeGroup1.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        nodeGroup1.setPlacementStrategy( new PlacementStrategy( "ROUND_ROBIN" ) );
         nodeGroup1.setTemplateName( "cassandra" );
 
         NodeGroup nodeGroup2 = new NodeGroup();
@@ -99,7 +99,7 @@ public class BlueprintUploadForm
         nodeGroup2.setLinkHosts( true );
         nodeGroup2.setExchangeSshKeys( true );
         nodeGroup2.setNumberOfNodes( 2 );
-        nodeGroup2.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        nodeGroup2.setPlacementStrategy( new PlacementStrategy( "ROUND_ROBIN" ) );
         nodeGroup2.setTemplateName( "master" );
 
         groups.add( nodeGroup1 );

@@ -31,17 +31,19 @@ class SubutaiResponsePack : public SubutaiResponse
 public:
 	SubutaiResponsePack();
 	virtual ~SubutaiResponsePack();
-	string createResponseMessage(string,int,int,int,string,string,string,string);
-	string createExitMessage(string,int, int, int,string,string,int);
-	string createRegistrationMessage(string,string,string,string,string,vector<string>);
-	string createTerminateMessage(string,int,string,string);
-	string createFailTerminateMessage(string,int,string,string);
+	string createResponseMessage(string,int,int,int,string,string,string);
+	string createExitMessage(string,int, int, int,string,int);
+	string createTerminateMessage(string,string,int, int);
 	string createInQueueMessage(string,string);
-	string createHeartBeatMessage(string,int,string,string,string,string,string,string);
-	string createTimeoutMessage(string,int,int,int,string,string,string,string);
+	string createHeartBeatMessage(string,string);
+    string createPsResponse(string, string);
+	string createTimeoutMessage(string,int,int,int,string,string,string);
 	string createInotifyMessage(string,string,string,string);
-	string createInotifyShowMessage(string,vector<string>);
+	string createInotifyShowMessage(string, string, vector<string>);
+	string setInotifyResponse(string, string);
+	string unsetInotifyResponse(string, string);
 private:
 	string sendout;
+	SubutaiHelper helper;
 };
 #endif /* SUBUTAIRESPONSEPACK_H_ */
