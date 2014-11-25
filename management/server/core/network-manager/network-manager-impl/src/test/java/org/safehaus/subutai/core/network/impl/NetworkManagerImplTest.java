@@ -51,6 +51,7 @@ public class NetworkManagerImplTest
     private static final String TUNNEL_TYPE = "tunnel type";
     private static final String GATEWAY_IP = "gateway.ip";
     private static final int VLAN_ID = 100;
+    private static final int VNI = 100;
     private static final String CONTAINER_NAME = "container";
     private static final int NET_MASK = 24;
     private static final String CONTAINER_IP_OUTPUT =
@@ -61,6 +62,8 @@ public class NetworkManagerImplTest
     private static final String LIST_TUNNELS_OUTPUT = "List of Tunnels\n" + "--------\n" + "tunnel1-10.2.1.3";
     private static final String LIST_N2N_OUTPUT = "LocalPeerIP ServerIP Port LocalInterface Community\n"
             + "10.1.2.3    212.167.154.154 5000    com community1 ";
+    private static final String PATH_TO_KEY_FILE = "/path/to/key/file";
+
     @Mock
     PeerManager peerManager;
     @Mock
@@ -108,11 +111,13 @@ public class NetworkManagerImplTest
     @Test
     public void testSetupN2NConnection() throws Exception
     {
-        networkManager.setupN2NConnection( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP );
+        networkManager.setupN2NConnection( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP,
+                PATH_TO_KEY_FILE );
 
         verify( localPeer ).getManagementHost();
-        verify( commands ).getSetupN2NConnectionCommand( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME,
-                LOCAL_IP );
+        verify( commands )
+                .getSetupN2NConnectionCommand( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP,
+                        PATH_TO_KEY_FILE );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 
@@ -268,6 +273,30 @@ public class NetworkManagerImplTest
         Set<N2NConnection> connections = networkManager.listN2NConnections();
 
         TestCase.assertFalse( connections.isEmpty() );
+    }
+
+
+    @Test
+    public void testSetupVniVLanMapping() throws Exception
+    {
+
+        networkManager.setupVniVLanMapping( TUNNEL_NAME, VNI, VLAN_ID );
+
+        verify( localPeer ).getManagementHost();
+        verify( commands ).getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID );
+        verify( managementHost ).execute( any( RequestBuilder.class ) );
+    }
+
+
+    @Test
+    public void testRemoveVniVLanMapping() throws Exception
+    {
+
+        networkManager.removeVniVLanMapping( TUNNEL_NAME, VNI, VLAN_ID );
+
+        verify( localPeer ).getManagementHost();
+        verify( commands ).getRemoveVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID );
+        verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 
 

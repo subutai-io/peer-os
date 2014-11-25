@@ -60,5 +60,9 @@ public class RemoteMetricRequestListenerTest
         listener.onRequest( payload );
 
         verify( request, times( 2 ) ).getEnvironmentId();
+
+        reset( payload );
+
+        listener.onRequest( payload );
     }
 }

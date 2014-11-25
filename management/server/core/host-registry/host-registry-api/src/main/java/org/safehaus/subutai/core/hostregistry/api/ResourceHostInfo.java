@@ -9,5 +9,8 @@ import java.util.Set;
  */
 public interface ResourceHostInfo extends HostInfo
 {
+    /**
+     * returns hosted containers
+     */
     public Set<ContainerHostInfo> getContainers();
 }

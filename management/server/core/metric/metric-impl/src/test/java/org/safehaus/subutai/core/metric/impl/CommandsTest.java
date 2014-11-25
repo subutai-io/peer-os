@@ -3,20 +3,36 @@ package org.safehaus.subutai.core.metric.impl;
 
 import org.junit.Test;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 
 public class CommandsTest
 {
+    private static final String HOSTNAME = "host";
     private Commands commands = new Commands();
 
 
     @Test
-    public void testGetReadContainerHostMetricCommand() throws Exception
+    public void testGetCurrentMetricCommand() throws Exception
     {
-        String hostname = "host";
-        assertEquals( new RequestBuilder( String.format( "subutai monitor %s", hostname ) ),
-                commands.getCurrentMetricCommand( hostname ) );
+        assertEquals( new RequestBuilder( String.format( "subutai monitor %s", HOSTNAME ) ),
+                commands.getCurrentMetricCommand( HOSTNAME ) );
     }
+
+
+    @Test
+    public void testGetActivateMonitoringCommand() throws Exception
+    {
+        MonitoringSettings settings = mock( MonitoringSettings.class );
+        RequestBuilder requestBuilder = commands.getActivateMonitoringCommand( HOSTNAME, settings );
+
+        verify( settings ).getCpuAlertThreshold();
+        assertNotNull( requestBuilder );
+    }
+
 }

@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.metric.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonSyntaxException;
 
@@ -42,7 +44,9 @@ import com.google.gson.JsonSyntaxException;
 public class MonitorImpl implements Monitor
 {
     private static final String ENVIRONMENT_IS_NULL_MSG = "Environment is null";
+    private static final String CONTAINER_IS_NULL_MSG = "Container is null";
     private static final String ALERT_LISTENER_IS_NULL = "Alert listener is null";
+    private static final String SETTINGS_IS_NULL_MSG = "Settings is null";
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class.getName() );
 
     //set of metric subscribers
@@ -55,15 +59,23 @@ public class MonitorImpl implements Monitor
     protected MonitorDao monitorDao;
 
 
-    public MonitorImpl( final DataSource dataSource, PeerManager peerManager ) throws DaoException
+    public MonitorImpl( final DataSource dataSource, PeerManager peerManager ) throws MonitorException
     {
         Preconditions.checkNotNull( dataSource, "Data source is null" );
         Preconditions.checkNotNull( peerManager, "Peer manager is null" );
 
-        this.monitorDao = new MonitorDao( dataSource );
-        this.peerManager = peerManager;
-        peerManager.addRequestListener( new RemoteAlertListener( this ) );
-        peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
+        try
+        {
+            this.monitorDao = new MonitorDao( dataSource );
+            this.peerManager = peerManager;
+            peerManager.addRequestListener( new RemoteAlertListener( this ) );
+            peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
+            peerManager.addRequestListener( new MonitoringActivationListener( this, peerManager ) );
+        }
+        catch ( DaoException e )
+        {
+            throw new MonitorException( e );
+        }
     }
 
 
@@ -88,7 +100,8 @@ public class MonitorImpl implements Monitor
             }
             catch ( PeerException e )
             {
-                LOG.warn( String.format( "Could not obtain peer for container %s", containerHost.getHostname() ), e );
+                LOG.error( String.format( "Could not obtain peer for container %s", containerHost.getHostname() ), e );
+                throw new MonitorException( e );
             }
         }
 
@@ -132,7 +145,7 @@ public class MonitorImpl implements Monitor
         }
         catch ( PeerException e )
         {
-            LOG.warn( String.format( "Error obtaining metrics from peer %s", peer.getName() ), e );
+            LOG.error( String.format( "Error obtaining metrics from peer %s", peer.getName() ), e );
         }
         return metrics;
     }
@@ -158,7 +171,7 @@ public class MonitorImpl implements Monitor
         }
         catch ( PeerException e )
         {
-            LOG.error( "Error in getLocalContainerHostsMetrics", e );
+            LOG.error( "Error obtaining local container metrics", e );
         }
         return metrics;
     }
@@ -201,7 +214,7 @@ public class MonitorImpl implements Monitor
 
 
     @Override
-    public Set<ResourceHostMetric> getResourceHostsMetrics() throws MonitorException
+    public Set<ResourceHostMetric> getResourceHostsMetrics()
     {
         Set<ResourceHostMetric> metrics = new HashSet<>();
         //obtain resource hosts
@@ -244,14 +257,12 @@ public class MonitorImpl implements Monitor
 
 
     @Override
-    public void startMonitoring( final AlertListener alertListener, final Environment environment )
-            throws MonitorException
+    public void startMonitoring( final AlertListener alertListener, final Environment environment,
+                                 final MonitoringSettings monitoringSettings ) throws MonitorException
     {
         Preconditions.checkNotNull( alertListener, ALERT_LISTENER_IS_NULL );
         Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
-
-        //TODO
-        // send activation request to environment hosting peers
+        Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
 
 
         //make sure subscriber id is truncated to 100 characters
@@ -270,15 +281,9 @@ public class MonitorImpl implements Monitor
             LOG.error( "Error in startMonitoring", e );
             throw new MonitorException( e );
         }
-    }
 
-
-    @Override
-    public void startMonitoring( final AlertListener alertListener, final Environment environment,
-                                 final MonitoringSettings monitoringSettings ) throws MonitorException
-    {
-        //TODO
-        //send activation request to environment hosting peers
+        //activate monitoring
+        activateMonitoring( environment.getContainers(), monitoringSettings );
     }
 
 
@@ -310,17 +315,105 @@ public class MonitorImpl implements Monitor
     @Override
     public void activateMonitoring( final ContainerHost containerHost, final MonitoringSettings monitoringSettings )
             throws MonitorException
+
     {
-        //TODO
-        //send activation request to hosting peer
+        Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
+        Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
+
+        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings );
     }
 
 
-    @Override
-    public void activateMonitoring( final ContainerHost containerHost ) throws MonitorException
+    protected void activateMonitoring( Set<ContainerHost> containerHosts, MonitoringSettings monitoringSettings )
+            throws MonitorException
     {
-        //TODO
-        //send activation request to hosting peer
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
+        Map<Peer, Set<ContainerHost>> peersContainers = Maps.newHashMap();
+
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            try
+            {
+                Peer peer = containerHost.getPeer();
+
+                Set<ContainerHost> containers = peersContainers.get( peer );
+
+                if ( containers == null )
+                {
+                    containers = Sets.newHashSet();
+                    peersContainers.put( peer, containers );
+                }
+
+                containers.add( containerHost );
+            }
+            catch ( PeerException e )
+            {
+                LOG.error( String.format( "Could not obtain peer for container %s", containerHost.getHostname() ), e );
+                throw new MonitorException( e );
+            }
+        }
+
+
+        for ( Map.Entry<Peer, Set<ContainerHost>> peerContainers : peersContainers.entrySet() )
+        {
+            Peer peer = peerContainers.getKey();
+            Set<ContainerHost> containers = peerContainers.getValue();
+
+            if ( peer.isLocal() )
+            {
+                activateMonitoringAtLocalContainers( containers, monitoringSettings );
+            }
+            else
+            {
+                activateMonitoringAtRemoteContainers( peer, containers, monitoringSettings );
+            }
+        }
+    }
+
+
+    protected void activateMonitoringAtRemoteContainers( Peer peer, Set<ContainerHost> containerHosts,
+                                                         MonitoringSettings monitoringSettings )
+    {
+        Preconditions.checkNotNull( peer );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
+
+        try
+        {
+            peer.sendRequest( new MonitoringActivationRequest( containerHosts, monitoringSettings ),
+                    RecipientType.MONITORING_ACTIVATION_RECIPIENT.name(), Constants.MONITORING_ACTIVATION_TIMEOUT );
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( "Error in activateMonitoringAtRemoteContainers", e );
+        }
+    }
+
+
+    protected void activateMonitoringAtLocalContainers( Set<ContainerHost> containerHosts,
+                                                        MonitoringSettings monitoringSettings )
+    {
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
+        Preconditions.checkNotNull( monitoringSettings );
+
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            try
+            {
+                ResourceHost resourceHost =
+                        peerManager.getLocalPeer().getResourceHostByName( containerHost.getParentHostname() );
+                CommandResult commandResult = resourceHost.execute(
+                        commands.getActivateMonitoringCommand( containerHost.getHostname(), monitoringSettings ) );
+                if ( !commandResult.hasSucceeded() )
+                {
+                    LOG.warn( String.format( "Error activating metrics on %s: %s %s", containerHost.getHostname(),
+                            commandResult.getStatus(), commandResult.getStdErr() ) );
+                }
+            }
+            catch ( CommandException | PeerException e )
+            {
+                LOG.error( "Error in activateMonitoringAtLocalContainers", e );
+            }
+        }
     }
 
 
@@ -346,18 +439,18 @@ public class MonitorImpl implements Monitor
                 //set metric's environment id for future reference on the receiving end
                 containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
 
-                //find container's hosting peer
-                Peer hostingPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
+                //find container's creator peer
+                Peer creatorPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
 
-                //if container is "hosted" by local peer, notifyOnAlert local peer
-                if ( hostingPeer.isLocal() )
+                //if container is "created" by local peer, notifyOnAlert local peer
+                if ( creatorPeer.isLocal() )
                 {
                     notifyOnAlert( containerHostMetric );
                 }
-                //send metric to remote hosting peer
+                //send metric to remote creator peer
                 else
                 {
-                    hostingPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
+                    creatorPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
                             Constants.ALERT_TIMEOUT );
                 }
             }
@@ -391,7 +484,7 @@ public class MonitorImpl implements Monitor
         }
         catch ( DaoException e )
         {
-            LOG.error( "Error in onAlert", e );
+            LOG.error( "Error in notifyOnAlert", e );
             throw new MonitorException( e );
         }
     }

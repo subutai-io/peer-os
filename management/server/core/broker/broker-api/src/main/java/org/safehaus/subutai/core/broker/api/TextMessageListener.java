@@ -6,5 +6,10 @@ package org.safehaus.subutai.core.broker.api;
  */
 public interface TextMessageListener extends MessageListener
 {
+    /**
+     * Triggered on incoming text message
+     *
+     * @param message - incoming message
+     */
     public void onMessage( String message );
 }
