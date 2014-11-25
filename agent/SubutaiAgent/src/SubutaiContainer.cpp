@@ -147,7 +147,7 @@ void SubutaiContainer::UpdateUsersList()
     this->_users.clear();
     vector<string> params;
     params.push_back("/etc/passwd");
-    string passwd = RunProgram("/bin/cat", params);
+    string passwd = RunProgram("/bin/cat", params, false, LXC_ATTACH_OPTIONS_DEFAULT).out;
     containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Get users defined on LXC"));
 
     stringstream ss(passwd);
@@ -248,7 +248,11 @@ bool SubutaiContainer::getContainerInterfaces()
 				if(found_i)
 				{
 					found_ip = true;
+                    // TODO: This is unsafe
 					ip = _helper.splitResult((*it_s), " ")[1];
+                    if (_helper.splitResult(ip, ":").size() > 1) {
+                        ip = _helper.splitResult(ip, ":")[1];
+                    }
 					found_i = false;
 				}
 				if(!strcmp((*it_s).c_str(), "inet")) found_i = true;
@@ -440,11 +444,13 @@ ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command)
     return res;
 }
 
-ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) 
-{
-    containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Running daemon. "));
-	// set default lxc attach options
+ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) {
+    string programName;
+    int outFd[2];
+    int errFd[2];
+    pid_t pid;
     lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT;
+    containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Running daemon. "));
 
     // set working directory for lxc_attach
     if (command->getWorkingDirectory() != "" && checkCWD(command->getWorkingDirectory())) {
@@ -458,27 +464,48 @@ ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command)
         opts.uid = getRunAsUserId(command->getRunAs());
     }
 
-    // Settings env variables
-    list< pair<string, string> >::iterator it;
-    int i = 0;
-    for (it = command->getEnvironment().begin(); it != command->getEnvironment().end(); it++, i++) {
-        stringstream ss;
-        ss << it->first << "=" << it->second;
-        strcpy(opts.extra_env_vars[i], ss.str().c_str());
-        containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "set environment " + ss.str()));
-    }
-
-    // divide program and arguments if all arguments are given in program field of command
+    // File descriptors
+    //pipe(outFd);
+    //pipe(errFd);
+    //opts.stdout_fd = outFd[1];
+    //opts.stderr_fd = errFd[1];
+    // Parsing arguments
     vector<string> pr = ExplodeCommandArguments(command);
-    string program = "subutai-run";
-    vector<string> args;
-    for (vector<string>::iterator it = pr.begin(); it != pr.end(); it++) {
-        args.push_back((*it));
+    char* args[pr.size() + 1];
+    int i = 0;
+    SubutaiHelper h;
+    for (vector<string>::iterator it = pr.begin(); it != pr.end(); it++, i++) {
+        if (it == pr.begin()) {
+            // This is a first argument which is actually a program name
+            programName = (*it); 
+            args[i] = const_cast<char*>((*it).c_str());
+            continue;
+        }
+        args[i] = const_cast<char*>((*it).c_str());
+        containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Iterator: ", h.toString(i)));
+        containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Argument: ", args[i]));
     }
-    args.push_back(command->getCommandId());
-
-    // execute program on LXC
-    ExecutionResult res = RunProgram(program, args, true, opts, false);
+    containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Iterator last: ", h.toString(i)));
+    args[i] = NULL;
+    lxc_attach_command_t cmd = {const_cast<char*>(programName.c_str()), args};
+    int ret = this->container->attach(this->container, lxc_attach_run_command, &cmd, &opts, &pid);
+    containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Daemon pid: ", h.toString(pid)));
+    containerLogger->writeLog(1, containerLogger->setLogData("<SubutaiContainer>", "Exit code: ", h.toString(ret)));
+    // Collect output during specified timeout
+    //sleep(command->getTimeout());
+    ExecutionResult res;
+    res.err = "";
+    /*char buffer[1024];
+    int size = read(outFd[0], (void *) buffer, 1024);
+    buffer[size + 1] = '\0';
+    cout << buffer << endl;
+    res.out = buffer;
+    res.exit_code = ret;
+    size = read(errFd[0], (void *) buffer, 1024);
+    buffer[size + 1] = '\0';
+    cerr << buffer << endl;
+    res.err = buffer;*/
+    res.pid = pid;
     return res;
 }
 
@@ -488,7 +515,7 @@ bool SubutaiContainer::checkCWD(string cwd)
 {
     vector<string> params;
     params.push_back(cwd);
-    ExecutionResult result = RunProgram("ls", params, true, LXC_ATTACH_OPTIONS_DEFAULT);    
+    ExecutionResult result = RunProgram("ls", params, false, LXC_ATTACH_OPTIONS_DEFAULT);    
     if (result.exit_code == 0) { 
         return true;
     } else {
@@ -604,4 +631,3 @@ void SubutaiContainer::tryLongCommand() {
     args.push_back("ls -la && ls && ls -la && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls");
     cout << RunProgram("/bin/bash", args) << endl;
 }
-
