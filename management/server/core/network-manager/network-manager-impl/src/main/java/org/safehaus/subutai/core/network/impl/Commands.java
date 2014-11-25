@@ -104,4 +104,18 @@ public class Commands
     {
         return new RequestBuilder( "route del default gw" );
     }
+
+
+    public RequestBuilder getSetupVniVlanMappingCommand( String tunnelName, int vni, int vLanId )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "-m", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );
+    }
+
+
+    public RequestBuilder getRemoveVniVlanMappingCommand( String tunnelName, int vni, int vLanId )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "-M", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );
+    }
 }

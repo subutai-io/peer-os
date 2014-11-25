@@ -7,39 +7,39 @@ import java.util.Set;
 public interface NetworkManager
 {
     /**
-     * Sets up an N2N connection to super node
+     * Sets up an N2N connection to super node on management host
      */
     public void setupN2NConnection( String superNodeIp, int superNodePort, String interfaceName, String communityName,
                                     String localIp, String pathToKeyFile ) throws NetworkManagerException;
 
     /**
-     * Removes N2N connection to super node
+     * Removes N2N connection to super node on management host
      */
     public void removeN2NConnection( String interfaceName, String communityName ) throws NetworkManagerException;
 
     /**
-     * Sets up tunnel to another peer
+     * Sets up tunnel to another peer on management host
      */
     public void setupTunnel( String tunnelName, String tunnelIp, String tunnelType ) throws NetworkManagerException;
 
     /**
-     * Removes tunnel to another peer
+     * Removes tunnel to another peer on management host
      */
     public void removeTunnel( String tunnelName ) throws NetworkManagerException;
 
     /**
-     * Sets container environment IP and VLAN ID
+     * Sets container environment IP and VLAN ID on container
      */
     public void setContainerIp( String containerName, String ip, int netMask, int vLanId )
             throws NetworkManagerException;
 
     /**
-     * Removes container environment IP and VLAN ID
+     * Removes container environment IP and VLAN ID on container
      */
     public void removeContainerIp( String containerName ) throws NetworkManagerException;
 
     /**
-     * Returns container environment IP
+     * Returns container environment IP on container
      */
     public ContainerInfo getContainerIp( String containerName ) throws NetworkManagerException;
 
@@ -73,5 +73,15 @@ public interface NetworkManager
      * Lists existing N2N connections on management host
      */
     public Set<N2NConnection> listN2NConnections() throws NetworkManagerException;
+
+    /**
+     * Sets up VNI-VLAN mapping on management host
+     */
+    public void setupVniVLanMapping( String tunnelName, int vni, int vLanId ) throws NetworkManagerException;
+
+    /**
+     * Removes VNI-VLAN mapping on management host
+     */
+    public void removeVniVLanMapping( String tunnelName, int vni, int vLanId ) throws NetworkManagerException;
 }
 

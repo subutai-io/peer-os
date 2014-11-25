@@ -21,6 +21,7 @@ public class CommandsTest
     private static final String CONTAINER_NAME = "container";
     private static final String PATH_TO_KEY_FILE = "/path/to/key/file";
     private static final int NET_MASK = 24;
+    private static final int VNI = 100;
     Commands commands = new Commands();
 
 
@@ -114,5 +115,19 @@ public class CommandsTest
     public void testGetRemoveGatewayOnContainerCommand() throws Exception
     {
         assertNotNull( commands.getRemoveGatewayOnContainerCommand() );
+    }
+
+
+    @Test
+    public void testGetSetupVniVlanMappingCommand() throws Exception
+    {
+        assertNotNull( commands.getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID ) );
+    }
+
+
+    @Test
+    public void testGetRemoveVniVlanMappingCommand() throws Exception
+    {
+        assertNotNull( commands.getRemoveVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID ) );
     }
 }

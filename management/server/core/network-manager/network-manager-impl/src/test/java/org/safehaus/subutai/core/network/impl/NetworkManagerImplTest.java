@@ -51,6 +51,7 @@ public class NetworkManagerImplTest
     private static final String TUNNEL_TYPE = "tunnel type";
     private static final String GATEWAY_IP = "gateway.ip";
     private static final int VLAN_ID = 100;
+    private static final int VNI = 100;
     private static final String CONTAINER_NAME = "container";
     private static final int NET_MASK = 24;
     private static final String CONTAINER_IP_OUTPUT =
@@ -272,6 +273,30 @@ public class NetworkManagerImplTest
         Set<N2NConnection> connections = networkManager.listN2NConnections();
 
         TestCase.assertFalse( connections.isEmpty() );
+    }
+
+
+    @Test
+    public void testSetupVniVLanMapping() throws Exception
+    {
+
+        networkManager.setupVniVLanMapping( TUNNEL_NAME, VNI, VLAN_ID );
+
+        verify( localPeer ).getManagementHost();
+        verify( commands ).getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID );
+        verify( managementHost ).execute( any( RequestBuilder.class ) );
+    }
+
+
+    @Test
+    public void testRemoveVniVLanMapping() throws Exception
+    {
+
+        networkManager.removeVniVLanMapping( TUNNEL_NAME, VNI, VLAN_ID );
+
+        verify( localPeer ).getManagementHost();
+        verify( commands ).getRemoveVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID );
+        verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 
 
