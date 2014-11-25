@@ -21,14 +21,14 @@ checkPackageVersion() {
   versionFirst_prev=$(echo $version_prev | awk -F"." '{print $1}')
   versionSecond_prev=$(echo $version_prev | awk -F"." '{print $2}')
 
-  version_tmp_prev=$(echo $version_new | awk -F"." '{print $3}')
+  version_tmp_prev=$(echo $version_prev | awk -F"." '{print $3}')
   versionThird_prev=$(echo $version_tmp_prev | awk -F"-" '{print $1}')
-  patch_prev=$(echo $versiontmp__prev | awk -F"-" '{print $2}')
+  patch_prev=$(echo $version_tmp_prev | awk -F"-" '{print $2}')
 
-  if [ "$patch_prev"="" ]; then
+  if [ -z $patch_prev ]; then
     patch_prev=0
   fi
-  if [ "$patch_new"="" ]; then
+  if [ -z $patch_new ]; then
     patch_new=0
   fi
   echo "version in control:$version_new current version:$version_prev "
