@@ -31,7 +31,7 @@ public class RemoteMetricRequestListener extends RequestListener
 
         if ( request != null )
         {
-            Set<ContainerHostMetricImpl> metrics = monitor.getLocalContainerHostMetrics( request.getEnvironmentId() );
+            Set<ContainerHostMetricImpl> metrics = monitor.getLocalContainerHostsMetrics( request.getEnvironmentId() );
 
             if ( !metrics.isEmpty() )
             {

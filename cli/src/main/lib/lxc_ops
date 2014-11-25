@@ -277,7 +277,13 @@ function lxc_clone {
   # removing the agent uuid of the cloned instance template
   if [ -s "$child_rootfs/etc/subutai-agent/uuid.txt" ]; then
     echo "" > $child_rootfs/etc/subutai-agent/uuid.txt
-  fi  
+  fi
+
+  # adding the agent subutai-run script to cloned instance template
+  if [ -f "/sbin/subutai-run" ]; then
+     cp /sbin/subutai-run $child_rootfs/sbin/
+  fi
+
 }
 
 
@@ -463,4 +469,47 @@ function lxc_install_agent {
   else
     msg_warn "    - subutai agent already installed on $container"
   fi
+}
+
+function lxc_get_memory {
+  container=$1
+  resource_parameter="memory.limit_in_bytes"
+
+  lxc_quota_modification $container $resource_parameter
+}
+
+function lxc_set_memory {
+  container=$1
+  resource_parameter="memory.limit_in_bytes"
+  parameter_value=$2
+
+  lxc_quota_modification $container $resource_parameter $parameter_value
+}
+
+function lxc_get_cpus {
+  container=$1
+  resource_parameter="cpuset.cpus"
+
+  lxc_quota_modification $container $resource_parameter
+}
+
+function lxc_set_cpus {
+  container=$1
+  resource_parameter="cpuset.cpus"
+  parameter_value=$2
+
+  lxc_quota_modification $container $resource_parameter $parameter_value
+}
+
+function lxc_quota_modification {
+  container=$1
+  resource_parameter=$2
+  parameter_value=$3
+
+  if [ -z "$parameter_value" ]; then
+    lxc-cgroup -n $container $resource_parameter
+  else
+    lxc-cgroup -n $container $resource_parameter $parameter_value
+  fi
+
 }

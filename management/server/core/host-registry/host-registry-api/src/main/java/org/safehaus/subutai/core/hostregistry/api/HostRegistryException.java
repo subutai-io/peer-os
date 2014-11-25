@@ -6,12 +6,6 @@ package org.safehaus.subutai.core.hostregistry.api;
  */
 public class HostRegistryException extends Exception
 {
-    public HostRegistryException( final String message )
-    {
-        super( message );
-    }
-
-
     public HostRegistryException( final Throwable cause )
     {
         super( cause );

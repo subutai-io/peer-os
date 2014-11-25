@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.metric.impl;
 
 import org.junit.Test;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
-import org.safehaus.subutai.core.metric.api.MetricListener;
+import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.slf4j.Logger;
 
 import static org.mockito.Matchers.any;
@@ -22,7 +22,7 @@ public class AlertNotifierTest
     public void testConstructorShouldFailOnNullMetric() throws Exception
     {
 
-        new AlertNotifier( null, mock( MetricListener.class ) );
+        new AlertNotifier( null, mock( AlertListener.class ) );
     }
 
 
@@ -39,12 +39,12 @@ public class AlertNotifierTest
     {
 
         ContainerHostMetric metric = mock( ContainerHostMetric.class );
-        MetricListener listener = mock( MetricListener.class );
+        AlertListener listener = mock( AlertListener.class );
         AlertNotifier alertNotifier = new AlertNotifier( metric, listener );
 
         alertNotifier.run();
 
-        verify( listener ).alertThresholdExcess( metric );
+        verify( listener ).onAlert( metric );
     }
 
 
@@ -52,9 +52,9 @@ public class AlertNotifierTest
     public void testLogError() throws Exception
     {
         ContainerHostMetric metric = mock( ContainerHostMetric.class );
-        MetricListener listener = mock( MetricListener.class );
+        AlertListener listener = mock( AlertListener.class );
         Logger logger = mock( Logger.class );
-        doThrow( new RuntimeException( "" ) ).when( listener ).alertThresholdExcess( metric );
+        doThrow( new RuntimeException( "" ) ).when( listener ).onAlert( metric );
         AlertNotifier alertNotifier = new AlertNotifier( metric, listener );
         alertNotifier.LOG = logger;
 

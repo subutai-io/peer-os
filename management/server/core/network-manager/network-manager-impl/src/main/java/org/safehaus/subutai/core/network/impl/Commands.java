@@ -8,8 +8,6 @@ import com.google.common.collect.Lists;
 
 /**
  * Networking commands
- *
- * TODO implement list commands when their output format is finalized
  */
 public class Commands
 {
@@ -18,11 +16,11 @@ public class Commands
 
 
     public RequestBuilder getSetupN2NConnectionCommand( String superNodeIp, int superNodePort, String interfaceName,
-                                                        String communityName, String localIp )
+                                                        String communityName, String localIp, String pathToKeyFile )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
                 Lists.newArrayList( "-N", superNodeIp, String.valueOf( superNodePort ), interfaceName, communityName,
-                        localIp ) );
+                        localIp, "file", pathToKeyFile ) );
     }
 
 
@@ -30,6 +28,12 @@ public class Commands
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
                 .withCmdArgs( Lists.newArrayList( "-R", communityName, interfaceName ) );
+    }
+
+
+    public RequestBuilder getListN2NConnectionsCommand()
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-L" ) );
     }
 
 
@@ -47,11 +51,24 @@ public class Commands
     }
 
 
+    public RequestBuilder getListTunnelsCommand()
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-l" ) );
+    }
+
+
     public RequestBuilder getSetContainerIpCommand( String containerName, String ip, int netMask, int vLanId )
     {
         return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING ).withCmdArgs(
                 Lists.newArrayList( containerName, "-s", String.format( "%s/%s", ip, netMask ),
                         String.valueOf( vLanId ) ) );
+    }
+
+
+    public RequestBuilder getShowContainerIpCommand( String containerName )
+    {
+        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( containerName, "-l" ) );
     }
 
 
@@ -86,5 +103,19 @@ public class Commands
     public RequestBuilder getRemoveGatewayOnContainerCommand()
     {
         return new RequestBuilder( "route del default gw" );
+    }
+
+
+    public RequestBuilder getSetupVniVlanMappingCommand( String tunnelName, int vni, int vLanId )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "-m", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );
+    }
+
+
+    public RequestBuilder getRemoveVniVlanMappingCommand( String tunnelName, int vni, int vLanId )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "-M", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );
     }
 }

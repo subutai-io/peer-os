@@ -47,11 +47,6 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <iostream>
-<<<<<<< HEAD
-#include <cstdio>
-#include <lxc/lxccontainer.h>
-=======
->>>>>>> 85d33c1728e3d754c8084ac4fd2e023f35e63696
 #include <string.h>
 #include <unistd.h>
 
@@ -149,6 +144,7 @@ int main(int argc,char *argv[],char *envp[])
     environment.getAgentInterfaces();
     environment.getAgentHostname();
     environment.getAgentEnvironmentId();
+    environment.getAgentArch();
     clientAddress = environment.getAgentUuidValue();
 
     /*
@@ -342,13 +338,13 @@ int main(int argc,char *argv[],char *envp[])
 
                         if (command.getPid() > 0)
                         {
-                            if( isLocal)
-                            {
+                            /*if( isLocal)
+                            {*/
                                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on resource host: " + command.getPid()));
                                 retstatus = kill(command.getPid(),SIGKILL);
                                 resp = response.createTerminateMessage(environment.getAgentUuidValue(),
                                         command.getCommandId(), command.getPid(), retstatus);
-                            }
+                            /*}
                             else
                             {
                                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on container node: " + command.getPid()));
@@ -357,10 +353,11 @@ int main(int argc,char *argv[],char *envp[])
                                 ExecutionResult execResult = target_container->RunCommand(&command);
                                 retstatus  = execResult.exit_code;
 
+
                                 resp = response.createTerminateMessage(target_container->getContainerIdValue(),
                                         command.getCommandId(), command.getPid(), retstatus);
 
-                            }
+                            }*/
 
                             connection->sendMessage(resp);
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate response: " + resp));
@@ -383,7 +380,7 @@ int main(int argc,char *argv[],char *envp[])
                                         preArg + command.getWatchArguments()[i]));
                         }
                         Watcher.stats();
-                        sendout = response.setInotifyResponse(environment.getAgentUuidValue(),response.getCommandId());
+                        sendout = response.setInotifyResponse(environment.getAgentUuidValue(),command.getCommandId());
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Set_Inotify response: " + sendout));
                         connection->sendMessage(sendout, "RESPONSE_TOPIC");
                         Watcher.stats();
@@ -400,7 +397,7 @@ int main(int argc,char *argv[],char *envp[])
                                         preArg + command.getWatchArguments()[i]));
                         }
                         Watcher.stats();
-                        sendout = response.unsetInotifyResponse(environment.getAgentUuidValue(),response.getCommandId());
+                        sendout = response.unsetInotifyResponse(environment.getAgentUuidValue(),command.getCommandId());
                         logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Unset_Inotify response: " + sendout));
                         connection->sendMessage(sendout, "RESPONSE_TOPIC");
                         Watcher.stats();

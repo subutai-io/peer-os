@@ -1,0 +1,66 @@
+#!/bin/bash
+
+
+function quota_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: List containers and/or temlates.
+  echo
+  echo "        "subutai \[-qh\] quota \[name_list\] \[quota_type\] \[quota_value\]
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+function quota {
+  OPTIND=0
+  if [ "$1" == "quota" ]; then
+    shift
+  fi
+
+  local container=$1
+  local resource_parameter=$2
+  local parameter_value=$3
+
+  if [[ -z $container ]]; then
+    echo "Dancing with container with no name. Aborting...";
+    exit 1;
+  fi
+
+  if [[ -z $resource_parameter ]]; then
+    echo "Resource parameter not provided. Aborting..."
+    exit 1;
+  fi
+
+  if [ -z $parameter_value ]; then
+    case $resource_parameter in
+      "memory.quota" )
+        lxc_get_memory $container
+      ;;
+      "cpu.cpus")
+        lxc_get_cpus $container
+      ;;
+      "hdd.quota")
+        zfs_get_quota $container
+      ;;
+    esac
+  else
+    case $resource_parameter in
+      "memory.quota" )
+        lxc_set_memory $container $parameter_value
+        ;;
+      "cpu.cpus" )
+        lxc_set_cpus $container $parameter_value
+      ;;
+      "hdd.quota")
+        local directory=$4
+        zfs_set_quota $container $directory $parameter_value
+      ;;
+    esac
+  fi
+
+}
+
+
+function quota_description {
+  echo sets and gets container quotas;
+}
+

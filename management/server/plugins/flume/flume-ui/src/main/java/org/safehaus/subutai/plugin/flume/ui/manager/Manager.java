@@ -1,22 +1,25 @@
 package org.safehaus.subutai.plugin.flume.ui.manager;
 
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.flume.api.Flume;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.flume.api.NodeOperationTask;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
@@ -59,13 +62,12 @@ public class Manager
     private final ExecutorService executorService;
     private final Flume flume;
     private final Tracker tracker;
-    private final CommandRunner commandRunner;
-    private final AgentManager agentManager;
     private GridLayout contentRoot;
     private ComboBox clusterCombo;
     private Table nodesTable;
     private FlumeConfig config;
     private Hadoop hadoop;
+    private final EnvironmentManager environmentManager;
 
 
     public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -74,9 +76,8 @@ public class Manager
         this.executorService = executorService;
         this.flume = serviceLocator.getService( Flume.class );
         this.tracker = serviceLocator.getService( Tracker.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         contentRoot = new GridLayout();
         contentRoot.setColumns( 1 );
@@ -123,12 +124,13 @@ public class Manager
                     HadoopClusterConfig hadoopConfig = hadoop.getCluster( config.getHadoopClusterName() );
                     if ( hadoopConfig != null )
                     {
-                        Set<Agent> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
+                        Set<UUID> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
                         nodes.removeAll( config.getNodes() );
                         if ( !nodes.isEmpty() )
                         {
+                            Set<ContainerHost> hosts = environmentManager.getEnvironmentByUUID( hadoopConfig.getEnvironmentId() ).getHostsByIds( nodes );
                             AddNodeWindow addNodeWindow =
-                                    new AddNodeWindow( flume, executorService, tracker, config, nodes );
+                                    new AddNodeWindow( flume, tracker, executorService, config, hosts );
                             contentRoot.getUI().addWindow( addNodeWindow );
                             addNodeWindow.addCloseListener( new Window.CloseListener()
                             {
@@ -180,7 +182,7 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = flume.uninstallCluster( config.getClusterName() );
+                            UUID trackID = flume.uninstallCluster( config );
                             ProgressWindow window =
                                     new ProgressWindow( executorService, tracker, trackID, FlumeConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
@@ -241,7 +243,6 @@ public class Manager
                 config = ( FlumeConfig ) event.getProperty().getValue();
                 refreshUI();
                 checkAllNodes();
-                checkAllNodes();
             }
         } );
 
@@ -296,7 +297,9 @@ public class Manager
     {
         if ( config != null )
         {
-            populateTable( nodesTable, config.getNodes() );
+            Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+            Set<ContainerHost> hosts = environment.getHostsByIds( config.getNodes() );
+            populateTable( nodesTable, hosts);
         }
         else
         {
@@ -305,23 +308,23 @@ public class Manager
     }
 
 
-    private void populateTable( final Table table, Set<Agent> agents )
+    private void populateTable( final Table table, Set<ContainerHost> containerHosts )
     {
 
         table.removeAllItems();
 
-        for ( final Agent agent : agents )
+        for ( final ContainerHost host : containerHosts )
         {
             final Label resultHolder = new Label();
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( agent.getListIP().get( 0 ) + "-flumeDestroy" );
+            destroyBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeDestroy" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.setId( agent.getListIP().get( 0 ) + "-flumeStart" );
+            startBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeStart" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.setId( agent.getListIP().get( 0 ) + "-flumeStop" );
+            stopBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeStop" );
 
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId( agent.getListIP().get( 0 ) + "-flumeCheck" );
+            checkBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeCheck" );
 
             enableButton( stopBtn, startBtn, checkBtn, destroyBtn );
 
@@ -332,13 +335,13 @@ public class Manager
             addGivenComponents( availableOperations, startBtn, stopBtn, checkBtn, destroyBtn );
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), resultHolder, availableOperations
+                    host.getHostname(), host.getAgent().getListIP().get( 0 ), resultHolder, availableOperations
             }, null );
 
 
-            addCheckButtonClickListener( agent, resultHolder, checkBtn, startBtn, stopBtn, destroyBtn );
-            addClickListenerToStartButton( agent, checkBtn, startBtn, stopBtn, destroyBtn );
-            addClickListenerToStopButton( agent, checkBtn, startBtn, stopBtn, destroyBtn );
+            addCheckButtonClickListener( host, resultHolder, checkBtn, startBtn, stopBtn, destroyBtn );
+            addClickListenerToStartButton( host, checkBtn, startBtn, stopBtn, destroyBtn );
+            addClickListenerToStopButton( host, checkBtn, startBtn, stopBtn, destroyBtn );
 
             destroyBtn.addClickListener( new Button.ClickListener()
             {
@@ -347,7 +350,7 @@ public class Manager
                 {
                     String m = "Are you sure to remove Flume from node '%s'?";
                     ConfirmationDialog alert =
-                            new ConfirmationDialog( String.format( m, agent.getHostname() ), "Yes", "No" );
+                            new ConfirmationDialog( String.format( m, host.getHostname() ), "Yes", "No" );
                     alert.getOk().addClickListener( new Button.ClickListener()
                     {
                         @Override
@@ -355,7 +358,7 @@ public class Manager
                         {
                             // before destroying installation, stop flume process
                             stopBtn.click();
-                            UUID trackID = flume.destroyNode( config.getClusterName(), agent.getHostname() );
+                            UUID trackID = flume.destroyNode( config.getClusterName(), host.getHostname() );
                             ProgressWindow window =
                                     new ProgressWindow( executorService, tracker, trackID, FlumeConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
@@ -377,7 +380,7 @@ public class Manager
     }
 
 
-    private void addClickListenerToStartButton( final Agent agent, final Button... buttons )
+    private void addClickListenerToStartButton( final ContainerHost host, final Button... buttons )
     {
         getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -387,26 +390,25 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StartTask( flume, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                        new NodeOperationTask( flume, tracker, config.getClusterName(), host,
+                                NodeOperationType.START, new org.safehaus.subutai.common.protocol.CompleteEvent()
                         {
                             @Override
-                            public void onComplete( String result )
+                            public void onComplete( NodeState nodeState )
                             {
-                                enableButton( buttons );
-                                PROGRESS_ICON.setVisible( false );
                                 synchronized ( PROGRESS_ICON )
                                 {
                                     getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
                                     getButton( CHECK_BUTTON_CAPTION, buttons ).click();
                                 }
                             }
-                        } ) );
+                        }, null ) );
             }
         } );
     }
 
 
-    public void addClickListenerToStopButton( final Agent agent, final Button... buttons )
+    public void addClickListenerToStopButton( final ContainerHost host, final Button... buttons )
     {
         getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -416,26 +418,25 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StopTask( flume, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                        new NodeOperationTask( flume, tracker, config.getClusterName(), host,
+                                NodeOperationType.STOP, new org.safehaus.subutai.common.protocol.CompleteEvent()
                         {
                             @Override
-                            public void onComplete( String result )
+                            public void onComplete( NodeState nodeState )
                             {
-                                enableButton( buttons );
-                                PROGRESS_ICON.setVisible( false );
                                 synchronized ( PROGRESS_ICON )
                                 {
                                     getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
                                     getButton( CHECK_BUTTON_CAPTION, buttons ).click();
                                 }
                             }
-                        } ) );
+                        }, null ) );
             }
         } );
     }
 
 
-    public void addCheckButtonClickListener( final Agent agent, final Label resultHolder, final Button... buttons )
+    public void addCheckButtonClickListener( final ContainerHost host, final Label resultHolder, final Button... buttons )
     {
         getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -445,14 +446,15 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new CheckTask( flume, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                        new NodeOperationTask( flume, tracker, config.getClusterName(), host,
+                                NodeOperationType.STATUS, new org.safehaus.subutai.common.protocol.CompleteEvent()
                         {
-                            public void onComplete( String result )
+                            public void onComplete( NodeState nodeState )
                             {
                                 synchronized ( PROGRESS_ICON )
                                 {
-                                    resultHolder.setValue( result );
-                                    if ( resultHolder.getValue().contains( "not" ) )
+                                    resultHolder.setValue( nodeState.name() );
+                                    if ( nodeState.name().contains( "STOPPED" ) )
                                     {
                                         getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
                                         getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
@@ -468,7 +470,7 @@ public class Manager
                                     getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
                                 }
                             }
-                        } ) );
+                        }, null ) );
             }
         } );
     }
@@ -586,14 +588,23 @@ public class Manager
             {
                 if ( event.isDoubleClick() )
                 {
-                    String lxcHostname =
+                    String containerId =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent agent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( agent != null )
+                    Set<ContainerHost> containerHosts =
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers();
+                    Iterator iterator = containerHosts.iterator();
+                    ContainerHost containerHost = null;
+                    while ( iterator.hasNext() )
                     {
-                        Set<Agent> set = new HashSet<>( Arrays.asList( agent ) );
-                        TerminalWindow terminal =
-                                new TerminalWindow( set, executorService, commandRunner, agentManager );
+                        containerHost = ( ContainerHost ) iterator.next();
+                        if ( containerHost.getId().equals( UUID.fromString( containerId ) ) )
+                        {
+                            break;
+                        }
+                    }
+                    if ( containerHost != null )
+                    {
+                        TerminalWindow terminal = new TerminalWindow( containerHosts );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else

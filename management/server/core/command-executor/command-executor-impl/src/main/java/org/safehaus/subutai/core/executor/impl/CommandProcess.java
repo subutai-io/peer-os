@@ -92,7 +92,6 @@ public class CommandProcess
         }
 
         status = CommandStatus.RUNNING;
-
         executor = Executors.newSingleThreadExecutor();
     }
 

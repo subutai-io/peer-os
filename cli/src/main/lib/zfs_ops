@@ -390,3 +390,61 @@ function fs_copy_ds {
   zfs destroy "$to_ds@$now"
 }
 
+function zfs_get_quota {
+  local container=$1
+
+  local lxc_home=$(zfs_quota_operations "lxc-data/$container-home")
+  local lxc_var=$(zfs_quota_operations "lxc-data/$container-var")
+  local lxc_opt=$(zfs_quota_operations "lxc/$container-opt")
+  local lxc_rootfs=$(zfs_quota_operations "lxc/$container")
+
+  printf "Container home:\t%s\n" $lxc_home
+  printf "Container opt:\t%s\n" $lxc_opt
+  printf "Container var:\t%s\n" $lxc_var
+  printf "Container rootfs:\t%s\n" $lxc_rootfs
+}
+
+function zfs_set_quota {
+  local container=$1
+  local directory=$2
+  local quota_value=$3
+
+  case $directory in
+    "home" )
+        container="lxc-data/$container-home";
+      ;;
+      "var")
+        container="lxc-data/$container-var";
+      ;;
+      "opt")
+        container="lxc/$container-opt";
+      ;;
+      "rootfs")
+        container="lxc/$container";
+      ;;
+      \?)
+        echo "Wrong directory name.";
+        exit 1;
+      ;;
+  esac
+
+  if [ -z "$quota_value" ]; then
+    echo "Please provide with quota value  for function to work in proper way.";
+    exit 1;
+  fi
+  zfs_quota_operations $container $quota_value
+}
+
+function zfs_quota_operations {
+  local container=$1
+  local quota_value=$2
+  local cmd=
+  if [ -z $quota_value ]; then
+    cmd=$(zfs get quota $container)
+    echo $cmd | awk '{print $7}'
+  else
+    cmd=$(zfs set quota=$quota_value $container)
+    echo $cmd
+  fi
+}
+

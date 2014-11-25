@@ -1,18 +1,18 @@
 package org.safehaus.subutai.plugin.hadoop.impl;
 
 
-import java.util.UUID;
-import java.util.logging.Logger;
-
-import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
+import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterConfigurationInterface;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+
+import java.util.UUID;
+import java.util.logging.Logger;
 
 
 public class ClusterConfiguration implements ClusterConfigurationInterface
@@ -31,6 +31,7 @@ public class ClusterConfiguration implements ClusterConfigurationInterface
 
 
     public void configureCluster( ConfigBase configBase, Environment environment ) throws ClusterConfigurationException    {
+
 
         HadoopClusterConfig config = ( HadoopClusterConfig ) configBase;
         Commands commands = new Commands( config );

@@ -18,6 +18,7 @@
     <module>command-executor-api</module>
     <module>command-executor-impl</module>
     <module>command-executor-cli</module>
+    <module>command-executor-ui</module>
   </modules>
 
 </project>

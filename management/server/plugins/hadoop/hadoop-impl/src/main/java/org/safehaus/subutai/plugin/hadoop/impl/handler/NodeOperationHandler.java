@@ -1,21 +1,21 @@
 package org.safehaus.subutai.plugin.hadoop.impl.handler;
 
 
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeType;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hadoop.impl.Commands;
+import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
+
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.plugin.common.api.NodeType;
-import org.safehaus.subutai.plugin.common.api.NodeOperationType;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
-import org.safehaus.subutai.plugin.hadoop.impl.Commands;
 
 
 /**
@@ -83,7 +83,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl, H
     }
 
 
-    private void runCommand( ContainerHost host, NodeOperationType operationType, NodeType nodeType )
+    protected void runCommand( ContainerHost host, NodeOperationType operationType, NodeType nodeType )
     {
         try
         {
@@ -174,7 +174,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl, H
     }
 
 
-    private void excludeNode()
+    protected void excludeNode()
     {
         HadoopClusterConfig config = manager.getCluster( clusterName );
         ContainerHost host = findNodeInCluster( hostname );
@@ -212,7 +212,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl, H
     }
 
 
-    private ContainerHost findNodeInCluster( String hostname )
+    protected ContainerHost findNodeInCluster( String hostname )
     {
         HadoopClusterConfig config = manager.getCluster( clusterName );
 
@@ -250,7 +250,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl, H
     }
 
 
-    private void includeNode()
+    protected void includeNode()
     {
 
         HadoopClusterConfig config = manager.getCluster( clusterName );

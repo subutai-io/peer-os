@@ -12,8 +12,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
+import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -49,7 +49,7 @@ public class LocalPeerImplTest
     CommunicationManager communicationManager;
 
     @Mock
-    CommandRunner commandRunner;
+    CommandExecutor commandExecutor;
 
     @Mock
     QuotaManager quotaManager;
@@ -70,9 +70,9 @@ public class LocalPeerImplTest
     public void testBindHostShouldFailOnNotExistenceHost() throws PeerException
     {
         LocalPeerImpl localPeer =
-                        new LocalPeerImpl( peerManager, agentManager, templateRegistry, peerDAO, communicationManager,
-                                commandRunner, quotaManager, strategyManager, null );
+                new LocalPeerImpl( peerManager, agentManager, templateRegistry, peerDAO, communicationManager,
+                        quotaManager, strategyManager, null, commandExecutor );
 
-                localPeer.bindHost( UUID.randomUUID() );
+        localPeer.bindHost( UUID.randomUUID() );
     }
 }

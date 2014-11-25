@@ -117,6 +117,7 @@ void SubutaiTimer::sendHeartBeat()
 
     response->setInterfaces(environment->getAgentInterfaceValues());
     response->setHostname(environment->getAgentHostnameValue());
+    response->setArch(environment->getAgentArch());
     response->setContainerSet(containerManager->getAllContainers());
     string resp = response->createHeartBeatMessage(environment->getAgentUuidValue(), environment->getAgentHostnameValue());
     connection->sendMessage(resp, "HEARTBEAT_TOPIC");

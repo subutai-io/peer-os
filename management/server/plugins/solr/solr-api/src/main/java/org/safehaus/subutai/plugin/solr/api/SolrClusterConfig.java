@@ -8,10 +8,9 @@ package org.safehaus.subutai.plugin.solr.api;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -24,13 +23,11 @@ public class SolrClusterConfig implements ConfigBase
     private String templateName = PRODUCT_NAME;
     private String clusterName = "";
     private int numberOfNodes = 1;
-    private Set<Agent> nodes = new HashSet<>();
+    private Set<UUID> nodes = new HashSet<>();
+    private UUID environmentId;
 
 
-    public String getClusterName()
-    {
-        return clusterName;
-    }
+
 
 
     public SolrClusterConfig setClusterName( String clusterName )
@@ -39,6 +36,10 @@ public class SolrClusterConfig implements ConfigBase
         return this;
     }
 
+    public String getClusterName()
+    {
+        return clusterName;
+    }
 
     @Override
     public String getProductName()
@@ -78,16 +79,18 @@ public class SolrClusterConfig implements ConfigBase
     }
 
 
-    public Set<Agent> getNodes()
+    public Set<UUID> getNodes()
     {
         return nodes;
     }
 
 
-    public void setNodes( final Set<Agent> nodes )
+    public void setNodes( final Set<UUID> nodes )
     {
         this.nodes = nodes;
     }
+
+
 
 
     @Override
@@ -96,5 +99,17 @@ public class SolrClusterConfig implements ConfigBase
         return new ToStringBuilder( this, ToStringStyle.SHORT_PREFIX_STYLE ).append( "clusterName", clusterName )
                                                                             .append( "numberOfNodes", numberOfNodes )
                                                                             .append( "nodes", nodes ).toString();
+    }
+
+
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
     }
 }

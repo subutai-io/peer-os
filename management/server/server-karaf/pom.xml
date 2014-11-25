@@ -137,6 +137,7 @@
           <targetServerDirectory>${assembly.directory}</targetServerDirectory>
           <bootFeatures>
             <feature>standard</feature>
+            <feature>kar</feature>
             <feature>war</feature>
             <feature>ssh</feature>
             <feature>subutai-application</feature>
@@ -166,6 +167,7 @@
               </descriptors>
               <features>
                 <feature>standard</feature>
+                <feature>kar</feature>
                 <feature>war</feature>
                 <feature>ssh</feature>
                 <feature>cxf</feature>

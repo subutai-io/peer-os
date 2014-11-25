@@ -11,8 +11,8 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestType;
 import org.safehaus.subutai.common.command.Response;
-import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.broker.api.Broker;
@@ -33,10 +33,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 
-//TODO use proper RequestType and update RequestBuilder.RequestImpl after migration to new agent
 public class FileTrackerImpl implements FileTracker, ByteMessageListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( FileTrackerImpl.class.getName() );
+    private static final String HOST_IS_NULL_MSG = "Host is null";
 
     protected Set<ConfigPointListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<ConfigPointListener, Boolean>() );
@@ -99,13 +99,13 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
     @Override
     public void createConfigPoints( Host host, Set<String> configPoints ) throws FileTrackerException
     {
-        Preconditions.checkNotNull( host, "Host is null" );
+        Preconditions.checkNotNull( host, HOST_IS_NULL_MSG );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( configPoints ), "Invalid config points" );
 
         try
         {
-            commandUtil.execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_CREATE_REQUEST )
-                                                            .withConfPoints( configPoints ), host );
+            commandUtil.execute( new RequestBuilder( "pwd" ).withType( RequestType.SET_INOTIFY_REQUEST )
+                                                            .withConfigPoints( configPoints ), host );
         }
         catch ( CommandException e )
         {
@@ -117,13 +117,13 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
     @Override
     public void removeConfigPoints( Host host, Set<String> configPoints ) throws FileTrackerException
     {
-        Preconditions.checkNotNull( host, "Host is null" );
+        Preconditions.checkNotNull( host, HOST_IS_NULL_MSG );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( configPoints ), "Invalid config points" );
 
         try
         {
-            commandUtil.execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_REMOVE_REQUEST )
-                                                            .withConfPoints( configPoints ), host );
+            commandUtil.execute( new RequestBuilder( "pwd" ).withType( RequestType.UNSET_INOTIFY_REQUEST )
+                                                            .withConfigPoints( configPoints ), host );
         }
         catch ( CommandException e )
         {
@@ -135,13 +135,13 @@ public class FileTrackerImpl implements FileTracker, ByteMessageListener
     @Override
     public Set<String> listConfigPoints( final Host host ) throws FileTrackerException
     {
-        Preconditions.checkNotNull( host, "Host is null" );
+        Preconditions.checkNotNull( host, HOST_IS_NULL_MSG );
 
         final Set<String> configPoints = Sets.newHashSet();
 
         try
         {
-            host.execute( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_LIST_REQUEST ),
+            host.execute( new RequestBuilder( "pwd" ).withType( RequestType.LIST_INOTIFY_REQUEST ),
                     new CommandCallback()
                     {
                         @Override

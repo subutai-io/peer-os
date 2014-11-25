@@ -420,7 +420,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* c
     /*
      * if the execution is done process pid could not be read and should be skipped now..
      */
-    if (!_container && !checkCWD(command, _container)) {
+    if (!_container && !checkCWD(command)) {
         this->setCWDERR(true);
         string message = this->getResponse().createResponseMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(), 1,
                 "Working Directory Does Not Exist on System", "", command->getCommandId());
@@ -428,7 +428,7 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* c
         this->getLogger().writeLog(7, this->getLogger().setLogData("<SubutaiThread::optionReadSend> " "CWD id not found on system..", "CWD:", command->getWorkingDirectory()));
         //problem about absolute path
     }
-    if (!_container && checkUID(command, _container)) {
+    if (!_container && !checkUID(command)) {
         this->setUIDERR(true);
         string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
                 "User Does Not Exist on System","",command->getCommandId());
@@ -706,10 +706,8 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
         string processpid = "";	                        //processpid for execution
         logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Fork is Starting!!", helper.toString(getpid())));
         this->getOutputStream().setMode(command->getStandardOutput());
-        //this->getOutputStream().setPath(command->getStandardOutputPath());
         this->getOutputStream().setIdentity("output");
         this->getErrorStream().setMode(command->getStandardError());
-        //this->getErrorStream().setPath(command->getStandardErrPath());
         this->getErrorStream().setIdentity("error");
 
         if (this->getOutputStream().openPipe() == false || this->getErrorStream().openPipe() == false) {
@@ -802,9 +800,9 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                 // Execute command
                 string execCmd = createExecString(command);
                 if (command->getIsDaemon()) {
-                    stringstream execCmdStream;
-                    execCmdStream << "subutai-run" << execCmd << " " << command->getCommandId();
-                    execCmd = execCmdStream.str();
+                    string cmd = createExecString(command);
+                    cmd.append(" &");
+                    system(cmd.c_str());
                 }
                 val = system(execCmd.c_str());
             } else {
