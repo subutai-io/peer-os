@@ -26,20 +26,13 @@ public class CommandsTest
 
 
     @Test
-    public void testGetActivateMonitoringWithCustomSettingsCommand() throws Exception
+    public void testGetActivateMonitoringCommand() throws Exception
     {
         MonitoringSettings settings = mock( MonitoringSettings.class );
-        RequestBuilder requestBuilder = commands.getActivateMonitoringWithCustomSettingsCommand( HOSTNAME, settings );
+        RequestBuilder requestBuilder = commands.getActivateMonitoringCommand( HOSTNAME, settings );
 
         verify( settings ).getCpuAlertThreshold();
         assertNotNull( requestBuilder );
     }
 
-
-    @Test
-    public void testGetActivateMonitoringWithDefaultSettingsCommand() throws Exception
-    {
-        assertEquals( new RequestBuilder( String.format( "subutai monitor -c %s", HOSTNAME ) ),
-                commands.getActivateMonitoringWithDefaultSettingsCommand( HOSTNAME ) );
-    }
 }

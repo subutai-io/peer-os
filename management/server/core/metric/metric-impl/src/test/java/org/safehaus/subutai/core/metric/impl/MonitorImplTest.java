@@ -285,7 +285,7 @@ public class MonitorImplTest
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
 
 
-        monitor.startMonitoring( alertListener, environment );
+        monitor.startMonitoring( alertListener, environment, monitoringSettings );
 
         verify( monitorDao ).addSubscription( ENVIRONMENT_ID, subscriberId );
     }
@@ -296,7 +296,7 @@ public class MonitorImplTest
     {
         doThrow( new DaoException( "" ) ).when( monitorDao ).addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
 
-        monitor.startMonitoring( alertListener, environment );
+        monitor.startMonitoring( alertListener, environment, monitoringSettings );
     }
 
 
@@ -620,7 +620,7 @@ public class MonitorImplTest
 
         verify( remotePeer, times( 2 ) ).sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt() );
 
-        monitor.activateMonitoring( containerHost );
+        monitor.activateMonitoring( containerHost, monitoringSettings );
 
         verify( remotePeer, times( 3 ) ).sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt() );
 

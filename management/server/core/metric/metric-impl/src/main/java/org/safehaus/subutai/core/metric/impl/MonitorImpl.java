@@ -46,6 +46,7 @@ public class MonitorImpl implements Monitor
     private static final String ENVIRONMENT_IS_NULL_MSG = "Environment is null";
     private static final String CONTAINER_IS_NULL_MSG = "Container is null";
     private static final String ALERT_LISTENER_IS_NULL = "Alert listener is null";
+    private static final String SETTINGS_IS_NULL_MSG = "Settings is null";
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class.getName() );
 
     //set of metric subscribers
@@ -256,19 +257,13 @@ public class MonitorImpl implements Monitor
 
 
     @Override
-    public void startMonitoring( final AlertListener alertListener, final Environment environment )
-            throws MonitorException
-    {
-        startMonitoring( alertListener, environment, null );
-    }
-
-
-    @Override
     public void startMonitoring( final AlertListener alertListener, final Environment environment,
                                  final MonitoringSettings monitoringSettings ) throws MonitorException
     {
         Preconditions.checkNotNull( alertListener, ALERT_LISTENER_IS_NULL );
         Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
+        Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
+
 
         //make sure subscriber id is truncated to 100 characters
         String subscriberId = alertListener.getSubscriberId();
@@ -323,15 +318,9 @@ public class MonitorImpl implements Monitor
 
     {
         Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
+        Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
 
         activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings );
-    }
-
-
-    @Override
-    public void activateMonitoring( final ContainerHost containerHost ) throws MonitorException
-    {
-        activateMonitoring( containerHost, null );
     }
 
 
@@ -404,6 +393,7 @@ public class MonitorImpl implements Monitor
                                                         MonitoringSettings monitoringSettings )
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
+        Preconditions.checkNotNull( monitoringSettings );
 
         for ( ContainerHost containerHost : containerHosts )
         {
@@ -411,12 +401,8 @@ public class MonitorImpl implements Monitor
             {
                 ResourceHost resourceHost =
                         peerManager.getLocalPeer().getResourceHostByName( containerHost.getParentHostname() );
-                CommandResult commandResult = resourceHost.execute( monitoringSettings == null ?
-                                                                    commands.getActivateMonitoringWithDefaultSettingsCommand(
-                                                                            containerHost.getHostname() ) :
-                                                                    commands.getActivateMonitoringWithCustomSettingsCommand(
-                                                                            containerHost.getHostname(),
-                                                                            monitoringSettings ) );
+                CommandResult commandResult = resourceHost.execute(
+                        commands.getActivateMonitoringCommand( containerHost.getHostname(), monitoringSettings ) );
                 if ( !commandResult.hasSucceeded() )
                 {
                     LOG.warn( String.format( "Error activating metrics on %s: %s %s", containerHost.getHostname(),

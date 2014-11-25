@@ -18,8 +18,7 @@ public class Commands
     }
 
 
-    public RequestBuilder getActivateMonitoringWithCustomSettingsCommand( String hostname,
-                                                                          MonitoringSettings monitoringSettings )
+    public RequestBuilder getActivateMonitoringCommand( String hostname, MonitoringSettings monitoringSettings )
     {
         return new RequestBuilder( String.format(
                 "subutai monitor -c -p \" metricCollectionIntervalInMin:%s, maxSampleCount:%s, "
@@ -29,11 +28,5 @@ public class Commands
                 monitoringSettings.getMetricCountToAverageToAlert(), monitoringSettings.getIntervalBetweenAlertsInMin(),
                 monitoringSettings.getRamAlertThreshold(), monitoringSettings.getCpuAlertThreshold(),
                 monitoringSettings.getDiskAlertThreshold(), hostname ) );
-    }
-
-
-    public RequestBuilder getActivateMonitoringWithDefaultSettingsCommand( String hostname )
-    {
-        return new RequestBuilder( String.format( "subutai monitor -c %s", hostname ) );
     }
 }

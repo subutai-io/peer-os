@@ -15,13 +15,14 @@ import com.google.common.collect.Sets;
 public class MonitoringActivationRequest
 {
     private Set<UUID> containerHostsIds;
-    private MonitoringSettingsImpl monitoringSettings;
+    private MonitoringSettings monitoringSettings;
 
 
     public MonitoringActivationRequest( final Set<ContainerHost> containerHosts,
                                         final MonitoringSettings monitoringSettings )
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
+        Preconditions.checkNotNull( monitoringSettings );
 
         this.containerHostsIds = Sets.newHashSet();
         for ( ContainerHost containerHost : containerHosts )
@@ -29,10 +30,7 @@ public class MonitoringActivationRequest
             containerHostsIds.add( containerHost.getId() );
         }
 
-        if ( monitoringSettings != null )
-        {
-            this.monitoringSettings = new MonitoringSettingsImpl( monitoringSettings );
-        }
+        this.monitoringSettings = monitoringSettings;
     }
 
 

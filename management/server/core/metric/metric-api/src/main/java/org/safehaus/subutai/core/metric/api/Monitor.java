@@ -37,18 +37,7 @@ public interface Monitor
 
     /**
      * Enables {@code AlertListener} to be triggered if thresholds on some containers within the given environment are
-     * exceeded. Monitoring infrastructure is initialized with default monitoring settings
-     *
-     * @param alertListener alertListener  to trigger
-     * @param environment environment to monitor
-     */
-
-    public void startMonitoring( AlertListener alertListener, Environment environment ) throws MonitorException;
-
-
-    /**
-     * Enables {@code AlertListener} to be triggered if thresholds on some containers within the given environment are
-     * exceeded. Monitoring infrastructure is initialized with custom monitoring settings
+     * exceeded. Monitoring infrastructure is initialized with given monitoring settings
      *
      * @param alertListener alertListener  to trigger
      * @param environment environment to monitor
@@ -68,7 +57,7 @@ public interface Monitor
 
 
     /**
-     * Activates monitoring on a given container with custom monitoring settings
+     * Activates monitoring on a given container
      *
      * @param containerHost container host to activate monitoring on
      * @param monitoringSettings monitoring settings
@@ -76,15 +65,6 @@ public interface Monitor
 
     public void activateMonitoring( ContainerHost containerHost, MonitoringSettings monitoringSettings )
             throws MonitorException;
-
-    /**
-     * Activates monitoring on a given container with default monitoring settings
-     *
-     * @param containerHost container host to activate monitoring on
-     */
-
-    public void activateMonitoring( ContainerHost containerHost ) throws MonitorException;
-
 
     /**
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
