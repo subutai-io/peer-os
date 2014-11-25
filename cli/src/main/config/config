@@ -33,6 +33,10 @@ export SUBUTAI_LOCK_PATH=/var/lock/subutai/
 # Directory to store round-robin database files for monitoring feature
 export SUBUTAI_RRD_DIRECTORY="/var/lib/subutai/rrd/"
 
+# Directory to store configuration files of monitoring infrastructure
+# of each host
+export SUBUTAI_MONITOR_CONF_DIRECTORY="/etc/subutai/monitor"
+
 # A colon separated list of non-overlapping configuration paths which
 # need to be tracked in templates for changes via git. By default /etc
 # is versioned on each container. Use the subutai-config-path utility
