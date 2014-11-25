@@ -37,7 +37,8 @@ public interface Monitor
 
     /**
      * Enables {@code AlertListener} to be triggered if thresholds on some containers within the given environment are
-     * exceeded. Monitoring infrastructure is initialized with given monitoring settings
+     * exceeded. Monitoring infrastructure is initialized with given monitoring settings. This call needs to be executed
+     * only once since subscription is stored in persistent storage
      *
      * @param alertListener alertListener  to trigger
      * @param environment environment to monitor
@@ -74,8 +75,19 @@ public interface Monitor
      */
     public void alert( String alertMetric ) throws MonitorException;
 
-
+    /**
+     * Adds listener to be notified if threshold within environment is exceeded (after this call, interested parties
+     * need to execute startMonitoring call passing some environment under interest). Usually one calls this method in
+     * init method of client module
+     *
+     * @param listener - listener
+     */
     public void addAlertListener( AlertListener listener );
 
+    /**
+     * Removes listener
+     *
+     * @param listener - listener
+     */
     public void removeAlertListener( AlertListener listener );
 }
