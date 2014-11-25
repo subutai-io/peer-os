@@ -21,7 +21,7 @@ public class Commands
     public RequestBuilder getActivateMonitoringCommand( String hostname, MonitoringSettings monitoringSettings )
     {
         return new RequestBuilder( String.format(
-                "subutai monitor -c -p \" metricCollectionIntervalInMin:%s, maxSampleCount:%s, "
+                "subutai monitor -c all -p \" metricCollectionIntervalInMin:%s, maxSampleCount:%s, "
                         + "metricCountToAverageToAlert:%s, intervalBetweenAlertsInMin:%s, ramAlertThreshold:%s, "
                         + "cpuAlertThreshold:%s, diskThreshold:%s \" %s",
                 monitoringSettings.getMetricCollectionIntervalInMin(), monitoringSettings.getMaxSampleCount(),
