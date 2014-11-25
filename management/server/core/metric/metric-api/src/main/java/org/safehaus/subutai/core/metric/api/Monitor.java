@@ -37,18 +37,8 @@ public interface Monitor
 
     /**
      * Enables {@code AlertListener} to be triggered if thresholds on some containers within the given environment are
-     * exceeded. Monitoring infrastructure is initialized with default monitoring settings
-     *
-     * @param alertListener alertListener  to trigger
-     * @param environment environment to monitor
-     */
-
-    public void startMonitoring( AlertListener alertListener, Environment environment ) throws MonitorException;
-
-
-    /**
-     * Enables {@code AlertListener} to be triggered if thresholds on some containers within the given environment are
-     * exceeded. Monitoring infrastructure is initialized with custom monitoring settings
+     * exceeded. Monitoring infrastructure is initialized with given monitoring settings. This call needs to be executed
+     * only once since subscription is stored in persistent storage
      *
      * @param alertListener alertListener  to trigger
      * @param environment environment to monitor
@@ -68,7 +58,7 @@ public interface Monitor
 
 
     /**
-     * Activates monitoring on a given container with custom monitoring settings
+     * Activates monitoring on a given container
      *
      * @param containerHost container host to activate monitoring on
      * @param monitoringSettings monitoring settings
@@ -78,15 +68,6 @@ public interface Monitor
             throws MonitorException;
 
     /**
-     * Activates monitoring on a given container with default monitoring settings
-     *
-     * @param containerHost container host to activate monitoring on
-     */
-
-    public void activateMonitoring( ContainerHost containerHost ) throws MonitorException;
-
-
-    /**
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
      * stress.
      *
@@ -94,8 +75,19 @@ public interface Monitor
      */
     public void alert( String alertMetric ) throws MonitorException;
 
-
+    /**
+     * Adds listener to be notified if threshold within environment is exceeded (after this call, interested parties
+     * need to execute startMonitoring call passing some environment under interest). Usually one calls this method in
+     * init method of client module
+     *
+     * @param listener - listener
+     */
     public void addAlertListener( AlertListener listener );
 
+    /**
+     * Removes listener
+     *
+     * @param listener - listener
+     */
     public void removeAlertListener( AlertListener listener );
 }

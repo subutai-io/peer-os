@@ -17,4 +17,7 @@ public class Constants
 
     //notifyOnAlert timeout in seconds
     public static final int ALERT_TIMEOUT = 30;
+
+    //monitoring activation timeout
+    public static final int MONITORING_ACTIVATION_TIMEOUT = 60;
 }
