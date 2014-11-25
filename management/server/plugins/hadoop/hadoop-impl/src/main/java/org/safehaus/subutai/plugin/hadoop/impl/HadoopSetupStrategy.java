@@ -1,11 +1,8 @@
 package org.safehaus.subutai.plugin.hadoop.impl;
 
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.UUID;
-
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -14,11 +11,11 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildExcep
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.impl.ClusterConfiguration;
-import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.UUID;
 
 
 /**
@@ -110,7 +107,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     }
 
 
-    private void setMasterNodes() throws ClusterSetupException
+    protected void setMasterNodes() throws ClusterSetupException
     {
         Set<UUID> masterNodes = new HashSet<>();
         int masterCount = 0;
@@ -136,7 +133,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     }
 
 
-    private void setSlaveNodes() throws ClusterSetupException
+    protected void setSlaveNodes() throws ClusterSetupException
     {
         Set<UUID> slaveNodes = new HashSet<>();
         for ( ContainerHost containerHost : environment.getContainers() )
