@@ -31,11 +31,14 @@ import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.Interface;
 import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.HostEvent;
+import org.safehaus.subutai.core.peer.api.HostEventListener;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -64,6 +67,15 @@ public abstract class AbstractSubutaiHost implements Host
 
     @Transient
     protected long lastHeartbeat = 0;
+    @Transient
+    protected Set<HostEventListener> eventListeners = Sets.newConcurrentHashSet();
+
+
+    @Override
+    public void init()
+    {
+        // Empty method
+    }
 
 
     protected AbstractSubutaiHost( final String peerId, final HostInfo hostInfo )
@@ -88,6 +100,37 @@ public abstract class AbstractSubutaiHost implements Host
 
     protected AbstractSubutaiHost()
     {
+    }
+
+
+    @Override
+    public void addListener( HostEventListener hostEventListener )
+    {
+        this.eventListeners.add( hostEventListener );
+    }
+
+
+    @Override
+    public void removeListener( HostEventListener hostEventListener )
+    {
+        this.eventListeners.remove( hostEventListener );
+    }
+
+
+    @Override
+    public void fireEvent( HostEvent hostEvent )
+    {
+        for ( HostEventListener hostEventListener : eventListeners )
+        {
+            try
+            {
+                hostEventListener.onHostEvent( hostEvent );
+            }
+            catch ( Exception e )
+            {
+                eventListeners.remove( hostEventListener );
+            }
+        }
     }
 
 

@@ -80,5 +80,5 @@ public interface LocalPeer extends Peer
 
     public ContainerHost getContainerHost( final HostInfo hostInfo, final String creatorPeerId,
                                            final String environmentId, final String nodeGroupName );
-    public void onPeerEvent( PeerEvent event );
+//    public void onPeerEvent( PeerEvent event );
 }

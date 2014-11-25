@@ -36,6 +36,12 @@ public interface Host extends Serializable
 
     public String getHostname();
 
+    void addListener( HostEventListener hostEventListener );
+
+    void removeListener( HostEventListener hostEventListener );
+
+    void fireEvent( HostEvent hostEvent );
+
     public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException;
 
     public CommandResult execute( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
@@ -55,4 +61,6 @@ public interface Host extends Serializable
     String getIpByMask( String mask );
 
     void addIpHostToEtcHosts( String domainName, Set<Host> others, String mask ) throws SubutaiException;
+
+    void init();
 }

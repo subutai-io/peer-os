@@ -13,7 +13,6 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
-import org.safehaus.subutai.core.peer.api.SubutaiInitException;
 import org.safehaus.subutai.core.peer.impl.Commands;
 
 
@@ -46,7 +45,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    public void init() throws SubutaiInitException
+    public void init()
     {
         //        try
         //        {

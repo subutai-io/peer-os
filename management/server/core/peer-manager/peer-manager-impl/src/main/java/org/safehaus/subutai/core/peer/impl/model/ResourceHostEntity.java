@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -30,17 +32,15 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.monitor.api.MetricType;
-import org.safehaus.subutai.core.peer.api.ContainerCreateOrder;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.ContainerState;
 import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.HostTask;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
 
 
 /**
@@ -49,7 +49,7 @@ import com.google.common.base.Preconditions;
 @Entity
 @Table( name = "resource_host" )
 @Access( AccessType.FIELD )
-public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost/*, HostListener*/
+public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost
 {
     @javax.persistence.Transient
     transient protected static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
@@ -62,7 +62,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @javax.persistence.Transient
     transient private static final int HOST_EXPIRATION = 60;
     @javax.persistence.Transient
-    transient private ExecutorService executor;
+    transient private ExecutorService singleThreadExecutorService;
+
+    @javax.persistence.Transient
+    transient private ExecutorService cachedThredPoolService;
+
+    @javax.persistence.Transient
+    transient private Queue<HostTask> taskQueue = new LinkedList<>();
+
     //    @javax.persistence.Transient
     //    protected Cache<UUID, ContainerHostInfo> hostCache;
 
@@ -82,16 +89,43 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    private ExecutorService getExecutor()
+    private ExecutorService getSingleThreadExecutorService()
     {
-        if ( executor == null )
+        if ( singleThreadExecutorService == null )
         {
-            executor = Executors.newFixedThreadPool( 1 );
+            singleThreadExecutorService = Executors.newSingleThreadExecutor();
         }
 
-        return executor;
+        return singleThreadExecutorService;
     }
 
+
+    private ExecutorService getCachedThreadExecutorService()
+    {
+        if ( cachedThredPoolService == null )
+        {
+            cachedThredPoolService = Executors.newCachedThreadPool();
+        }
+
+        return cachedThredPoolService;
+    }
+
+
+    @Override
+    public void queue( final HostTask hostTask )
+    {
+        LOG.info( String.format( "New sequential task %s queued.", hostTask.getId() ) );
+        ExecutorService executorService = getSingleThreadExecutorService();
+        //        LOG.debug( executorService.toString() );
+        executorService.submit( hostTask );
+    }
+
+
+    public void run( final HostTask hostTask )
+    {
+        LOG.info( String.format( "New immediate task %s added.", hostTask.getId() ) );
+        getCachedThreadExecutorService().submit( hostTask );
+    }
     //
     //    private Cache<UUID, ContainerHostInfo> getHostCache()
     //    {
@@ -401,43 +435,59 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    private void create( final ContainerCreateOrder containerCreateOrder ) throws ResourceHostException
-    {
-        prepareTemplates( containerCreateOrder.getTemplates() );
-        run( Command.CLONE, containerCreateOrder.getTemplateName(), containerCreateOrder.getHostname() );
-    }
-
-
     @Override
-    public void createContainer( final ContainerCreateOrder containerCreateOrder )
-
+    public void cloneContainer( final String templateName, final String cloneName ) throws ResourceHostException
     {
-        Preconditions.checkNotNull( containerCreateOrder, "Container create order is null." );
-
-        getExecutor().execute( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    /*ContainerHost containerHost =*/
-                    create( containerCreateOrder );
-                    containerCreateOrder.setState( ContainerCreateOrder.State.SUCCESS );
-                    containerCreateOrder.setDescription( "Container successfully cloned." );
-                    //                    containerHost.setNodeGroupName( nodeGroupName );
-                    //                    containerHost.setEnvironmentId( environmentId.toString() );
-                    //                    localPeer.onPeerEvent( new PeerEvent( PeerEventType
-                    // .CONTAINER_CREATE_SUCCESS, containerHost ) );
-                }
-                catch ( Exception e )
-                {
-                    containerCreateOrder.setState( ContainerCreateOrder.State.FAIL );
-                    containerCreateOrder.setDescription( e.toString() );
-                }
-            }
-        } );
+        LOG.debug( String.format( "Cloning container %s from template %s", cloneName, cloneName ) );
+        run( Command.CLONE, templateName, cloneName );
     }
+
+
+    //    private void create( final CloneTask cloneTask )
+    //    {
+    //        try
+    //        {
+    //            prepareTemplates( cloneTask.getParameter().getTemplates() );
+    //            run( Command.CLONE, cloneTask.getParameter().getTemplateName(), cloneTask.getParameter()
+    // .getHostname() );
+    //            ContainerHost host = getContainerHostByName( cloneTask.getParameter().getHostname() );
+    //            if ( host != null )
+    //            {
+    //                cloneTask.success();
+    //            }
+    //            else
+    //            {
+    //                cloneTask.fail( new ResourceHostException(
+    //                        String.format( "Container %s on % is not cloned in estimated time.", this.hostname,
+    //                                cloneTask.getParameter().getHostname() ), "" ) );
+    //            }
+    //        }
+    //        catch ( Exception e )
+    //        {
+    //            cloneTask.fail( new ResourceHostException(
+    //                    String.format( "Error on cloning container %s on %s.", this.hostname,
+    //                            cloneTask.getParameter().getHostname() ), e.toString() ) );
+    //        }
+    //        fireEvent( new HostEvent( this, HostEvent.EventType.TASK_FINISHED, cloneTask ) );
+    //    }
+    //
+    //
+    //    @Override
+    //    public void createContainer( final ContainerCreateOrder containerCreateOrder )
+    //
+    //    {
+    //        Preconditions.checkNotNull( containerCreateOrder, "Container create order is null." );
+    //        LOG.info( "Scheduled new container clone order for %s", containerCreateOrder.getHostname() );
+    //        final CloneTask task = new CloneTask( containerCreateOrder );
+    //        getSingleThreadExecutorService().execute( new Runnable()
+    //        {
+    //            @Override
+    //            public void run()
+    //            {
+    //                create( task );
+    //            }
+    //        } );
+    //    }
 
 
     //    private ContainerHost waitHeartbeatAndCreateContainerHost( final String containerName, final String
@@ -460,23 +510,25 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     //    }
 
 
-    protected void prepareTemplates( List<Template> templates ) throws ResourceHostException
+    @Override
+    public void prepareTemplates( List<Template> templates ) throws ResourceHostException
     {
+        LOG.debug( "Preparing templates..." );
         for ( Template p : templates )
         {
-            checkTemplate( p );
+            prepareTemplate( p );
         }
+        LOG.debug( "Template successfully prepared." );
     }
 
 
-    private void checkTemplate( final Template p ) throws ResourceHostException
+    @Override
+    public void prepareTemplate( final Template p ) throws ResourceHostException
     {
-
         if ( isTemplateExist( p ) )
         {
             return;
         }
-
         importTemplate( p );
         if ( isTemplateExist( p ) )
         {
@@ -487,28 +539,43 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         importTemplate( p );
         if ( !isTemplateExist( p ) )
         {
+            LOG.debug( String.format( "Could not prepare templae %s on %s.", p.getTemplateName(), hostname ) );
             throw new ResourceHostException( String.format( "Could not prepare template %s on %s", p.getTemplateName(),
                     getAgent().getHostname() ), null );
         }
     }
 
 
-    protected boolean isTemplateExist( final Template template ) throws ResourceHostException
+    @Override
+    public boolean isTemplateExist( final Template template ) throws ResourceHostException
     {
-        return run( Command.LIST_TEMPLATES, template.getTemplateName() );
+        boolean exists = run( Command.LIST_TEMPLATES, template.getTemplateName() );
+        if ( exists )
+        {
+            LOG.debug( String.format( "Template %s exists on %s.", template.getTemplateName(), hostname ) );
+        }
+        else
+        {
+            LOG.debug( String.format( "Template %s does not exists on %s.", template.getTemplateName(), hostname ) );
+        }
+        return exists;
     }
 
 
-    protected void importTemplate( Template template ) throws ResourceHostException
+    @Override
+    public void importTemplate( Template template ) throws ResourceHostException
     {
+        LOG.debug( String.format( "Trying to import template %s to %s.", template.getTemplateName(), hostname ) );
         run( Command.IMPORT, template.getTemplateName() );
     }
 
 
-    protected void updateRepository( Template template ) throws ResourceHostException
+    @Override
+    public void updateRepository( Template template ) throws ResourceHostException
     {
         if ( template.isRemote() )
         {
+            LOG.debug( String.format( "Adding remote repository %s to %s...", template.getPeerId(), hostname ) );
             run( Command.ADD_SOURCE, template.getPeerId().toString() );
             run( Command.APT_GET_UPDATE );
         }
@@ -656,7 +723,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 return true;
             }
             throw new ResourceHostException(
-                    String.format( "Execution failed %s", String.format( command.script, args ) ),
+                    String.format( "Command execution failed %s", String.format( command.script, args ) ),
                     commandResult.toString() );
         }
         catch ( CommandException e )
@@ -742,7 +809,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     enum Command
     {
         LIST_TEMPLATES( "subutai list -t %s" ),
-        CLONE( "subutai clone %s %s", 180, true ),
+        CLONE( "subutai clone %s %s", 180 ),
         DESTROY( "subutai destroy %s" ),
         IMPORT( "subutai import %s" ),
         PROMOTE( "promote %s" ),
