@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -23,7 +23,7 @@ public class Wizard
     private final Tracker tracker;
     private int step = 1;
     private HadoopClusterConfig hadoopClusterConfig = new HadoopClusterConfig();
-    private AgentManager agentManager;
+    private HostRegistry hostRegistry;
 
 
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -32,7 +32,7 @@ public class Wizard
         this.tracker = serviceLocator.getService( Tracker.class );
         this.executorService = executorService;
         this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
+        this.hostRegistry = serviceLocator.getService( HostRegistry.class );
 
         grid = new VerticalLayout();
         grid.setMargin( true );
@@ -55,7 +55,7 @@ public class Wizard
             }
             case 2:
             {
-                component = new ConfigurationStep( this, agentManager );
+                component = new ConfigurationStep( this, hostRegistry );
                 break;
             }
             case 3:

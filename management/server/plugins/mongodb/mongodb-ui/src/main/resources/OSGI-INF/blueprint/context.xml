@@ -3,12 +3,9 @@
 
   <reference id="mongoManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.mongodb.api.Mongo" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
-  <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
+
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.mongodb.ui.MongoPortalModule"
         init-method="init" destroy-method="destroy">
