@@ -126,6 +126,8 @@ generateRepoPackage() {
      if [ "$removedPackage" != "" ]; then
         rm $ISOPATH/$removedPackage
      fi
+     #copy debian package to pool/extras
+     cp $BASE/subutai-cli-management*.deb $ISOPATH/
   fi
   
   #check package starts with subutai tag
