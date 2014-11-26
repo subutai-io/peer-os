@@ -1,17 +1,15 @@
 package org.safehaus.subutai.wol.api;
 
 
-import org.safehaus.subutai.common.command.CommandResult;
 import java.util.ArrayList;
 
-/**
- * Created by emin on 14/11/14.
- */
+import org.safehaus.subutai.common.command.CommandResult;
+
+
 public interface WolManager
 {
 
-    public CommandResult sendMagicPackagebyMacId(String macId) throws WolManagerException;
+    public CommandResult sendMagicPackageByMacId( String macId ) throws WolManagerException;
 
-    public Boolean sendMagicPackagebyList(ArrayList<String> macList) throws WolManagerException;
-
+    public Boolean sendMagicPackageByList( ArrayList<String> macList ) throws WolManagerException;
 }
