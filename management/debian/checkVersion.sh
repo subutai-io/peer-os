@@ -54,5 +54,6 @@
         fi
      fi
   fi
-}
-
+  #There is a change Continue to new package creation.
+  echo "There is a change Continue to new package creation"
+  exit 0

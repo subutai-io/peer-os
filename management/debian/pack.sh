@@ -104,6 +104,16 @@ distroName=`ls | grep tar.gz`
 distroFolderName=`ls | grep tar.gz | awk '{print substr($0, 0, length($0)-7)}'`
 popd
 
+if [ "$distroName" = "" ]; then
+   echo "distroName is empty. Exiting."
+   exit 1
+fi
+
+if [ "$distroFolderName" = "" ]; then
+   echo "distroFolderName is empty. Exiting."
+   exit 1
+fi
+ 
 pushd $MANAGEMENT_BASE
 echo "distroName:"$distroName
 echo "distroFolderName:"$distroFolderName
