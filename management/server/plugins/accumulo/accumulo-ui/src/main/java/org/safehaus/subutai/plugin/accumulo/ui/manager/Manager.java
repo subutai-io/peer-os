@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -659,7 +658,7 @@ public class Manager
             addGivenComponents( availableOperations, checkBtn );
             addStyleName( checkBtn, destroyBtn, availableOperations );
 
-            final String nodeRole = findNodeRoles( containerHost.getAgent() );
+            final String nodeRole = findNodeRoles( containerHost );
             table.addItem( new Object[] {
                     containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ), nodeRole, resultHolder,
                     availableOperations
@@ -831,26 +830,26 @@ public class Manager
     }
 
 
-    private String findNodeRoles( Agent node )
+    private String findNodeRoles( ContainerHost node )
     {
         StringBuilder sb = new StringBuilder();
-        if ( accumuloClusterConfig.getMasterNode().equals( node.getUuid() ) )
+        if ( accumuloClusterConfig.getMasterNode().equals( node.getId() ) )
         {
             sb.append( "Master" ).append( ", " );
         }
-        if ( accumuloClusterConfig.getGcNode().equals( node.getUuid() ) )
+        if ( accumuloClusterConfig.getGcNode().equals( node.getId() ) )
         {
             sb.append( "GC" ).append( ", " );
         }
-        if ( accumuloClusterConfig.getMonitor().equals( node.getUuid() ) )
+        if ( accumuloClusterConfig.getMonitor().equals( node.getId() ) )
         {
             sb.append( "Monitor" ).append( ", " );
         }
-        if ( accumuloClusterConfig.getTracers().contains( node.getUuid() ) )
+        if ( accumuloClusterConfig.getTracers().contains( node.getId() ) )
         {
             sb.append( "Tracer" ).append( ", " );
         }
-        if ( accumuloClusterConfig.getSlaves().contains( node.getUuid() ) )
+        if ( accumuloClusterConfig.getSlaves().contains( node.getId() ) )
         {
             sb.append( "Tablet_Server" ).append( ", " );
         }

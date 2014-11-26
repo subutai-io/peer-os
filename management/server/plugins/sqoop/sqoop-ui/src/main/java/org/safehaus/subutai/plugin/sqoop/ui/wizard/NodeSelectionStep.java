@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -122,7 +121,7 @@ public class NodeSelectionStep extends VerticalLayout
 
     private void addOverHadoopControls( ComponentContainer parent, final SqoopConfig config )
     {
-        final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
+        final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<ContainerHost>() );
         select.setId( "sqoopSlaveNodes" );
 
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );

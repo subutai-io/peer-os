@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -206,20 +205,6 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public UUID getNode( Agent agent )
-    {
-        Preconditions.checkNotNull( agent, "Agent is null" );
-        for ( UUID uuid : getAllNodes() )
-        {
-            if ( uuid.equals( agent.getUuid() ) )
-            {
-                return uuid;
-            }
-        }
-        return null;
-    }
-
-
     public List<UUID> getAllNodes()
     {
         Set<UUID> allAgents = new HashSet<>();
@@ -374,6 +359,7 @@ public class HadoopClusterConfig implements ConfigBase
         this.countOfSlaveNodes = countOfSlaveNodes;
     }
 
+
     public Set<UUID> getBlockedAgentUUIDs()
     {
         Set<UUID> blockedAgents = new HashSet<>();
@@ -383,6 +369,7 @@ public class HadoopClusterConfig implements ConfigBase
         }
         return blockedAgents;
     }
+
 
     public Set<UUID> getBlockedAgents()
     {

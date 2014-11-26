@@ -2,10 +2,8 @@ package org.safehaus.subutai.plugin.common.ui;
 
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.BaseManagerInterface;
 
@@ -84,11 +82,11 @@ public abstract class BaseManager implements BaseManagerInterface
         processCount++;
     }
 
+
     public synchronized void decrementProcessCount()
     {
         processCount--;
     }
-
 
 
     public HorizontalLayout getStatusLayout( final Item row )
@@ -246,7 +244,6 @@ public abstract class BaseManager implements BaseManagerInterface
             }
         }
     }
-
 
 
     public HorizontalLayout getAvailableOperationsLayout( Item row )
