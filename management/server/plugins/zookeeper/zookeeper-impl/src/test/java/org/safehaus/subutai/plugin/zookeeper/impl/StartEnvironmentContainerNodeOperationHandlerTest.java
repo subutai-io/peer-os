@@ -4,8 +4,6 @@ package org.safehaus.subutai.plugin.zookeeper.impl;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.OperationState;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.common.mock.TrackerMock;
@@ -31,7 +29,8 @@ public class StartEnvironmentContainerNodeOperationHandlerTest
         when( zookeeperMock.getHadoopManager() ).thenReturn( mock( Hadoop.class ) );
         when( zookeeperMock.getCluster( anyString() ) ).thenReturn( null );
         AbstractOperationHandler operationHandler =
-                new ZookeeperNodeOperationHandler( zookeeperMock, "test-cluster", "test-node", NodeOperationType.START );
+                new ZookeeperNodeOperationHandler( zookeeperMock, "test-cluster", "test-node",
+                        NodeOperationType.START );
         operationHandler.run();
 
         assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not exist" ) );

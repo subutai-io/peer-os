@@ -40,7 +40,6 @@ import com.google.common.collect.Sets;
 public class NutchImpl implements Nutch
 {
 
-    protected Commands commands;
     private static final Logger LOG = LoggerFactory.getLogger( NutchImpl.class.getName() );
     private Tracker tracker;
     private Hadoop hadoopManager;
@@ -65,10 +64,7 @@ public class NutchImpl implements Nutch
         return hadoopManager;
     }
 
-    public Commands getCommands()
-    {
-        return commands;
-    }
+
 
     public Tracker getTracker()
     {
@@ -85,10 +81,6 @@ public class NutchImpl implements Nutch
         return environmentManager;
     }
 
-    public void setCommands( final Commands commands )
-    {
-        this.commands = commands;
-    }
 
     public void setTracker( final Tracker tracker )
     {

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
+  <reference id="peerManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
   <bean id="lxcQuotaManager" scope="singleton" class="org.safehaus.subutai.core.lxc.quota.impl.QuotaManagerImpl">
-    <argument ref="commandRunner" />
+    <argument ref="peerManager" />
   </bean>
 
   <service ref="lxcQuotaManager" interface="org.safehaus.subutai.core.lxc.quota.api.QuotaManager" />
