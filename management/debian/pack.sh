@@ -64,6 +64,7 @@ checkPackageVersion
 BASE=$(pwd)
 sh -c 'cd $BASE'
 cd ..
+ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
 MANAGEMENT_BASE=$(pwd)
 SOURCE=$MANAGEMENT_BASE"/workspace/management/server/server-karaf/target"
 BASE_SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/management/debian/management/"
@@ -133,5 +134,14 @@ cp $packageName".deb" /var/lib/jenkins/Automation/Bigdata/management/
 #editing package properties 
 chown jenkins:jenkins *.deb
 chmod -R 644 *.deb
+
+#get package latest package from ISOPATH to remove it
+removedPackage=`ls -lt $ISOPATH | grep "subutai-management" | awk '{ print $9 }' | grep .deb | head -1`
+echo "removedPackageName: $removedPackage" 
+if [ "$removedPackage" != "" ]; then
+	rm $ISOPATH/$removedPackage
+fi
+cp $packageName".deb" $ISOPATH
+
 popd
 
