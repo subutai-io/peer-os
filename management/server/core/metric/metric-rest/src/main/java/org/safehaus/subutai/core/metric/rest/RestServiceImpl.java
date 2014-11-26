@@ -11,8 +11,8 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
-import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
 import org.safehaus.subutai.core.metric.api.MonitorException;
+import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,23 +41,23 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getResourceHostMetrics()
+    public Response getResourceHostsMetrics()
     {
         try
         {
-            Set<ResourceHostMetric> metrics = monitor.getResourceHostMetrics();
+            Set<ResourceHostMetric> metrics = monitor.getResourceHostsMetrics();
             return Response.ok( JsonUtil.toJson( metrics ) ).build();
         }
         catch ( MonitorException e )
         {
-            LOG.error( "Error in getResourceHostMetrics", e );
+            LOG.error( "Error in getResourceHostsMetrics", e );
             return Response.serverError().entity( e ).build();
         }
     }
 
 
     @Override
-    public Response getContainerHostMetrics( final String uuid )
+    public Response getContainerHostsMetrics( final String uuid )
     {
         try
         {
@@ -66,7 +66,7 @@ public class RestServiceImpl implements RestService
             Environment environment = environmentManager.getEnvironmentByUUID( environmentId );
             if ( environment != null )
             {
-                Set<ContainerHostMetric> metrics = monitor.getContainerMetrics( environment );
+                Set<ContainerHostMetric> metrics = monitor.getContainerHostsMetrics( environment );
                 return Response.ok( JsonUtil.toJson( metrics ) ).build();
             }
             else
@@ -77,28 +77,28 @@ public class RestServiceImpl implements RestService
         }
         catch ( NullPointerException | IllegalArgumentException e )
         {
-            LOG.error( "Error in getContainerHostMetrics", e );
+            LOG.error( "Error in getContainerHostsMetrics", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
         catch ( MonitorException e )
         {
-            LOG.error( "Error in getContainerHostMetrics", e );
+            LOG.error( "Error in getContainerHostsMetrics", e );
             return Response.serverError().entity( e ).build();
         }
     }
 
 
     @Override
-    public Response alertThresholdExcess( final String alertMetric )
+    public Response alert( final String alertMetric )
     {
         try
         {
-            monitor.alertThresholdExcess( alertMetric );
+            monitor.alert( alertMetric );
             return Response.accepted().build();
         }
         catch ( MonitorException e )
         {
-            LOG.error( "Error in alertThresholdExcess", e );
+            LOG.error( "Error in alert", e );
             return Response.serverError().entity( e ).build();
         }
     }

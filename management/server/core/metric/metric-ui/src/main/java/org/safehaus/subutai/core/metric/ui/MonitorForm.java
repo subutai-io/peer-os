@@ -102,7 +102,7 @@ public class MonitorForm extends CustomComponent
     {
         try
         {
-            Set<ContainerHostMetric> metrics = monitor.getContainerMetrics( environment );
+            Set<ContainerHostMetric> metrics = monitor.getContainerHostsMetrics( environment );
             for ( ContainerHostMetric metric : metrics )
             {
                 addOutput( metric.toString() );
@@ -121,7 +121,7 @@ public class MonitorForm extends CustomComponent
     {
         try
         {
-            Set<ResourceHostMetric> metrics = monitor.getResourceHostMetrics();
+            Set<ResourceHostMetric> metrics = monitor.getResourceHostsMetrics();
             for ( ResourceHostMetric metric : metrics )
             {
                 addOutput( metric.toString() );

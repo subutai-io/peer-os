@@ -50,7 +50,7 @@ public class ContainerHostMetricsCommand extends OsgiCommandSupport
         Environment environment = environmentManager.getEnvironmentByUUID( environmentId );
         if ( environment != null )
         {
-            Set<ContainerHostMetric> metrics = monitor.getContainerMetrics( environment );
+            Set<ContainerHostMetric> metrics = monitor.getContainerHostsMetrics( environment );
             for ( ContainerHostMetric metric : metrics )
             {
                 System.out.println( metric );

@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.hadoop.impl;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -21,10 +22,9 @@ public class ClusterConfigurationTest {
     HadoopClusterConfig configBase;
     Environment environment;
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         trackerOperation = mock(TrackerOperation.class);
         hadoopImpl = mock(HadoopImpl.class);
-//        configBase = mock(ConfigBase.class);
         configBase = mock(HadoopClusterConfig.class);
         environment = mock(Environment.class);
         clusterConfiguration = new ClusterConfiguration(trackerOperation,hadoopImpl);
@@ -32,7 +32,7 @@ public class ClusterConfigurationTest {
 
 
     @Test
-    public void testConfigureCluster() throws Exception {
+    public void testConfigureCluster() throws ClusterConfigurationException {
         ContainerHost containerHost = mock(ContainerHost.class);
         ContainerHost containerHost2 = mock(ContainerHost.class);
         Set<ContainerHost> mySet = mock(Set.class);
@@ -66,37 +66,17 @@ public class ClusterConfigurationTest {
         when(hadoopImpl.getPluginDAO()).thenReturn(pluginDAO);
         when(pluginDAO.saveInfo(HadoopClusterConfig.PRODUCT_KEY, configBase.getClusterName(), configBase)).thenReturn(true);
 
+        UUID uuid1 = new UUID(50,50);
+        when(environment.getId()).thenReturn(uuid1);
         clusterConfiguration.configureCluster(configBase, environment);
 
         assertEquals(containerHost, environment.getContainerHostByUUID(hadoopClusterConfig.getNameNode()));
         assertEquals(containerHost,environment.getContainerHostByUUID(hadoopClusterConfig.getJobTracker()));
         assertEquals(containerHost,environment.getContainerHostByUUID(hadoopClusterConfig.getSecondaryNameNode()));
-
     }
 
     @Test
-    public void testConstructorConfigureCluster() throws  Exception {
+    public void testConstructorConfigureCluster() {
         clusterConfiguration = new ClusterConfiguration(trackerOperation,hadoopImpl);
     }
-
-//    @Test
-//    public void shouldThrowCommandExceptionInExecuteCommandOnContainer() throws Exception {
-//        ContainerHost containerHost = mock(ContainerHost.class);
-//        when(containerHost.execute(any(RequestBuilder.class))).thenThrow(CommandException.class);
-//        CommandException commandException = mock(CommandException.class);
-//
-//
-//        PluginDAO pluginDAO = mock(PluginDAO.class);
-//        HadoopClusterConfig hadoopClusterConfig = mock(HadoopClusterConfig.class);
-//        when(environment.getContainerHostByUUID(hadoopClusterConfig.getNameNode())).thenReturn(containerHost);
-//        when(environment.getContainerHostByUUID(hadoopClusterConfig.getJobTracker())).thenReturn(containerHost);
-//        when(environment.getContainerHostByUUID(hadoopClusterConfig.getSecondaryNameNode())).thenReturn(containerHost);
-//
-//
-//        when(hadoopImpl.getPluginDAO()).thenReturn(pluginDAO);
-//        when(pluginDAO.saveInfo(HadoopClusterConfig.PRODUCT_KEY, configBase.getClusterName(), configBase)).thenReturn(true);
-//
-//        clusterConfiguration.configureCluster(configBase,environment);
-//        verify(commandException).printStackTrace();
-//    }
 }

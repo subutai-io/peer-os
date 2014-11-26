@@ -140,19 +140,12 @@ public class HadoopImplTest {
 
     @Test
     public void testGetEnvironmentManager() {
-        hadoopImpl.setEnvironmentManager(environmentManager);
         hadoopImpl.getEnvironmentManager();
-
-        assertNotNull(hadoopImpl.getEnvironmentManager());
-        assertEquals(environmentManager,hadoopImpl.getEnvironmentManager());
     }
 
     @Test
     public void testSetEnvironmentManager() {
         hadoopImpl.setEnvironmentManager(environmentManager);
-        hadoopImpl.getEnvironmentManager();
-
-        assertEquals(environmentManager,hadoopImpl.getEnvironmentManager());
     }
 
     @Test

@@ -30,7 +30,7 @@ using namespace std;
 /**
  *  \details   Default constructor of SubutaiContainer class.
  */
-SubutaiContainer::SubutaiContainer(SubutaiLogger* logger, lxc_container* cont)
+SubutaiContainer::SubutaiContainer(SubutaiLogger* logger, lxc_container* cont) : _arch("")
 {
     this->container = cont;
     this->containerLogger = logger;
@@ -275,6 +275,20 @@ bool SubutaiContainer::getContainerInterfaces()
 void SubutaiContainer::setContainerHostname(string hostname)
 {
     this->hostname = hostname;
+}
+
+string SubutaiContainer::getContainerArch() {
+    if (_arch == "" && this->status == RUNNING) {
+        vector<string> args;
+        args.push_back("-m");
+        ExecutionResult ex = RunProgram("uname", args, true);
+        _arch = ex.out;
+        size_t found = _arch.find("\n");
+        if (found != string::npos) {
+            _arch = _arch.substr(0, found);
+        }
+    }
+    return _arch;
 }
 
 /**
