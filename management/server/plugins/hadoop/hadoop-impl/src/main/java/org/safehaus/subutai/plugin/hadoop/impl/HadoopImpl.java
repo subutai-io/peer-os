@@ -2,9 +2,7 @@ package org.safehaus.subutai.plugin.hadoop.impl;
 
 
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,7 +18,6 @@ import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -47,10 +44,8 @@ public class HadoopImpl implements Hadoop
     public static final int INITIAL_CAPACITY = 2;
     private static final Logger LOG = LoggerFactory.getLogger( HadoopImpl.class.getName() );
     private Tracker tracker;
-    private ContainerManager containerManager;
     private ExecutorService executor;
     private EnvironmentManager environmentManager;
-    private Commands commands;
     private PluginDAO pluginDAO;
     private DataSource dataSource;
 
@@ -58,18 +53,6 @@ public class HadoopImpl implements Hadoop
     public HadoopImpl( DataSource dataSource )
     {
         this.dataSource = dataSource;
-    }
-
-
-    public Commands getCommands()
-    {
-        return commands;
-    }
-
-
-    public void setCommands( final Commands commands )
-    {
-        this.commands = commands;
     }
 
 
@@ -102,18 +85,6 @@ public class HadoopImpl implements Hadoop
     public void setTracker( final Tracker tracker )
     {
         this.tracker = tracker;
-    }
-
-
-    public ContainerManager getContainerManager()
-    {
-        return containerManager;
-    }
-
-
-    public void setContainerManager( final ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
     }
 
 
@@ -489,7 +460,7 @@ public class HadoopImpl implements Hadoop
         environmentBlueprint.setLinkHosts( true );
         environmentBlueprint.setExchangeSshKeys( true );
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
-//        Set<NodeGroup> nodeGroups = new HashSet<>( INITIAL_CAPACITY );
+        //        Set<NodeGroup> nodeGroups = new HashSet<>( INITIAL_CAPACITY );
 
         NodeGroup nodeGroup = new NodeGroup();
         nodeGroup.setName( "Hadoop node group" );
