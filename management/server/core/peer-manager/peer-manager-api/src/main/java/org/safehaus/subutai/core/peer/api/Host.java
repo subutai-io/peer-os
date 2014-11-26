@@ -11,6 +11,7 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 
 
 /**
@@ -50,9 +51,7 @@ public interface Host extends Serializable
 
     public void executeAsync( RequestBuilder requestBuilder ) throws CommandException;
 
-    void updateHeartbeat();
-
-    void resetHeartbeat();
+    void updateHostInfo( HostInfo hostInfo );
 
     public boolean isConnected();
 

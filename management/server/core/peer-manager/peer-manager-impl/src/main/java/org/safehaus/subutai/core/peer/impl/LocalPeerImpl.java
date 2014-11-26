@@ -26,6 +26,7 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
+import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
@@ -35,7 +36,6 @@ import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.CloneParam;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.ContainerState;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.HostEvent;
 import org.safehaus.subutai.core.peer.api.HostEventListener;
@@ -142,7 +142,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
         for ( ResourceHost resourceHost : resourceHosts )
         {
-            resourceHost.resetHeartbeat();
+            //            resourceHost.resetHeartbeat();
         }
         hostRegistry.addHostListener( this );
         sequences = new ConcurrentHashMap<>();
@@ -699,12 +699,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         {
             if ( resourceHost.startContainerHost( containerHost ) )
             {
-                containerHost.setState( ContainerState.RUNNING );
+                //                containerHost.setState( ContainerHostState.RUNNING );
             }
         }
         catch ( ResourceHostException e )
         {
-            containerHost.setState( ContainerState.UNKNOWN );
+            //            containerHost.setState( ContainerState.UNKNOWN );
             throw new PeerException( String.format( "Could not start LXC container [%s]", e.toString() ) );
         }
         catch ( Exception e )
@@ -724,12 +724,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         {
             if ( resourceHost.stopContainerHost( containerHost ) )
             {
-                containerHost.setState( ContainerState.STOPPED );
+                //                containerHost.setState( ContainerState.STOPPED );
             }
         }
         catch ( ResourceHostException e )
         {
-            containerHost.setState( ContainerState.UNKNOWN );
+            //            containerHost.setState( ContainerState.UNKNOWN );
             throw new PeerException( String.format( "Could not stop LXC container [%s]", e.toString() ) );
         }
         catch ( Exception e )
@@ -771,6 +771,19 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         try
         {
             Host h = bindHost( host.getId() );
+
+            if ( h instanceof ContainerHost )
+            {
+                if ( ContainerHostState.RUNNING.equals( ( ( ContainerHost ) h ).getState() ) )
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
             if ( isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME ) )
             {
                 return false;
@@ -1057,7 +1070,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 managementHostDataService.persist( ( ManagementHostEntity ) managementHost );
                 managementHost.addListener( this );
             }
-            managementHost.updateHeartbeat();
+            managementHost.updateHostInfo( resourceHostInfo );
             //            peerDAO.saveInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId().toString(), managementHost );
             return;
         }
@@ -1087,7 +1100,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                             host.addContainerHost( ( ContainerHostEntity ) containerHost );
                             newContainer = true;
                         }
-                        containerHost.updateHeartbeat();
+                        containerHost.updateHostInfo( containerHostInfo );
                     }
                     if ( newContainer )
                     {
@@ -1103,7 +1116,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 addResourceHost( host );
                 host.addListener( this );
             }
-            host.updateHeartbeat();
+            host.updateHostInfo( resourceHostInfo );
             //            peerDAO.saveInfo( SOURCE_RESOURCE_HOST, host.getId().toString(), host );
             return;
         }

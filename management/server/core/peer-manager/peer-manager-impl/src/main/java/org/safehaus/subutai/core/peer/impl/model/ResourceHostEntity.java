@@ -91,7 +91,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     private ExecutorService getSingleThreadExecutorService()
     {
-        if ( singleThreadExecutorService == null )
+        if ( singleThreadExecutorService == null || singleThreadExecutorService.isShutdown() )
         {
             singleThreadExecutorService = Executors.newSingleThreadExecutor();
         }
@@ -504,7 +504,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     //        containerHost.setCreatorPeerId( creatorPeerId );
     //        containerHost.setTemplateName( templateName );
     //        containerHost.setTemplateArch( "amd64" );
-    //        containerHost.updateHeartbeat();
+    //        containerHost.updateHostInfo();
     //        addContainerHost( containerHost );
     //        return containerHost;
     //    }
@@ -809,7 +809,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     enum Command
     {
         LIST_TEMPLATES( "subutai list -t %s" ),
-        CLONE( "subutai clone %s %s", 180 ),
+        CLONE( "subutai clone %s %s", 120 ),
         DESTROY( "subutai destroy %s" ),
         IMPORT( "subutai import %s" ),
         PROMOTE( "promote %s" ),
@@ -825,7 +825,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         String script;
         boolean daemon = false;
-        int timeout = 180;
+        int timeout = 120;
 
 
         Command( String script )

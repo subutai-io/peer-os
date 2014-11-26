@@ -1,6 +1,11 @@
 package org.safehaus.subutai.core.peer.impl.model;
 
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -120,5 +125,13 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         {
             throw new PeerException( "Could not add remote host as apt source", e.toString() );
         }
+    }
+
+
+    @Override
+    public String readFile( final String path ) throws IOException
+    {
+        byte[] encoded = Files.readAllBytes( Paths.get( path ) );
+        return new String( encoded, Charset.defaultCharset() );
     }
 }

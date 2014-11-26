@@ -5,17 +5,17 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
+import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.ContainerState;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -41,8 +41,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     private String templateName;
     @Column( name = "template_arch", nullable = false )
     private String templateArch;
-    @Enumerated( EnumType.STRING )
-    private ContainerState state = ContainerState.UNKNOWN;
+    @Transient
+    private volatile ContainerHostState state = ContainerHostState.STOPPED;
     @Column( name = "node_group_name", nullable = false )
     private String nodeGroupName;
     //    @Column( name = "parent_host_name", nullable = false )
@@ -140,17 +140,10 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public ContainerState getState()
+    public ContainerHostState getState()
     {
         return state;
     }
-
-
-    public void setState( final ContainerState state )
-    {
-        this.state = state;
-    }
-
 
     public ResourceHost getParent()
     {
@@ -189,6 +182,16 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         Peer peer = getPeer();
         peer.destroyContainer( this );
+    }
+
+
+    @Override
+    public void updateHostInfo( final HostInfo hostInfo )
+    {
+        super.updateHostInfo( hostInfo );
+
+        ContainerHostInfo conatinerHostInfo = ( ContainerHostInfo ) hostInfo;
+        this.state = conatinerHostInfo.getStatus();
     }
 
 

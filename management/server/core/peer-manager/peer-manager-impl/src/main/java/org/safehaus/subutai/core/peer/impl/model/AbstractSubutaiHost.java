@@ -66,7 +66,7 @@ public abstract class AbstractSubutaiHost implements Host
     protected Set<HostInterface> interfaces = new HashSet<>();
 
     @Transient
-    protected long lastHeartbeat = 0;
+    protected volatile long lastHeartbeat = 0;
     @Transient
     protected Set<HostEventListener> eventListeners = Sets.newConcurrentHashSet();
 
@@ -243,19 +243,9 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     @Override
-    public void updateHeartbeat()
+    public void updateHostInfo( final HostInfo hostInfo )
     {
         lastHeartbeat = System.currentTimeMillis();
-    }
-
-
-    @Override
-    public void resetHeartbeat()
-    {
-        if ( lastHeartbeat > 10 * 100 * 6 )
-        {
-            lastHeartbeat -= 10 * 10 * 6;
-        }
     }
 
 

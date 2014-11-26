@@ -437,10 +437,10 @@ public class MonitorImpl implements Monitor
             if ( containerHost != null )
             {
                 //set metric's environment id for future reference on the receiving end
-                containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
+                containerHostMetric.setEnvironmentId( UUID.fromString( containerHost.getEnvironmentId() ) );
 
                 //find container's creator peer
-                Peer creatorPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
+                Peer creatorPeer = peerManager.getPeer( UUID.fromString( containerHost.getCreatorPeerId() ) );
 
                 //if container is "created" by local peer, notifyOnAlert local peer
                 if ( creatorPeer.isLocal() )

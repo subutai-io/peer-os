@@ -11,24 +11,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.apt.api.AptRepoException;
-import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.peer.api.ManagementHost;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.safehaus.subutai.core.repository.api.RepositoryException;
+import org.safehaus.subutai.core.repository.api.RepositoryManager;
 import org.safehaus.subutai.core.template.api.TemplateManager;
+import org.slf4j.LoggerFactory;
+
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
@@ -36,13 +37,14 @@ import com.google.common.hash.Hashing;
 
 public class RestServiceImpl implements RestService
 {
-
-    private static final Logger logger = Logger.getLogger( RestServiceImpl.class.getName() );
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class );
     TemplateManager templateManager;
     TemplateRegistry templateRegistry;
-    AptRepositoryManager aptRepoManager;
-    AgentManager agentManager;
+    RepositoryManager repoManager;
+    //    AgentManager agentManager;
     CommandRunner commandRunner;
+    PeerManager peerManager;
+
     private String managementHostName = "management";
 
 
@@ -58,21 +60,27 @@ public class RestServiceImpl implements RestService
     }
 
 
-    public void setAptRepoManager( AptRepositoryManager aptRepoManager )
+    public void setRepoManager( RepositoryManager repoManager )
     {
-        this.aptRepoManager = aptRepoManager;
+        this.repoManager = repoManager;
     }
 
 
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }
+    //    public void setAgentManager( AgentManager agentManager )
+    //    {
+    //        this.agentManager = agentManager;
+    //    }
 
 
     public void setCommandRunner( CommandRunner commandRunner )
     {
         this.commandRunner = commandRunner;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
     }
 
 
@@ -91,12 +99,18 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response importTemplate( InputStream in, String configDir )
+    public Response importTemplate( final Attachment attachment, String configDir )
     {
+        if ( configDir.charAt( 0 ) == '/' )
+        {
+            configDir = configDir.substring( 1 );
+        }
+        String packageName = attachment.getContentDisposition().getParameter( "filename" );
         Path path;
         try
         {
             path = Files.createTempFile( "subutai-template-", ".deb" );
+            InputStream in = attachment.getObject( InputStream.class );
             try ( OutputStream os = new FileOutputStream( path.toFile() ) )
             {
                 int len;
@@ -107,27 +121,42 @@ public class RestServiceImpl implements RestService
                 }
                 os.flush();
             }
-            logger.info( "Payload saved to " + path.toString() );
+            LOG.info( "Payload saved to " + path.toString() );
         }
         catch ( IOException ex )
         {
             String m = "Failed to write payload data to file";
-            logger.log( Level.SEVERE, m, ex );
+            LOG.error( m, ex );
             return Response.serverError().build();
         }
 
-        Agent mgmt = agentManager.getAgentByHostname( managementHostName );
+        //        Agent mgmt = agentManager.getAgentByHostname( managementHostName );
         try
         {
             Path configPath = Paths.get( configDir, "config" );
             Path packagesPath = Paths.get( configDir, "packages" );
-            List<String> files = aptRepoManager.readFileContents( mgmt, path.toString(),
-                    Arrays.asList( configPath.toString(), packagesPath.toString() ) );
+
+            Set<String> files = new HashSet<>();
+            files.add( configPath.toString() );
+            files.add( packagesPath.toString() );
+
+            repoManager.extractPackageFiles( packageName, files );
+
+            ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
+
+            String configContent = managementHost.readFile(
+                    String.format( "/tmp/%s/%s", packageName.replace( ".deb", "" ), configPath.toString() ) );
+
+            String packagesContent = managementHost.readFile(
+                    String.format( "/tmp/%s/%s", packageName.replace( ".deb", "" ), packagesPath.toString() ) );
+
+            //            List<String> files = repoManager.readFileContents( mgmt, path.toString(),
+            //                    Arrays.asList( configPath.toString(), packagesPath.toString() ) );
 
             HashCode md5 = com.google.common.io.Files.hash( path.toFile(), Hashing.md5() );
             String md5sum = md5.toString();
 
-            String templateName = retrieveTemplateName( files.get( 0 ) );
+            String templateName = retrieveTemplateName( configContent );
             String debPack = templateManager.getDebianPackageName( templateName );
             path = movePath( path, debPack + ".deb" );
             if ( path == null )
@@ -135,19 +164,19 @@ public class RestServiceImpl implements RestService
                 throw new Exception( "Failed to rename uploaded package" );
             }
 
-            aptRepoManager.addPackageByPath( mgmt, path.toString(), false );
-            templateRegistry.registerTemplate( files.get( 0 ), files.get( 1 ), md5sum );
+            repoManager.addPackageByPath( path.toString() );
+            templateRegistry.registerTemplate( configContent, packagesContent, md5sum );
         }
-        catch ( AptRepoException ex )
+        catch ( RepositoryException ex )
         {
             String m = "Failed to process deb package";
-            logger.log( Level.SEVERE, m, ex );
+            LOG.error( m, ex );
             return Response.serverError().build();
         }
         catch ( Exception ex )
         {
             String m = "Import of package failed";
-            logger.log( Level.SEVERE, m, ex );
+            LOG.error( m, ex );
             return Response.serverError().build();
         }
         finally
@@ -158,7 +187,7 @@ public class RestServiceImpl implements RestService
                 path.toFile().delete();
             }
         }
-        logger.info( "Template package successfully imported." );
+        LOG.info( "Template package successfully imported." );
         return Response.ok().build();
     }
 
@@ -187,26 +216,26 @@ public class RestServiceImpl implements RestService
         try
         {
             templateRegistry.unregisterTemplate( templateName );
-            logger.info( String.format( "Template unregistered: %s", templateName ) );
+            LOG.info( String.format( "Template unregistered: %s", templateName ) );
         }
         catch ( RegistryException ex )
         {
-            logger.log( Level.SEVERE, "Failed to unregister template", ex );
+            LOG.error( "Failed to unregister template", ex );
             return Response.serverError().build();
         }
 
         String pack_name = templateManager.getPackageName( templateName );
-        Agent mgmt = agentManager.getAgentByHostname( managementHostName );
+        //        Agent mgmt = agentManager.getAgentByHostname( managementHostName );
         try
         {
-            aptRepoManager.removePackageByName( mgmt, pack_name );
-            logger.info( String.format( "Package removed from repository: %s", pack_name ) );
+            repoManager.removePackageByName( pack_name );
+            LOG.info( String.format( "Package removed from repository: %s", pack_name ) );
 
             removeDebianPackage( templateName );
         }
-        catch ( AptRepoException ex )
+        catch ( RepositoryException ex )
         {
-            logger.log( Level.SEVERE, "Failed to remove from repo", ex );
+            LOG.error( "Failed to remove from repo", ex );
             return Response.serverError().build();
         }
 
@@ -219,7 +248,7 @@ public class RestServiceImpl implements RestService
         String deb_pack = templateManager.getDebianPackageName( templateName );
         if ( deb_pack == null )
         {
-            logger.log( Level.WARNING, "Can't get Debian package name for {0}", templateName );
+            LOG.error( "Can't get Debian package name for {0}", templateName );
             return;
         }
         deb_pack += ".deb";
@@ -228,11 +257,11 @@ public class RestServiceImpl implements RestService
         try
         {
             Files.delete( path );
-            logger.log( Level.INFO, "Removed package file {0}", path );
+            LOG.info( "Removed package file {0}", path );
         }
         catch ( IOException ex )
         {
-            logger.log( Level.SEVERE, "Failed to remove package file " + deb_pack, ex );
+            LOG.error( "Failed to remove package file " + deb_pack, ex );
         }
     }
 
@@ -247,7 +276,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( IOException ex )
         {
-            logger.log( Level.SEVERE, "Failed to retrieve template name from config: {}", ex.getMessage() );
+            LOG.error( "Failed to retrieve template name from config: {}", ex.getMessage() );
         }
         return null;
     }
@@ -263,7 +292,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( IOException ex )
         {
-            logger.log( Level.SEVERE, "Failed to move package file: {0}", ex.getMessage() );
+            LOG.error( "Failed to move package file: {0}", ex.getMessage() );
         }
         return null;
     }
