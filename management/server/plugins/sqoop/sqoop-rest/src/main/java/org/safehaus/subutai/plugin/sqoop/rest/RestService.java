@@ -16,7 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.sqoop.api.DataSourceType;
 import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
@@ -33,14 +32,6 @@ public class RestService
     private static final String OPERATION_ID = "OPERATION_ID";
 
     private Sqoop sqoopManager;
-
-    private AgentManager agentManager;
-
-
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }
 
 
     public void setSqoopManager( Sqoop sqoopManager )
@@ -93,7 +84,7 @@ public class RestService
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
         return Response.status( Response.Status.CREATED ).entity( operationId ).build();
     }
-    
+
 
     @DELETE
     @Path( "clusters/{clusterName}/nodes/{hostname}" )

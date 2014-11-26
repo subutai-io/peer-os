@@ -1,18 +1,11 @@
 package org.safehaus.subutai.plugin.zookeeper.impl;
 
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
-import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
 import org.safehaus.subutai.plugin.common.mock.TrackerMock;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
@@ -40,8 +33,8 @@ public class AddEnvironmentContainerNodeOperationHandlerTest
         when( zookeeperMock.getHadoopManager() ).thenReturn( mock( Hadoop.class ) );
         when( zookeeperMock.getCluster( anyString() ) ).thenReturn( null );
         when( config.getClusterName() ).thenReturn( "test" );
-        AbstractOperationHandler operationHandler = new ZookeeperClusterOperationHandler( zookeeperMock, config,
-                ClusterOperationType.ADD );
+        AbstractOperationHandler operationHandler =
+                new ZookeeperClusterOperationHandler( zookeeperMock, config, ClusterOperationType.ADD );
         operationHandler.run();
 
         assertTrue( operationHandler.getTrackerOperation().getLog().contains( "Not supported SetupType" ) );
@@ -64,8 +57,8 @@ public class AddEnvironmentContainerNodeOperationHandlerTest
         when( config.getSetupType() ).thenReturn( SetupType.STANDALONE );
 
 
-        AbstractOperationHandler operationHandler = new ZookeeperClusterOperationHandler( zookeeperMock, config,
-                ClusterOperationType.ADD );
+        AbstractOperationHandler operationHandler =
+                new ZookeeperClusterOperationHandler( zookeeperMock, config, ClusterOperationType.ADD );
         operationHandler.run();
 
         assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not supported" ) );

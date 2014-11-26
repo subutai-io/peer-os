@@ -23,7 +23,7 @@ import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.nutch.api.NutchConfig;
 import org.safehaus.subutai.plugin.nutch.api.SetupType;
-import org.safehaus.subutai.plugin.nutch.impl.Commands;
+import org.safehaus.subutai.plugin.nutch.impl.Constants;
 import org.safehaus.subutai.plugin.nutch.impl.NutchImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -191,7 +191,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<NutchImpl,
             CommandResult result = null;
             try
             {
-                result = containerHost.execute( new RequestBuilder( Commands.UNINSTALL ) );
+                result = containerHost.execute( new RequestBuilder( Constants.UNINSTALL ) );
                 if ( !result.hasSucceeded() )
                 {
                     po.addLog( result.getStdErr() );

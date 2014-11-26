@@ -573,7 +573,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     {
         try
         {
-            return quotaManager.getQuota( host.getHostname(), quota, host.getParentAgent() );
+            return quotaManager.getQuota( host.getHostname(), quota );
         }
         catch ( QuotaException e )
         {
@@ -587,7 +587,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, ResponseListener,
     {
         try
         {
-            quotaManager.setQuota( host.getHostname(), quota, value, host.getParentAgent() );
+            quotaManager.setQuota( host.getHostname(), quota, value );
         }
         catch ( QuotaException e )
         {
