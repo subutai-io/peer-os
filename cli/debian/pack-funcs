@@ -123,7 +123,7 @@ generateRepoPackage() {
      #remove cli-management package from pool/extras
      removedPackage=`ls -lt $ISOPATH | grep "subutai-$productName" | awk '{ print $9 }' | grep .deb | head -1`
      echo "removedPackageName: $removedPackage" 
-     if [ "$removedPackage" != "" ]; then
+     if [ ! -z "$removedPackage" ]; then
         rm $ISOPATH/$removedPackage
      fi
      #copy debian package to pool/extras
