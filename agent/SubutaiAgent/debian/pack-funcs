@@ -3,8 +3,8 @@ set -e
 # Check if any deb file exists!!!
 
 checkPackageVersion() {
-
-  CONTROL="$1/SubutaiAgent/debian/Agent/DEBIAN/control"
+	SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/agent/"
+  CONTROL="$SOURCE/SubutaiAgent/debian/Agent/DEBIAN/control"
 
   lineNumberVersion=$(sed -n '/Version:/=' $CONTROL)
   lineVersion=$(sed $lineNumberVersion!d $CONTROL)
@@ -80,8 +80,9 @@ removePreviousVersionSource() {
 
 
 getNewVersionSource() {
-	cp $1/SubutaiAgent/src/* ../../Agent/autoconf/src/
-	cp $1/SubutaiAgent/debian/Agent/autoconf/* ../../Agent/autoconf/src/
+	SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/agent/"
+	cp $SOURCE/SubutaiAgent/src/* ../../Agent/autoconf/src/
+	cp $SOURCE/SubutaiAgent/debian/Agent/autoconf/* ../../Agent/autoconf/src/
 }
 
 runMake() {
@@ -92,43 +93,31 @@ runMake() {
 }
 
 getSourcesToRelevantDirectories() {
+	SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/agent/"
 	fileName=`ls | grep subutai|  awk '{print $1}' | head -1`
 
 	strip ../autoconf/src/subutai-agent
 	cp ../autoconf/src/subutai-agent $fileName/sbin/
-	cp $1/SubutaiAgent/config/agent.xml $fileName/etc/subutai-agent/
+	cp $SOURCE/SubutaiAgent/config/agent.xml $fileName/etc/subutai-agent/
 
 	if [ -f $fileName/DEBIAN/control ] ; then
 		rm $fileName/DEBIAN/*
 	fi
-	cp $1/SubutaiAgent/debian/Agent/DEBIAN/* $fileName/DEBIAN/
+	cp $SOURCE/SubutaiAgent/debian/Agent/DEBIAN/* $fileName/DEBIAN/
 }
 
 createDebian() {
 	fileName=`ls | grep subutai|  awk '{print $1}' | head -1`
-	echo $fileName
 	lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
-	lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
-	echo $lineNumberVersion
-	echo $lineNumberPackage
 	lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
-	linePackage=$(sed $lineNumberPackage!d $fileName/DEBIAN/control)
-
-	echo $lineVersion
-	echo $linePackage
-
 	version=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
-	package=$(echo $linePackage | awk -F":" '{split($2,a," ");print a[1]}')
-
+	packageName="subutai-agent_"$version"_amd64"
+	mv $fileName $packageName
+	echo $fileName
+	echo $lineNumberVersion
+	echo $lineVersion
 	echo $version
-	echo $package
-
-	packageName=$package"_"$version"_amd64"
 	echo $packageName $fileName
-
-	if [ "$packageName" != "$fileName" ] ; then
-		 mv $fileName $packageName
-	fi
 
 	find ./$packageName -name "*~" -print0 | xargs -0 rm -rf
 	md5sum `find ./$packageName -type f | awk '/.\//{ print substr($0, 3) }'` >> $packageName/DEBIAN/md5sums
