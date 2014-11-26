@@ -17,8 +17,6 @@ import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
@@ -63,8 +61,6 @@ public class Manager
     private final ExecutorService executorService;
     private final Tracker tracker;
     private final Mongo mongo;
-    private final AgentManager agentManager;
-    private final CommandRunner commandRunner;
     private MongoClusterConfig mongoClusterConfig;
 
 
@@ -74,8 +70,6 @@ public class Manager
         this.executorService = executorService;
         this.tracker = serviceLocator.getService( Tracker.class );
         this.mongo = serviceLocator.getService( Mongo.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -357,19 +351,22 @@ public class Manager
                 {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
-                    {
-                        //                        TerminalWindow terminal =
-                        //                                new TerminalWindow( Sets.newHashSet( lxcAgent ),
-                        // executorService, commandRunner,
-                        //                                        agentManager );
-                        //                        contentRoot.getUI().addWindow( terminal.getWindow() );
-                    }
-                    else
-                    {
-                        show( "Agent is not connected" );
-                    }
+                    //TODO please use ContainerHost.isConnected method here to check of host is connected
+                    //                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
+                    //                    if ( lxcAgent != null )
+                    //                    {
+                    //                        //                        TerminalWindow terminal =
+                    //                        //                                new TerminalWindow( Sets.newHashSet(
+                    // lxcAgent ),
+                    //                        // executorService, commandRunner,
+                    //                        //                                        agentManager );
+                    //                        //                        contentRoot.getUI().addWindow( terminal
+                    // .getWindow() );
+                    //                    }
+                    //                    else
+                    //                    {
+                    //                        show( "Agent is not connected" );
+                    //                    }
                 }
             }
         } );

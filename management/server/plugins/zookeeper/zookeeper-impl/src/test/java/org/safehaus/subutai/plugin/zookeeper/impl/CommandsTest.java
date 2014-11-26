@@ -1,11 +1,8 @@
 package org.safehaus.subutai.plugin.zookeeper.impl;
 
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.plugin.common.mock.CommandRunnerMock;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -15,6 +12,7 @@ public class CommandsTest
 {
 
     private static Commands commands;
+
 
     @Test
     public void testInstallCommand()

@@ -25,7 +25,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>command-runner-api</artifactId>
+      <artifactId>peer-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

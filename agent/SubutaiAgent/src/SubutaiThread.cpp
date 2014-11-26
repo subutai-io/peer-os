@@ -800,10 +800,8 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                 // Execute command
                 string execCmd = createExecString(command);
                 if (command->getIsDaemon()) {
-                    string cmd = createExecString(command);
-                    cmd.append(" &");
-                    system(cmd.c_str());
-                }
+                    execCmd.append(" &");
+                } 
                 val = system(execCmd.c_str());
             } else {
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is starting!! on a container", "pid", pidchldnumstr));

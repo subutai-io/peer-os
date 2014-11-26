@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
@@ -77,16 +76,13 @@ public class MockUtils
     {
         List<ServerMetric> result = new ArrayList<>();
 
-        Map<MetricType, Double> avgMetric = new HashMap<>();
-        avgMetric.put( MetricType.CPU_USER, 1.0 );
-        avgMetric.put( MetricType.MEM_FREE, 4096.0 );
+
         Set<Agent> physicalAgents = getPhysicalAgents();
         int i = 0;
         for ( Agent agent : physicalAgents )
         {
-            ServerMetric metric =
-                    new ServerMetric( agent.getHostname(), 20000 + ( i++ ), 40000 + ( i++ ), 30 + ( i++ ), 4 + ( i++ ),
-                            avgMetric );
+            ServerMetric metric = new ServerMetric( agent.getHostname(), 20000 + ( i++ ), 40000 + ( i++ ), 30 + ( i++ ),
+                    4 + ( i++ ) );
             result.add( metric );
         }
         return result;

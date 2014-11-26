@@ -20,8 +20,9 @@
     <module>apt-repository-manager</module>
     <module>command-runner</module>
     <module>communication-manager</module>
-    <module>monitoring</module>
-    <module>container-manager</module>
+    <module>template-manager</module>
+    <!--<module>container-manager</module>-->
+    <!--<module>monitoring</module>-->
     <module>file-tracker</module>
     <module>environment-manager</module>
     <module>environment-terminal</module>
@@ -31,7 +32,6 @@
     <module>security-manager</module>
     <module>peer-manager</module>
     <module>strategy-manager</module>
-    <module>template-manager</module>
     <module>template-registry</module>
     <module>tracker</module>
     <module>metric</module>

@@ -10,13 +10,10 @@
       <cxf:logging />
     </cxf:features>
   </cxf:bus>
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
   <reference id="hiveManager" availability="mandatory" interface="org.safehaus.subutai.plugin.hive.api.Hive" />
 
   <bean id="restService" class="org.safehaus.subutai.plugin.hive.rest.RestService">
-    <property name="agentManager" ref="agentManager" />
     <property name="hiveManager" ref="hiveManager" />
   </bean>
 
