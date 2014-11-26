@@ -3,6 +3,13 @@
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
 
+  <reference id="hadoop" availability="mandatory"
+             interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
+  <reference id="accumulo" availability="mandatory"
+             interface="org.safehaus.subutai.plugin.accumulo.api.Accumulo" />
+  <reference id="tracker" availability="mandatory"
+             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+
   <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.accumulo.ui.AccumuloPortalModule"
         init-method="init" destroy-method="destroy">
   </bean>
