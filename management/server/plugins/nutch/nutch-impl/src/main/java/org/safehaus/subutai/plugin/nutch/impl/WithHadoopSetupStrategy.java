@@ -70,7 +70,7 @@ class WithHadoopSetupStrategy extends NutchSetupStrategy
 
                 config.getHadoopNodes().add( container.getId() );
 
-                if ( container.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
+                if ( container.getTemplate().getProducts().contains( Constants.PACKAGE_NAME ) )
                 {
                     config.getNodes().add( container.getId() );
                 }

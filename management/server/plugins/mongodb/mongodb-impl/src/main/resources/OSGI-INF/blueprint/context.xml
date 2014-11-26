@@ -9,10 +9,6 @@
 
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
-  <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
   <reference id="environmentManager" availability="mandatory"
@@ -21,8 +17,6 @@
   <bean id="mongo-impl" scope="singleton" class="org.safehaus.subutai.plugin.mongodb.impl.MongoImpl"
         init-method="init" destroy-method="destroy">
     <property name="tracker" ref="tracker" />
-    <property name="commandRunner" ref="commandRunner" />
-    <property name="agentManager" ref="agentManager" />
     <property name="peerManager" ref="peerManager" />
     <property name="environmentManager" ref="environmentManager" />
     <argument ref="dataSource" />

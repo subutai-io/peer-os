@@ -7,9 +7,7 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
@@ -23,7 +21,6 @@ public class RestServiceImpl implements RestService
 
     private static final String OPERATION_ID = "OPERATION_ID";
     private Hadoop hadoopManager;
-    private AgentManager agentManager;
 
 
     public Hadoop getHadoopManager()
@@ -163,9 +160,8 @@ public class RestServiceImpl implements RestService
     @Override
     public Response statusDataNode( String clusterName, String hostname )
     {
-        Agent agent = agentManager.getAgentByHostname( hostname );
         String operationId = JsonUtil.toJson( OPERATION_ID,
-                hadoopManager.statusDataNode( hadoopManager.getCluster( clusterName ), agent.getHostname() ) );
+                hadoopManager.statusDataNode( hadoopManager.getCluster( clusterName ), hostname ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
 
@@ -173,10 +169,9 @@ public class RestServiceImpl implements RestService
     @Override
     public Response statusTaskTracker( String clusterName, String hostname )
     {
-        Agent agent = agentManager.getAgentByHostname( hostname );
         HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( clusterName );
-        String operationId = JsonUtil.toJson( OPERATION_ID,
-                hadoopManager.statusTaskTracker( hadoopClusterConfig, agent.getHostname() ) );
+        String operationId =
+                JsonUtil.toJson( OPERATION_ID, hadoopManager.statusTaskTracker( hadoopClusterConfig, hostname ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
 }
