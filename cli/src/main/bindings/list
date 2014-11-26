@@ -139,9 +139,9 @@ function list_containers {
   local lxc_list=`lxc-ls`
   local mode="$2"
   local containers="$1"
-
+  local lxc_list_fancy=`lxc-ls -f`
   if [ -z "$containers" ]; then
-    for container in `lxc-ls`; do
+    for container in $lxc_list; do
       if [ -z "`echo $templates | grep $container`" ]; then
         containers="$containers $container"
       fi
@@ -167,7 +167,7 @@ function list_containers {
     fi
 
     if [ -z "$mode" ]; then
-      echo $container
+      echo "$lxc_list_fancy" | grep -w "$container"
     elif [ "ancestors" == "$mode" ]; then 
       echo -e "$container\t\t`get_ancestor_list $container`"
     elif [ "parents" == "$mode" ]; then 

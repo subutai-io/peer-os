@@ -24,12 +24,18 @@ public class GitChangedFile
     }
 
 
+    /**
+     * Returns status of a changed file
+     */
     public GitFileStatus getGitFileStatus()
     {
         return gitFileStatus;
     }
 
 
+    /**
+     * Returns path of a changed file
+     */
     public String getGitFilePath()
     {
         return gitFilePath;

@@ -33,7 +33,7 @@ import com.google.gson.JsonSyntaxException;
  */
 public class MessengerImpl implements Messenger, MessageProcessor
 {
-    protected static Logger LOG = LoggerFactory.getLogger( MessengerImpl.class.getName() );
+    private static Logger LOG = LoggerFactory.getLogger( MessengerImpl.class.getName() );
     protected final Set<MessageListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MessageListener, Boolean>() );
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();

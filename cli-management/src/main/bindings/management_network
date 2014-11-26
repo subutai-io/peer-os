@@ -26,13 +26,13 @@ Usage:   Delete a Open flow rule from a bridge
         "subutai \[-qh\] management_network -d BRIDGENAME MATCHCASE
 *******************************************************************************
 Usage:   Create a n2n Tunnel                 
-        "subutai \[-qh\] management_network -N SUPERNODEIPADDRESS SUPERNODEPORT INTERFACENAME COMMUNITYNAME LOCALPEERIPADDRESS
+        "subutai \[-qh\] management_network -N SUPERNODEIPADDRESS SUPERNODEPORT INTERFACENAME COMMUNITYNAME LOCALPEERIPADDRESS KEYTYPE KEYFILE
 
 Usage:   List opened n2n Tunnels                 
         "subutai \[-qh\] management_network -L
 
 Usage:   Remove a n2n Tunnel                 
-        "subutai \[-qh\] management_network -R COMMUNITYNAME INTERFACENAME
+        "subutai \[-qh\] management_network -R INTERFACENAME COMMUNITYNAME
 ******************************************************************************
 Usage:   Create a gateway tap device                 
         "subutai \[-qh\] management_network -T VLANIP/SUBNET VLANID
@@ -63,7 +63,9 @@ function management_network {
   local interfaceName
   local communityName
   local localPeerIpAddress
-  
+  local keyType
+  local keyFile  
+
   local createTunnel="false"
   local listTunnel="false"
   local removeTunnel="false"
@@ -321,7 +323,9 @@ function management_network {
       interfaceName="$3"
       communityName="$4"
       localPeerIpAddress="$5"
-      extra="$6"
+      keyType="$6"
+      keyFile="$7"
+      extra="$8"
 
       if [ -z "$supernodeIpAddress" ]; then
          msg_error "supernodeIpAddress Parameter not provided. Aborting ..."
@@ -347,6 +351,18 @@ function management_network {
          msg_error "localPeerIpAddress Parameter not provided. Aborting ..."
          show_usage "`management_network_usage`"
       fi
+    
+      #keytype can be keystring or TWOFISH key.
+      if [ -z "$keyType" ]; then
+         msg_error "keytype Parameter not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
+      
+      #keyfile accordingly provided from a file or a keystring
+      if [ -z "$keyFile" ]; then
+         msg_error "keyfile Parameter not provided. Aborting ..."
+         show_usage "`management_network_usage`"
+      fi
 
       if [ "$extra" ]; then
          msg_error "extra Parameter provided. Aborting ..."
@@ -355,8 +371,15 @@ function management_network {
 
       net_check_N2N_IpAddress $supernodeIpAddress $localPeerIpAddress
       net_check_portNumber $supernodePort
+      net_check_keyType $keyType
       
-      edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -k secret -r -a $localPeerIpAddress
+      if [ $keyType = "string" ]; then 
+         edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -k $keyFile -r -a $localPeerIpAddress
+      elif [ $keyType = "file" ]; then 
+         net_check_keyFile $keyFile
+         edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -K $keyFile -r -a $localPeerIpAddress
+      fi
+
       msg_info "New Com device is created: $interfaceName"
       msg_info "New CommunityName is created: $communityName"
      
@@ -369,7 +392,7 @@ function management_network {
    fi
 
    if [ "true" == "$removeN2NTunnel" ]; then
-     kill -9 `ps aux | grep -e "-c $1" | grep -e "-d $2" | grep -v "\-\-color" | awk -F" " '{print $2}'` > /dev/null 2>&1
+     kill -9 `ps aux | grep -e "-c $2" | grep -e "-d $1" | grep -v "\-\-color" | awk -F" " '{print $2}'` > /dev/null 2>&1
      if [ "$?" != "0" ]; then
        msg_error "Removing Tunnel Failed!"
        show_usage "`management_network_usage`"

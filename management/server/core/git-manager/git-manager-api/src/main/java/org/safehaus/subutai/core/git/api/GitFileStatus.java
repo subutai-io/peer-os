@@ -13,7 +13,8 @@ public enum GitFileStatus
     DELETED( "D" ),
     UNMERGED( "U" ),
     UNVERSIONED( "X" ),
-    UNMODIFIED( "" );
+    UNMODIFIED( "" ),
+    UNKNOWN( "unknown" );
 
 
     private final String statusAcronym;
@@ -41,6 +42,6 @@ public enum GitFileStatus
                 return gitFileStatus;
             }
         }
-        return GitFileStatus.UNMODIFIED;
+        return GitFileStatus.UNKNOWN;
     }
 }

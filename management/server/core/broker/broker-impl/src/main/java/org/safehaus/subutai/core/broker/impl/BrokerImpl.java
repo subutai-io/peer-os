@@ -81,6 +81,7 @@ public class BrokerImpl implements Broker
     public void addByteMessageListener( final ByteMessageListener listener ) throws BrokerException
     {
         Preconditions.checkNotNull( listener );
+        Preconditions.checkNotNull( listener.getTopic() );
 
         messageRouter.addListener( listener );
     }
@@ -90,6 +91,7 @@ public class BrokerImpl implements Broker
     public void addTextMessageListener( final TextMessageListener listener ) throws BrokerException
     {
         Preconditions.checkNotNull( listener );
+        Preconditions.checkNotNull( listener.getTopic() );
 
         messageRouter.addListener( listener );
     }
@@ -117,8 +119,6 @@ public class BrokerImpl implements Broker
         {
             pool.stop();
         }
-
-        messageRouter.dispose();
     }
 
 

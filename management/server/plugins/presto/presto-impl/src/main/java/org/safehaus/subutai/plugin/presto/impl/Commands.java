@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.presto.impl;
 
 
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.enums.OutputRedirection;
+import org.safehaus.subutai.common.command.OutputRedirection;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;

@@ -32,6 +32,8 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
+#include <pthread.h>
+#include <csignal>
 #include <sstream>
 #include <list>
 #include <lxc/lxccontainer.h>
@@ -62,6 +64,7 @@ struct ExecutionResult {
     string out;
     string err;
     int exit_code;
+    pid_t pid;
 };
 
 
@@ -88,6 +91,7 @@ class SubutaiContainer
         void PutToFile(string filename, string text);
         vector<Interface> getContainerInterfaceValues();
         lxc_container* getLxcContainerValue();
+        string getContainerArch();
         string getContainerStatus();
         string getContainerIdValue();
         string getContainerHostnameValue();
@@ -97,7 +101,6 @@ class SubutaiContainer
         ExecutionResult RunCommand(SubutaiCommand* command);
         ExecutionResult RunDaemon(SubutaiCommand* command);
         ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT, bool captureOutput = true);
-
     protected:
         vector<string> ExplodeCommandArguments(SubutaiCommand* command);
     private:
@@ -109,6 +112,7 @@ class SubutaiContainer
         vector<Interface> 	interfaces;
         SubutaiLogger*		containerLogger;
         SubutaiHelper 		_helper;
+        string              _arch;
 };
 #endif /* SUBUTAICONTAINER_H_ */
 

@@ -43,11 +43,12 @@ public class NetworkManagerImpl implements NetworkManager
 
     @Override
     public void setupN2NConnection( final String superNodeIp, final int superNodePort, final String interfaceName,
-                                    final String communityName, final String localIp ) throws NetworkManagerException
+                                    final String communityName, final String localIp, final String pathToKeyFile )
+            throws NetworkManagerException
     {
         execute( getManagementHost(),
                 commands.getSetupN2NConnectionCommand( superNodeIp, superNodePort, interfaceName, communityName,
-                        localIp ) );
+                        localIp, pathToKeyFile ) );
     }
 
 
@@ -141,6 +142,22 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
+    public void setupVniVLanMapping( final String tunnelName, final int vni, final int vLanId )
+            throws NetworkManagerException
+    {
+        execute( getManagementHost(), commands.getSetupVniVlanMappingCommand( tunnelName, vni, vLanId ) );
+    }
+
+
+    @Override
+    public void removeVniVLanMapping( final String tunnelName, final int vni, final int vLanId )
+            throws NetworkManagerException
+    {
+        execute( getManagementHost(), commands.getRemoveVniVlanMappingCommand( tunnelName, vni, vLanId ) );
+    }
+
+
+    @Override
     public void setContainerIp( final String containerName, final String ip, final int netMask, final int vLanId )
             throws NetworkManagerException
     {
@@ -177,7 +194,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    private ManagementHost getManagementHost() throws NetworkManagerException
+    protected ManagementHost getManagementHost() throws NetworkManagerException
     {
         try
         {
@@ -190,7 +207,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    public ResourceHost getResourceHost( String containerName ) throws NetworkManagerException
+    protected ResourceHost getResourceHost( String containerName ) throws NetworkManagerException
     {
         try
         {
@@ -204,7 +221,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    public ContainerHost getContainerHost( String containerName ) throws NetworkManagerException
+    protected ContainerHost getContainerHost( String containerName ) throws NetworkManagerException
     {
         try
         {
@@ -217,7 +234,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    private CommandResult execute( Host host, RequestBuilder requestBuilder ) throws NetworkManagerException
+    protected CommandResult execute( Host host, RequestBuilder requestBuilder ) throws NetworkManagerException
     {
         try
         {

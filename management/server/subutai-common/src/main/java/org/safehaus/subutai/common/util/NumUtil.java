@@ -2,7 +2,7 @@ package org.safehaus.subutai.common.util;
 
 
 /**
- * Created by dilshat on 9/23/14.
+ * Provides number utility functions
  */
 public class NumUtil
 {

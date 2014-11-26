@@ -144,6 +144,7 @@ int main(int argc,char *argv[],char *envp[])
     environment.getAgentInterfaces();
     environment.getAgentHostname();
     environment.getAgentEnvironmentId();
+    environment.getAgentArch();
     clientAddress = environment.getAgentUuidValue();
 
     /*
@@ -337,13 +338,13 @@ int main(int argc,char *argv[],char *envp[])
 
                         if (command.getPid() > 0)
                         {
-                            if( isLocal)
-                            {
+                            /*if( isLocal)
+                            {*/
                                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on resource host: " + command.getPid()));
                                 retstatus = kill(command.getPid(),SIGKILL);
                                 resp = response.createTerminateMessage(environment.getAgentUuidValue(),
                                         command.getCommandId(), command.getPid(), retstatus);
-                            }
+                            /*}
                             else
                             {
                                 logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on container node: " + command.getPid()));
@@ -352,10 +353,11 @@ int main(int argc,char *argv[],char *envp[])
                                 ExecutionResult execResult = target_container->RunCommand(&command);
                                 retstatus  = execResult.exit_code;
 
+
                                 resp = response.createTerminateMessage(target_container->getContainerIdValue(),
                                         command.getCommandId(), command.getPid(), retstatus);
 
-                            }
+                            }*/
 
                             connection->sendMessage(resp);
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate response: " + resp));

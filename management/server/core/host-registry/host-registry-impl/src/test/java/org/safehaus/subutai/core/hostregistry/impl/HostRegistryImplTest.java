@@ -24,6 +24,8 @@ import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
 
+import junit.framework.Assert;
+
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertNotNull;
@@ -45,6 +47,7 @@ public class HostRegistryImplTest
     private static final UUID CONTAINER_ID = UUID.randomUUID();
     private static final String CONTAINER_HOSTNAME = "container";
     private static final String DUMMY_HOSTNAME = "dummy";
+    private static final int HOST_EXPIRATION = 30;
 
     @Mock
     Broker broker;
@@ -79,7 +82,7 @@ public class HostRegistryImplTest
     @Before
     public void setUp() throws Exception
     {
-        registry = new HostRegistryImpl( broker );
+        registry = new HostRegistryImpl( broker, HOST_EXPIRATION );
         registry.hostListeners = hostListeners;
         registry.notifier = notifier;
         registry.heartBeatListener = heartBeatListener;
@@ -101,7 +104,14 @@ public class HostRegistryImplTest
     @Test( expected = NullPointerException.class )
     public void testConstructor() throws Exception
     {
-        new HostRegistryImpl( null );
+        new HostRegistryImpl( null, HOST_EXPIRATION );
+    }
+
+
+    @Test( expected = IllegalArgumentException.class )
+    public void testConstructor2() throws Exception
+    {
+        new HostRegistryImpl( broker, 0 );
     }
 
 
@@ -115,6 +125,24 @@ public class HostRegistryImplTest
         try
         {
             registry.getContainerHostInfoById( UUID.randomUUID() );
+            fail( "Expected HostDisconnectedException" );
+        }
+        catch ( HostDisconnectedException e )
+        {
+        }
+    }
+
+
+    @Test
+    public void testGetHostInfoById() throws Exception
+    {
+
+        assertNotNull(registry.getHostInfoById( CONTAINER_ID ));
+        assertNotNull( registry.getHostInfoById( HOST_ID ) );
+
+        try
+        {
+            registry.getHostInfoById( UUID.randomUUID() );
             fail( "Expected HostDisconnectedException" );
         }
         catch ( HostDisconnectedException e )
@@ -152,7 +180,7 @@ public class HostRegistryImplTest
 
 
     @Test
-    public void testGetHostInfoById() throws Exception
+    public void testGetResourceHostInfoById() throws Exception
     {
         ResourceHostInfo existingHost = registry.getResourceHostInfoById( HOST_ID );
         assertNotNull( existingHost );
@@ -169,7 +197,7 @@ public class HostRegistryImplTest
 
 
     @Test
-    public void testGetHostInfoByHostname() throws Exception
+    public void testGetResourceHostInfoByHostname() throws Exception
     {
         ResourceHostInfo existingHost = registry.getResourceHostInfoByHostname( HOST_HOSTNAME );
 
@@ -187,7 +215,7 @@ public class HostRegistryImplTest
 
 
     @Test
-    public void testGetHostsInfo() throws Exception
+    public void testGetResourceHostsInfo() throws Exception
     {
         Set<ResourceHostInfo> info = registry.getResourceHostsInfo();
 

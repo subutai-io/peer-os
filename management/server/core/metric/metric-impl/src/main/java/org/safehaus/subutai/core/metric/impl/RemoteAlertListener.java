@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RemoteAlertListener extends RequestListener
 {
-    protected static Logger LOG = LoggerFactory.getLogger( RemoteAlertListener.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RemoteAlertListener.class.getName() );
 
     protected MonitorImpl monitor;
 
@@ -33,7 +33,7 @@ public class RemoteAlertListener extends RequestListener
 
         try
         {
-            monitor.alertThresholdExcess( containerHostMetric );
+            monitor.notifyOnAlert( containerHostMetric );
         }
         catch ( MonitorException e )
         {

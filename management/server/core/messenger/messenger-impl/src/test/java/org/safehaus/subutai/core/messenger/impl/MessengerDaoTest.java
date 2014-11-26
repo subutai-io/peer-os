@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.messenger.impl;
 
 
+import java.io.PrintStream;
 import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,17 +19,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.slf4j.Logger;
 
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -53,7 +53,7 @@ public class MessengerDaoTest
     @Mock
     DataSource dataSource;
     @Mock
-    Logger logger;
+    SQLException exception;
     @Mock
     ResultSet envelopesRs;
 
@@ -92,8 +92,8 @@ public class MessengerDaoTest
 
     private void throwDbException() throws SQLException
     {
-        doThrow( new SQLException() ).when( dbUtil ).update( anyString(), anyVararg() );
-        doThrow( new SQLException() ).when( dbUtil ).select( anyString(), anyVararg() );
+        doThrow( exception ).when( dbUtil ).update( anyString(), anyVararg() );
+        doThrow( exception ).when( dbUtil ).select( anyString(), anyVararg() );
     }
 
 
@@ -102,7 +102,6 @@ public class MessengerDaoTest
     {
         messengerDao = new MessengerDaoExt( dataSource );
         messengerDao.setDbUtil( dbUtil );
-        messengerDao.LOG = logger;
         message = new MessageImpl( SOURCE_PEER_ID, PAYLOAD );
         envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE );
         envelope.setCreateDate( CREATE_DATE );
@@ -157,7 +156,7 @@ public class MessengerDaoTest
 
         messengerDao.purgeExpiredMessages();
 
-        verify( logger ).error( anyString(), isA( SQLException.class ) );
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 
 
@@ -182,7 +181,7 @@ public class MessengerDaoTest
 
         messengerDao.getEnvelopes();
 
-        verify( logger ).error( anyString(), isA( SQLException.class ) );
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 
 
@@ -197,7 +196,7 @@ public class MessengerDaoTest
 
         messengerDao.markAsSent( envelope );
 
-        verify( logger ).error( anyString(), isA( SQLException.class ) );
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 
 
@@ -213,7 +212,7 @@ public class MessengerDaoTest
 
         messengerDao.incrementDeliveryAttempts( envelope );
 
-        verify( logger ).error( anyString(), isA( SQLException.class ) );
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 
 
@@ -229,7 +228,8 @@ public class MessengerDaoTest
         try
         {
             messengerDao.saveEnvelope( envelope );
-            verify( logger ).error( anyString(), isA( SQLException.class ) );
+            verify( exception ).printStackTrace( any( PrintStream.class ) );
+
             fail( "Expected DaoException" );
         }
         catch ( DaoException e )
@@ -244,7 +244,7 @@ public class MessengerDaoTest
     {
         when( dbUtil.select( anyString(), anyVararg() ) ).thenReturn( envelopesRs );
 
-        Envelope envelope1 = messengerDao.getEnvelope(message.getId());
+        Envelope envelope1 = messengerDao.getEnvelope( message.getId() );
 
         assertEquals( envelope.getRecipient(), envelope1.getRecipient() );
         assertEquals( envelope.getTargetPeerId(), envelope1.getTargetPeerId() );
@@ -255,13 +255,13 @@ public class MessengerDaoTest
         try
         {
             messengerDao.getEnvelope( message.getId() );
-            verify( logger ).error( anyString(), isA( SQLException.class ) );
+            verify( exception ).printStackTrace( any( PrintStream.class ) );
+
             fail( "Expected DaoException" );
         }
         catch ( DaoException e )
         {
 
         }
-
     }
 }

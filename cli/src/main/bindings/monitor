@@ -5,9 +5,18 @@ function monitor_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Monitor containers.
   echo
-  echo "        "subutai \[-qh\] monitor \[-c\|-d\|-s metric_type\|-e metric_type\|-q metric_type\] \[hostname\]
+  echo "        "subutai \[-qh\] monitor \[-c metric_type \[-p monitoring_parameters\] \|-d metric_type\|-s metric_type\|-e metric_type\|-q metric_type\] \[hostname\]
   echo "          "parameters:
   echo "                    "c -- create monitoring infrastructure for container
+  echo "                      "p -- parameters to override default values
+  echo "                        "parameters:
+  echo "                          "metricCollectionIntervalInMin
+  echo "                          "maxSampleCount
+  echo "                          "metricCountToAverageToAlert
+  echo "                          "intervalBetweenAlertsInMin
+  echo "                          "ramAlertThreshold
+  echo "                          "cpuAlertThreshold
+  echo "                          "diskAlertThreshold
   echo "                    "d -- destroy monitoring infrastructure for container
   echo "                    "s -- starts monitoring of container for given metric
   echo "                    "e -- ends monitoring of container for given metric
@@ -25,11 +34,13 @@ function monitor {
   local is_start="false"
   local is_end="false"
   local is_query="false"
+  local is_parameter="false"
   shift_amount=0;
   error_message="Cannot use the -c, -d, -s, -e, -u, and -q options together."
-  while getopts ":cds:e:u:q:" opt; do
+  while getopts ":c:d:s:e:u:q:p:" opt; do
     case $opt in
       c)
+        metric_type="$OPTARG"
         is_create="true"
         if [[ "true" == "$is_start" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_destroy" ]]; then
           msg_error "$error_message" >&2
@@ -37,6 +48,7 @@ function monitor {
         fi
 	;;
       d)
+        metric_type="$OPTARG"
         is_destroy="true"
         if [[ "true" == "$is_start" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_create" ]]; then
           msg_error "$error_message" >&2
@@ -75,6 +87,14 @@ function monitor {
           exit 1
         fi
 	;;
+      p)
+        parameters="$OPTARG"
+        is_parameter="true"
+        if [[ "true" == "$is_start" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_destroy" ]]; then
+          msg_error "-p option can only be used together with -c option." >&2
+          exit 1
+        fi
+        ;;
       \?)
         msg_error "Unrecognized option -$OPTARG"
         exit 1
@@ -85,6 +105,12 @@ function monitor {
     esac
     shift_amount=$(($shift_amount + 1))
   done
+
+  if [ "$is_parameter" == "true" -a "$is_create" != "true" ]; then
+    msg_error "Cannot use -p option without -c option"
+    exit 1
+  fi
+
 #  while [ -n "`echo $1 | grep -`" ]; do
 #    shift
 #  done
@@ -113,14 +139,24 @@ function monitor {
     echo -e "is_start\t= $is_start"
     echo -e "is_end\t= $is_end"
     echo -e "is_query\t= $is_query"
+    echo -e "is_parameter\t= $is_parameter"
+    echo -e "parameters\t= $parameters"
     echo -e "metric_type\t= $metric_type"
     echo
   fi
  
   if [ $is_create == "true" ]; then
-    create_all_rrd "$hostname"
+    if [ "$metric_type" == "all" ]; then
+      create_all_rrd "$hostname" "$parameters"
+    else
+      create_rrd "$hostname" "$metric_type" "$parameters"
+    fi
   elif [ $is_destroy == "true" ]; then
-    destroy_monitor $hostname
+    if [ "$metric_type" == "all" ]; then
+      destroy_all_monitor $hostname
+    else
+      destroy_monitor $hostname $metric_type
+    fi
   elif [ $is_update == "true"  ]; then
     update_rrd "$hostname" "$metric_type"
   elif [ $is_start == "true"  ]; then
