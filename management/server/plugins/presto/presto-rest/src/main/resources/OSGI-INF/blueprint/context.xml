@@ -2,19 +2,4 @@
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
 
-  <reference id="prestoManager" availability="mandatory"
-             interface="org.safehaus.subutai.plugin.presto.api.Presto" />
-  <reference id="hadoopManager" availability="mandatory"
-             interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
-  <reference id="environmentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
-
-
-  <bean id="presto-rest" scope="singleton" class="org.safehaus.subutai.plugin.presto.rest.RestService"
-        init-method="init" destroy-method="destroy">
-    <argument ref="prestoManager" />
-    <argument ref="hadoopManager" />
-    <argument ref="environmentManager" />
-  </bean>
-
 </blueprint>

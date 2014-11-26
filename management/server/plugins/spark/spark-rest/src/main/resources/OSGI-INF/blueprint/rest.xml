@@ -11,12 +11,6 @@
     </cxf:features>
   </cxf:bus>
 
-  <jaxrs:server address="/spark" id="sparkRestServiceImpl">
-    <jaxrs:serviceBeans>
-      <ref component-id="sparkRestService" />
-    </jaxrs:serviceBeans>
-  </jaxrs:server>
-
   <reference id="sparkManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.spark.api.Spark" />
   <reference id="hadoopManager" availability="mandatory"
@@ -29,5 +23,11 @@
     <argument ref="hadoopManager" />
     <argument ref="environmentManager" />
   </bean>
+
+  <jaxrs:server address="/spark" id="sparkRestServiceImpl">
+    <jaxrs:serviceBeans>
+      <ref component-id="sparkRestService" />
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
 
 </blueprint>
