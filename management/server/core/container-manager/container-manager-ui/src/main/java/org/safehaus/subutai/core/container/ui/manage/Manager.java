@@ -559,10 +559,8 @@ public class Manager extends VerticalLayout
 
                         try
                         {
-                            containerMemory = quotaManager.getQuota( lxcHostname, QuotaEnum.MEMORY_LIMIT_IN_BYTES,
-                                    agentManager.getAgentByHostname( parentHostname ) );
-                            containerCpu = quotaManager.getQuota( lxcHostname, QuotaEnum.CPUSET_CPUS,
-                                    agentManager.getAgentByHostname( parentHostname ) );
+                            containerMemory = quotaManager.getQuota( lxcHostname, QuotaEnum.MEMORY_LIMIT_IN_BYTES);
+                            containerCpu = quotaManager.getQuota( lxcHostname, QuotaEnum.CPUSET_CPUS );
                             containerCpuTextField.setValue( containerCpu );
 
                             memoryQuotaComponent.setValueForMemoryTextField( containerMemory );
@@ -577,10 +575,8 @@ public class Manager extends VerticalLayout
                                         String cpuLimit = containerCpuTextField.getValue().replaceAll( "\n", "" );
 
                                         quotaManager
-                                                .setQuota( lxcHostname, QuotaEnum.MEMORY_LIMIT_IN_BYTES, memoryLimit,
-                                                        agentManager.getAgentByHostname( parentHostname ) );
-                                        quotaManager.setQuota( lxcHostname, QuotaEnum.CPUSET_CPUS, cpuLimit,
-                                                agentManager.getAgentByHostname( parentHostname ) );
+                                                .setQuota( lxcHostname, QuotaEnum.MEMORY_LIMIT_IN_BYTES, memoryLimit );
+                                        quotaManager.setQuota( lxcHostname, QuotaEnum.CPUSET_CPUS, cpuLimit );
                                     }
                                     catch ( QuotaException e )
                                     {

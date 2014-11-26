@@ -10,13 +10,10 @@
       <cxf:logging />
     </cxf:features>
   </cxf:bus>
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
   <reference id="nutchManager" availability="mandatory" interface="org.safehaus.subutai.plugin.nutch.api.Nutch" />
 
   <bean id="restService" class="org.safehaus.subutai.plugin.nutch.rest.RestService">
-    <property name="agentManager" ref="agentManager" />
     <property name="nutchManager" ref="nutchManager" />
   </bean>
 

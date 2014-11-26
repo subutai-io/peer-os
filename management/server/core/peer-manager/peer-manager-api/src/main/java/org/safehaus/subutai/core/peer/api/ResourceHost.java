@@ -3,11 +3,9 @@ package org.safehaus.subutai.core.peer.api;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -20,7 +18,6 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
 import com.google.common.collect.Sets;
@@ -125,7 +122,6 @@ public class ResourceHost extends SubutaiHost
             {
                 String[] metrics = result.getStdOut().split( "\n" );
                 serverMetric = gatherMetrics( metrics );
-                serverMetric.setAverageMetrics( gatherAvgMetrics() );
             }
             return serverMetric;
         }
@@ -139,16 +135,6 @@ public class ResourceHost extends SubutaiHost
     public Set<ContainerHost> getContainerHosts()
     {
         return containersHosts;
-    }
-
-
-    /**
-     * Gather metrics from elastic search for a one week period
-     */
-    private Map<MetricType, Double> gatherAvgMetrics()
-    {
-        //TODO: Implement me
-        return new EnumMap<>( MetricType.class );
     }
 
 
@@ -249,7 +235,7 @@ public class ResourceHost extends SubutaiHost
         }
         if ( parseOk )
         {
-            return new ServerMetric( getHostname(), freeHddMb, freeRamMb, ( int ) cpuLoadPercent, numOfProc, null );
+            return new ServerMetric( getHostname(), freeHddMb, freeRamMb, ( int ) cpuLoadPercent, numOfProc );
         }
         else
         {

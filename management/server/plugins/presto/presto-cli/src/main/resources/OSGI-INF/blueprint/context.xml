@@ -12,7 +12,7 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="flume/uninstall-cluster">
+    <command name="presto/uninstall-cluster">
       <action class="org.safehaus.subutai.plugin.presto.cli.UninstallClusterCommand">
         <property name="prestoManager" ref="prestoManager" />
       </action>

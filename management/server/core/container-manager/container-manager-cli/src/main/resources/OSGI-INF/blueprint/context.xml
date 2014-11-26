@@ -1,12 +1,5 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <!--
-  <reference id="templateManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.template.api.TemplateManager" />
-
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
-  -->
   <reference id="containerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.container.api.ContainerManager" />
 
