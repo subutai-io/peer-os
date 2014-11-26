@@ -812,9 +812,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         try
         {
             Host c = bindHost( host.getHostId() );
-            ContainerHostEntity containerHost = ( ContainerHostEntity ) c;
-            ResourceHost resourceHost = containerHost.getParent();
-            return quotaManager.getQuota( host.getHostname(), quota, resourceHost.getAgent() );
+            return quotaManager.getQuota( c.getHostname(), quota );
         }
         catch ( QuotaException e )
         {
@@ -829,9 +827,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         try
         {
             Host c = bindHost( host.getHostId() );
-            ContainerHostEntity containerHost = ( ContainerHostEntity ) c;
-            ResourceHost resourceHost = containerHost.getParent();
-            quotaManager.setQuota( host.getHostname(), quota, value, resourceHost.getAgent() );
+            quotaManager.setQuota( c.getHostname(), quota, value );
         }
         catch ( QuotaException e )
         {
