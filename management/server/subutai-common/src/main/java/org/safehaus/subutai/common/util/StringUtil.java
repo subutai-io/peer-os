@@ -72,9 +72,9 @@ public class StringUtil
             {
                 sb.append( "\"" );
             }
-            sb.append( delimiter ).append( " " );
+            sb.append( delimiter );
         }
-        sb.replace( sb.length() - 2, sb.length(), "" );
+        sb.replace( sb.length() - 1, sb.length(), "" );
         return sb.toString();
     }
 
