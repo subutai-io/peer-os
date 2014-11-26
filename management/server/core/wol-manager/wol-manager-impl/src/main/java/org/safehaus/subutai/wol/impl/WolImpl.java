@@ -1,22 +1,23 @@
 package org.safehaus.subutai.wol.impl;
 
-import com.google.common.base.Preconditions;
+
+import java.util.ArrayList;
+
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.core.peer.api.*;
+import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.ManagementHost;
+import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.wol.api.WolManager;
 import org.safehaus.subutai.wol.api.WolManagerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import java.util.ArrayList;
+
+import com.google.common.base.Preconditions;
 
 
-/**
- * Created by emin on 14/11/14.
- */
-public class WolImpl implements WolManager {
-    private static final Logger LOG = LoggerFactory.getLogger(WolImpl.class.getName());
+public class WolImpl implements WolManager
+{
     private final PeerManager peerManager;
     protected Commands commands = new Commands();
 
@@ -24,27 +25,27 @@ public class WolImpl implements WolManager {
     //Default Impl Constructor
     public WolImpl( final PeerManager peerManager )
     {
-        Preconditions.checkNotNull(peerManager);
+        Preconditions.checkNotNull( peerManager );
 
         this.peerManager = peerManager;
     }
 
 
     @Override
-    public CommandResult sendMagicPackagebyMacId(String macID) throws WolManagerException
+    public CommandResult sendMagicPackageByMacId( String macID ) throws WolManagerException
     {
         return execute( getManagementHost(), commands.getSendWakeOnLanCommand( macID ) );
     }
 
 
     @Override
-    public Boolean sendMagicPackagebyList(ArrayList<String> macList)  throws WolManagerException
+    public Boolean sendMagicPackageByList( ArrayList<String> macList ) throws WolManagerException
     {
 
-        for(int i=0 ; i<macList.size() ; i++ )
+        for ( String aMacList : macList )
         {
-            CommandResult commandResult = execute( getManagementHost(), commands.getSendWakeOnLanCommand(macList.get(i)));
-            if ( ! commandResult.hasSucceeded() )
+            CommandResult commandResult = execute( getManagementHost(), commands.getSendWakeOnLanCommand( aMacList ) );
+            if ( !commandResult.hasSucceeded() )
             {
                 return false;
             }
