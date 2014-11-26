@@ -28,6 +28,8 @@ public class ExecSyncCommand extends OsgiCommandSupport
     String command;
     @Argument( index = 2, name = "timeout", required = false, multiValued = false, description = "command timeout" )
     int timeout = 30;
+    @Argument( index = 3, name = "daemon", required = false, multiValued = false, description = "is daemon" )
+    boolean daemon = false;
 
 
     public ExecSyncCommand( final CommandExecutor executor )
@@ -46,7 +48,8 @@ public class ExecSyncCommand extends OsgiCommandSupport
         {
             UUID id = UUIDUtil.generateUUIDFromString( hostId );
 
-            CommandResult result = executor.execute( id, new RequestBuilder( command ).withTimeout( timeout ) );
+            RequestBuilder requestBuilder = new RequestBuilder( command ).withTimeout( timeout );
+            CommandResult result = executor.execute( id, daemon ? requestBuilder.daemon() : requestBuilder );
 
             System.out.println( result );
         }

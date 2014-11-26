@@ -47,11 +47,11 @@ public class RemoteAlertListenerTest
 
         remoteAlertListener.onRequest( payload );
 
-        verify( monitor ).alertThresholdExcess( metric );
+        verify( monitor ).notifyOnAlert( metric );
 
         MonitorException exception = mock( MonitorException.class );
 
-        doThrow( exception ).when( monitor ).alertThresholdExcess( metric );
+        doThrow( exception ).when( monitor ).notifyOnAlert( metric );
 
         remoteAlertListener.onRequest( payload );
 

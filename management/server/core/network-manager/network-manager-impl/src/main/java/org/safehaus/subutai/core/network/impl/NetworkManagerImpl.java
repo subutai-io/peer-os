@@ -43,11 +43,12 @@ public class NetworkManagerImpl implements NetworkManager
 
     @Override
     public void setupN2NConnection( final String superNodeIp, final int superNodePort, final String interfaceName,
-                                    final String communityName, final String localIp ) throws NetworkManagerException
+                                    final String communityName, final String localIp, final String pathToKeyFile )
+            throws NetworkManagerException
     {
         execute( getManagementHost(),
                 commands.getSetupN2NConnectionCommand( superNodeIp, superNodePort, interfaceName, communityName,
-                        localIp ) );
+                        localIp, pathToKeyFile ) );
     }
 
 
@@ -137,6 +138,22 @@ public class NetworkManagerImpl implements NetworkManager
         }
 
         return connections;
+    }
+
+
+    @Override
+    public void setupVniVLanMapping( final String tunnelName, final int vni, final int vLanId )
+            throws NetworkManagerException
+    {
+        execute( getManagementHost(), commands.getSetupVniVlanMappingCommand( tunnelName, vni, vLanId ) );
+    }
+
+
+    @Override
+    public void removeVniVLanMapping( final String tunnelName, final int vni, final int vLanId )
+            throws NetworkManagerException
+    {
+        execute( getManagementHost(), commands.getRemoveVniVlanMappingCommand( tunnelName, vni, vLanId ) );
     }
 
 

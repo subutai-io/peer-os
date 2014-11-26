@@ -148,9 +148,9 @@
         <version>${project.version}</version>
       </dependency>
       <!--<dependency>-->
-        <!--<groupId>${project.groupId}</groupId>-->
-        <!--<artifactId>command-runner-ui-old</artifactId>-->
-        <!--<version>${project.version}</version>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>command-runner-ui-old</artifactId>-->
+      <!--<version>${project.version}</version>-->
       <!--</dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -383,6 +383,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>host-registry-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>host-registry-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 

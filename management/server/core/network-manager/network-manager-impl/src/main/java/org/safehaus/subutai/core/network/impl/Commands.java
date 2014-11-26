@@ -16,11 +16,11 @@ public class Commands
 
 
     public RequestBuilder getSetupN2NConnectionCommand( String superNodeIp, int superNodePort, String interfaceName,
-                                                        String communityName, String localIp )
+                                                        String communityName, String localIp, String pathToKeyFile )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
                 Lists.newArrayList( "-N", superNodeIp, String.valueOf( superNodePort ), interfaceName, communityName,
-                        localIp ) );
+                        localIp, "file", pathToKeyFile ) );
     }
 
 
@@ -103,5 +103,19 @@ public class Commands
     public RequestBuilder getRemoveGatewayOnContainerCommand()
     {
         return new RequestBuilder( "route del default gw" );
+    }
+
+
+    public RequestBuilder getSetupVniVlanMappingCommand( String tunnelName, int vni, int vLanId )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "-m", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );
+    }
+
+
+    public RequestBuilder getRemoveVniVlanMappingCommand( String tunnelName, int vni, int vLanId )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "-M", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );
     }
 }

@@ -46,7 +46,7 @@ public class RemoteMetricRequestListenerTest
     {
         when( payload.getMessage( ContainerHostMetricRequest.class ) ).thenReturn( request );
 
-        when( monitor.getLocalContainerHostMetrics( any( UUID.class ) ) ).thenReturn( metrics );
+        when( monitor.getLocalContainerHostsMetrics( any( UUID.class ) ) ).thenReturn( metrics );
 
         when( metrics.isEmpty() ).thenReturn( false );
 
@@ -60,5 +60,9 @@ public class RemoteMetricRequestListenerTest
         listener.onRequest( payload );
 
         verify( request, times( 2 ) ).getEnvironmentId();
+
+        reset( payload );
+
+        listener.onRequest( payload );
     }
 }

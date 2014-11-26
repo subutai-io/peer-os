@@ -105,7 +105,7 @@ public class MonitorFormTest
     public void testPrintResourceHostMetrics() throws Exception
     {
         ResourceHostMetric resourceHostMetric = mock( ResourceHostMetric.class );
-        when( monitor.getResourceHostMetrics() ).thenReturn( Sets.newHashSet( resourceHostMetric ) );
+        when( monitor.getResourceHostsMetrics() ).thenReturn( Sets.newHashSet( resourceHostMetric ) );
 
         monitorForm.printResourceHostMetrics();
 
@@ -113,7 +113,7 @@ public class MonitorFormTest
 
 
         MonitorException exception = mock( MonitorException.class );
-        doThrow( exception ).when( monitor ).getResourceHostMetrics();
+        doThrow( exception ).when( monitor ).getResourceHostsMetrics();
 
         monitorForm.printResourceHostMetrics();
 
@@ -126,7 +126,7 @@ public class MonitorFormTest
     {
         ContainerHostMetric containerHostMetric = mock( ContainerHostMetric.class );
         Environment environment = mock( Environment.class );
-        when( monitor.getContainerMetrics( environment ) ).thenReturn( Sets.newHashSet( containerHostMetric ) );
+        when( monitor.getContainerHostsMetrics( environment ) ).thenReturn( Sets.newHashSet( containerHostMetric ) );
 
 
         monitorForm.printContainerMetrics( environment );
@@ -134,7 +134,7 @@ public class MonitorFormTest
         verify( outputTextArea ).setValue( anyString() );
 
         MonitorException exception = mock( MonitorException.class );
-        doThrow( exception ).when( monitor ).getContainerMetrics( environment );
+        doThrow( exception ).when( monitor ).getContainerHostsMetrics( environment );
 
         monitorForm.printContainerMetrics( environment );
 

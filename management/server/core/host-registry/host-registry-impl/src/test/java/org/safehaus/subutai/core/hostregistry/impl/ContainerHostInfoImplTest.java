@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
+import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
 
 import com.google.common.collect.Maps;
 
@@ -26,17 +27,18 @@ public class ContainerHostInfoImplTest
     private static final UUID ID = UUID.randomUUID();
     private static final UUID ID2 = UUID.randomUUID();
     private static final ContainerHostState CONTAINER_STATUS = ContainerHostState.FROZEN;
+    private static final HostArchitecture ARCH = HostArchitecture.AMD64;
     private static final String INTERFACE = "eth0";
     private static final String IP = "127.0.0.1";
     private static final String MAC = "0c:8b:fd:c0:ea:fe";
     private static final String INFO_JSON = String.format(
             "{ \"hostname\":\"%s\", \"id\":\"%s\", \"interfaces\" : [{ \"interfaceName\":\"%s\", "
-                    + "\"ip\":\"%s\",\"mac\":\"%s\"}],  \"status\":\"%s\" }", HOSTNAME, ID, INTERFACE, IP, MAC,
-            CONTAINER_STATUS );
+                    + "\"ip\":\"%s\",\"mac\":\"%s\"}],  \"status\":\"%s\", \"arch\":\"%s\" }", HOSTNAME, ID, INTERFACE, IP, MAC,
+            CONTAINER_STATUS , ARCH);
     private static final String INFO2_JSON = String.format(
             "{ \"hostname\":\"%s\", \"id\":\"%s\", \"interfaces\" : [{ \"interfaceName\":\"%s\", "
-                    + "\"ip\":\"%s\",\"mac\":\"%s\"}],  \"status\":\"%s\" }", HOSTNAME, ID2, INTERFACE, IP, MAC,
-            CONTAINER_STATUS );
+                    + "\"ip\":\"%s\",\"mac\":\"%s\"}],  \"status\":\"%s\", \"arch\":\"%s\" }", HOSTNAME, ID2, INTERFACE,
+            IP, MAC, CONTAINER_STATUS, ARCH );
 
 
     ContainerHostInfoImpl containerHostInfo;
@@ -55,6 +57,7 @@ public class ContainerHostInfoImplTest
         assertEquals( HOSTNAME, containerHostInfo.getHostname() );
         assertEquals( ID, containerHostInfo.getId() );
         assertEquals( CONTAINER_STATUS, containerHostInfo.getStatus() );
+        assertEquals( ARCH, containerHostInfo.getArch() );
         assertEquals( INTERFACE, containerHostInfo.getInterfaces().iterator().next().getInterfaceName() );
         assertEquals( MAC, containerHostInfo.getInterfaces().iterator().next().getMac() );
         assertEquals( IP, containerHostInfo.getInterfaces().iterator().next().getIp() );
@@ -70,6 +73,7 @@ public class ContainerHostInfoImplTest
         assertThat( toString, containsString( IP ) );
         assertThat( toString, containsString( ID.toString() ) );
         assertThat( toString, containsString( CONTAINER_STATUS.name() ) );
+        assertThat( toString, containsString( ARCH.name() ) );
     }
 
 

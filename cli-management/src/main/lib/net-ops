@@ -120,7 +120,7 @@ function net_check_portNumber {
        msg_error "Port value \"$port\" is greater than maximum-65535 value.."
        show_usage "`management_network_usage`"
      else
-       echo "Port Number: OK"
+       msg_info "Port Number: OK"
      fi
   else
      msg_error "Port value \"$port\" is not valid.."
@@ -128,3 +128,31 @@ function net_check_portNumber {
   fi
 }
 
+function net_check_keyType {
+  local keyType="$1"
+
+  declare -a listArray=('string' 'file')
+  
+  #checking keyType is valid or not
+  local result="false"
+  for i in "${listArray[@]}"
+  do
+    if [  $i == $keyType ]; then
+        result="true"
+    fi
+  done
+ 
+  if [ "false" == "$result" ]; then
+    msg_error "keyType \"$keyType\" is not valid.."
+    show_usage "`management_network_usage`"
+  fi
+}
+
+function net_check_keyFile {
+  local keyFile="$1"
+
+  if [ ! -f  "$keyFile" ]; then
+    msg_error "keyFile \"$keyFile\" does not exist.."
+    show_usage "`management_network_usage`"
+  fi
+}

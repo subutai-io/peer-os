@@ -5,6 +5,7 @@
 # ==========================================================================
 
 metric_list=("ram" "cpu")
+parameter_list=("metricCollectionIntervalInMin" "maxSampleCount" "metricCountToAverageToAlert" "intervalBetweenAlertsInMin" "ramAlertThreshold" "cpuAlertThreshold" "diskAlertThreshold")
 
 function get_total_ram {
   local lxc="$1"
@@ -118,6 +119,7 @@ function get_physical_total_disk {
   echo "550000"
 }
 
+
 function contains() {
     local n=$#
     local value=${!n}
@@ -131,25 +133,49 @@ function contains() {
     return 1
 }
 
+
 function create_rrd {
   local hostname=$1
   local metric_type=$2
+  local parameters=$3
   if [ `hostname` != $hostname ]; then
     lxc_assert "$hostname"
   fi
-  
+
   mkdir -p $SUBUTAI_RRD_DIRECTORY > /dev/null 2>&1
   assert_metric "$metric_type"
+
   local database_file=$(get_database_file $hostname $metric_type)
   local dataset_name=$(get_dataset_name $metric_type)
-  local update_sequence=$(get_update_sequence)
-  pushd $SUBUTAI_RRD_DIRECTORY > /dev/null
-  if [ -f $database_file ]; then
+
+  if [ -f $SUBUTAI_RRD_DIRECTORY/$database_file ]; then
     msg_notice "    - $database_file already exists, skipping..."
     start_update_rrd "$hostname" "$metric_type" > /dev/null
     return
   fi
-  rrdtool create "$database_file" --no-overwrite --step $update_sequence DS:"$dataset_name":GAUGE:$(($update_sequence * 2 - 1)):0:U RRA:LAST:0.5:1:1500
+
+  # Assert no config file exists if parameter is passed
+  if [ -n "$parameters" ]; then
+    local monitor_conf=$(get_monitor_configuration_file $hostname $metric_type)
+    if [ -f $monitor_conf ]; then
+      msg_notice "    - configuration file of $metric_type already exists for $hostname! Using existing configuration.."
+    else
+      # Save parameters inside configuration file
+      store_monitor_configuration "$hostname" "$metric_type" "$parameters"
+    fi
+  fi
+
+  # Setup configurations of monitoring infrastructure for host
+  get_monitor_configuration "$hostname" "$metric_type"
+
+  # Initialize following variables that depend on configuration file
+  # after get_monitor_configuration call
+  local update_sequence=$(get_update_sequence)
+  local maxSampleCount=$(get_max_sample_count)
+
+  pushd $SUBUTAI_RRD_DIRECTORY > /dev/null
+
+  rrdtool create "$database_file" --no-overwrite --step $update_sequence DS:"$dataset_name":GAUGE:$(($update_sequence * 2 - 1)):0:U RRA:LAST:0.5:1:$maxSampleCount
   msg_info "    - $metric_type rrd is created for $hostname"
   popd > /dev/null
   start_update_rrd "$hostname" "$metric_type" > /dev/null
@@ -158,9 +184,11 @@ function create_rrd {
 
 function create_all_rrd {
   local hostname=$1
+  local parameters=$2
+
   for metric_type in "${metric_list[@]}"
   do
-    create_rrd "$hostname" "$metric_type"
+    create_rrd "$hostname" "$metric_type" "$parameters"
   done
 }
 
@@ -172,8 +200,9 @@ function update_rrd {
   if [ `hostname` != $hostname ]; then
     lxc_assert "$hostname"
   fi
-  assert_metric "$metric_type" 
 
+  assert_metric "$metric_type"
+  get_monitor_configuration "$hostname" "$metric_type"
   local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
   local tag=$(get_metric_tag $metric_type)
   local dataset_name=$(get_dataset_name $metric_type)
@@ -191,7 +220,6 @@ function start_update_rrd {
   if [ `hostname` != $hostname ]; then
     lxc_assert "$hostname"
   fi
-
   local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
   if [ ! -f $database_file ]; then
     msg_error "Please create the $metric_type rrd for $hostname first. Aborting!"
@@ -199,6 +227,7 @@ function start_update_rrd {
   fi
 
   assert_metric "$metric_type"
+  get_monitor_configuration $hostname $metric_type
   # Remove cron job of host for metric_type if exists
   stop_update_rrd "$hostname" "$metric_type" > /dev/null
   #write out current crontab
@@ -249,7 +278,6 @@ function stop_update_all_rrd {
 }
 
 
-
 function query_rrd {
   local hostname=$1
   local metric_type=$2
@@ -258,32 +286,69 @@ function query_rrd {
     lxc_assert "$hostname"
   fi
   assert_metric "$metric_type"
-
+  get_monitor_configuration $hostname $metric_type
   local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
 
   local TIME=$(date +%s)
   local update_sequence=$(get_update_sequence)
   # Show last X entries
-  local start_time=$(($update_sequence * 50))
+  local maxSampleCount=$(get_max_sample_count)
+  local start_time=$(($update_sequence * $maxSampleCount))
   rrdtool fetch "$database_file" LAST -e $TIME -s e-"$start_time"sec
 }
 
 
 function destroy_monitor {
   local hostname=$1
+  local metric_type=$2
 
+  assert_metric "$metric_type"
+
+  remove_monitor_configuration $hostname $metric_type
+  remove_rrd_file $hostname $metric_type
+}
+
+
+function destroy_all_monitor {
+  local hostname=$1
   for metric_type in "${metric_list[@]}"
   do
-    assert_metric "$metric_type"
-    stop_update_rrd $hostname $metric_type
-    local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
-    rm -f $database_file > /dev/null 2>&1
-    msg_info "    - $metric_type rrd of $hostname is destroyed"
+    destroy_monitor $hostname $metric_type
   done
 }
 
 
+function remove_rrd_file {
+  local hostname=$1
+  local metric_type=$2
+
+  assert_metric "$metric_type" > /dev/null 2>&1
+
+  local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
+  stop_update_rrd $hostname $metric_type
+  rm -f $database_file > /dev/null 2>&1
+  msg_info "    - $metric_type rrd of $hostname is destroyed"
+}
+
+
+function remove_monitor_configuration {
+  local hostname=$1
+  local metric_type=$2
+  if [ -z $hostname  ]; then
+    msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+  assert_metric $metric_type
+
+  local monitor_conf=$(get_monitor_configuration_file $hostname $metric_type)
+
+  rm -f $monitor_conf > /dev/null 2>&1
+  msg_info "    - $monitor_conf file is removed"
+}
+
+
 function assert_metric {
+  local metric_type=$1
   if [ -z $metric_type ]; then
     msg_error "Metric type is empty. Aborting!"
     exit 1
@@ -295,6 +360,35 @@ function assert_metric {
     exit 1
   fi
 }
+
+
+function assert_parameters {
+  local parameters=$1
+
+  IFS=',' read -a parameterArray <<< "$parameters"
+  for parameter in "${parameterArray[@]}"
+  do
+    assert_parameter $(echo $parameter | cut -d':' -f1)
+  done
+}
+
+
+function assert_parameter {
+  local parameter=$1
+  if [ -z $parameter ]; then
+    msg_error "Parameter is empty. Aborting!"
+    exit 1
+  fi
+
+  if [ $(contains "${parameter_list[@]}" "$parameter") != "y" ]; then
+    msg_error "$parameter is not a supported parameter. Please provide one of the followings:"
+    echo "${parameter_list[@]}"
+    exit 1
+  else
+    msg_info "    - check passed: valid parameter \"$parameter\""
+  fi
+}
+
 
 function get_dataset_name {
   local metric_type=$1
@@ -325,10 +419,152 @@ function get_database_file {
   echo ""$metric_type"_"$hostname".rrd"
 }
 
+
 function get_cron_interval_in_minutes {
-  echo "1"
+  if [ -z $metricCollectionIntervalInMin ]; then
+    echo "1"
+    return
+  fi
+  echo $metricCollectionIntervalInMin
+  return
 }
+
+
 function get_update_sequence {
   local interval_in_minutes=$(get_cron_interval_in_minutes)
   echo "$(($interval_in_minutes * 60))"
 }
+
+
+function get_max_sample_count {
+  if [ -z $maxSampleCount ]; then
+    echo "1440"
+    return
+  fi
+  echo $maxSampleCount
+  return
+}
+
+
+function store_monitor_configuration {
+  local hostname=$1
+  local metric_type=$2
+  local parameters=$3
+  local monitor_conf=$(get_monitor_configuration_file $hostname $metric_type)
+
+  if [[ -z $parameters ]]; then
+    if [ -f $monitor_conf ]; then
+      msg_info "    - using configuration file $monitor_conf"
+    else
+      msg_info "    - no parameters passed, default values are being used"
+    fi
+    return
+  fi
+
+  assert_no_config "$hostname" "$metric_type"
+  assert_parameters "$parameters"
+
+  IFS=',' read -a parameterArray <<< "$parameters"
+  for parameter in "${parameterArray[@]}"
+  do
+    # Remove unnecessary whitespaces if any
+    local parameter=$(echo " $parameter " | tr -d ' ')
+    local value=$(echo $parameter | cut -d':' -f2)
+    local numberExpression='^[0-9]+$'
+
+    if [ -z $value ]; then
+      msg_error "No value provided for $parameter! Aborting.."
+      exit 1
+    fi
+
+    # Check if the value is a number
+    if ! [[ $value =~ $numberExpression ]] ; then
+      msg_error "$value is not a number! Aborting.."
+      exit 1
+    fi
+
+    # Create the monitor conf directory if not created before
+    mkdir -p "$SUBUTAI_MONITOR_CONF_DIRECTORY/$hostname"
+    touch $monitor_conf
+    # Parse the parameter
+    for supported_parameter in "${parameter_list[@]}"
+    do
+      if [[ $parameter == $supported_parameter:* ]]; then
+	entry="export $supported_parameter=$value"
+        echo "$entry" >> $monitor_conf
+        msg_info "    - adding \"$entry\" into $metric_type configuration"
+	break
+      fi
+    done
+  done
+  # Set the conf file to read only to disable user changes
+  chmod 444 $monitor_conf
+
+}
+
+
+function get_monitor_configuration {
+  local hostname=$1
+  local metric_type=$2
+
+  if [ -z $hostname  ]; then
+    msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+  assert_metric $metric_type
+
+  local monitor_conf=$(get_monitor_configuration_file $hostname $metric_type)
+  # Inject the configurations if file exists
+  if [ -f $monitor_conf ]; then
+    . $monitor_conf
+  fi
+}
+
+
+function get_monitor_configuration_file {
+  local hostname=$1
+  local metric_type=$2
+
+  if [ -z $hostname  ]; then
+    msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+  assert_metric $metric_type > /dev/null 2>&1
+
+  echo "$SUBUTAI_MONITOR_CONF_DIRECTORY/$hostname/$hostname-$metric_type-monitor.conf"
+  return
+}
+
+
+function get_monitor_configuration_dir {
+  local hostname=$1
+
+  if [ -z $hostname  ]; then
+    msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  echo "$SUBUTAI_MONITOR_CONF_DIRECTORY/$hostname"
+  return
+}
+
+
+function assert_no_config {
+  local hostname=$1
+  local metric_type=$2
+
+  if [ -z $hostname  ]; then
+    msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+  assert_metric $metric_type > /dev/null 2>&1
+
+  local monitor_conf=$(get_monitor_configuration_file $hostname $metric_type)
+  if [ -f $monitor_conf ]; then
+    msg_error "Configuration file of $metric_type already exists for $hostname! Aborting.."
+    exit 1
+  fi
+}
+
+
+
