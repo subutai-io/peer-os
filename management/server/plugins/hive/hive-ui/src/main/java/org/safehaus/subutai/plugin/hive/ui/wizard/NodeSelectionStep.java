@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -139,16 +138,16 @@ public class NodeSelectionStep extends Panel
                     config.setHadoopClusterName( hc.getClusterName() );
                     config.setHadoopNodes( new HashSet<>( hc.getAllNodes() ) );
 
-                    Agent selected = null;
+                    ContainerHost selected = null;
                     if ( config.getServer() != null )
                     {
                         selected = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() )
-                                                     .getContainerHostByUUID( config.getServer() ).getAgent();
+                                                     .getContainerHostByUUID( config.getServer() );
                     }
                     else
                     {
                         selected = environmentManager.getEnvironmentByUUID( hc.getEnvironmentId() )
-                                                     .getContainerHostByUUID( hc.getNameNode() ).getAgent();
+                                                     .getContainerHostByUUID( hc.getNameNode() );
                     }
                     fillServerNodeComboBox( config, cmbServerNode, hc, selected );
                     filterNodes( cmbServerNode, hc );
@@ -208,7 +207,7 @@ public class NodeSelectionStep extends Panel
 
 
     private void fillServerNodeComboBox( HiveConfig config, ComboBox serverNode, HadoopClusterConfig hadoopInfo,
-                                         Agent selected )
+                                         ContainerHost selected )
     {
         serverNode.removeAllItems();
         List<UUID> slaves = hadoopInfo.getAllSlaveNodes();
@@ -237,7 +236,7 @@ public class NodeSelectionStep extends Panel
         }
         if ( selected != null )
         {
-            serverNode.setValue( selected );
+            serverNode.setValue( selected.getId() );
         }
     }
 

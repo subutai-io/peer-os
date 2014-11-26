@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hipi.api.HipiConfig;
@@ -110,7 +109,7 @@ public class ConfigurationStep extends Panel
     private void addOverHadoopControls( ComponentContainer parent, final HipiConfig config )
     {
 
-        final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
+        final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<UUID>() );
 
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
         hadoopClusters.setId( "hipiHadoopCluster" );

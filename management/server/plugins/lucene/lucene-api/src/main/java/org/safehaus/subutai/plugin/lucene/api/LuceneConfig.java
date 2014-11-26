@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
@@ -105,6 +104,7 @@ public class LuceneConfig implements ConfigBase
     {
         this.hadoopNodes = hadoopNodes;
     }
+
 
     public UUID getEnvironmentId()
     {

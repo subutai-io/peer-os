@@ -1,15 +1,10 @@
 package org.safehaus.subutai.plugin.flume.impl;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
@@ -90,7 +85,6 @@ class WithHadoopSetupStrategy extends FlumeSetupStrategy
             po.addLog( "Saving to db..." );
             manager.getPluginDao().saveInfo( FlumeConfig.PRODUCT_KEY, config.getClusterName(), config );
             po.addLog( "Cluster info successfully saved" );
-
         }
         catch ( PeerException e )
         {
