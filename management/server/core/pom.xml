@@ -42,6 +42,7 @@
     <module>host-registry</module>
     <module>command-executor</module>
     <module>wol-manager</module>
+    <module>key-manager</module>
   </modules>
 
 </project>
