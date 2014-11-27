@@ -69,7 +69,7 @@ public class MonitorImplTest
     private static final String HOST = "test";
     private static final double METRIC_VALUE = 123;
     private static final String METRIC_JSON = " {\"host\":\"test\", \"totalRam\":\"123\"," +
-            "\"availableRam\":\"123\", \"usedRam\":\"123\", \"cpuLoad5\":\"123\","
+            "\"availableRam\":\"123\", \"usedRam\":\"123\", \"usedCpu\":\"123\","
             + "  \"availableDisk\" : \"123\", \"usedDisk\" : \"123\", \"totalDisk\" : \"123\"}";
     @Mock
     DataSource dataSource;

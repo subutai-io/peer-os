@@ -1,9 +1,14 @@
 package org.safehaus.subutai.plugin.flume.ui.wizard;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -118,7 +123,7 @@ public class ConfigurationStep extends VerticalLayout
 
     private void addOverHadoopControls( ComponentContainer parent, final FlumeConfig config )
     {
-        final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
+        final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<ContainerHost>() );
 
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
         hadoopClusters.setId( "FluHadoopClustersCb" );
@@ -135,10 +140,10 @@ public class ConfigurationStep extends VerticalLayout
                 {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
-                    config.setHadoopNodes( Sets.newHashSet(hadoopInfo.getAllNodes()) );
+                    config.setHadoopNodes( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
                     hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
                     Set<ContainerHost> hadoopNodes =
-                            hadoopEnvironment.getHostsByIds(  Sets.newHashSet(hadoopInfo.getAllNodes())  );
+                            hadoopEnvironment.getHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
                     select.setValue( null );
                     select.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
@@ -192,7 +197,7 @@ public class ConfigurationStep extends VerticalLayout
                 {
                     Set<UUID> nodes = new HashSet<UUID>();
                     Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
-                    for( ContainerHost host : nodeList)
+                    for ( ContainerHost host : nodeList )
                     {
                         nodes.add( host.getAgent().getUuid() );
                     }

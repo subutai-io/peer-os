@@ -2,17 +2,12 @@ package org.safehaus.subutai.plugin.solr.impl;
 
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.protocol.Container;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -46,7 +41,6 @@ public class SolrSetupStrategy implements ClusterSetupStrategy
         this.config = config;
         this.environment = environment;
     }
-
 
 
     @Override
