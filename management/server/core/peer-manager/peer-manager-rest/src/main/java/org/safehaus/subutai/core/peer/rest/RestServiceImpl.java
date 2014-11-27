@@ -13,6 +13,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -21,7 +22,6 @@ import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.common.protocol.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -241,7 +241,7 @@ public class RestServiceImpl implements RestService
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            Host host = localPeer.bindHost( UUID.fromString( hostId ) );
+            Host host = localPeer.bindHost( hostId );
             if ( host instanceof ContainerHost )
             {
                 localPeer.destroyContainer( ( ContainerHost ) host );
@@ -262,7 +262,7 @@ public class RestServiceImpl implements RestService
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            Host host = localPeer.bindHost( UUID.fromString( hostId ) );
+            Host host = localPeer.bindHost( hostId );
             if ( host instanceof ContainerHost )
             {
                 localPeer.startContainer( ( ContainerHost ) host );
@@ -282,7 +282,7 @@ public class RestServiceImpl implements RestService
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            Host host = localPeer.bindHost( UUID.fromString( hostId ) );
+            Host host = localPeer.bindHost( hostId );
             if ( host instanceof ContainerHost )
             {
                 localPeer.stopContainer( ( ContainerHost ) host );
@@ -302,7 +302,7 @@ public class RestServiceImpl implements RestService
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            Boolean result = localPeer.isConnected( localPeer.bindHost( UUID.fromString( hostId ) ) );
+            Boolean result = localPeer.isConnected( localPeer.bindHost( hostId ) );
             return Response.ok( result.toString() ).build();
         }
         catch ( PeerException e )

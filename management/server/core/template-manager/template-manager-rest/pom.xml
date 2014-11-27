@@ -19,13 +19,19 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
+    <!--
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
     </dependency>
+    -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>apt-repository-api</artifactId>
+      <artifactId>repository-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>peer-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.safehaus.subutai</groupId>

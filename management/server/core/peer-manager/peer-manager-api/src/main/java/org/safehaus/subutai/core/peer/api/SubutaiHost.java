@@ -54,6 +54,13 @@ public abstract class SubutaiHost implements Host
     //    }
 
 
+    @Override
+    public String getHostId()
+    {
+        return this.getId() != null ? this.getId().toString() : null;
+    }
+
+
     public Agent getAgent()
     {
         return agent;
@@ -140,17 +147,17 @@ public abstract class SubutaiHost implements Host
 
 
     @Override
-    public UUID getPeerId()
+    public String getPeerId()
     {
-        return peerId;
+        return peerId.toString();
     }
 
-
-    @Override
-    public void setPeerId( final UUID peerId )
-    {
-        this.peerId = peerId;
-    }
+    //
+    //    @Override
+    //    public void setPeerId( final UUID peerId )
+    //    {
+    //        this.peerId = peerId;
+    //    }
 
 
     @Override
@@ -159,12 +166,12 @@ public abstract class SubutaiHost implements Host
         return agent.getUuid();
     }
 
-
-    @Override
-    public String getParentHostname()
-    {
-        return agent.getParentHostName();
-    }
+//
+//    @Override
+//    public String getParentHostname()
+//    {
+//        return agent.getParentHostName();
+//    }
 
 
     @Override

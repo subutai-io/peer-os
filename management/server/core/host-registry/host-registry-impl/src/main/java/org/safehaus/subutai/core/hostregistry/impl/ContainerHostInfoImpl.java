@@ -78,40 +78,6 @@ public class ContainerHostInfoImpl implements ContainerHostInfo
     @Override
     public int compareTo( final HostInfo o )
     {
-        if ( hostname != null && o != null )
-        {
-            return hostname.compareTo( o.getHostname() );
-        }
-        return -1;
-    }
-
-
-    @Override
-    public boolean equals( final Object o )
-    {
-        if ( this == o )
-        {
-            return true;
-        }
-        if ( !( o instanceof ContainerHostInfoImpl ) )
-        {
-            return false;
-        }
-
-        final ContainerHostInfoImpl that = ( ContainerHostInfoImpl ) o;
-
-        if ( id != null ? !id.equals( that.id ) : that.id != null )
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-
-    @Override
-    public int hashCode()
-    {
-        return id != null ? id.hashCode() : 0;
+        return 0;
     }
 }
