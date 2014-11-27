@@ -35,12 +35,12 @@ public class ListEnvironmentCommandTest
     }
 
 
-    @Test
-    public void test() throws Exception
-    {
-        List<Environment> l = new ArrayList<>();
-        l.add( new Environment( NAME ) );
-        when( manager.getEnvironments() ).thenReturn( l );
-        command.doExecute();
-    }
+//    @Test
+//    public void test() throws Exception
+//    {
+//        List<Environment> l = new ArrayList<>();
+//        l.add( new Environment( NAME ) );
+//        when( manager.getEnvironments() ).thenReturn( l );
+//        command.doExecute();
+//    }
 }

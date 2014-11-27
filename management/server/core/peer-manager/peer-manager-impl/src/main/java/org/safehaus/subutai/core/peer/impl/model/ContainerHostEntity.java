@@ -16,6 +16,7 @@ import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -75,6 +76,16 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         this.nodeGroupName = nodeGroupName;
         this.templateArch = "amd64";
         this.templateName = "UNKNOWN";
+    }
+
+
+    public ContainerHostEntity( final HostKey hostKey )
+    {
+        this.hostId = hostKey.getHostId();
+        this.peerId = hostKey.getPeerId();
+        this.creatorPeerId = hostKey.getCreatorId();
+        this.environmentId = hostKey.getEnvironmentId();
+        this.nodeGroupName = hostKey.getNodeGroupName();
     }
 
 

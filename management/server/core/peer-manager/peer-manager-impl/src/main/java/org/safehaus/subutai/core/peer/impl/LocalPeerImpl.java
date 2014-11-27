@@ -28,7 +28,6 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
@@ -40,6 +39,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.HostEvent;
 import org.safehaus.subutai.core.peer.api.HostEventListener;
+import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostTask;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -391,16 +391,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     @Override
-    public ContainerHost getContainerHost( final HostInfo hostInfo, final String creatorPeerId,
-                                           final String environmentId, final String nodeGroupName )
+    public ContainerHost getContainerHostImpl( final HostKey hostKey )
     {
         Host host = null;
 
-        if ( getId().equals( creatorPeerId ) )
+        if ( getId().equals( hostKey.getCreatorId() ) )
         {
             try
             {
-                host = bindHost( hostInfo.getId() );
+                host = bindHost( hostKey.getHostId() );
             }
             catch ( HostNotFoundException ignore )
             {
@@ -409,8 +408,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         }
         if ( host == null )
         {
-            host = new ContainerHostEntity( getId().toString(), creatorPeerId, environmentId.toString(), nodeGroupName,
-                    hostInfo );
+            //TODO: implement remote ContainerHostImpl if needs
+            host = new ContainerHostEntity( hostKey );
         }
         return ( ContainerHost ) host;
     }
