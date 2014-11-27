@@ -6,10 +6,7 @@ function network_usage {
 echo --------------------------------------------------------------------------
 echo
 echo Usage:   Assign Environment IP and VLAN ID of Container
-echo "        "subutai \[-qh\] network CONTAINER -a IPADDRESS/NETMASK VLANID
-echo
-echo Usage:   Modify Environment IP and VLAN ID of Container
-echo "        "subutai \[-qh\] network CONTAINER -m IPADDRESS/NETMASK VLANID
+echo "        "subutai \[-qh\] network CONTAINER -s IPADDRESS/NETMASK VLANID
 echo
 echo Usage:   Remove Environment IP and VLAN ID of Container
 echo "        "subutai \[-qh\] network CONTAINER -r
@@ -25,8 +22,7 @@ echo --------------------------------------------------------------------------
 
 function network {
   #Parse provided arguments
-  local assign="false"
-  local modify="false"
+  local setIP="false"
   local remove="false"
   local list="false"
   local container="$1"
@@ -41,7 +37,7 @@ function network {
   fi
 
   lxc_assert "$container" "`network_usage`"
-  if [ "$2" != "-a" ] && [ "$2" != "-m" ] && [ "$2" != "-r" ] && [ "$2" != "-l" ]
+  if [ "$2" != "-s" ] && [ "$2" != "-r" ] && [ "$2" != "-l" ]
   then
      msg_error "Error Getting Options. Aborting..."
      show_usage "`network_usage`"
@@ -49,15 +45,10 @@ function network {
   OPTIND=0
   shift
   shift_amount=0;
-  while getopts ":amrlh" opt; do
+  while getopts ":srlh" opt; do
     case $opt in
-      a)
-        assign="true"
-        net_check_parameters $ipAddress $vlanID $extra
-	net_check_ip_vlan_validation $ipAddress $vlanID
-        ;;
-      m)
-        modify="true"
+      s)
+        setIP="true"
         net_check_parameters $ipAddress $vlanID $extra
 	net_check_ip_vlan_validation $ipAddress $vlanID
         ;;
@@ -76,38 +67,35 @@ function network {
   done
 
   #Environment IP and VLAN ID Assignment Procedure
-  if [ $assign == "true" ]; then
-    if [ "`cat $config | grep "lxc.network.ipv4"`" ] || [ "`cat $config | grep "#vlan_id"`" ]
-    then
-     msg_error "Environment IP or Vlan ID already set. Aborting..."
-     exit 1
-    fi
-    sed -i '/-2/a lxc.network.ipv4 = '$ipAddress'' $config
-    echo "#vlan_id = $vlanID"  >> $config
-    # get macaddress_of_container to initialize ovs bridges' name
-    macaddress_of_container=`cat $config | grep lxc.network.hwaddr | cut -d "=" -f 2 | tr -d ' '`
-    #Remove ':' characters from macaddress to initialize ovs_bridges
-    ovs_port_name=`echo $macaddress_of_container | tr -d ':'`
-    net_update_networking $container $ovs_port_name $ipAddress $vlanID 
-    msg_ok "Environment IP and VLAN ID Assignment Done."
-
-  #Environment IP and VLAN ID Modify Procedure
-  elif [ $modify == "true" ]; then
+  if [ $setIP == "true" ]; then
+    #checking container IP is assigned or not 
     if [ -z "`cat $config | grep "lxc.network.ipv4"`" ] || [ -z "`cat $config | grep "#vlan_id"`" ]
     then
-     msg_error "Environment IP or Vlan ID not set. Aborting..."
-     exit 1
+       msg_info "Environment IP or VLAN ID has not been set. Assignment starting.."
+       sed -i '/-2/a lxc.network.ipv4 = '$ipAddress'' $config
+       echo "#vlan_id = $vlanID"  >> $config
+       # get macaddress_of_container to initialize ovs bridges' name
+       macaddress_of_container=`cat $config | grep lxc.network.hwaddr | cut -d "=" -f 2 | tr -d ' '`
+       #Remove ':' characters from macaddress to initialize ovs_bridges
+       ovs_port_name=`echo $macaddress_of_container | tr -d ':'`
+       net_update_networking $container $ovs_port_name $ipAddress $vlanID
+       msg_ok "Environment IP and VLAN ID Assignment Done."
+    
+    #check container IP is assigned then modification should be done 
+    elif [ "`cat $config | grep "lxc.network.ipv4"`" ] || [ "`cat $config | grep "#vlan_id"`" ]
+    then
+     msg_info "Environment IP or VLAN ID has already been set. Modification starting.."
+     sed -i '/lxc.network.ipv4/c\lxc.network.ipv4 = '$ipAddress'' $config
+     sed -i '/#vlan_id/c\#vlan_id = '$vlanID'' $config
+     # get macaddress_of_container to initialize ovs bridges' name
+     macaddress_of_container=`cat $config | grep lxc.network.hwaddr | cut -d "=" -f 2 | tr -d ' '`
+     #Remove ':' characters from macaddress to initialize ovs_bridges
+     ovs_port_name=`echo $macaddress_of_container | tr -d ':'`
+     net_update_networking $container $ovs_port_name $ipAddress $vlanID 
+     msg_ok "Environment IP and VLAN ID Modification Done."
     fi
-    sed -i '/lxc.network.ipv4/c\lxc.network.ipv4 = '$ipAddress'' $config
-    sed -i '/#vlan_id/c\#vlan_id = '$vlanID'' $config
-    # get macaddress_of_container to initialize ovs bridges' name
-    macaddress_of_container=`cat $config | grep lxc.network.hwaddr | cut -d "=" -f 2 | tr -d ' '`
-    #Remove ':' characters from macaddress to initialize ovs_bridges
-    ovs_port_name=`echo $macaddress_of_container | tr -d ':'`
-    net_update_networking $container $ovs_port_name $ipAddress $vlanID 
-    msg_ok "Environment IP and VLAN ID Editing Done."
 
-    #Environment IP and VLAN ID Remove Procedure
+  #Environment IP and VLAN ID Remove Procedure
   elif [ $remove == "true" ]; then
     if [ "$ipAddress" ]; then
       msg_error "Extra Argument Detected. Aborting ..."
@@ -142,6 +130,8 @@ function network {
 }
 
 function network_description {
-  echo "Establish a tunnel between subutai peers"
+  echo "Assign or Modify given container's container IP and VLAN ID"
+  echo "Remove given container's container IP"
+  echo "List given container's container IP and VLAN ID"
 }
 

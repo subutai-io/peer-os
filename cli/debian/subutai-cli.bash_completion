@@ -34,7 +34,7 @@ _subutai()
                     COMPREPLY=( $(compgen -W "${config_binding_switches}" -- ${cur}))
                     ;;
                 network)
-                    networkArgs="-a -h -l -m -r"
+                    networkArgs="-s -h -l -r"
                     COMPREPLY=( $(compgen -W "${networkArgs}" -- ${cur}) )
                     return 0
                     ;;
@@ -59,7 +59,7 @@ _subutai()
                     COMPREPLY=( $(compgen -W "${config_binding_switches}" -- ${cur}))
                     ;;
                 network)
-                    networkArgs="-a -h -l -m -r"
+                    networkArgs="-s -h -l -r"
                     COMPREPLY=( $(compgen -W "${networkArgs}" -- ${cur}) )
                     return 0
                     ;;
