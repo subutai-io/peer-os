@@ -184,6 +184,9 @@ void SubutaiContainerManager::updateContainerLists()
     } catch (std::exception e) {
 
     }
+    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+        (*it).getContainerAllFields();
+    }
 }
 
 /**
