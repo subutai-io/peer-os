@@ -38,7 +38,7 @@ public class ContainerCreatorThread extends Observable implements Runnable
     {
         try
         {
-            Set<ContainerHost> containers = peerManager.getPeer( peerManager.getLocalPeer().getId() ).
+            Set<ContainerHost> containers = peerManager.getPeer( message.getTargetPeerId() ).
                     createContainers( message.getTargetPeerId(), environmentId, message.getTemplates(),
                             message.getNumberOfNodes(), message.getStrategy().getStrategyId(),
                             message.getStrategy().getCriteriaAsList(), message.getNodeGroupName() );
