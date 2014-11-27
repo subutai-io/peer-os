@@ -163,7 +163,7 @@ public class NodeOperationHandlerTest {
         when(commandResult.hasSucceeded()).thenReturn(true);
         nodeOperationHandler.executeCommand(containerHost, requestBuilder);
 
-        assertEquals(true, commandResult.hasSucceeded());
+        assertTrue(commandResult.hasSucceeded());
         assertEquals(commandResult, nodeOperationHandler.executeCommand(containerHost, requestBuilder));
         assertEquals(commandResult, containerHost.execute(requestBuilder));
         assertNotNull(nodeOperationHandler.executeCommand(containerHost, requestBuilder));
