@@ -13,9 +13,9 @@ public class CloneTask extends HostTask<ResourceHost, CloneParam, CloneResult>
 {
 
 
-    public CloneTask( final ResourceHost resourceHost, final CloneParam parameter )
+    public CloneTask( final String groupId, final ResourceHost resourceHost, final CloneParam parameter )
     {
-        super( resourceHost, parameter );
+        super( groupId, resourceHost, parameter );
         result = new CloneResult();
     }
 
@@ -25,25 +25,20 @@ public class CloneTask extends HostTask<ResourceHost, CloneParam, CloneResult>
     {
         try
         {
-            LOG.debug( String.format( "Preparing templates on %s...", host.getHostname() ) );
             host.prepareTemplates( getParameter().getTemplates() );
-            LOG.debug( String.format( "Cloning container %s on %s...", param.getHostname(), host.getHostname() ) );
             host.cloneContainer( getParameter().getTemplateName(), getParameter().getHostname() );
-
-            ContainerHost containerHost =
-                    waitContainerHost( param.getHostname(), 180 );//host.getContainerHostByName( param.getHostname() );
+            ContainerHost containerHost = waitContainerHost( param.getHostname(), 180 );
             if ( containerHost != null )
             {
                 LOG.info( String.format( "Container %s with id %s on %s cloned successfully.", param.getHostname(),
                         containerHost.getId(), host.getHostname() ) );
-                result.setContainerHost( containerHost );
-                done();
+                result.ok( containerHost );
             }
             else
             {
                 LOG.debug( String.format( "Cloning container %s on %s failed.", param.getHostname(),
                         host.getHostname() ) );
-                fail( new ResourceHostException(
+                result.fail( new ResourceHostException(
                         String.format( "Container %s on %s is not cloned in estimated timeout.", host.getHostname(),
                                 param.getHostname() ), "" ) );
                 getHost().fireEvent( new HostEvent( host, HostEvent.EventType.HOST_CLONE_FAIL, containerHost ) );
@@ -76,6 +71,8 @@ public class CloneTask extends HostTask<ResourceHost, CloneParam, CloneResult>
             {
             }
             containerHost = host.getContainerHostByName( hostname );
+            LOG.debug( String.format( "Waiting for %s. Timeout: %d", hostname,
+                    threshold - System.currentTimeMillis() / 1000 ) );
         }
         while ( threshold > System.currentTimeMillis() && containerHost == null );
         return containerHost;
@@ -85,6 +82,8 @@ public class CloneTask extends HostTask<ResourceHost, CloneParam, CloneResult>
     @Override
     public void start()
     {
+        LOG.debug( String.format( "Scheduling %s clone task on %s for container %s using template %s", getId(),
+                host.getHostname(), param.getHostname(), param.getTemplateName() ) );
         getHost().queue( this );
     }
 

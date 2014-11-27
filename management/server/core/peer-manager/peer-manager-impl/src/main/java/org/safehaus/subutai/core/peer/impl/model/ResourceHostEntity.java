@@ -3,12 +3,10 @@ package org.safehaus.subutai.core.peer.impl.model;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
@@ -31,7 +29,6 @@ import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
-import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.ContainerState;
 import org.safehaus.subutai.core.peer.api.Host;
@@ -91,9 +88,10 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     private ExecutorService getSingleThreadExecutorService()
     {
-        if ( singleThreadExecutorService == null || singleThreadExecutorService.isShutdown() )
+        if ( singleThreadExecutorService == null )
         {
             singleThreadExecutorService = Executors.newSingleThreadExecutor();
+            LOG.debug( String.format( "New single thread executor created for %s", hostname ) );
         }
 
         return singleThreadExecutorService;
@@ -112,16 +110,16 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void queue( final HostTask hostTask )
+    public synchronized void queue( final HostTask hostTask )
     {
-        LOG.info( String.format( "New sequential task %s queued.", hostTask.getId() ) );
+        LOG.debug( String.format( "New sequential task %s queued.", hostTask.getId() ) );
         ExecutorService executorService = getSingleThreadExecutorService();
         //        LOG.debug( executorService.toString() );
         executorService.submit( hostTask );
     }
 
 
-    public void run( final HostTask hostTask )
+    public synchronized void run( final HostTask hostTask )
     {
         LOG.info( String.format( "New immediate task %s added.", hostTask.getId() ) );
         getCachedThreadExecutorService().submit( hostTask );
@@ -207,7 +205,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             {
                 String[] metrics = result.getStdOut().split( "\n" );
                 serverMetric = gatherMetrics( metrics );
-                serverMetric.setAverageMetrics( gatherAvgMetrics() );
+                //                serverMetric.setAverageMetrics( gatherAvgMetrics() );
             }
             return serverMetric;
         }
@@ -227,11 +225,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     /**
      * Gather metrics from elastic search for a one week period
      */
-    private Map<MetricType, Double> gatherAvgMetrics()
-    {
-        //TODO: Implement me
-        return new EnumMap<>( MetricType.class );
-    }
+    //    private Map<MetricType, Double> gatherAvgMetrics()
+    //    {
+    //        //TODO: Implement me
+    //        return new EnumMap<>( MetricType.class );
+    //    }
 
 
     /**
@@ -331,7 +329,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         if ( parseOk )
         {
-            return new ServerMetric( getHostname(), freeHddMb, freeRamMb, ( int ) cpuLoadPercent, numOfProc, null );
+            return new ServerMetric( getHostname(), freeHddMb, freeRamMb, ( int ) cpuLoadPercent, numOfProc );
         }
         else
         {
@@ -438,7 +436,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public void cloneContainer( final String templateName, final String cloneName ) throws ResourceHostException
     {
-        LOG.debug( String.format( "Cloning container %s from template %s", cloneName, cloneName ) );
+        LOG.debug( String.format( "Cloning container %s on %s from template %s", cloneName, hostname, templateName ) );
         run( Command.CLONE, templateName, cloneName );
     }
 
@@ -513,7 +511,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public void prepareTemplates( List<Template> templates ) throws ResourceHostException
     {
-        LOG.debug( "Preparing templates..." );
+        LOG.debug( String.format( "Preparing templates on %s...", hostname ) );
         for ( Template p : templates )
         {
             prepareTemplate( p );
@@ -539,9 +537,10 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         importTemplate( p );
         if ( !isTemplateExist( p ) )
         {
-            LOG.debug( String.format( "Could not prepare templae %s on %s.", p.getTemplateName(), hostname ) );
-            throw new ResourceHostException( String.format( "Could not prepare template %s on %s", p.getTemplateName(),
-                    getAgent().getHostname() ), null );
+            LOG.debug( String.format( "Could not prepare template %s on %s.", p.getTemplateName(), hostname ) );
+            throw new ResourceHostException( "Prepare template exception.",
+                    String.format( "Could not prepare template %s on %s", p.getTemplateName(),
+                            getAgent().getHostname() ) );
         }
     }
 
@@ -549,16 +548,17 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public boolean isTemplateExist( final Template template ) throws ResourceHostException
     {
-        boolean exists = run( Command.LIST_TEMPLATES, template.getTemplateName() );
-        if ( exists )
+        try
         {
+            run( Command.LIST_TEMPLATES, template.getTemplateName() );
             LOG.debug( String.format( "Template %s exists on %s.", template.getTemplateName(), hostname ) );
+            return true;
         }
-        else
+        catch ( ResourceHostException rhe )
         {
             LOG.debug( String.format( "Template %s does not exists on %s.", template.getTemplateName(), hostname ) );
+            return false;
         }
-        return exists;
     }
 
 
@@ -607,8 +607,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         args.add( cloneName );
         String[] arr = args.toArray( new String[args.size()] );
-
-        return run( Command.PROMOTE, arr );
+        run( Command.PROMOTE, arr );
+        return true;
     }
 
 
@@ -621,14 +621,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
      */
     public String exportTemplate( String templateName ) throws ResourceHostException
     {
-        if ( run( Command.EXPORT, templateName ) )
-        {
-            return getExportedPackageFilePath( templateName );
-        }
-        else
-        {
-            return null;
-        }
+        run( Command.EXPORT, templateName );
+        return getExportedPackageFilePath( templateName );
     }
 
 
@@ -712,25 +706,23 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    protected boolean run( Command command, String... args ) throws ResourceHostException
+    protected void run( Command command, String... args ) throws ResourceHostException
     {
         try
         {
             CommandResult commandResult = execute( command.build( args ) );
 
-            if ( commandResult.getStatus().equals( CommandStatus.SUCCEEDED ) )
+            if ( !commandResult.getStatus().equals( CommandStatus.SUCCEEDED ) )
             {
-                return true;
+                throw new ResourceHostException(
+                        String.format( "Command execution failed %s.", String.format( command.script, args ) ),
+                        commandResult.getStdErr() );
             }
-            throw new ResourceHostException(
-                    String.format( "Command execution failed %s", String.format( command.script, args ) ),
-                    commandResult.toString() );
         }
         catch ( CommandException e )
         {
             throw new ResourceHostException(
-                    String.format( "Could not execute script/command %s", String.format( command.script, args ) ),
-                    e.toString() );
+                    String.format( "Could not execute script/command %s", String.format( command.script, args ) ), e.toString() );
         }
     }
 
@@ -809,7 +801,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     enum Command
     {
         LIST_TEMPLATES( "subutai list -t %s" ),
-        CLONE( "subutai clone %s %s", 120 ),
+        CLONE( "subutai clone %s %s", 1, true ),
         DESTROY( "subutai destroy %s" ),
         IMPORT( "subutai import %s" ),
         PROMOTE( "promote %s" ),

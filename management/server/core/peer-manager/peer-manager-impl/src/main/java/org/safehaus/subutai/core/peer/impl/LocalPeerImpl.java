@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -97,6 +98,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     private ResourceHostDataService resourceHostDataService;
     private HostRegistry hostRegistry;
     private Set<RequestListener> requestListeners;
+    private List<HostTask> tasks = Lists.newCopyOnWriteArrayList();
 
 
     public LocalPeerImpl( PeerManager peerManager, AgentManager agentManager, TemplateRegistry templateRegistry,
@@ -218,76 +220,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         Preconditions.checkNotNull( environmentId, "Environment ID is null." );
         Preconditions.checkNotNull( templateName, "Template list is null." );
 
-        //        String nodeGroup = UUID.randomUUID().toString();
-
         CloneParam cloneParam = new CloneParam( cloneName, Lists.newArrayList( getTemplate( templateName ) ) );
         ResourceHost resourceHost = getResourceHostByName( hostName );
 
 
-        CloneTask cloneTask = new CloneTask( resourceHost, cloneParam );
+        String taskGroupId = UUID.randomUUID().toString();
+        CloneTask cloneTask = new CloneTask( taskGroupId, resourceHost, cloneParam );
         cloneTask.start();
-        while ( cloneTask.getPhase() != HostTask.Phase.DONE )
+
+        try
         {
-            try
-            {
-                Thread.sleep( 2000 );
-            }
-            catch ( InterruptedException ignore )
-            {
-            }
+            return waitCloneTasks( Lists.newArrayList( cloneTask ) ).iterator().next();
         }
-        CloneResult result = cloneTask.getResult();
-
-        return result.getContainerHost();
-        //        cloneTask.getResult();
-        //        Set<ContainerHost> containerHosts = waitContainerOrders( resourceHost, Lists.newArrayList(
-        // cloneParam ) );
-        //        ContainerHost result = containerHosts.iterator().next();
-        //        //        result.setEnvironmentId( environmentId.toString() );
-        //        //        result.setNodeGroupName( nodeGroup );
-        //        //        result.setCreatorPeerId( getId().toString() );
-        //        //        result.setTemplateName( templateName );
-        //        //        resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
-        //        return result;
-    }
-
-
-    private Set<ContainerHost> waitContainerOrders( ResourceHost resourceHost, List<CloneParam> orders )
-            throws PeerException
-    {
-
-        Set<ContainerHost> result = new HashSet<>();
-        int quantity = orders.size();
-        long threshold = System.currentTimeMillis() + 120 * quantity * 1000;
-        Set<String> cloneNames = new HashSet<>();
-        for ( CloneParam cloneParam : orders )
+        catch ( Exception e )
         {
-            cloneNames.add( cloneParam.getHostname() );
+            LOG.error( "Clone fail", e );
+            throw new PeerException( "Clone fail.", e.toString() );
         }
-        while ( result.size() != quantity && threshold - System.currentTimeMillis() > 0 )
-        {
-            try
-            {
-                Date date = new Date( threshold - System.currentTimeMillis() );
-                DateFormat formatter = new SimpleDateFormat( "HH:mm:ss" );
-                LOG.info( String.format( "Waiting for container(s) on %s: %d. Ready: %d container(s). Timeout: %s ",
-                        resourceHost.getHostname(), quantity, result.size(), formatter.format( date ) ) );
-                Thread.sleep( 5000 );
-            }
-            catch ( InterruptedException ignore )
-            {
-            }
-            result = resourceHost.getContainerHostsByNameList( cloneNames );
-        }
-        if ( result.size() != quantity )
-        {
-            throw new PeerException( String.format(
-                    "Not all containers created for %s. Count of cloned container=%d. Expected count=%d).",
-                    resourceHost, result.size(), quantity ) );
-        }
-
-
-        return result;
     }
 
 
@@ -303,7 +252,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         Preconditions.checkNotNull( templates, "Template list is null." );
         Preconditions.checkState( templates.size() > 0, "Template list is empty" );
 
-        LOG.info( String.format( "=============> Received: %s %d %s", nodeGroupName, quantity,
+        LOG.info( String.format( "=============> Order received: %s %d %s", nodeGroupName, quantity,
                 creatorPeerId.toString() ) );
 
         try
@@ -353,7 +302,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 cloneNames.put( resourceHost, hostCloneNames );
             }
 
+            List<CloneTask> cloneTasks = new ArrayList<>();
             Map<ResourceHost, List<CloneParam>> orders = new HashMap<>();
+            String taskGroupId = UUID.randomUUID().toString();
             for ( final Map.Entry<ResourceHost, Set<String>> e : cloneNames.entrySet() )
             {
                 ResourceHost rh = e.getKey();
@@ -362,45 +313,79 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 List<CloneParam> cloneParams = new ArrayList<>();
                 for ( String cloneName : clones )
                 {
-                    LOG.info(
-                            String.format( "+++++++++++++++++++++> Ordered: %s on %s", cloneName, rh.getHostname() ) );
                     CloneParam cloneParam = new CloneParam( cloneName, templates );
                     cloneParams.add( cloneParam );
-                    CloneTask cloneTask = new CloneTask( resourceHost, cloneParam );
+                    CloneTask cloneTask = new CloneTask( taskGroupId, resourceHost, cloneParam );
                     cloneTask.start();
+                    cloneTasks.add( cloneTask );
                 }
                 orders.put( rh, cloneParams );
             }
-            HashSet<ContainerHost> result = new HashSet<>();
-
-            for ( final Map.Entry<ResourceHost, List<CloneParam>> e : orders.entrySet() )
+            tasks.addAll( cloneTasks );
+            Set<ContainerHost> result = waitCloneTasks( cloneTasks );
+            for ( ContainerHost containerHost : result )
             {
-                result.addAll( waitContainerOrders( e.getKey(), e.getValue() ) );
+                containerHost.setCreatorPeerId( creatorPeerId.toString() );
+                containerHost.setNodeGroupName( nodeGroupName );
+                containerHost.setEnvironmentId( environmentId.toString() );
+                containerHost.setTemplateName( templateName );
             }
-
-            //            for ( final Map.Entry<ResourceHost, List<CloneParam>> e : orders.entrySet() )
-            //            {
-            //                ResourceHost resourceHost = e.getKey();
-            //                for ( CloneParam cloneParam : e.getValue() )
-            //                {
-            //                    ContainerHost containerHost = resourceHost.getContainerHostByName( cloneParam
-            // .getHostname() );
-            //                    containerHost.setCreatorPeerId( cloneParam.getCreatorPeerId() );
-            //                    containerHost.setNodeGroupName( cloneParam.getNodeGroupName() );
-            //                    containerHost.setEnvironmentId( cloneParam.getEnvironmentId() );
-            //                    containerHost.setTemplateName( cloneParam.getTemplateName() );
-            //                }
-            //                resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
-            //            }
-
             return result;
         }
         catch ( Exception e )
         {
-            LOG.error( e.toString() );
+            LOG.error( "Clone fail.", e );
             //TODO: destroy environment containers
             throw new PeerException( e.toString() );
         }
+    }
+
+
+    private Set<ContainerHost> waitCloneTasks( final List<CloneTask> cloneTasks ) throws Exception
+    {
+        int quantity = cloneTasks.size();
+        long threshold = System.currentTimeMillis() + 180 * quantity * 1000;
+        DateFormat formatter = new SimpleDateFormat( "HH:mm:ss" );
+        formatter.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
+
+        int i = 0;
+        while ( i < quantity && threshold - System.currentTimeMillis() > 0 )
+        {
+            i = 0;
+            for ( CloneTask cloneTask : cloneTasks )
+            {
+                LOG.info( String.format( "Clone task check %s  %s:%s", cloneTask.getPhase(),
+                        cloneTask.getHost().getHostname(), cloneTask.getParameter().getHostname() ) );
+                if ( cloneTask.getPhase() == HostTask.Phase.DONE )
+                {
+                    if ( cloneTask.getResult().isOk() )
+                    {
+                        i++;
+                    }
+                    else
+                    {
+                        LOG.error( "Container clone error.", cloneTask.getException() );
+                        throw cloneTask.getException();
+                    }
+                }
+            }
+
+            try
+            {
+                Thread.sleep( 5000 );
+            }
+            catch ( InterruptedException ignore )
+            {
+            }
+            LOG.info( String.format( "Waiting clone tasks. Timeout: %s ",
+                    formatter.format( new Date( threshold - System.currentTimeMillis() ) ) ) );
+        }
+        Set<ContainerHost> result = new HashSet<>();
+        for ( CloneTask cloneTask : cloneTasks )
+        {
+            result.add( cloneTask.getResult().getValue() );
+        }
+        return result;
     }
 
 
@@ -435,60 +420,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     {
         LOG.info( String.format( "HostEvent received: %s %s", hostEvent.getType(), hostEvent.getObject() ) );
     }
-    //
-    //
-    //    @Override
-    //    public void onPeerEvent( PeerEvent event )
-    //    {
-    //        LOG.info( String.format( "Received onPeerEvent: %s %s.", event.getType(), event.getObject() ) );
-    //        try
-    //        {
-    //            switch ( event.getType() )
-    //            {
-    //                case CONTAINER_CREATE_SUCCESS:
-    //                    ContainerHostEntity containerHost = ( ContainerHostEntity ) event.getObject();
-    //                    //                    try
-    //                    //                    {
-    //                    //                        ResourceHost resourceHost = containerHost.getParent();
-    //                    //                        if ( resourceHost == null )
-    //                    //                        {
-    //                    //                            throw new PeerException( "Resource host not found to register
-    //                    // container." );
-    //                    //                        }
-    //                    //                        LOG.info( String.format( "Resource host %s. Containers count: =%d",
-    //                    // resourceHost.getHostname(),
-    //                    //                                resourceHost.getContainerHosts().size() ) );
-    //                    //                        resourceHost.addContainerHost( containerHost );
-    //                    //                        LOG.info( String.format( "Registered new container: %s %s %s",
-    //                    // containerHost.getHostname(),
-    //                    //                                containerHost.getEnvironmentId(), containerHost
-    //                    // .getNodeGroupName() ) );
-    //                    //                        peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId()
-    //                    // .toString(), resourceHost );
-    //
-    //                    //                        resourceHostDataService.update( ( ResourceHostEntity )
-    // resourceHost );
-    //                    //                        LOG.info( String.format( "Resource host %s saved. Containers count:
-    //                    // =%d",
-    //                    //                                resourceHost.getHostname(), resourceHost.getContainerHosts()
-    //                    // .size() ) );
-    //                    //                    }
-    //                    //                    catch ( PeerException e )
-    //                    //                    {
-    //                    //                        LOG.error( "Error in onPeerEvent", e );
-    //                    //                    }
-    //                    break;
-    //                case CONTAINER_CREATE_FAIL:
-    //                    Exception e = ( Exception ) event.getObject();
-    //                    LOG.error( "Container clone failed.", e );
-    //                    break;
-    //            }
-    //        }
-    //        catch ( Exception e )
-    //        {
-    //            LOG.error( "onPeerEvent: unhandled exception.", e );
-    //        }
-    //    }
 
 
     private String nextHostName( String templateName, Set<String> existingNames )

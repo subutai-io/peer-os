@@ -34,17 +34,17 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     private ResourceHost parent;
 
     @Column( name = "env_id", nullable = false )
-    private String environmentId;
+    private String environmentId = "UNKNOWN";
     @Column( name = "creator_id", nullable = false )
-    private String creatorPeerId;
+    private String creatorPeerId = "UNKNOWN";
     @Column( name = "template_name", nullable = false )
-    private String templateName;
+    private String templateName = "UNKNOWN";
     @Column( name = "template_arch", nullable = false )
-    private String templateArch;
+    private String templateArch = "UNKNOWN";
     @Transient
     private volatile ContainerHostState state = ContainerHostState.STOPPED;
     @Column( name = "node_group_name", nullable = false )
-    private String nodeGroupName;
+    private String nodeGroupName = "UNKNOWN";
     //    @Column( name = "parent_host_name", nullable = false )
     //    protected String parentHostname;
 
@@ -144,6 +144,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         return state;
     }
+
 
     public ResourceHost getParent()
     {

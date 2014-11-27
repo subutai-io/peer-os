@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 abstract public class HostTask<H extends Host, P extends HostTaskParam, R extends HostTaskResult> implements Runnable
 {
     protected static final Logger LOG = LoggerFactory.getLogger( HostTask.class );
+    private String groupId;
     private String id;
     protected P param;
     protected volatile Phase phase = Phase.NEW;
@@ -18,11 +19,18 @@ abstract public class HostTask<H extends Host, P extends HostTaskParam, R extend
     protected H host;
 
 
-    public HostTask( H host, P parameter )
+    public HostTask( String groupId, H host, P parameter )
     {
+        this.groupId = groupId;
         this.id = UUID.randomUUID().toString();
         this.host = host;
         this.param = parameter;
+    }
+
+
+    public String getGroupId()
+    {
+        return this.groupId;
     }
 
 
@@ -56,12 +64,6 @@ abstract public class HostTask<H extends Host, P extends HostTaskParam, R extend
     public Exception getException()
     {
         return exception;
-    }
-
-
-    public void done()
-    {
-        this.phase = Phase.DONE;
     }
 
 

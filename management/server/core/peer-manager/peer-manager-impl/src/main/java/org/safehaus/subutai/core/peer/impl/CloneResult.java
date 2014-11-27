@@ -8,23 +8,17 @@ import org.safehaus.subutai.core.peer.api.HostTaskResult;
 /**
  * Created by timur on 11/24/14.
  */
-public class CloneResult implements HostTaskResult
+public class CloneResult implements HostTaskResult<ContainerHost>
 {
-    private ContainerHost containerHost;
+    private ContainerHost value;
     private boolean success = false;
     private Exception exception;
 
 
-    public ContainerHost getContainerHost()
+    @Override
+    public ContainerHost getValue()
     {
-        return containerHost;
-    }
-
-
-    public void setContainerHost( final ContainerHost containerHost )
-    {
-        this.containerHost = containerHost;
-        this.success = true;
+        return value;
     }
 
 
@@ -32,6 +26,14 @@ public class CloneResult implements HostTaskResult
     public boolean isOk()
     {
         return success;
+    }
+
+
+    @Override
+    public void ok( final ContainerHost containerHost )
+    {
+        this.value = containerHost;
+        this.success = true;
     }
 
 
