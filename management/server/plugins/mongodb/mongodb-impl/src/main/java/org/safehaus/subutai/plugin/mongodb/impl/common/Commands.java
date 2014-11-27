@@ -12,12 +12,12 @@ import java.util.Set;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
+import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoRouterNode;
 import org.safehaus.subutai.plugin.mongodb.api.Timeouts;
 
@@ -59,19 +59,19 @@ public class Commands
     }
 
 
-    public CommandDef getAddIpHostToEtcHostsCommand( String domainName, Host containerHost, Set<Host> others )
+    public CommandDef getAddIpHostToEtcHostsCommand( String domainName, Host containerHost, Set<MongoNode> others )
     {
         StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
         StringBuilder appendHosts = new StringBuilder();
-        for ( Host otherAgent : others )
+        for ( MongoNode otherNode : others )
         {
-            if ( containerHost.getId().equals( otherAgent.getId() ) )
+            if ( containerHost.getId().equals( otherNode.getContainerHost().getId() ) )
             {
                 continue;
             }
 
-            String ip = AgentUtil.getAgentIpByMask( otherAgent.getAgent(), Common.IP_MASK );
-            String hostname = otherAgent.getHostname();
+            String ip = otherNode.getContainerHost().getIpByMask( Common.IP_MASK );
+            String hostname = otherNode.getHostname();
             cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
             appendHosts.append( "/bin/echo '" ).
                     append( ip ).append( " " ).
@@ -199,13 +199,14 @@ public class Commands
     {
 
 
-        Set<Host> clusterMembers = new HashSet<Host>( config.getAllNodes() );
+        Set<MongoNode> clusterMembers = new HashSet<>( config.getAllNodes() );
         clusterMembers.add( newRouterAgent );
         try
         {
-            for ( Host c : clusterMembers )
+            for ( MongoNode c : clusterMembers )
             {
-                CommandDef commandDef = getAddIpHostToEtcHostsCommand( config.getDomainName(), c, clusterMembers );
+                CommandDef commandDef =
+                        getAddIpHostToEtcHostsCommand( config.getDomainName(), c.getContainerHost(), clusterMembers );
 
                 c.execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
             }
@@ -228,13 +229,14 @@ public class Commands
     {
 
 
-        Set<Host> clusterMembers = new HashSet<Host>( config.getAllNodes() );
+        Set<MongoNode> clusterMembers = new HashSet<>( config.getAllNodes() );
         clusterMembers.add( newDataNode );
         try
         {
-            for ( Host c : clusterMembers )
+            for ( MongoNode c : clusterMembers )
             {
-                CommandDef commandDef = getAddIpHostToEtcHostsCommand( config.getDomainName(), c, clusterMembers );
+                CommandDef commandDef =
+                        getAddIpHostToEtcHostsCommand( config.getDomainName(), c.getContainerHost(), clusterMembers );
 
                 c.execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef.getTimeout() ) );
             }

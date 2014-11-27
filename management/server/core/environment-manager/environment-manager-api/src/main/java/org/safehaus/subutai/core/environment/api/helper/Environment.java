@@ -51,7 +51,7 @@ public class Environment
 
     public void addContainer( ContainerHost container )
     {
-        container.setEnvironmentId( id );
+        container.setEnvironmentId( id.toString() );
         this.containers.add( container );
     }
 

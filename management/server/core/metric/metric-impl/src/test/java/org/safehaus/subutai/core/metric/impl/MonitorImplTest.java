@@ -28,6 +28,7 @@ import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -143,7 +144,7 @@ public class MonitorImplTest
         when( remotePeer.isLocal() ).thenReturn( false );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         when( environment.getContainers() ).thenReturn( Sets.newHashSet( containerHost ) );
-        when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
+        when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID.toString() );
         when( localPeer.getResourceHosts() ).thenReturn( Sets.newHashSet( resourceHost ) );
     }
 
@@ -230,7 +231,7 @@ public class MonitorImplTest
     public void testAlertThresholdExcessLocalPeer() throws Exception
     {
         //set owner id as local peer
-        when( containerHost.getCreatorPeerId() ).thenReturn( LOCAL_PEER_ID );
+        when( containerHost.getCreatorPeerId() ).thenReturn( LOCAL_PEER_ID.toString() );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         Peer ownerPeer = mock( Peer.class );
         when( peerManager.getPeer( LOCAL_PEER_ID ) ).thenReturn( ownerPeer );
@@ -247,7 +248,7 @@ public class MonitorImplTest
     public void testAlertThresholdExcessRemotePeer() throws Exception
     {
         //set owner id as local peer
-        when( containerHost.getCreatorPeerId() ).thenReturn( REMOTE_PEER_ID );
+        when( containerHost.getCreatorPeerId() ).thenReturn( REMOTE_PEER_ID.toString() );
         when( localPeer.getContainerHostByName( HOST ) ).thenReturn( containerHost );
         Peer ownerPeer = mock( Peer.class );
         when( peerManager.getPeer( REMOTE_PEER_ID ) ).thenReturn( ownerPeer );
@@ -264,7 +265,7 @@ public class MonitorImplTest
     public void testAlertThresholdExcessException2() throws Exception
     {
 
-        when( localPeer.getContainerHostByName( HOST ) ).thenThrow( new PeerException( "" ) );
+        when( localPeer.getContainerHostByName( HOST ) ).thenThrow( new HostNotFoundException( "" ) );
 
         monitor.alert( METRIC_JSON );
     }
@@ -439,7 +440,7 @@ public class MonitorImplTest
                 .thenReturn( Sets.newHashSet( containerHost ) );
         when( containerHost.getParentHostname() ).thenReturn( RESOURCE_HOST );
 
-        PeerException exception = mock( PeerException.class );
+        HostNotFoundException exception = mock( HostNotFoundException.class );
         doThrow( exception ).when( localPeer ).getResourceHostByName( RESOURCE_HOST );
 
 
@@ -585,7 +586,7 @@ public class MonitorImplTest
         verify( commandResult ).getStdErr();
 
 
-        PeerException exception = mock( PeerException.class );
+        HostNotFoundException exception = mock( HostNotFoundException.class );
         doThrow( exception ).when( localPeer ).getResourceHostByName( RESOURCE_HOST );
 
         monitor.activateMonitoringAtLocalContainers( Sets.newHashSet( containerHost ), monitoringSettings );

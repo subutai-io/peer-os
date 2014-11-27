@@ -1,7 +1,10 @@
 package org.safehaus.subutai.core.peer.ui;
 
 
+import javax.naming.NamingException;
+
 import org.safehaus.subutai.common.protocol.Disposable;
+import org.safehaus.subutai.core.peer.ui.container.ContainerComponent;
 import org.safehaus.subutai.core.peer.ui.forms.PeerGroupComponent;
 import org.safehaus.subutai.core.peer.ui.forms.PeerRegisterForm;
 
@@ -31,6 +34,15 @@ public class PeerComponent extends CustomComponent implements Disposable
         sheet.setSizeFull();
         sheet.addTab( new PeerRegisterForm( peerManagerPortalModule ), "Registration" );
         sheet.addTab( new PeerGroupComponent( peerManagerPortalModule ), "Peer groups" );
+        try
+        {
+            sheet.addTab( new ContainerComponent( peerManagerPortalModule ), "Containers" );
+        }
+        catch ( NamingException e )
+        {
+            peerManagerPortalModule.LOG.error( "Could not create container component.", e );
+        }
+
         verticalLayout.addComponent( sheet );
 
 

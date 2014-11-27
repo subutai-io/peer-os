@@ -1,13 +1,12 @@
 package org.safehaus.subutai.plugin.mongodb.impl;
 
 
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoException;
 import org.safehaus.subutai.plugin.mongodb.impl.common.CommandDef;
@@ -19,10 +18,9 @@ import com.google.common.base.Strings;
 public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
 {
 
-    public MongoDataNodeImpl( final Agent agent, final UUID peerId, final UUID environmentId, final String domainName,
-                              final int port )
+    public MongoDataNodeImpl( final ContainerHost containerHost, final String domainName, final int port )
     {
-        super( agent, peerId, environmentId, domainName, port );
+        super( containerHost, domainName, port );
     }
 
 
@@ -32,7 +30,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
         try
         {
             CommandDef commandDef = Commands.getStartDataNodeCommandLine( port );
-            CommandResult commandResult = execute( commandDef.build( true ) );
+            CommandResult commandResult = containerHost.execute( commandDef.build( true ) );
 
             if ( !commandResult.getStdOut().contains( "child process started successfully, parent exiting" ) )
             {
@@ -53,7 +51,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
         try
         {
             CommandDef commandDef = Commands.getSetReplicaSetNameCommandLine( replicaSetName );
-            CommandResult commandResult = execute( commandDef.build() );
+            CommandResult commandResult = containerHost.execute( commandDef.build() );
             LOG.info( commandResult.toString() );
         }
         catch ( CommandException e )
@@ -69,7 +67,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
         CommandDef commandDef = Commands.getFindPrimaryNodeCommandLine( port );
         try
         {
-            CommandResult commandResult = execute( commandDef.build() );
+            CommandResult commandResult = containerHost.execute( commandDef.build() );
             Pattern p = Pattern.compile( "primary\" : \"(.*)\"" );
             Matcher m = p.matcher( commandResult.getStdOut() );
             if ( m.find() )
@@ -98,7 +96,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
                 Commands.getRegisterSecondaryNodeWithPrimaryCommandLine( dataNode.getHostname(), port, domainName );
         try
         {
-            CommandResult commandResult = execute( commandDef.build() );
+            CommandResult commandResult = dataNode.execute( commandDef.build() );
 
             if ( !commandResult.getStdOut().contains( "connecting to:" ) )
             {

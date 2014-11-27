@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.peer.cli;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.UUID;
 
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
@@ -17,7 +18,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "peer", name = "hosts")
+@Command( scope = "peer", name = "hosts" )
 public class HostsCommand extends OsgiCommandSupport
 {
 
@@ -75,7 +76,7 @@ public class HostsCommand extends OsgiCommandSupport
 
             if ( c.getCreatorPeerId() != null )
             {
-                Peer peer = peerManager.getPeer( c.getCreatorPeerId() );
+                Peer peer = peerManager.getPeer( UUID.fromString( c.getPeerId() ) );
                 if ( peer != null )
                 {
                     containerInfo += " " + peer.getPeerInfo().getIp();
