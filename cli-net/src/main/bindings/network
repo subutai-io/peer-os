@@ -5,7 +5,7 @@
 function network_usage {
 echo --------------------------------------------------------------------------
 echo
-echo Usage:   Assign Environment IP and VLAN ID of Container
+echo Usage:   Assign or Modify -due to state of container- Environment IP and VLAN ID of Container
 echo "        "subutai \[-qh\] network CONTAINER -s IPADDRESS/NETMASK VLANID
 echo
 echo Usage:   Remove Environment IP and VLAN ID of Container
