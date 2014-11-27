@@ -7,10 +7,11 @@ import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandStatus;
-import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.messenger.api.Message;
@@ -32,7 +33,6 @@ import org.safehaus.subutai.core.peer.impl.container.CreateContainerResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequest;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
-import org.safehaus.subutai.common.protocol.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -215,6 +215,7 @@ public class RemotePeerImpl implements RemotePeer
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
             throws CommandException
     {
+
         BlockingCommandCallback blockingCommandCallback = new BlockingCommandCallback( callback );
 
         executeAsync( requestBuilder, host, blockingCommandCallback, blockingCommandCallback.getCompletionSemaphore() );
@@ -255,6 +256,9 @@ public class RemotePeerImpl implements RemotePeer
     private void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback,
                                Semaphore semaphore ) throws CommandException
     {
+        Preconditions.checkNotNull( requestBuilder );
+        Preconditions.checkNotNull( host );
+
         if ( !host.isConnected() )
         {
             throw new CommandException( "Host disconnected." );
@@ -265,7 +269,7 @@ public class RemotePeerImpl implements RemotePeer
             throw new CommandException( "Operation not allowed" );
         }
 
-        CommandRequest request = new CommandRequest( requestBuilder, ( ContainerHost ) host );
+        CommandRequest request = new CommandRequest( requestBuilder, host.getId() );
         //cache callback
         commandResponseListener.addCallback( request.getRequestId(), callback, requestBuilder.getTimeout(), semaphore );
 
