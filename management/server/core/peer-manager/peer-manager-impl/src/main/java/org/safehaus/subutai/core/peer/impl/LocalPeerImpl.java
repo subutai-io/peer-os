@@ -354,8 +354,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             i = 0;
             for ( CloneTask cloneTask : cloneTasks )
             {
-                LOG.info( String.format( "Clone task check %s  %s:%s", cloneTask.getPhase(),
-                        cloneTask.getHost().getHostname(), cloneTask.getParameter().getHostname() ) );
+                LOG.info(
+                        String.format( "Clone task %s  %s:%s", cloneTask.getPhase(), cloneTask.getHost().getHostname(),
+                                cloneTask.getParameter().getHostname() ) );
                 if ( cloneTask.getPhase() == HostTask.Phase.DONE )
                 {
                     if ( cloneTask.getResult().isOk() )
@@ -682,6 +683,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                     entity.getParent(); //getResourceHostByName( containerHost.getAgent().getParentHostName() );
             resourceHost.destroyContainerHost( containerHost );
             resourceHost.removeContainerHost( result );
+            entity.setParent( null );
             resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
             //            peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
         }

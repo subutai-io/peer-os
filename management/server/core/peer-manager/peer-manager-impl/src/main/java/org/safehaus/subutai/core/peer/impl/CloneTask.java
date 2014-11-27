@@ -59,7 +59,7 @@ public class CloneTask extends HostTask<ResourceHost, CloneParam, CloneResult>
     private ContainerHost waitContainerHost( final String hostname, final int timeout )
     {
         long threshold = System.currentTimeMillis() + timeout * 1000;
-
+        LOG.debug( String.format( "Waiting for container %s on %s.", hostname, getHost().getHostname() ) );
         ContainerHost containerHost;
         do
         {
@@ -71,8 +71,6 @@ public class CloneTask extends HostTask<ResourceHost, CloneParam, CloneResult>
             {
             }
             containerHost = host.getContainerHostByName( hostname );
-            LOG.debug( String.format( "Waiting for %s. Timeout: %d", hostname,
-                    threshold - System.currentTimeMillis() / 1000 ) );
         }
         while ( threshold > System.currentTimeMillis() && containerHost == null );
         return containerHost;
