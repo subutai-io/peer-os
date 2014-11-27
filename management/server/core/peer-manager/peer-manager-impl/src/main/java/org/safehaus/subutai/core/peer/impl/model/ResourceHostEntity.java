@@ -70,8 +70,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     //    @javax.persistence.Transient
     //    protected Cache<UUID, ContainerHostInfo> hostCache;
 
-    @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity =
-            ContainerHostEntity.class )
+    @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true,
+            targetEntity = ContainerHostEntity.class )
     Set<ContainerHost> containersHosts = new HashSet();
 
 
@@ -722,7 +722,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( CommandException e )
         {
             throw new ResourceHostException(
-                    String.format( "Could not execute script/command %s", String.format( command.script, args ) ), e.toString() );
+                    String.format( "Could not execute script/command %s", String.format( command.script, args ) ),
+                    e.toString() );
         }
     }
 
