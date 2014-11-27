@@ -68,16 +68,17 @@ public class Manager
     private Hadoop hadoop;
 
 
-    public Manager( ExecutorService executorService, ServiceLocator serviceLocator, SqoopComponent sqoopComponent )
+    public Manager( ExecutorService executorService, Sqoop sqoop, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager, SqoopComponent sqoopComponent )
             throws NamingException
     {
 
         this.executorService = executorService;
         this.sqoopComponent = sqoopComponent;
-        this.sqoop = serviceLocator.getService( Sqoop.class );
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
-        this.hadoop = serviceLocator.getService( Hadoop.class );
+        this.sqoop = sqoop;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
+
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );

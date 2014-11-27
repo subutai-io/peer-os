@@ -11,7 +11,6 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -77,13 +76,15 @@ public class Manager
     private Hadoop hadoop;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Manager( final ExecutorService executorService, Hive hive, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
         this.executorService = executorService;
-        this.hive = serviceLocator.getService( Hive.class );
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
-        this.hadoop = serviceLocator.getService( Hadoop.class );
+        this.hive = hive;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
+
+
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );

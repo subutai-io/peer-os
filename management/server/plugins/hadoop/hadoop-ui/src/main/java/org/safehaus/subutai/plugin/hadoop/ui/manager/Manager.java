@@ -11,7 +11,6 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -80,13 +79,13 @@ public class Manager
     private ManagerListener managerListener;
 
 
-    public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Manager( ExecutorService executorService, Tracker tracker, Hadoop hadoop, EnvironmentManager environmentManager) throws NamingException
     {
         super();
         this.executorService = executorService;
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.tracker = tracker;
+        this.hadoop = hadoop;
+        this.environmentManager = environmentManager;
 
         managerListener = new ManagerListener( this );
 

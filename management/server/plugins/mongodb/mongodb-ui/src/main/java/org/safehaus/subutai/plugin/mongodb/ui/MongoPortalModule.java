@@ -15,6 +15,8 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -28,13 +30,16 @@ public class MongoPortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "mongodb.png";
     protected static final Logger LOG = Logger.getLogger( MongoPortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
+    private final Tracker tracker;
+    private final Mongo mongo;
 
 
-    public MongoPortalModule()
+    public MongoPortalModule( Mongo mongo, Tracker tracker )
     {
-        serviceLocator = new ServiceLocator();
+
+        this.mongo = mongo;
+        this.tracker = tracker;
     }
 
 
@@ -74,7 +79,7 @@ public class MongoPortalModule implements PortalModule
     {
         try
         {
-            return new MongoComponent( executor, serviceLocator );
+            return new MongoComponent( executor, mongo, tracker );
         }
         catch ( NamingException e )
         {

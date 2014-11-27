@@ -14,7 +14,9 @@ import java.util.logging.Logger;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -25,13 +27,17 @@ public class SolrPortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "solr.png";
     protected static final Logger LOG = Logger.getLogger( SolrPortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
+    private final Tracker tracker;
+    private final EnvironmentManager environmentManager;
+    private final Solr solr;
 
 
-    public SolrPortalModule()
+    public SolrPortalModule( Solr solr, Tracker tracker, EnvironmentManager environmentManager)
     {
-        serviceLocator = new ServiceLocator();
+        this.solr = solr;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
     }
 
 
@@ -72,7 +78,7 @@ public class SolrPortalModule implements PortalModule
     {
         try
         {
-            return new SolrComponent( executor, serviceLocator );
+            return new SolrComponent( executor, solr, tracker, environmentManager );
         }
         catch ( NamingException e )
         {

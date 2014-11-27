@@ -9,8 +9,11 @@ import java.util.logging.Logger;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
+import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -21,13 +24,19 @@ public class SharkPortalModule implements PortalModule
 
     public static final String MODULE_IMAGE = "shark.png";
     protected static final Logger LOG = Logger.getLogger( SharkPortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
+    private final Spark spark;
+    private final Tracker tracker;
+    private final Shark shark;
+    private final EnvironmentManager environmentManager;
 
 
-    public SharkPortalModule()
+    public SharkPortalModule( Shark shark, Spark spark, Tracker tracker, EnvironmentManager environmentManager)
     {
-        this.serviceLocator = new ServiceLocator();
+        this.shark = shark;
+        this.spark = spark;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
     }
 
 
@@ -69,7 +78,7 @@ public class SharkPortalModule implements PortalModule
     {
         try
         {
-            return new SharkComponent( executor, serviceLocator );
+            return new SharkComponent( executor, shark, spark, tracker, environmentManager );
         }
         catch ( NamingException e )
         {

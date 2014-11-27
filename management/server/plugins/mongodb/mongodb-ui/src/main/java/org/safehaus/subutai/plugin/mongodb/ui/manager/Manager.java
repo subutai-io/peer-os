@@ -15,7 +15,6 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
@@ -63,12 +62,13 @@ public class Manager
     private MongoClusterConfig mongoClusterConfig;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Manager( final ExecutorService executorService, final Mongo mongo, final Tracker tracker ) throws NamingException
     {
 
         this.executorService = executorService;
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.mongo = serviceLocator.getService( Mongo.class );
+        this.mongo = mongo;
+        this.tracker = tracker;
+
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );

@@ -11,6 +11,10 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.lucene.api.Lucene;
 import org.safehaus.subutai.plugin.lucene.ui.manager.Manager;
 import org.safehaus.subutai.plugin.lucene.ui.wizard.Wizard;
 
@@ -22,7 +26,7 @@ import com.vaadin.ui.VerticalLayout;
 public class LuceneComponent extends CustomComponent
 {
 
-    public LuceneComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public LuceneComponent( ExecutorService executorService, Lucene lucene, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
         setSizeFull();
 
@@ -32,8 +36,8 @@ public class LuceneComponent extends CustomComponent
 
         TabSheet sheet = new TabSheet();
         sheet.setSizeFull();
-        final Manager manager = new Manager( executorService, serviceLocator );
-        Wizard wizard = new Wizard( executorService, serviceLocator );
+        final Manager manager = new Manager( executorService, lucene, hadoop, tracker, environmentManager );
+        Wizard wizard = new Wizard( executorService, lucene, hadoop, tracker, environmentManager );
         sheet.addTab( wizard.getContent(), "Install" );
         sheet.getTab( 0 ).setId( "LuceneInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );

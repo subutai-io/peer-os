@@ -69,22 +69,20 @@ public class Manager
     private final Spark spark;
     private final Tracker tracker;
     private final Hadoop hadoop;
-
     private final EnvironmentManager environmentManager;
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private SparkClusterConfig config;
     private Environment environment;
 
 
-    public Manager( final ExecutorService executor, final ServiceLocator serviceLocator ) throws NamingException
+    public Manager( final ExecutorService executor, Spark spark, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
         Preconditions.checkNotNull( executor, "Executor is null" );
-        Preconditions.checkNotNull( serviceLocator, "Service Locator is null" );
 
-        this.spark = serviceLocator.getService( Spark.class );
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.spark = spark;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
 
         this.executor = executor;
         contentRoot = new GridLayout();

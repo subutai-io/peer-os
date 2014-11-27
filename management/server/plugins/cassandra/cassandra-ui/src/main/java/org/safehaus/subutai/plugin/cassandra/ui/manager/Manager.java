@@ -72,13 +72,13 @@ public class Manager
     private CassandraClusterConfig config;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Manager( final ExecutorService executorService, Cassandra cassandra, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
 
-        this.cassandra = serviceLocator.getService( Cassandra.class );
+        this.cassandra = cassandra;
         this.executorService = executorService;
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );

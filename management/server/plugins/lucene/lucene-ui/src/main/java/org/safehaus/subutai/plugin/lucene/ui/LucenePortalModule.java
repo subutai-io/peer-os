@@ -14,7 +14,10 @@ import java.util.logging.Logger;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.lucene.api.Lucene;
 import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -25,13 +28,19 @@ public class LucenePortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "lucene.png";
     protected static final Logger LOG = Logger.getLogger( LucenePortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
+    private Lucene lucene;
+    private Hadoop hadoop;
+    private Tracker tracker;
+    private EnvironmentManager environmentManager;
 
 
-    public LucenePortalModule()
+    public LucenePortalModule(Lucene lucene, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager)
     {
-        this.serviceLocator = new ServiceLocator();
+        this.lucene = lucene;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
     }
 
 
@@ -72,7 +81,7 @@ public class LucenePortalModule implements PortalModule
     {
         try
         {
-            return new LuceneComponent( executor, serviceLocator );
+            return new LuceneComponent( executor, lucene, hadoop, tracker, environmentManager );
         }
         catch ( NamingException e )
         {

@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -26,13 +25,13 @@ public class Wizard
     private HostRegistry hostRegistry;
 
 
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Wizard( ExecutorService executorService, Hadoop hadoop, HostRegistry hostRegistry, Tracker tracker ) throws NamingException
     {
 
-        this.tracker = serviceLocator.getService( Tracker.class );
+        this.tracker = tracker;
         this.executorService = executorService;
-        this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.hostRegistry = serviceLocator.getService( HostRegistry.class );
+        this.hadoop = hadoop;
+        this.hostRegistry = hostRegistry;
 
         grid = new VerticalLayout();
         grid.setMargin( true );

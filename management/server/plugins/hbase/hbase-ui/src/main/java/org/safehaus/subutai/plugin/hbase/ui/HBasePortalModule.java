@@ -14,7 +14,10 @@ import java.util.logging.Logger;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -26,13 +29,20 @@ public class HBasePortalModule implements PortalModule
 
     public static final String MODULE_IMAGE = "hbase.png";
     private static final Logger LOG = Logger.getLogger( HBasePortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
+    private HBase hBase;
+    private Hadoop hadoop;
+    private Tracker tracker;
+    private  EnvironmentManager environmentManager;
 
 
-    public HBasePortalModule()
+    public HBasePortalModule(HBase hBase, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager)
     {
-        this.serviceLocator = new ServiceLocator();
+        this.hBase = hBase;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
+
     }
 
 
@@ -75,7 +85,7 @@ public class HBasePortalModule implements PortalModule
     {
         try
         {
-            return new HBaseComponent( executor, serviceLocator );
+            return new HBaseComponent( executor, hBase, hadoop, tracker, environmentManager );
         }
         catch ( NamingException e )
         {

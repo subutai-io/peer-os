@@ -5,9 +5,12 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.flume.api.Flume;
 import org.safehaus.subutai.plugin.flume.ui.manager.Manager;
 import org.safehaus.subutai.plugin.flume.ui.wizard.Wizard;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
@@ -21,7 +24,7 @@ public class FlumeComponent extends CustomComponent
     private final Manager manager;
 
 
-    public FlumeComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public FlumeComponent( ExecutorService executorService, Flume flume, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
         setSizeFull();
 
@@ -31,8 +34,8 @@ public class FlumeComponent extends CustomComponent
 
         TabSheet sheet = new TabSheet();
         sheet.setSizeFull();
-        manager = new Manager( executorService, serviceLocator );
-        wizard = new Wizard( executorService, serviceLocator );
+        manager = new Manager( executorService, flume, hadoop, tracker, environmentManager );
+        wizard = new Wizard( executorService, flume, hadoop, tracker, environmentManager );
         sheet.addTab( wizard.getContent(), "Install" );
         sheet.getTab( 0 ).setId( "FlumeInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );

@@ -9,8 +9,11 @@ import java.util.logging.Logger;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.flume.api.Flume;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -20,13 +23,19 @@ public class FlumePortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "flume.png";
     protected static final Logger LOG = Logger.getLogger( FlumePortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
+    private Flume flume;
+    private Hadoop hadoop;
+    private Tracker tracker;
+    private EnvironmentManager environmentManager;
 
 
-    public FlumePortalModule()
+    public FlumePortalModule( Flume flume, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager)
     {
-        this.serviceLocator = new ServiceLocator();
+        this.flume = flume;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
     }
 
 
@@ -68,7 +77,7 @@ public class FlumePortalModule implements PortalModule
     {
         try
         {
-            return new FlumeComponent( executor, serviceLocator );
+            return new FlumeComponent( executor, flume, hadoop, tracker, environmentManager );
         }
         catch ( NamingException e )
         {

@@ -15,6 +15,10 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hipi.api.Hipi;
 import org.safehaus.subutai.plugin.hipi.api.HipiConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -25,13 +29,19 @@ public class HipiPortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "hipi.png";
     protected static final Logger LOG = Logger.getLogger( HipiPortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
+    private final Hipi hipi;
+    private final Tracker tracker;
+    private final Hadoop hadoop;
+    private final EnvironmentManager environmentManager;
 
 
-    public HipiPortalModule()
+    public HipiPortalModule( Hipi hipi, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager )
     {
-        this.serviceLocator = new ServiceLocator();
+        this.hipi = hipi;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
     }
 
 
@@ -72,7 +82,7 @@ public class HipiPortalModule implements PortalModule
     {
         try
         {
-            return new HipiComponent( executor, serviceLocator );
+            return new HipiComponent( executor, hipi, hadoop, tracker, environmentManager );
         }
         catch ( NamingException e )
         {

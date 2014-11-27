@@ -5,7 +5,10 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.ui.manager.Manager;
 import org.safehaus.subutai.plugin.hadoop.ui.wizard.Wizard;
 
@@ -20,7 +23,7 @@ public class HadoopComponent extends CustomComponent
     private final Manager manager;
 
 
-    public HadoopComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public HadoopComponent( ExecutorService executorService, Tracker tracker, Hadoop hadoop, EnvironmentManager environmentManager, HostRegistry hostRegistry ) throws NamingException
     {
         setSizeFull();
 
@@ -31,8 +34,8 @@ public class HadoopComponent extends CustomComponent
         TabSheet sheet = new TabSheet();
         sheet.setSizeFull();
 
-        manager = new Manager( executorService, serviceLocator );
-        wizard = new Wizard( executorService, serviceLocator );
+        manager = new Manager( executorService, tracker, hadoop, environmentManager );
+        wizard = new Wizard( executorService, hadoop, hostRegistry, tracker );
         sheet.addTab( wizard.getContent(), "Install" );
         sheet.getTab( 0 ).setId( "HadoopInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );

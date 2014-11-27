@@ -29,11 +29,11 @@ public class Wizard
     private SolrClusterConfig solrClusterConfig = new SolrClusterConfig();
 
 
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Wizard( ExecutorService executorService, Solr solr, Tracker tracker ) throws NamingException
     {
         this.executorService = executorService;
-        this.solr = serviceLocator.getService( Solr.class );
-        this.tracker = serviceLocator.getService( Tracker.class );
+        this.solr = solr;
+        this.tracker = tracker;
 
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );

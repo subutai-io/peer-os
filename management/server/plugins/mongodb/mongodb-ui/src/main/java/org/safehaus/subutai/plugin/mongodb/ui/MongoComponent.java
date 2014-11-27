@@ -11,6 +11,8 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.ui.manager.Manager;
 import org.safehaus.subutai.plugin.mongodb.ui.wizard.Wizard;
 
@@ -25,7 +27,7 @@ import com.vaadin.ui.VerticalLayout;
 public class MongoComponent extends CustomComponent
 {
 
-    public MongoComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public MongoComponent( ExecutorService executorService, Mongo mongo, Tracker tracker ) throws NamingException
     {
         setSizeFull();
 
@@ -35,8 +37,8 @@ public class MongoComponent extends CustomComponent
 
         TabSheet mongoSheet = new TabSheet();
         mongoSheet.setSizeFull();
-        Manager manager = new Manager( executorService, serviceLocator );
-        Wizard wizard = new Wizard( executorService, serviceLocator );
+        Manager manager = new Manager( executorService, mongo, tracker );
+        Wizard wizard = new Wizard( executorService, mongo, tracker );
         mongoSheet.addTab( wizard.getContent(), "Install" );
         mongoSheet.addTab( manager.getContent(), "Manage" );
         verticalLayout.addComponent( mongoSheet );

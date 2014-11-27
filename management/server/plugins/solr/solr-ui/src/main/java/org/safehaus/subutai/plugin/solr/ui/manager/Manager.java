@@ -73,13 +73,13 @@ public class Manager
     private SolrClusterConfig solrClusterConfig;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Manager( final ExecutorService executorService, Solr solr, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
 
         this.executorService = executorService;
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.solr = serviceLocator.getService( Solr.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.solr = solr;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );

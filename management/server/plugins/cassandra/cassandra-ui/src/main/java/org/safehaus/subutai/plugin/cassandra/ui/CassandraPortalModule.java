@@ -15,31 +15,39 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
 
 
+
 public class CassandraPortalModule implements PortalModule
 {
 
     public static final String MODULE_IMAGE = "cassandra.png";
-    private final ServiceLocator serviceLocator;
     protected Logger LOG = Logger.getLogger( CassandraPortalModule.class.getName() );
     private ExecutorService executor;
+    private Cassandra cassandra;
+    private Tracker tracker;
+    private EnvironmentManager environmentManager;
 
 
-    public CassandraPortalModule()
+    public CassandraPortalModule(Cassandra cassandra, Tracker tracker, EnvironmentManager environmentManager)
     {
-        this.serviceLocator = new ServiceLocator();
+        this.cassandra = cassandra;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
     }
 
 
-    public CassandraPortalModule( String ui )
+    /*public CassandraPortalModule( String ui )
     {
-        this.serviceLocator = new ServiceLocator();
-    }
+
+    }*/
 
 
     public void init()
@@ -78,7 +86,7 @@ public class CassandraPortalModule implements PortalModule
     {
         try
         {
-            return new CassandraComponent( executor, serviceLocator );
+            return new CassandraComponent( executor, cassandra, tracker, environmentManager );
         }
         catch ( NamingException e )
         {

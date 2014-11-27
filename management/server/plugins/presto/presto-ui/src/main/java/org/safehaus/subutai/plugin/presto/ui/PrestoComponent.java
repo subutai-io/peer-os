@@ -6,6 +6,10 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.presto.api.Presto;
 import org.safehaus.subutai.plugin.presto.ui.manager.Manager;
 import org.safehaus.subutai.plugin.presto.ui.wizard.Wizard;
 
@@ -17,7 +21,7 @@ import com.vaadin.ui.VerticalLayout;
 public class PrestoComponent extends CustomComponent
 {
 
-    public PrestoComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public PrestoComponent( ExecutorService executorService, Presto presto, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
         setSizeFull();
 
@@ -27,8 +31,8 @@ public class PrestoComponent extends CustomComponent
 
         TabSheet cassandraSheet = new TabSheet();
         cassandraSheet.setSizeFull();
-        final Manager manager = new Manager( executorService, serviceLocator );
-        Wizard wizard = new Wizard( executorService, serviceLocator );
+        final Manager manager = new Manager( executorService, presto, hadoop, tracker, environmentManager );
+        Wizard wizard = new Wizard( executorService, presto, hadoop, tracker, environmentManager );
         cassandraSheet.addTab( wizard.getContent(), "Install" );
         cassandraSheet.getTab( 0 ).setId( "PrestoInstallTab" );
         cassandraSheet.addTab( manager.getContent(), "Manage" );

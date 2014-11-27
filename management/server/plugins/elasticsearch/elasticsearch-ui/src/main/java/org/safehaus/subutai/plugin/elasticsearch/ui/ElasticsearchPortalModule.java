@@ -9,7 +9,9 @@ import java.util.logging.Logger;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -21,14 +23,19 @@ public class ElasticsearchPortalModule implements PortalModule
 
     public static final String MODULE_IMAGE = "logo.jpeg";
     private static Logger LOG = Logger.getLogger( ElasticsearchPortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
 
     private ExecutorService executor;
+    private Elasticsearch elasticsearch;
+    private Tracker tracker;
+    private EnvironmentManager environmentManager;
 
 
-    public ElasticsearchPortalModule()
+    public ElasticsearchPortalModule(Elasticsearch elasticsearch, Tracker tracker, EnvironmentManager environmentManager)
     {
-        this.serviceLocator = new ServiceLocator();
+
+        this.elasticsearch = elasticsearch;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
     }
 
 
@@ -68,7 +75,7 @@ public class ElasticsearchPortalModule implements PortalModule
     {
         try
         {
-            return new ElasticsearchComponent( executor, serviceLocator );
+            return new ElasticsearchComponent( executor, elasticsearch, tracker, environmentManager );
         }
         catch ( NamingException e )
         {
