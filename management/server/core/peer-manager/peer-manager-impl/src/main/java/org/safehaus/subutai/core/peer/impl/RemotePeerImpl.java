@@ -231,6 +231,7 @@ public class RemotePeerImpl implements RemotePeer
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
             throws CommandException
     {
+
         BlockingCommandCallback blockingCommandCallback = new BlockingCommandCallback( callback );
 
         executeAsync( requestBuilder, host, blockingCommandCallback, blockingCommandCallback.getCompletionSemaphore() );
@@ -271,6 +272,9 @@ public class RemotePeerImpl implements RemotePeer
     private void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback,
                                Semaphore semaphore ) throws CommandException
     {
+        Preconditions.checkNotNull( requestBuilder );
+        Preconditions.checkNotNull( host );
+
         if ( !host.isConnected() )
         {
             throw new CommandException( "Host disconnected." );
@@ -281,7 +285,7 @@ public class RemotePeerImpl implements RemotePeer
             throw new CommandException( "Operation not allowed" );
         }
 
-        CommandRequest request = new CommandRequest( requestBuilder, ( ContainerHost ) host );
+        CommandRequest request = new CommandRequest( requestBuilder, host.getId() );
         //cache callback
         commandResponseListener.addCallback( request.getRequestId(), callback, requestBuilder.getTimeout(), semaphore );
 

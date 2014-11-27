@@ -7,8 +7,8 @@
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
-  <reference id="repoManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.apt.api.AptRepositoryManager" />
+  <!--<reference id="repoManager" availability="mandatory"-->
+             <!--interface="org.safehaus.subutai.core.apt.api.AptRepositoryManager" />-->
 
   <bean id="templateManager" scope="singleton"
         class="org.safehaus.subutai.core.template.impl.TemplateManagerImpl"
@@ -16,7 +16,7 @@
     <property name="agentManager" ref="agentManager" />
     <property name="commandRunner" ref="commandRunner" />
     <property name="templateRegistry" ref="templateRegistry" />
-    <property name="repoManager" ref="repoManager" />
+    <!--<property name="repoManager" ref="repoManager" />-->
   </bean>
 
   <service ref="templateManager" interface="org.safehaus.subutai.core.template.api.TemplateManager" />

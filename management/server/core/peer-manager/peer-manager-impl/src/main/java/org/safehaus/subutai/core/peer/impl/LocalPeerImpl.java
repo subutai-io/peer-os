@@ -822,7 +822,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                                   final CommandCallback callback ) throws CommandException
     {
         Preconditions.checkNotNull( requestBuilder );
-        Preconditions.checkNotNull( hashCode() );
+        Preconditions.checkNotNull( aHost );
 
         Host host;
         try
@@ -858,6 +858,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     public void executeAsync( final RequestBuilder requestBuilder, final Host aHost, final CommandCallback callback )
             throws CommandException
     {
+        Preconditions.checkNotNull( requestBuilder );
+        Preconditions.checkNotNull( aHost );
+
         Host host;
         try
         {
