@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -23,7 +22,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.event.Action;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.ComponentContainer;
@@ -35,6 +33,8 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
+
+//import org.safehaus.subutai.common.protocol.Agent;
 
 
 public class ConfigurationStep extends Panel
@@ -133,7 +133,7 @@ public class ConfigurationStep extends Panel
         hadoopClustersCombo.setId( "PresHadoopClusterCb" );
         coordinatorNodeCombo = new ComboBox( "Coordinator" );
         coordinatorNodeCombo.setId( "PresCoordinatorCb" );
-        workersSelect = new TwinColSelect( "Workers", new ArrayList<Agent>() );
+        workersSelect = new TwinColSelect( "Workers", new ArrayList<ContainerHost>() );
         workersSelect.setId( "PresSelect" );
 
         coordinatorNodeCombo.setImmediate( true );
@@ -194,7 +194,8 @@ public class ConfigurationStep extends Panel
             HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
             config.setHadoopClusterName( hadoopInfo.getClusterName() );
             hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
-            Set<ContainerHost> hadoopNodes = hadoopEnvironment.getHostsByIds( Sets.newHashSet(hadoopInfo.getAllNodes()) );
+            Set<ContainerHost> hadoopNodes =
+                    hadoopEnvironment.getHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
             workersSelect.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
             for ( ContainerHost hadoopNode : hadoopNodes )
             {
@@ -230,10 +231,10 @@ public class ConfigurationStep extends Panel
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
                     hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
-                    Set<ContainerHost> hadoopNodes = hadoopEnvironment.getHostsByIds( Sets.newHashSet(hadoopInfo.getAllNodes()) );
+                    Set<ContainerHost> hadoopNodes =
+                            hadoopEnvironment.getHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
                     workersSelect.setValue( null );
-                    workersSelect
-                            .setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
+                    workersSelect.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
                     coordinatorNodeCombo.setValue( null );
                     coordinatorNodeCombo.removeAllItems();
                     for ( ContainerHost hadoopNode : hadoopNodes )
@@ -268,7 +269,7 @@ public class ConfigurationStep extends Panel
                     }
                     hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
                     Set<ContainerHost> hadoopNodes =
-                            hadoopEnvironment.getHostsByIds( Sets.newHashSet(hadoopInfo.getAllNodes()) );
+                            hadoopEnvironment.getHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
                     hadoopNodes.remove( coordinator );
                     workersSelect.getContainerDataSource().removeAllItems();
                     for ( ContainerHost hadoopNode : hadoopNodes )
@@ -276,7 +277,7 @@ public class ConfigurationStep extends Panel
                         workersSelect.getContainerDataSource().addItem( hadoopNode );
                     }
                     workersSelect.removeValueChangeListener( workersSelectChangeListener );
-                    workersSelect.setValue( hadoopEnvironment.getHostsByIds( config.getWorkers() ));
+                    workersSelect.setValue( hadoopEnvironment.getHostsByIds( config.getWorkers() ) );
                     workersSelect.addValueChangeListener( workersSelectChangeListener );
                 }
             }
@@ -294,7 +295,7 @@ public class ConfigurationStep extends Panel
                 {
                     Set<ContainerHost> nodes = ( Set<ContainerHost> ) event.getProperty().getValue();
                     Set<UUID> workerList = new HashSet<>();
-                    for( ContainerHost host : nodes)
+                    for ( ContainerHost host : nodes )
                     {
                         workerList.add( host.getId() );
                     }

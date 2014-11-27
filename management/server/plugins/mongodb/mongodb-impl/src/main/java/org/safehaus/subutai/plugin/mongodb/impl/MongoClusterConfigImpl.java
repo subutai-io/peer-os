@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
@@ -20,6 +19,8 @@ import org.safehaus.subutai.plugin.mongodb.api.MongoException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoRouterNode;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
+
+//import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
@@ -240,22 +241,6 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
     public void setDataNodes( Set<MongoDataNode> dataNodes )
     {
         this.dataNodes = dataNodes;
-    }
-
-
-    public int getNodePort( Agent node )
-    {
-
-        if ( getRouterServers().contains( node ) )
-        {
-            return getRouterPort();
-        }
-        else if ( getConfigServers().contains( node ) )
-        {
-            return getCfgSrvPort();
-        }
-
-        return getDataNodePort();
     }
 
 

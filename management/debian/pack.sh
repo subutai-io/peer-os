@@ -97,29 +97,41 @@ cp -a $BASE_SOURCE/etc $BASE/$fileName/etc
 #copying subutai.tar.gz file from maven output target folder
 echo "copying subutai-management snapshot files.."
 
-pushd $SOURCE
+temp=`ls $SOURCE/`
+echo "SOURCE_FOLDER_CONTENT= $temp" 
+
+cd $SOURCE/
 #getting the name of subutai distro for instance: subutai-2.0.0.tar.gz
 distroName=`ls | grep tar.gz`
 #subutai distro's folder name for instance: subutai-2.0.0 
 distroFolderName=`ls | grep tar.gz | awk '{print substr($0, 0, length($0)-7)}'`
-popd
 
-pushd $MANAGEMENT_BASE
+if [ "$distroName" = "" ]; then
+   echo "distroName is empty. Exiting."
+   exit 1
+fi
+
+if [ "$distroFolderName" = "" ]; then
+   echo "distroFolderName is empty. Exiting."
+   exit 1
+fi
+ 
+cd $MANAGEMENT_BASE
 echo "distroName:"$distroName
 echo "distroFolderName:"$distroFolderName
 cp $SOURCE/$distroName $BASE/
-popd
 
-pushd $BASE
+
+cd $BASE
 tar xzvf $distroName
 cp -a $BASE/$distroFolderName/* $BASE/$fileName/opt/subutai-management/
 #removing subutai and subutai.tar.gz fodler and files
 rm $BASE/$distroName
 rm -rf $BASE/$distroFolderName
-popd
+
 
 #packaging subutai-management
-pushd $BASE
+cd $BASE
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
 lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
 version=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
@@ -143,5 +155,4 @@ if [ "$removedPackage" != "" ]; then
 fi
 cp $packageName".deb" $ISOPATH
 
-popd
 
