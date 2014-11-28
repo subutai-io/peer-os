@@ -119,12 +119,6 @@ class SubutaiContainer
         string              _logEntry;      // <SubutaiContainer::CONTAINER_NAME>
 };
 
-inline bool operator==(SubutaiContainer& l, SubutaiContainer& r) 
-{
-    if (l.getContainerHostnameValue() == r.getContainerHostnameValue()) return true;
-    return false;
-}
-
 #endif /* SUBUTAICONTAINER_H_ */
 
 

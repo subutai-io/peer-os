@@ -198,8 +198,8 @@ bool SubutaiContainer::getContainerId()
  */
 bool SubutaiContainer::getContainerInterfaces()
 {
-    if (getState() != "RUNNING") return false;
     interfaces.clear();
+    if (getState() != "RUNNING") return false;
 
     vector<string> v;
     containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Run ifconfig on LXC"));
@@ -351,6 +351,11 @@ void SubutaiContainer::getContainerAllFields()
     UpdateUsersList();
 }
 
+/*
+ * \details Executes a command received from server.
+ *          Method prepares received command from server: collects arguments and env. variables
+ *          and passes them to RunProgram method 
+ */
 ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command) 
 {
     containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Running command.. "));
@@ -393,6 +398,11 @@ ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command)
     return res;
 }
 
+/*
+ * \details Runs a daemon within a container
+ *          Methods prepares command to be executed, parses it and executes lxc api function
+ *          attach()
+ */
 ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) {
     if (getState() != "RUNNING") throw new SubutaiException("Trying to run daemon on a not running container", 100);
 
@@ -588,6 +598,9 @@ void SubutaiContainer::tryLongCommand()
     cout << RunProgram("/bin/bash", args) << endl;
 }
 
+/*
+ * \details Method invokes state() function from lxc api, which returns state of current container
+ */
 string SubutaiContainer::getState() 
 {
     return this->container->state(this->container);

@@ -59,7 +59,6 @@ class SubutaiContainerManager {
         bool isContainerFrozen(string );
         void updateContainerLists();
         void write();
-        //void getContainerStates(vector<SubutaiContainer>);
     protected:
     private:
         string                          _lxc_path;

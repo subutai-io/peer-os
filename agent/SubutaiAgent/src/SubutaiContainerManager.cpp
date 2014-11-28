@@ -166,6 +166,7 @@ void SubutaiContainerManager::updateContainerLists()
     try {
         num = list_all_containers(_lxc_path.c_str(), &names, &cont);
         for (int i = 0; i < num; i++) {
+            // Check is there is any new conatiner appears
             bool containerFound = false;
             for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
                 if ((*it).getContainerHostnameValue() == string(names[i])) {
