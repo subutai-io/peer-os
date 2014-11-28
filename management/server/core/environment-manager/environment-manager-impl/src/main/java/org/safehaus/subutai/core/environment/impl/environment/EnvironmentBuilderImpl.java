@@ -43,7 +43,7 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
     public Environment build( final EnvironmentBlueprint blueprint, final EnvironmentBuildProcess process )
             throws BuildException
     {
-        this.environment = new Environment( blueprint.getName() );
+        this.environment = new Environment( blueprint.getName(), manager.getPeerManager().getLocalPeer() );
 
         int messageSize = process.getMessageMap().size();
         int containersAmount = 0;

@@ -25,6 +25,11 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>strategy-manager-api</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>command-executor-api</artifactId>
+    </dependency>
     <!--
     <dependency>
       <groupId>${project.groupId}</groupId>

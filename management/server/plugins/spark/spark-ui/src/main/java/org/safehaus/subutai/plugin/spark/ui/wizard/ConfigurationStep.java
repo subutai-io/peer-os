@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -120,7 +119,7 @@ public class ConfigurationStep extends Panel
     {
         final ComboBox hadoopClustersCombo = new ComboBox( "Hadoop cluster" );
         final ComboBox masterNodeCombo = new ComboBox( "Master node" );
-        final TwinColSelect slaveNodesSelect = new TwinColSelect( "Slave nodes", new ArrayList<Agent>() );
+        final TwinColSelect slaveNodesSelect = new TwinColSelect( "Slave nodes", new ArrayList<ContainerHost>() );
 
         hadoopClustersCombo.setId( "sparkHadoopCluster" );
         masterNodeCombo.setId( "sparkMasterNode" );

@@ -2,11 +2,10 @@ package org.safehaus.subutai.plugin.mongodb.impl;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoException;
@@ -23,10 +22,10 @@ public class MongoRouterNodeImpl extends MongoNodeImpl implements MongoRouterNod
     int cfgSrvPort;
 
 
-    public MongoRouterNodeImpl( final Agent agent, final UUID peerId, final UUID environmentId, final String domainName,
-                                final int port, final int cfgSrvPort )
+    public MongoRouterNodeImpl( final ContainerHost containerHost, final String domainName, final int port,
+                                final int cfgSrvPort )
     {
-        super( agent, peerId, environmentId, domainName, port );
+        super( containerHost, domainName, port );
         this.cfgSrvPort = cfgSrvPort;
     }
 
@@ -45,7 +44,7 @@ public class MongoRouterNodeImpl extends MongoNodeImpl implements MongoRouterNod
         CommandDef commandDef = Commands.getStartRouterCommandLine( port, cfgSrvPort, domainName, configServers );
         try
         {
-            CommandResult commandResult = execute( commandDef.build( true ) );
+            CommandResult commandResult = containerHost.execute( commandDef.build( true ) );
 
             if ( !commandResult.getStdOut().contains( "child process started successfully, parent exiting" ) )
             {
@@ -67,7 +66,7 @@ public class MongoRouterNodeImpl extends MongoNodeImpl implements MongoRouterNod
         CommandDef cmd = Commands.getRegisterReplicaWithRouterCommandLine( this, dataNodes, replicaName );
         try
         {
-            CommandResult commandResult = execute( cmd.build() );
+            CommandResult commandResult = containerHost.execute( cmd.build() );
             if ( !commandResult.hasSucceeded() )
             {
                 throw new MongoException( "Could not register data nodes." );

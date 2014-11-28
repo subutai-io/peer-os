@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hipi.api.HipiConfig;
@@ -69,14 +69,7 @@ public class ConfigurationStep extends Panel
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                if ( Strings.isNullOrEmpty( wizard.getConfig().getHadoopClusterName() ) )
-                {
-                    show( "Please, enter Hadoop cluster" );
-                }
-                else
-                {
-                    wizard.next();
-                }
+                nextButtonClick( wizard );
             }
         } );
 
@@ -110,7 +103,7 @@ public class ConfigurationStep extends Panel
     private void addOverHadoopControls( ComponentContainer parent, final HipiConfig config )
     {
 
-        final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
+        final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<UUID>() );
 
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
         hadoopClusters.setId( "hipiHadoopCluster" );
@@ -129,6 +122,7 @@ public class ConfigurationStep extends Panel
                     select.setValue( null );
                     select.setContainerDataSource( new BeanItemContainer<>( UUID.class, hadoopInfo.getAllNodes() ) );
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
+                    config.setClusterName( hadoopInfo.getClusterName() );
                     config.getNodes().clear();
                 }
             }
@@ -168,7 +162,7 @@ public class ConfigurationStep extends Panel
         select.setRightColumnCaption( "Selected Nodes" );
         select.setWidth( 100, Unit.PERCENTAGE );
         select.setRequired( true );
-        if ( config.getNodes() != null && !config.getNodes().isEmpty() )
+        if ( !CollectionUtil.isCollectionEmpty( config.getNodes() ) )
         {
             select.setValue( config.getNodes() );
         }
@@ -212,6 +206,7 @@ public class ConfigurationStep extends Panel
             {
                 String name = event.getProperty().getValue().toString().trim();
                 config.setHadoopClusterName( name );
+                config.setClusterName( name );
                 hadoopConfig.setClusterName( name );
             }
         } );
@@ -278,22 +273,21 @@ public class ConfigurationStep extends Panel
     }
 
 
-    private void nextButtonClickHandler( Wizard wizard )
+    private void nextButtonClick( Wizard wizard )
     {
         HipiConfig config = wizard.getConfig();
-        if ( config.getClusterName() == null || config.getClusterName().isEmpty() )
+        if ( Strings.isNullOrEmpty( config.getClusterName() ) )
         {
             show( "Enter installation name" );
             return;
         }
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            String name = config.getHadoopClusterName();
-            if ( name == null || name.isEmpty() )
+            if ( Strings.isNullOrEmpty( config.getHadoopClusterName() ) )
             {
                 show( "Select Hadoop cluster" );
             }
-            else if ( config.getNodes() == null || config.getNodes().isEmpty() )
+            else if ( CollectionUtil.isCollectionEmpty( config.getNodes() ) )
             {
                 show( "Select target nodes" );
             }
@@ -305,7 +299,7 @@ public class ConfigurationStep extends Panel
         else if ( config.getSetupType() == SetupType.WITH_HADOOP )
         {
             HadoopClusterConfig hc = wizard.getHadoopConfig();
-            if ( hc.getClusterName() == null || hc.getClusterName().isEmpty() )
+            if ( Strings.isNullOrEmpty( hc.getClusterName() ) )
             {
                 show( "Enter Hadoop cluster name" );
             }
@@ -317,7 +311,7 @@ public class ConfigurationStep extends Panel
             {
                 show( "Invalid replication factor" );
             }
-            else if ( hc.getDomainName() == null || hc.getDomainName().isEmpty() )
+            else if ( Strings.isNullOrEmpty( hc.getDomainName() ) )
             {
                 show( "Enter Hadoop domain name" );
             }

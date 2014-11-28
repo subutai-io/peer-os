@@ -5,6 +5,7 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.Response;
+import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -43,26 +44,26 @@ public class CommandRequestListener extends RequestListener
             try
             {
                 final Peer sourcePeer = peerManager.getPeer( payload.getSourcePeerId() );
+                Host host = localPeer.bindHost( commandRequest.getHostId() );
 
-                localPeer.executeAsync( commandRequest.getRequestBuilder(), commandRequest.getHost(),
-                        new CommandCallback()
+                localPeer.executeAsync( commandRequest.getRequestBuilder(), host, new CommandCallback()
+                {
+                    @Override
+                    public void onResponse( final Response response, final CommandResult commandResult )
+                    {
+                        try
                         {
-                            @Override
-                            public void onResponse( final Response response, final CommandResult commandResult )
-                            {
-                                try
-                                {
-                                    sourcePeer.sendRequest( new CommandResponse( commandRequest.getRequestId(),
-                                                    ( ResponseImpl ) response, ( CommandResultImpl ) commandResult ),
-                                            RecipientType.COMMAND_RESPONSE.name(),
-                                            Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT );
-                                }
-                                catch ( PeerException e )
-                                {
-                                    LOG.error( "Error in onMessage", e );
-                                }
-                            }
-                        } );
+                            sourcePeer.sendRequest(
+                                    new CommandResponse( commandRequest.getRequestId(), ( ResponseImpl ) response,
+                                            ( CommandResultImpl ) commandResult ),
+                                    RecipientType.COMMAND_RESPONSE.name(), Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT );
+                        }
+                        catch ( PeerException e )
+                        {
+                            LOG.error( "Error in onMessage", e );
+                        }
+                    }
+                } );
             }
             catch ( CommandException e )
             {

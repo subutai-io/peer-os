@@ -105,20 +105,20 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- apt-repository-manager -->
+      <!-- key-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>apt-repository-api</artifactId>
+        <artifactId>key-manager-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>apt-repository-impl</artifactId>
+        <artifactId>key-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>apt-repository-cli</artifactId>
+        <artifactId>key-manager-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -136,24 +136,6 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- command-runner -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>command-runner-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>command-runner-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>command-runner-ui-old</artifactId>-->
-      <!--<version>${project.version}</version>-->
-      <!--</dependency>-->
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- communication-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -163,70 +145,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>communication-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- config-point-tracker -->
-      <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>config-point-tracker-api</artifactId>-->
-      <!--<version>${project.version}</version>-->
-      <!--</dependency>-->
-      <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>config-point-tracker-impl</artifactId>-->
-      <!--<version>${project.version}</version>-->
-      <!--</dependency>-->
-      <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>config-point-tracker-cli</artifactId>-->
-      <!--<version>${project.version}</version>-->
-      <!--</dependency>-->
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- configuration-manager -->
-      <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>configuration-manager-api</artifactId>-->
-      <!--<version>${project.version}</version>-->
-      <!--</dependency>-->
-      <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>configuration-manager-impl</artifactId>-->
-      <!--<version>${project.version}</version>-->
-      <!--</dependency>-->
-      <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>configuration-manager-cli</artifactId>-->
-      <!--<version>${project.version}</version>-->
-      <!--</dependency>-->
-      <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>configuration-manager-ui</artifactId>-->
-      <!--<version>${project.version}</version>-->
-      <!--</dependency>-->
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- container-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>container-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>container-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>container-manager-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>container-manager-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -312,21 +230,21 @@
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- monitoring -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>monitoring-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>monitoring-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>monitoring-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+      <!--<dependency>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>monitoring-api</artifactId>-->
+      <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
+      <!--<dependency>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>monitoring-impl</artifactId>-->
+      <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
+      <!--<dependency>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>monitoring-cli</artifactId>-->
+      <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- script-manager -->
@@ -564,29 +482,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>strategy-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- template-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>template-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>template-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>template-manager-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>template-manager-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 

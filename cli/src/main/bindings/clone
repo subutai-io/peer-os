@@ -81,7 +81,6 @@ function clone {
 
   ovs_configure_lxc $child
   git_child_branch $child
-  lxc_install_agent $child
   msg_ok "Successfully cloned $child container from $parent"
   unlock_container_write $child
   if [ $monitor_enabled == "true" ]; then

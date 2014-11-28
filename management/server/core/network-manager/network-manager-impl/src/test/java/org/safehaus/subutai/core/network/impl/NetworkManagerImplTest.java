@@ -16,6 +16,7 @@ import org.safehaus.subutai.core.network.api.N2NConnection;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.network.api.Tunnel;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -319,7 +320,7 @@ public class NetworkManagerImplTest
     @Test( expected = NetworkManagerException.class )
     public void testGetManagementHost() throws Exception
     {
-        doThrow( new PeerException( "" ) ).when( localPeer ).getManagementHost();
+        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getManagementHost();
 
         networkManager.getManagementHost();
     }
@@ -329,7 +330,7 @@ public class NetworkManagerImplTest
     public void testGetResourceHost() throws Exception
     {
 
-        doThrow( new PeerException( "" ) ).when( localPeer ).getResourceHostByName( anyString() );
+        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getResourceHostByName( anyString() );
 
         networkManager.getResourceHost( CONTAINER_NAME );
     }
@@ -338,7 +339,7 @@ public class NetworkManagerImplTest
     @Test( expected = NetworkManagerException.class )
     public void testGetContainerHost() throws Exception
     {
-        doThrow( new PeerException( "" ) ).when( localPeer ).getContainerHostByName( anyString() );
+        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getContainerHostByName( anyString() );
 
         networkManager.getContainerHost( CONTAINER_NAME );
     }

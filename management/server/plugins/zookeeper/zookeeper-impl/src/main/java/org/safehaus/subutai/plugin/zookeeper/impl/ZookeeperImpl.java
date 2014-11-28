@@ -13,7 +13,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
@@ -144,8 +143,8 @@ public class ZookeeperImpl implements Zookeeper
     {
         Preconditions.checkNotNull( config, "Configuration is null" );
 
-        AbstractOperationHandler operationHandler = new ZookeeperClusterOperationHandler( this, config,
-                ClusterOperationType.INSTALL );
+        AbstractOperationHandler operationHandler =
+                new ZookeeperClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
 
         executor.execute( operationHandler );
 
@@ -157,8 +156,8 @@ public class ZookeeperImpl implements Zookeeper
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
 
-        AbstractOperationHandler operationHandler = new ZookeeperClusterOperationHandler( this, getCluster( clusterName ),
-                ClusterOperationType.UNINSTALL );
+        AbstractOperationHandler operationHandler =
+                new ZookeeperClusterOperationHandler( this, getCluster( clusterName ), ClusterOperationType.UNINSTALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -222,8 +221,8 @@ public class ZookeeperImpl implements Zookeeper
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         ZookeeperClusterConfig zookeeperClusterConfig = getCluster( clusterName );
 
-        AbstractOperationHandler operationHandler = new ZookeeperClusterOperationHandler( this, zookeeperClusterConfig,
-                ClusterOperationType.ADD );
+        AbstractOperationHandler operationHandler =
+                new ZookeeperClusterOperationHandler( this, zookeeperClusterConfig, ClusterOperationType.ADD );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -234,8 +233,9 @@ public class ZookeeperImpl implements Zookeeper
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostname ), "Lxc hostname is null or empty" );
         ZookeeperClusterConfig zookeeperClusterConfig = getCluster( clusterName );
-        AbstractOperationHandler operationHandler = new ZookeeperClusterOperationHandler( this, zookeeperClusterConfig,
-                lxcHostname, ClusterOperationType.ADD );
+        AbstractOperationHandler operationHandler =
+                new ZookeeperClusterOperationHandler( this, zookeeperClusterConfig, lxcHostname,
+                        ClusterOperationType.ADD );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -246,8 +246,8 @@ public class ZookeeperImpl implements Zookeeper
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostName ), "Lxc hostname is null or empty" );
 
-        AbstractOperationHandler operationHandler = new ZookeeperNodeOperationHandler( this, clusterName,
-                lxcHostName, NodeOperationType.DESTROY );
+        AbstractOperationHandler operationHandler =
+                new ZookeeperNodeOperationHandler( this, clusterName, lxcHostName, NodeOperationType.DESTROY );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -330,7 +330,6 @@ public class ZookeeperImpl implements Zookeeper
                 return Commands.getStatusCommand();
         }
         return null;
-
     }
 
 

@@ -19,7 +19,7 @@ public class MetricTest
 {
 
     private static final String METRIC_JSON = " {\"host\":\"test\", \"totalRam\":\"123\"," +
-            "\"availableRam\":\"123\", \"usedRam\":\"123\", \"cpuLoad5\":\"123\","
+            "\"availableRam\":\"123\", \"usedRam\":\"123\", \"usedCpu\":\"123\","
             + "  \"availableDisk\" : \"123\", \"usedDisk\" : \"123\", \"totalDisk\" : \"123\"}";
     private static final String HOST = "test";
     private static final double VALUE = 123;
@@ -33,7 +33,7 @@ public class MetricTest
         assertTrue( VALUE == metric.getTotalRam() );
         assertTrue( VALUE == metric.getAvailableRam() );
         assertTrue( VALUE == metric.getUsedRam() );
-        assertTrue( VALUE == metric.getCpuLoad5() );
+        assertTrue( VALUE == metric.getUsedCpu() );
         assertTrue( VALUE == metric.getAvailableDisk() );
         assertTrue( VALUE == metric.getUsedDisk() );
         assertTrue( VALUE == metric.getTotalDisk() );

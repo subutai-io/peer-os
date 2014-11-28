@@ -331,7 +331,7 @@ public class Manager
         }
     }
 
-
+    //TODO use host.getInterfaces instead
     private String getIPofHost( ContainerHost host )
     {
         Agent agent = host.getAgent();

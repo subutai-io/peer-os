@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.hive.ui.manager;
 
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -11,7 +10,6 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
@@ -45,6 +43,8 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+
+//import org.safehaus.subutai.common.protocol.Agent;
 
 
 public class Manager
@@ -330,10 +330,10 @@ public class Manager
             public void itemClick( ItemClickEvent event )
             {
                 String containerId =
-                        ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION )
-                                        .getValue();
-                ContainerHost containerHost =
-                        environmentManager.getEnvironmentByUUID( hadoop.getCluster( config.getHadoopClusterName() ).getEnvironmentId() ).getContainerHostByHostname( containerId );
+                        ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION ).getValue();
+                ContainerHost containerHost = environmentManager
+                        .getEnvironmentByUUID( hadoop.getCluster( config.getHadoopClusterName() ).getEnvironmentId() )
+                        .getContainerHostByHostname( containerId );
 
                 if ( containerHost != null )
                 {
@@ -424,7 +424,7 @@ public class Manager
             availableOperations.addStyleName( "default" );
             availableOperations.setSpacing( true );
 
-            if ( isServer( containerHost.getAgent() ) )
+            if ( isServer( containerHost ) )
             {
                 addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn );
             }
@@ -469,7 +469,7 @@ public class Manager
 
             table.addItem( new Object[] {
                     containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ),
-                    checkNodeRole( containerHost.getAgent() ), availableOperations
+                    checkNodeRole( containerHost ), availableOperations
             }, null );
 
             addClickListenerToCheckButton( containerHost, startBtn, stopBtn, checkBtn, destroyBtn );
@@ -479,10 +479,10 @@ public class Manager
     }
 
 
-    public String checkNodeRole( Agent agent )
+    public String checkNodeRole( ContainerHost agent )
     {
 
-        if ( config.getServer().equals( agent.getUuid() ) )
+        if ( config.getServer().equals( agent.getId() ) )
         {
             return "Server";
         }
@@ -493,9 +493,9 @@ public class Manager
     }
 
 
-    private boolean isServer( Agent agent )
+    private boolean isServer( ContainerHost agent )
     {
-        return config.getServer().equals( agent.getUuid() );
+        return config.getServer().equals( agent.getId() );
     }
 
 
