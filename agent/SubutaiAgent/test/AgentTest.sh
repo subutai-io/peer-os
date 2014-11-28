@@ -18,6 +18,8 @@ echo "copying source files.."
 echo "starting source compilation"
 
 #Starting generation of Object Files
+g++ -I/usr/include -I/usr/lib/gcc/x86_64-linux-gnu/4.6/include-fixed -I/usr/lib/gcc/x86_64-linux-gnu/4.6/include -I/usr/include/x86_64-linux-gnu -I/usr/local/include -I/usr/include/c++ -I/usr/include/c++/4.6 -I/var/lib/jenkins/AgentInstallation/mosquitto-1.3.1/lib -I/usr/include/c++/4.6/backward -ffunction-sections -fdata-sections -g3 -Wall -c $BASE/src/SubutaiException.cpp
+
 g++ -I/usr/include  -I/usr/lib/gcc/x86_64-linux-gnu/4.6/include-fixed -I/usr/lib/gcc/x86_64-linux-gnu/4.6/include -I/usr/include/x86_64-linux-gnu -I/usr/local/include -I/usr/include/c++ -I/usr/include/c++/4.6 -I/var/lib/jenkins/AgentInstallation/mosquitto-1.3.1/lib -I/usr/include/c++/4.6/backward -ffunction-sections -fdata-sections -g3 -Wall -c $BASE/src/SubutaiAgentTest.cpp 
 
 g++ -I/usr/include  -I/usr/lib/gcc/x86_64-linux-gnu/4.6/include-fixed -I/usr/lib/gcc/x86_64-linux-gnu/4.6/include -I/usr/include/x86_64-linux-gnu -I/usr/local/include -I/usr/include/c++ -I/usr/include/c++/4.6 -I/var/lib/jenkins/AgentInstallation/mosquitto-1.3.1/lib -I/usr/include/c++/4.6/backward -ffunction-sections -fdata-sections -g3 -Wall -c $BASE/src/SubutaiEnvironment.cpp 
@@ -54,7 +56,6 @@ g++ -I/usr/include -I/usr/lib/gcc/x86_64-linux-gnu/4.6/include-fixed -I/usr/lib/
 
 g++ -I/usr/include -I/usr/lib/gcc/x86_64-linux-gnu/4.6/include-fixed -I/usr/lib/gcc/x86_64-linux-gnu/4.6/include -I/usr/include/x86_64-linux-gnu -I/usr/local/include -I/usr/include/c++ -I/usr/include/c++/4.6 -I/var/lib/jenkins//AgentInstallation/mosquitto-1.3.1/lib -I/usr/include/c++/4.6/backward -ffunction-sections -fdata-sections -g3 -Wall -c $BASE/src/SubutaiWatch.cpp
 
-g++ -I/usr/include -I/usr/lib/gcc/x86_64-linux-gnu/4.6/include-fixed -I/usr/lib/gcc/x86_64-linux-gnu/4.6/include -I/usr/include/x86_64-linux-gnu -I/usr/local/include -I/usr/include/c++ -I/usr/include/c++/4.6 -I/var/lib/jenkins/AgentInstallation/mosquitto-1.3.1/lib -I/usr/include/c++/4.6/backward -ffunction-sections -fdata-sections -g3 -Wall -c $BASE/src/SubutaiException.cpp
 
 echo "moving object files"
 mv *.o $BASE/debug
