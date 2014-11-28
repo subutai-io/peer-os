@@ -2,9 +2,16 @@ package org.safehaus.subutai.core.registry.rest;
 
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
@@ -12,14 +19,22 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.peer.api.ManagementHost;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
+import org.safehaus.subutai.core.repository.api.RepositoryException;
+import org.safehaus.subutai.core.repository.api.RepositoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -39,13 +54,21 @@ public class RestServiceImpl implements RestService
 
     private static final Gson GSON =
             new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
-    private TemplateRegistry templateRegistry;
+    private final TemplateRegistry templateRegistry;
+    private final RepositoryManager repositoryManager;
+    private final PeerManager peerManager;
 
 
-    public void setTemplateRegistry( TemplateRegistry templateRegistry )
+    public RestServiceImpl( final RepositoryManager repositoryManager, final TemplateRegistry templateRegistry,
+                            final PeerManager peerManager )
     {
-        Preconditions.checkNotNull( templateRegistry, "TemplateRegistry is null." );
+        Preconditions.checkNotNull( repositoryManager );
+        Preconditions.checkNotNull( templateRegistry );
+        Preconditions.checkNotNull( peerManager );
+
+        this.repositoryManager = repositoryManager;
         this.templateRegistry = templateRegistry;
+        this.peerManager = peerManager;
     }
 
 
@@ -80,6 +103,112 @@ public class RestServiceImpl implements RestService
             LOG.error( "Error in registerTemplate", e );
             return Response.status( Response.Status.BAD_REQUEST ).header( EXCEPTION_HEADER, e.getMessage() ).build();
         }
+    }
+
+
+    private String getTempDirPath()
+    {
+        return System.getProperty( "java.io.tmpdir" );
+    }
+
+
+    @Override
+    public Response importTemplate( final Attachment attachment, String configDir )
+    {
+        String packageName = attachment.getContentDisposition().getParameter( "filename" );
+
+        Path path = Paths.get( getTempDirPath(), packageName );
+
+        try
+        {
+
+            //save file to temp directory
+            InputStream in = attachment.getObject( InputStream.class );
+            try
+            {
+                Files.copy( in, path, StandardCopyOption.REPLACE_EXISTING );
+            }
+            catch ( IOException e )
+            {
+                String m = "Failed to write payload data to file";
+                LOG.error( m, e );
+                return Response.serverError().entity( e ).build();
+            }
+
+            //add package to repository
+            try
+            {
+                repositoryManager.addPackageByPath( path.toString() );
+            }
+            catch ( RepositoryException e )
+            {
+                String m = "Failed to add package to repository";
+                LOG.error( m, e );
+                return Response.serverError().entity( e ).build();
+            }
+
+            //trim leading slash
+            if ( configDir.charAt( 0 ) == '/' )
+            {
+                configDir = configDir.substring( 1 );
+            }
+
+            //extract config and packages files and read their content
+            Path configPath = Paths.get( configDir, "config" );
+            Path packagesPath = Paths.get( configDir, "packages" );
+
+            Set<String> files = new HashSet<>();
+            files.add( configPath.toString() );
+            files.add( packagesPath.toString() );
+
+            try
+            {
+                repositoryManager.extractPackageFiles( packageName, files );
+            }
+            catch ( RepositoryException e )
+            {
+                String m = "Failed to extract template metadata from package";
+                LOG.error( m, e );
+                return Response.serverError().entity( e ).build();
+            }
+
+            //register template
+            try
+            {
+                ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
+
+                String configContent = managementHost.readFile(
+                        String.format( "/tmp/%s/%s", packageName.replace( ".deb", "" ), configPath.toString() ) );
+
+                String packagesContent = managementHost.readFile(
+                        String.format( "/tmp/%s/%s", packageName.replace( ".deb", "" ), packagesPath.toString() ) );
+
+                //calculate md5sum of template
+                HashCode md5 = com.google.common.io.Files.hash( path.toFile(), Hashing.md5() );
+                String md5sum = md5.toString();
+
+                //register template with registry
+                templateRegistry.registerTemplate( configContent, packagesContent, md5sum );
+            }
+            catch ( Exception e )
+            {
+                String m = "Failed to register template";
+                LOG.error( m, e );
+                return Response.serverError().entity( e ).build();
+            }
+        }
+        finally
+        {
+            // clean up
+            if ( path != null )
+            {
+                path.toFile().delete();
+            }
+        }
+
+        //all ok
+        LOG.info( "Template package successfully imported." );
+        return Response.ok().build();
     }
 
 
