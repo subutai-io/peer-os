@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.core.Response;
 
@@ -215,17 +217,66 @@ public class RestServiceImpl implements RestService
     @Override
     public Response unregisterTemplate( final String templateName )
     {
+
+        //check if template exists
+        if ( templateRegistry.getTemplate( templateName ) == null )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
+
+        //unregister template from registry
         try
         {
-
             templateRegistry.unregisterTemplate( templateName );
 
             return Response.ok().build();
         }
-        catch ( RegistryException | RuntimeException e )
+        catch ( RegistryException e )
+        {
+            LOG.error( "Error in unregisterTemplate", e );
+            return Response.serverError().entity( e ).build();
+        }
+        catch ( RuntimeException e )
         {
             LOG.error( "Error in unregisterTemplate", e );
             return Response.status( Response.Status.BAD_REQUEST ).header( EXCEPTION_HEADER, e.getMessage() ).build();
+        }
+    }
+
+
+    @Override
+    public Response removeTemplate( final String templateName )
+    {
+        Response response = unregisterTemplate( templateName );
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            try
+            {
+                String packageName = String.format( "%s-subutai-template", templateName );
+                String packageInfo = repositoryManager.getPackageInfo( packageName );
+                Pattern p = Pattern.compile( "Filename:.+/(.+deb)" );
+                Matcher m = p.matcher( packageInfo );
+                if ( m.find() )
+                {
+                    String fullPackageName = m.group( 1 );
+                    repositoryManager.removePackageByName( fullPackageName );
+                    return Response.ok().build();
+                }
+                else
+                {
+                    return Response.serverError().header( EXCEPTION_HEADER, "Could not get full package name" ).build();
+                }
+            }
+            catch ( RepositoryException e )
+            {
+                LOG.error( "Error in removeTemplate", e );
+                return Response.serverError().entity( e ).build();
+            }
+        }
+        else
+        {
+            return response;
         }
     }
 

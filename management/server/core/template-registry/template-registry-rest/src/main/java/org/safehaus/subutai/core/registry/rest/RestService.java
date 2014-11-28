@@ -31,16 +31,20 @@ public interface RestService
                                       @FormParam( "packages" ) String packagesFilePath,
                                       @FormParam( "md5sum" ) String md5sum );
 
+    @DELETE
+    @Path( "templates/{templateName}" )
+    public Response unregisterTemplate( @PathParam( "templateName" ) String templateName );
+
 
     @POST
-    @Path( "templates" )
+    @Path( "templates/import" )
     @Consumes( { MediaType.MULTIPART_FORM_DATA } )
     public Response importTemplate( @Multipart( "file" ) Attachment in, @Multipart( "config_dir" ) String configDir );
 
 
     @DELETE
-    @Path( "templates/{templateName}" )
-    public Response unregisterTemplate( @PathParam( "templateName" ) String templateName );
+    @Path( "templates/{templateName}/remove" )
+    public Response removeTemplate( @PathParam( "templateName" ) String templateName );
 
     @GET
     @Path( "templates/{templateName}/arch/{lxcArch}" )
