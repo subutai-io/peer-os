@@ -115,9 +115,9 @@ vector<SubutaiContainer> SubutaiContainerManager::findAllContainers()
             containers.push_back(*c);
         }
     } catch (SubutaiException e) {
-
+        _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));
     } catch (std::exception e) {
-
+        _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", string(e.what())));
     }
     return containers;
 }
@@ -180,9 +180,9 @@ void SubutaiContainerManager::updateContainerLists()
             }
         }
     } catch (SubutaiException e) {
-
+        _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));
     } catch (std::exception e) {
-
+        _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", string(e.what())));
     }
     for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
         (*it).getContainerAllFields();

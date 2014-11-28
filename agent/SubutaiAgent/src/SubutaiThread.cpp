@@ -678,18 +678,18 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* c
  */
 int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *command, char* argv[], SubutaiContainer* container)
 {
-    if (container) {
+    if (container) 
+    {
         _container = container; // Keep container for future use
     }
-    //signal(SIGCHLD, SIG_IGN);	// when the child process done it will be raped by kernel. We do not allowed zombie processes.
     pid = fork();		// creating a child process
     if (pid == 0)		// child process is starting
     {
         int argv0size = strlen(argv[0]);
         strncpy(argv[0], "subutai-agent-child", argv0size);
         logger.openLogFile(getpid(),command->getRequestSequenceNumber());
-        string pidparnumstr = helper.toString(getpid());       //geting pid number of the process
-        string processpid = "";	                        //processpid for execution
+        string pidparnumstr = helper.toString(getpid());        //geting pid number of the process
+        string processpid = "";	                                //processpid for execution
         logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Fork is Starting!!", helper.toString(getpid())));
         this->getOutputStream().setMode(command->getStandardOutput());
         this->getOutputStream().setIdentity("output");
@@ -701,53 +701,6 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
             logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Error opening pipes!!"));
         }
 
-        string executecmd = createExecString(command).c_str();
-        string latest = executecmd.substr(executecmd.length()-3);
-        /*  if (command->getIsDaemon()) {
-            logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Process will be executed as a Daemon process!!"));
-            int myval = daemon(0, 0);
-            if (!checkCWD(command, container)) { //if the CWD does not exist
-            string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
-            "Working Directory Does Not Exist on System","",command->getCommandId());
-            while (!messageQueue->try_send(message.data(), message.size(), 0));
-            myval = 1 ;
-            message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-            this->getResponsecount(),command->getCommandId(),myval);
-            while (!messageQueue->try_send(message.data(), message.size(), 0));
-            logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
-            exit(1);
-        //problem about absolute path
-        }
-        if (!checkUID(command, container)) //if the User does not exist
-        {
-        string message = this->getResponse().createResponseMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(), 1,
-        "User Does Not Exist on System", "", command->getCommandId());
-        while (!messageQueue->try_send(message.data(), message.size(), 0));
-        myval = 1 ;
-        message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-        this->getResponsecount(),command->getCommandId(),myval);
-        while (!messageQueue->try_send(message.data(), message.size(), 0));
-        logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "User id not found on system..","RunAs:",command->getRunAs()));
-        exit(1);
-        }
-        logger.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getCommand()));
-        if (!container) {
-        //executing the process on background
-        stringstream cmd;
-        cmd << "subutai-run " << createExecString(command) << " " << command->getCommandId();
-        system(cmd.str().c_str());
-        } else {
-        container->RunDaemon(command);
-        }
-        //parent returns with success if the daemon successfully send to process to background
-        string message = this->getResponse().createExitMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(),
-        this->getResponsecount(), command->getCommandId(), myval);
-        while (!messageQueue->try_send(message.data(), message.size(), 0));
-
-        exit(1);
-        }
-        else
-        {   // not daemon*/
         if (command->getIsDaemon()) {
             logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Process will be executed as a Daemon process!!"));
         } else {
@@ -771,25 +724,24 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                 logger.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
                 kill(getpid(), SIGKILL);		//killing child
                 exit(1);
-                //problem about absolute path
             }
             if (!checkUID(command, container))
             {
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "User id not found on system..","RunAs:",command->getRunAs()));
                 kill(getpid(), SIGKILL);		//killing child
                 exit(1);
-                //problem about UID
             }
 
             if (!container) {
+                // Execute command for host
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is starting!!", "pid", pidchldnumstr));
-                // Execute command
                 string execCmd = createExecString(command);
                 if (command->getIsDaemon()) {
                     execCmd.append(" &");
                 } 
                 val = system(execCmd.c_str());
             } else {
+                // Execute command for container
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is starting!! on a container", "pid", pidchldnumstr));
                 try {
                     if (command->getIsDaemon()) {
@@ -830,42 +782,19 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Thread is Stopping!!","pid",helper.toString(getpid())));
                 logger.closeLogFile();
                 kill(getpid(), SIGKILL);		//killing child
-                return true; //thread successfully done its work.
+                return true;                    //thread successfully done its work.
             }
             catch(const std::exception& error)
             {
-
-                //Parent read the result and send back
-                try
-                {
-                    signal(SIGCHLD, SIG_IGN);
-                    this->getErrorStream().closePipe(1);
-                    this->getOutputStream().closePipe(1);
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend is starting!!","pid",helper.toString(getpid())));
-                    optionReadSend(messageQueue, command, newpid, ret);
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend has finished!!","pid",helper.toString(getpid())));
-                    this->getErrorStream().closePipe(0);
-                    this->getOutputStream().closePipe(0);
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Thread is Stopping!!","pid",helper.toString(getpid())));
-                    logger.closeLogFile();
-                    kill(getpid(), SIGKILL);		//killing child
-                    return true; //thread successfully done its work.
-                }
-                catch(const std::exception& error)
-                {
-                    logger.writeLog(3, logger.setLogData("<SubutaiThread::threadFunction> " "Problem TF:",error.what()));
-                    cout<<error.what()<<endl;
-                }
+                logger.writeLog(3, logger.setLogData("<SubutaiThread::threadFunction> " "Problem TF:",error.what()));
+                cout<<error.what()<<endl;
             }
         }
-        // } else not daemon
     } else if (pid == -1) {
-        //log.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "ERROR DURING MAIN FORK!!","pid",helper.toString(getpid())));
         return pid;
     }
     else if (pid > 0)	//parent continue its process and return back
     {
-        //logger.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "Parent Process continue!!","pid",helper.toString(getpid())));
         return pid;	//parent successfully done
     }
     return pid;
@@ -1080,3 +1009,4 @@ string SubutaiThread::getProcessPid(const char* cmd)
     pclose(pipe);
     return result;
 }
+
