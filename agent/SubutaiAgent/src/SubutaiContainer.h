@@ -53,6 +53,8 @@
 #include "SubutaiConnection.h"
 #include "SubutaiCommand.h"
 #include "SubutaiHelper.h"
+#include "SubutaiException.h"
+
 using namespace std;
 using std::stringstream;
 using std::string;
@@ -83,6 +85,7 @@ class SubutaiContainer
         bool getContainerInterfaces();
         void setContainerHostname(string);
         void setContainerStatus(containerStatus);
+        string getState();
         void write();
         void clear();
         bool checkCWD(string cwd);
@@ -113,7 +116,9 @@ class SubutaiContainer
         SubutaiLogger*		containerLogger;
         SubutaiHelper 		_helper;
         string              _arch;
+        string              _logEntry;      // <SubutaiContainer::CONTAINER_NAME>
 };
+
 #endif /* SUBUTAICONTAINER_H_ */
 
 
