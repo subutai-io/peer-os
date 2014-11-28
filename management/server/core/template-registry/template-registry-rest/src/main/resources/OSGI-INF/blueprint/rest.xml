@@ -11,11 +11,17 @@
     </cxf:features>
   </cxf:bus>
 
+  <reference id="repoManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.repository.api.RepositoryManager" />
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
+  <reference id="peerManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
   <bean id="templateRegistryRestImpl" class="org.safehaus.subutai.core.registry.rest.RestServiceImpl">
-    <property name="templateRegistry" ref="templateRegistry" />
+    <argument ref="repoManager" />
+    <argument ref="templateRegistry" />
+    <argument ref="peerManager" />
   </bean>
 
   <jaxrs:server address="/registry" id="registryRestService">
