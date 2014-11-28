@@ -16,9 +16,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
+import org.safehaus.subutai.core.repository.api.RepositoryManager;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -46,6 +48,8 @@ public class RestServiceImplTest
 
 
     private TemplateRegistry templateRegistry;
+    private PeerManager peerManager;
+    private RepositoryManager repositoryManager;
     private RestServiceImpl restService;
     private Template template;
     private List<Template> templates;
@@ -100,15 +104,9 @@ public class RestServiceImplTest
         template = parseTemplate( CONFIG_FILE, "packagesFile", "md5sum" );
         templates = Lists.newArrayList( template );
         templateRegistry = mock( TemplateRegistry.class );
-        restService = new RestServiceImpl();
-        restService.setTemplateRegistry( templateRegistry );
-    }
-
-
-    @Test( expected = NullPointerException.class )
-    public void shouldThrowNullPointerExceptionForSettingNullValue()
-    {
-        restService.setTemplateRegistry( null );
+        peerManager = mock( PeerManager.class );
+        repositoryManager = mock( RepositoryManager.class );
+        restService = new RestServiceImpl( repositoryManager, templateRegistry, peerManager );
     }
 
 
@@ -158,6 +156,7 @@ public class RestServiceImplTest
     public void shouldGetBadRequestOnUnregisterTemplate() throws RegistryException
     {
         when( templateRegistry.unregisterTemplate( TEMPLATE_NAME ) ).thenThrow( new RuntimeException() );
+        when( templateRegistry.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
         Response response = restService.unregisterTemplate( TEMPLATE_NAME );
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
     }
@@ -167,6 +166,8 @@ public class RestServiceImplTest
     public void shouldGetOkOnUnregisterTemplate() throws RegistryException
     {
         when( templateRegistry.unregisterTemplate( TEMPLATE_NAME ) ).thenReturn( true );
+        when( templateRegistry.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
+
         Response response = restService.unregisterTemplate( TEMPLATE_NAME );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
     }
@@ -239,8 +240,7 @@ public class RestServiceImplTest
         Response response = restService.getParentTemplates( TEMPLATE_NAME );
 
         Type templateType = new TypeToken<List<String>>()
-        {
-        }.getType();
+        {}.getType();
 
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -255,8 +255,7 @@ public class RestServiceImplTest
         Response response = restService.getParentTemplates( TEMPLATE_NAME, Common.DEFAULT_LXC_ARCH );
 
         Type templateType = new TypeToken<List<String>>()
-        {
-        }.getType();
+        {}.getType();
 
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -271,8 +270,7 @@ public class RestServiceImplTest
         Response response = restService.getChildTemplates( TEMPLATE_NAME );
 
         Type templateType = new TypeToken<List<String>>()
-        {
-        }.getType();
+        {}.getType();
 
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -287,8 +285,7 @@ public class RestServiceImplTest
         Response response = restService.getChildTemplates( TEMPLATE_NAME, ARCH );
 
         Type templateType = new TypeToken<List<String>>()
-        {
-        }.getType();
+        {}.getType();
 
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -303,8 +300,7 @@ public class RestServiceImplTest
         Response response = restService.getParentTemplates( TEMPLATE_NAME, Common.DEFAULT_LXC_ARCH );
 
         Type templateType = new TypeToken<List<String>>()
-        {
-        }.getType();
+        {}.getType();
 
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -323,8 +319,7 @@ public class RestServiceImplTest
         when( templateRegistry.getTemplateTree() ).thenReturn( templateTree );
 
         Type templateType = new TypeToken<List<Template>>()
-        {
-        }.getType();
+        {}.getType();
 
         Response response = restService.getTemplateTree();
 
@@ -381,8 +376,7 @@ public class RestServiceImplTest
         when( templateRegistry.getAllTemplates() ).thenReturn( templates );
         Response response = restService.listTemplates();
         Type templateListType = new TypeToken<List<String>>()
-        {
-        }.getType();
+        {}.getType();
         List<String> responseTemplates = GSON.fromJson( String.valueOf( response.getEntity() ), templateListType );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -397,8 +391,7 @@ public class RestServiceImplTest
         Response response = restService.listTemplates( Common.DEFAULT_LXC_ARCH );
 
         Type templatesType = new TypeToken<List<String>>()
-        {
-        }.getType();
+        {}.getType();
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templatesType );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
