@@ -103,14 +103,14 @@ generateRepoPackage() {
  
   pushd $BASE
 
-  #get package latest package from ISOPATH to remove it
+  #get latest package from ISOPATH to remove it
   removedPackage=`ls -lt $ISOPATH | grep "subutai-repo-$productName_" | awk '{ print $9 }' | grep .deb | head -1`
   echo "removedPackageName: $removedPackage" 
   if [ "$removedPackage" != "" ]; then
       rm $ISOPATH/$removedPackage
   fi
 
-  #get package full name, for example:subutai-hadoop_1.0.12_all.deb
+  #get package full name, for example:subutai-cli_1.0.150_all.deb
   currentPackage=`ls -lt $TARGET | awk '{ print $9 }' | grep .deb | head -1` 
   echo "CurrentPackageName: $currentPackage"
   
