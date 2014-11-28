@@ -7,4 +7,10 @@ public class ResourceHostException extends HostException
     {
         super( message, description );
     }
+
+
+    public ResourceHostException( final String message )
+    {
+        super( message, "" );
+    }
 }

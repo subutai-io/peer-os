@@ -76,6 +76,8 @@ public interface LocalPeer extends Peer
     public ContainerHost createContainer( String hostName, String templateName, String cloneName, UUID envId )
             throws PeerException;
 
+    public List<HostTask> getTasks();
+
     //    Agent waitForAgent( String containerName, int timeout );
 
     //    public void onPeerEvent( PeerEvent event );
