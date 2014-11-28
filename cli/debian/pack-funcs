@@ -114,11 +114,6 @@ generateRepoPackage() {
   currentPackage=`ls -lt $TARGET | awk '{ print $9 }' | grep .deb | head -1` 
   echo "CurrentPackageName: $currentPackage"
   
-  #delete repo package: subutai-repo-hadoop_1.0.12_all.deb
-  if [ -f "$ISOPATH/subutai-repo-$currentPackage" ]; then
-      rm $ISOPATH/subutai-repo-$currentPackage 
-  fi
-  
   if [ "$productName" = "cli-management" ]; then
      #remove cli-management package from pool/extras
      removedPackage=`ls -lt $ISOPATH | grep "subutai-$productName" | awk '{ print $9 }' | grep .deb | head -1`
