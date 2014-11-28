@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Container;
 
 
 /**
@@ -29,26 +28,6 @@ public class AgentUtil
                 }
             }
             return agent.getHostname();
-        }
-        return null;
-    }
-
-
-    public static String getContainerIpByMask( Container container, String mask )
-    {
-        if ( container != null )
-        {
-            if ( !CollectionUtil.isCollectionEmpty( container.getIps() ) )
-            {
-                for ( String ip : container.getIps() )
-                {
-                    if ( ip.matches( mask ) )
-                    {
-                        return ip;
-                    }
-                }
-            }
-            return container.getHostname();
         }
         return null;
     }

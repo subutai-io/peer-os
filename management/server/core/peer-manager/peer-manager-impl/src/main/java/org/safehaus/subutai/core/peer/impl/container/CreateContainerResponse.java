@@ -1,9 +1,11 @@
 package org.safehaus.subutai.core.peer.impl.container;
 
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.HostKey;
 
 
 /**
@@ -11,18 +13,24 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
  */
 public class CreateContainerResponse
 {
-    private Set<ContainerHost> containerHosts;
+    private Set<HostKey> hostKeys;
 
 
-    public CreateContainerResponse( final Set<ContainerHost> containerHosts )
+    public CreateContainerResponse( final Set<ContainerHost> hostKeys )
     {
-        this.containerHosts = containerHosts;
+        this.hostKeys = new HashSet<>();
+        for ( ContainerHost containerHost : hostKeys )
+        {
+            this.hostKeys.add( new HostKey( containerHost.getHostId(), containerHost.getPeerId(),
+                    containerHost.getCreatorPeerId(), containerHost.getHostname(), containerHost.getEnvironmentId(),
+                    containerHost.getNodeGroupName() ) );
+        }
     }
 
 
-    public Set<ContainerHost> getContainerHosts()
+    public Set<HostKey> getHostKeys()
     {
-        return containerHosts;
+        return hostKeys;
     }
 }
 

@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -19,6 +20,7 @@ import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -30,6 +32,7 @@ import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandResultImpl;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequest;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerResponse;
+import org.safehaus.subutai.core.peer.impl.model.ContainerHostEntity;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequest;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
@@ -143,7 +146,9 @@ public class RemotePeerImpl implements RemotePeer
 
             if ( response != null )
             {
-                return response.getContainerHosts();
+                Set<HostKey> hostKeys = response.getHostKeys();
+                Set<ContainerHost> result = getContainerHostImpl( hostKeys );
+                return result;
             }
             else
             {
@@ -155,6 +160,17 @@ public class RemotePeerImpl implements RemotePeer
             LOG.error( "Error in createContainers", e );
             throw new PeerException( e.getMessage() );
         }
+    }
+
+
+    private Set<ContainerHost> getContainerHostImpl( final Set<HostKey> hostKeys )
+    {
+        Set<ContainerHost> result = new HashSet<>();
+        for ( HostKey hostKey : hostKeys )
+        {
+            result.add( new ContainerHostEntity( hostKey ) );
+        }
+        return result;
     }
 
 

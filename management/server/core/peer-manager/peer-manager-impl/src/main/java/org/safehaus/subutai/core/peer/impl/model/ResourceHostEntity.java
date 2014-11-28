@@ -5,9 +5,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -25,13 +23,12 @@ import javax.persistence.Table;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.ContainerState;
-import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.HostTask;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
@@ -48,6 +45,10 @@ import org.slf4j.LoggerFactory;
 @Access( AccessType.FIELD )
 public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost
 {
+    private static final String CONTAINER_DOES_NOT_EXISTS = "Container \"%s\" does NOT exist. Aborting ...";
+    private static final String CONTAINER_DESTROYED = "Destruction of \"%s\" completed successfully";
+    private static final String TEMPLATE_EXISTS = "Container \"%s\" exists. Aborting ...";
+
     @javax.persistence.Transient
     transient protected static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
     @javax.persistence.Transient
@@ -57,21 +58,13 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @javax.persistence.Transient
     transient private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
     @javax.persistence.Transient
-    transient private static final int HOST_EXPIRATION = 60;
-    @javax.persistence.Transient
     transient private ExecutorService singleThreadExecutorService;
 
     @javax.persistence.Transient
     transient private ExecutorService cachedThredPoolService;
 
-    @javax.persistence.Transient
-    transient private Queue<HostTask> taskQueue = new LinkedList<>();
-
-    //    @javax.persistence.Transient
-    //    protected Cache<UUID, ContainerHostInfo> hostCache;
-
-    @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity =
-            ContainerHostEntity.class )
+    @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true,
+            targetEntity = ContainerHostEntity.class )
     Set<ContainerHost> containersHosts = new HashSet();
 
 
@@ -124,17 +117,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         LOG.info( String.format( "New immediate task %s added.", hostTask.getId() ) );
         getCachedThreadExecutorService().submit( hostTask );
     }
-    //
-    //    private Cache<UUID, ContainerHostInfo> getHostCache()
-    //    {
-    //        if ( hostCache == null )
-    //        {
-    //            hostCache = CacheBuilder.newBuilder().
-    //                    expireAfterWrite( HOST_EXPIRATION, TimeUnit.SECONDS ).
-    //                                            build();
-    //        }
-    //        return hostCache;
-    //    }
 
 
     public boolean startContainerHost( final ContainerHost container ) throws ResourceHostException
@@ -366,7 +348,30 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     public void destroyContainerHost( final ContainerHost containerHost ) throws ResourceHostException
     {
-        run( Command.DESTROY, containerHost.getHostname() );
+        try
+        {
+            CommandResult commandResult = run( Command.DESTROY, containerHost.getHostname() );
+
+            if ( commandResult.hasSucceeded() && CommandUtil.isStdOutContains( commandResult,
+                    String.format( CONTAINER_DESTROYED, containerHost.getHostname() ) ) )
+            {
+                return;
+            }
+
+            if ( !commandResult.hasSucceeded() && CommandUtil.isStdOutContains( commandResult,
+                    String.format( CONTAINER_DOES_NOT_EXISTS, containerHost.getHostname() ) ) )
+            {
+                return;
+            }
+            LOG.error( "Unexpected command result: " + commandResult );
+            throw new ResourceHostException( "Unexpected command result on destroying container.",
+                    commandResult.getStdOut() );
+        }
+        catch ( CommandException ce )
+        {
+            LOG.error( "Command exception.", ce );
+            throw new ResourceHostException( "General command exception on destroying container.", ce.toString() );
+        }
     }
 
 
@@ -406,11 +411,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public void removeContainerHost( final Host result )
+    public void removeContainerHost( final ContainerHost containerHost )
     {
-        if ( containersHosts.contains( result ) )
+        if ( containersHosts.contains( containerHost ) )
         {
-            containersHosts.remove( result );
+            containersHosts.remove( containerHost );
         }
     }
 
@@ -437,7 +442,15 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void cloneContainer( final String templateName, final String cloneName ) throws ResourceHostException
     {
         LOG.debug( String.format( "Cloning container %s on %s from template %s", cloneName, hostname, templateName ) );
-        run( Command.CLONE, templateName, cloneName );
+        try
+        {
+            run( Command.CLONE, templateName, cloneName );
+        }
+        catch ( CommandException ce )
+        {
+            LOG.error( "Command exception.", ce );
+            throw new ResourceHostException( "General command exception on cloning container.", ce.toString() );
+        }
     }
 
 
@@ -550,14 +563,24 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            run( Command.LIST_TEMPLATES, template.getTemplateName() );
-            LOG.debug( String.format( "Template %s exists on %s.", template.getTemplateName(), hostname ) );
-            return true;
+            CommandResult commandresult = run( Command.LIST_TEMPLATES, template.getTemplateName() );
+            if ( commandresult.hasSucceeded() )
+            {
+                LOG.debug( String.format( "Template %s exists on %s.", template.getTemplateName(), hostname ) );
+                return true;
+            }
+            else
+            {
+                LOG.debug(
+                        String.format( "Template %s does not exists on %s.", template.getTemplateName(), hostname ) );
+                return false;
+            }
         }
-        catch ( ResourceHostException rhe )
+        catch ( CommandException ce )
         {
-            LOG.debug( String.format( "Template %s does not exists on %s.", template.getTemplateName(), hostname ) );
-            return false;
+            LOG.error( "Command exception.", ce );
+            throw new ResourceHostException( "General command exception on checking container existence.",
+                    ce.toString() );
         }
     }
 
@@ -566,7 +589,34 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void importTemplate( Template template ) throws ResourceHostException
     {
         LOG.debug( String.format( "Trying to import template %s to %s.", template.getTemplateName(), hostname ) );
-        run( Command.IMPORT, template.getTemplateName() );
+        try
+        {
+            CommandResult commandResult = run( Command.IMPORT, template.getTemplateName() );
+            if ( commandResult.hasSucceeded() )
+            {
+                return;
+            }
+            else
+            {
+                if ( CommandUtil.isStdOutContains( commandResult,
+                        String.format( TEMPLATE_EXISTS, template.getTemplateName() ) ) )
+                {
+                    return;
+                }
+                else
+                {
+                    LOG.error( "Unexpected command result: " + commandResult );
+                    throw new ResourceHostException( "Unexpected command result on importing template.",
+                            commandResult.getStdOut() );
+                }
+            }
+        }
+        catch ( CommandException ce )
+        {
+            LOG.error( "Command exception.", ce );
+            throw new ResourceHostException( "General command exception on checking container existence.",
+                    ce.toString() );
+        }
     }
 
 
@@ -575,9 +625,28 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         if ( template.isRemote() )
         {
-            LOG.debug( String.format( "Adding remote repository %s to %s...", template.getPeerId(), hostname ) );
-            run( Command.ADD_SOURCE, template.getPeerId().toString() );
-            run( Command.APT_GET_UPDATE );
+            try
+            {
+                LOG.debug( String.format( "Adding remote repository %s to %s...", template.getPeerId(), hostname ) );
+                CommandResult commandResult = run( Command.ADD_SOURCE, template.getPeerId().toString() );
+                if ( !commandResult.hasSucceeded() )
+                {
+                    throw new ResourceHostException(
+                            String.format( "Could not add repository %s to %s.", template.getPeerId(), hostname ) );
+                }
+                LOG.debug( String.format( "Updating repository index on %s...", hostname ) );
+                commandResult = run( Command.APT_GET_UPDATE );
+                if ( !commandResult.hasSucceeded() )
+                {
+                    throw new ResourceHostException(
+                            String.format( "Could not update repository %s on %s.", template.getPeerId(), hostname ) );
+                }
+            }
+            catch ( CommandException ce )
+            {
+                LOG.error( "Command exception.", ce );
+                throw new ResourceHostException( "General command exception on updating repository.", ce.toString() );
+            }
         }
     }
 
@@ -586,15 +655,13 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
      * Promotes a given clone into a template with given name. This method gives possibility to promote a copy of the
      * clone instead of the clone itself.
      *
-     * @param hostName the physical host name
      * @param cloneName name of the clone to be converted
      * @param newName new name for template
      * @param copyit if set <tt>true</tt>, a copy of clone is made first and a copied clone is promoted to template
      *
      * @return <tt>true</tt> if promote successfully completed
      */
-    public boolean promote( String hostName, String cloneName, String newName, boolean copyit )
-            throws ResourceHostException
+    public boolean promote( String cloneName, String newName, boolean copyit ) throws ResourceHostException
     {
         List<String> args = new ArrayList<>();
         if ( newName != null && newName.length() > 0 )
@@ -607,7 +674,19 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         args.add( cloneName );
         String[] arr = args.toArray( new String[args.size()] );
-        run( Command.PROMOTE, arr );
+        try
+        {
+            CommandResult commandResult = run( Command.PROMOTE, arr );
+            if ( !commandResult.hasSucceeded() )
+            {
+                throw new ResourceHostException( String.format( "Could not promote container %s.", cloneName ) );
+            }
+        }
+        catch ( CommandException ce )
+        {
+            LOG.error( "Command exception.", ce );
+            throw new ResourceHostException( "General command exception on promoting container.", ce.toString() );
+        }
         return true;
     }
 
@@ -621,7 +700,18 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
      */
     public String exportTemplate( String templateName ) throws ResourceHostException
     {
-        run( Command.EXPORT, templateName );
+        try
+        {
+            CommandResult commandResult = run( Command.EXPORT, templateName );
+            if ( !commandResult.hasSucceeded() )
+            {
+                throw new ResourceHostException(
+                        String.format( "Could not export template %s on %s.", templateName, hostname ) );
+            }
+        }
+        catch ( CommandException ce )
+        {
+        }
         return getExportedPackageFilePath( templateName );
     }
 
@@ -706,24 +796,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    protected void run( Command command, String... args ) throws ResourceHostException
+    protected CommandResult run( Command command, String... args ) throws CommandException
     {
-        try
-        {
-            CommandResult commandResult = execute( command.build( args ) );
-
-            if ( !commandResult.getStatus().equals( CommandStatus.SUCCEEDED ) )
-            {
-                throw new ResourceHostException(
-                        String.format( "Command execution failed %s.", String.format( command.script, args ) ),
-                        commandResult.getStdErr() );
-            }
-        }
-        catch ( CommandException e )
-        {
-            throw new ResourceHostException(
-                    String.format( "Could not execute script/command %s", String.format( command.script, args ) ), e.toString() );
-        }
+        return execute( command.build( args ) );
     }
 
 
@@ -801,7 +876,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     enum Command
     {
         LIST_TEMPLATES( "subutai list -t %s" ),
-        CLONE( "subutai clone %s %s", 1, true ),
+        CLONE( "subutai clone %s %s", 90 ),
         DESTROY( "subutai destroy %s" ),
         IMPORT( "subutai import %s" ),
         PROMOTE( "promote %s" ),

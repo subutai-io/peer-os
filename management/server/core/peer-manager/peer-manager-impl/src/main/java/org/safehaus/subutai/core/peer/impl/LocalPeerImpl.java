@@ -24,11 +24,9 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
@@ -40,6 +38,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.HostEvent;
 import org.safehaus.subutai.core.peer.api.HostEventListener;
+import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostTask;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -90,7 +89,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     private ManagementHost managementHost;
     private Set<ResourceHost> resourceHosts = Sets.newHashSet();
     private CommandExecutor commandExecutor;
-    private AgentManager agentManager;
+    //    private AgentManager agentManager;
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private ConcurrentMap<String, AtomicInteger> sequences;
@@ -101,13 +100,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     private List<HostTask> tasks = Lists.newCopyOnWriteArrayList();
 
 
-    public LocalPeerImpl( PeerManager peerManager, AgentManager agentManager, TemplateRegistry templateRegistry,
-                          PeerDAO peerDao, QuotaManager quotaManager, StrategyManager strategyManager,
+    public LocalPeerImpl( PeerManager peerManager, TemplateRegistry templateRegistry, PeerDAO peerDao,
+                          QuotaManager quotaManager, StrategyManager strategyManager,
                           Set<RequestListener> requestListeners, CommandExecutor commandExecutor,
                           HostRegistry hostRegistry )
 
     {
-        this.agentManager = agentManager;
+        //        this.agentManager = agentManager;
         this.strategyManager = strategyManager;
         this.peerManager = peerManager;
         //        this.containerManager = containerManager;
@@ -213,6 +212,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     @Override
+    public List<HostTask> getTasks()
+    {
+        return tasks;
+    }
+
+
+    @Override
     public ContainerHost createContainer( final String hostName, final String templateName, final String cloneName,
                                           final UUID environmentId ) throws PeerException
     {
@@ -226,6 +232,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
         String taskGroupId = UUID.randomUUID().toString();
         CloneTask cloneTask = new CloneTask( taskGroupId, resourceHost, cloneParam );
+        tasks.add( cloneTask );
         cloneTask.start();
 
         try
@@ -391,16 +398,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     @Override
-    public ContainerHost getContainerHost( final HostInfo hostInfo, final String creatorPeerId,
-                                           final String environmentId, final String nodeGroupName )
+    public ContainerHost getContainerHostImpl( final HostKey hostKey )
     {
         Host host = null;
 
-        if ( getId().equals( creatorPeerId ) )
+        if ( getId().equals( hostKey.getCreatorId() ) )
         {
             try
             {
-                host = bindHost( hostInfo.getId() );
+                host = bindHost( hostKey.getHostId() );
             }
             catch ( HostNotFoundException ignore )
             {
@@ -409,8 +415,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         }
         if ( host == null )
         {
-            host = new ContainerHostEntity( getId().toString(), creatorPeerId, environmentId.toString(), nodeGroupName,
-                    hostInfo );
+            //TODO: implement remote ContainerHostImpl if needs
+            host = new ContainerHostEntity( hostKey );
         }
         return ( ContainerHost ) host;
     }
@@ -677,23 +683,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         try
         {
             ContainerHost result = bindHost( containerHost );
-
             ContainerHostEntity entity = ( ContainerHostEntity ) result;
             ResourceHost resourceHost =
                     entity.getParent(); //getResourceHostByName( containerHost.getAgent().getParentHostName() );
             resourceHost.destroyContainerHost( containerHost );
-            resourceHost.removeContainerHost( result );
-            entity.setParent( null );
-            resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
+            resourceHostDataService.removeContainer( ( ResourceHostEntity ) resourceHost, containerHost );
             //            peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
         }
         catch ( ResourceHostException e )
         {
-            throw new PeerException( e.toString() );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( String.format( "Could not stop LXC container [%s]", e.toString() ) );
+            String errMsg = String.format( "Could not destroy container [%s]", containerHost.getHostname() );
+            LOG.error( errMsg, e );
+            throw new PeerException( errMsg, e.toString() );
         }
     }
 
