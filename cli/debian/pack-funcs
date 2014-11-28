@@ -104,7 +104,7 @@ generateRepoPackage() {
   pushd $BASE
 
   #get package latest package from ISOPATH to remove it
-  removedPackage=`ls -lt $ISOPATH | grep "subutai-repo-$productName" | awk '{ print $9 }' | grep .deb | head -1`
+  removedPackage=`ls -lt $ISOPATH | grep "subutai-repo-$productName_" | awk '{ print $9 }' | grep .deb | head -1`
   echo "removedPackageName: $removedPackage" 
   if [ "$removedPackage" != "" ]; then
       rm $ISOPATH/$removedPackage
