@@ -19,19 +19,11 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
-    <!--<dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>agent-manager-api</artifactId>
-    </dependency>-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>security-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!--<dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>command-dispatcher-api</artifactId>
-    </dependency>-->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
@@ -54,11 +46,6 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
-    <!--<dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>command-dispatcher-impl</artifactId>
-      <scope>test</scope>
-    </dependency>-->
   </dependencies>
 
   <build>
