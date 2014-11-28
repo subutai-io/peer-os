@@ -105,20 +105,20 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- apt-repository-manager -->
+      <!-- key-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>apt-repository-api</artifactId>
+        <artifactId>key-manager-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>apt-repository-impl</artifactId>
+        <artifactId>key-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>apt-repository-cli</artifactId>
+        <artifactId>key-manager-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -313,19 +313,19 @@
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- monitoring -->
       <!--<dependency>-->
-        <!--<groupId>${project.groupId}</groupId>-->
-        <!--<artifactId>monitoring-api</artifactId>-->
-        <!--<version>${project.version}</version>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>monitoring-api</artifactId>-->
+      <!--<version>${project.version}</version>-->
       <!--</dependency>-->
       <!--<dependency>-->
-        <!--<groupId>${project.groupId}</groupId>-->
-        <!--<artifactId>monitoring-impl</artifactId>-->
-        <!--<version>${project.version}</version>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>monitoring-impl</artifactId>-->
+      <!--<version>${project.version}</version>-->
       <!--</dependency>-->
       <!--<dependency>-->
-        <!--<groupId>${project.groupId}</groupId>-->
-        <!--<artifactId>monitoring-cli</artifactId>-->
-        <!--<version>${project.version}</version>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>monitoring-cli</artifactId>-->
+      <!--<version>${project.version}</version>-->
       <!--</dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

@@ -68,19 +68,21 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- apt-repository-manager -->
+    <!-- key-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>apt-repository-api</artifactId>
-
+      <artifactId>key-manager-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>apt-repository-impl</artifactId>
+      <artifactId>key-manager-impl</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>apt-repository-cli</artifactId>
+      <artifactId>key-manager-cli</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
