@@ -32,8 +32,6 @@ public class PeerComponent extends CustomComponent implements Disposable
         TabSheet sheet = new TabSheet();
         sheet.setStyleName( Runo.TABSHEET_SMALL );
         sheet.setSizeFull();
-        sheet.addTab( new PeerRegisterForm( peerManagerPortalModule ), "Registration" );
-        sheet.addTab( new PeerGroupComponent( peerManagerPortalModule ), "Peer groups" );
         try
         {
             sheet.addTab( new ContainerComponent( peerManagerPortalModule ), "Containers" );
@@ -42,6 +40,8 @@ public class PeerComponent extends CustomComponent implements Disposable
         {
             peerManagerPortalModule.LOG.error( "Could not create container component.", e );
         }
+        sheet.addTab( new PeerRegisterForm( peerManagerPortalModule ), "Registration" );
+        sheet.addTab( new PeerGroupComponent( peerManagerPortalModule ), "Peer groups" );
 
         verticalLayout.addComponent( sheet );
 

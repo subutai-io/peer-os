@@ -8,8 +8,10 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -22,12 +24,15 @@ public class EnvironmentTest
     private static final String NAME = "name";
     Environment environment;
 
+    @Mock
+    LocalPeer localPeer;
+
 
     @Before
     public void setUp() throws Exception
     {
 
-        this.environment = new Environment( NAME );
+        this.environment = new Environment( NAME, localPeer );
     }
 
 
@@ -64,10 +69,10 @@ public class EnvironmentTest
     }
 
 
-//    @Test
-//    public void testInvoke() throws Exception
-//    {
-//        PeerCommandMessage peerCommandMessage = mock( PeerCommandMessage.class );
-//        environment.invoke( peerCommandMessage );
-//    }
+    //    @Test
+    //    public void testInvoke() throws Exception
+    //    {
+    //        PeerCommandMessage peerCommandMessage = mock( PeerCommandMessage.class );
+    //        environment.invoke( peerCommandMessage );
+    //    }
 }

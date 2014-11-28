@@ -15,9 +15,6 @@
   <reference id="messenger" availability="mandatory"
              interface="org.safehaus.subutai.core.messenger.api.Messenger" />
 
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
-
   <reference id="commandExecutor" interface="org.safehaus.subutai.core.executor.api.CommandExecutor" />
 
   <reference id="templateRegistry" interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
@@ -31,7 +28,6 @@
 
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
-    <property name="agentManager" ref="agentManager" />
     <property name="templateRegistry" ref="templateRegistry" />
     <property name="hostRegistry" ref="hostRegistry" />
     <property name="strategyManager" ref="strategyManager" />

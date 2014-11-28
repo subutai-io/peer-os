@@ -46,7 +46,7 @@ public interface ResourceHost extends Host
 
     public void destroyContainerHost( ContainerHost containerHost ) throws ResourceHostException;
 
-    public void removeContainerHost( Host result ) throws ResourceHostException;
+    public void removeContainerHost( ContainerHost result ) throws ResourceHostException;
 
     //    void onHeartbeat( ResourceHostInfo resourceHostInfo );
     public void queue( HostTask hostTask );
