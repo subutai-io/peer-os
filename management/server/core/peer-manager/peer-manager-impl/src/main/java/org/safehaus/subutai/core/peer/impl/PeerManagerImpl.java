@@ -9,7 +9,6 @@ import java.util.UUID;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
@@ -48,7 +47,7 @@ public class PeerManagerImpl implements PeerManager
     private static final String SOURCE_REMOTE_PEER = "PEER_REMOTE";
     private static final String SOURCE_LOCAL_PEER = "PEER_LOCAL";
     private static final String PEER_GROUP = "PEER_GROUP";
-    private AgentManager agentManager;
+    //    private AgentManager agentManager;
     private PeerDAO peerDAO;
     private QuotaManager quotaManager;
     private TemplateRegistry templateRegistry;
@@ -116,8 +115,8 @@ public class PeerManagerImpl implements PeerManager
         {
             peerInfo = result.get( 0 );
         }
-        localPeer = new LocalPeerImpl( this, agentManager, templateRegistry, peerDAO, quotaManager, strategyManager,
-                requestListeners, commandExecutor, hostRegistry );
+        localPeer = new LocalPeerImpl( this, templateRegistry, peerDAO, quotaManager, strategyManager, requestListeners,
+                commandExecutor, hostRegistry );
         localPeer.init();
 
         //add command request listener
@@ -158,12 +157,6 @@ public class PeerManagerImpl implements PeerManager
     public void setStrategyManager( final StrategyManager strategyManager )
     {
         this.strategyManager = strategyManager;
-    }
-
-
-    public void setAgentManager( final AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
     }
 
 

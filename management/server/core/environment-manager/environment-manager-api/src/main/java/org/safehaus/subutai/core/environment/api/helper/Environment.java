@@ -9,23 +9,31 @@ import java.util.UUID;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.HostKey;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 
 import com.google.common.collect.Sets;
+
+
 public class Environment
 {
 
     private UUID id;
     private String name;
-    private Set<ContainerHost> containers;
+    transient private Set<ContainerHost> containers;
+    private Set<HostKey> hostKeys;
     private EnvironmentStatusEnum status;
     private long creationTimestamp;
+    transient private LocalPeer localPeer;
 
 
-    public Environment( String name )
+    public Environment( String name, LocalPeer localPeer )
     {
         this.name = name;
+        this.localPeer = localPeer;
         this.id = UUIDUtil.generateTimeBasedUUID();
         this.containers = new HashSet<>();
+        this.hostKeys = new HashSet<>();
         this.status = EnvironmentStatusEnum.EMPTY;
         this.creationTimestamp = System.currentTimeMillis();
     }
@@ -53,19 +61,26 @@ public class Environment
     {
         container.setEnvironmentId( id.toString() );
         this.containers.add( container );
+        this.hostKeys.add( new HostKey( container.getHostId(), container.getPeerId(), container.getCreatorPeerId(),
+                container.getHostname(), container.getEnvironmentId(), container.getNodeGroupName() ) );
     }
 
 
     public Set<ContainerHost> getContainers()
     {
+        containers = new HashSet<>();
+        for ( HostKey hostKey : hostKeys )
+        {
+            containers.add( localPeer.getContainerHostImpl( hostKey ) );
+        }
         return containers;
     }
 
-
-    public void setContainers( final Set<ContainerHost> containers )
-    {
-        this.containers = containers;
-    }
+    //
+    //    public void setContainers( final Set<ContainerHost> containers )
+    //    {
+    //        this.containers = containers;
+    //    }
 
 
     public void destroyContainer( UUID containerId ) throws EnvironmentManagerException
@@ -86,14 +101,17 @@ public class Environment
     }
 
 
-    public ContainerHost getContainerHostByUUID( UUID uuid ) {
+    public ContainerHost getContainerHostByUUID( UUID uuid )
+    {
         Iterator<ContainerHost> iterator = containers.iterator();
         while ( iterator.hasNext() )
         {
             ContainerHost containerHost = iterator.next();
             if ( containerHost.getId().equals( uuid ) )
+            {
                 return containerHost;
-         }
+            }
+        }
         return null;
     }
 
@@ -101,7 +119,8 @@ public class Environment
     public ContainerHost getContainerHostByHostname( String hostname )
     {
         Iterator<ContainerHost> iterator = containers.iterator();
-        while ( iterator.hasNext() ) {
+        while ( iterator.hasNext() )
+        {
             ContainerHost containerHost = iterator.next();
             if ( containerHost.getHostname().equalsIgnoreCase( hostname ) )
             {

@@ -70,8 +70,8 @@ public class LocalPeerImplTest
     public void testBindHostShouldFailOnNotExistenceHost() throws PeerException
     {
         LocalPeerImpl localPeer =
-                new LocalPeerImpl( peerManager, agentManager, templateRegistry, peerDAO, quotaManager, strategyManager,
-                        null, commandExecutor, hostRegistry );
+                new LocalPeerImpl( peerManager, templateRegistry, peerDAO, quotaManager, strategyManager, null,
+                        commandExecutor, hostRegistry );
 
         localPeer.bindHost( UUID.randomUUID().toString() );
     }
