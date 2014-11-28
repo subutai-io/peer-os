@@ -89,11 +89,11 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     }
     _params[i] = NULL;
 
-    if (captureOutput) {
-    int outfd[2];
-    pipe(outfd);
-    opts.stdout_fd = outfd[1];
     ExecutionResult result;
+    int outfd[2];
+    if (captureOutput) {
+        pipe(outfd);
+        opts.stdout_fd = outfd[1];
     }
     pid_t pid;
     try {
@@ -103,9 +103,10 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
         containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Execution failed (LXC): " + string(e.what())));
     }
     if (captureOutput) {
-        char outbuf[1024];
+        char outbuf[4000];
         size_t size = read(outfd[0], outbuf, sizeof(outbuf) - 1);
         if (size > 0) {
+            outbuf[size] = '\0';
             result.out.append(outbuf);
         }
         close(outfd[0]);
