@@ -156,6 +156,7 @@ public class RestServiceImplTest
     public void shouldGetBadRequestOnUnregisterTemplate() throws RegistryException
     {
         when( templateRegistry.unregisterTemplate( TEMPLATE_NAME ) ).thenThrow( new RuntimeException() );
+        when( templateRegistry.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
         Response response = restService.unregisterTemplate( TEMPLATE_NAME );
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
     }
@@ -165,6 +166,8 @@ public class RestServiceImplTest
     public void shouldGetOkOnUnregisterTemplate() throws RegistryException
     {
         when( templateRegistry.unregisterTemplate( TEMPLATE_NAME ) ).thenReturn( true );
+        when( templateRegistry.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
+
         Response response = restService.unregisterTemplate( TEMPLATE_NAME );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
     }
