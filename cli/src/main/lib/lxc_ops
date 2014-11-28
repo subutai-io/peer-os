@@ -279,11 +279,6 @@ function lxc_clone {
     echo "" > $child_rootfs/etc/subutai-agent/uuid.txt
   fi
 
-  # adding the agent subutai-run script to cloned instance template
-  if [ -f "/sbin/subutai-run" ]; then
-     cp /sbin/subutai-run $child_rootfs/sbin/
-  fi
-
 }
 
 
