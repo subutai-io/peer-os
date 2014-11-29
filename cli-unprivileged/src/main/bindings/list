@@ -1,0 +1,294 @@
+#!/bin/bash
+
+
+function list_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: List containers and/or temlates.
+  echo
+  echo "        "subutai \[-qh\] list \[-tcpa\] \[name_list\]
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+
+function get_ancestor_list {
+  contemp="$1"
+  ancestor_list=
+  ancestor=`fs_get_parent $contemp`
+  while true; do
+    if [ -z "$ancestor_list" ]; then
+      ancestor_list="$ancestor"
+    else
+      ancestor_list="$ancestor_list,$ancestor"
+    fi
+
+    if [ "master" == "$ancestor" ]; then
+      break
+    else
+      ancestor=`fs_get_parent $ancestor`
+    fi
+  done
+ 
+  echo $ancestor_list
+}
+
+
+# lists all the containers and templates together filtered by operands
+# first parameter $1 = set of cont/temp names for filtering (operands)
+# second parameter $2 = mode which can be "", "parents" or "ancestors"
+function list_contemp {
+  if [ -z "$1" ]; then
+    local contemps=`lxc-ls`
+  else
+    local contemps="$1"
+  fi
+  local mode="$2"
+
+  if [ "false" == "$subutai_quiet" -a -z "$mode" ]; then
+    echo -e "CONT/TEMP"
+    echo -e "---------"
+  elif [ "false" == "$subutai_quiet" -a "ancestors" == "$mode" ]; then
+    echo -e "CONT/TEMP\tANCESTORS"
+    echo -e "---------\t---------"
+  elif [ "false" == "$subutai_quiet" -a "parents" == "$mode" ]; then
+    echo -e "CONT/TEMP\tPARENTS"
+    echo -e "---------\t-------"
+  fi
+
+  for contemp in $contemps; do
+    if [ -z "$mode" ]; then
+      echo $contemp
+    elif [ "ancestors" == "$mode" ]; then 
+      echo -e "$contemp\t\t`get_ancestor_list $contemp`"
+    elif [ "parents" == "$mode" ]; then 
+      echo -e "$contemp\t\t`fs_get_parent $contemp`"
+    fi
+  done
+}
+
+
+# lists all the templates together filtered by operands
+# first parameter $1 = set of template names for filtering (operands)
+# second parameter $2 = mode which can be "", "parents" or "ancestors"
+function list_templates {
+  if [ -z "$1" ]; then
+    local templates=`fs_list_templates`
+  else
+    local templates="$1"
+  fi
+  local mode="$2"
+
+  if [ "false" == "$subutai_quiet" -a -z "$mode" ]; then
+    echo -e "TEMPLATE"
+    echo -e "--------"
+  elif [ "false" == "$subutai_quiet" -a "ancestors" == "$mode" ]; then
+    echo -e "TEMPLATE\tANCESTORS"
+    echo -e "--------\t---------"
+  elif [ "false" == "$subutai_quiet" -a "parents" == "$mode" ]; then
+    echo -e "TEMPLATE\tPARENTS"
+    echo -e "--------\t-------"
+  fi
+
+  for template in $templates; do
+    if [ "false" == "`fs_is_template $template`" ]; then
+      msg_error "Provided operand $template is a container not a template"
+      exit 1
+    fi
+
+    if [ -z "$mode" ]; then
+      echo $template
+    elif [ "ancestors" == "$mode" ]; then 
+      echo -e "$template\t\t`get_ancestor_list $template`"
+    elif [ "parents" == "$mode" ]; then 
+      echo -e "$template\t\t`fs_get_parent $template`"
+    fi
+  done
+}
+
+# lists all registered templates
+# first parameter $1 = mode which can be "" or "parents"
+function list_registered_templates {
+  local mode="$1"
+  local templates=`list_reg_templates "$mode"`
+
+  if [ "false" == "$subutai_quiet" -a -z "$mode" ]; then
+    echo -e "TEMPLATE"
+    echo -e "--------"
+  elif [ "false" == "$subutai_quiet" -a "parents" == "$mode" ]; then
+    echo -e "TEMPLATE\tPARENT"
+    echo -e "--------\t-------"
+  fi
+
+  for template in $templates; do
+    local t=`echo -e "$template" | cut -f 1`
+    local p=`echo -e "$template" | cut -s -f 2`
+    if [ "parents" == "$mode" ]; then
+      echo -e "$t\t\t$p"
+    else
+      echo "$t"
+    fi
+  done
+}
+
+
+# lists all the containers (not templates) together filtered by operands
+# first parameter $1 = set of container names for filtering (operands)
+# second parameter $2 = mode which can be "", "parents" or "ancestors"
+function list_containers {
+  local templates=`fs_list_templates`
+  local lxc_list=`lxc-ls`
+  local mode="$2"
+  local containers="$1"
+  local lxc_list_fancy=`lxc-ls -f`
+  if [ -z "$containers" ]; then
+    for container in $lxc_list; do
+      if [ -z "`echo $templates | grep $container`" ]; then
+        containers="$containers $container"
+      fi
+    done
+  fi
+
+
+  if [ "false" == "$subutai_quiet" -a -z "$mode" ]; then
+    echo -e "CONTAINER"
+    echo -e "---------"
+  elif [ "false" == "$subutai_quiet" -a "ancestors" == "$mode" ]; then
+    echo -e "CONTAINER\tANCESTORS"
+    echo -e "---------\t---------"
+  elif [ "false" == "$subutai_quiet" -a "parents" == "$mode" ]; then
+    echo -e "CONTAINER\tPARENTS"
+    echo -e "---------\t-------"
+  fi
+
+  for container in $containers; do
+    if [ "true" == "`fs_is_template $container`" ]; then
+      msg_error "Provided operand $container is a template not a container"
+      exit 1
+    fi
+
+    if [ -z "$mode" ]; then
+      echo "$lxc_list_fancy" | grep -w "$container"
+    elif [ "ancestors" == "$mode" ]; then 
+      echo -e "$container\t\t`get_ancestor_list $container`"
+    elif [ "parents" == "$mode" ]; then 
+      echo -e "$container\t\t`fs_get_parent $container`"
+    fi
+  done
+}
+
+
+function list {
+  OPTIND=0
+  if [ "$1" == "list" ]; then
+    shift
+  fi
+  
+  templates="false"
+  containers="false"
+  registered="false"
+  parents="false"
+  ancestors="false"
+
+  shift_amount=0;
+  while getopts ":tcrpa" opt; do
+    case $opt in
+      t)
+        templates="true"
+        if [[ "true" == "$containers" || "true" == "$registered" ]]; then
+          msg_error "Cannot use the -t, -r, and -c options together." >&2
+          exit 1
+        fi
+        ;;
+      c)
+        containers="true"
+        if [[ "true" == "$templates" || "true" == "$registered" ]]; then
+          msg_error "Cannot use the -t, -r, and -c options together." >&2
+          exit 1
+        fi
+        ;;
+      r)
+        registered="true"
+        if [[ "true" == "$templates" || "true" == "$containers" ]]; then
+          msg_error "Cannot use the -t, -r, and -c options together." >&2
+          exit 1
+        fi
+        ;;
+      p)
+        parents="true"
+        if [ "true" == "$ancestors" ]; then
+          msg_error "Cannot use the -p and -a options together." >&2
+          exit 1
+        fi
+        ;;
+      a)
+        ancestors="true"
+        if [ "true" == "$parents" ]; then
+          msg_error "Cannot use the -p and -a options together." >&2
+          exit 1
+        fi
+        ;;
+      \?)
+        msg_error "Unrecognized option -$OPTARG"
+        exit 1
+        ;;
+    esac
+    shift_amount=$(($shift_amount + 1))
+  done
+
+  while [ -n "`echo $1 | grep -`" ]; do
+    shift
+  done
+  
+  operands="`for op in "$@"; do echo $op; done | sort | uniq`"
+
+  if [ "$TEST_MODE" == "true" ]; then
+    echo ---- TEST_MODE DUMP ----
+    echo -e "operand count\t= $#"
+    echo -e "operands\t= $operands"
+    echo -e "parents\t\t= $parents"
+    echo -e "templates\t= $templates"
+    echo -e "registered\t= $registered"
+    echo -e "containers\t= $containers"
+    echo -e "ancestors\t= $ancestors"
+    echo
+  fi
+
+  if [ "false" == "$templates" -a "false" == "$containers" -a "false" == "$registered" ]; then
+    if [ "false" == "$parents" -a "false" == "$ancestors" ]; then
+      list_contemp "$operands"
+    elif [ "true" == "$parents" ];then
+      list_contemp "$operands" "parents"
+    elif [ "true" == "$ancestors" ];then
+      list_contemp "$operands" "ancestors"
+    fi
+  elif [ "true" == "$templates" ]; then
+    if [ "false" == "$parents" -a "false" == "$ancestors" ]; then
+      list_templates "$operands" 
+    elif [ "true" == "$parents" ]; then
+      list_templates "$operands" "parents"
+    elif [ "true" == "$ancestors" ]; then
+      list_templates "$operands" "ancestors"
+    fi
+  elif [ "true" == "$containers" ]; then
+    if [ "false" == "$parents" -a "false" == "$ancestors" ]; then
+      list_containers "$operands" 
+    elif [ "true" == "$parents" ]; then
+      list_containers "$operands" "parents"
+    elif [ "true" == "$ancestors" ]; then
+      list_containers "$operands" "ancestors"
+    fi
+  elif [ "true" == "$registered" ]; then
+    if [  "true" == "$parents" ]; then
+      list_registered_templates "parents"
+    else
+      list_registered_templates
+    fi
+  fi
+
+}
+
+
+function list_description {
+  echo lists templates and instance containers
+}
+

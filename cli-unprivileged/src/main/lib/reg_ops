@@ -1,0 +1,205 @@
+#!/bin/bash
+
+# URGENT: this is a stub function and needs to be properly implemented
+# this function needs to ask Subutai if a template name is registered 
+# already. Since this functionality is not available I just stubbed it 
+# out with a call to fs_is_template. 
+function is_registered {
+ 
+  local template=$1
+  local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template
+  if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    echo true
+    return
+  fi
+
+  response=$(curl --write-out %{http_code} -s --output /dev/null -XGET $url)
+  if [ $response == "200"  ]; then
+    echo true
+    return
+  else
+    echo false
+    return
+  fi
+} 
+
+
+function has_child_templates_registered {
+  local template=$1
+  local url=`build_rest_url "registry/templates/$template/children"`
+
+  if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    echo false
+    return
+  fi
+ 
+  response=$(curl --write-out %{http_code} -s --output /dev/null -XGET $url)
+  if [ $response == "200"  ]; then
+    echo true
+    return
+  else
+    echo false
+    return
+  fi
+}
+
+
+function notify_template_import {
+  local template=$1
+  set_template_in_use $template "true"
+}
+
+
+function notify_template_destroy {
+  local template=$1
+  set_template_in_use $template "false"
+}
+
+
+function set_template_in_use {
+
+  if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    return
+  fi
+
+  local template=$1
+  local in_use=$2
+  local hostname=`hostname`
+  local url=`build_rest_url "registry/templates/$template/fai/$hostname/is-used/$in_use"`
+
+  response=$(curl --write-out %{http_code} -s --output /dev/null -XPUT $url)
+  message="    - send $in_use for usage of template $template on host $hostname"
+  if [ $response == "200"  ]; then
+    msg_info "$message"
+  else
+    msg_fail "$message"
+  fi
+}
+
+
+function is_template_in_use {
+  template=$1
+  local url=`build_rest_url "registry/templates/$template/is-used-on-fai"`
+
+  if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    echo false
+    return
+  fi
+
+  response=`curl -s -XGET $url`
+  # response should contain quoted template name
+  if [[ -n "$response" && "$response" == *true* ]]; then
+    echo true
+  else
+    echo false
+  fi
+}
+
+
+# accepts parameter "template-name"
+# returns true|false according to md5sum comparison
+# of registered template package with local template package
+function are_md5sums_equal {
+  local template=$1
+  local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template
+
+  if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    echo true
+    return
+  fi
+
+  if [ "`is_registered $template`" == "false" ]; then
+    echo "false"
+  fi
+  resp=`curl -s -XGET $url`
+  md5sum_of_remote_package=$(echo $resp | awk '{split($0,a,"md5sum"); print a[2]}' | cut -d '"' -f 3)
+  debian_file="$SUBUTAI_TMPDIR/"`get_debian_package_name $template`".deb"
+  md5sum_of_local_package=$(echo `md5sum $debian_file` | awk '{split($0,a," "); print a[1]}')
+  if [ "$md5sum_of_remote_package" == "$md5sum_of_local_package" ];then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+
+# returns registered templates
+# accepts parameter "parents" which include templates' parents
+function list_reg_templates {
+  local parents="$1"
+  local url=`build_rest_url $SUBUTAI_REST_LIST_TEMPLATES`
+  IFS=$'\n'
+  response=$(curl -s $url)
+  for i in $response
+  do
+    if [ "$parents" == "parents" ]; then
+      echo $i | tr " " "\t"
+    else
+      echo "$i" | awk '{print $1}'
+    fi
+  done
+}
+  
+# URGENT: this is a stub function and needs to be properly implemented
+# this function needs to take the supplied debian package file and upload and 
+# register it with the Subutai management server.
+#
+# REST service receives Debian package, uploads it to repo, and registers it
+# in templates registry 
+function send_n_register {
+  local debian_file=$1
+  local config_dir=$2
+  local url=`build_rest_url $SUBUTAI_REST_REGISTER_PATH`
+
+  if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    msg_info "${FUNCNAME[0]} called in TEST/OFFLINE mode"
+    return
+  fi
+
+  response=$(curl -f -XPOST $url -F file=@$debian_file -F config_dir=$config_dir)
+  send_n_register_status=$?
+  check_status "Sending Debian file $debian_file to management server" "$send_n_register_status"
+  if [ $send_n_register_status != "0" ]; then
+    msg_error "$response"
+  fi
+} 
+
+
+function delete_n_unregister {
+  template=$1
+  local url="`build_rest_url $SUBUTAI_REST_REGISTER_PATH`/$template"
+
+  if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    msg_info "${FUNCNAME[0]} called in TEST/OFFLINE mode"
+    return
+  fi 
+  
+  response=$(curl --write-out %{http_code} -s --output /dev/null -XDELETE $url)
+  message="Unregister template $template from site registry"
+  if [ $response == "200"  ]; then
+    msg_ok "$message"
+  else
+    msg_error "$message"
+  fi
+}
+
+
+# This function builds URL for REST services and returns it.
+# Accepets path argument which is appended to REST services URL
+function build_rest_url {
+  local path=$1
+  local url=http://$SUBUTAI_REST_IP
+
+  if [ -n "$SUBUTAI_REST_PORT" ]; then
+    url=$url:$SUBUTAI_REST_PORT
+  fi
+  if [ -n "$SUBUTAI_REST_PATH" ]; then
+    url=$url/$SUBUTAI_REST_PATH
+  fi
+  if [ -n "$path" ]; then
+    url="$url/$path"
+  fi
+
+  echo $url
+}
+

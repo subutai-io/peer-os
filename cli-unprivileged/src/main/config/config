@@ -1,0 +1,70 @@
+#!/bin/bash
+
+# The version of Subutai
+export SUBUTAI_VERSION=2.1.0
+
+# LAN mirror on management server used instead of going over the WAN
+#export SUBUTAI_APT_MIRROR=172.16.2.140
+
+# The Site Git Repository: set to have push take place on template creation
+export SUBUTAI_SITE_GIT=git@gw:subutai.git
+
+# A large area where some debian package builds occur
+export SUBUTAI_TMPDIR=/lxc-data/tmpdir
+
+# Default set of packages to install on all containers
+export SUBUTAI_PACKAGES=git
+
+# The Subutai user to use for container's non-root user and will also
+# be used to make commits to git and possibly perform additional things
+# in the future like run unpriviledged containers under this user.
+export SUBUTAI_USER=subutai
+export SUBUTAI_EMAIL=subutai@safehaus.org
+
+# The public key to use to allow for non-passwd based access, this is 
+# setup in the SUBUTAI_USER's .ssh/authorized_keys. Could also be used
+# for git and other services later on.
+export SUBUTAI_AUTH_KEY=/root/.ssh/id_dsa.pub
+
+#This variable is used for locking mechanism for concurrent operations 
+#on the same container/template
+export SUBUTAI_LOCK_PATH=/var/lock/subutai/
+
+# Directory to store round-robin database files for monitoring feature
+export SUBUTAI_RRD_DIRECTORY="/var/lib/subutai/rrd/"
+
+# Directory to store configuration files of monitoring infrastructure
+# of each host
+export SUBUTAI_MONITOR_CONF_DIRECTORY="/etc/subutai/monitor"
+
+# A colon separated list of non-overlapping configuration paths which
+# need to be tracked in templates for changes via git. By default /etc
+# is versioned on each container. Use the subutai-config-path utility
+# to add more paths. 
+#
+# NOTE: this is just here as the default for the master image for 
+# manual setup and creation, each container must have this information
+# tracked for itself internally and within the container's configuration
+# files. See the new subutai.config.path property in container configs.
+export SUBUTAI_CONFIG_PATH=/etc
+
+# A colon separated list of non-overlapping application data paths
+# which need to be tracked in 
+export SUBUTAI_APP_DATA_PATH=/var
+
+#Local repository has subutai packages
+export SUBUTAI_SITE_REPO=http://gw.intra.lan/ksks
+export SUBUTAI_OS_RELEASE_NAME=trusty
+
+#Apt-Proxy settings
+export SUBUTAI_APT_PROXY=http://gw.intra.lan:9999/ubuntu
+
+# URL to REST services on management server
+export SUBUTAI_REST_IP=gw.intra.lan
+export SUBUTAI_REST_PORT=8181
+export SUBUTAI_REST_PATH=cxf
+# Below are paths to specific actions, do not inclue leading and trailing
+# slashes in paths
+export SUBUTAI_REST_REGISTER_PATH=template
+export SUBUTAI_REST_GET_TEMPLATE_PATH=registry/templates
+export SUBUTAI_REST_LIST_TEMPLATES=$SUBUTAI_REST_GET_TEMPLATE_PATH/plain-list

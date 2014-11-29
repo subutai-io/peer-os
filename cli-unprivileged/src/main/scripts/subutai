@@ -1,0 +1,145 @@
+#!/bin/bash
+
+# expected paths when in production mode
+subutai_conf_base=/etc/subutai
+subutai_binding_base=/etc/subutai/bindings
+subutai_lib_base=/usr/share/subutai-cli/subutai/lib
+subutai_script_base=/usr/bin
+
+# source user overrides and settings
+if [ -f ~/.subutairc ]; then
+  . ~/.subutairc
+fi
+
+# check if the user is using the scripts in test mode
+# if the user has specified the TEST_MODE to be true
+# and specifies the PROJECT_HOME we use the scripts
+# and function libraries from inside the project there.
+
+if [ -n "$TEST_MODE" -a "$TEST_MODE" == "true" ]; then
+  export subutai_conf_base="$PROJECT_HOME/src/main/config"
+  export subutai_lib_base="$PROJECT_HOME/src/main/lib"
+  export subutai_binding_base="$PROJECT_HOME/src/main/bindings"
+  export subutai_script_base="$PROJECT_HOME/src/main/scripts"
+
+  if [ ! -d $subutai_lib_base ]; then
+    echo "Missing directory $subutai_lib_base"
+    exit 1
+  fi
+  
+  . $subutai_lib_base/funcs
+  export TEST_MODE
+  msg_warning "Operating in test mode!!!"
+else 
+  export subutai_conf_base
+  export subutai_lib_base
+  export subutai_binding_base
+  export subutai_script_base
+
+  if [ ! -d $subutai_lib_base ]; then
+    echo "Missing directory $subutai_lib_base"
+    exit 1
+  fi
+
+  . $subutai_lib_base/funcs
+fi
+
+if [ ! -d $subutai_conf_base ]; then 
+  msg_error "Missing directory $subutai_conf_base"
+  exit 1
+fi
+
+if [ ! -d $subutai_binding_base ]; then
+  msg_error "Missing directory $subutai_binding_base"
+  exit 1
+fi 
+
+function usage {
+  if [ -n "$1" ]; then
+    . "$subutai_binding_base/$1"
+    "$1"_usage
+    return 0
+  fi
+
+  for binding in `ls $subutai_binding_base`; do 
+    . $subutai_binding_base/$binding
+    desc="$binding"_description
+
+    if [ "function" == "`type -t $desc`" ]; then
+      desc=`$desc`
+    else
+      desc="no description available for subcommand $binding"
+    fi
+
+    if [ -z "$desc" ]; then
+      desc="no description available for subcommand $binding"
+    fi
+
+    if [ `echo ${#binding}` -gt 7 ]; then
+      echo -e "\t$binding\t- $desc"
+    else
+      echo -e "\t$binding\t\t- $desc"
+    fi
+  done
+}
+
+if [ $# == 0 ]; then
+  msg_error "No arguments provided"
+  show_usage "`usage`"
+fi
+
+
+export subutai_quiet="false"
+while getopts ":qh" opt; do
+  case $opt in
+    q)
+      export subutai_quiet="true"
+      unset msg_ok
+      unset msg_warning
+      unset msg_info
+      unset msg_notice
+      unset msg_error
+      unset msg_debug
+      function msg_ok {
+        echo "$1"
+      }
+      function msg_debug {
+        return 0
+      }
+      function msg_info {
+        return 0
+      }
+      function msg_warning {
+        return 0
+      }
+      function msg_notice {
+        return 0
+      }
+      function msg_error {
+        echo "$1"
+      }
+      ;;
+    h)
+      while [ -n "`echo $1 | grep -`" ]; do
+        shift
+      done
+      usage "$1" 
+      exit
+      ;;
+    \?)
+      echo unrecognized option -$OPTARG >&2
+      exit 1
+      ;;
+  esac
+done
+
+while [ -n "`echo $1 | grep -`" ]; do
+  shift
+done
+
+subcommand="$1"
+
+. "$subutai_binding_base/$subcommand"
+shift
+"$subcommand" "$@"
+

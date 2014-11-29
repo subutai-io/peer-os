@@ -1,0 +1,171 @@
+#!/bin/bash
+
+function destroy_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Destroy an existing container or template by name.
+  echo
+  echo "        "subutai \[-qh\] destory name
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+function destroy {
+  # Destruction Plan:
+  # ----------------------------------------------------------------------------
+  # (1) check that clone exists first, and find its parent
+  # (2) check if the clone has dependent child and abort if not called via recursive option
+  # (3) Remove the debian package if installed
+  # (4) release all holds on clone's rootfs snapshots
+  # (5) destroy all snapshots on clones's rootfs
+  # (6) lxc-destroy the clone
+  # (7) destroy mounted partitions
+  # (8) notify template destroy if template is registered
+  # (9) remove relevant directories under $SUBUTAI_TMPDIR if any
+  # ----------------------------------------------------------------------------
+
+  # Parse provided arguments
+  local recursive="false"
+  local force="false"
+
+  shift_amount=0;
+  while getopts ":rf" opt; do
+    case $opt in
+      r)
+        recursive="true"
+	;;
+      f)
+        force="true"
+        ;;
+      \?)
+        msg_error "Unrecognized option -$OPTARG"
+        exit 1
+        ;;
+    esac
+    shift_amount=$(($shift_amount + 1))
+  done
+
+  while [ -n "`echo $1 | grep -`" ]; do
+    shift
+  done
+
+  local clone="$1"
+
+  if [ "`are_containers_writable $clone`" == "true" ]
+  then
+     msg_error "Container locked by a subutai process"
+     exit 1
+  fi
+  
+  lock_container_read $clone
+  if [ $? != 0 ]; then msg_error "Container cannot be locked!"; exit 1; fi
+
+  if [ "$clone" == "master" ]; then
+    msg_error "Use subutai master_destroy instead of subutai destroy"
+    unlock_container_read $clone
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+    exit 1
+  fi
+
+  # (1) check that clone exists first: turn off if on
+  lxc_assert "$clone" "`usage`"
+  lxc_stop $clone
+
+  # (1) let's get the clone's parent
+  parent=`fs_get_parent $clone`
+
+  # (2) check if the clone has dependent children
+  msg_info "    - checking if \"$clone\" has dependent children ..."
+  fs_get_children $clone
+  child_count=$?
+
+  if [ $child_count -gt 0 ]; then
+    if [ $recursive == "false" ]; then
+      msg_error "Cannot destroy \"$clone\", it has $child_count child containers."
+      unlock_container_read $clone
+      if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+      exit 1
+    elif [ $recursive == "true" -a $force == "false" ]; then
+      # Confirm recursive destroy operation
+      echo WARNING: this destroys $clone along with its all child templates and containers
+      while true; do
+        read -p "Do you wish to destroy $clone template? [Y/N]" yn
+        case $yn in
+          [Yy]* ) break;;
+          [Nn]* )unlock_container_read $clone
+                 if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi 
+                 exit 1;;
+          * ) echo "Please answer yes or no.";;
+        esac
+      done
+    fi
+  fi
+ 
+  # Destroy all children of master template
+  children_list=`fs_get_children_list $clone`
+  for child in $children_list 
+  do
+    subutai destroy -r -f $child
+    if [ $? != 0 ]
+    then
+      unlock_container_read $clone
+      if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+      exit 1
+    fi
+  done
+  
+  # (3) Remove the debian package if installed
+  local container=$clone
+  local package_name=`get_package_name $container`
+ 
+  if [ "`is_dpkg_locked`" == "true" ]
+  then
+    echo "$1 import FAILED! dpkg is locked by process!"
+    unlock_container_read $clone
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+    exit 1
+  fi
+ 
+  # Check if the package is installed
+  is_package_installed $package_name
+  if [ $? = 0  ]; then
+    apt-get --assume-yes --force-yes purge $package_name
+  fi
+
+  # (4) & (5) release all holds on clone's rootfs snaps and delete snaps
+  fs_rls_holds_delete_snaps $clone
+
+  destroy_all_monitor $clone
+  ovs_port_name=$(ovs_get_port_name $clone)
+  # (6) lxc-destroy the clone
+  lxc-destroy -n $clone -f
+
+  # (7) destroy mounted partitions 
+  fs_remove_mount $clone $parent opt lxc
+  fs_remove_mount $clone $parent var lxc-data
+  fs_remove_mount $clone $parent home lxc-data
+
+  # (8) notify template destroy if template is registered
+  if [ "`is_registered $clone`" == "true" ]; then
+    notify_template_destroy $clone
+  fi
+
+  msg_ok "Destruction of \"$clone\" completed successfully"
+
+  # (9) remove relevant directories under $SUBUTAI_TMPDIR if any
+  local debian_root="$SUBUTAI_TMPDIR/$container"
+  rm -rf $debian_root
+  
+  #deleting related veth pair port from ovs
+  ovs-vsctl --if-exist del-port br-int "$ovs_port_name-1" > /dev/null 2>&1
+  ovs-vsctl --if-exist del-port br-int "$ovs_port_name-2" > /dev/null 2>&1
+
+  unlock_container_read $clone
+  if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+  exit 0
+}
+
+
+function destroy_description {
+  echo destroys a template or instance container
+}
+

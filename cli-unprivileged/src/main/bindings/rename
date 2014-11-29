@@ -1,0 +1,103 @@
+#!/bin/bash
+
+
+function rename_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: renames an instance container
+  echo
+  echo "        "subutai \[-qh\] rename \[-n altname\] \[-c\] oldname newname
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+
+# Plan for renaming a container
+# ---------------------------------------------------------------------------
+# (1) perform sanity checks first
+#     - source container MUST exist
+#     - source container MUST NOT have a 'template' snapshot
+#     - source container name MUST NOT be in the template registry
+#     - source container parent MUST be present in the template registry
+
+function rename {
+  if [ "`is_system_locked`" == "true" ]
+  then
+     msg_error "System locked by a subutai process"
+     exit 1
+  fi
+
+  OPTIND=0
+  if [ "$1" == "rename" ]; then
+    shift
+  fi
+
+  local src="$1"
+  local dst="$2"
+
+  if [ "`are_containers_writable $src $dst`" == "true" ]
+  then
+     msg_error "Container(s) locked by a subutai process"
+     exit 1
+  fi
+
+  lock_container_read $src $dst
+  if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
+
+  if [ "$TEST_MODE" == "true" ]; then
+    echo ---- TEST_MODE DUMP ----
+    echo -e "operand count\t= $#"
+    echo -e "operands\t= $@"
+    echo -e "src\t= $src"
+    echo -e "dst\t= $dst"
+    echo
+  fi
+ 
+  # The master is already a template
+  if [ "$src" == "master" ]; then
+    msg_error "Awe dude come on. Lay off the master. Aborting ..."
+    unlock_container_read $src
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+    exit 1
+  fi
+
+  # ---------------------------------------------------------------------------
+  # (1) perform some sanity checks
+  # ---------------------------------------------------------------------------
+  lxc_assert $src
+  lxc_assert_no $dst
+
+  # check to make sure the source container is NOT already a template
+  if [ "`fs_is_template $src`" == "true" ]; then
+    msg_error "Container \"$src\" is a template. Aborting ..."
+    unlock_container_read $src
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+    exit 1
+  else
+    msg_info "    - check passed: \"$src\" is NOT a template"
+  fi
+
+  # check to make sure container is NOT registered as a template
+  if [ "`is_registered $lxc`" == "true" ]; then
+    msg_error "A template with name \"$src\" is registered. Aborting ..."
+    unlock_container_read $src
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+    exit 1
+  else
+    msg_info "    - check passed: \"$src\" is NOT registered"
+  fi
+
+  lxc_assert_no "$dst" "`usage`"
+  lxc_stop "$src"
+  lxc_rename "$src" "$dst"
+  check_status "container $src is renamed to $dst succesfully" "$?"
+  
+  unlock_container_read $src
+  if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+}
+
+
+function rename_description {
+  echo renames an instance container
+}
+
+

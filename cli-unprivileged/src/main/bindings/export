@@ -1,0 +1,148 @@
+#!/bin/bash
+
+
+function export_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Exports a template as a debian pkg
+  echo
+  echo "        "subutai export template
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+
+# Plan for exporting a template
+# -----------------------------------------------------------------------------
+# (1) perform sanity checks first
+#     - defer exports of master to the subutai-master-export script
+#     - template container MUST exist
+#     - container MUST be a template with the '@template' snapshot
+#     - container parent MUST be present in the template registry
+# (2) generate delta images of all filesystems: 
+#     'pool/parent-partition@child' -> 'pool/child-partition@template'
+# (3) generate the debian file deltas, and package info
+
+function export {
+  if [ "`is_system_locked`" == "true" ]
+  then
+     msg_error "System locked by a subutai process"
+     exit 1
+  fi
+
+  local container="$1"
+   
+  ps aux | grep "subutai export $container" | grep -v $$ \
+         | grep -v "grep subutai" | grep -v "grep --color" > /dev/null 2>&1
+  if [ $? == 0 ]
+  then
+    msg_error "Container \"$container\" is being exported by other process!"
+    exit 1
+  fi
+
+  if [ "`are_containers_readable $container`" == "true" ]
+  then
+     msg_error "Container(s) locked by a subutai process"
+     exit 1
+  fi
+
+  lock_container_write $container
+  if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
+
+  # ----------------------------------------------------------------------------
+  # (1) perform some sanity checks
+  # ----------------------------------------------------------------------------
+
+  lxc_assert $container "`usage`"
+
+  if [ "$container" == "master" ]; then
+    echo "Please use master_export command!"
+    unlock_container_write $container
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+    exit 1
+  fi
+
+  local debian_package_name=`get_debian_package_name $container`
+  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+
+  if [ -f $debian_file ]; then
+    msg_error "It seems the debian file has already been generated"
+    msg_error "Destroy $SUBUTAI_TMPDIR/$container and the peer debian file first"
+    unlock_container_write $container
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+    exit 1
+  fi
+
+  # check to make sure the container is a template
+  if [ "`fs_is_template $container`" == "false" ]; then
+    msg_error "Container \"$container\" is NOT a template. Aborting ..."
+    unlock_container_write $container
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+    exit 1
+  else
+    msg_info "    - check passed: \"$container\" is a template"
+  fi
+
+  parent=`fs_get_parent $container`
+  lxc_assert $parent
+  # check to make sure the parent is a template
+  if [ "`fs_is_template $parent`" == "false" ]; then
+    msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
+    unlock_container_write $container
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+    exit 1
+  else
+    msg_info "    - check passed: parent \"$parent\" is a template"
+  fi
+
+  # check to make sure the parent is registered
+  if [ "`is_registered $parent`" == "false" ]; then
+    msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
+    unlock_container_write $container
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+    exit 1
+  else
+    msg_info "    - check passed: parent \"$parent\" is registered"
+  fi
+
+  # ----------------------------------------------------------------------------
+  # (2) generate delta images of all filesystems: 
+  #     'pool/parent-partition@child' -> 'pool/child-partition@template'
+  # ----------------------------------------------------------------------------
+
+  debian_dir=$SUBUTAI_TMPDIR/$debian_package_name
+  debian_root="$debian_dir$SUBUTAI_TMPDIR/$container"
+  deltas="$debian_root/deltas"
+  mkdir -p $deltas
+  fs_send $parent $container $deltas
+
+  # ----------------------------------------------------------------------------
+  # (3) generate the debian file from deltas, and package info
+  # ----------------------------------------------------------------------------
+  
+  # insert subutai.template.package info inside containers config file
+  conf="/var/lib/lxc/$container/config"
+  propline="`cat $conf | grep subutai.template.package`"
+
+  if [ -z "$propline" ]; then
+    echo "subutai.template.package = $debian_dir.deb" >> /var/lib/lxc/$container/config
+    debian_file=$debian_dir".deb"
+  else
+    debian_file=`echo $propline | awk '{print $3}'`
+  fi
+
+  cp /var/lib/lxc/$container/config $debian_root
+  cp /var/lib/lxc/$container/fstab  $debian_root
+  cp /var/lib/lxc/$container/packages  $debian_root
+
+  pkg=`deb_pkg $container`
+  check_status "debian package $pkg generated" "$?"
+  
+  # Remove debian directory after debian package generation
+  rm -rf $debian_dir
+  unlock_container_write $container
+}
+
+
+function export_description {
+  echo export a template
+}

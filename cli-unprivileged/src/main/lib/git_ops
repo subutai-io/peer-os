@@ -1,0 +1,119 @@
+#!/bin/bash
+
+# --------------------------------------------------------------------------
+# Bunch-O GIT convenience operations
+# --------------------------------------------------------------------------
+
+
+function git_master_uuid {
+  pushd . > /dev/null
+  cd /var/lib/lxc/master/rootfs
+  git log | grep commit | head -n 1 | awk '{print $2}'
+  popd > /dev/null
+}
+
+
+function git_init_master {
+  local home=/var/lib/lxc/master
+  local config=$home/config
+
+  pushd . > /dev/null
+  cd $home/rootfs
+  git init
+  git config user.email "$SUBUTAI_EMAIL"
+  git config user.name  "$SUBUTAI_USER"
+  cp $subutai_conf_base/gitignore ./.gitignore
+  git add ./.gitignore
+  git commit -m 'ignoring some files at root'
+  git add -A
+  git commit -m 'initial master /etc import'
+  local uuid=`git_master_uuid`
+  echo subutai.git.uuid = $uuid >> $config
+  popd > /dev/null
+}
+
+
+function git_child_branch {
+  local child="$1"
+
+  if [ -z "`lxc-info -n $child | grep RUNNING`" ]; then
+    lxc-start -d -n $child
+  fi
+
+  lxc-wait -n $child -s RUNNING
+  o=`lxc-attach -n $child -- git -C / checkout -b $child 2>&1`
+  status=$?
+  message="    - new child container branch \"$child\" created"
+  if [ "$status" == "0" ]
+  then
+      msg_info "$message"
+  else
+      msg_fail "$message"
+  fi
+}
+
+
+# takes container name as arg $1
+# returns the uuid of the last commit
+function git_add_commit { 
+  local lxc="$1"
+
+  if [ -z "`lxc-info -n $lxc | grep RUNNING`" ]; then
+    lxc-start -d -n $lxc
+  fi
+
+  lxc-wait -n $lxc -s RUNNING
+  o=`lxc-attach -n $lxc \
+    -- git -C / commit -a -m \
+    "commit changes for $lxc template" 2>&1 > /dev/null`
+  lxc-attach -n $lxc \
+    -- git -C / log | grep commit | head -n 1 | awk '{print $2}'
+}
+
+
+function git_remote_push {
+  local lxc="$1"
+
+  pushd /var/lib/lxc/$lxc/rootfs > /dev/null
+  git push -u $SUBUTAI_SITE_GIT $lxc > /dev/null 2>&1
+  status=$?
+  message="    - branch \"$lxc\" pushed to site git repository"
+  if [ "$status" == "0" ]
+  then
+      msg_info "$message"
+  else
+      msg_fail "$message"
+  fi
+  popd > /dev/null
+}
+
+
+function git_rename_branch {
+  local oldname="$1"
+  local newname="$2"
+
+  if [ -z "`lxc-info -n $newname | grep RUNNING`" ]; then
+    lxc-start -d -n $newname
+  fi
+
+  lxc-wait -n $newname -s RUNNING
+  lxc-attach -n $newname -- git -C / branch -m $oldname $newname
+}
+
+
+function git_delete_branch {
+  local branch=$1
+
+  pushd /var/lib/lxc/master/rootfs > /dev/null
+  git push $SUBUTAI_SITE_GIT :$branch 2>&1 > /dev/null
+  status=$?
+  message="    - branch \"$branch\" deleted from site git repository"
+  if [ "$status" == "0" ]
+  then
+      msg_info "$message"
+  else
+      msg_fail "$message"
+  fi
+
+  popd > /dev/null
+} 

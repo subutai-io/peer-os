@@ -2,11 +2,11 @@
 
 #export DH_VERBOSE=1
 
-d = debian/subutai-cli
-CONFDIR=/etc/subutai
-BINDINGS=/etc/subutai/bindings
-LIBDIR=/usr/share/subutai-cli/subutai/lib
-SCRIPTS=/usr/sbin
+d = debian/subutai-cli-unprivileged
+CONFDIR=/etc/subutai-unprivileged
+BINDINGS=/etc/subutai/unprivileged/bindings
+LIBDIR=/usr/share/subutai-cli-unprivileged/subutai/lib
+SCRIPTS=/usr/bin
 MANDIR=/usr/share/man/man1
 BASHCOMPDIR=/etc/bash_completion.d/
 %:
