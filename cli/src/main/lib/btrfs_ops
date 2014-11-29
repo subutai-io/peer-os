@@ -231,21 +231,19 @@ function fs_assert_nods {
   local usage="$2"
   if [[ "$from_ds" =~ "var" ]] || [[ "$from_ds" =~ "home" ]]; then
     if [ -n "`btrfs subvolume list /lxc-data | grep $ds`" ]; then
-      msg_error "BTRFS dataset \"$ds\" does NOT exist!"
-      show_usage "$usage"
+      msg_info "BTRFS dataset \"$ds\" does NOT exist!"
     fi
   elif [[ "$from_ds" =~ "opt" ]];then
     if [ -n "`btrfs subvolume list /lxc | grep $ds`" ]; then
-      msg_error "BTRFS dataset \"$ds\" does NOT exist!"
-      show_usage "$usage"
+      msg_info "BTRFS dataset \"$ds\" does NOT exist!"
      fi
   else
     if [ -n "`btrfs subvolume list /var/lib/lxc/ | grep $ds`" ]; then
-      msg_error "BTRFS dataset \"$ds\" does NOT exist!"
-      show_usage "$usage"
+      msg_info "BTRFS dataset \"$ds\" does NOT exist!"
     fi
   fi
 }
+
 
 # assert dataset (arg $1) exists, if it does NOT show usage (arg $2)
 # warning: exits!
