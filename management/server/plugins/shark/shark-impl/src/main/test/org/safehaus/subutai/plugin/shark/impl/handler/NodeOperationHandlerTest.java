@@ -30,7 +30,8 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class NodeOperationHandlerTest {
+public class NodeOperationHandlerTest
+{
     NodeOperationHandler nodeOperationHandler;
     NodeOperationHandler nodeOperationHandler2;
     private SharkImpl sharkImpl;
@@ -49,7 +50,8 @@ public class NodeOperationHandlerTest {
     private PluginDAO pluginDAO;
 
     @Before
-    public void setUp() {
+    public void setUp()
+    {
         pluginDAO = mock(PluginDAO.class);
         commands = mock(Commands.class);
         sparkClusterConfig = mock(SparkClusterConfig.class);
@@ -72,7 +74,8 @@ public class NodeOperationHandlerTest {
 
 
     @Test
-    public void testRunWithOperationTypeInclude() throws CommandException, ClusterException {
+    public void testRunWithOperationTypeInclude() throws CommandException, ClusterException
+    {
         // mock run method
         when(sharkImpl.getCluster(any(String.class))).thenReturn(sharkClusterConfig);
         when(sharkImpl.getEnvironmentManager()).thenReturn(environmentManager);
@@ -95,7 +98,7 @@ public class NodeOperationHandlerTest {
         when(commands.getInstallCommand()).thenReturn(requestBuilder);
         when(commands.getSetMasterIPCommand(containerHost)).thenReturn(requestBuilder);
         when(sharkImpl.getPluginDao()).thenReturn(pluginDAO);
-        when(pluginDAO.saveInfo(anyString(),anyString(),any())).thenReturn(true);
+        when(pluginDAO.saveInfo(anyString(), anyString(), any())).thenReturn(true);
 
         // mock executeCommand method
         when(sharkImpl.getCommands()).thenReturn(commands);
@@ -109,14 +112,16 @@ public class NodeOperationHandlerTest {
         assertNotNull(containerHost);
         assertNotNull(sparkClusterConfig);
         assertNotNull(commandResult);
-        assertEquals(commandResult, nodeOperationHandler.executeCommand(containerHost, sharkImpl.getCommands().getInstallCommand()));
+        assertEquals(commandResult, nodeOperationHandler.executeCommand(containerHost, sharkImpl.getCommands()
+                .getInstallCommand()));
         assertEquals(uuid, containerHost.getId());
         assertTrue(containerHost.isConnected());
-        assertTrue(pluginDAO.saveInfo(anyString(),anyString(),any()));
+        assertTrue(pluginDAO.saveInfo(anyString(), anyString(), any()));
     }
 
     @Test
-    public void testRunWithOperationTypeExclude() throws CommandException, ClusterException {
+    public void testRunWithOperationTypeExclude() throws CommandException, ClusterException
+    {
         // mock run method
         when(sharkImpl.getCluster(any(String.class))).thenReturn(sharkClusterConfig);
         when(sharkImpl.getEnvironmentManager()).thenReturn(environmentManager);
@@ -150,15 +155,17 @@ public class NodeOperationHandlerTest {
         assertNotNull(containerHost);
         assertNotNull(sparkClusterConfig);
         assertNotNull(commandResult);
-        assertEquals(commandResult, nodeOperationHandler.executeCommand(containerHost, sharkImpl.getCommands().getUninstallCommand()));
+        assertEquals(commandResult, nodeOperationHandler.executeCommand(containerHost, sharkImpl.getCommands()
+                .getUninstallCommand()));
         assertEquals(uuid, containerHost.getId());
         assertTrue(containerHost.isConnected());
-        assertTrue(pluginDAO.saveInfo(anyString(),anyString(),any()));
+        assertTrue(pluginDAO.saveInfo(anyString(), anyString(), any()));
     }
 
 
     @Test
-    public void testExecuteCommand() throws CommandException, ClusterException {
+    public void testExecuteCommand() throws CommandException, ClusterException
+    {
         when(containerHost.execute(requestBuilder)).thenReturn(commandResult);
         when(commandResult.hasSucceeded()).thenReturn(true);
         nodeOperationHandler.executeCommand(containerHost, requestBuilder);
@@ -171,13 +178,15 @@ public class NodeOperationHandlerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testRunWhenClusterNameIsNull() {
+    public void testRunWhenClusterNameIsNull()
+    {
         when(sharkImpl.getTracker()).thenReturn(tracker);
         nodeOperationHandler = new NodeOperationHandler(sharkImpl, sharkClusterConfig, null, OperationType.INSTALL);
     }
 
     @Test(expected = ClusterException.class)
-    public void shouldThrowsClusterExceptionInExecuteCommand() throws CommandException, ClusterException {
+    public void shouldThrowsClusterExceptionInExecuteCommand() throws CommandException, ClusterException
+    {
         when(containerHost.execute(requestBuilder)).thenReturn(commandResult);
         nodeOperationHandler.executeCommand(containerHost, requestBuilder);
     }

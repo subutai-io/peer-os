@@ -6,11 +6,13 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterException;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -34,7 +36,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class ClusterOperationHandlerTest {
+public class ClusterOperationHandlerTest
+{
     private ClusterOperationHandler clusterOperationHandler;
     private ClusterOperationHandler clusterOperationHandler2;
     private ClusterOperationHandler clusterOperationHandler3;
@@ -59,7 +62,8 @@ public class ClusterOperationHandlerTest {
     private ConfigBase configBase;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp()
+    {
         configBase = mock(ConfigBase.class);
         environmentBlueprint = mock(EnvironmentBlueprint.class);
         hadoop = mock(Hadoop.class);
@@ -81,65 +85,30 @@ public class ClusterOperationHandlerTest {
         sharkClusterConfig = mock(SharkClusterConfig.class);
         when(sharkImpl.getTracker()).thenReturn(tracker);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
-        clusterOperationHandler = new ClusterOperationHandler(sharkImpl, sharkClusterConfig, ClusterOperationType.INSTALL, hadoopClusterConfig);
-        clusterOperationHandler2 = new ClusterOperationHandler(sharkImpl, sharkClusterConfig, ClusterOperationType.UNINSTALL, hadoopClusterConfig);
-        clusterOperationHandler3 = new ClusterOperationHandler(sharkImpl, sharkClusterConfig, ClusterOperationType.CUSTOM, hadoopClusterConfig);
+        clusterOperationHandler = new ClusterOperationHandler(sharkImpl, sharkClusterConfig, ClusterOperationType
+                .INSTALL, hadoopClusterConfig);
+        clusterOperationHandler2 = new ClusterOperationHandler(sharkImpl, sharkClusterConfig, ClusterOperationType
+                .UNINSTALL, hadoopClusterConfig);
+        clusterOperationHandler3 = new ClusterOperationHandler(sharkImpl, sharkClusterConfig, ClusterOperationType
+                .CUSTOM, hadoopClusterConfig);
     }
 
     @Test
-    public void testRunOperationOnContainersWithOperationTypeInstallWithoutHadoopInstalation() throws Exception {
-
+    public void testRunOperationOnContainersWithOperationTypeInstallWithoutHadoopInstalation()
+    {
         // mock setupCluster method
         // mock setup Shark cluster
         when(sharkImpl.getSparkManager()).thenReturn(spark);
         when(spark.getCluster(any(String.class))).thenReturn(sparkClusterConfig);
         when(sharkImpl.getEnvironmentManager()).thenReturn(environmentManager);
         when(environmentManager.getEnvironmentByUUID(any(UUID.class))).thenReturn(environment);
-        when(sharkImpl.getClusterSetupStrategy(trackerOperation,sharkClusterConfig,environment)).thenReturn(clusterSetupStrategy);
+        when(sharkImpl.getClusterSetupStrategy(trackerOperation, sharkClusterConfig, environment)).thenReturn
+                (clusterSetupStrategy);
 
         clusterOperationHandler.runOperationOnContainers(ClusterOperationType.INSTALL);
 
         // asserts
-        assertNotEquals(SetupType.WITH_HADOOP_SPARK,sharkClusterConfig.getSetupType());
-        assertEquals(spark,sharkImpl.getSparkManager());
-        assertNotNull(sparkClusterConfig);
-        assertEquals(sparkClusterConfig, sharkImpl.getSparkManager().getCluster(anyString()));
-        assertNotNull(environment);
-        assertEquals(environment,sharkImpl.getEnvironmentManager().getEnvironmentByUUID(any(UUID.class)));
-        verify(sharkImpl).getClusterSetupStrategy(trackerOperation,sharkClusterConfig,environment);
-    }
-
-    @Test
-    public void testRunWithOperationTypeInstallWithHadoopInstalation() throws Exception {
-        // mock setupCluster method
-        // mock setupCluster with Hadoop
-        when(sharkClusterConfig.getSetupType()).thenReturn(SetupType.WITH_HADOOP_SPARK);
-        when(sharkImpl.getHadoopManager()).thenReturn(hadoop);
-        when(hadoop.getDefaultEnvironmentBlueprint(hadoopClusterConfig)).thenReturn(environmentBlueprint);
-        when(sharkImpl.getEnvironmentManager()).thenReturn(environmentManager);
-        when(environmentManager.buildEnvironment(environmentBlueprint)).thenReturn(environment);
-        when(sharkImpl.getHadoopManager()).thenReturn(hadoop);
-        when(hadoop.getClusterSetupStrategy(environment, hadoopClusterConfig, trackerOperation)).thenReturn(clusterSetupStrategy);
-        when(clusterSetupStrategy.setup()).thenReturn(configBase);
-        when(sharkClusterConfig.getSparkClusterName()).thenReturn("test");
-        when(sharkImpl.getSparkManager()).thenReturn(spark);
-        when(spark.getClusterSetupStrategy(any(TrackerOperation.class), any(SparkClusterConfig.class), any(Environment.class))).thenReturn(clusterSetupStrategy);
-        when(clusterSetupStrategy.setup()).thenReturn(configBase);
-
-        // mock setup Shark cluster
-        when(sharkImpl.getSparkManager()).thenReturn(spark);
-        when(spark.getCluster(any(String.class))).thenReturn(sparkClusterConfig);
-        when(sharkImpl.getEnvironmentManager()).thenReturn(environmentManager);
-        when(environmentManager.getEnvironmentByUUID(any(UUID.class))).thenReturn(environment);
-        when(sharkImpl.getClusterSetupStrategy(trackerOperation, sharkClusterConfig, environment)).thenReturn(clusterSetupStrategy);
-
-
-        clusterOperationHandler.run();
-
-        // asserts
-        assertEquals(SetupType.WITH_HADOOP_SPARK,sharkClusterConfig.getSetupType());
-        assertEquals(environmentBlueprint,sharkImpl.getHadoopManager().getDefaultEnvironmentBlueprint(hadoopClusterConfig));
-        assertEquals(environment,sharkImpl.getEnvironmentManager().buildEnvironment(environmentBlueprint));
+        assertNotEquals(SetupType.WITH_HADOOP_SPARK, sharkClusterConfig.getSetupType());
         assertEquals(spark, sharkImpl.getSparkManager());
         assertNotNull(sparkClusterConfig);
         assertEquals(sparkClusterConfig, sharkImpl.getSparkManager().getCluster(anyString()));
@@ -149,7 +118,52 @@ public class ClusterOperationHandlerTest {
     }
 
     @Test
-    public void testRunWithOperationTypeUninstall() throws CommandException, ClusterException {
+    public void testRunWithOperationTypeInstallWithHadoopInstalation() throws ClusterSetupException, EnvironmentBuildException
+    {
+        // mock setupCluster method
+        // mock setupCluster with Hadoop
+        when(sharkClusterConfig.getSetupType()).thenReturn(SetupType.WITH_HADOOP_SPARK);
+        when(sharkImpl.getHadoopManager()).thenReturn(hadoop);
+        when(hadoop.getDefaultEnvironmentBlueprint(hadoopClusterConfig)).thenReturn(environmentBlueprint);
+        when(sharkImpl.getEnvironmentManager()).thenReturn(environmentManager);
+        when(environmentManager.buildEnvironment(environmentBlueprint)).thenReturn(environment);
+        when(sharkImpl.getHadoopManager()).thenReturn(hadoop);
+        when(hadoop.getClusterSetupStrategy(environment, hadoopClusterConfig, trackerOperation)).thenReturn
+                (clusterSetupStrategy);
+        when(clusterSetupStrategy.setup()).thenReturn(configBase);
+        when(sharkClusterConfig.getSparkClusterName()).thenReturn("test");
+        when(sharkImpl.getSparkManager()).thenReturn(spark);
+        when(spark.getClusterSetupStrategy(any(TrackerOperation.class), any(SparkClusterConfig.class), any
+                (Environment.class))).thenReturn(clusterSetupStrategy);
+        when(clusterSetupStrategy.setup()).thenReturn(configBase);
+
+        // mock setup Shark cluster
+        when(sharkImpl.getSparkManager()).thenReturn(spark);
+        when(spark.getCluster(any(String.class))).thenReturn(sparkClusterConfig);
+        when(sharkImpl.getEnvironmentManager()).thenReturn(environmentManager);
+        when(environmentManager.getEnvironmentByUUID(any(UUID.class))).thenReturn(environment);
+        when(sharkImpl.getClusterSetupStrategy(trackerOperation, sharkClusterConfig, environment)).thenReturn
+                (clusterSetupStrategy);
+
+
+        clusterOperationHandler.run();
+
+        // asserts
+        assertEquals(SetupType.WITH_HADOOP_SPARK, sharkClusterConfig.getSetupType());
+        assertEquals(environmentBlueprint, sharkImpl.getHadoopManager().getDefaultEnvironmentBlueprint
+                (hadoopClusterConfig));
+        assertEquals(environment, sharkImpl.getEnvironmentManager().buildEnvironment(environmentBlueprint));
+        assertEquals(spark, sharkImpl.getSparkManager());
+        assertNotNull(sparkClusterConfig);
+        assertEquals(sparkClusterConfig, sharkImpl.getSparkManager().getCluster(anyString()));
+        assertNotNull(environment);
+        assertEquals(environment, sharkImpl.getEnvironmentManager().getEnvironmentByUUID(any(UUID.class)));
+        verify(sharkImpl).getClusterSetupStrategy(trackerOperation, sharkClusterConfig, environment);
+    }
+
+    @Test
+    public void testRunWithOperationTypeUninstall() throws CommandException, ClusterException
+    {
         // mock destroyCluster method
         Set<ContainerHost> mySet = mock(Set.class);
         mySet.add(containerHost);
@@ -165,7 +179,7 @@ public class ClusterOperationHandlerTest {
         when(sharkImpl.getCommands()).thenReturn(commands);
         when(commands.getUninstallCommand()).thenReturn(requestBuilder);
         when(sharkImpl.getPluginDao()).thenReturn(pluginDAO);
-        when(pluginDAO.deleteInfo(anyString(),anyString())).thenReturn(true);
+        when(pluginDAO.deleteInfo(anyString(), anyString())).thenReturn(true);
 
         // mock executeCommand
         when(containerHost.execute(requestBuilder)).thenReturn(commandResult);
@@ -179,12 +193,13 @@ public class ClusterOperationHandlerTest {
         assertNotNull(environment);
         assertEquals(environment, sharkImpl.getEnvironmentManager().getEnvironmentByUUID(any(UUID.class)));
         assertTrue(containerHost.isConnected());
-        assertEquals(requestBuilder,sharkImpl.getCommands().getUninstallCommand());
-        assertTrue(sharkImpl.getPluginDao().deleteInfo(anyString(),anyString()));
+        assertEquals(requestBuilder, sharkImpl.getCommands().getUninstallCommand());
+        assertTrue(sharkImpl.getPluginDao().deleteInfo(anyString(), anyString()));
     }
 
     @Test
-    public void testRunWithOperationTypeCustom() throws CommandException, ClusterException {
+    public void testRunWithOperationTypeCustom() throws CommandException, ClusterException
+    {
         // mock actualizeMasterIP method
         when(sharkImpl.getSparkManager()).thenReturn(spark);
         when(spark.getCluster(anyString())).thenReturn(sparkClusterConfig);
@@ -211,19 +226,20 @@ public class ClusterOperationHandlerTest {
         clusterOperationHandler3.run();
 
         // asserts
-        assertEquals(sparkClusterConfig,sharkImpl.getSparkManager().getCluster(anyString()));
+        assertEquals(sparkClusterConfig, sharkImpl.getSparkManager().getCluster(anyString()));
         assertNotNull(sparkClusterConfig);
         assertNotNull(environment);
         assertEquals(environment, sharkImpl.getEnvironmentManager().getEnvironmentByUUID(any(UUID.class)));
         assertTrue(containerHost.isConnected());
         assertNotNull(containerHost);
-        assertEquals(containerHost,environment.getContainerHostByUUID(any(UUID.class)));
-        assertEquals(commandResult,clusterOperationHandler3.executeCommand(containerHost,requestBuilder));
+        assertEquals(containerHost, environment.getContainerHostByUUID(any(UUID.class)));
+        assertEquals(commandResult, clusterOperationHandler3.executeCommand(containerHost, requestBuilder));
 
     }
 
     @Test
-    public void testExecuteCommand() throws Exception {
+    public void testExecuteCommand() throws CommandException, ClusterException
+    {
         when(containerHost.execute(requestBuilder)).thenReturn(commandResult);
         when(commandResult.hasSucceeded()).thenReturn(true);
         clusterOperationHandler.executeCommand(containerHost, requestBuilder);

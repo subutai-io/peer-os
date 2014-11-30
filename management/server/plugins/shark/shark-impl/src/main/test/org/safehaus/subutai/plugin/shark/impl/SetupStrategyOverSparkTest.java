@@ -2,8 +2,11 @@ package org.safehaus.subutai.plugin.shark.impl;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.ClusterException;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -23,7 +26,8 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SetupStrategyOverSparkTest {
+public class SetupStrategyOverSparkTest
+{
     SetupStrategyOverSpark setupStrategyOverSpark;
     private SharkImpl sharkImpl;
     private SharkClusterConfig sharkClusterConfig;
@@ -41,7 +45,8 @@ public class SetupStrategyOverSparkTest {
     private PluginDAO pluginDAO;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp()
+    {
         pluginDAO = mock(PluginDAO.class);
         commands = mock(Commands.class);
         sparkClusterConfig = mock(SparkClusterConfig.class);
@@ -59,11 +64,13 @@ public class SetupStrategyOverSparkTest {
         when(sharkImpl.getTracker()).thenReturn(tracker);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
 
-        setupStrategyOverSpark = new SetupStrategyOverSpark(environment,sharkImpl,sharkClusterConfig,trackerOperation);
+        setupStrategyOverSpark = new SetupStrategyOverSpark(environment, sharkImpl, sharkClusterConfig,
+                trackerOperation);
     }
 
     @Test
-    public void testSetup() throws Exception {
+    public void testSetup() throws CommandException, ClusterException, ClusterSetupException
+    {
         // mock check method
         when(sharkImpl.getSparkManager()).thenReturn(spark);
         when(spark.getCluster(anyString())).thenReturn(sparkClusterConfig);
@@ -72,7 +79,7 @@ public class SetupStrategyOverSparkTest {
         mySet.add(containerHost);
         when(containerHost.getId()).thenReturn(uuid);
 
-        ContainerHost [] arr = new ContainerHost[1];
+        ContainerHost[] arr = new ContainerHost[1];
         arr[0] = containerHost;
 
         when(environment.getHostsByIds(any(Set.class))).thenReturn(mySet);
@@ -111,11 +118,12 @@ public class SetupStrategyOverSparkTest {
         assertNotNull(commandResult);
         assertEquals(uuid, containerHost.getId());
         assertTrue(containerHost.isConnected());
-        assertTrue(pluginDAO.saveInfo(anyString(),anyString(),any()));
+        assertTrue(pluginDAO.saveInfo(anyString(), anyString(), any()));
     }
 
     @Test
-    public void testExecuteCommand() throws Exception {
+    public void testExecuteCommand() throws CommandException, ClusterException
+    {
         when(containerHost.execute(requestBuilder)).thenReturn(commandResult);
         when(commandResult.hasSucceeded()).thenReturn(true);
         setupStrategyOverSpark.executeCommand(containerHost, requestBuilder);
@@ -127,7 +135,8 @@ public class SetupStrategyOverSparkTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void shouldThorwsNullPointerExceptionInConstructor() {
-        setupStrategyOverSpark = new SetupStrategyOverSpark(null,null,null,null);
+    public void shouldThorwsNullPointerExceptionInConstructor()
+    {
+        setupStrategyOverSpark = new SetupStrategyOverSpark(null, null, null, null);
     }
 }
