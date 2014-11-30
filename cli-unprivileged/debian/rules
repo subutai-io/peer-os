@@ -3,9 +3,9 @@
 #export DH_VERBOSE=1
 
 d = debian/subutai-cli-unprivileged
-CONFDIR=/etc/subutai-unprivileged
+CONFDIR=/etc/subutai/unprivileged
 BINDINGS=/etc/subutai/unprivileged/bindings
-LIBDIR=/usr/share/subutai-cli-unprivileged/subutai/lib
+LIBDIR=/usr/share/subutai-cli/subutai/unprivileged/lib
 SCRIPTS=/usr/bin
 MANDIR=/usr/share/man/man1
 BASHCOMPDIR=/etc/bash_completion.d/

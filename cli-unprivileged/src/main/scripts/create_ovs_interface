@@ -2,7 +2,7 @@
 # creating default ovs bridge and ports durin lxc startup
 BRIDGE="br-int"
 echo $5 > /tmp/$1
-vlan_id="`cat /var/lib/lxc/$1/config | grep "#vlan_id" | cut -d " " -f3`"
+vlan_id="`cat /$HOME/.local/lxc/$1/config | grep "#vlan_id" | cut -d " " -f3`"
 ovs-vsctl --may-exist add-br $BRIDGE
 ovs-vsctl --if-exists del-port $BRIDGE $5
 if [ "$vlan_id" ] && [ "`cat /tmp/$1 | grep "\-2"`"  ]; then

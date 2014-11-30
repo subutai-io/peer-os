@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # expected paths when in production mode
-subutai_conf_base=/etc/subutai
-subutai_binding_base=/etc/subutai/bindings
-subutai_lib_base=/usr/share/subutai-cli/subutai/lib
+subutai_conf_base=/etc/subutai/unprivileged
+subutai_binding_base=/etc/subutai/unprivileged/bindings
+subutai_lib_base=/usr/share/subutai-cli/subutai/unprivileged/lib
 subutai_script_base=/usr/bin
 
 # source user overrides and settings

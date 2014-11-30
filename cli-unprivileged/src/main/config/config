@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # The version of Subutai
-export SUBUTAI_VERSION=2.1.0
+export SUBUTAI_VERSION=1.0.1
 
 # LAN mirror on management server used instead of going over the WAN
 #export SUBUTAI_APT_MIRROR=172.16.2.140
@@ -10,7 +10,7 @@ export SUBUTAI_VERSION=2.1.0
 export SUBUTAI_SITE_GIT=git@gw:subutai.git
 
 # A large area where some debian package builds occur
-export SUBUTAI_TMPDIR=/lxc-data/tmpdir
+export SUBUTAI_TMPDIR=/$HOME/lxc-data/tmpdir
 
 # Default set of packages to install on all containers
 export SUBUTAI_PACKAGES=git
@@ -24,17 +24,19 @@ export SUBUTAI_EMAIL=subutai@safehaus.org
 # The public key to use to allow for non-passwd based access, this is 
 # setup in the SUBUTAI_USER's .ssh/authorized_keys. Could also be used
 # for git and other services later on.
-export SUBUTAI_AUTH_KEY=/root/.ssh/id_dsa.pub
+export SUBUTAI_AUTH_KEY=/$HOME/.ssh/id_dsa.pub
 
 #This variable is used for locking mechanism for concurrent operations 
 #on the same container/template
-export SUBUTAI_LOCK_PATH=/var/lock/subutai/
+export SUBUTAI_LOCK_PATH=/$HOME/.local/lock/subutai/
 
 # Directory to store round-robin database files for monitoring feature
+#TODO
 export SUBUTAI_RRD_DIRECTORY="/var/lib/subutai/rrd/"
 
 # Directory to store configuration files of monitoring infrastructure
 # of each host
+#TODO
 export SUBUTAI_MONITOR_CONF_DIRECTORY="/etc/subutai/monitor"
 
 # A colon separated list of non-overlapping configuration paths which
