@@ -31,7 +31,7 @@ function clone {
   lxc_assert_name $child
   lxc_assert_no $child
 
-  config=/var/lib/lxc/$child/config
+  config=/$HOME/.local/share/lxc/$child/config
 
   if [ "`are_containers_readable $parent $child`" == "true" ]
   then

@@ -64,6 +64,7 @@ function lxc_wait_net {
 # ------
 #    lxc_exists $lxc $usage
 
+
 function lxc_assert_no {
   local lxc="$1"
   local usage="$2"
@@ -82,6 +83,17 @@ function lxc_assert_no {
     fi
     show_usage "$usage"
   else
+    sudo ls /var/lib/lxc/$lxc/rootfs > /dev/null 2>&1
+    if [ $? == 0 ]; then
+      msg_error "Container \"$lxc\" exists. Aborting ..."
+      if [ $lxc == "master" ]; then
+        unlock_subutai_system
+      fi
+      unlock_container_read $lxc
+      show_usage "$usage"
+    else
+      msg_info "    - check passed: container \"$lxc\" does NOT exist."
+    fi
     msg_info "    - check passed: container \"$lxc\" does NOT exist."
   fi
 }
@@ -99,11 +111,23 @@ function lxc_assert {
 
   lxc-info -n $lxc > /dev/null 2>&1
   if [ $? != 0 ]; then
-    msg_error "Container \"$lxc\" does NOT exist. Aborting ..."
-    unlock_container_read $lxc
-    show_usage "$usage"
+    sudo ls /var/lib/lxc/$lxc/rootfs > /dev/null 2>&1
+    if [ $? != 0 ]; then
+      msg_error "Container \"$lxc\" does NOT exist. Aborting ..."
+      unlock_container_read $lxc
+      show_usage "$usage"
+    else
+      msg_info "    - check passed: container \"$lxc\" exists."
+    fi
   else
-    msg_info "    - check passed: container \"$lxc\" exists."
+    sudo ls /var/lib/lxc/$lxc/rootfs > /dev/null 2>&1
+    if [ $? == 0 ]; then
+      msg_error "Container \"$lxc\" exist in both in public and $whoami 's templates. Rename local template!  Aborting ..."
+      unlock_container_read $lxc
+      show_usage "$usage"
+    else
+      msg_info "    - check passed: container \"$lxc\" exists."
+    fi
   fi
 }
 
@@ -137,19 +161,19 @@ function lxc_clone_ds {
 
 
 function lxc_new_mac {
-  local mac=`cat /etc/lxc/default.conf | grep lxc.network.hwaddr | awk '{print $3}'`
+  local mac=`sudo cat /etc/lxc/default.conf | grep lxc.network.hwaddr | awk '{print $3}'`
   
   local int=`expr $RANDOM % 255`
   local hex=`printf '%x\n' "$int"`
-  local mac=`echo $mac | sed -e "s/xx/$hex/"`
+  local mac=`echo $mac | sudo sed -e "s/xx/$hex/"`
 
   int=`expr $RANDOM % 255`
   hex=`printf '%x\n' "$int"`
-  mac=`echo $mac | sed -e "s/xx/$hex/"`
+  mac=`echo $mac | sudo sed -e "s/xx/$hex/"`
 
   int=`expr $RANDOM % 255`
   hex=`printf '%x\n' "$int"`
-  mac=`echo $mac | sed -e "s/xx/$hex/"`
+  mac=`echo $mac | sudo sed -e "s/xx/$hex/"`
 
   echo $mac
 }
@@ -175,8 +199,17 @@ function lxc_new_mac {
 # (3) fs clone snapshots for child datasets
 # (4) alter hostname from /etc/hosts and /etc/hostname
 
+function lxc_find_parent_dir {
+  local parent="$1"
+  lxc-info -n $parent > /dev/null 2>&1 
+  if [ $? == 0 ]; then
+    echo "$HOME/.local/share/lxc/$parent"
+  else
+    echo "/var/lib/lxc/$parent"
+  fi
+}
+
 function lxc_clone {
-  # nice local names for args
   local parent="$1"
   lxc_assert_name "$parent"
 
@@ -206,10 +239,9 @@ function lxc_clone {
     exit 1
   fi
 
-  # keep it tight with convenience vars
-  local parent_home=/var/lib/lxc/$parent
+  local parent_home=`lxc_find_parent_dir $parent`
   local parent_conf=$parent_home/config
-  local child_home=/var/lib/lxc/$child
+  local child_home=/$HOME/.local/share/lxc/$child
   local child_rootfs=$child_home/rootfs
   local child_conf=$child_home/config
 
@@ -217,7 +249,7 @@ function lxc_clone {
   lxc_assert_no $child "`usage`"
   lxc_assert $parent "`usage`"
 
-  if [ "`fs_is_template $parent`" == "false" ]; then
+  if [ "`fs_is_template $parent_home/rootfs`" == "false" ]; then
     msg_error "Parent \"$parent\" is not a template"
     unlock_container_read $child
     exit 1
@@ -228,15 +260,15 @@ function lxc_clone {
   # (2) setup skeleton of new cloned child container
   mkdir -p $child_rootfs
   local mac=`lxc_new_mac`
-  cat $parent_conf | grep -v subutai.template.package \
-      | sed                                           \
+  sudo cat $parent_conf | grep -v subutai.template.package 		   \
+      | sudo sed                                           		   \
      -e "s/lxc\.utsname.*/lxc\.utsname = $child/"                  \
      -e "s/subutai\.parent.*/subutai\.parent = $parent/"           \
-     -e "s/\/var\/lib\/lxc\/$parent\//\/var\/lib\/lxc\/$child\//g" \
+     -e "s/\/lxc\/$parent\//\/$HOME\/.local/share\/lxc\/$child\//g"      \
      -e "s/subutai\.git\.branch.*/subutai\.git\.branch = $child/"  \
      -e "s/lxc\.network\.hwaddr.*/lxc\.network\.hwaddr = $mac/"    \
      -e "s/$parent-/$child-/g" | grep -v subutai.git.uuid >> $child_conf
-  cp $parent_home/fstab $child_home
+  sudo cp $parent_home/fstab $child_home
 
   # (3) fs clone snapshots for child datasets
   fs_clone lxc/$parent@template lxc/$child
@@ -247,11 +279,11 @@ function lxc_clone {
 
   # (4) alter hostname from /etc/hosts and /etc/hostname
   echo $child > $child_rootfs/etc/hostname
-  cat $parent_home/rootfs/etc/hosts | sed \
+  sudo cat $parent_home/rootfs/etc/hosts | sudo sed \
     -e "s/$parent/$child/g" > $child_rootfs/etc/hosts
 
-  if [ -n "`cat $child_rootfs/etc/profile | grep PHY_HOST`" ]; then
-    cat $child_rootfs/etc/profile | \
+  if [ -n "`sudo cat $child_rootfs/etc/profile | grep PHY_HOST`" ]; then
+    sudo cat $child_rootfs/etc/profile | \
       grep -v PHY_HOST >> $child_rootfs/etc/profile.new
     rm $child_rootfs/etc/profile
     mv $child_rootfs/etc/profile.new $child_rootfs/etc/profile
@@ -265,7 +297,7 @@ function lxc_clone {
   if [ ! -f $child_rootfs/etc/subutai/lxc-config ]; then
      touch $child_rootfs/etc/subutai/lxc-config
   else
-     cp /dev/null $child_rootfs/etc/subutai/lxc-config
+     sudo cp /dev/null $child_rootfs/etc/subutai/lxc-config
   fi
   
   echo "[Subutai-Agent]" >> $child_rootfs/etc/subutai/lxc-config
@@ -278,9 +310,25 @@ function lxc_clone {
   if [ -s "$child_rootfs/etc/subutai-agent/uuid.txt" ]; then
     echo "" > $child_rootfs/etc/subutai-agent/uuid.txt
   fi
-
+  lxc_mapshifting $child
 }
 
+function lxc_mapshifting {
+  local lxc_name="$1"
+  #change the ownership of the container and shift the rootfs to user id and group
+  sudo chown -R $USER:$USER $HOME/.local/share/lxc/$lxc_name
+  uidmapshift -uuidmapshift -u $HOME/.local/share/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  uidmapshift -uuidmapshift -g $HOME/.local/share/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+
+  sudo chown -R $USER:$USER $HOME/lxc/$lxc_name
+  uidmapshift -uuidmapshift -u $HOME/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  uidmapshift -uuidmapshift -g $HOME/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+
+  sudo chown -R $USER:$USER $HOME/lxc-data/$lxc_name
+  uidmapshift -uuidmapshift -u $HOME/lxc-data/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  uidmapshift -uuidmapshift -g $HOME/lxc-data/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+
+}
 
 function lxc_copy {
   # nice local names for args
@@ -305,9 +353,9 @@ function lxc_copy {
   fi
 
   # keep it tight with convenience vars
-  local parent_home=/var/lib/lxc/$parent
+  local parent_home=`lxc_find_parent_dir $parent`
   local parent_conf=$parent_home/config
-  local child_home=/var/lib/lxc/$child
+  local child_home=$HOME/.local/share/lxc/$child
   local child_rootfs=$child_home/rootfs
   local child_conf=$child_home/config
 
@@ -326,14 +374,16 @@ function lxc_copy {
   # (2) setup skeleton of new cloned child container
   mkdir -p $child_rootfs
   local mac=`lxc_new_mac`
-  cat $parent_conf | sed                                           \
+  sudo cat $parent_conf | sudo sed                                           \
      -e "s/lxc\.utsname.*/lxc\.utsname = $child/"                  \
      -e "s/subutai\.parent.*/subutai\.parent = $parent/"           \
-     -e "s/\/var\/lib\/lxc\/$parent\//\/var\/lib\/lxc\/$child\//g" \
+     -e "s/\/lxc\/$parent\//\/$HOME\/.local/share\/lxc\/$child\//g"      \
      -e "s/subutai\.git\.branch.*/subutai\.git\.branch = $child/"  \
      -e "s/lxc\.network\.hwaddr.*/lxc\.network\.hwaddr = $mac/"    \
      -e "s/$parent-/$child-/g" | grep -v subutai.git.uuid >> $child_conf
-  cp $parent_home/fstab $child_home
+  sudo cp $parent_home/fstab $child_home
+
+
 
   # (3) fs clone child datasets
   grand_parent="`fs_get_parent $parent`"
@@ -345,7 +395,7 @@ function lxc_copy {
 
   # (4) alter hostname from /etc/hosts and /etc/hostname
   echo $child > $child_rootfs/etc/hostname
-  cat $parent_home/rootfs/etc/hosts | sed \
+  sudo cat $parent_home/rootfs/etc/hosts | sudo sed \
     -e "s/$parent/$child/g" > $child_rootfs/etc/hosts
 }
 
@@ -372,9 +422,9 @@ function lxc_rename {
   fi
 
   # keep it tight with convenience vars
-  local src_home=/var/lib/lxc/$src
+  local src_home=`lxc_find_parent_dir $src`
   local src_conf=$src_home/config
-  local dst_home=/var/lib/lxc/$dst
+  local dst_home=$HOME/.local/share/lxc/$dst
   local dst_rootfs=$dst_home/rootfs
   local dst_conf=$dst_home/config
 
@@ -390,20 +440,20 @@ function lxc_rename {
 
   # (2) setup skeleton of destination container
   mkdir -p "$dst_rootfs"
-  cat "$src_conf" | sed                                           \
+  sudo cat "$src_conf" | sudo sed                                           \
      -e "s/lxc\.utsname.*/lxc\.utsname = $dst/"                   \
-     -e "s/\/var\/lib\/lxc\/$src\//\/var\/lib\/lxc\/$dst\//g"     \
+     -e "s/\/lxc\/$src\//\/$HOME\/lxc\/$dst\//g"     \
      -e "s/subutai\.git\.branch.*/subutai\.git\.branch = $dst/"   \
      -e "s/$src-/$dst-/g" | grep -v subutai.git.uuid >> "$dst_conf"
-  cp "$src_home/fstab" "$dst_home"
+  sudo cp "$src_home/fstab" "$dst_home"
   
   lxc_stop "$src"
   
   # umount all the partitions
-  umount "/lxc-data/$src-home"
-  umount "/lxc-data/$src-var"
-  umount "/lxc/$src-opt"
-  umount "/var/lib/lxc/$src/rootfs"
+  umount "$HOME/lxc-data/$src-home"
+  umount "$HOME/lxc-data/$src-var"
+  umount "$HOME/lxc/$src-opt"
+  umount "$HOME/.local/share/lxc/$src/rootfs"
   
   # rename datasets and set mount point for rootfs
   fs_rename_datasets_set_mount_point $src $dst $dst_rootfs
@@ -412,7 +462,7 @@ function lxc_rename {
   str_replace_in_file "$src" "$dst" "$dst_rootfs/etc/hosts"
 
   # cleanup the old source, start up the new container, and adjust git
-  rm -rf "/var/lib/lxc/$src"
+  rm -rf "$HOME/.local/share/lxc/$src"
   lxc_wait_net "$dst"
   git_rename_branch "$src" "$dst"
   lxc_stop "$dst"
