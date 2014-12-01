@@ -320,20 +320,20 @@ function lxc_mapshifting {
   local lxc_name="$1"
   #change the ownership of the container and shift the rootfs to user id and group
   sudo chown -R $USER:$USER $HOME/.local/share/lxc/$lxc_name
-  uidmapshift -uuidmapshift -u $HOME/.local/share/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
-  uidmapshift -uuidmapshift -g $HOME/.local/share/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  sudo uidmapshift -u $HOME/.local/share/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  sudo uidmapshift -g $HOME/.local/share/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
 
   sudo chown -R $USER:$USER $HOME/lxc/$lxc_name-opt
-  uidmapshift -uuidmapshift -u $HOME/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
-  uidmapshift -uuidmapshift -g $HOME/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  sudo uidmapshift -u $HOME/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  sudo uidmapshift -g $HOME/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
 
   sudo chown -R $USER:$USER $HOME/lxc-data/$lxc_name-var
-  uidmapshift -uuidmapshift -u $HOME/lxc-data/$lxc_name-var 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
-  uidmapshift -uuidmapshift -g $HOME/lxc-data/$lxc_name-var 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
-  
+  sudo uidmapshift -u $HOME/lxc-data/$lxc_name-var 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  sudo uidmapshift -g $HOME/lxc-data/$lxc_name-var 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+
   sudo chown -R $USER:$USER $HOME/lxc-data/$lxc_name-home
-  uidmapshift -uuidmapshift -u $HOME/lxc-data/$lxc_name-home 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
-  uidmapshift -uuidmapshift -g $HOME/lxc-data/$lxc_name-home 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  sudo uidmapshift -u $HOME/lxc-data/$lxc_name-home 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  sudo uidmapshift -g $HOME/lxc-data/$lxc_name-home 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
 
 
 }
