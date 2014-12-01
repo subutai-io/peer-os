@@ -1,10 +1,6 @@
 package org.safehaus.subutai.core.peer.api;
 
 
-import java.io.Serializable;
-import java.util.Set;
-import java.util.UUID;
-
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
@@ -14,6 +10,10 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.Interface;
+
+import java.io.Serializable;
+import java.util.Set;
+import java.util.UUID;
 
 
 /**
