@@ -26,7 +26,6 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -232,20 +231,6 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
     @Override
-    public Agent getParentAgent()
-    {
-        throw new UnsupportedOperationException( "Unsupported operation." );
-    }
-
-
-    @Override
-    public void setParentAgent( final Agent agent )
-    {
-        throw new UnsupportedOperationException( "Unsupported operation." );
-    }
-
-
-    @Override
     public String getPeerId()
     {
         return this.peerId;
@@ -395,8 +380,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
         try
         {
-            execute( new RequestBuilder( String.format( "sh -c echo `%s`", appendHosts.toString() ) )
-                    .withTimeout( 30 ) );
+            execute( new RequestBuilder( appendHosts.toString() ).withTimeout( 30 ) );
         }
         catch ( CommandException e )
         {
@@ -409,20 +393,6 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public void init()
     {
         // Empty method
-    }
-
-
-    @Override
-    public Agent getAgent()
-    {
-        try
-        {
-            return new Agent( getId(), hostname, null, null, getIps(), true, null );
-        }
-        catch ( PeerException e )
-        {
-            return null;
-        }
     }
 
 
@@ -443,6 +413,36 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public Set<Interface> getNetInterfaces()
     {
         return interfaces;
+    }
+
+
+    @Override
+    public String getIpByInterfaceName( String interfaceName )
+    {
+        for ( Interface iface : interfaces )
+        {
+            if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
+            {
+                return iface.getIp();
+            }
+        }
+
+        return null;
+    }
+
+
+    @Override
+    public String getMacByInterfaceName( final String interfaceName )
+    {
+        for ( Interface iface : interfaces )
+        {
+            if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
+            {
+                return iface.getMac();
+            }
+        }
+
+        return null;
     }
 
 

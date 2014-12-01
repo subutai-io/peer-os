@@ -70,7 +70,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
                 if ( !n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
                 {
                     throw new ClusterSetupException(
-                            String.format( "Node %s does not have Storm installed", n.getAgent().getHostname() ) );
+                            String.format( "Node %s does not have Storm installed", n.getHostname() ) );
                 }
             }
             catch ( PeerException e )
@@ -183,7 +183,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         else {
             nimbusHost = environment.getContainerHostByUUID( config.getNimbus() );
         }
-        paramValues.put( "nimbus.host", nimbusHost.getAgent().getListIP().get( 0 ) );
+        paramValues.put( "nimbus.host", nimbusHost.getIpByInterfaceName( "eth0" ) );
 
         Set<ContainerHost> supervisorNodes = environment.getHostsByIds( config.getSupervisors() );
 
@@ -274,7 +274,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
                     {
                         sb.append( "," );
                     }
-                    sb.append( containerHost.getAgent().getListIP().get( 0 ) );
+                    sb.append( containerHost.getIpByInterfaceName( "eth0" ) );
                 }
                 return sb.toString();
             }
@@ -282,7 +282,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         else if ( config.getNimbus() != null )
         {
             ContainerHost nimbusHost = environment.getContainerHostByUUID( config.getNimbus() );
-            return nimbusHost.getAgent().getListIP().get( 0 );
+            return nimbusHost.getIpByInterfaceName( "eth0" );
         }
 
         return null;

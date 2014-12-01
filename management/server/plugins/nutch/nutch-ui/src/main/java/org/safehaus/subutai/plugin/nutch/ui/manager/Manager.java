@@ -315,7 +315,7 @@ public class Manager
         for ( final ContainerHost host : containerHosts )
         {
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( host.getAgent().getListIP().get( 0 ) + "-nutchDestroy" );
+            destroyBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-nutchDestroy" );
             destroyBtn.addStyleName( "default" );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();
@@ -325,7 +325,7 @@ public class Manager
             addGivenComponents( availableOperations, destroyBtn );
 
             table.addItem( new Object[] {
-                    host.getHostname(), host.getAgent().getListIP().get( 0 ), availableOperations
+                    host.getHostname(), host.getIpByInterfaceName( "eth0" ), availableOperations
             }, null );
             addClickListenerToDestroyButton( host, destroyBtn );
         }

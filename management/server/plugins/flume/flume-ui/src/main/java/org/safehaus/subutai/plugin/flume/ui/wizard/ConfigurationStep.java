@@ -199,7 +199,7 @@ public class ConfigurationStep extends VerticalLayout
                     Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
                     for ( ContainerHost host : nodeList )
                     {
-                        nodes.add( host.getAgent().getUuid() );
+                        nodes.add( host.getId() );
                     }
                     config.getNodes().clear();
                     config.getNodes().addAll( nodes );

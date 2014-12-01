@@ -70,12 +70,6 @@ public abstract class SparkBase
     }
 
 
-    public Hadoop getHadoopManager()
-    {
-        return hadoopManager;
-    }
-
-
     public PluginDAO getPluginDAO()
     {
         return pluginDAO;
