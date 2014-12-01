@@ -44,23 +44,23 @@ public class HadoopClusterConfig implements ConfigBase
     {
         List<NodeType> nodeRoles = new ArrayList<>();
 
-        if ( clusterConfig.isNameNode( containerHost.getAgent().getUuid() ) )
+        if ( clusterConfig.isNameNode( containerHost.getId() ) )
         {
             nodeRoles.add( NodeType.NAMENODE );
         }
-        if ( clusterConfig.isSecondaryNameNode( containerHost.getAgent().getUuid() ) )
+        if ( clusterConfig.isSecondaryNameNode( containerHost.getId() ) )
         {
             nodeRoles.add( NodeType.SECONDARY_NAMENODE );
         }
-        if ( clusterConfig.isJobTracker( containerHost.getAgent().getUuid() ) )
+        if ( clusterConfig.isJobTracker( containerHost.getId() ) )
         {
             nodeRoles.add( NodeType.JOBTRACKER );
         }
-        if ( clusterConfig.isDataNode( containerHost.getAgent().getUuid() ) )
+        if ( clusterConfig.isDataNode( containerHost.getId() ) )
         {
             nodeRoles.add( NodeType.DATANODE );
         }
-        if ( clusterConfig.isTaskTracker( containerHost.getAgent().getUuid() ) )
+        if ( clusterConfig.isTaskTracker( containerHost.getId() ) )
         {
             nodeRoles.add( NodeType.TASKTRACKER );
         }
@@ -385,9 +385,9 @@ public class HadoopClusterConfig implements ConfigBase
 
     public boolean isMasterNode( ContainerHost containerHost )
     {
-        return containerHost.getAgent().getUuid().equals( getNameNode() ) ||
-                containerHost.getAgent().getUuid().equals( getJobTracker() ) ||
-                containerHost.getAgent().getUuid().equals( getSecondaryNameNode() );
+        return containerHost.getId().equals( getNameNode() ) ||
+                containerHost.getId().equals( getJobTracker() ) ||
+                containerHost.getId().equals( getSecondaryNameNode() );
     }
 
 

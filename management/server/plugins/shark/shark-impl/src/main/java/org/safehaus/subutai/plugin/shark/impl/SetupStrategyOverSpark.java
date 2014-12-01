@@ -55,7 +55,8 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
     }
 
 
-    //TODO for nodes with Shark installed skipp installation and just configure
+    //TODO find all Shark clusters and check if node if Shark installed belongs to them
+    //if belongs then fail otherwise add to non installable nodes
     private void check() throws ClusterSetupException
     {
 

@@ -368,7 +368,7 @@ public class ConfigurationStep extends Panel
                         Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
                         for ( ContainerHost host : nodeList )
                         {
-                            nodes.add( host.getAgent().getUuid() );
+                            nodes.add( host.getId() );
                         }
                         wizard.getConfig().setTracers( nodes );
                     }
@@ -385,7 +385,7 @@ public class ConfigurationStep extends Panel
                         Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
                         for ( ContainerHost host : nodeList )
                         {
-                            nodes.add( host.getAgent().getUuid() );
+                            nodes.add( host.getId() );
                         }
                         wizard.getConfig().setSlaves( nodes );
                     }

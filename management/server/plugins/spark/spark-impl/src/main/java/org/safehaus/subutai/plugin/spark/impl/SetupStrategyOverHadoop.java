@@ -56,7 +56,8 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
         return config;
     }
 
-    //TODO for nodes already having spark installed skip installation and just configure cluster
+    //TODO find all Spark clusters and check if node if Spark installed belongs to them
+    //if belongs then fail otherwise add to non installable nodes
     private void check() throws ClusterSetupException
     {
 

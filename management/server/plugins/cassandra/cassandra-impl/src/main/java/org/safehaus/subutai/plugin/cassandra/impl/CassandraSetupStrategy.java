@@ -66,7 +66,7 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy
         Set<UUID> cassNodes = new HashSet<>();
         for ( ContainerHost environmentContainer : environment.getContainers() )
         {
-            cassNodes.add( environmentContainer.getAgent().getUuid() );
+            cassNodes.add( environmentContainer.getId() );
         }
         config.setNodes( cassNodes );
 

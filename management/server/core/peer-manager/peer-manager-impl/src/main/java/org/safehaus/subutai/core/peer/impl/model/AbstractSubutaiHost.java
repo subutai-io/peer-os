@@ -25,7 +25,6 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
@@ -316,6 +315,21 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     @Override
+    public String getMacByInterfaceName( final String interfaceName )
+    {
+        for ( Interface iface : interfaces )
+        {
+            if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
+            {
+                return iface.getMac();
+            }
+        }
+
+        return null;
+    }
+
+
+    @Override
     public String getIpByMask( String mask )
     {
         String[] s = this.netInterfaces.split( ";" );
@@ -373,12 +387,6 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    public Agent getAgent()
-    {
-        return new Agent( getId(), hostname, null, null, getIps(), false, null );
-    }
-
-
     private List<String> getIps()
     {
         String[] str = this.netInterfaces.split( ";" );
@@ -389,20 +397,6 @@ public abstract class AbstractSubutaiHost implements Host
             result.add( s );
         }
         return result;
-    }
-
-
-    @Override
-    public Agent getParentAgent()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-
-    @Override
-    public void setParentAgent( final Agent agent )
-    {
-        throw new UnsupportedOperationException();
     }
 
 
