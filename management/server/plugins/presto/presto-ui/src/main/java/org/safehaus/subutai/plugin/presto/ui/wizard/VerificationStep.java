@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -29,7 +28,7 @@ public class VerificationStep extends Panel
 {
 
     public VerificationStep( final Presto presto, final ExecutorService executorService, final Tracker tracker,
-                             EnvironmentManager environmentManager,final Wizard wizard )
+                             EnvironmentManager environmentManager, final Wizard wizard )
     {
 
         setSizeFull();
@@ -51,7 +50,8 @@ public class VerificationStep extends Panel
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
             Environment hadoopEnvironment = environmentManager.getEnvironmentByUUID( hc.getEnvironmentId() );
-            ContainerHost coordinator = hadoopEnvironment.getContainerHostByUUID( wizard.getConfig().getCoordinatorNode() );
+            ContainerHost coordinator =
+                    hadoopEnvironment.getContainerHostByUUID( wizard.getConfig().getCoordinatorNode() );
             Set<ContainerHost> workers = hadoopEnvironment.getHostsByIds( wizard.getConfig().getWorkers() );
             cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getHadoopClusterName() );
             cfgView.addStringCfg( "Master Node", coordinator.getHostname() );

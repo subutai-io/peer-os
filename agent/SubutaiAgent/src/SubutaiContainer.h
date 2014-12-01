@@ -32,6 +32,8 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
+#include <pthread.h>
+#include <csignal>
 #include <sstream>
 #include <list>
 #include <lxc/lxccontainer.h>
@@ -51,6 +53,8 @@
 #include "SubutaiConnection.h"
 #include "SubutaiCommand.h"
 #include "SubutaiHelper.h"
+#include "SubutaiException.h"
+
 using namespace std;
 using std::stringstream;
 using std::string;
@@ -62,6 +66,7 @@ struct ExecutionResult {
     string out;
     string err;
     int exit_code;
+    pid_t pid;
 };
 
 
@@ -80,6 +85,7 @@ class SubutaiContainer
         bool getContainerInterfaces();
         void setContainerHostname(string);
         void setContainerStatus(containerStatus);
+        string getState();
         void write();
         void clear();
         bool checkCWD(string cwd);
@@ -98,7 +104,6 @@ class SubutaiContainer
         ExecutionResult RunCommand(SubutaiCommand* command);
         ExecutionResult RunDaemon(SubutaiCommand* command);
         ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT, bool captureOutput = true);
-
     protected:
         vector<string> ExplodeCommandArguments(SubutaiCommand* command);
     private:
@@ -111,7 +116,9 @@ class SubutaiContainer
         SubutaiLogger*		containerLogger;
         SubutaiHelper 		_helper;
         string              _arch;
+        string              _logEntry;      // <SubutaiContainer::CONTAINER_NAME>
 };
+
 #endif /* SUBUTAICONTAINER_H_ */
 
 

@@ -1,17 +1,17 @@
 package org.safehaus.subutai.plugin.flume.ui.manager;
 
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -128,7 +128,9 @@ public class Manager
                         nodes.removeAll( config.getNodes() );
                         if ( !nodes.isEmpty() )
                         {
-                            Set<ContainerHost> hosts = environmentManager.getEnvironmentByUUID( hadoopConfig.getEnvironmentId() ).getHostsByIds( nodes );
+                            Set<ContainerHost> hosts =
+                                    environmentManager.getEnvironmentByUUID( hadoopConfig.getEnvironmentId() )
+                                                      .getHostsByIds( nodes );
                             AddNodeWindow addNodeWindow =
                                     new AddNodeWindow( flume, tracker, executorService, config, hosts );
                             contentRoot.getUI().addWindow( addNodeWindow );
@@ -299,7 +301,7 @@ public class Manager
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
             Set<ContainerHost> hosts = environment.getHostsByIds( config.getNodes() );
-            populateTable( nodesTable, hosts);
+            populateTable( nodesTable, hosts );
         }
         else
         {
@@ -390,19 +392,19 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new NodeOperationTask( flume, tracker, config.getClusterName(), host,
-                                NodeOperationType.START, new org.safehaus.subutai.common.protocol.CompleteEvent()
-                        {
-                            @Override
-                            public void onComplete( NodeState nodeState )
-                            {
-                                synchronized ( PROGRESS_ICON )
+                        new NodeOperationTask( flume, tracker, config.getClusterName(), host, NodeOperationType.START,
+                                new org.safehaus.subutai.common.protocol.CompleteEvent()
                                 {
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                }
-                            }
-                        }, null ) );
+                                    @Override
+                                    public void onComplete( NodeState nodeState )
+                                    {
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                        }
+                                    }
+                                }, null ) );
             }
         } );
     }
@@ -418,25 +420,26 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new NodeOperationTask( flume, tracker, config.getClusterName(), host,
-                                NodeOperationType.STOP, new org.safehaus.subutai.common.protocol.CompleteEvent()
-                        {
-                            @Override
-                            public void onComplete( NodeState nodeState )
-                            {
-                                synchronized ( PROGRESS_ICON )
+                        new NodeOperationTask( flume, tracker, config.getClusterName(), host, NodeOperationType.STOP,
+                                new org.safehaus.subutai.common.protocol.CompleteEvent()
                                 {
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                }
-                            }
-                        }, null ) );
+                                    @Override
+                                    public void onComplete( NodeState nodeState )
+                                    {
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                        }
+                                    }
+                                }, null ) );
             }
         } );
     }
 
 
-    public void addCheckButtonClickListener( final ContainerHost host, final Label resultHolder, final Button... buttons )
+    public void addCheckButtonClickListener( final ContainerHost host, final Label resultHolder,
+                                             final Button... buttons )
     {
         getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -446,31 +449,31 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new NodeOperationTask( flume, tracker, config.getClusterName(), host,
-                                NodeOperationType.STATUS, new org.safehaus.subutai.common.protocol.CompleteEvent()
-                        {
-                            public void onComplete( NodeState nodeState )
-                            {
-                                synchronized ( PROGRESS_ICON )
+                        new NodeOperationTask( flume, tracker, config.getClusterName(), host, NodeOperationType.STATUS,
+                                new org.safehaus.subutai.common.protocol.CompleteEvent()
                                 {
-                                    resultHolder.setValue( nodeState.name() );
-                                    if ( nodeState.name().contains( "STOPPED" ) )
+                                    public void onComplete( NodeState nodeState )
                                     {
-                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                    }
-                                    else
-                                    {
-                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                    }
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            resultHolder.setValue( nodeState.name() );
+                                            if ( nodeState.name().contains( "STOPPED" ) )
+                                            {
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                            }
+                                            else
+                                            {
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            }
 
-                                    PROGRESS_ICON.setVisible( false );
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                    getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                }
-                            }
-                        }, null ) );
+                                            PROGRESS_ICON.setVisible( false );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        }
+                                    }
+                                }, null ) );
             }
         } );
     }

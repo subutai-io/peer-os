@@ -1,10 +1,10 @@
 package org.safehaus.subutai.plugin.hadoop.impl;
 
+
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -22,7 +22,9 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class HadoopImplTest {
+
+public class HadoopImplTest
+{
     private HadoopImpl hadoopImpl;
     private DataSource dataSource;
     ExecutorService executorService;
@@ -33,12 +35,12 @@ public class HadoopImplTest {
     Commands commands;
     PreparedStatement preparedStatement;
     Connection connection;
-    ContainerManager containerManager;
     EnvironmentManager environmentManager;
 
 
     @Before
-    public void setUp() {
+    public void setUp()
+    {
         dataSource = mock(DataSource.class);
         hadoopImpl = new HadoopImpl(dataSource);
         executorService = mock(ExecutorService.class);
@@ -49,27 +51,33 @@ public class HadoopImplTest {
         commands = mock(Commands.class);
         preparedStatement = mock(PreparedStatement.class);
         connection = mock(Connection.class);
-        containerManager = mock(ContainerManager.class);
+//        containerManager = mock( ContainerManager.class );
         environmentManager = mock(EnvironmentManager.class);
     }
 
+
+//    @Test
+//    public void testGetCommands()
+//    {
+//        hadoopImpl.setCommands( commands );
+//
+//        assertNotNull( hadoopImpl.getCommands() );
+//        assertEquals( commands, hadoopImpl.getCommands() );
+//    }
+
+
+//    @Test
+//    public void testSetCommands()
+//    {
+//        hadoopImpl.setCommands( commands );
+//
+//        assertEquals( commands, hadoopImpl.getCommands() );
+//    }
+
+
     @Test
-    public void testGetCommands() {
-        hadoopImpl.setCommands(commands);
-
-        assertNotNull(hadoopImpl.getCommands());
-        assertEquals(commands, hadoopImpl.getCommands());
-    }
-
-    @Test
-    public void testSetCommands() {
-        hadoopImpl.setCommands(commands);
-
-        assertEquals(commands, hadoopImpl.getCommands());
-    }
-
-    @Test
-    public void testInit() throws SQLException {
+    public void testInit() throws SQLException
+    {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(5);
         when(dataSource.getConnection()).thenReturn(connection);
@@ -78,51 +86,60 @@ public class HadoopImplTest {
 
         assertEquals(connection, dataSource.getConnection());
         assertEquals(5, preparedStatement.executeUpdate());
-
     }
 
+
     @Test
-    public void testDestroy() {
+    public void testDestroy()
+    {
         hadoopImpl.setExecutor(executorService);
         hadoopImpl.destroy();
-
     }
 
+
     @Test
-    public void testGetTracker() {
+    public void testGetTracker()
+    {
         hadoopImpl.setTracker(tracker);
         hadoopImpl.getTracker();
 
         assertEquals(tracker, hadoopImpl.getTracker());
         assertNotNull(hadoopImpl.getTracker());
-
     }
 
+
     @Test
-    public void testSetTracker() {
+    public void testSetTracker()
+    {
         hadoopImpl.setTracker(tracker);
 
         assertEquals(tracker, hadoopImpl.getTracker());
     }
 
+
+//    @Test
+//    public void testGetContainerManager()
+//    {
+//        hadoopImpl.setContainerManager(containerManager);
+//        hadoopImpl.getContainerManager();
+//
+//        assertEquals(containerManager, hadoopImpl.getContainerManager());
+//        assertNotNull(hadoopImpl.getContainerManager());
+//    }
+
+
+//    @Test
+//    public void testSetContainerManager()
+//    {
+//        hadoopImpl.setContainerManager(containerManager);
+//
+//        assertEquals(containerManager, hadoopImpl.getContainerManager());
+//    }
+
+
     @Test
-    public void testGetContainerManager() {
-        hadoopImpl.setContainerManager(containerManager);
-        hadoopImpl.getContainerManager();
-
-        assertEquals(containerManager, hadoopImpl.getContainerManager());
-        assertNotNull(hadoopImpl.getContainerManager());
-    }
-
-    @Test
-    public void testSetContainerManager() {
-        hadoopImpl.setContainerManager(containerManager);
-
-        assertEquals(containerManager, hadoopImpl.getContainerManager());
-    }
-
-    @Test
-    public void testGetExecutor() {
+    public void testGetExecutor()
+    {
         hadoopImpl.setExecutor(executorService);
         hadoopImpl.getExecutor();
 
@@ -130,31 +147,41 @@ public class HadoopImplTest {
         assertNotNull(hadoopImpl.getExecutor());
     }
 
+
     @Test
-    public void testSetExecutor() {
+    public void testSetExecutor()
+    {
         hadoopImpl.setExecutor(executorService);
         hadoopImpl.getExecutor();
 
         assertEquals(executorService, hadoopImpl.getExecutor());
     }
 
+
     @Test
-    public void testGetEnvironmentManager() {
+    public void testGetEnvironmentManager()
+    {
         hadoopImpl.getEnvironmentManager();
     }
 
+
     @Test
-    public void testSetEnvironmentManager() {
+    public void testSetEnvironmentManager()
+    {
         hadoopImpl.setEnvironmentManager(environmentManager);
     }
 
+
     @Test
-    public void testGetPluginDAO() {
+    public void testGetPluginDAO()
+    {
         hadoopImpl.getPluginDAO();
     }
 
+
     @Test
-    public void testInstallCluster() {
+    public void testInstallCluster()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -167,8 +194,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.installCluster(hadoopClusterConfig));
     }
 
+
     @Test
-    public void testUninstallCluster() {
+    public void testUninstallCluster()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -181,8 +210,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.uninstallCluster(hadoopClusterConfig));
     }
 
+
     @Test
-    public void testStartNameNode() {
+    public void testStartNameNode()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -195,8 +226,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.startNameNode(hadoopClusterConfig));
     }
 
+
     @Test
-    public void testStopNameNode() {
+    public void testStopNameNode()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -209,8 +242,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.stopNameNode(hadoopClusterConfig));
     }
 
+
     @Test
-    public void testStatusNameNode() {
+    public void testStatusNameNode()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -221,11 +256,12 @@ public class HadoopImplTest {
 
         assertNotNull(hadoopImpl.statusNameNode(hadoopClusterConfig));
         assertEquals(uuid, hadoopImpl.statusNameNode(hadoopClusterConfig));
-
     }
 
+
     @Test
-    public void testStatusSecondaryNameNode() {
+    public void testStatusSecondaryNameNode()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -238,8 +274,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.statusSecondaryNameNode(hadoopClusterConfig));
     }
 
+
     @Test
-    public void testStartDataNode() {
+    public void testStartDataNode()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -252,8 +290,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.startDataNode(hadoopClusterConfig, hostname));
     }
 
+
     @Test
-    public void testStopDataNode() {
+    public void testStopDataNode()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -266,8 +306,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.stopDataNode(hadoopClusterConfig, hostname));
     }
 
+
     @Test
-    public void testStatusDataNode() {
+    public void testStatusDataNode()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -278,11 +320,12 @@ public class HadoopImplTest {
 
         assertNotNull(hadoopImpl.statusDataNode(hadoopClusterConfig, hostname));
         assertEquals(uuid, hadoopImpl.statusDataNode(hadoopClusterConfig, hostname));
-
     }
 
+
     @Test
-    public void testStartJobTracker() {
+    public void testStartJobTracker()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -295,8 +338,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.startJobTracker(hadoopClusterConfig));
     }
 
+
     @Test
-    public void testStopJobTracker() {
+    public void testStopJobTracker()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -309,8 +354,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.stopJobTracker(hadoopClusterConfig));
     }
 
+
     @Test
-    public void testStatusJobTracker() {
+    public void testStatusJobTracker()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -323,8 +370,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.statusJobTracker(hadoopClusterConfig));
     }
 
+
     @Test
-    public void testStartTaskTracker() {
+    public void testStartTaskTracker()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -337,8 +386,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.startTaskTracker(hadoopClusterConfig, hostname));
     }
 
+
     @Test
-    public void testStopTaskTracker() {
+    public void testStopTaskTracker()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -351,8 +402,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.stopTaskTracker(hadoopClusterConfig, hostname));
     }
 
+
     @Test
-    public void testStatusTaskTracker() {
+    public void testStatusTaskTracker()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -365,8 +418,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.statusTaskTracker(hadoopClusterConfig, hostname));
     }
 
+
     @Test
-    public void testAddNode1() {
+    public void testAddNode1()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -379,8 +434,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.addNode(clusterName, 5));
     }
 
+
     @Test
-    public void testDestroyNode() {
+    public void testDestroyNode()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -393,8 +450,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.destroyNode(hadoopClusterConfig, hostname));
     }
 
+
     @Test
-    public void testCheckDecomissionStatus() {
+    public void testCheckDecomissionStatus()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -407,8 +466,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.checkDecomissionStatus(hadoopClusterConfig));
     }
 
+
     @Test
-    public void testExcludeNode() {
+    public void testExcludeNode()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -421,8 +482,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.excludeNode(hadoopClusterConfig, hostname));
     }
 
+
     @Test
-    public void testIncludeNode() {
+    public void testIncludeNode()
+    {
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
         hadoopImpl.setTracker(tracker);
@@ -435,8 +498,10 @@ public class HadoopImplTest {
         assertEquals(uuid, hadoopImpl.includeNode(hadoopClusterConfig, hostname));
     }
 
+
     @Test
-    public void testGetDefaultEnvironmentBlueprint() throws ClusterSetupException {
+    public void testGetDefaultEnvironmentBlueprint() throws ClusterSetupException
+    {
         hadoopImpl.getDefaultEnvironmentBlueprint(hadoopClusterConfig);
 
         assertNotNull(hadoopImpl.getDefaultEnvironmentBlueprint(hadoopClusterConfig));

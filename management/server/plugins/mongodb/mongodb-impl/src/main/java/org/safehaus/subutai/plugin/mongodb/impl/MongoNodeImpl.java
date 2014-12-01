@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.mongodb.api.MongoException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
@@ -18,18 +18,18 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by timur on 11/14/14.
  */
-public abstract class MongoNodeImpl extends ContainerHost implements MongoNode
+public abstract class MongoNodeImpl implements MongoNode
 {
     static final Logger LOG = LoggerFactory.getLogger( MongoNodeImpl.class );
 
-
+    ContainerHost containerHost;
     String domainName;
     int port;
 
 
-    public MongoNodeImpl( final Agent agent, final UUID peerId, final UUID environmentId, String domainName, int port )
+    public MongoNodeImpl( final ContainerHost containerHost, String domainName, int port )
     {
-        super( agent, peerId, environmentId );
+        this.containerHost = containerHost;
         this.domainName = domainName;
         this.port = port;
     }
@@ -45,10 +45,11 @@ public abstract class MongoNodeImpl extends ContainerHost implements MongoNode
     @Override
     public boolean isRunning()
     {
-        CommandDef commandDef = Commands.getCheckInstanceRunningCommand( getHostname(), domainName, port );
+        CommandDef commandDef =
+                Commands.getCheckInstanceRunningCommand( containerHost.getHostname(), domainName, port );
         try
         {
-            CommandResult commandResult = execute( commandDef.build() );
+            CommandResult commandResult = containerHost.execute( commandDef.build() );
             if ( commandResult.getStdOut().contains( "couldn't connect to server" ) )
             {
                 return false;
@@ -87,12 +88,40 @@ public abstract class MongoNodeImpl extends ContainerHost implements MongoNode
         CommandDef commandDef = Commands.getStopNodeCommand();
         try
         {
-            execute( commandDef.build( true ) );
+            containerHost.execute( commandDef.build( true ) );
         }
         catch ( CommandException e )
         {
             LOG.error( e.toString(), e );
             throw new MongoException( "Could not stop mongo instance." );
         }
+    }
+
+
+    @Override
+    public String getHostname()
+    {
+        return containerHost.getHostname();
+    }
+
+
+    @Override
+    public CommandResult execute( final RequestBuilder build ) throws CommandException
+    {
+        return containerHost.execute( build );
+    }
+
+
+    @Override
+    public UUID getPeerId()
+    {
+        return UUID.fromString( containerHost.getPeerId() );
+    }
+
+
+    @Override
+    public ContainerHost getContainerHost()
+    {
+        return containerHost;
     }
 }

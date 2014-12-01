@@ -16,7 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.nutch.api.Nutch;
 import org.safehaus.subutai.plugin.nutch.api.NutchConfig;
 import org.safehaus.subutai.plugin.nutch.api.SetupType;
@@ -28,13 +27,6 @@ public class RestService
     private static final String OPERATION_ID = "OPERATION_ID";
 
     private Nutch nutchManager;
-    private AgentManager agentManager;
-
-
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }
 
 
     public void setNutchManager( Nutch nutchManager )

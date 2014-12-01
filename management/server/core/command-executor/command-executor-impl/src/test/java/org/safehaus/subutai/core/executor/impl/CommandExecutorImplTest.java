@@ -49,7 +49,7 @@ public class CommandExecutorImplTest
     {
         commandExecutor = new CommandExecutorImpl( broker, hostRegistry );
         commandExecutor.commandProcessor = commandProcessor;
-        when( requestBuilder.build2( HOST_ID ) ).thenReturn( request );
+        when( requestBuilder.build( HOST_ID ) ).thenReturn( request );
     }
 
 

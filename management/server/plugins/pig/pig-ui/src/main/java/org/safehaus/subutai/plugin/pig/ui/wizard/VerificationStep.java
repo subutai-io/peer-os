@@ -1,12 +1,10 @@
 package org.safehaus.subutai.plugin.pig.ui.wizard;
 
 
-import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -53,7 +51,8 @@ public class VerificationStep extends Panel
 
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            Environment hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
+            Environment hadoopEnvironment =
+                    environmentManager.getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
             Set<ContainerHost> nodes = hadoopEnvironment.getHostsByIds( wizard.getConfig().getNodes() );
             for ( ContainerHost host : nodes )
             {

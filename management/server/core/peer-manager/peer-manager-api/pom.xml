@@ -25,20 +25,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>strategy-manager-api</artifactId>
     </dependency>
-    <!--
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>container-manager-api</artifactId>
-    </dependency>
-    -->
-    <!--<dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>command-dispatcher-api</artifactId>
-    </dependency>-->
 
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>agent-manager-api</artifactId>
+      <artifactId>command-executor-api</artifactId>
     </dependency>
 
     <dependency>

@@ -159,7 +159,7 @@ string SubutaiEnvironment::getAgentArch() {
     utsname info;
     if (uname(&info) != 0) {
         environmentLogger->writeLog(3, environmentLogger->setLogData("<SubutaiAgent>", "Error: Failed to extract machine information"));
-        return "unknown";
+        return "UNKNOWN";
     } else {
         environmentLogger->writeLog(3, environmentLogger->setLogData("<SubutaiAgent>", "Machine architecture:", info.machine));
         return info.machine;
@@ -253,6 +253,9 @@ bool SubutaiEnvironment::getAgentInterfaces()
 	    			{
 	    				found_ip = true;
 	    				ip = _helper.splitResult((*it_s), " ")[1];
+                        if (_helper.splitResult(ip, ":").size() > 1) {
+                            ip = _helper.splitResult(ip, ":")[1];
+                        }
 	    				found_i = false;
 	    			}
 	    			if(!strcmp((*it_s).c_str(), "inet")) found_i = true;

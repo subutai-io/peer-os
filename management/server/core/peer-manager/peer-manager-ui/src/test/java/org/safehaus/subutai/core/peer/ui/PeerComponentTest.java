@@ -23,7 +23,7 @@ public class PeerComponentTest
     @Before
     public void setUp() throws Exception
     {
-        peerComponent = new PeerComponent( peerManagerPortalModule );
+//        peerComponent = new PeerComponent( peerManagerPortalModule );
     }
 
 

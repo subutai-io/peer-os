@@ -4,20 +4,19 @@ package org.safehaus.subutai.core.peer.impl.command;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
 public class CommandRequest
 {
     private RequestBuilder requestBuilder;
-    private ContainerHost host;
+    private UUID hostId;
     private UUID requestId;
 
 
-    public CommandRequest( final RequestBuilder requestBuilder, final ContainerHost host )
+    public CommandRequest( final RequestBuilder requestBuilder, final UUID hostId )
     {
         this.requestBuilder = requestBuilder;
-        this.host = host;
+        this.hostId = hostId;
         this.requestId = UUID.randomUUID();
     }
 
@@ -34,8 +33,8 @@ public class CommandRequest
     }
 
 
-    public ContainerHost getHost()
+    public UUID getHostId()
     {
-        return host;
+        return hostId;
     }
 }

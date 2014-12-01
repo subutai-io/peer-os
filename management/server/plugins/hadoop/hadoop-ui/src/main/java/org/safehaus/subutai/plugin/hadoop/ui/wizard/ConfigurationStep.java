@@ -8,10 +8,8 @@ package org.safehaus.subutai.plugin.hadoop.ui.wizard;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
@@ -30,12 +28,10 @@ public class ConfigurationStep extends VerticalLayout
 
     private static final int MAX_NUMBER_OF_NODES_PER_SERVER = 5;
     private static final String SUGGESTED_NUMBER_OF_NODES_CAPTION = " (Suggested)";
-    private AgentManager agentManager;
 
 
-    public ConfigurationStep( final Wizard wizard, AgentManager agentManager )
+    public ConfigurationStep( final Wizard wizard, HostRegistry hostRegistry )
     {
-        this.agentManager = agentManager;
         setSizeFull();
         GridLayout content = new GridLayout( 2, 7 );
         content.setSizeFull();
@@ -62,8 +58,9 @@ public class ConfigurationStep extends VerticalLayout
 
         //configuration servers number
         List<String> slaveNodeCountList = new ArrayList<String>();
-        Set<Agent> agents = agentManager.getPhysicalAgents();
-        int connected_fai_count = agents.size() - 1;
+        //TODO please do not count only local resource hosts since environments can span multiple peers
+        //remove host registry usage once this fix is applied
+        int connected_fai_count = hostRegistry.getResourceHostsInfo().size() - 1;
         for ( int i = 1; i <= ( connected_fai_count ) * MAX_NUMBER_OF_NODES_PER_SERVER; i++ )
         {
             if ( i == connected_fai_count )

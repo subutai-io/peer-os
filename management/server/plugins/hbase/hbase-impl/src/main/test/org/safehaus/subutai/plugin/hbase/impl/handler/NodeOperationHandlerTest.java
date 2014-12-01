@@ -89,7 +89,7 @@ public class NodeOperationHandlerTest {
         when(containerHost.execute(requestBuilder)).thenReturn(commandResult);
         when(commandResult.hasSucceeded()).thenReturn(true);
         when(commandResult.getStdOut()).thenReturn("test");
-        when(commands.getInstallCommand()).thenReturn(requestBuilder);
+//        when(commands.getInstallCommand()).thenReturn(requestBuilder);
         when(hBaseImpl.getPluginDAO()).thenReturn(pluginDAO);
         when(pluginDAO.saveInfo(anyString(),anyString(),any())).thenReturn(true);
 
@@ -110,7 +110,7 @@ public class NodeOperationHandlerTest {
 //        when(pluginDAO.saveInfo(anyString(),anyString(),any())).thenReturn(true);
 //
 
-        nodeOperationHandler.run();
+//        nodeOperationHandler.run();
 
 //        assertNotNull(environment);
 //        assertNotNull(containerHost);

@@ -15,9 +15,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
@@ -30,13 +28,6 @@ public class RestService
     private static final String OPERATION_ID = "OPERATION_ID";
 
     private Hive hiveManager;
-    private AgentManager agentManager;
-
-
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }
 
 
     public void setHiveManager( Hive hiveManager )
@@ -88,16 +79,16 @@ public class RestService
         config.setClusterName( clusterName );
         config.setHadoopClusterName( hadoopClusterName );
 
-        Agent serverAgent = agentManager.getAgentByHostname( server );
-        // TODO fix here
-        config.setServer( serverAgent.getUuid() );
-
-        for ( String client : clients.split( "," ) )
-        {
-            Agent agent = agentManager.getAgentByHostname( client );
-            // TODO fix here agent uuid
-            config.getClients().add( agent.getUuid() );
-        }
+        // TODO fix here please do not use agentManager, try to pass number of nodes to create instead of specific
+        // containers
+        //        Agent serverAgent = agentManager.getAgentByHostname( server );
+        //        config.setServer( serverAgent.getUuid() );
+        //
+        //        for ( String client : clients.split( "," ) )
+        //        {
+        //            Agent agent = agentManager.getAgentByHostname( client );
+        //            config.getClients().add( agent.getUuid() );
+        //        }
 
         UUID uuid = hiveManager.installCluster( config );
 

@@ -27,7 +27,7 @@ public class Commands
     public RequestBuilder getRemoveN2NConnectionCommand( String interfaceName, String communityName )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-R", communityName, interfaceName ) );
+                .withCmdArgs( Lists.newArrayList( "-R", interfaceName, communityName ) );
     }
 
 

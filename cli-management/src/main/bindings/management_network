@@ -32,7 +32,7 @@ Usage:   List opened n2n Tunnels
         "subutai \[-qh\] management_network -L
 
 Usage:   Remove a n2n Tunnel                 
-        "subutai \[-qh\] management_network -R COMMUNITYNAME INTERFACENAME
+        "subutai \[-qh\] management_network -R INTERFACENAME COMMUNITYNAME
 ******************************************************************************
 Usage:   Create a gateway tap device                 
         "subutai \[-qh\] management_network -T VLANIP/SUBNET VLANID
@@ -392,7 +392,7 @@ function management_network {
    fi
 
    if [ "true" == "$removeN2NTunnel" ]; then
-     kill -9 `ps aux | grep -e "-c $1" | grep -e "-d $2" | grep -v "\-\-color" | awk -F" " '{print $2}'` > /dev/null 2>&1
+     kill -9 `ps aux | grep -e "-c $2" | grep -e "-d $1" | grep -v "\-\-color" | awk -F" " '{print $2}'` > /dev/null 2>&1
      if [ "$?" != "0" ]; then
        msg_error "Removing Tunnel Failed!"
        show_usage "`management_network_usage`"

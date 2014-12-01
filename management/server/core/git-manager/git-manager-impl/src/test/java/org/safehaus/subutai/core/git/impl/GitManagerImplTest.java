@@ -19,6 +19,7 @@ import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitFileStatus;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -500,7 +501,7 @@ public class GitManagerImplTest extends SystemOutRedirectTest
     @Test( expected = GitException.class )
     public void testGetManagementHost() throws Exception
     {
-        doThrow( new PeerException( "" ) ).when( localPeer ).getManagementHost();
+        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getManagementHost();
 
         gitManager.getManagementHost();
     }
