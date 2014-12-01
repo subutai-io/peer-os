@@ -1,8 +1,7 @@
 package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
-import java.util.Set;
-
+import com.google.common.base.Preconditions;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
@@ -24,7 +23,7 @@ import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
+import java.util.Set;
 
 
 public class ClusterOperationHandler extends AbstractOperationHandler<SharkImpl, SharkClusterConfig>
@@ -138,6 +137,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SharkImpl,
     @Override
     public void setupCluster()
     {
+
         try
         {
             if ( config.getSetupType() == SetupType.WITH_HADOOP_SPARK )
@@ -180,14 +180,14 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SharkImpl,
                             String.format( "Could not find environment of Spark cluster by id %s",
                                     sparkConfig.getEnvironmentId() ) );
                 }
+
             }
-
             //setup Shark cluster
-            ClusterSetupStrategy s = manager.getClusterSetupStrategy( trackerOperation, config, environment );
+            ClusterSetupStrategy s = manager.getClusterSetupStrategy( trackerOperation, config, environment);
 
-            trackerOperation.addLog( "Installing cluster..." );
+            trackerOperation.addLog("Installing cluster...");
             s.setup();
-            trackerOperation.addLogDone( "Installing cluster completed" );
+            trackerOperation.addLogDone("Installing cluster completed");
         }
         catch ( EnvironmentBuildException | ClusterSetupException e )
         {
