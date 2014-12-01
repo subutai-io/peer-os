@@ -30,7 +30,7 @@ public interface ContainerHost extends Host
 
     void setTemplateArch( String templateArch );
 
-    public ContainerHostState getState();
+    public ContainerHostState getState() throws PeerException;
 
     //    public void setParent( ResourceHost resourceHost );
 
@@ -42,7 +42,9 @@ public interface ContainerHost extends Host
 
     void dispose() throws PeerException;
 
-    Peer getPeer() throws PeerException;
+    Peer getPeer();
+
+    void setPeer( Peer peer );
 
     Template getTemplate() throws PeerException;
 

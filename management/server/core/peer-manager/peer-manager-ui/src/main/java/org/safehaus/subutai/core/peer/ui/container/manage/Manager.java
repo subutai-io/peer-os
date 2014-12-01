@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -437,7 +438,16 @@ public class Manager extends VerticalLayout
                 String containerCpu = "Cpu Shares";
                 final TextField containerCpuTextField = new TextField();
                 final String lxcHostname = containerHost.getHostname();
-                if ( ContainerState.RUNNING.equals( containerHost.getState() ) )
+                ContainerHostState state = null;
+                try
+                {
+                    state = containerHost.getState();
+                }
+                catch ( PeerException e )
+                {
+                    state = ContainerHostState.STOPPED;
+                }
+                if ( ContainerState.RUNNING.equals( state ) )
                 {
                     containerStatus.setValue( "RUNNING" );
                     LOG.info( "This is quota manager: " + quotaManager.toString() );
@@ -503,7 +513,7 @@ public class Manager extends VerticalLayout
                         show( pe.toString() );
                     }
                 }
-                else if ( ContainerState.STOPPED.equals( containerHost.getState() ) )
+                else if ( ContainerState.STOPPED.equals( state ) )
                 {
                     containerStatus.setValue( "STOPPED" );
                 }

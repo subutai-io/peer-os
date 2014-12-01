@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
+  <reference id="entityManagerFactory1" interface="javax.persistence.EntityManagerFactory"
+             filter="(osgi.unit.name=envManagerUnit)" />
+
   <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
     <property name="URL" value="jdbc:h2:~/environment_manager" />
     <property name="user" value="sa" />
@@ -25,6 +28,7 @@
     <property name="securityManager" ref="securityManager" />
     <property name="tracker" ref="tracker" />
     <property name="peerManager" ref="peerManager" />
+    <property name="entityManagerFactory" ref="entityManagerFactory1" />
     <argument ref="dataSource" />
   </bean>
 

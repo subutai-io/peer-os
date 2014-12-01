@@ -162,8 +162,6 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
 
             for ( ContainerHost ec : environment.getContainers() )
             {
-                //TODO: remove next line when persistent API is JPA
-                ec.setEnvironmentId( environment.getId().toString() );
                 String peerId = ec.getPeerId().toString();
                 String itemId = peerId + ":" + ec.getId();
 

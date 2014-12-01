@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.impl.dao;
+package org.safehaus.subutai.core.environment.impl.dao;
 
 
 import java.util.Collection;
@@ -7,20 +7,20 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
-import org.safehaus.subutai.core.peer.impl.model.ResourceHostEntity;
+import org.safehaus.subutai.core.environment.impl.EnvironmentContainerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
 
-public class ResourceHostDataService implements DataService<String, ResourceHostEntity>
+public class EnvironmentContainerDataService implements DataService<String, EnvironmentContainerImpl>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ResourceHostDataService.class );
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentContainerDataService.class );
     EntityManagerFactory emf;
 
 
-    public ResourceHostDataService( EntityManagerFactory entityManagerFactory )
+    public EnvironmentContainerDataService( EntityManagerFactory entityManagerFactory )
     {
         this.emf = entityManagerFactory;
     }
@@ -33,14 +33,14 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
 
 
     @Override
-    public ResourceHostEntity find( final String id )
+    public EnvironmentContainerImpl find( final String id )
     {
-        ResourceHostEntity result = null;
+        EnvironmentContainerImpl result = null;
         EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
-            result = em.find( ResourceHostEntity.class, id );
+            result = em.find( EnvironmentContainerImpl.class, id );
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -60,14 +60,15 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
 
 
     @Override
-    public Collection<ResourceHostEntity> getAll()
+    public Collection<EnvironmentContainerImpl> getAll()
     {
-        Collection<ResourceHostEntity> result = Lists.newArrayList();
+        Collection<EnvironmentContainerImpl> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery( "select h from ResourceHostEntity h", ResourceHostEntity.class ).getResultList();
+            result = em.createQuery( "select h from EnvironmentContainerImpl h", EnvironmentContainerImpl.class )
+                       .getResultList();
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -87,7 +88,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
 
 
     @Override
-    public void persist( final ResourceHostEntity item )
+    public void persist( final EnvironmentContainerImpl item )
     {
         EntityManager em = emf.createEntityManager();
         try
@@ -119,7 +120,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
         try
         {
             em.getTransaction().begin();
-            ResourceHostEntity item = em.find( ResourceHostEntity.class, id );
+            EnvironmentContainerImpl item = em.find( EnvironmentContainerImpl.class, id );
             em.remove( item );
             em.getTransaction().commit();
         }
@@ -139,7 +140,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
 
 
     @Override
-    public void update( final ResourceHostEntity item )
+    public void update( final EnvironmentContainerImpl item )
     {
         EntityManager em = emf.createEntityManager();
         try

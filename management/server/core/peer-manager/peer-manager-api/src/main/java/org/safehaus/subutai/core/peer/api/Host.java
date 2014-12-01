@@ -11,7 +11,9 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.Interface;
 
 
 /**
@@ -19,7 +21,15 @@ import org.safehaus.subutai.core.hostregistry.api.HostInfo;
  */
 public interface Host extends Serializable
 {
-    public Agent getAgent();
+
+    public Peer getPeer();
+
+    public void setPeer( Peer peer );
+
+    @Deprecated
+    /**
+     * Please use other properties of Host interface
+     */ public Agent getAgent();
 
     @Deprecated
     public Agent getParentAgent();
@@ -62,4 +72,8 @@ public interface Host extends Serializable
     void addIpHostToEtcHosts( String domainName, Set<Host> others, String mask ) throws SubutaiException;
 
     void init();
+
+    public Set<Interface> getNetInterfaces() throws PeerException;
+
+    public HostArchitecture getHostArchitecture();
 }

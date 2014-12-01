@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
@@ -36,8 +35,6 @@ public class LocalPeerImplTest
     DataSource dataSource;
     @Mock
     Messenger messenger;
-    @Mock
-    AgentManager agentManager;
 
     @Mock
     TemplateRegistry templateRegistry;

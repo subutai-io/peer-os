@@ -40,12 +40,12 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>command-dispatcher-api</artifactId>
     </dependency>-->
-
+    <!--
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
     </dependency>
-
+    -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>host-registry-api</artifactId>

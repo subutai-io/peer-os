@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
@@ -41,6 +43,7 @@ import org.safehaus.subutai.core.environment.impl.builder.NodeGroup2PeerBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.NodeGroup2PeerGroupBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.ProcessBuilderException;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
+import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDataService;
 import org.safehaus.subutai.core.environment.impl.environment.BuildException;
 import org.safehaus.subutai.core.environment.impl.environment.DestroyException;
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentBuilder;
@@ -71,7 +74,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class.getName() );
-    private static final String ENVIRONMENT = "ENVIRONMENT";
+    //    private static final String ENVIRONMENT = "ENVIRONMENT";
     private static final String PROCESS = "PROCESS";
     private static final String BLUEPRINT = "BLUEPRINT";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -82,6 +85,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private SecurityManager securityManager;
     private Tracker tracker;
     private DataSource dataSource;
+    private EntityManagerFactory entityManagerFactory;
+    private EnvironmentDataService environmentDataService;
 
 
     public EnvironmentManagerImpl( final DataSource dataSource ) throws SQLException
@@ -100,6 +105,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
         this.templateRegistry = templateRegistry;
+    }
+
+
+    public EntityManagerFactory getEntityManagerFactory()
+    {
+        return entityManagerFactory;
+    }
+
+
+    public void setEntityManagerFactory( final EntityManagerFactory entityManagerFactory )
+    {
+        this.entityManagerFactory = entityManagerFactory;
     }
 
 
@@ -137,6 +154,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             LOG.error( e.getMessage(), e );
         }
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        LOG.info( entityManager.toString() );
+        environmentDataService = new EnvironmentDataService( entityManagerFactory );
+        LOG.info( environmentDataService.getAll().toString() );
     }
 
 
@@ -189,14 +210,30 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public List<Environment> getEnvironments()
     {
-        return environmentDAO.getInfo( ENVIRONMENT, Environment.class );
+        List<Environment> result = new ArrayList<>();
+        result.addAll( environmentDataService.getAll() );
+        for ( Environment environment : result )
+        {
+            for ( ContainerHost containerHost : environment.getContainers() )
+            {
+                containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
+            }
+        }
+        return result;
+        //        return environmentDAO.getInfo( ENVIRONMENT, Environment.class );
     }
 
 
     @Override
     public Environment getEnvironment( final String uuid )
     {
-        return environmentDAO.getInfo( ENVIRONMENT, uuid, Environment.class );
+        Environment result = environmentDataService.find( uuid );
+        for ( ContainerHost containerHost : result.getContainers() )
+        {
+            containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
+        }
+        return result;
+        //        return environmentDAO.getInfo( ENVIRONMENT, uuid, Environment.class );
     }
 
 
@@ -208,7 +245,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             destroyer.destroy( environment );
-            environmentDAO.deleteInfo( ENVIRONMENT, environment.getId().toString() );
+            environmentDataService.remove( environmentId.toString() );
+            //            environmentDAO.deleteInfo( ENVIRONMENT, environment.getId().toString() );
         }
         catch ( DestroyException e )
         {
@@ -284,15 +322,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public void saveEnvironment( final Environment environment ) throws EnvironmentManagerException
     {
-        try
-        {
-            environmentDAO.saveInfo( ENVIRONMENT, environment.getId().toString(), environment );
-        }
-        catch ( EnvironmentPersistenceException e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new EnvironmentManagerException( e.getMessage() );
-        }
+        environmentDataService.persist( ( EnvironmentImpl ) environment );
+        //        try
+        //        {
+        //            environmentDAO.saveInfo( ENVIRONMENT, environment.getId().toString(), environment );
+        //        }
+        //        catch ( EnvironmentPersistenceException e )
+        //        {
+        //            LOG.error( e.getMessage(), e );
+        //            throw new EnvironmentManagerException( e.getMessage() );
+        //        }
     }
 
 
@@ -397,7 +436,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public Environment getEnvironmentByUUID( final UUID environmentId )
     {
-        return environmentDAO.getInfo( ENVIRONMENT, environmentId.toString(), Environment.class );
+        Environment result = environmentDataService.find( environmentId.toString() );
+        for ( ContainerHost containerHost : result.getContainers() )
+        {
+            containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
+        }
+        return result;
+        //        return environmentDAO.getInfo( ENVIRONMENT, environmentId.toString(), Environment.class );
     }
 
 
