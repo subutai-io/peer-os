@@ -173,11 +173,6 @@
       <artifactId>subutai-common</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>agent-manager-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
     <!-- Vaadin dependencies -->
     <dependency>
       <groupId>com.vaadin</groupId>
