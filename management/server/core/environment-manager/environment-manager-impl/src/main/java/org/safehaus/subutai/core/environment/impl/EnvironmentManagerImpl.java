@@ -8,11 +8,11 @@ package org.safehaus.subutai.core.environment.impl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
@@ -41,6 +41,7 @@ import org.safehaus.subutai.core.environment.impl.builder.NodeGroup2PeerBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.NodeGroup2PeerGroupBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.ProcessBuilderException;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
+import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDataService;
 import org.safehaus.subutai.core.environment.impl.environment.BuildException;
 import org.safehaus.subutai.core.environment.impl.environment.DestroyException;
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentBuilder;
@@ -48,6 +49,7 @@ import org.safehaus.subutai.core.environment.impl.environment.EnvironmentBuilder
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentDestroyer;
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentDestroyerImpl;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -71,7 +73,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class.getName() );
-    private static final String ENVIRONMENT = "ENVIRONMENT";
+    //    private static final String ENVIRONMENT = "ENVIRONMENT";
     private static final String PROCESS = "PROCESS";
     private static final String BLUEPRINT = "BLUEPRINT";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -82,6 +84,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private SecurityManager securityManager;
     private Tracker tracker;
     private DataSource dataSource;
+    private EntityManagerFactory entityManagerFactory;
+    private EnvironmentDataService environmentDataService;
 
 
     public EnvironmentManagerImpl( final DataSource dataSource ) throws SQLException
@@ -100,6 +104,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
         this.templateRegistry = templateRegistry;
+    }
+
+
+    public EntityManagerFactory getEntityManagerFactory()
+    {
+        return entityManagerFactory;
+    }
+
+
+    public void setEntityManagerFactory( final EntityManagerFactory entityManagerFactory )
+    {
+        this.entityManagerFactory = entityManagerFactory;
     }
 
 
@@ -137,6 +153,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             LOG.error( e.getMessage(), e );
         }
+        entityManagerFactory.createEntityManager();
+        environmentDataService = new EnvironmentDataService( entityManagerFactory );
     }
 
 
@@ -189,14 +207,29 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public List<Environment> getEnvironments()
     {
-        return environmentDAO.getInfo( ENVIRONMENT, Environment.class );
+        List<Environment> result = new ArrayList<>();
+        result.addAll( environmentDataService.getAll() );
+        for ( Environment environment : result )
+        {
+            for ( ContainerHost containerHost : environment.getContainers() )
+            {
+                containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
+            }
+        }
+        return result;
     }
 
 
     @Override
     public Environment getEnvironment( final String uuid )
     {
-        return environmentDAO.getInfo( ENVIRONMENT, uuid, Environment.class );
+        Environment result = environmentDataService.find( uuid );
+        for ( ContainerHost containerHost : result.getContainers() )
+        {
+            containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
+        }
+        return result;
+        //        return environmentDAO.getInfo( ENVIRONMENT, uuid, Environment.class );
     }
 
 
@@ -208,7 +241,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             destroyer.destroy( environment );
-            environmentDAO.deleteInfo( ENVIRONMENT, environment.getId().toString() );
+            environmentDataService.remove( environmentId.toString() );
         }
         catch ( DestroyException e )
         {
@@ -284,14 +317,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public void saveEnvironment( final Environment environment ) throws EnvironmentManagerException
     {
-        try
+
+        if ( environmentDataService.find( environment.getId().toString() ) == null )
         {
-            environmentDAO.saveInfo( ENVIRONMENT, environment.getId().toString(), environment );
+            environmentDataService.persist( ( EnvironmentImpl ) environment );
         }
-        catch ( EnvironmentPersistenceException e )
+        else
         {
-            LOG.error( e.getMessage(), e );
-            throw new EnvironmentManagerException( e.getMessage() );
+            environmentDataService.update( ( EnvironmentImpl ) environment );
         }
     }
 
@@ -397,7 +430,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public Environment getEnvironmentByUUID( final UUID environmentId )
     {
-        return environmentDAO.getInfo( ENVIRONMENT, environmentId.toString(), Environment.class );
+        Environment result = environmentDataService.find( environmentId.toString() );
+        for ( ContainerHost containerHost : result.getContainers() )
+        {
+            containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
+        }
+        return result;
+        //        return environmentDAO.getInfo( ENVIRONMENT, environmentId.toString(), Environment.class );
     }
 
 
@@ -488,16 +527,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         try
         {
-            Set<ContainerHost> containers = peerManager.getPeer( peer.getId() ).
-                    createContainers( peerId, environment.getId(), templatesData, nodeGroup.getNumberOfNodes(),
+            Set<HostInfoModel> hostInfoModels = peerManager.getPeer( peer.getId() ).
+                    scheduleCloneContainers( peerId, templatesData, nodeGroup.getNumberOfNodes(),
                             nodeGroup.getPlacementStrategy().getStrategyId(),
-                            nodeGroup.getPlacementStrategy().getCriteriaAsList(), nodeGroup.getName() );
-            if ( !containers.isEmpty() )
+                            nodeGroup.getPlacementStrategy().getCriteriaAsList() );
+            if ( !hostInfoModels.isEmpty() )
             {
-                for ( ContainerHost container : containers )
+                for ( HostInfoModel hostInfoModel : hostInfoModels )
                 {
-                    container.setNodeGroupName( nodeGroup.getName() );
-                    environment.addContainer( container );
+                    EnvironmentContainerImpl environmentContainer =
+                            new EnvironmentContainerImpl( peer.getId(), nodeGroup.getName(), hostInfoModel );
+                    environment.addContainer( environmentContainer );
                 }
             }
             else
@@ -526,17 +566,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
 
             List<Template> templates = builder.fetchRequiredTemplates( peer.getId(), template );
-            Set<ContainerHost> hosts = peerManager.getPeer( peer.getId() )
-                                                  .createContainers( peerManager.getLocalPeer().getId(), environmentId,
+
+            Set<HostInfoModel> hosts = peerManager.getPeer( peer.getId() )
+                                                  .scheduleCloneContainers( peerManager.getLocalPeer().getId(),
                                                           templates, 1, strategy.getStrategyId(),
-                                                          strategy.getCriteriaAsList(), nodeGroupName );
+                                                          strategy.getCriteriaAsList() );
+
             if ( hosts.isEmpty() )
             {
                 throw new EnvironmentManagerException( "Containers not created" );
             }
             else
             {
-                ContainerHost newHost = ( ContainerHost ) Arrays.asList( hosts ).get( 0 );
+                EnvironmentContainerImpl newHost =
+                        new EnvironmentContainerImpl( peer.getId(), nodeGroupName, hosts.iterator().next() );
                 Environment environment = getEnvironmentByUUID( environmentId );
                 environment.addContainer( newHost );
                 saveEnvironment( environment );

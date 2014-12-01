@@ -293,6 +293,13 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
+    public Peer getPeer( final String peerId )
+    {
+        return getPeer( UUID.fromString( peerId ) );
+    }
+
+
+    @Override
     public LocalPeer getLocalPeer()
     {
         return localPeer;

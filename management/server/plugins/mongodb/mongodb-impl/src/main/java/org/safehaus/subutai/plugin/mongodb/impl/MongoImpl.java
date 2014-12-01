@@ -6,7 +6,6 @@
 package org.safehaus.subutai.plugin.mongodb.impl;
 
 
-import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +21,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.common.util.GsonInterfaceAdapter;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -49,13 +49,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 
 
 /**
@@ -148,9 +141,11 @@ public class MongoImpl implements Mongo
         {
 
             GsonBuilder gsonBuilder = new GsonBuilder();
-            gsonBuilder.registerTypeAdapter( MongoDataNode.class, new InterfaceAdapter<MongoDataNode>() ).create();
-            gsonBuilder.registerTypeAdapter( MongoConfigNode.class, new InterfaceAdapter<MongoConfigNode>() ).create();
-            gsonBuilder.registerTypeAdapter( MongoRouterNode.class, new InterfaceAdapter<MongoRouterNode>() ).create();
+            gsonBuilder.registerTypeAdapter( MongoDataNode.class, new GsonInterfaceAdapter<MongoDataNode>() ).create();
+            gsonBuilder.registerTypeAdapter( MongoConfigNode.class, new GsonInterfaceAdapter<MongoConfigNode>() )
+                       .create();
+            gsonBuilder.registerTypeAdapter( MongoRouterNode.class, new GsonInterfaceAdapter<MongoRouterNode>() )
+                       .create();
 
             this.pluginDAO = new PluginDAO( dataSource, gsonBuilder );
         }
@@ -352,53 +347,5 @@ public class MongoImpl implements Mongo
     public MongoClusterConfig newMongoClusterConfigInstance()
     {
         return new MongoClusterConfigImpl();
-    }
-
-
-    class InterfaceAdapter<T> implements JsonSerializer<T>, JsonDeserializer<T>
-    {
-        public JsonElement serialize( T object, Type interfaceType, JsonSerializationContext context )
-        {
-            final JsonObject wrapper = new JsonObject();
-            wrapper.addProperty( "type", object.getClass().getName() );
-            wrapper.add( "data", context.serialize( object ) );
-            return wrapper;
-        }
-
-
-        public T deserialize( JsonElement elem, Type interfaceType, JsonDeserializationContext context )
-                throws JsonParseException
-        {
-            final JsonObject wrapper = ( JsonObject ) elem;
-            final JsonElement typeName = get( wrapper, "type" );
-            final JsonElement data = get( wrapper, "data" );
-            final Type actualType = typeForName( typeName );
-            return context.deserialize( data, actualType );
-        }
-
-
-        private Type typeForName( final JsonElement typeElem )
-        {
-            try
-            {
-                return Class.forName( typeElem.getAsString() );
-            }
-            catch ( ClassNotFoundException e )
-            {
-                throw new JsonParseException( e );
-            }
-        }
-
-
-        private JsonElement get( final JsonObject wrapper, String memberName )
-        {
-            final JsonElement elem = wrapper.get( memberName );
-            if ( elem == null )
-            {
-                throw new JsonParseException(
-                        "no '" + memberName + "' member found in what was expected to be an interface wrapper" );
-            }
-            return elem;
-        }
     }
 }

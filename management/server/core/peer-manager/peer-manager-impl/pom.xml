@@ -46,6 +46,10 @@
       <artifactId>host-registry-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>host-registry-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-frontend-jaxrs</artifactId>
     </dependency>
@@ -67,6 +71,7 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
     </dependency>
+    <!--
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-jta_1.1_spec</artifactId>
@@ -80,7 +85,6 @@
     <dependency>
       <groupId>org.apache.openjpa</groupId>
       <artifactId>openjpa</artifactId>
-      <!-- set the version to be the same as the level in your runtime -->
       <version>2.3.0</version>
     </dependency>
 
@@ -89,6 +93,7 @@
       <artifactId>h2</artifactId>
       <version>1.4.181</version>
     </dependency>
+    -->
   </dependencies>
 
   <build>

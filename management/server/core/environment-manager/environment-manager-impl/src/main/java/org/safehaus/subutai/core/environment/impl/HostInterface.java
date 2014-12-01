@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.impl.model;
+package org.safehaus.subutai.core.environment.impl;
 
 
 import java.io.Serializable;
@@ -34,7 +34,7 @@ public class HostInterface implements Interface, Serializable
 
     @ManyToOne
     @JoinColumn( name = "host_id" )
-    private AbstractSubutaiHost host;
+    private EnvironmentContainerImpl host;
 
 
     private HostInterface()
@@ -101,13 +101,13 @@ public class HostInterface implements Interface, Serializable
     }
 
 
-    public AbstractSubutaiHost getHost()
+    public EnvironmentContainerImpl getHost()
     {
         return host;
     }
 
 
-    public void setHost( final AbstractSubutaiHost host )
+    public void setHost( final EnvironmentContainerImpl host )
     {
         this.host = host;
     }

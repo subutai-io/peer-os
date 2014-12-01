@@ -3,7 +3,6 @@ package org.safehaus.subutai.core.peer.impl.model;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -31,7 +30,7 @@ import org.safehaus.subutai.core.peer.api.ResourceHost;
 @Access( AccessType.FIELD )
 public class ContainerHostEntity extends AbstractSubutaiHost implements ContainerHost
 {
-    @ManyToOne( targetEntity = ResourceHostEntity.class, cascade = CascadeType.ALL )
+    @ManyToOne( targetEntity = ResourceHostEntity.class )
     @JoinColumn( name = "parent_id" )
     private ResourceHost parent;
 
@@ -43,6 +42,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     private String templateName = "UNKNOWN";
     @Column( name = "template_arch", nullable = false )
     private String templateArch = "UNKNOWN";
+
     @Transient
     private volatile ContainerHostState state = ContainerHostState.STOPPED;
     @Column( name = "node_group_name", nullable = false )
