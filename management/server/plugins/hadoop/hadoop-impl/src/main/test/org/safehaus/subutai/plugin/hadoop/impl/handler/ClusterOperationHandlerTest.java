@@ -29,7 +29,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class ClusterOperationHandlerTest {
+public class ClusterOperationHandlerTest
+{
     ClusterOperationHandler clusterOperationHandler;
     ClusterOperationHandler clusterOperationHandler1;
     ClusterOperationHandler clusterOperationHandler2;
@@ -47,7 +48,8 @@ public class ClusterOperationHandlerTest {
     CommandResult commandResult;
 
     @Before
-    public void setUp() throws ClusterSetupException, EnvironmentBuildException {
+    public void setUp() throws ClusterSetupException, EnvironmentBuildException
+    {
         containerHost = mock(ContainerHost.class);
         containerHost2 = mock(ContainerHost.class);
         Set<ContainerHost> mySet = mock(Set.class);
@@ -71,37 +73,46 @@ public class ClusterOperationHandlerTest {
         when(environmentManager.getEnvironmentByUUID(uuid)).thenReturn(environment);
         when(environment.getContainerHostByUUID(uuid)).thenReturn(containerHost);
 
-        when(environmentManager.buildEnvironment(hadoop.getDefaultEnvironmentBlueprint(hadoopClusterConfig))).thenReturn(environment);
+        when(environmentManager.buildEnvironment(hadoop.getDefaultEnvironmentBlueprint(hadoopClusterConfig)))
+                .thenReturn(environment);
         when(hadoopClusterConfig.getNameNode()).thenReturn(uuid);
 
         when(hadoopClusterConfig.getClusterName()).thenReturn("test");
 
-        clusterOperationHandler = new ClusterOperationHandler(hadoop,hadoopClusterConfig,ClusterOperationType.INSTALL,NodeType.NAMENODE);
-        clusterOperationHandler1 = new ClusterOperationHandler(hadoop,hadoopClusterConfig,ClusterOperationType.UNINSTALL,NodeType.JOBTRACKER);
-        clusterOperationHandler2 = new ClusterOperationHandler(hadoop,hadoopClusterConfig,ClusterOperationType.STATUS_ALL,NodeType.SECONDARY_NAMENODE);
-        clusterOperationHandler3 = new ClusterOperationHandler(hadoop,hadoopClusterConfig,ClusterOperationType.DECOMISSION_STATUS,NodeType.MASTER_NODE);
+        clusterOperationHandler = new ClusterOperationHandler(hadoop, hadoopClusterConfig, ClusterOperationType
+                .INSTALL, NodeType.NAMENODE);
+        clusterOperationHandler1 = new ClusterOperationHandler(hadoop, hadoopClusterConfig, ClusterOperationType
+                .UNINSTALL, NodeType.JOBTRACKER);
+        clusterOperationHandler2 = new ClusterOperationHandler(hadoop, hadoopClusterConfig, ClusterOperationType
+                .STATUS_ALL, NodeType.SECONDARY_NAMENODE);
+        clusterOperationHandler3 = new ClusterOperationHandler(hadoop, hadoopClusterConfig, ClusterOperationType
+                .DECOMISSION_STATUS, NodeType.MASTER_NODE);
     }
 
     @Test
-    public void testRunWithClusterOperationTypeInstallCluster() {
+    public void testRunWithClusterOperationTypeInstallCluster()
+    {
         when(hadoopClusterConfig.getClusterName()).thenReturn("test");
         when(hadoop.getCluster("test")).thenReturn(hadoopClusterConfig);
         clusterOperationHandler.run();
     }
 
     @Test
-    public void testRunClusterOperationTypeInstall() {
+    public void testRunClusterOperationTypeInstall()
+    {
         when(hadoopClusterConfig.getClusterName()).thenReturn(null);
         clusterOperationHandler.run();
     }
 
     @Test
-    public void testRunClusterOperationTypeUninstall() {
+    public void testRunClusterOperationTypeUninstall()
+    {
         clusterOperationHandler1.run();
     }
 
     @Test
-    public void testRunOperationOnContainers() throws CommandException {
+    public void testRunOperationOnContainers() throws CommandException
+    {
         when(hadoopClusterConfig.getEnvironmentId()).thenReturn(uuid);
         when(hadoopClusterConfig.getNameNode()).thenReturn(uuid);
         when(hadoopClusterConfig.getJobTracker()).thenReturn(uuid);
@@ -142,7 +153,8 @@ public class ClusterOperationHandlerTest {
     }
 
     @Test
-    public void testLogStatusResultsWithNodeTypeNONAME() {
+    public void testLogStatusResultsWithNodeTypeNONAME()
+    {
         when(commandResult.getStdOut()).thenReturn("NameNode");
         clusterOperationHandler.logStatusResults(trackerOperation, commandResult, NodeType.NAMENODE);
 
@@ -150,25 +162,28 @@ public class ClusterOperationHandlerTest {
     }
 
     @Test
-    public void testLogStatusResultsWithNodeTypeJOBTRACKER() {
+    public void testLogStatusResultsWithNodeTypeJOBTRACKER()
+    {
         CommandResult commandResult = mock(CommandResult.class);
         when(commandResult.getStdOut()).thenReturn("JobTracker");
-        clusterOperationHandler.logStatusResults(trackerOperation,commandResult,NodeType.JOBTRACKER);
-
-        verify(trackerOperation).addLogDone(String.format( "Node state is %s", NodeState.RUNNING));
-    }
-
-    @Test
-    public void testLogStatusResultsWithNodeTypeSECONDARY_NAMENODE() {
-        CommandResult commandResult = mock(CommandResult.class);
-        when(commandResult.getStdOut()).thenReturn("SecondaryNameNode");
-        clusterOperationHandler.logStatusResults(trackerOperation,commandResult,NodeType.SECONDARY_NAMENODE);
+        clusterOperationHandler.logStatusResults(trackerOperation, commandResult, NodeType.JOBTRACKER);
 
         verify(trackerOperation).addLogDone(String.format("Node state is %s", NodeState.RUNNING));
     }
 
     @Test
-    public void testLogStatusResultsWithNodeTypeDATANODE() {
+    public void testLogStatusResultsWithNodeTypeSECONDARY_NAMENODE()
+    {
+        CommandResult commandResult = mock(CommandResult.class);
+        when(commandResult.getStdOut()).thenReturn("SecondaryNameNode");
+        clusterOperationHandler.logStatusResults(trackerOperation, commandResult, NodeType.SECONDARY_NAMENODE);
+
+        verify(trackerOperation).addLogDone(String.format("Node state is %s", NodeState.RUNNING));
+    }
+
+    @Test
+    public void testLogStatusResultsWithNodeTypeDATANODE()
+    {
         CommandResult commandResult = mock(CommandResult.class);
         when(commandResult.getStdOut()).thenReturn("DataNode");
         clusterOperationHandler.logStatusResults(trackerOperation, commandResult, NodeType.DATANODE);
@@ -177,32 +192,35 @@ public class ClusterOperationHandlerTest {
     }
 
     @Test
-    public void testLogStatusResultsWithNodeTypeTASKTRACKER() {
+    public void testLogStatusResultsWithNodeTypeTASKTRACKER()
+    {
         CommandResult commandResult = mock(CommandResult.class);
         when(commandResult.getStdOut()).thenReturn("TaskTracker");
-        clusterOperationHandler.logStatusResults(trackerOperation,commandResult,NodeType.TASKTRACKER);
+        clusterOperationHandler.logStatusResults(trackerOperation, commandResult, NodeType.TASKTRACKER);
 
-        verify(trackerOperation).addLogDone(String.format( "Node state is %s", NodeState.RUNNING));
+        verify(trackerOperation).addLogDone(String.format("Node state is %s", NodeState.RUNNING));
     }
 
     @Test
-    public void testLogStatusResultsWithNodeTypeSLAVE_NODE() {
+    public void testLogStatusResultsWithNodeTypeSLAVE_NODE()
+    {
         CommandResult commandResult = mock(CommandResult.class);
-        clusterOperationHandler.logStatusResults(trackerOperation,commandResult,NodeType.SLAVE_NODE);
+        clusterOperationHandler.logStatusResults(trackerOperation, commandResult, NodeType.SLAVE_NODE);
 
     }
 
     @Test
-    public void testDestroyCluster() {
+    public void testDestroyCluster()
+    {
         PluginDAO pluginDAO = mock(PluginDAO.class);
         when(hadoopClusterConfig.getEnvironmentId()).thenReturn(uuid);
         when(hadoop.getPluginDAO()).thenReturn(pluginDAO);
         when(hadoop.getCluster("test")).thenReturn(hadoopClusterConfig);
         clusterOperationHandler.destroyCluster();
 
-        assertEquals(hadoopClusterConfig,hadoop.getCluster("test"));
-        assertEquals(uuid,hadoopClusterConfig.getEnvironmentId());
+        assertEquals(hadoopClusterConfig, hadoop.getCluster("test"));
+        assertEquals(uuid, hadoopClusterConfig.getEnvironmentId());
         verify(hadoop).getEnvironmentManager();
-   }
+    }
 
 }
