@@ -349,7 +349,8 @@ public abstract class AbstractSubutaiHost implements Host
 
         try
         {
-            execute( new RequestBuilder( appendHosts.toString() ).withTimeout( 30 ) );
+            execute( new RequestBuilder( String.format( "sh -c echo `%s`", appendHosts.toString() ) )
+                    .withTimeout( 30 ) );
         }
         catch ( CommandException e )
         {
