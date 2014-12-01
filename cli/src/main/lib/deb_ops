@@ -49,13 +49,14 @@ function is_dpkg_locked {
 
 function deb_pkg {
   local lxc="$1"
+  local version="$2"
   
   if [ -z "$lxc" ]; then
     msg_error "lxc name not provided. Aborting ..."
     exit 1
   fi
 
-  local debian_package_name=`get_debian_package_name $lxc`
+  local debian_package_name=`get_debian_package_name $lxc $version`
   local debian_dir=$SUBUTAI_TMPDIR/$debian_package_name
   
   # ----------------------------------------------------------------------------
@@ -66,7 +67,7 @@ function deb_pkg {
   # ----------------------------------------------------------------------------
   # (2)  create control file of debian package
   # ----------------------------------------------------------------------------
-  create_control_file $lxc $debian_dir
+  create_control_file $lxc $debian_dir $version
 
   # ----------------------------------------------------------------------------
   # (3) create postinst and postrm script of debian package
@@ -112,6 +113,7 @@ function create_control_file {
   local architecture=`get_architecture`
   local control_file=$debian_dir/DEBIAN/control
   local dependency="subutai-cli (>= $SUBUTAI_VERSION)"
+  local version=$3
   
   # Check if lxc is master. If not, put a dependency to the parent template 
   lxc_assert $lxc "`usage`" > /dev/null
@@ -126,7 +128,11 @@ function create_control_file {
   local Package="$package_name" 
   local Maintainer="subutai"
   local Architecture=$architecture
-  local Version=$SUBUTAI_VERSION
+  if [ ! -z $version ]; then
+    local Version=$version;
+  else
+    local Version=$SUBUTAI_VERSION
+  fi
   local Depends=$dependency
   local Description="This is a Subutai delta image debian package of $lxc template"
 
