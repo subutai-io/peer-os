@@ -98,7 +98,7 @@ public class MonitorImpl implements Monitor
             {
                 peers.add( containerHost.getPeer() );
             }
-            catch ( PeerException e )
+            catch ( Exception e )
             {
                 LOG.error( String.format( "Could not obtain peer for container %s", containerHost.getHostname() ), e );
                 throw new MonitorException( e );
@@ -346,7 +346,7 @@ public class MonitorImpl implements Monitor
 
                 containers.add( containerHost );
             }
-            catch ( PeerException e )
+            catch ( Exception e )
             {
                 LOG.error( String.format( "Could not obtain peer for container %s", containerHost.getHostname() ), e );
                 throw new MonitorException( e );

@@ -12,7 +12,7 @@ public interface DataService<K, T>
 
     void persist( T item );
 
-    void remove( T item );
+    void remove( K id );
 
     void update( T resourceHost );
 }

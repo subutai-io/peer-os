@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.core.peer.api.CloneParam;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostEvent;
@@ -9,14 +11,14 @@ import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
 
 
-public class CloneTask extends HostTask<ResourceHost, CloneParam, CloneResult>
+public class HostCloneTask extends HostTask<ResourceHost, CloneParam, HostCloneResult>
 {
 
 
-    public CloneTask( final String groupId, final ResourceHost resourceHost, final CloneParam parameter )
+    public HostCloneTask( final UUID groupId, final ResourceHost resourceHost, final CloneParam parameter )
     {
         super( groupId, resourceHost, parameter );
-        result = new CloneResult();
+        result = new HostCloneResult();
     }
 
 
@@ -87,7 +89,7 @@ public class CloneTask extends HostTask<ResourceHost, CloneParam, CloneResult>
 
 
     @Override
-    public CloneResult getResult()
+    public HostCloneResult getResult()
     {
         return result;
     }
