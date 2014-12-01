@@ -46,7 +46,6 @@ public class Commands
     }
 
 
-    //TODO use host.getInterfaces
     public RequestBuilder getAddIpHostToEtcHostsCommand( String domainName, Set<ContainerHost> containerHosts )
     {
         StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
