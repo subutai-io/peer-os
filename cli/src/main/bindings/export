@@ -80,7 +80,7 @@ function export {
   local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
 
   if [ -f $debian_file ]; then
-    msg_error "It seems the debian file has already been generated"
+    msg_error "It seems the debian file has already been generated for this version: $version"
     msg_error "Destroy $SUBUTAI_TMPDIR/$container and the peer debian file first"
     unlock_container_write $container
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
@@ -145,7 +145,7 @@ function export {
   cp /var/lib/lxc/$container/fstab  $debian_root
   cp /var/lib/lxc/$container/packages  $debian_root
 
-  pkg=`deb_pkg $container $export`
+  pkg=`deb_pkg $container $version`
   check_status "debian package $pkg generated" "$?"
   
   # Remove debian directory after debian package generation

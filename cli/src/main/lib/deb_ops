@@ -157,7 +157,8 @@ function create_control_file {
 # -----------------------------------------------------------------------------
 function create_preinst_script {
   local lxc=$1
-  local debian_package_name=`get_debian_package_name $lxc`
+  local version=$2
+  local debian_package_name=`get_debian_package_name $lxc $version`
   local debian_dir=$2
   local preinst_file=$debian_dir/DEBIAN/preinst
   local archive_directory=/var/cache/apt/archives/
@@ -222,13 +223,18 @@ function create_prerm_script {
 
 function get_debian_package_name {
   local lxc=$1
+  local version=$2
   if [ -z "$lxc" ]; then
     msg_error "lxc name not provided. Aborting ..."
     exit 1
   fi	
   local package_name=`get_package_name $lxc`
   local architecture=`get_architecture`
-  echo $package_name"_"$SUBUTAI_VERSION"_"$architecture
+  if [ ! -z $version ]; then
+    echo $package_name"_"$version"_"$architecture
+  else
+    echo $package_name"_"$SUBUTAI_VERSION"_"$architecture
+  fi
 }
 
 
