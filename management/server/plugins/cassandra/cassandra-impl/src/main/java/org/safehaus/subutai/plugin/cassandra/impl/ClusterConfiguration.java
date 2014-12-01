@@ -3,10 +3,10 @@ package org.safehaus.subutai.plugin.cassandra.impl;
 
 import java.util.logging.Logger;
 
-import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.AgentUtil;
@@ -30,6 +30,7 @@ public class ClusterConfiguration
     }
 
 
+    //TODO use host.getInterfaces instead of Agents
     public void configureCluster( CassandraClusterConfig config, Environment environment )
             throws ClusterConfigurationException
     {
@@ -77,11 +78,11 @@ public class ClusterConfiguration
                 commandResult = containerHost
                         .execute( new RequestBuilder( String.format( "mkdir -p %s", config.getDataDirectory() ) ) );
                 po.addLog( commandResult.getStdOut() );
-                commandResult = containerHost
-                        .execute( new RequestBuilder( String.format( "mkdir -p %s", config.getCommitLogDirectory() ) ) );
+                commandResult = containerHost.execute(
+                        new RequestBuilder( String.format( "mkdir -p %s", config.getCommitLogDirectory() ) ) );
                 po.addLog( commandResult.getStdOut() );
-                commandResult = containerHost
-                        .execute( new RequestBuilder( String.format( "mkdir -p %s", config.getSavedCachesDirectory() ) ) );
+                commandResult = containerHost.execute(
+                        new RequestBuilder( String.format( "mkdir -p %s", config.getSavedCachesDirectory() ) ) );
                 po.addLog( commandResult.getStdOut() );
 
                 // Configure directories

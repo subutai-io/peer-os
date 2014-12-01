@@ -159,7 +159,7 @@ string SubutaiEnvironment::getAgentArch() {
     utsname info;
     if (uname(&info) != 0) {
         environmentLogger->writeLog(3, environmentLogger->setLogData("<SubutaiAgent>", "Error: Failed to extract machine information"));
-        return "unknown";
+        return "UNKNOWN";
     } else {
         environmentLogger->writeLog(3, environmentLogger->setLogData("<SubutaiAgent>", "Machine architecture:", info.machine));
         return info.machine;
