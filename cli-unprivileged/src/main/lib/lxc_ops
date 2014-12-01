@@ -260,11 +260,12 @@ function lxc_clone {
   # (2) setup skeleton of new cloned child container
   mkdir -p $child_rootfs
   local mac=`lxc_new_mac`
+  #TODO sed failed
   sudo cat $parent_conf | grep -v subutai.template.package 		   \
       | sudo sed                                           		   \
      -e "s/lxc\.utsname.*/lxc\.utsname = $child/"                  \
      -e "s/subutai\.parent.*/subutai\.parent = $parent/"           \
-     -e "s/\/lxc\/$parent\//\/$HOME\/.local/share\/lxc\/$child\//g"      \
+     -e "s|\/var\/lib\/lxc\/$parent\/|${HOME}\/\.local\/share\/lxc\/$child\/|g"\
      -e "s/subutai\.git\.branch.*/subutai\.git\.branch = $child/"  \
      -e "s/lxc\.network\.hwaddr.*/lxc\.network\.hwaddr = $mac/"    \
      -e "s/$parent-/$child-/g" | grep -v subutai.git.uuid >> $child_conf
@@ -276,8 +277,10 @@ function lxc_clone {
   lxc_clone_ds $parent $child opt lxc "$usage"
   lxc_clone_ds $parent $child var lxc-data "$usage"
   lxc_clone_ds $parent $child home lxc-data "$usage"
+  lxc_mapshifting $child
 
   # (4) alter hostname from /etc/hosts and /etc/hostname
+  
   echo $child > $child_rootfs/etc/hostname
   sudo cat $parent_home/rootfs/etc/hosts | sudo sed \
     -e "s/$parent/$child/g" > $child_rootfs/etc/hosts
@@ -310,7 +313,7 @@ function lxc_clone {
   if [ -s "$child_rootfs/etc/subutai-agent/uuid.txt" ]; then
     echo "" > $child_rootfs/etc/subutai-agent/uuid.txt
   fi
-  lxc_mapshifting $child
+   lxc_mapshifting $child
 }
 
 function lxc_mapshifting {
@@ -320,13 +323,18 @@ function lxc_mapshifting {
   uidmapshift -uuidmapshift -u $HOME/.local/share/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
   uidmapshift -uuidmapshift -g $HOME/.local/share/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
 
-  sudo chown -R $USER:$USER $HOME/lxc/$lxc_name
+  sudo chown -R $USER:$USER $HOME/lxc/$lxc_name-opt
   uidmapshift -uuidmapshift -u $HOME/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
   uidmapshift -uuidmapshift -g $HOME/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
 
-  sudo chown -R $USER:$USER $HOME/lxc-data/$lxc_name
-  uidmapshift -uuidmapshift -u $HOME/lxc-data/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
-  uidmapshift -uuidmapshift -g $HOME/lxc-data/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  sudo chown -R $USER:$USER $HOME/lxc-data/$lxc_name-var
+  uidmapshift -uuidmapshift -u $HOME/lxc-data/$lxc_name-var 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  uidmapshift -uuidmapshift -g $HOME/lxc-data/$lxc_name-var 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  
+  sudo chown -R $USER:$USER $HOME/lxc-data/$lxc_name-home
+  uidmapshift -uuidmapshift -u $HOME/lxc-data/$lxc_name-home 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  uidmapshift -uuidmapshift -g $HOME/lxc-data/$lxc_name-home 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+
 
 }
 
@@ -377,7 +385,7 @@ function lxc_copy {
   sudo cat $parent_conf | sudo sed                                           \
      -e "s/lxc\.utsname.*/lxc\.utsname = $child/"                  \
      -e "s/subutai\.parent.*/subutai\.parent = $parent/"           \
-     -e "s/\/lxc\/$parent\//\/$HOME\/.local/share\/lxc\/$child\//g"      \
+     -e "s|\/var\/lib\/lxc\/$parent\/|${HOME}\/\.local\/share\/lxc\/$child\/|g"\
      -e "s/subutai\.git\.branch.*/subutai\.git\.branch = $child/"  \
      -e "s/lxc\.network\.hwaddr.*/lxc\.network\.hwaddr = $mac/"    \
      -e "s/$parent-/$child-/g" | grep -v subutai.git.uuid >> $child_conf

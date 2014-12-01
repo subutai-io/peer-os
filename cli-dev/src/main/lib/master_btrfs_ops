@@ -343,9 +343,12 @@ function fs_master_destroy {
 function fs_master_lxc_create {
   local SUBUTAI_USER="$1"
   local SUBUTAI_AUTH_KEY="$2"
-  lxc-create -n master            \
-   -t ubuntu                      \
+  sudo lxc-create -n master         \
+   -t download                      \
    -B btrfs --                      \
-   -u $SUBUTAI_USER               \
-   -S $SUBUTAI_AUTH_KEY
+   -d ubuntu  			    \
+   -r trusty 			    \ 
+   -a amd64
+   #-u $SUBUTAI_USER               \
+   #-S $SUBUTAI_AUTH_KEY
 }
