@@ -30,6 +30,21 @@ function export {
   fi
 
   local container="$1"
+  local switch="$2"
+  local version
+  if [ ! -z  $switch ]; then
+        if [ ! $2 == "-v" ]; then
+           msg_error "You need to use \"-v\" switch for version";
+           exit 1;
+        fi
+        if [ -z $3 ]; then
+           msg_error "You need to enter a valid version number !"
+           exit 1;
+        fi 
+        version=$3 
+  fi
+  
+  assert_version_validity $version
    
   ps aux | grep "subutai export $container" | grep -v $$ \
          | grep -v "grep subutai" | grep -v "grep --color" > /dev/null 2>&1
@@ -61,7 +76,7 @@ function export {
     exit 1
   fi
 
-  local debian_package_name=`get_debian_package_name $container`
+  local debian_package_name=`get_debian_package_name $container $version` 
   local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
 
   if [ -f $debian_file ]; then
@@ -121,20 +136,16 @@ function export {
   
   # insert subutai.template.package info inside containers config file
   conf="/var/lib/lxc/$container/config"
-  propline="`cat $conf | grep subutai.template.package`"
 
-  if [ -z "$propline" ]; then
-    echo "subutai.template.package = $debian_dir.deb" >> /var/lib/lxc/$container/config
-    debian_file=$debian_dir".deb"
-  else
-    debian_file=`echo $propline | awk '{print $3}'`
-  fi
+  escaped_debian_dir=$(echo $debian_dir | sed -e 's/\//\\\//g')
+  sed -i "s/subutai.template.package = *.*/subutai.template.package = $escaped_debian_dir.deb/g" $conf 
+  debian_file=$debian_dir".deb"
 
   cp /var/lib/lxc/$container/config $debian_root
   cp /var/lib/lxc/$container/fstab  $debian_root
   cp /var/lib/lxc/$container/packages  $debian_root
 
-  pkg=`deb_pkg $container`
+  pkg=`deb_pkg $container $export`
   check_status "debian package $pkg generated" "$?"
   
   # Remove debian directory after debian package generation
