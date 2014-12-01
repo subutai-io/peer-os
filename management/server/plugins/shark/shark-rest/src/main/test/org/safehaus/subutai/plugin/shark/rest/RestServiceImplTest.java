@@ -9,9 +9,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 
+import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
@@ -50,9 +52,14 @@ public class RestServiceImplTest
         SharkClusterConfig sharkClusterConfig1 = new SharkClusterConfig();
         sharkClusterConfig1.setClusterName("test");
         when(shark.getCluster(anyString())).thenReturn(sharkClusterConfig1);
-
         restService.getCluster("test");
 
+        Response response = restService.getCluster("test");
+
+        // assertions
+        assertEquals("test",sharkClusterConfig1.getClusterName());
+        assertEquals(sharkClusterConfig1,shark.getCluster("test"));
+        assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
     }
 
     @Test
@@ -60,29 +67,55 @@ public class RestServiceImplTest
     {
         when(shark.installCluster(any(SharkClusterConfig.class))).thenReturn(UUID.randomUUID());
         restService.installCluster("test");
+
+        Response response = restService.installCluster("test");;
+
+        // assertions
+        assertEquals( Response.Status.CREATED.getStatusCode(), response.getStatus() );
     }
 
     @Test
     public void testUninstallCluster() throws Exception
     {
+        when(shark.uninstallCluster(anyString())).thenReturn(UUID.randomUUID());
+        restService.uninstallCluster("test");
+        Response response = restService.uninstallCluster("test");
+
+        // assertions
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
     }
 
     @Test
     public void testAddNode() throws Exception
     {
+        when(shark.addNode(anyString(), anyString())).thenReturn(UUID.randomUUID());
+        restService.addNode("test","test");
+        Response response = restService.addNode("test","test");
 
+        // assertions
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     }
 
     @Test
     public void testDestroyNode() throws Exception
     {
+        when(shark.destroyNode(anyString(), anyString())).thenReturn(UUID.randomUUID());
+        restService.destroyNode("test","test");
+        Response response = restService.destroyNode("test","test");
 
+        // assertions
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
 
     @Test
     public void testActualizeMasterIP() throws Exception
     {
+        when(shark.actualizeMasterIP(anyString())).thenReturn(UUID.randomUUID());
+        restService.actualizeMasterIP("test");
+        Response response = restService.actualizeMasterIP("test");
 
+        // assertions
+        assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
     }
 }
