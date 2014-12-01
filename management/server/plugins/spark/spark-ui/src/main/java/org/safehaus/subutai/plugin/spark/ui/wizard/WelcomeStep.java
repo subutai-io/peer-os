@@ -45,12 +45,13 @@ public class WelcomeStep extends Panel
         grid.addComponent( next, 4, 4, 4, 4 );
         grid.setComponentAlignment( next, Alignment.BOTTOM_RIGHT );
 
-        Button next2 = new Button( "Start with-Hadoop installation" );
-        next2.setId( "sparkStartWithHadoop" );
-        next2.addStyleName( "default" );
-        next2.addClickListener( new NextClickHandler( wizard, SetupType.WITH_HADOOP ) );
-        grid.addComponent( next2, 5, 4, 5, 4 );
-        grid.setComponentAlignment( next2, Alignment.BOTTOM_RIGHT );
+        //disabling with hadoop installation since plugins will use ready environments or clusters
+//        Button next2 = new Button( "Start with-Hadoop installation" );
+//        next2.setId( "sparkStartWithHadoop" );
+//        next2.addStyleName( "default" );
+//        next2.addClickListener( new NextClickHandler( wizard, SetupType.WITH_HADOOP ) );
+//        grid.addComponent( next2, 5, 4, 5, 4 );
+//        grid.setComponentAlignment( next2, Alignment.BOTTOM_RIGHT );
 
         setContent( grid );
     }
