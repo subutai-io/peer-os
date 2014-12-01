@@ -8,7 +8,7 @@ BINDINGS=/etc/subutai/unprivileged/bindings
 LIBDIR=/usr/share/subutai-cli/subutai/unprivileged/lib
 SCRIPTS=/usr/bin
 MANDIR=/usr/share/man/man1
-BASHCOMPDIR=/etc/bash_completion.d/
+#BASHCOMPDIR=/etc/bash_completion.d/
 %:
 	dh $@
 
@@ -41,9 +41,9 @@ install: build
 	cp -a src/main/bindings/* ${d}${BINDINGS}
 	cp -a src/main/lib/* ${d}${LIBDIR}
 	cp -a src/main/scripts/* ${d}${SCRIPTS}
-	cp debian/subutai-manpage.1 ${d}${MANDIR}
-	gzip ${d}${MANDIR}/subutai-manpage.1
-	cp debian/subutai-cli.bash_completion ${d}${BASHCOMPDIR}
+	cp debian/subutai-unprivileged-manpage.1 ${d}${MANDIR}
+	gzip ${d}${MANDIR}/subutai-unprivileged-manpage.1
+#	cp debian/subutai-cli.bash_completion ${d}${BASHCOMPDIR}
 	dh_link
 
 

@@ -16,7 +16,7 @@ function ovs_configure_lxc {
     return
   fi
 
-  config="/var/lib/lxc/$lxc/config"
+  config="$HOME/.local/share/lxc/$lxc/config"
 
   # Remove configuration entries for network.(type,flags,link,veth.pair,script.up)
   sed -i '/lxc.network.type.*/d' $config
@@ -60,7 +60,7 @@ function ovs_revert_configuration {
     return
   fi
 
-  config="/var/lib/lxc/$lxc/config"
+  config="$HOME/.local/share/lxc/$lxc/config"
 
   # Remove configuration entries for network.(type,flags,link,veth.pair,script.up)
   sed -i '/lxc.network.type.*/d' $config
@@ -88,7 +88,7 @@ function ovs_get_port_name {
   fi
   
   # get macaddress_of_container to initialize ovs bridges' name
-  macaddress_of_container=`cat /var/lib/lxc/$lxc/config | grep lxc.network.hwaddr | cut -d "=" -f 2 | tr -d ' '`
+  macaddress_of_container=`cat $HOME/.local/share/lxc/$lxc/config | grep lxc.network.hwaddr | cut -d "=" -f 2 | tr -d ' '`
   #Remove ':' characters from macaddress to initialize ovs_bridges
   ovs_port_name=`echo $macaddress_of_container | tr -d ':'`
   echo "$ovs_port_name"
