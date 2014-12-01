@@ -15,7 +15,6 @@ public class SharkClusterConfig implements ConfigBase
     public static final String PRODUCT_KEY = "Shark";
     public static final String TEMPLATE_NAME = "shark";
 
-    private SetupType setupType;
     private String clusterName = "";
     private String sparkClusterName = "";
     private String hadoopClusterName = "";
@@ -32,18 +31,6 @@ public class SharkClusterConfig implements ConfigBase
     public void setEnvironmentId( final UUID environmentId )
     {
         this.environmentId = environmentId;
-    }
-
-
-    public SetupType getSetupType()
-    {
-        return setupType;
-    }
-
-
-    public void setSetupType( SetupType setupType )
-    {
-        this.setupType = setupType;
     }
 
 

@@ -301,6 +301,21 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     @Override
+    public String getIpByInterfaceName( String interfaceName )
+    {
+        for ( Interface iface : interfaces )
+        {
+            if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
+            {
+                return iface.getIp();
+            }
+        }
+
+        return null;
+    }
+
+
+    @Override
     public String getIpByMask( String mask )
     {
         String[] s = this.netInterfaces.split( ";" );

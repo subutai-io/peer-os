@@ -365,42 +365,42 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
             throws SubutaiException
     {
         StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
-                StringBuilder appendHosts = new StringBuilder();
-                for ( Host otherHost : others )
-                {
-                    if ( getId().equals( otherHost.getId() ) )
-                    {
-                        continue;
-                    }
+        StringBuilder appendHosts = new StringBuilder();
+        for ( Host otherHost : others )
+        {
+            if ( getId().equals( otherHost.getId() ) )
+            {
+                continue;
+            }
 
-                    String ip = otherHost.getIpByMask( Common.IP_MASK );
-                    String hostname = otherHost.getHostname();
-                    cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
-                    appendHosts.append( "/bin/echo '" ).
-                            append( ip ).append( " " ).
-                                       append( hostname ).append( "." ).append( domainName ).
-                                       append( " " ).append( hostname ).
-                                       append( "' >> '/etc/hosts'; " );
-                }
-                if ( cleanHosts.length() > 0 )
-                {
-                    //drop pipe | symbol
-                    cleanHosts.setLength( cleanHosts.length() - 1 );
-                    cleanHosts.insert( 0, "egrep -v '" );
-                    cleanHosts.append( "' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;" );
-                    appendHosts.insert( 0, cleanHosts );
-                }
+            String ip = otherHost.getIpByMask( Common.IP_MASK );
+            String hostname = otherHost.getHostname();
+            cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
+            appendHosts.append( "/bin/echo '" ).
+                    append( ip ).append( " " ).
+                               append( hostname ).append( "." ).append( domainName ).
+                               append( " " ).append( hostname ).
+                               append( "' >> '/etc/hosts'; " );
+        }
+        if ( cleanHosts.length() > 0 )
+        {
+            //drop pipe | symbol
+            cleanHosts.setLength( cleanHosts.length() - 1 );
+            cleanHosts.insert( 0, "egrep -v '" );
+            cleanHosts.append( "' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;" );
+            appendHosts.insert( 0, cleanHosts );
+        }
 
-                appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( getHostname() ).append( "' >> '/etc/hosts';" );
+        appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( getHostname() ).append( "' >> '/etc/hosts';" );
 
-                try
-                {
-                    execute( new RequestBuilder( appendHosts.toString() ).withTimeout( 30 ) );
-                }
-                catch ( CommandException e )
-                {
-                    throw new SubutaiException( "Could not add to /etc/hosts: " + e.toString() );
-                }
+        try
+        {
+            execute( new RequestBuilder( appendHosts.toString() ).withTimeout( 30 ) );
+        }
+        catch ( CommandException e )
+        {
+            throw new SubutaiException( "Could not add to /etc/hosts: " + e.toString() );
+        }
     }
 
 
@@ -442,6 +442,21 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public Set<Interface> getNetInterfaces()
     {
         return interfaces;
+    }
+
+
+    @Override
+    public String getIpByInterfaceName( String interfaceName )
+    {
+        for ( Interface iface : interfaces )
+        {
+            if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
+            {
+                return iface.getIp();
+            }
+        }
+
+        return null;
     }
 
 

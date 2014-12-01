@@ -1,6 +1,10 @@
 package org.safehaus.subutai.core.peer.api;
 
 
+import java.io.Serializable;
+import java.util.Set;
+import java.util.UUID;
+
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
@@ -10,10 +14,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.Interface;
-
-import java.io.Serializable;
-import java.util.Set;
-import java.util.UUID;
 
 
 /**
@@ -79,7 +79,9 @@ public interface Host extends Serializable
 
     void init();
 
-    public Set<Interface> getNetInterfaces() throws PeerException;
+    public Set<Interface> getNetInterfaces();
+
+    public String getIpByInterfaceName( String interfaceName );
 
     public HostArchitecture getHostArchitecture();
 }

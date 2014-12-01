@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
@@ -46,6 +45,7 @@ public class Commands
                 "chmod 644 /root/.ssh/config" );
     }
 
+
     //TODO use host.getInterfaces
     public RequestBuilder getAddIpHostToEtcHostsCommand( String domainName, Set<ContainerHost> containerHosts )
     {
@@ -54,7 +54,7 @@ public class Commands
 
         for ( ContainerHost host : containerHosts )
         {
-            String ip = AgentUtil.getAgentIpByMask( host.getAgent(), Common.IP_MASK );
+            String ip = host.getIpByMask( Common.IP_MASK );
             String hostname = host.getHostname();
             cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
             appendHosts.append( "/bin/echo '" ).
