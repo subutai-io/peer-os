@@ -46,6 +46,7 @@ public class Commands
                 "chmod 644 /root/.ssh/config" );
     }
 
+
     //TODO use host.getInterfaces
     public RequestBuilder getAddIpHostToEtcHostsCommand( String domainName, Set<ContainerHost> containerHosts )
     {
@@ -75,6 +76,6 @@ public class Commands
 
         appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( "' >> '/etc/hosts';" );
 
-        return new RequestBuilder( appendHosts.toString() );
+        return new RequestBuilder( String.format( "sh -c echo `%s`", appendHosts.toString() ) );
     }
 }
