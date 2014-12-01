@@ -1,9 +1,9 @@
 package org.safehaus.subutai.plugin.shark.impl;
 
 
-import java.util.List;
-import java.util.Set;
-
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
@@ -17,14 +17,16 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.List;
+import java.util.Set;
 
 
 public class SetupStrategyOverSpark implements ClusterSetupStrategy
 {
+    private static final Logger LOG = LoggerFactory.getLogger(SetupStrategyOverSpark.class.getName());
 
     private final Environment environment;
     private final SharkImpl manager;
@@ -59,7 +61,6 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
         {
             throw new ClusterSetupException( String.format( "Cluster %s already exists", config.getClusterName() ) );
         }
-
         sparkConfig = manager.getSparkManager().getCluster( config.getSparkClusterName() );
         if ( sparkConfig == null )
         {
@@ -106,7 +107,6 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
         allNodes.add( sparkMaster );
 
         RequestBuilder checkCommand = manager.getCommands().getCheckInstalledCommand();
-
         for ( ContainerHost node : allNodes )
         {
             try
