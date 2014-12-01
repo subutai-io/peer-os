@@ -114,12 +114,13 @@ public class ManagementHostDataService implements DataService<String, Management
 
 
     @Override
-    public void remove( final ManagementHostEntity item )
+    public void remove( final String id )
     {
         EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
+            ManagementHostEntity item = em.find( ManagementHostEntity.class, id );
             em.remove( item );
             em.getTransaction().commit();
         }

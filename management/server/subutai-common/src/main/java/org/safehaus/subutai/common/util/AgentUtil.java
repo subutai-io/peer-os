@@ -13,7 +13,10 @@ import org.safehaus.subutai.common.protocol.Agent;
 public class AgentUtil
 {
 
-    public static String getAgentIpByMask( Agent agent, String mask )
+    @Deprecated
+    /**
+     * Please use getIpByMask method of Host interface
+     */ public static String getAgentIpByMask( Agent agent, String mask )
     {
         if ( agent != null )
         {

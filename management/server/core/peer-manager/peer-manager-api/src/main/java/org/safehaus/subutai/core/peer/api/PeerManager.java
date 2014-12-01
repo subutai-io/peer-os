@@ -34,6 +34,8 @@ public interface PeerManager
 
     public Peer getPeer( UUID peerId );
 
+    public Peer getPeer( String peerId );
+
     public List<Peer> getPeers();
 
 

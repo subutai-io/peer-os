@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostTaskResult;
 
@@ -8,9 +9,10 @@ import org.safehaus.subutai.core.peer.api.HostTaskResult;
 /**
  * Created by timur on 11/24/14.
  */
-public class CloneResult implements HostTaskResult<ContainerHost>
+public class HostCloneResult implements HostTaskResult<ContainerHost>
 {
     private ContainerHost value;
+    private HostInfo hostInfo;
     private boolean success = false;
     private Exception exception;
 
@@ -19,6 +21,18 @@ public class CloneResult implements HostTaskResult<ContainerHost>
     public ContainerHost getValue()
     {
         return value;
+    }
+
+
+    public HostInfo getHostInfo()
+    {
+        return hostInfo;
+    }
+
+
+    public void setHostInfo( HostInfo hostInfo )
+    {
+        this.hostInfo = hostInfo;
     }
 
 

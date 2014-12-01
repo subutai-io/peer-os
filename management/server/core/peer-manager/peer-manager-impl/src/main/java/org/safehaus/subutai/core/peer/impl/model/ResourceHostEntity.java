@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
@@ -63,7 +62,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @javax.persistence.Transient
     transient private ExecutorService cachedThredPoolService;
 
-    @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true,
+    @OneToMany( mappedBy = "parent", fetch = FetchType.EAGER,
             targetEntity = ContainerHostEntity.class )
     Set<ContainerHost> containersHosts = new HashSet();
 
@@ -552,8 +551,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             LOG.debug( String.format( "Could not prepare template %s on %s.", p.getTemplateName(), hostname ) );
             throw new ResourceHostException( "Prepare template exception.",
-                    String.format( "Could not prepare template %s on %s", p.getTemplateName(),
-                            getAgent().getHostname() ) );
+                    String.format( "Could not prepare template %s on %s", p.getTemplateName(), hostname ) );
         }
     }
 
@@ -876,7 +874,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     enum Command
     {
         LIST_TEMPLATES( "subutai list -t %s" ),
-        CLONE( "subutai clone %s %s", 90 ),
+        CLONE( "subutai clone %s %s", 1, true ),
         DESTROY( "subutai destroy %s" ),
         IMPORT( "subutai import %s" ),
         PROMOTE( "promote %s" ),

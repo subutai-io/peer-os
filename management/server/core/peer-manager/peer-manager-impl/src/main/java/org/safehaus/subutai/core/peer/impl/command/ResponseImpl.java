@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.safehaus.subutai.common.command.Response;
 import org.safehaus.subutai.common.command.ResponseType;
 
+import com.google.common.base.Preconditions;
+
 
 /**
  * Represents response to command from host
@@ -24,19 +26,19 @@ public class ResponseImpl implements Response
     private Set<String> configPoints;
 
 
-    public ResponseImpl( final ResponseType type, final UUID id, final UUID commandId, final Integer pid,
-                         final Integer responseNumber, final String stdOut, final String stdErr, final Integer exitCode,
-                         final Set<String> configPoints )
+    public ResponseImpl( final Response response )
     {
-        this.type = type;
-        this.id = id;
-        this.commandId = commandId;
-        this.pid = pid;
-        this.responseNumber = responseNumber;
-        this.stdOut = stdOut;
-        this.stdErr = stdErr;
-        this.exitCode = exitCode;
-        this.configPoints = configPoints;
+        Preconditions.checkNotNull( response );
+
+        this.type = response.getType();
+        this.id = response.getId();
+        this.commandId = response.getCommandId();
+        this.pid = response.getPid();
+        this.responseNumber = response.getResponseNumber();
+        this.stdOut = response.getStdOut();
+        this.stdErr = response.getStdErr();
+        this.exitCode = response.getExitCode();
+        this.configPoints = response.getConfigPoints();
     }
 
 

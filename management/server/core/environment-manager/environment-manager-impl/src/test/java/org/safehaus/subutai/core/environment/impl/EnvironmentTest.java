@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.environment.api;
+package org.safehaus.subutai.core.environment.impl;
 
 
 import java.util.HashSet;
@@ -32,7 +32,7 @@ public class EnvironmentTest
     public void setUp() throws Exception
     {
 
-        this.environment = new Environment( NAME, localPeer );
+        this.environment = new EnvironmentImpl( NAME );
     }
 
 
