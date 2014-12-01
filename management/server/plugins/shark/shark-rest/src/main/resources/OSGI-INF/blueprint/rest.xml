@@ -13,13 +13,13 @@
   <reference id="sharkManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.shark.api.Shark" />
 
-  <bean id="sharkRestService" class="org.safehaus.subutai.plugin.shark.rest.RestService">
+  <bean id="sharkRestServiceImpl" class="org.safehaus.subutai.plugin.shark.rest.RestServiceImpl">
     <argument ref="sharkManager" />
   </bean>
 
-  <jaxrs:server address="/shark" id="sharkRestServiceImpl">
+  <jaxrs:server address="/shark" id="sharkRestServiceInterface">
     <jaxrs:serviceBeans>
-      <ref component-id="sharkRestService" />
+      <ref component-id="sharkRestServiceImpl" />
     </jaxrs:serviceBeans>
   </jaxrs:server>
 </blueprint>
