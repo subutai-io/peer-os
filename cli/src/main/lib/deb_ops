@@ -266,12 +266,18 @@ function assert_version_validity(){
   if [ -z $version ]; then
     return
   fi
-  if [ ! -z `echo "$version" | grep '[*|~|\|/]'` ]; then
+  if [ ! -z `echo "$version" | grep '[*\/]'` ]; then
     msg_error "Invalid character in version. Aborting ..."
     exit 1
   fi
+  if [ ! -z `echo "${version: -1}" | grep '[^A-Za-z0-9]'` ]; then
+    msg_error "Last character in version is invalid. Aborting ..."
+    exit 1
+  fi
+
   if [ ! -z `echo $version | cut -c 1 | grep '[^0-9]'` ]; then
     msg_error "Version should start with a digit! Aborting ..."
     exit 1
   fi
 }
+
