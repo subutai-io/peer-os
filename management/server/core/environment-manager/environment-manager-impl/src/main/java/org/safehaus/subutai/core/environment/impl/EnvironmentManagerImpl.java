@@ -8,12 +8,10 @@ package org.safehaus.subutai.core.environment.impl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
@@ -51,6 +49,7 @@ import org.safehaus.subutai.core.environment.impl.environment.EnvironmentBuilder
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentDestroyer;
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentDestroyerImpl;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -154,10 +153,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             LOG.error( e.getMessage(), e );
         }
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        LOG.info( entityManager.toString() );
+        //        EntityManager entityManager = entityManagerFactory.createEntityManager();
         environmentDataService = new EnvironmentDataService( entityManagerFactory );
-        LOG.info( environmentDataService.getAll().toString() );
     }
 
 
@@ -220,7 +217,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
         }
         return result;
-        //        return environmentDAO.getInfo( ENVIRONMENT, Environment.class );
     }
 
 
@@ -246,7 +242,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             destroyer.destroy( environment );
             environmentDataService.remove( environmentId.toString() );
-            //            environmentDAO.deleteInfo( ENVIRONMENT, environment.getId().toString() );
         }
         catch ( DestroyException e )
         {
@@ -322,16 +317,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public void saveEnvironment( final Environment environment ) throws EnvironmentManagerException
     {
-        environmentDataService.persist( ( EnvironmentImpl ) environment );
-        //        try
-        //        {
-        //            environmentDAO.saveInfo( ENVIRONMENT, environment.getId().toString(), environment );
-        //        }
-        //        catch ( EnvironmentPersistenceException e )
-        //        {
-        //            LOG.error( e.getMessage(), e );
-        //            throw new EnvironmentManagerException( e.getMessage() );
-        //        }
+
+        if ( environmentDataService.find( environment.getId().toString() ) == null )
+        {
+            environmentDataService.persist( ( EnvironmentImpl ) environment );
+        }
+        else
+        {
+            environmentDataService.update( ( EnvironmentImpl ) environment );
+        }
     }
 
 
@@ -533,16 +527,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         try
         {
-            Set<ContainerHost> containers = peerManager.getPeer( peer.getId() ).
-                    createContainers( peerId, environment.getId(), templatesData, nodeGroup.getNumberOfNodes(),
+            Set<HostInfoModel> hostInfoModels = peerManager.getPeer( peer.getId() ).
+                    scheduleCloneContainers( peerId, templatesData, nodeGroup.getNumberOfNodes(),
                             nodeGroup.getPlacementStrategy().getStrategyId(),
-                            nodeGroup.getPlacementStrategy().getCriteriaAsList(), nodeGroup.getName() );
-            if ( !containers.isEmpty() )
+                            nodeGroup.getPlacementStrategy().getCriteriaAsList() );
+            if ( !hostInfoModels.isEmpty() )
             {
-                for ( ContainerHost container : containers )
+                for ( HostInfoModel hostInfoModel : hostInfoModels )
                 {
-                    container.setNodeGroupName( nodeGroup.getName() );
-                    environment.addContainer( container );
+                    EnvironmentContainerImpl environmentContainer =
+                            new EnvironmentContainerImpl( peer.getId(), nodeGroup.getName(), hostInfoModel );
+                    environment.addContainer( environmentContainer );
                 }
             }
             else
@@ -571,17 +566,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
 
             List<Template> templates = builder.fetchRequiredTemplates( peer.getId(), template );
-            Set<ContainerHost> hosts = peerManager.getPeer( peer.getId() )
-                                                  .createContainers( peerManager.getLocalPeer().getId(), environmentId,
+
+            Set<HostInfoModel> hosts = peerManager.getPeer( peer.getId() )
+                                                  .scheduleCloneContainers( peerManager.getLocalPeer().getId(),
                                                           templates, 1, strategy.getStrategyId(),
-                                                          strategy.getCriteriaAsList(), nodeGroupName );
+                                                          strategy.getCriteriaAsList() );
+
             if ( hosts.isEmpty() )
             {
                 throw new EnvironmentManagerException( "Containers not created" );
             }
             else
             {
-                ContainerHost newHost = ( ContainerHost ) Arrays.asList( hosts ).get( 0 );
+                EnvironmentContainerImpl newHost =
+                        new EnvironmentContainerImpl( peer.getId(), nodeGroupName, hosts.iterator().next() );
                 Environment environment = getEnvironmentByUUID( environmentId );
                 environment.addContainer( newHost );
                 saveEnvironment( environment );

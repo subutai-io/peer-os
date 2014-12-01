@@ -21,7 +21,11 @@ import org.safehaus.subutai.core.hostregistry.api.Interface;
  */
 public interface Host extends Serializable
 {
-
+    /**
+     * Returns reference to parent peer
+     *
+     * @return returns Peer interface
+     */
     public Peer getPeer();
 
     public void setPeer( Peer peer );
@@ -32,14 +36,16 @@ public interface Host extends Serializable
      */ public Agent getAgent();
 
     @Deprecated
-    public Agent getParentAgent();
+    /**
+     * Please use other properties of Host interface
+     */ public Agent getParentAgent();
 
     @Deprecated
-    public void setParentAgent( Agent agent );
+    /**
+     * Will be removed in next release
+     */ public void setParentAgent( Agent agent );
 
     public String getPeerId();
-
-    //    public void setPeerId( UUID peerId );
 
     public UUID getId();
 
@@ -47,11 +53,11 @@ public interface Host extends Serializable
 
     public String getHostname();
 
-    void addListener( HostEventListener hostEventListener );
+    public void addListener( HostEventListener hostEventListener );
 
-    void removeListener( HostEventListener hostEventListener );
+    public void removeListener( HostEventListener hostEventListener );
 
-    void fireEvent( HostEvent hostEvent );
+    public void fireEvent( HostEvent hostEvent );
 
     public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException;
 
@@ -67,7 +73,7 @@ public interface Host extends Serializable
 
     public long getLastHeartbeat();
 
-    String getIpByMask( String mask );
+    public String getIpByMask( String mask );
 
     void addIpHostToEtcHosts( String domainName, Set<Host> others, String mask ) throws SubutaiException;
 
