@@ -15,9 +15,9 @@ function fs_master_snapshot {
   fs_addmount master opt lxc
   fs_addmount master home lxc-data
   fs_addmount master var lxc-data
-  btrfs subvolume snapshot -r /var/lib/lxc/master/rootfs /var/lib/lxc/master/rootfs2
-  btrfs subvolume delete /var/lib/lxc/master/rootfs
-  mv  /var/lib/lxc/master/rootfs2  /var/lib/lxc/master/rootfs
+  sudo btrfs subvolume snapshot -r /var/lib/lxc/master/rootfs /var/lib/lxc/master/rootfs2
+  sudo btrfs subvolume delete /var/lib/lxc/master/rootfs
+  sudo mv  /var/lib/lxc/master/rootfs2  /var/lib/lxc/master/rootfs
 }
 
 function fs_master_import {
@@ -347,8 +347,11 @@ function fs_master_lxc_create {
    -t download                      \
    -B btrfs --                      \
    -d ubuntu  			    \
-   -r trusty 			    \ 
+   -r trusty 			    \
    -a amd64
+  sudo lxc-start -n master -d
+  sudo lxc-attach -n master -- useradd -m -p ubuntu subutai
+  sudo lxc-stop -n master
    #-u $SUBUTAI_USER               \
    #-S $SUBUTAI_AUTH_KEY
 }

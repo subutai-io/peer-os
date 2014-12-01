@@ -41,7 +41,7 @@ function fs_addmount {
   local dataset=$zpool/$name-$mount
 
   echo Creating $dataset dataset for $mount mount entry
-  btrfs subvolume create /$dataset > /dev/null 2>&1
+  sudo btrfs subvolume create /$dataset > /dev/null 2>&1
 
   if [ -z "`btrfs subvolume list /$dataset`" ]; then
     echo Could not create $dataset dataset
@@ -67,9 +67,9 @@ function fs_addmount {
 
   popd
   # Time to Snapshot and Apply Holds
-  btrfs subvolume snapshot -r /$dataset /$dataset-2 > /dev/null 2>&1
-  btrfs subvolume delete /$dataset > /dev/null 2>&1
-  mv /$dataset-2 /$dataset
+  sudo btrfs subvolume snapshot -r /$dataset /$dataset-2 > /dev/null 2>&1
+  sudo btrfs subvolume delete /$dataset > /dev/null 2>&1
+  sudo mv /$dataset-2 /$dataset
   return
 }
 #snaphost ll holds on clone's rootfs
@@ -243,7 +243,6 @@ function fs_assert_nods {
     fi
   fi
 }
-
 
 # assert dataset (arg $1) exists, if it does NOT show usage (arg $2)
 # warning: exits!
