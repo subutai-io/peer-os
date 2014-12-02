@@ -14,7 +14,7 @@ function export_usage {
 # Plan for exporting a template
 # -----------------------------------------------------------------------------
 # (1) perform sanity checks first
-#     - 
+#     - given version should be valid 
 #     - defer exports of master to the subutai-master-export script
 #     - template container MUST exist
 #     - container MUST be a template with the '@template' snapshot

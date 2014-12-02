@@ -274,7 +274,6 @@ function assert_version_validity(){
     msg_error "Last character in version is invalid. Aborting ..."
     exit 1
   fi
-
   if [ ! -z `echo $version | cut -c 1 | grep '[^0-9]'` ]; then
     msg_error "Version should start with a digit! Aborting ..."
     exit 1
