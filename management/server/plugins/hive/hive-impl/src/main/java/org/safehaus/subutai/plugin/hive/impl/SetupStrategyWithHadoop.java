@@ -44,13 +44,13 @@
 //            throw new ClusterSetupException( "Environment not specified" );
 //        }
 //
-//        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
+//        if ( environment.getContainerHosts() == null || environment.getContainerHosts().isEmpty() )
 //        {
 //            throw new ClusterSetupException( "Environment has no nodes" );
 //        }
 //
 //        Set<UUID> clients = new HashSet<>(), allNodes = new HashSet<>();
-//        for ( ContainerHost n : environment.getContainers() )
+//        for ( ContainerHost n : environment.getContainerHosts() )
 //        {
 //            allNodes.add( n.getAgent().getUuid() );
 //            // if Derby installed on node and server node is not yet set

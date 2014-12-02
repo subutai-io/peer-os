@@ -49,8 +49,8 @@ public class VerificationStep extends Panel
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
             Environment hadoopEnvironment = environmentManager.getEnvironmentByUUID( hc.getEnvironmentId() );
-            ContainerHost master = hadoopEnvironment.getContainerHostByUUID( wizard.getConfig().getServer() );
-            Set<ContainerHost> slaves = hadoopEnvironment.getHostsByIds( wizard.getConfig().getClients() );
+            ContainerHost master = hadoopEnvironment.getContainerHostById( wizard.getConfig().getServer() );
+            Set<ContainerHost> slaves = hadoopEnvironment.getContainerHostsByIds( wizard.getConfig().getClients() );
 
             cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getHadoopClusterName() );
             cfgView.addStringCfg( "Server node", master.getHostname() );

@@ -10,7 +10,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
-import org.safehaus.subutai.plugin.pig.api.Pig;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.impl.Commands;
 import org.safehaus.subutai.plugin.pig.impl.PigImpl;
@@ -49,7 +48,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<PigImpl, PigC
         }
 
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        Iterator iterator = environment.getContainers().iterator();
+        Iterator iterator = environment.getContainerHosts().iterator();
         ContainerHost host = null;
         while ( iterator.hasNext() )
         {

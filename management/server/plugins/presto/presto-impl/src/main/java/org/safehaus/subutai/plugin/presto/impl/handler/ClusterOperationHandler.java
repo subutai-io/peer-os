@@ -183,7 +183,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PrestoImpl
         {
             ContainerHost containerHost =
                     manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
-                           .getContainerHostByUUID( uuid );
+                           .getContainerHostById( uuid );
             if ( containerHost.getHostname() == null )
             {
                 po.addLogFailed(

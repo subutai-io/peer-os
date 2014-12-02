@@ -57,7 +57,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl, H
         }
 
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        Iterator iterator = environment.getContainers().iterator();
+        Iterator iterator = environment.getContainerHosts().iterator();
         ContainerHost host = null;
         while ( iterator.hasNext() )
         {
@@ -194,9 +194,9 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl, H
 
             // refresh NameNode and JobTracker
             ContainerHost namenode = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
-                                            .getContainerHostByUUID( config.getNameNode() );
+                                            .getContainerHostById( config.getNameNode() );
             ContainerHost jobtracker = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
-                                              .getContainerHostByUUID( config.getJobTracker() );
+                                              .getContainerHostById( config.getJobTracker() );
 
             namenode.execute( new RequestBuilder( Commands.getRefreshNameNodeCommand() ) );
             jobtracker.execute( new RequestBuilder( Commands.getRefreshJobTrackerCommand() ) );
@@ -229,7 +229,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl, H
         }
 
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        Iterator iterator = environment.getContainers().iterator();
+        Iterator iterator = environment.getContainerHosts().iterator();
 
         ContainerHost host = null;
         while ( iterator.hasNext() )
@@ -259,9 +259,9 @@ public class NodeOperationHandler extends AbstractOperationHandler<HadoopImpl, H
         try
         {
             ContainerHost namenode = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
-                                            .getContainerHostByUUID( config.getNameNode() );
+                                            .getContainerHostById( config.getNameNode() );
             ContainerHost jobtracker = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
-                                              .getContainerHostByUUID( config.getJobTracker() );
+                                              .getContainerHostById( config.getJobTracker() );
 
             /** DataNode Operations */
             // set data node

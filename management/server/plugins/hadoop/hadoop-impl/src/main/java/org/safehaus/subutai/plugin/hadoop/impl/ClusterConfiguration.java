@@ -36,20 +36,20 @@ public class ClusterConfiguration implements ClusterConfigurationInterface
         HadoopClusterConfig config = ( HadoopClusterConfig ) configBase;
         Commands commands = new Commands( config );
 
-        ContainerHost namenode = environment.getContainerHostByUUID( config.getNameNode() );
-        ContainerHost jobtracker = environment.getContainerHostByUUID( config.getJobTracker() );
-        ContainerHost secondaryNameNode = environment.getContainerHostByUUID( config.getSecondaryNameNode() );
+        ContainerHost namenode = environment.getContainerHostById( config.getNameNode() );
+        ContainerHost jobtracker = environment.getContainerHostById( config.getJobTracker() );
+        ContainerHost secondaryNameNode = environment.getContainerHostById( config.getSecondaryNameNode() );
         po.addLog( String.format( "Configuring cluster: %s", configBase.getClusterName() ) );
 
         // Clear configuration files
-        for ( ContainerHost containerHost : environment.getContainers() )
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
             executeCommandOnContainer( containerHost, Commands.getClearMastersCommand() );
             executeCommandOnContainer( containerHost, Commands.getClearSlavesCommand() );
         }
 
         // Configure NameNode
-        for ( ContainerHost containerHost : environment.getContainers() )
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
             executeCommandOnContainer( containerHost, commands.getSetMastersCommand( namenode.getHostname(), jobtracker.getHostname() ) );
         }
@@ -66,13 +66,14 @@ public class ClusterConfiguration implements ClusterConfigurationInterface
         for ( UUID uuid : config.getDataNodes() )
         {
             executeCommandOnContainer( namenode,
-                    commands.getConfigureDataNodesCommand( environment.getContainerHostByUUID( uuid ).getHostname() ) );
+                    commands.getConfigureDataNodesCommand( environment.getContainerHostById( uuid ).getHostname() ) );
         }
 
         // Configure TaskTrackers
         for ( UUID uuid : config.getTaskTrackers() )
         {
-            executeCommandOnContainer( jobtracker, commands.getConfigureTaskTrackersCommand( environment.getContainerHostByUUID( uuid ).getHostname() ) );
+            executeCommandOnContainer( jobtracker, commands.getConfigureTaskTrackersCommand( environment.getContainerHostById(
+                    uuid ).getHostname() ) );
         }
 
         // Format NameNode

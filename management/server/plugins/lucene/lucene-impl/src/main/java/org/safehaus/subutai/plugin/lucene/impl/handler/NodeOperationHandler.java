@@ -49,7 +49,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<LuceneImpl, L
         }
 
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        Iterator iterator = environment.getContainers().iterator();
+        Iterator iterator = environment.getContainerHosts().iterator();
         ContainerHost host = null;
         while ( iterator.hasNext() )
         {

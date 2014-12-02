@@ -30,14 +30,14 @@ public class ClusterConfiguration implements ClusterConfigurationInterface
             throws ClusterConfigurationException
     {
         HiveConfig hiveConfig = ( HiveConfig ) config;
-        ContainerHost server = environment.getContainerHostByUUID( ( ( HiveConfig ) config ).getServer() );
+        ContainerHost server = environment.getContainerHostById( ( ( HiveConfig ) config ).getServer() );
 
         // configure hive server
         po.addLog( "Configuring server node: " + server.getHostname() );
         executeCommand( server, Commands.configureClient( server ) );
 
 
-        for ( ContainerHost containerHost : environment.getContainers() )
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
             if ( !containerHost.getId().equals( server.getId() ) )
             {

@@ -58,11 +58,11 @@ public class VerificationStep extends Panel
         {
             Environment hadoopEnvironment = environmentManager.getEnvironmentByUUID(
                     hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ).getEnvironmentId() );
-            ContainerHost master = hadoopEnvironment.getContainerHostByUUID( wizard.getConfig().getMasterNode() );
-            ContainerHost gc = hadoopEnvironment.getContainerHostByUUID( wizard.getConfig().getGcNode() );
-            ContainerHost monitor = hadoopEnvironment.getContainerHostByUUID( wizard.getConfig().getMonitor() );
-            Set<ContainerHost> tracers = hadoopEnvironment.getHostsByIds( wizard.getConfig().getTracers() );
-            Set<ContainerHost> slaves = hadoopEnvironment.getHostsByIds( wizard.getConfig().getSlaves() );
+            ContainerHost master = hadoopEnvironment.getContainerHostById( wizard.getConfig().getMasterNode() );
+            ContainerHost gc = hadoopEnvironment.getContainerHostById( wizard.getConfig().getGcNode() );
+            ContainerHost monitor = hadoopEnvironment.getContainerHostById( wizard.getConfig().getMonitor() );
+            Set<ContainerHost> tracers = hadoopEnvironment.getContainerHostsByIds( wizard.getConfig().getTracers() );
+            Set<ContainerHost> slaves = hadoopEnvironment.getContainerHostsByIds( wizard.getConfig().getSlaves() );
 
             cfgView.addStringCfg( "Master node", master.getHostname() );
             cfgView.addStringCfg( "GC node", gc.getHostname() );

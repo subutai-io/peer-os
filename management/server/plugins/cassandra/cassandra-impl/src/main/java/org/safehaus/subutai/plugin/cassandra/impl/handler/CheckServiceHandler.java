@@ -47,7 +47,7 @@ public class CheckServiceHandler extends AbstractOperationHandler<CassandraImpl,
         }
 
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        Iterator iterator = environment.getContainers().iterator();
+        Iterator iterator = environment.getContainerHosts().iterator();
 
         ContainerHost host = null;
         while ( iterator.hasNext() )

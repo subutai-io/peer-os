@@ -82,19 +82,19 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HiveImpl, 
         switch ( clusterOperationType )
         {
             case START_ALL:
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost containerHost : environment.getContainerHosts() )
                 {
                     result = executeCommand( containerHost, Commands.startCommand );
                 }
                 break;
             case STOP_ALL:
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost containerHost : environment.getContainerHosts() )
                 {
                     result = executeCommand( containerHost, Commands.stopCommand );
                 }
                 break;
             case STATUS_ALL:
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost containerHost : environment.getContainerHosts() )
                 {
                     result = executeCommand( containerHost, Commands.statusCommand );
                 }
@@ -153,7 +153,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HiveImpl, 
         for ( UUID uuid : config.getAllNodes() )
         {
             ContainerHost host = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopConfig.getEnvironmentId() )
-                                        .getContainerHostByUUID( uuid );
+                                        .getContainerHostById( uuid );
             CommandResult result = null;
             try
             {

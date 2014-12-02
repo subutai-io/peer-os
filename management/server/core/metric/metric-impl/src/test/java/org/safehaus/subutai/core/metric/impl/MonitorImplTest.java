@@ -144,7 +144,7 @@ public class MonitorImplTest
         when( localPeer.isLocal() ).thenReturn( true );
         when( remotePeer.isLocal() ).thenReturn( false );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
-        when( environment.getContainers() ).thenReturn( Sets.newHashSet( containerHost ) );
+        when( environment.getContainerHosts() ).thenReturn( Sets.newHashSet( containerHost ) );
         when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID.toString() );
         when( localPeer.getResourceHosts() ).thenReturn( Sets.newHashSet( resourceHost ) );
     }

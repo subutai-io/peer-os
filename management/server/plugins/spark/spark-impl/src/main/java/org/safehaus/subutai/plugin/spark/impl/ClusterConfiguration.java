@@ -36,8 +36,8 @@ public class ClusterConfiguration implements ClusterConfigurationInterface<Spark
     public void configureCluster( final SparkClusterConfig config, final Environment environment )
             throws ClusterConfigurationException
     {
-        final ContainerHost master = environment.getContainerHostByUUID( config.getMasterNodeId() );
-        final Set<ContainerHost> slaves = environment.getHostsByIds( config.getSlaveIds() );
+        final ContainerHost master = environment.getContainerHostById( config.getMasterNodeId() );
+        final Set<ContainerHost> slaves = environment.getContainerHostsByIds( config.getSlaveIds() );
 
         //configure master IP
         po.addLog( "Setting master IP..." );
