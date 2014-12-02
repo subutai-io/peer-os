@@ -30,7 +30,6 @@ import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -602,12 +601,12 @@ public class Manager
 
                 if ( containerHost != null )
                 {
-                    TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( containerHost ) );
+                    TerminalWindow terminal = new TerminalWindow( containerHost );
                     contentRoot.getUI().addWindow( terminal.getWindow() );
                 }
                 else
                 {
-                    Notification.show( "Agent is not connected" );
+                    Notification.show( "Host not found" );
                 }
             }
         } );
@@ -620,8 +619,10 @@ public class Manager
         {
             Environment environment = environmentManager.getEnvironmentByUUID(
                     hadoop.getCluster( accumuloClusterConfig.getHadoopClusterName() ).getEnvironmentId() );
-            populateTable( slavesTable, environment.getContainerHostsByIds( accumuloClusterConfig.getSlaves() ), false );
-            populateTable( tracersTable, environment.getContainerHostsByIds( accumuloClusterConfig.getTracers() ), false );
+            populateTable( slavesTable, environment.getContainerHostsByIds( accumuloClusterConfig.getSlaves() ),
+                    false );
+            populateTable( tracersTable, environment.getContainerHostsByIds( accumuloClusterConfig.getTracers() ),
+                    false );
 
 
             Set<ContainerHost> masters = new HashSet<>();

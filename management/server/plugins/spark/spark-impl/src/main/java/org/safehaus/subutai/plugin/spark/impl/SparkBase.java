@@ -76,6 +76,12 @@ public abstract class SparkBase
     }
 
 
+    public Hadoop getHadoopManager()
+    {
+        return hadoopManager;
+    }
+
+
     protected SparkBase( final DataSource dataSource, final Tracker tracker,
                          final EnvironmentManager environmentManager, final Hadoop hadoopManager )
     {

@@ -22,7 +22,6 @@ import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
-import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
@@ -284,12 +283,12 @@ public class Manager
                     ContainerHost node = environment.getContainerHostByHostname( hostname );
                     if ( node != null )
                     {
-                        TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( node ) );
+                        TerminalWindow terminal = new TerminalWindow( node );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Container not found" );
+                        show( "Host not found" );
                     }
                 }
             }

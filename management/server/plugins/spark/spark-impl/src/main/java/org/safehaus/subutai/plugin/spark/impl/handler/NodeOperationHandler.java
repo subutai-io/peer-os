@@ -161,8 +161,16 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
             throw new ClusterException( String.format( "Node %s already belongs to this cluster", hostname ) );
         }
 
+
+        HadoopClusterConfig hadoopConfig = manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
+
+        if ( hadoopConfig == null )
+        {
+            throw new ClusterException(
+                    String.format( "Hadoop cluster %s is not found", config.getHadoopClusterName() ) );
+        }
         // check if node is one of Hadoop cluster nodes
-        if ( !config.getHadoopNodeIds().contains( node.getId() ) )
+        if ( !hadoopConfig.getAllNodes().contains( node.getId() ) )
         {
             throw new ClusterException( "Node does not belong to Hadoop cluster" );
         }

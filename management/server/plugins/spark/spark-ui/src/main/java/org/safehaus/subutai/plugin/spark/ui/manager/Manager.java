@@ -411,12 +411,12 @@ public class Manager
                     ContainerHost node = environment.getContainerHostByHostname( hostname );
                     if ( node != null )
                     {
-                        TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( node ) );
+                        TerminalWindow terminal = new TerminalWindow( node );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Container not found" );
+                        show( "Host not found" );
                     }
                 }
             }
