@@ -35,17 +35,17 @@ public class SetupHelper
     }
 
 
-    void checkConnected( Environment environment) throws ClusterSetupException
+    void checkConnected( Environment environment ) throws ClusterSetupException
     {
 
-        if ( getCoordinatorHost( environment ).getAgent() == null )
+        if ( !getCoordinatorHost( environment ).isConnected() )
         {
             throw new ClusterSetupException( "Coordinator node is not connected" );
         }
 
         for ( ContainerHost host : environment.getHostsByIds( config.getWorkers() ) )
         {
-            if ( host.getAgent() == null )
+            if ( !host.isConnected() )
             {
                 throw new ClusterSetupException( "Not all worker nodes are connected" );
             }
@@ -53,21 +53,22 @@ public class SetupHelper
     }
 
 
-    public void configureAsCoordinator( ContainerHost host, Environment environment ) throws ClusterSetupException, CommandException
+    public void configureAsCoordinator( ContainerHost host, Environment environment )
+            throws ClusterSetupException, CommandException
     {
         po.addLog( "Configuring coordinator..." );
 
-          CommandResult result = host.execute( manager.getCommands().getSetCoordinatorCommand( getCoordinatorHost( environment)) );
-          processResult( host, result );
-
+        CommandResult result =
+                host.execute( manager.getCommands().getSetCoordinatorCommand( getCoordinatorHost( environment ) ) );
+        processResult( host, result );
     }
 
 
-    public void configureAsWorker(Set<ContainerHost> workerHosts) throws ClusterSetupException
+    public void configureAsWorker( Set<ContainerHost> workerHosts ) throws ClusterSetupException
     {
         po.addLog( "Configuring worker(s)..." );
 
-        for( ContainerHost host : workerHosts )
+        for ( ContainerHost host : workerHosts )
         {
             CommandResult result = null;
             try
@@ -80,7 +81,6 @@ public class SetupHelper
                 throw new ClusterSetupException(
                         String.format( "Failed to configure workers Presto node(s): %s", result.getStdErr() ) );
             }
-
         }
     }
 
@@ -88,7 +88,7 @@ public class SetupHelper
     public void startNodes( final Set<ContainerHost> set ) throws ClusterSetupException
     {
         po.addLog( "Starting Presto node(s)..." );
-        for(ContainerHost host : set)
+        for ( ContainerHost host : set )
         {
             CommandResult result = null;
             try
@@ -104,6 +104,8 @@ public class SetupHelper
             po.addLogDone( "Presto node(s) started successfully\nDone" );
         }
     }
+
+
     public void processResult( ContainerHost host, CommandResult result ) throws ClusterSetupException
     {
 
@@ -113,7 +115,9 @@ public class SetupHelper
                     result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
         }
     }
-    public ContainerHost getCoordinatorHost( Environment environment)
+
+
+    public ContainerHost getCoordinatorHost( Environment environment )
     {
         ContainerHost host = environment.getContainerHostByUUID( config.getCoordinatorNode() );
         return host;

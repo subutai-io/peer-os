@@ -18,6 +18,7 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
@@ -207,6 +208,32 @@ public class RestServiceImpl implements RestService
                             ( List<Template> ) JsonUtil.fromJson( templates, new TypeToken<List<Template>>()
                             {
                             }.getType() ), quantity, strategyId, criteriaList, nodeGroupName );
+            return Response.ok( JsonUtil.toJson( result ) ).build();
+            //            return Response.ok().entity( result ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response scheduleCloneContainers( final String creatorPeerId, final String templates, final int quantity,
+                                             final String strategyId, final String criteria )
+    {
+
+        List<Criteria> criteriaList = new ArrayList();
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            Set<HostInfoModel> result = localPeer.scheduleCloneContainers( UUID.fromString( creatorPeerId ),
+                    ( List<Template> ) JsonUtil.fromJson( templates, new TypeToken<List<Template>>()
+                    {
+                    }.getType() ), quantity, strategyId,
+                    ( List<Criteria> ) JsonUtil.fromJson( templates, new TypeToken<List<Criteria>>()
+                    {
+                    }.getType() ) );
             return Response.ok( JsonUtil.toJson( result ) ).build();
             //            return Response.ok().entity( result ).build();
         }

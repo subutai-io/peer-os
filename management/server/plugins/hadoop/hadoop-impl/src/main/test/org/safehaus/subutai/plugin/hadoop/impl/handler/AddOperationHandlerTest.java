@@ -15,15 +15,18 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AddOperationHandlerTest {
+public class AddOperationHandlerTest
+{
     AddOperationHandler addOperationHandler;
     TrackerOperation trackerOperation;
     UUID uuid;
     DataSource dataSource;
     ExecutorService executorService;
     Tracker tracker;
+
     @Before
-    public void setUp() {
+    public void setUp()
+    {
         dataSource = mock(DataSource.class);
         executorService = mock(ExecutorService.class);
         trackerOperation = mock(TrackerOperation.class);
@@ -38,14 +41,15 @@ public class AddOperationHandlerTest {
         hadoop.setExecutor(executorService);
         addOperationHandler = new AddOperationHandler(hadoop, clusterName, 5);
 
-        assertEquals(uuid,trackerOperation.getId());
-        assertEquals(tracker,hadoop.getTracker());
-        assertEquals(executorService,hadoop.getExecutor());
+        assertEquals(uuid, trackerOperation.getId());
+        assertEquals(tracker, hadoop.getTracker());
+        assertEquals(executorService, hadoop.getExecutor());
 
     }
 
     @Test
-    public void testRun() {
+    public void testRun()
+    {
         HadoopImpl hadoop = new HadoopImpl(dataSource);
         when(trackerOperation.getId()).thenReturn(uuid);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
@@ -53,8 +57,8 @@ public class AddOperationHandlerTest {
         hadoop.setExecutor(executorService);
         addOperationHandler.run();
 
-        assertEquals(uuid,trackerOperation.getId());
-        assertEquals(tracker,hadoop.getTracker());
-        assertEquals(executorService,hadoop.getExecutor());
+        assertEquals(uuid, trackerOperation.getId());
+        assertEquals(tracker, hadoop.getTracker());
+        assertEquals(executorService, hadoop.getExecutor());
     }
 }

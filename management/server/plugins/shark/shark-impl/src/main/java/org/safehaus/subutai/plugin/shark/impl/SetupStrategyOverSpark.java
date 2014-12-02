@@ -17,6 +17,8 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -25,6 +27,7 @@ import com.google.common.collect.Sets;
 
 public class SetupStrategyOverSpark implements ClusterSetupStrategy
 {
+    private static final Logger LOG = LoggerFactory.getLogger( SetupStrategyOverSpark.class.getName() );
 
     private final Environment environment;
     private final SharkImpl manager;
@@ -52,6 +55,8 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
     }
 
 
+    //TODO find all Shark clusters and check if node if Shark installed belongs to them
+    //if belongs then fail otherwise add to non installable nodes
     private void check() throws ClusterSetupException
     {
 
@@ -59,7 +64,6 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
         {
             throw new ClusterSetupException( String.format( "Cluster %s already exists", config.getClusterName() ) );
         }
-
         sparkConfig = manager.getSparkManager().getCluster( config.getSparkClusterName() );
         if ( sparkConfig == null )
         {
@@ -106,7 +110,6 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
         allNodes.add( sparkMaster );
 
         RequestBuilder checkCommand = manager.getCommands().getCheckInstalledCommand();
-
         for ( ContainerHost node : allNodes )
         {
             try

@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import javax.sql.DataSource;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -393,6 +394,7 @@ public class MonitorImplTest
     }
 
 
+    @Ignore
     @Test( expected = MonitorException.class )
     public void testGetContainerHostMetricsWithException() throws Exception
     {
@@ -595,6 +597,7 @@ public class MonitorImplTest
     }
 
 
+    @Ignore
     @Test( expected = MonitorException.class )
     public void testActivateMonitoring() throws Exception
     {

@@ -5,6 +5,7 @@
 
   <reference id="entityManagerFactory" interface="javax.persistence.EntityManagerFactory"
              filter="(osgi.unit.name=peerManagerUnit)" />
+
   <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
     <property name="URL" value="jdbc:h2:~/peer_manager" />
     <property name="user" value="sa" />

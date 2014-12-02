@@ -213,13 +213,13 @@ public class Manager
         for ( final ContainerHost containerHost : containerHosts )
         {
             final Label resultHolder = new Label();
-            resultHolder.setId( containerHost.getAgent().getListIP().get( 0 ) + "-solrResult" );
+            resultHolder.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-solrResult" );
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-solrCheck" );
+            checkBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-solrCheck" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-solrStart" );
+            startBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-solrStart" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-solrStop" );
+            stopBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-solrStop" );
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn );
             enableButtons( startBtn, stopBtn );
@@ -236,7 +236,7 @@ public class Manager
 
 
             table.addItem( new Object[] {
-                    containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ), resultHolder, availableOperations
+                    containerHost.getHostname(), containerHost.getIpByInterfaceName( "eth0" ), resultHolder, availableOperations
             }, null );
 
             addCheckButtonClickListener( containerHost, resultHolder, startBtn, stopBtn, checkBtn );
@@ -466,7 +466,7 @@ public class Manager
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Host is not connected" );
                     }
                 }
             }
