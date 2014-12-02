@@ -33,6 +33,13 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger*
     // after crash
     try {
         _containers = findAllContainers();
+
+        for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+                (*it).getContainerId();
+        }
+
+        deleteContainerInfo("ali");
+
     } catch (SubutaiException e) {
         _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));         
     } catch (std::exception e) {
@@ -94,6 +101,33 @@ bool SubutaiContainerManager::isContainerFrozen(string container_name)
     return false;
 }
 
+/**
+ * Delete related container info from containerIdList file when a container is destroyed.
+ */
+void SubutaiContainerManager::deleteContainerInfo(string hostname)
+{
+    string hostname_file, id;
+
+    string path = "/etc/subutai-agent/";
+    string uuidFile = path + "containerIdList.txt";
+
+    ifstream file(uuidFile.c_str());
+    ofstream temp("temp.txt"); // temp file for input of every student except the one user wants to delete
+
+
+    while(file >> hostname_file >> id)
+    {
+        if(strcmp(hostname_file.c_str(),hostname.c_str())){ // if there are students with different name, input their data into temp file
+            temp << hostname_file << " " << id << endl;
+        }
+    }
+    file.clear(); // clear eof and fail bits
+    file.seekg(0, ios::beg);
+    file.close();
+    temp.close();
+    remove(uuidFile.c_str());
+    rename("temp.txt",uuidFile.c_str());
+}
 
 /*
  * \details find all containers - returns all defined containers -active stopped running
