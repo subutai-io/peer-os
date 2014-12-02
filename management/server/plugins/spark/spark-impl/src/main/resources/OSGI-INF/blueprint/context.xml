@@ -13,6 +13,8 @@
              interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
   <reference id="hadoopManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
+  <reference id="monitor" availability="mandatory"
+             interface="org.safehaus.subutai.core.metric.api.Monitor" />
 
   <bean id="spark-impl" scope="singleton" class="org.safehaus.subutai.plugin.spark.impl.SparkImpl"
         init-method="init" destroy-method="destroy">
@@ -20,6 +22,7 @@
     <argument ref="tracker" />
     <argument ref="environmentManager" />
     <argument ref="hadoopManager" />
+    <argument ref="monitor" />
   </bean>
 
   <service ref="spark-impl" interface="org.safehaus.subutai.plugin.spark.api.Spark" />

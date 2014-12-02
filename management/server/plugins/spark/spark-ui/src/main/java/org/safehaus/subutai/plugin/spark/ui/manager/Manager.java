@@ -53,6 +53,7 @@ public class Manager
     protected static final String STOP_BUTTON_CAPTION = "Stop";
     protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
     protected static final String DESTROY_BUTTON_CAPTION = "Destroy";
+    protected static final String QUOTA_BUTTON_CAPTION = "Quotas";
     protected static final String HOST_COLUMN_CAPTION = "Host";
     protected static final String IP_COLUMN_CAPTION = "IP List";
     protected static final String NODE_ROLE_COLUMN_CAPTION = "Node Role";
@@ -608,21 +609,23 @@ public class Manager
             final Button startBtn = new Button( START_BUTTON_CAPTION );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
+            final Button quotaBtn = new Button( QUOTA_BUTTON_CAPTION );
 
             checkBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-sparkCheck" );
             startBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-sparkStart" );
             stopBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-sparkStop" );
             destroyBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-sparkDestroy" );
+            quotaBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-sparkQuota" );
 
-            addStyleNameToButtons( checkBtn, startBtn, stopBtn, destroyBtn );
-            enableButtons( startBtn, stopBtn );
+            addStyleNameToButtons( checkBtn, startBtn, stopBtn, destroyBtn, quotaBtn );
+            enableButtons( startBtn, stopBtn, quotaBtn );
             progressIcon.setVisible( false );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.addStyleName( "default" );
             availableOperations.setSpacing( true );
 
-            addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn, destroyBtn );
+            addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn, destroyBtn, quotaBtn );
 
             table.addItem( new Object[] {
                     node.getHostname(), node.getIpByInterfaceName( "eth0" ), checkIfMaster( node ), resultHolder,
@@ -634,6 +637,7 @@ public class Manager
             addClickListenerToStartButton( node, false, startBtn, stopBtn, checkBtn, destroyBtn );
             addClickListenerToStopButton( node, false, startBtn, stopBtn, checkBtn, destroyBtn );
             addClickListenerToDestroyButton( node, destroyBtn );
+            addClickListenerToQuotaButton( node, quotaBtn );
         }
 
         //add master here
@@ -641,13 +645,15 @@ public class Manager
         final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
         final Button startBtn = new Button( START_BUTTON_CAPTION );
         final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
+        final Button quotaBtn = new Button( QUOTA_BUTTON_CAPTION );
 
 
         checkBtn.setId( master.getIpByInterfaceName( "eth0" ) + "-sparkCheck" );
         startBtn.setId( master.getIpByInterfaceName( "eth0" ) + "-sparkStart" );
         stopBtn.setId( master.getIpByInterfaceName( "eth0" ) + "-sparkStop" );
+        quotaBtn.setId( master.getIpByInterfaceName( "eth0" ) + "-sparkQuota" );
 
-        addStyleNameToButtons( checkBtn, startBtn, stopBtn );
+        addStyleNameToButtons( checkBtn, startBtn, stopBtn, quotaBtn );
 
         disableButtons( stopBtn, startBtn );
         progressIcon.setVisible( false );
@@ -656,7 +662,7 @@ public class Manager
         availableOperations.addStyleName( "default" );
         availableOperations.setSpacing( true );
 
-        addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn );
+        addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn, quotaBtn );
 
         table.addItem( new Object[] {
                 master.getHostname(), master.getIpByInterfaceName( "eth0" ), checkIfMaster( master ), resultHolder,
@@ -666,6 +672,7 @@ public class Manager
         addClickListenerToMasterCheckButton( master, resultHolder, checkBtn, startBtn, stopBtn );
         addClickListenerToStartButton( master, true, checkBtn, startBtn, stopBtn );
         addClickListenerToStopButton( master, true, checkBtn, startBtn, stopBtn );
+        addClickListenerToQuotaButton( master, quotaBtn );
     }
 
 
@@ -821,6 +828,19 @@ public class Manager
                 } );
 
                 contentRoot.getUI().addWindow( alert.getAlert() );
+            }
+        } );
+    }
+
+
+    public void addClickListenerToQuotaButton( final ContainerHost node, final Button... buttons )
+    {
+        getButton( QUOTA_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                contentRoot.getUI().addWindow( new QuotaWindow( node ) );
             }
         } );
     }
