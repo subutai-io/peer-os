@@ -72,7 +72,7 @@ public class SolrSetupStrategy implements ClusterSetupStrategy
         Set<UUID> solrNodes = new HashSet<>();
         for ( ContainerHost host : environment.getContainers() )
         {
-            solrNodes.add( host.getAgent().getUuid() );
+            solrNodes.add( host.getId() );
         }
 
         config.setNodes( solrNodes );

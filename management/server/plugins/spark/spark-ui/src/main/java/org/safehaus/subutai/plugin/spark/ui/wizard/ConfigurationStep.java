@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.spark.ui.wizard;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +13,6 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 import com.google.common.base.Strings;
@@ -101,21 +99,16 @@ public class ConfigurationStep extends Panel
         buttons.addComponent( next );
 
         content.addComponent( nameTxt );
-        if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP )
-        {
-            addOverHadoopComponents( content, wizard.getConfig() );
-        }
-        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP )
-        {
-            addWithHadoopComponents( content, wizard.getConfig(), wizard.getHadoopConfig() );
-        }
+
+        addControls( content, wizard.getConfig() );
+
         content.addComponent( buttons );
 
         setContent( layout );
     }
 
 
-    private void addOverHadoopComponents( ComponentContainer parent, final SparkClusterConfig config )
+    private void addControls( ComponentContainer parent, final SparkClusterConfig config )
     {
         final ComboBox hadoopClustersCombo = new ComboBox( "Hadoop cluster" );
         final ComboBox masterNodeCombo = new ComboBox( "Master node" );
@@ -155,7 +148,7 @@ public class ConfigurationStep extends Panel
             }
         }
 
-        if ( Strings.isNullOrEmpty( config.getClusterName() ) )
+        if ( Strings.isNullOrEmpty( config.getHadoopClusterName() ) )
         {
             if ( !clusters.isEmpty() )
             {
@@ -164,7 +157,7 @@ public class ConfigurationStep extends Panel
         }
         else
         {
-            HadoopClusterConfig info = hadoop.getCluster( config.getClusterName() );
+            HadoopClusterConfig info = hadoop.getCluster( config.getHadoopClusterName() );
             if ( info != null )
             //restore cluster
             {
@@ -296,138 +289,28 @@ public class ConfigurationStep extends Panel
     }
 
 
-    private void addWithHadoopComponents( ComponentContainer parent, final SparkClusterConfig config,
-                                          final HadoopClusterConfig hadoopConfig )
-    {
-
-        Collection<Integer> col = Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
-
-        final TextField txtHadoopClusterName = new TextField( "Hadoop cluster name" );
-        txtHadoopClusterName.setRequired( true );
-        txtHadoopClusterName.setMaxLength( 20 );
-        if ( hadoopConfig.getClusterName() != null )
-        {
-            txtHadoopClusterName.setValue( hadoopConfig.getClusterName() );
-        }
-        txtHadoopClusterName.addValueChangeListener( new Property.ValueChangeListener()
-        {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                String name = event.getProperty().getValue().toString().trim();
-                config.setHadoopClusterName( name );
-                hadoopConfig.setClusterName( name );
-            }
-        } );
-
-        ComboBox cmbSlaveNodes = new ComboBox( "Number of Hadoop slave nodes", col );
-        cmbSlaveNodes.setImmediate( true );
-        cmbSlaveNodes.setTextInputAllowed( false );
-        cmbSlaveNodes.setNullSelectionAllowed( false );
-        cmbSlaveNodes.setValue( hadoopConfig.getCountOfSlaveNodes() );
-        cmbSlaveNodes.addValueChangeListener( new Property.ValueChangeListener()
-        {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                hadoopConfig.setCountOfSlaveNodes( ( Integer ) event.getProperty().getValue() );
-            }
-        } );
-
-        ComboBox cmbReplFactor = new ComboBox( "Replication factor for Hadoop slave nodes", col );
-        cmbReplFactor.setImmediate( true );
-        cmbReplFactor.setTextInputAllowed( false );
-        cmbReplFactor.setNullSelectionAllowed( false );
-        cmbReplFactor.setValue( hadoopConfig.getReplicationFactor() );
-        cmbReplFactor.addValueChangeListener( new Property.ValueChangeListener()
-        {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                hadoopConfig.setReplicationFactor( ( Integer ) event.getProperty().getValue() );
-            }
-        } );
-
-        TextField txtHadoopDomain = new TextField( "Hadoop cluster domain name" );
-        txtHadoopDomain.setInputPrompt( hadoopConfig.getDomainName() );
-        txtHadoopDomain.setValue( hadoopConfig.getDomainName() );
-        txtHadoopDomain.setMaxLength( 20 );
-        txtHadoopDomain.addValueChangeListener( new Property.ValueChangeListener()
-        {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                String val = event.getProperty().getValue().toString().trim();
-                if ( !val.isEmpty() )
-                {
-                    hadoopConfig.setDomainName( val );
-                }
-            }
-        } );
-
-        parent.addComponent( new Label( "Hadoop settings" ) );
-        parent.addComponent( txtHadoopClusterName );
-        parent.addComponent( cmbSlaveNodes );
-        parent.addComponent( cmbReplFactor );
-        parent.addComponent( txtHadoopDomain );
-    }
-
-
     private void nextClickHandler( Wizard wizard )
     {
         SparkClusterConfig config = wizard.getConfig();
-        if ( config.getClusterName() == null || config.getClusterName().isEmpty() )
+        if ( Strings.isNullOrEmpty( config.getClusterName() ) )
         {
             show( "Enter cluster name" );
-            return;
         }
-
-        if ( config.getSetupType() == SetupType.OVER_HADOOP )
+        else if ( Strings.isNullOrEmpty( config.getHadoopClusterName() ) )
         {
-            if ( Strings.isNullOrEmpty( config.getHadoopClusterName() ) )
-            {
-                show( "Please, select Hadoop cluster" );
-            }
-            else if ( config.getMasterNodeId() == null )
-            {
-                show( "Please, select master node" );
-            }
-            else if ( CollectionUtil.isCollectionEmpty( config.getSlaveIds() ) )
-            {
-                show( "Please, select slave node(s)" );
-            }
-            else
-            {
-                wizard.next();
-            }
+            show( "Please, select Hadoop cluster" );
         }
-        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        else if ( config.getMasterNodeId() == null )
         {
-            HadoopClusterConfig hc = wizard.getHadoopConfig();
-            if ( Strings.isNullOrEmpty( hc.getClusterName() ) )
-            {
-                show( "Enter Hadoop cluster name" );
-            }
-            else if ( hc.getCountOfSlaveNodes() <= 0 )
-            {
-                show( "Invalid number of Hadoop slave nodes" );
-            }
-            else if ( hc.getReplicationFactor() <= 0 )
-            {
-                show( "Invalid replication factor" );
-            }
-            else if ( Strings.isNullOrEmpty( hc.getDomainName() ) )
-            {
-                show( "Enter Hadoop domain name" );
-            }
-            else
-            {
-                wizard.next();
-            }
+            show( "Please, select master node" );
+        }
+        else if ( CollectionUtil.isCollectionEmpty( config.getSlaveIds() ) )
+        {
+            show( "Please, select slave node(s)" );
         }
         else
         {
-            show( "Installation type not supported" );
+            wizard.next();
         }
     }
 
