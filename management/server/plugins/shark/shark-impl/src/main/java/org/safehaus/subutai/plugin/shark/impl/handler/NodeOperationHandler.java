@@ -1,6 +1,8 @@
 package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
+import java.util.List;
+
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
@@ -153,25 +155,39 @@ public class NodeOperationHandler extends AbstractOperationHandler<SharkImpl, Sh
             throw new ClusterException( "Node does not belong to Spark cluster" );
         }
 
-        CommandResult result = executeCommand( node, manager.getCommands().getCheckInstalledCommand() );
+        //check if node already belongs to some existing Shark cluster
+        List<SharkClusterConfig> clusters = manager.getClusters();
 
-        if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
+        for ( SharkClusterConfig cluster : clusters )
         {
-            throw new ClusterException( "Node already has Shark installed" );
+            if ( cluster.getNodeIds().contains( node.getId() ) )
+            {
+                throw new ClusterException(
+                        String.format( "Node %s already belongs to Shark cluster %s", node.getHostname(),
+                                cluster.getClusterName() ) );
+            }
         }
 
-        config.getNodeIds().add( node.getId() );
+        trackerOperation.addLog( "Checking prerequisites..." );
 
+        CommandResult result = executeCommand( node, manager.getCommands().getCheckInstalledCommand() );
 
-        trackerOperation.addLog( "Installing Shark..." );
+        boolean install = !result.getStdOut().contains( Commands.PACKAGE_NAME );
 
-        executeCommand( node, manager.getCommands().getInstallCommand() );
+        if ( install )
+        {
+            trackerOperation.addLog( "Installing Shark..." );
+
+            executeCommand( node, manager.getCommands().getInstallCommand() );
+        }
 
         trackerOperation.addLog( "Setting Master IP..." );
 
         executeCommand( node, manager.getCommands().getSetMasterIPCommand( sparkMaster ) );
 
         trackerOperation.addLog( "Updating db..." );
+
+        config.getNodeIds().add( node.getId() );
 
         if ( !manager.getPluginDao().saveInfo( SharkClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
         {
