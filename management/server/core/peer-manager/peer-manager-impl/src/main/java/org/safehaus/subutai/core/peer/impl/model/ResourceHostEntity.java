@@ -596,17 +596,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
             else
             {
-                if ( CommandUtil.isStdOutContains( commandResult,
-                        String.format( TEMPLATE_EXISTS, template.getTemplateName() ) ) )
-                {
-                    return;
-                }
-                else
-                {
-                    LOG.error( "Unexpected command result: " + commandResult );
-                    throw new ResourceHostException( "Unexpected command result on importing template.",
-                            commandResult.getStdOut() );
-                }
+                LOG.debug( "Template import failed. ", commandResult );
             }
         }
         catch ( CommandException ce )
