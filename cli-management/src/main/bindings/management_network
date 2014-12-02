@@ -140,7 +140,7 @@ function management_network {
          shift
          ;;
        v)
-         listVNImapping="true"
+         vnivlanMap="true"
          shift
          ;;
        M)
