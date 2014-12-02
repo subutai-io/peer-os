@@ -101,7 +101,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.common</Bundle-SymbolicName>
             <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
-            <Export-Package>{local-packages},{local-packages}.*;version=${project.version};-noimport:=true
+            <Export-Package>{local-packages};version=${project.version};-noimport:=true
             </Export-Package>
             <Import-Package>*</Import-Package>
           </instructions>

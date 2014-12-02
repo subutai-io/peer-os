@@ -75,7 +75,7 @@
             <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
             <Bundle-SymbolicName>${project.groupId}.core.environment.impl</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
+              {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
           </instructions>
         </configuration>
