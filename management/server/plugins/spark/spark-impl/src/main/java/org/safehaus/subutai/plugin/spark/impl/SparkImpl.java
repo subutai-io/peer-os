@@ -11,6 +11,10 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.metric.api.Monitor;
+import org.safehaus.subutai.core.metric.api.MonitorException;
+import org.safehaus.subutai.core.metric.api.MonitoringSettings;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeType;
@@ -27,10 +31,30 @@ import com.google.common.base.Preconditions;
 public class SparkImpl extends SparkBase implements Spark
 {
 
+    private final MonitoringSettings alertSettings = new MonitoringSettings().withIntervalBetweenAlertsInMin( 45 );
+    private SparkAlertListener sparkAlertListener;
+
+
     public SparkImpl( final DataSource dataSource, final Tracker tracker, final EnvironmentManager environmentManager,
-                      final Hadoop hadoopManager )
+                      final Hadoop hadoopManager, final Monitor monitor )
     {
-        super( dataSource, tracker, environmentManager, hadoopManager );
+        super( dataSource, tracker, environmentManager, hadoopManager, monitor );
+
+        //subscribe to alerts
+        sparkAlertListener = new SparkAlertListener( this );
+        monitor.addAlertListener( sparkAlertListener );
+    }
+
+
+    public void subscribeToAlerts( Environment environment ) throws MonitorException
+    {
+        getMonitor().startMonitoring( sparkAlertListener, environment, alertSettings );
+    }
+
+
+    public void subscribeToAlerts( ContainerHost host ) throws MonitorException
+    {
+        getMonitor().activateMonitoring( host, alertSettings );
     }
 
 
