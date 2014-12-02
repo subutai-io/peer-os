@@ -112,6 +112,8 @@ public class SetupStrategyOverSparkTest
         when(sharkImpl.getPluginDao()).thenReturn(pluginDAO);
         when(pluginDAO.saveInfo(anyString(), anyString(), any())).thenReturn(true);
 
+        when(commands.getInstallCommand()).thenReturn(requestBuilder);
+
         setupStrategyOverSpark.setup();
 
         assertNotNull(environment);

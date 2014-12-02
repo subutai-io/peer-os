@@ -221,7 +221,7 @@ public class SharkImplTest
         when(containerHost.execute(any(RequestBuilder.class))).thenReturn(commandResult);
         when(commandResult.hasSucceeded()).thenReturn(true);
 
-//        setupStrategyOverSpark.executeCommand(containerHost, requestBuilder);
+        setupStrategyOverSpark.executeCommand(containerHost, requestBuilder);
         when(commandResult.getStdOut()).thenReturn("test");
         when(commands.getSetMasterIPCommand(containerHost)).thenReturn(requestBuilder);
         when(preparedStatement.executeUpdate()).thenReturn(2);
@@ -231,7 +231,7 @@ public class SharkImplTest
         sharkClusterConfig2.setEnvironmentId(uuid);
         sharkClusterConfig2.setSparkClusterName("test");
 
-//        sharkImpl.installCluster(sharkClusterConfig2);
+        sharkImpl.installCluster(sharkClusterConfig2);
 
         assertEquals(trackerOperation, tracker.createTrackerOperation(anyString(), anyString()));
         assertNotNull(sharkImpl.getSparkManager());
