@@ -14,7 +14,6 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.impl.SharkImpl;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
@@ -31,17 +30,6 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SharkImpl,
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
     private ClusterOperationType operationType;
     private Environment environment;
-    private HadoopClusterConfig hadoopConfig;
-
-
-    public ClusterOperationHandler( final SharkImpl manager, final SharkClusterConfig config,
-                                    final ClusterOperationType operationType, HadoopClusterConfig hadoopConfig )
-    {
-        this( manager, config, operationType );
-        Preconditions.checkNotNull( hadoopConfig );
-
-        this.hadoopConfig = hadoopConfig;
-    }
 
 
     public ClusterOperationHandler( final SharkImpl manager, final SharkClusterConfig config,
