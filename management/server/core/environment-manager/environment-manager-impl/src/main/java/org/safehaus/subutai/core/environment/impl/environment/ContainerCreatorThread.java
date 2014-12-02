@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.environment.impl.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -45,6 +46,7 @@ public class ContainerCreatorThread extends Observable implements Runnable
                             message.getNumberOfNodes(), message.getStrategy().getStrategyId(),
                             message.getStrategy().getCriteriaAsList() );
             LOG.info( String.format( "Received %d containers for environment %s", hostInfos.size(), environmentId ) );
+            Template template = message.getTemplates().get( message.getTemplates().size() - 1 );
             setChanged();
             Set<EnvironmentContainerImpl> containers = new HashSet<>();
             for ( HostInfoModel hostInfo : hostInfos )
@@ -53,6 +55,7 @@ public class ContainerCreatorThread extends Observable implements Runnable
                         new EnvironmentContainerImpl( message.getTargetPeerId(), message.getNodeGroupName(), hostInfo );
                 container.setCreatorPeerId( peerManager.getLocalPeer().getId().toString() );
                 container.setPeer( peerManager.getPeer( message.getTargetPeerId() ) );
+                container.setTemplateName( template.getTemplateName() );
                 containers.add( container );
             }
             notifyObservers( containers );
