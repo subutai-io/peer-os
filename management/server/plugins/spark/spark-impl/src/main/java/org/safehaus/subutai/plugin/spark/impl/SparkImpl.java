@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
+import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
@@ -226,5 +227,23 @@ public class SparkImpl extends SparkBase implements Spark
         Preconditions.checkNotNull( clusterConfig, "Spark cluster config is null" );
 
         return new SetupStrategyOverHadoop( po, this, clusterConfig, environment );
+    }
+
+
+    @Override
+    public void saveConfig( final SparkClusterConfig config ) throws ClusterException
+    {
+        Preconditions.checkNotNull( config );
+
+        if ( !getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
+        {
+            throw new ClusterException( "Could not save cluster info" );
+        }
+    }
+
+
+    public void unsubscribeFromAlerts( final Environment environment ) throws MonitorException
+    {
+        getMonitor().stopMonitoring( sparkAlertListener, environment );
     }
 }

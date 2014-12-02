@@ -23,6 +23,19 @@ public class SparkClusterConfig implements ConfigBase
     private UUID masterNodeId;
     private Set<UUID> slaveIds = new HashSet<>();
     private UUID environmentId;
+    private boolean autoScaling;
+
+
+    public boolean isAutoScaling()
+    {
+        return autoScaling;
+    }
+
+
+    public void setAutoScaling( final boolean autoScaling )
+    {
+        this.autoScaling = autoScaling;
+    }
 
 
     public UUID getEnvironmentId()

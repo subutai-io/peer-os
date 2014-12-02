@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
+import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -30,6 +31,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Embedded;
@@ -61,6 +63,7 @@ public class Manager
     protected static final String ADD_NODE_CAPTION = "Add Node";
     protected static final String BUTTON_STYLE_NAME = "default";
     private static final String MESSAGE = "No cluster is installed !";
+    private static final String AUTO_SCALE_BUTTON_CAPTION = "Auto Scale";
     final Button refreshClustersBtn, startAllNodesBtn, stopAllNodesBtn, checkAllBtn, destroyClusterBtn, addNodeBtn;
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
@@ -69,6 +72,7 @@ public class Manager
     private final Spark spark;
     private final Tracker tracker;
     private final Hadoop hadoop;
+    private CheckBox autoScaleBtn;
 
     private final EnvironmentManager environmentManager;
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
@@ -157,6 +161,37 @@ public class Manager
         addNodeBtn = new Button( ADD_NODE_CAPTION );
         addClickListenerToAddNodeButton();
         controlsContent.addComponent( addNodeBtn );
+
+        //auto scale button
+        autoScaleBtn = new CheckBox( AUTO_SCALE_BUTTON_CAPTION );
+        autoScaleBtn.setValue( false );
+        autoScaleBtn.addStyleName( BUTTON_STYLE_NAME );
+        controlsContent.addComponent( autoScaleBtn );
+        autoScaleBtn.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( final Property.ValueChangeEvent event )
+            {
+                if ( config == null )
+                {
+                    show( "Select cluster" );
+                }
+                else
+                {
+                    boolean value = ( Boolean ) event.getProperty().getValue();
+                    config.setAutoScaling( value );
+                    try
+                    {
+                        spark.saveConfig( config );
+                    }
+                    catch ( ClusterException e )
+                    {
+                        show( e.getMessage() );
+                    }
+                }
+            }
+        } );
+
 
         addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllNodesBtn, stopAllNodesBtn, destroyClusterBtn,
                 addNodeBtn );
@@ -435,6 +470,7 @@ public class Manager
             populateTable( nodesTable, environment.getContainerHostsByIds( config.getSlaveIds() ),
                     environment.getContainerHostById( config.getMasterNodeId() ) );
             checkAllNodesStatus();
+            autoScaleBtn.setValue( config.isAutoScaling() );
         }
         else
         {

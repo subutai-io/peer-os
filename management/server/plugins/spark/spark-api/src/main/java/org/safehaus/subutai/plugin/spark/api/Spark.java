@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.spark.api;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
@@ -77,4 +78,11 @@ public interface Spark extends ApiBase<SparkClusterConfig>
 
     public ClusterSetupStrategy getClusterSetupStrategy( TrackerOperation po, SparkClusterConfig clusterConfig,
                                                          Environment environment );
+
+    /**
+     * Saves/Updates cluster config in database
+     *
+     * @param config - config to update
+     */
+    public void saveConfig( SparkClusterConfig config ) throws ClusterException;
 }

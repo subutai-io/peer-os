@@ -205,6 +205,15 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
             }
 
             trackerOperation.addLogDone( "Cluster uninstalled successfully" );
+
+            try
+            {
+                manager.unsubscribeFromAlerts( environment );
+            }
+            catch ( MonitorException e )
+            {
+                throw new ClusterException( e );
+            }
         }
         catch ( ClusterException e )
         {
