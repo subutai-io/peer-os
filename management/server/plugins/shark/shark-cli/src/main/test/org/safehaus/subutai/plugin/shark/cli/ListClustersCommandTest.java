@@ -19,7 +19,7 @@ public class ListClustersCommandTest
     private SharkClusterConfig sharkClusterConfig;
 
     @Before
-    public void setUp() throws Exception
+    public void setUp()
     {
         sharkClusterConfig = mock(SharkClusterConfig.class);
         shark = mock(Shark.class);
@@ -27,7 +27,7 @@ public class ListClustersCommandTest
     }
 
     @Test
-    public void testGetSharkManager() throws Exception
+    public void testGetSharkManager()
     {
         listClustersCommand.setSharkManager(shark);
         listClustersCommand.getSharkManager();
@@ -38,7 +38,7 @@ public class ListClustersCommandTest
     }
 
     @Test
-    public void testSetSharkManager() throws Exception
+    public void testSetSharkManager() 
     {
         listClustersCommand.setSharkManager(shark);
 
@@ -48,7 +48,7 @@ public class ListClustersCommandTest
     }
 
     @Test
-    public void testDoExecutePrintClusterName() throws Exception
+    public void testDoExecutePrintClusterName() 
     {
         List<SharkClusterConfig> myList = mock(List.class);
         myList.add(sharkClusterConfig);
@@ -69,7 +69,7 @@ public class ListClustersCommandTest
     }
 
     @Test
-    public void testDoExecutePrintNoSharkCluster() throws Exception
+    public void testDoExecutePrintNoSharkCluster() 
     {
         List<SharkClusterConfig> myList = mock(List.class);
         myList.add(sharkClusterConfig);

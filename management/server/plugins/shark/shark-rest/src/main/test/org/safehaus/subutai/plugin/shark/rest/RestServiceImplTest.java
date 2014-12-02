@@ -29,14 +29,14 @@ public class RestServiceImplTest
 
 
     @Before
-    public void setUp() throws Exception
+    public void setUp() 
     {
 
         restService = new RestServiceImpl(shark);
     }
 
     @Test
-    public void testListClusters() throws Exception
+    public void testListClusters() 
     {
         List<SharkClusterConfig> myList = Lists.newArrayList();
         myList.add(sharkClusterConfig);
@@ -47,7 +47,7 @@ public class RestServiceImplTest
     }
 
     @Test
-    public void testGetCluster() throws Exception
+    public void testGetCluster() 
     {
         SharkClusterConfig sharkClusterConfig1 = new SharkClusterConfig();
         sharkClusterConfig1.setClusterName("test");
@@ -63,7 +63,7 @@ public class RestServiceImplTest
     }
 
     @Test
-    public void testInstallCluster() throws Exception
+    public void testInstallCluster() 
     {
         when(shark.installCluster(any(SharkClusterConfig.class))).thenReturn(UUID.randomUUID());
         restService.installCluster("test");
@@ -75,7 +75,7 @@ public class RestServiceImplTest
     }
 
     @Test
-    public void testUninstallCluster() throws Exception
+    public void testUninstallCluster() 
     {
         when(shark.uninstallCluster(anyString())).thenReturn(UUID.randomUUID());
         restService.uninstallCluster("test");
@@ -87,7 +87,7 @@ public class RestServiceImplTest
     }
 
     @Test
-    public void testAddNode() throws Exception
+    public void testAddNode() 
     {
         when(shark.addNode(anyString(), anyString())).thenReturn(UUID.randomUUID());
         restService.addNode("test","test");
@@ -98,7 +98,7 @@ public class RestServiceImplTest
     }
 
     @Test
-    public void testDestroyNode() throws Exception
+    public void testDestroyNode() 
     {
         when(shark.destroyNode(anyString(), anyString())).thenReturn(UUID.randomUUID());
         restService.destroyNode("test","test");
@@ -109,7 +109,7 @@ public class RestServiceImplTest
     }
 
     @Test
-    public void testActualizeMasterIP() throws Exception
+    public void testActualizeMasterIP() 
     {
         when(shark.actualizeMasterIP(anyString())).thenReturn(UUID.randomUUID());
         restService.actualizeMasterIP("test");
