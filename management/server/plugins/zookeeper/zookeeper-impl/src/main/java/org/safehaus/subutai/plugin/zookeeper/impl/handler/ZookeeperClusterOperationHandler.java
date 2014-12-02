@@ -92,7 +92,7 @@ public class ZookeeperClusterOperationHandler extends AbstractPluginOperationHan
                 break;
             case START_ALL:
                 environment = manager.getEnvironmentManager().getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost containerHost : environment.getContainerHosts() )
                 {
                     commandResultList.add( executeCommand( containerHost,
                             Commands.getStartCommand() ) );
@@ -100,7 +100,7 @@ public class ZookeeperClusterOperationHandler extends AbstractPluginOperationHan
                 break;
             case STOP_ALL:
                 environment = manager.getEnvironmentManager().getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost containerHost : environment.getContainerHosts() )
                 {
                     commandResultList.add( executeCommand( containerHost,
                             Commands.getStopCommand() ) );
@@ -108,7 +108,7 @@ public class ZookeeperClusterOperationHandler extends AbstractPluginOperationHan
                 break;
             case STATUS_ALL:
                 environment = manager.getEnvironmentManager().getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost containerHost : environment.getContainerHosts() )
                 {
                     commandResultList.add( executeCommand( containerHost,
                             Commands.getStatusCommand() ) );
@@ -195,7 +195,7 @@ public class ZookeeperClusterOperationHandler extends AbstractPluginOperationHan
                 trackerOperation.addLog( "Uninstalling zookeeper on hadoop nodes" );
                 Environment zookeeperEnvironment =
                         manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-                for ( ContainerHost containerHost : zookeeperEnvironment.getHostsByIds( config.getNodes() ) ) {
+                for ( ContainerHost containerHost : zookeeperEnvironment.getContainerHostsByIds( config.getNodes() ) ) {
                     commandResultList.add( containerHost.execute( new RequestBuilder (
                             Commands.getUninstallCommand() ) ) );
                 }

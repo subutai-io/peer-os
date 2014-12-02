@@ -139,7 +139,8 @@ public class NodeSelectionStep extends VerticalLayout
                 {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     Environment env = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
-                    Set<ContainerHost> allNodes = env.getHostsByIds( new HashSet<>( hadoopInfo.getAllNodes() ) );
+                    Set<ContainerHost> allNodes = env.getContainerHostsByIds(
+                            new HashSet<>( hadoopInfo.getAllNodes() ) );
                     select.setValue( null );
                     select.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, allNodes ) );
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
@@ -188,7 +189,7 @@ public class NodeSelectionStep extends VerticalLayout
                 Environment env = environmentManager.getEnvironmentByUUID( hadoopConfig.getEnvironmentId() );
                 if ( env != null )
                 {
-                    Set<ContainerHost> hosts = env.getHostsByIds( config.getNodes() );
+                    Set<ContainerHost> hosts = env.getContainerHostsByIds( config.getNodes() );
                     select.setValue( hosts );
                 }
             }

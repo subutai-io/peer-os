@@ -89,7 +89,7 @@ public class NodeOperationHandlerTest
         when(containerHost.getId()).thenReturn(uuid);
         when(sharkImpl.getSparkManager()).thenReturn(spark);
         when(spark.getCluster(any(String.class))).thenReturn(sparkClusterConfig);
-        when(environment.getContainerHostByUUID(any(UUID.class))).thenReturn(containerHost);
+        when(environment.getContainerHostById( any( UUID.class ) )).thenReturn(containerHost);
         when(sparkClusterConfig.getAllNodesIds()).thenReturn(myList);
         when(sparkClusterConfig.getAllNodesIds().contains(uuid)).thenReturn(true);
 

@@ -42,13 +42,13 @@
 //            throw new ClusterSetupException( "Environment not specified" );
 //        }
 //
-//        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
+//        if ( environment.getContainerHosts() == null || environment.getContainerHosts().isEmpty() )
 //        {
 //            throw new ClusterSetupException( "Environment has no nodes" );
 //        }
 //
 //        config.getWorkers().clear();
-//        for ( EnvironmentContainer n : environment.getContainers() )
+//        for ( EnvironmentContainer n : environment.getContainerHosts() )
 //        {
 //            if ( n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
 //            {

@@ -49,10 +49,10 @@ abstract class HiveSetupStrategy implements ClusterSetupStrategy
                     String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
-        if ( environment.getContainers().size() < config.getNumberOfNodes() )
+        if ( environment.getContainerHosts().size() < config.getNumberOfNodes() )
         {
             throw new ClusterSetupException( String.format( "Environment needs to have %d nodes but has only %d nodes",
-                    config.getNumberOfNodes(), environment.getContainers().size() ) );
+                    config.getNumberOfNodes(), environment.getContainerHosts().size() ) );
         }
         return null;
     }

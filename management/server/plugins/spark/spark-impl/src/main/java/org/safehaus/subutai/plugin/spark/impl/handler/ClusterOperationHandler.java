@@ -82,7 +82,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
             throw new ClusterException( String.format( "Environment not found by id %s", config.getEnvironmentId() ) );
         }
 
-        master = environment.getContainerHostByUUID( config.getMasterNodeId() );
+        master = environment.getContainerHostById( config.getMasterNodeId() );
 
         if ( master == null )
         {
@@ -166,7 +166,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
         {
             checkPrerequisites();
 
-            Set<ContainerHost> allNodes = environment.getHostsByIds( config.getSlaveIds() );
+            Set<ContainerHost> allNodes = environment.getContainerHostsByIds( config.getSlaveIds() );
 
             for ( ContainerHost node : allNodes )
             {
