@@ -17,6 +17,7 @@ import javax.naming.NamingException;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.hostregistry.api.Interface;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
@@ -401,7 +402,10 @@ public class Manager
         {
 
             final Label resultHolder = new Label();
-            resultHolder.setId( containerHost.getAgent().getListIP().get( 0 ) + "-cassandraResult" );
+            //containerHost.getIpByInterfaceName("eth0");
+            //Set<Interface> interfaces = containerHost.getNetInterfaces();
+
+            //resultHolder.setId( containerHost.getIpByInterfaceName("eth0") + "-cassandraResult" );
             final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
             checkButton.setId( containerHost.getAgent().getListIP().get( 0 ) + "-cassandraCheck" );
             final Button startButton = new Button( START_BUTTON_CAPTION );
