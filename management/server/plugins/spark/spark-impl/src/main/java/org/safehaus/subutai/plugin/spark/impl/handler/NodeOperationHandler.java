@@ -139,7 +139,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
     public void addSlaveNode() throws ClusterException
     {
-        ContainerHost master = environment.getContainerHostByUUID( config.getMasterNodeId() );
+        ContainerHost master = environment.getContainerHostById( config.getMasterNodeId() );
 
         if ( master == null )
         {
@@ -257,7 +257,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
         }
 
 
-        ContainerHost master = environment.getContainerHostByUUID( config.getMasterNodeId() );
+        ContainerHost master = environment.getContainerHostById( config.getMasterNodeId() );
 
         if ( master == null )
         {
@@ -328,7 +328,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
             throw new ClusterException( String.format( "Node %s does not belong to this cluster", hostname ) );
         }
 
-        ContainerHost master = environment.getContainerHostByUUID( config.getMasterNodeId() );
+        ContainerHost master = environment.getContainerHostById( config.getMasterNodeId() );
 
         if ( master == null )
         {
@@ -348,8 +348,8 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
         }
 
 
-        Set<ContainerHost> allNodes = environment.getHostsByIds( config.getSlaveIds() );
-        allNodes.add( environment.getContainerHostByUUID( config.getMasterNodeId() ) );
+        Set<ContainerHost> allNodes = environment.getContainerHostsByIds( config.getSlaveIds() );
+        allNodes.add( environment.getContainerHostById( config.getMasterNodeId() ) );
 
         for ( ContainerHost node : allNodes )
         {
@@ -389,7 +389,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
         trackerOperation.addLog( "Adding nodes to new master..." );
 
-        Set<ContainerHost> slaves = environment.getHostsByIds( config.getSlaveIds() );
+        Set<ContainerHost> slaves = environment.getContainerHostsByIds( config.getSlaveIds() );
         Set<String> slaveHostnames = Sets.newHashSet();
         for ( ContainerHost slave : slaves )
         {

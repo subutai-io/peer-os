@@ -169,7 +169,7 @@ public class ClusterOperationHandlerTest
         mySet.add(containerHost);
         when(sharkImpl.getEnvironmentManager()).thenReturn(environmentManager);
         when(environmentManager.getEnvironmentByUUID(any(UUID.class))).thenReturn(environment);
-        when(environment.getHostsByIds(any(Set.class))).thenReturn(mySet).thenReturn(mySet);
+        when(environment.getContainerHostsByIds( any( Set.class ) )).thenReturn(mySet).thenReturn(mySet);
         Iterator<ContainerHost> iterator = mock(Iterator.class);
         when(mySet.iterator()).thenReturn(iterator).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(true).thenReturn(false).thenReturn(true).thenReturn(false);
@@ -207,14 +207,14 @@ public class ClusterOperationHandlerTest
         when(environmentManager.getEnvironmentByUUID(any(UUID.class))).thenReturn(environment);
         Set<ContainerHost> mySet = mock(Set.class);
         mySet.add(containerHost);
-        when(environment.getHostsByIds(any(Set.class))).thenReturn(mySet).thenReturn(mySet);
+        when(environment.getContainerHostsByIds( any( Set.class ) )).thenReturn(mySet).thenReturn(mySet);
         Iterator<ContainerHost> iterator = mock(Iterator.class);
         when(mySet.iterator()).thenReturn(iterator).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(true).thenReturn(false).thenReturn(true).thenReturn(false);
         when(iterator.next()).thenReturn(containerHost).thenReturn(containerHost);
         when(containerHost.isConnected()).thenReturn(true);
         when(mySet.size()).thenReturn(1);
-        when(environment.getContainerHostByUUID(any(UUID.class))).thenReturn(containerHost);
+        when(environment.getContainerHostById( any( UUID.class ) )).thenReturn(containerHost);
         when(sharkImpl.getCommands()).thenReturn(commands);
         when(commands.getSetMasterIPCommand(containerHost)).thenReturn(requestBuilder);
 
@@ -232,7 +232,7 @@ public class ClusterOperationHandlerTest
         assertEquals(environment, sharkImpl.getEnvironmentManager().getEnvironmentByUUID(any(UUID.class)));
         assertTrue(containerHost.isConnected());
         assertNotNull(containerHost);
-        assertEquals(containerHost, environment.getContainerHostByUUID(any(UUID.class)));
+        assertEquals(containerHost, environment.getContainerHostById( any( UUID.class ) ));
         assertEquals(commandResult, clusterOperationHandler3.executeCommand(containerHost, requestBuilder));
 
     }

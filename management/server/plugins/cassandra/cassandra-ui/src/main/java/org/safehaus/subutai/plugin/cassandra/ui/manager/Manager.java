@@ -351,7 +351,7 @@ public class Manager
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION )
                                             .getValue();
                     Set<ContainerHost> containerHosts =
-                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers();
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts();
                     Iterator iterator = containerHosts.iterator();
                     ContainerHost containerHost = null;
                     while ( iterator.hasNext() )
@@ -669,7 +669,7 @@ public class Manager
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
             if ( environment != null )
             {
-                populateTable( nodesTable, environment.getContainers() );
+                populateTable( nodesTable, environment.getContainerHosts() );
             }
             else
             {

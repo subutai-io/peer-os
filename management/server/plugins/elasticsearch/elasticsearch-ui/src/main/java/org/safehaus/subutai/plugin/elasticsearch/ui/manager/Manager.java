@@ -346,7 +346,7 @@ public class Manager
         for ( UUID containerUUID : config.getNodes() )
         {
             ContainerHost containerHost = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() )
-                                                            .getContainerHostByUUID( containerUUID );
+                                                            .getContainerHostById( containerUUID );
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
@@ -372,7 +372,7 @@ public class Manager
         for ( UUID containerUUID : config.getNodes() )
         {
             ContainerHost containerHost = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() )
-                                                            .getContainerHostByUUID( containerUUID );
+                                                            .getContainerHostById( containerUUID );
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
@@ -468,7 +468,7 @@ public class Manager
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION )
                                             .getValue();
                     Set<ContainerHost> containerHosts =
-                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers();
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts();
                     Iterator iterator = containerHosts.iterator();
                     ContainerHost containerHost = null;
                     while ( iterator.hasNext() )
@@ -505,7 +505,7 @@ public class Manager
         if ( config != null )
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-            populateTable( nodesTable, environment.getContainers() );
+            populateTable( nodesTable, environment.getContainerHosts() );
         }
         else
         {

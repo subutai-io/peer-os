@@ -89,14 +89,14 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SharkImpl,
                         String.format( "Environment not found by id %s", config.getEnvironmentId() ) );
             }
 
-            Set<ContainerHost> sharkNodes = environment.getHostsByIds( config.getNodeIds() );
+            Set<ContainerHost> sharkNodes = environment.getContainerHostsByIds( config.getNodeIds() );
 
             if ( sharkNodes.size() < config.getNodeIds().size() )
             {
                 throw new ClusterException( "Found fewer Shark nodes in environment than exist" );
             }
 
-            ContainerHost sparkMaster = environment.getContainerHostByUUID( sparkConfig.getMasterNodeId() );
+            ContainerHost sparkMaster = environment.getContainerHostById( sparkConfig.getMasterNodeId() );
 
             if ( sparkMaster == null )
             {
@@ -180,7 +180,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SharkImpl,
                         String.format( "Environment not found by id %s", config.getEnvironmentId() ) );
             }
 
-            Set<ContainerHost> sharkNodes = environment.getHostsByIds( config.getNodeIds() );
+            Set<ContainerHost> sharkNodes = environment.getContainerHostsByIds( config.getNodeIds() );
 
             if ( sharkNodes.size() < config.getNodeIds().size() )
             {

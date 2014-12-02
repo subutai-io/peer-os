@@ -193,7 +193,7 @@ public class ConfigurationStep extends Panel
             allHadoopNodeSet.addAll( allHadoopNodes );
             Environment hadoopEnvironment =
                     environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
-            final Set<ContainerHost> hadoopNodes = hadoopEnvironment.getHostsByIds( allHadoopNodeSet );
+            final Set<ContainerHost> hadoopNodes = hadoopEnvironment.getContainerHostsByIds( allHadoopNodeSet );
 
             if ( hadoopClustersCombo.getValue() != null )
             {

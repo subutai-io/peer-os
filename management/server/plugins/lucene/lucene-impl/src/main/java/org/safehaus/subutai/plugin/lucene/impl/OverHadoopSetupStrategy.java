@@ -61,7 +61,7 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy
                             config.getClusterName() ) );
         }
         //check nodes are connected
-        Set<ContainerHost> nodes = environment.getHostsByIds( config.getNodes() );
+        Set<ContainerHost> nodes = environment.getContainerHostsByIds( config.getNodes() );
         for ( ContainerHost host : nodes )
         {
             if ( !host.isConnected() )
@@ -85,7 +85,7 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy
         RequestBuilder checkInstalledCommand = new RequestBuilder( Commands.checkCommand );
         for ( UUID uuid : config.getNodes() )
         {
-            ContainerHost node = environment.getContainerHostByUUID( uuid );
+            ContainerHost node = environment.getContainerHostById( uuid );
             try
             {
                 CommandResult result = node.execute( checkInstalledCommand );
@@ -126,7 +126,7 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy
 
         for ( UUID uuid : config.getNodes() )
         {
-            ContainerHost node = environment.getContainerHostByUUID( uuid );
+            ContainerHost node = environment.getContainerHostById( uuid );
             try
             {
                 CommandResult result = node.execute( new RequestBuilder( Commands.installCommand ).withTimeout( 600 ) );

@@ -9,8 +9,6 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
-import java.util.*;
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -51,11 +49,11 @@ public class ClusterConfigurationTest
 
         PluginDAO pluginDAO = mock(PluginDAO.class);
         HadoopClusterConfig hadoopClusterConfig = mock(HadoopClusterConfig.class);
-        when(environment.getContainerHostByUUID(hadoopClusterConfig.getNameNode())).thenReturn(containerHost);
-        when(environment.getContainerHostByUUID(hadoopClusterConfig.getJobTracker())).thenReturn(containerHost);
-        when(environment.getContainerHostByUUID(hadoopClusterConfig.getSecondaryNameNode())).thenReturn(containerHost);
+        when(environment.getContainerHostById( hadoopClusterConfig.getNameNode() )).thenReturn(containerHost);
+        when(environment.getContainerHostById( hadoopClusterConfig.getJobTracker() )).thenReturn(containerHost);
+        when(environment.getContainerHostById( hadoopClusterConfig.getSecondaryNameNode() )).thenReturn(containerHost);
 
-        when(environment.getContainers()).thenReturn(mySet);
+        when(environment.getContainerHosts()).thenReturn(mySet);
         Iterator<ContainerHost> iterator = mock(Iterator.class);
         when(mySet.iterator()).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(false).thenReturn(true).thenReturn(false);
@@ -75,9 +73,9 @@ public class ClusterConfigurationTest
         when(environment.getId()).thenReturn(uuid1);
         clusterConfiguration.configureCluster(configBase, environment);
 
-        assertEquals(containerHost, environment.getContainerHostByUUID(hadoopClusterConfig.getNameNode()));
-        assertEquals(containerHost, environment.getContainerHostByUUID(hadoopClusterConfig.getJobTracker()));
-        assertEquals(containerHost, environment.getContainerHostByUUID(hadoopClusterConfig.getSecondaryNameNode()));
+        assertEquals(containerHost, environment.getContainerHostById( hadoopClusterConfig.getNameNode() ));
+        assertEquals(containerHost, environment.getContainerHostById( hadoopClusterConfig.getJobTracker() ));
+        assertEquals(containerHost, environment.getContainerHostById( hadoopClusterConfig.getSecondaryNameNode() ));
     }
 
     @Test
