@@ -136,10 +136,16 @@ function export {
   
   # insert subutai.template.package info inside containers config file
   conf="/var/lib/lxc/$container/config"
+  propline="`cat $conf | grep subutai.template.package`"
 
-  escaped_debian_dir=$(echo $debian_dir | sed -e 's/\//\\\//g')
-  sed -i "s/subutai.template.package = *.*/subutai.template.package = $escaped_debian_dir.deb/g" $conf 
-  debian_file=$debian_dir".deb"
+  if [ -z "$propline" ]; then
+    echo "subutai.template.package = $debian_dir.deb" >> /var/lib/lxc/$container/config
+    debian_file=$debian_dir".deb"
+  else
+    escaped_debian_dir=$(echo $debian_dir | sed -e 's/\//\\\//g')
+    sed -i "s/subutai.template.package = *.*/subutai.template.package = $escaped_debian_dir.deb/g" $conf 
+    debian_file=$debian_dir".deb"
+  fi
 
   cp /var/lib/lxc/$container/config $debian_root
   cp /var/lib/lxc/$container/fstab  $debian_root
