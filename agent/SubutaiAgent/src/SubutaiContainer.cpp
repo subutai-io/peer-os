@@ -98,7 +98,7 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     pid_t pid;
     try {
         lxc_attach_command_t cmd = {_params[0], _params};
-        result.exit_code = this->container->attach_run_wait(this->container, &opts, program.c_str(), _params);
+        result.exit_code = this->container->attach(this->container, lxc_attach_run_command, &cmd, &opts, &pid);
     } catch (std::exception e) {
         containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Execution failed (LXC): " + string(e.what())));
     }
@@ -126,7 +126,7 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
 void SubutaiContainer::UpdateUsersList() 
 { 
     if (getState() != "RUNNING") return ;
-    containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Updating user list"));
+    containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Updating user list"));
     _users.clear();
     vector<string> params;
     params.push_back("/etc/passwd");
@@ -138,8 +138,8 @@ void SubutaiContainer::UpdateUsersList()
         int uid;
         string uname;
         std::size_t found_first  = line.find(":");
-        std::size_t found_second = line.find(":", found_first+1);
-        std::size_t found_third  = line.find(":", found_second+1);
+        std::size_t found_second = line.find(":", found_first + 1);
+        std::size_t found_third  = line.find(":", found_second + 1);
         uname = line.substr(0, found_first);
         uid   = atoi(line.substr(found_second+1, found_third).c_str());
         _users.insert(make_pair(uid, uname));
@@ -154,8 +154,8 @@ bool SubutaiContainer::getContainerId()
 {
     try
     {
-        containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Get container id"));
-        containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Check uuid.txt.."));
+        containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Get container id"));
+        containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Check uuid.txt.."));
         string path = "/var/lib/lxc/" + this->hostname + "/rootfs/etc/subutai-agent/";
         string uuidFile = path + "uuid.txt";
         ifstream file(uuidFile.c_str());	//opening uuid.txt
@@ -445,25 +445,45 @@ ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) {
 
     // Parsing arguments
     vector<string> pr = ExplodeCommandArguments(command);
-    char* args[pr.size() + 1];
-    int i = 0;
-    SubutaiHelper h;
-    for (vector<string>::iterator it = pr.begin(); it != pr.end(); it++, i++) {
-        if (it == pr.begin()) {
-            // This is a first argument which is actually a program name
-            programName = (*it); 
-            args[i] = const_cast<char*>((*it).c_str());
-            continue;
-        }
-        args[i] = const_cast<char*>((*it).c_str());
-    }
-    args[i] = NULL;
-    lxc_attach_command_t cmd = {const_cast<char*>(programName.c_str()), args};
     int ret;
-    try {
-        ret = this->container->attach(this->container, lxc_attach_run_command, &cmd, &opts, &pid);
-    } catch (std::exception e) {
-        containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Daemon Exception: ", string(e.what())));
+    SubutaiHelper h;
+    if (hasSubCommand(command)) {
+        char* args[3];
+        args[0] = "sh";
+        args[1] = "-c";
+        string cmdLine = "echo -e \"$(";
+        for (vector<string>::iterator it = pr.begin(); it != pr.end(); it++) {
+            cmdLine.append((*it));
+            cmdLine.append(" ");
+        }
+        cmdLine.append(")\"");
+        args[2] = const_cast<char*>(cmdLine.c_str());
+        args[3] = NULL;
+        lxc_attach_command_t cmd = {args[0], args};
+        try {
+            ret = this->container->attach(this->container, lxc_attach_run_command, &cmd, &opts, &pid);
+        } catch (std::exception e) {
+            containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Daemon Exception: ", string(e.what())));
+        }
+    } else {
+        char* args[pr.size() + 1];
+        int i = 0;
+        for (vector<string>::iterator it = pr.begin(); it != pr.end(); it++, i++) {
+            if (it == pr.begin()) {
+                // This is a first argument which is actually a program name
+                programName = (*it); 
+                args[i] = const_cast<char*>((*it).c_str());
+                continue;
+            }
+            args[i] = const_cast<char*>((*it).c_str());
+        }
+        args[i] = NULL;
+        lxc_attach_command_t cmd = {const_cast<char*>(programName.c_str()), args};
+        try {
+            ret = this->container->attach(this->container, lxc_attach_run_command, &cmd, &opts, &pid);
+        } catch (std::exception e) {
+            containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Daemon Exception: ", string(e.what())));
+        }
     }
     containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "Daemon pid: ", h.toString(pid)));
     containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "Exit code: ", h.toString(ret)));
@@ -617,7 +637,7 @@ string SubutaiContainer::getState()
 bool SubutaiContainer::hasSubCommand(SubutaiCommand* command) {
     vector<string> args = ExplodeCommandArguments(command);
     for (vector<string>::iterator it = args.begin(); it != args.end(); it++) {
-        if (it->compare("|") == 0 || it->compare(">") == 0 || it->compare(">>") == 0) {
+        if (it->compare("|") == 0 || it->compare(">") == 0 || it->compare(">>") == 0 || it->compare(";") || it->compare("&") || it->compare("&&") || it->compare("<")) {
             return true;
         }
     }
