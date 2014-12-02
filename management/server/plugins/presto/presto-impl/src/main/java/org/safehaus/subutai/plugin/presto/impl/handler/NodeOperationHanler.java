@@ -75,7 +75,7 @@ public class NodeOperationHanler extends AbstractOperationHandler<PrestoImpl, Pr
             return;
         }
         ContainerHost coordinator = environment.getContainerHostByUUID( config.getCoordinatorNode() );
-        if( coordinator.getAgent() == null)
+        if( !coordinator.isConnected())
         {
             trackerOperation.addLogFailed( String.format( "Coordinator node %s is not connected",
                     coordinator.getHostname() ) );
@@ -121,11 +121,11 @@ public class NodeOperationHanler extends AbstractOperationHandler<PrestoImpl, Pr
         CommandResult result = null;
         try
         {
-            if( host.getAgent() == null)
+            if( !host.isConnected())
             {
                 throw new ClusterSetupException( "New node is not connected" );
             }
-            if( config.getWorkers().contains( host.getAgent().getUuid() ))
+            if( config.getWorkers().contains( host.getId() ))
             {
                 throw new ClusterSetupException( "Node already belongs to cluster" + clusterName );
             }

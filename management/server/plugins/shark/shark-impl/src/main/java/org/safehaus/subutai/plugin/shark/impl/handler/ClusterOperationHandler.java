@@ -1,7 +1,8 @@
 package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
-import com.google.common.base.Preconditions;
+import java.util.Set;
+
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
@@ -9,21 +10,18 @@ import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.shark.api.SetupType;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.impl.SharkImpl;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
+import com.google.common.base.Preconditions;
 
 
 public class ClusterOperationHandler extends AbstractOperationHandler<SharkImpl, SharkClusterConfig>
@@ -140,56 +138,29 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SharkImpl,
 
         try
         {
-            if ( config.getSetupType() == SetupType.WITH_HADOOP_SPARK )
+
+            SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( config.getSparkClusterName() );
+            if ( sparkConfig == null )
             {
-
-                if ( hadoopConfig == null )
-                {
-                    throw new ClusterSetupException( "No Hadoop configuration specified" );
-                }
-
-                trackerOperation.addLog( "Preparing environment..." );
-
-                //setup Hadoop cluster
-                hadoopConfig.setTemplateName( SharkClusterConfig.TEMPLATE_NAME );
-                EnvironmentBlueprint eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
-                environment = manager.getEnvironmentManager().buildEnvironment( eb );
-                manager.getHadoopManager().getClusterSetupStrategy( environment, hadoopConfig, trackerOperation )
-                       .setup();
-
-                //setup Spark cluster
-                SparkClusterConfig sparkConfig = new SparkClusterConfig();
-                sparkConfig.setClusterName( config.getSparkClusterName() );
-                sparkConfig.setSetupType( org.safehaus.subutai.plugin.spark.api.SetupType.WITH_HADOOP );
-                manager.getSparkManager().getClusterSetupStrategy( trackerOperation, sparkConfig, environment ).setup();
-
-                trackerOperation.addLog( "Environment built successfully" );
+                throw new ClusterSetupException(
+                        String.format( "Spark cluster %s not found", config.getClusterName() ) );
             }
-            else
+            environment = manager.getEnvironmentManager().getEnvironmentByUUID( sparkConfig.getEnvironmentId() );
+            if ( environment == null )
             {
-                SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( config.getSparkClusterName() );
-                if ( sparkConfig == null )
-                {
-                    throw new ClusterSetupException(
-                            String.format( "Spark cluster %s not found", config.getClusterName() ) );
-                }
-                environment = manager.getEnvironmentManager().getEnvironmentByUUID( sparkConfig.getEnvironmentId() );
-                if ( environment == null )
-                {
-                    throw new ClusterSetupException(
-                            String.format( "Could not find environment of Spark cluster by id %s",
-                                    sparkConfig.getEnvironmentId() ) );
-                }
-
+                throw new ClusterSetupException( String.format( "Could not find environment of Spark cluster by id %s",
+                        sparkConfig.getEnvironmentId() ) );
             }
+
+
             //setup Shark cluster
-            ClusterSetupStrategy s = manager.getClusterSetupStrategy( trackerOperation, config, environment);
+            ClusterSetupStrategy s = manager.getClusterSetupStrategy( trackerOperation, config, environment );
 
-            trackerOperation.addLog("Installing cluster...");
+            trackerOperation.addLog( "Setting up cluster..." );
             s.setup();
-            trackerOperation.addLogDone("Installing cluster completed");
+            trackerOperation.addLogDone( "Cluster setup completed" );
         }
-        catch ( EnvironmentBuildException | ClusterSetupException e )
+        catch ( ClusterSetupException e )
         {
             LOG.error( "Error in setupCluster", e );
             trackerOperation.addLogFailed( String.format( "Failed to setup cluster : %s", e.getMessage() ) );

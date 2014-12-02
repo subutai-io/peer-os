@@ -318,14 +318,14 @@ public class Manager
         {
             final Label resultHolder = new Label();
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeDestroy" );
+            destroyBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-flumeDestroy" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeStart" );
+            startBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-flumeStart" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeStop" );
+            stopBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-flumeStop" );
 
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeCheck" );
+            checkBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-flumeCheck" );
 
             enableButton( stopBtn, startBtn, checkBtn, destroyBtn );
 
@@ -336,7 +336,7 @@ public class Manager
             addGivenComponents( availableOperations, startBtn, stopBtn, checkBtn, destroyBtn );
 
             table.addItem( new Object[] {
-                    host.getHostname(), host.getAgent().getListIP().get( 0 ), resultHolder, availableOperations
+                    host.getHostname(), host.getIpByInterfaceName( "eth0" ), resultHolder, availableOperations
             }, null );
 
 

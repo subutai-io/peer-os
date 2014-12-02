@@ -359,12 +359,12 @@ public class Manager
         {
             containerHosts.add( environment.getContainerHostByUUID( agentID ) );
         }
-        for ( ContainerHost agent : containerHosts )
+        for ( ContainerHost host : containerHosts )
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StartTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                    new StartTask( zookeeper, tracker, config.getClusterName(), host.getHostname(), new CompleteEvent()
                     {
                         @Override
                         public void onComplete( String result )
@@ -389,12 +389,12 @@ public class Manager
             containerHosts.add( environment.getContainerHostByUUID( agentID ) );
         }
 
-        for ( ContainerHost agent : containerHosts )
+        for ( ContainerHost host : containerHosts )
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StopTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                    new StopTask( zookeeper, tracker, config.getClusterName(), host.getHostname(), new CompleteEvent()
                     {
                         @Override
                         public void onComplete( String result )
@@ -596,7 +596,7 @@ public class Manager
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Host is not connected" );
                     }
                 }
             }
@@ -630,7 +630,7 @@ public class Manager
         Set<ContainerHost> list = new HashSet<>();
         for ( ContainerHost containerHost : containerHosts )
         {
-            if ( config.getNodes().contains( containerHost.getAgent().getUuid() ) )
+            if ( config.getNodes().contains( containerHost.getId() ) )
             {
                 list.add( containerHost );
             }
@@ -650,10 +650,10 @@ public class Manager
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
 
-            checkBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperCheck" );
-            startBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperStart" );
-            stopBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperStop" );
-            destroyBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperDestroy" );
+            checkBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-zookeeperCheck" );
+            startBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-zookeeperStart" );
+            stopBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-zookeeperStop" );
+            destroyBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-zookeeperDestroy" );
 
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );
@@ -666,7 +666,7 @@ public class Manager
             PROGRESS_ICON.setVisible( false );
 
             table.addItem( new Object[] {
-                    containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ), resultHolder,
+                    containerHost.getHostname(), containerHost.getIpByInterfaceName( "eth0" ), resultHolder,
                     availableOperations
             }, null );
 

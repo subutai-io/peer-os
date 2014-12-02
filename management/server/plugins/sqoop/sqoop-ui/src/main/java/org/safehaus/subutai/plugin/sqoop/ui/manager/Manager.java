@@ -11,7 +11,6 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -167,8 +166,8 @@ public class Manager
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
                             UUID trackID = sqoop.uninstallCluster( config.getClusterName() );
-                            ProgressWindow window
-                                    = new ProgressWindow( executorService, tracker, trackID, SqoopConfig.PRODUCT_KEY );
+                            ProgressWindow window =
+                                    new ProgressWindow( executorService, tracker, trackID, SqoopConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -219,8 +218,8 @@ public class Manager
             {
                 if ( event.isDoubleClick() )
                 {
-                    String hostname
-                            = ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
+                    String hostname =
+                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     ContainerHost host = environment.getContainerHostByHostname( hostname );
                     if ( host != null && host.isConnected() )
                     {
@@ -301,9 +300,8 @@ public class Manager
 
             addGivenComponents( availableOperations, importBtn, exportBtn, destroyBtn );
 
-            table.addItem( new Object[]
-            {
-                node.getHostname(), ip, availableOperations
+            table.addItem( new Object[] {
+                    node.getHostname(), ip, availableOperations
             }, null );
 
 
@@ -332,15 +330,10 @@ public class Manager
         }
     }
 
-    //TODO use host.getInterfaces instead
+
     private String getIPofHost( ContainerHost host )
     {
-        Agent agent = host.getAgent();
-        if ( agent != null && agent.getListIP() != null && agent.getListIP().size() > 0 )
-        {
-            return agent.getListIP().get( 0 );
-        }
-        return null;
+        return host.getIpByInterfaceName( "eth0" );
     }
 
 
@@ -361,8 +354,8 @@ public class Manager
                     public void buttonClick( Button.ClickEvent clickEvent )
                     {
                         UUID trackId = sqoop.destroyNode( config.getClusterName(), node.getHostname() );
-                        ProgressWindow window
-                                = new ProgressWindow( executorService, tracker, trackId, SqoopConfig.PRODUCT_KEY );
+                        ProgressWindow window =
+                                new ProgressWindow( executorService, tracker, trackId, SqoopConfig.PRODUCT_KEY );
                         window.getWindow().addCloseListener( new Window.CloseListener()
                         {
                             @Override

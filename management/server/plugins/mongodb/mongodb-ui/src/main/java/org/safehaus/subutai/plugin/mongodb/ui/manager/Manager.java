@@ -415,19 +415,19 @@ public class Manager
         {
             final MongoNode node = ( MongoNode ) o;
             final Button checkBtn = new Button( "Check" );
-            checkBtn.setId( node.getContainerHost().getAgent().getListIP().get( 0 ) + "-mongoCheck" );
+            checkBtn.setId( node.getContainerHost().getIpByInterfaceName( "eth0" ) + "-mongoCheck" );
             checkBtn.addStyleName( "default" );
             final Button startBtn = new Button( "Start" );
-            startBtn.setId( node.getContainerHost().getAgent().getListIP().get( 0 ) + "-mongoStart" );
+            startBtn.setId( node.getContainerHost().getIpByInterfaceName( "eth0" ) + "-mongoStart" );
             startBtn.addStyleName( "default" );
             final Button stopBtn = new Button( "Stop" );
-            stopBtn.setId( node.getContainerHost().getAgent().getListIP().get( 0 ) + "mongoStop" );
+            stopBtn.setId( node.getContainerHost().getIpByInterfaceName( "eth0" ) + "mongoStop" );
             stopBtn.addStyleName( "default" );
             final Button destroyBtn = new Button( "Destroy" );
-            destroyBtn.setId( node.getContainerHost().getAgent().getListIP().get( 0 ) + "mongoDestroy" );
+            destroyBtn.setId( node.getContainerHost().getIpByInterfaceName( "eth0" ) + "mongoDestroy" );
             destroyBtn.addStyleName( "default" );
             final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-            progressIcon.setId( node.getContainerHost().getAgent().getListIP().get( 0 ) + "mongoProgress" );
+            progressIcon.setId( node.getContainerHost().getIpByInterfaceName( "eth0" ) + "mongoProgress" );
             stopBtn.setEnabled( false );
             startBtn.setEnabled( false );
             progressIcon.setVisible( false );

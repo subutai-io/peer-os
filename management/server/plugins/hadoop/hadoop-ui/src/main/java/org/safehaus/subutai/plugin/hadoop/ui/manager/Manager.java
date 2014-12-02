@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -285,13 +284,13 @@ public class Manager
 
         // Buttons to be added to availableOperations
         final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
-        checkButton.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hadoopCheck" );
+        checkButton.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-hadoopCheck" );
         final Button destroyButton = new Button( DESTROY_BUTTON_CAPTION );
-        destroyButton.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hadoopDestroy" );
+        destroyButton.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-hadoopDestroy" );
         final Button startStopButton = new Button( START_STOP_BUTTON_DEFAULT_CAPTION );
-        startStopButton.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hadoopStartStop" );
+        startStopButton.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-hadoopStartStop" );
         final Button excludeIncludeNodeButton = new Button( EXCLUDE_INCLUDE_BUTTON_DEFAULT_CAPTION );
-        excludeIncludeNodeButton.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hadoopExcludeInclude" );
+        excludeIncludeNodeButton.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-hadoopExcludeInclude" );
         final Button urlButton = new Button( URL_BUTTON_CAPTION );
         urlButton.setId( containerHost.getHostname() + "-hadoopUrl" );
 
@@ -305,11 +304,11 @@ public class Manager
 
         // Labels to be added to statusGroup
         final Label statusDatanode = new Label( "" );
-        statusDatanode.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hadoopStatusDataNode" );
+        statusDatanode.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-hadoopStatusDataNode" );
         final Label statusTaskTracker = new Label( "" );
-        statusTaskTracker.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hadoopStatusTaskTracker" );
+        statusTaskTracker.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-hadoopStatusTaskTracker" );
         final Label statusDecommission = new Label( "" );
-        statusDecommission.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hadoopStatusDecommission" );
+        statusDecommission.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-hadoopStatusDecommission" );
 
         statusDatanode.addStyleName( "default" );
         statusTaskTracker.addStyleName( "default" );
@@ -319,21 +318,21 @@ public class Manager
 
         if ( cluster.isMasterNode( containerHost ) )
         {
-            if ( cluster.isNameNode( containerHost.getAgent().getUuid() ) )
+            if ( cluster.isNameNode( containerHost.getId() ) )
             {
                 availableOperations.addComponent( checkButton );
                 availableOperations.addComponent( startStopButton );
                 availableOperations.addComponent( urlButton );
                 statusGroup.addComponent( statusDatanode );
             }
-            else if ( cluster.isJobTracker( containerHost.getAgent().getUuid() ) )
+            else if ( cluster.isJobTracker( containerHost.getId() ) )
             {
                 availableOperations.addComponent( checkButton );
                 availableOperations.addComponent( startStopButton );
                 availableOperations.addComponent( urlButton );
                 statusGroup.addComponent( statusTaskTracker );
             }
-            else if ( cluster.isSecondaryNameNode( containerHost.getAgent().getUuid() ) )
+            else if ( cluster.isSecondaryNameNode( containerHost.getId() ) )
             {
                 availableOperations.addComponent( checkButton );
                 availableOperations.addComponent( urlButton );
@@ -350,12 +349,12 @@ public class Manager
             statusGroup.addComponent( statusDecommission );
         }
         table.addItem( new Object[] {
-                containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ),
+                containerHost.getHostname(), containerHost.getIpByInterfaceName( "eth0" ),
                 getNodeRoles( cluster, containerHost ).toString(), statusGroup, availableOperations
         }, null );
 
 
-        Item row = getAgentRow( table, containerHost.getAgent() );
+        Item row = getAgentRow( table, containerHost );
 
         // Add listeners according to node type
 
@@ -363,24 +362,23 @@ public class Manager
         if ( cluster.isMasterNode( containerHost ) )
         {
             // If Namenode
-            if ( cluster.isNameNode( containerHost.getAgent().getUuid() ) )
+            if ( cluster.isNameNode( containerHost.getId() ) )
             {
-                urlButton.addClickListener( managerListener.nameNodeURLButtonListener( containerHost.getAgent() ) );
+                urlButton.addClickListener( managerListener.nameNodeURLButtonListener( containerHost ) );
                 checkButton.addClickListener( managerListener.nameNodeCheckButtonListener( row ) );
                 startStopButton.addClickListener( managerListener.nameNodeStartStopButtonListener( row ) );
             }
             // If Jobtracker
-            else if ( cluster.isJobTracker( containerHost.getAgent().getUuid() ) )
+            else if ( cluster.isJobTracker( containerHost.getId() ) )
             {
-                urlButton.addClickListener( jobTrackerURLButtonListener( containerHost.getAgent() ) );
+                urlButton.addClickListener( jobTrackerURLButtonListener( containerHost ) );
                 checkButton.addClickListener( managerListener.jobTrackerCheckButtonListener( row ) );
                 startStopButton.addClickListener( managerListener.jobTrackerStartStopButtonListener( row ) );
             }
             // If SecondaryNameNode
-            else if ( cluster.isSecondaryNameNode( containerHost.getAgent().getUuid() ) )
+            else if ( cluster.isSecondaryNameNode( containerHost.getId() ) )
             {
-                urlButton.addClickListener(
-                        managerListener.secondaryNameNodeURLButtonListener( containerHost.getAgent() ) );
+                urlButton.addClickListener( managerListener.secondaryNameNodeURLButtonListener( containerHost ) );
                 checkButton.addClickListener( managerListener.secondaryNameNodeCheckButtonListener( row ) );
             }
         }
@@ -394,10 +392,10 @@ public class Manager
     }
 
 
-    public Item getAgentRow( final Table table, final Agent agent )
+    public Item getAgentRow( final Table table, final ContainerHost host )
     {
 
-        int rowId = getAgentRowId( table, agent );
+        int rowId = getAgentRowId( table, host );
         Item row = null;
         if ( rowId >= 0 )
         {
@@ -405,23 +403,23 @@ public class Manager
         }
         if ( row == null )
         {
-            Notification.show( "Agent rowId should have been found inside " + table.getCaption()
+            Notification.show( "Host rowId should have been found inside " + table.getCaption()
                     + " but could not find! " );
         }
         return row;
     }
 
 
-    protected int getAgentRowId( final Table table, final Agent agent )
+    protected int getAgentRowId( final Table table, final ContainerHost host )
     {
-        if ( table != null && agent != null )
+        if ( table != null && host != null )
         {
             for ( Object o : table.getItemIds() )
             {
                 int rowId = ( Integer ) o;
                 Item row = table.getItem( rowId );
                 String hostName = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
-                if ( hostName.equals( agent.getHostname() ) )
+                if ( hostName.equals( host.getHostname() ) )
                 {
                     return rowId;
                 }
@@ -435,23 +433,23 @@ public class Manager
     {
         List<NodeType> nodeRoles = new ArrayList<>();
 
-        if ( clusterConfig.isNameNode( containerHost.getAgent().getUuid() ) )
+        if ( clusterConfig.isNameNode( containerHost.getId() ) )
         {
             nodeRoles.add( NodeType.NAMENODE );
         }
-        if ( clusterConfig.isSecondaryNameNode( containerHost.getAgent().getUuid() ) )
+        if ( clusterConfig.isSecondaryNameNode( containerHost.getId() ) )
         {
             nodeRoles.add( NodeType.SECONDARY_NAMENODE );
         }
-        if ( clusterConfig.isJobTracker( containerHost.getAgent().getUuid() ) )
+        if ( clusterConfig.isJobTracker( containerHost.getId() ) )
         {
             nodeRoles.add( NodeType.JOBTRACKER );
         }
-        if ( clusterConfig.isDataNode( containerHost.getAgent().getUuid() ) )
+        if ( clusterConfig.isDataNode( containerHost.getId() ) )
         {
             nodeRoles.add( NodeType.DATANODE );
         }
-        if ( clusterConfig.isTaskTracker( containerHost.getAgent().getUuid() ) )
+        if ( clusterConfig.isTaskTracker( containerHost.getId() ) )
         {
             nodeRoles.add( NodeType.TASKTRACKER );
         }
@@ -460,7 +458,7 @@ public class Manager
     }
 
 
-    private Button.ClickListener jobTrackerURLButtonListener( final Agent agent )
+    private Button.ClickListener jobTrackerURLButtonListener( final ContainerHost host )
     {
         return new Button.ClickListener()
         {
@@ -468,7 +466,7 @@ public class Manager
             public void buttonClick( final Button.ClickEvent event )
             {
                 contentRoot.getUI().getPage()
-                           .open( "http://" + agent.getListIP().get( 0 ) + ":50030", "JobTracker", false );
+                           .open( "http://" + host.getIpByInterfaceName( "eth0" ) + ":50030", "JobTracker", false );
             }
         };
     }
@@ -479,7 +477,7 @@ public class Manager
         Set<ContainerHost> list = new HashSet<>();
         for ( ContainerHost containerHost : containerHosts )
         {
-            if ( config.getAllMasterNodesAgents().contains( containerHost.getAgent().getUuid() ) )
+            if ( config.getAllMasterNodesAgents().contains( containerHost.getId() ) )
             {
                 list.add( containerHost );
             }
@@ -493,7 +491,7 @@ public class Manager
         Set<ContainerHost> list = new HashSet<>();
         for ( ContainerHost containerHost : containerHosts )
         {
-            if ( config.getAllSlaveNodesAgents().contains( containerHost.getAgent().getUuid() ) )
+            if ( config.getAllSlaveNodesAgents().contains( containerHost.getId() ) )
             {
                 list.add( containerHost );
             }
@@ -722,7 +720,7 @@ public class Manager
     }
 
 
-    protected Agent getAgentByRow( final Item row )
+    protected ContainerHost getHostByRow( final Item row )
     {
         if ( row == null )
         {
@@ -735,7 +733,7 @@ public class Manager
         {
             if ( containerHost.getHostname().equals( lxcHostname ) )
             {
-                return containerHost.getAgent();
+                return containerHost;
             }
         }
         return null;
@@ -772,10 +770,10 @@ public class Manager
     }
 
 
-    protected NodeState getDecommissionStatus( final String operationLog, final Agent agent )
+    protected NodeState getDecommissionStatus( final String operationLog, final ContainerHost host )
     {
         NodeState decommissionState = NodeState.UNKNOWN;
-        String ipOfNode = agent.getListIP().get( 0 );
+        String ipOfNode = host.getIpByInterfaceName( "eth0" );
 
         if ( operationLog != null && operationLog.contains( ipOfNode ) )
         {
@@ -815,7 +813,7 @@ public class Manager
             decommissionState = NodeState.UNKNOWN;
         }
 
-        if ( decommissionState == NodeState.NORMAL && hadoopCluster.getBlockedAgents().contains( agent ) )
+        if ( decommissionState == NodeState.NORMAL && hadoopCluster.getBlockedAgents().contains( host ) )
         {
             decommissionState = NodeState.DECOMMISSIONED;
         }

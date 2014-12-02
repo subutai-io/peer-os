@@ -46,7 +46,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 {
     private static final String CONTAINER_DOES_NOT_EXISTS = "Container \"%s\" does NOT exist. Aborting ...";
     private static final String CONTAINER_DESTROYED = "Destruction of \"%s\" completed successfully";
-    private static final String TEMPLATE_EXISTS = "Container \"%s\" exists. Aborting ...";
+    private static final String TEMPLATE_EXISTS = "Template \"%s\" seems already installed, please destroy first";
 
     @javax.persistence.Transient
     transient protected static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
@@ -596,17 +596,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
             else
             {
-                if ( CommandUtil.isStdOutContains( commandResult,
-                        String.format( TEMPLATE_EXISTS, template.getTemplateName() ) ) )
-                {
-                    return;
-                }
-                else
-                {
-                    LOG.error( "Unexpected command result: " + commandResult );
-                    throw new ResourceHostException( "Unexpected command result on importing template.",
-                            commandResult.getStdOut() );
-                }
+                LOG.debug( "Template import failed. ", commandResult );
             }
         }
         catch ( CommandException ce )

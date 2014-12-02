@@ -15,7 +15,6 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
@@ -189,29 +188,24 @@ public class Manager
                 }
 
                 Set<ContainerHost> set = null;
-                if ( config.getSetupType() == SetupType.OVER_HADOOP )
+
+                String hn = config.getHadoopClusterName();
+                if ( !Strings.isNullOrEmpty( hn ) )
                 {
-                    String hn = config.getHadoopClusterName();
-                    if ( !Strings.isNullOrEmpty( hn ) )
+                    HadoopClusterConfig hci = hadoop.getCluster( hn );
+                    if ( hci != null )
                     {
-                        HadoopClusterConfig hci = hadoop.getCluster( hn );
-                        if ( hci != null )
-                        {
-                            set = environment.getHostsByIds( Sets.newHashSet( hci.getAllNodes() ) );
-                        }
+                        set = environment.getHostsByIds( Sets.newHashSet( hci.getAllNodes() ) );
                     }
                 }
-                else if ( config.getSetupType() == SetupType.WITH_HADOOP )
-                {
-                    set = environment.getHostsByIds( config.getHadoopNodeIds() );
-                }
+
 
                 if ( set == null )
                 {
                     show( "Hadoop cluster not found" );
                     return;
                 }
-                set.removeAll( environment.getHostsByIds( Sets.newHashSet(config.getAllNodesIds())) );
+                set.removeAll( environment.getHostsByIds( Sets.newHashSet( config.getAllNodesIds() ) ) );
                 if ( set.isEmpty() )
                 {
                     show( "All nodes in Hadoop cluster have Spark installed" );
@@ -613,10 +607,10 @@ public class Manager
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
 
-            checkBtn.setId( node.getAgent().getListIP().get( 0 ) + "-sparkCheck" );
-            startBtn.setId( node.getAgent().getListIP().get( 0 ) + "-sparkStart" );
-            stopBtn.setId( node.getAgent().getListIP().get( 0 ) + "-sparkStop" );
-            destroyBtn.setId( node.getAgent().getListIP().get( 0 ) + "-sparkDestroy" );
+            checkBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-sparkCheck" );
+            startBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-sparkStart" );
+            stopBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-sparkStop" );
+            destroyBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-sparkDestroy" );
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn, destroyBtn );
             enableButtons( startBtn, stopBtn );
@@ -629,7 +623,7 @@ public class Manager
             addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn, destroyBtn );
 
             table.addItem( new Object[] {
-                    node.getHostname(), node.getAgent().getListIP().get( 0 ), checkIfMaster( node ), resultHolder,
+                    node.getHostname(), node.getIpByInterfaceName( "eth0" ), checkIfMaster( node ), resultHolder,
                     availableOperations
             }, null );
 
@@ -647,9 +641,9 @@ public class Manager
         final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
 
 
-        checkBtn.setId( master.getAgent().getListIP().get( 0 ) + "-sparkCheck" );
-        startBtn.setId( master.getAgent().getListIP().get( 0 ) + "-sparkStart" );
-        stopBtn.setId( master.getAgent().getListIP().get( 0 ) + "-sparkStop" );
+        checkBtn.setId( master.getIpByInterfaceName( "eth0" ) + "-sparkCheck" );
+        startBtn.setId( master.getIpByInterfaceName( "eth0" ) + "-sparkStart" );
+        stopBtn.setId( master.getIpByInterfaceName( "eth0" ) + "-sparkStop" );
 
         addStyleNameToButtons( checkBtn, startBtn, stopBtn );
 
@@ -663,7 +657,7 @@ public class Manager
         addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn );
 
         table.addItem( new Object[] {
-                master.getHostname(), master.getAgent().getListIP().get( 0 ), checkIfMaster( master ), resultHolder,
+                master.getHostname(), master.getIpByInterfaceName( "eth0" ), checkIfMaster( master ), resultHolder,
                 availableOperations
         }, null );
 

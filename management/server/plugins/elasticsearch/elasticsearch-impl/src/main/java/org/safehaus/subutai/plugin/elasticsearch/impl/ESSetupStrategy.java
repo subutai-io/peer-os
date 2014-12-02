@@ -67,7 +67,7 @@ public class ESSetupStrategy implements ClusterSetupStrategy
         Set<UUID> esNodes = new HashSet<>();
         for ( ContainerHost containerHost : environment.getContainers() )
         {
-            esNodes.add( containerHost.getAgent().getUuid() );
+            esNodes.add( containerHost.getId() );
         }
         config.setNodes( esNodes );
 

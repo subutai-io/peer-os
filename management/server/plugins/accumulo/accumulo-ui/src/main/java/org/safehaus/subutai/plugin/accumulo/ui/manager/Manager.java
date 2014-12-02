@@ -645,11 +645,11 @@ public class Manager
         for ( final ContainerHost containerHost : containerHosts )
         {
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-accumuloCheck" );
+            checkBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-accumuloCheck" );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-accumuloDestroy" );
+            destroyBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-accumuloDestroy" );
             final Label resultHolder = new Label();
-            resultHolder.setId( containerHost.getAgent().getListIP().get( 0 ) + "accumuloResult" );
+            resultHolder.setId( containerHost.getIpByInterfaceName( "eth0" ) + "accumuloResult" );
 
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );
@@ -660,7 +660,7 @@ public class Manager
 
             final String nodeRole = findNodeRoles( containerHost );
             table.addItem( new Object[] {
-                    containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ), nodeRole, resultHolder,
+                    containerHost.getHostname(), containerHost.getIpByInterfaceName( "eth0" ), nodeRole, resultHolder,
                     availableOperations
             }, null );
 

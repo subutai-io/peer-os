@@ -8,13 +8,7 @@ import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.Criteria;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -22,15 +16,12 @@ import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.handler.ClusterOperationHandler;
 import org.safehaus.subutai.plugin.spark.impl.handler.NodeOperationHandler;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
 
 public class SparkImpl extends SparkBase implements Spark
@@ -90,21 +81,6 @@ public class SparkImpl extends SparkBase implements Spark
     public UUID addNode( final String clusterName, final String agentHostName )
     {
         return null;
-    }
-
-
-    @Override
-    public UUID installCluster( SparkClusterConfig config, HadoopClusterConfig hadoopConfig )
-    {
-        Preconditions.checkNotNull( config, "Configuration is null" );
-        Preconditions.checkNotNull( hadoopConfig, "Hadoop Configuration is null" );
-
-        AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL, hadoopConfig );
-
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
     }
 
 
@@ -217,29 +193,6 @@ public class SparkImpl extends SparkBase implements Spark
 
 
     @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( SparkClusterConfig config )
-    {
-
-        EnvironmentBlueprint blueprint = new EnvironmentBlueprint();
-
-        blueprint.setName( String.format( "%s-%s", config.getProductKey(), UUIDUtil.generateTimeBasedUUID() ) );
-        blueprint.setExchangeSshKeys( true );
-        blueprint.setLinkHosts( true );
-        blueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
-
-        NodeGroup ng = new NodeGroup();
-        ng.setName( "Default" );
-        ng.setNumberOfNodes( 1 + config.getSlaveNodesCount() ); // master +slaves
-        ng.setTemplateName( SparkClusterConfig.TEMPLATE_NAME );
-        ng.setPlacementStrategy( new PlacementStrategy( "BEST_SERVER", new Criteria( "MORE_RAM", true ) ) );
-        blueprint.setNodeGroups( Sets.newHashSet( ng ) );
-
-
-        return blueprint;
-    }
-
-
-    @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final TrackerOperation po,
                                                          final SparkClusterConfig clusterConfig,
                                                          final Environment environment )
@@ -248,13 +201,6 @@ public class SparkImpl extends SparkBase implements Spark
         Preconditions.checkNotNull( po, "Product operation is null" );
         Preconditions.checkNotNull( clusterConfig, "Spark cluster config is null" );
 
-        if ( clusterConfig.getSetupType() == SetupType.OVER_HADOOP )
-        {
-            return new SetupStrategyOverHadoop( po, this, clusterConfig, environment );
-        }
-        else
-        {
-            return new SetupStrategyWithHadoop( po, this, clusterConfig, environment );
-        }
+        return new SetupStrategyOverHadoop( po, this, clusterConfig, environment );
     }
 }

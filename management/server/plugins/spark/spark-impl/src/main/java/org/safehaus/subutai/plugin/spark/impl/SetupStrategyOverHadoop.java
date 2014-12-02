@@ -56,7 +56,8 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
         return config;
     }
 
-
+    //TODO find all Spark clusters and check if node if Spark installed belongs to them
+    //if belongs then fail otherwise add to non installable nodes
     private void check() throws ClusterSetupException
     {
 
@@ -110,7 +111,6 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
             throw new ClusterSetupException(
                     "Not all nodes belong to Hadoop cluster " + config.getHadoopClusterName() );
         }
-        //        config.setHadoopNodeIds( new HashSet<>( hc.getAllNodes() ) );
 
         po.addLog( "Checking prerequisites..." );
 

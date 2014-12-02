@@ -38,16 +38,10 @@ public class HostInfoModel implements HostInfo
         this.id = containerHost.getId();
         this.hostname = containerHost.getHostname();
         this.hostArchitecture = containerHost.getHostArchitecture();
-        try
+
+        for ( Interface anInterface : containerHost.getNetInterfaces() )
         {
-            for ( Interface anInterface : containerHost.getNetInterfaces() )
-            {
-                this.netInterfaces.add( new InterfaceModel( anInterface ) );
-            }
-        }
-        catch ( PeerException e )
-        {
-            e.printStackTrace();
+            this.netInterfaces.add( new InterfaceModel( anInterface ) );
         }
     }
 

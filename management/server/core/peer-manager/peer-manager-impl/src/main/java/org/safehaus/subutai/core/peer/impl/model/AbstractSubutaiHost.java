@@ -25,7 +25,6 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
@@ -301,6 +300,36 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     @Override
+    public String getIpByInterfaceName( String interfaceName )
+    {
+        for ( Interface iface : interfaces )
+        {
+            if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
+            {
+                return iface.getIp();
+            }
+        }
+
+        return null;
+    }
+
+
+    @Override
+    public String getMacByInterfaceName( final String interfaceName )
+    {
+        for ( Interface iface : interfaces )
+        {
+            if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
+            {
+                return iface.getMac();
+            }
+        }
+
+        return null;
+    }
+
+
+    @Override
     public String getIpByMask( String mask )
     {
         String[] s = this.netInterfaces.split( ";" );
@@ -349,18 +378,13 @@ public abstract class AbstractSubutaiHost implements Host
 
         try
         {
-            execute( new RequestBuilder( appendHosts.toString() ).withTimeout( 30 ) );
+            execute( new RequestBuilder( String.format( "sh -c echo `%s`", appendHosts.toString() ) )
+                    .withTimeout( 30 ) );
         }
         catch ( CommandException e )
         {
             throw new SubutaiException( "Could not add to /etc/hosts: " + e.toString() );
         }
-    }
-
-
-    public Agent getAgent()
-    {
-        return new Agent( getId(), hostname, null, null, getIps(), false, null );
     }
 
 
@@ -374,20 +398,6 @@ public abstract class AbstractSubutaiHost implements Host
             result.add( s );
         }
         return result;
-    }
-
-
-    @Override
-    public Agent getParentAgent()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-
-    @Override
-    public void setParentAgent( final Agent agent )
-    {
-        throw new UnsupportedOperationException();
     }
 
 
