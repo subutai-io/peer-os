@@ -14,6 +14,7 @@ function export_usage {
 # Plan for exporting a template
 # -----------------------------------------------------------------------------
 # (1) perform sanity checks first
+#     - 
 #     - defer exports of master to the subutai-master-export script
 #     - template container MUST exist
 #     - container MUST be a template with the '@template' snapshot
@@ -34,14 +35,18 @@ function export {
   local version
   if [ ! -z  $switch ]; then
         if [ ! $2 == "-v" ]; then
-           msg_error "You need to use \"-v\" switch for version";
+           msg_error "Use \"-v\" switch to specify version";
            exit 1;
         fi
         if [ -z $3 ]; then
-           msg_error "You need to enter a valid version number !"
+           msg_error "Enter a valid version number!"
            exit 1;
         fi 
         version=$3 
+  fi
+  
+  if [ -z $version ];then
+    version=$SUBUTAI_VERSION
   fi
   
   assert_version_validity $version
