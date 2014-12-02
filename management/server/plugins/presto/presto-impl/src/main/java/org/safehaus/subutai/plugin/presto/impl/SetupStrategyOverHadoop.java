@@ -78,11 +78,11 @@ public class SetupStrategyOverHadoop extends SetupHelper implements ClusterSetup
                     config.getWorkers().remove( node.getId() );
                     config.getAllNodes().remove( node.getId() );
                 }
-                else if ( !result.getStdOut().contains( hadoopPack ) )
+                /*else if ( !result.getStdOut().contains( hadoopPack ) )
                 {
                     throw new ClusterSetupException(
                             String.format( "Node %s has no Hadoop installation", node.getHostname() ) );
-                }
+                }*/
             }
             catch ( CommandException e )
             {
