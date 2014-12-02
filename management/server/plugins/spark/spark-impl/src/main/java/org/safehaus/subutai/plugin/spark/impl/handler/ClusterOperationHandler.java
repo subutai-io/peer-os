@@ -11,6 +11,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
@@ -240,10 +241,17 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
                 trackerOperation.addLog( "Setting up cluster..." );
                 s.setup();
                 trackerOperation.addLogDone( "Cluster setup completed" );
+
+                //subscribe to alerts
+                manager.subscribeToAlerts( env );
             }
-            catch ( ClusterSetupException ex )
+            catch ( ClusterSetupException e )
             {
-                throw new ClusterException( "Failed to setup cluster: " + ex.getMessage() );
+                throw new ClusterException( "Failed to setup cluster: " + e.getMessage() );
+            }
+            catch ( MonitorException e )
+            {
+                throw new ClusterException( "Failed to subscribe to alerts: " + e.getMessage() );
             }
         }
         catch ( ClusterException e )

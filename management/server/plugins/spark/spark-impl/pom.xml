@@ -37,7 +37,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>spark-plugin-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -46,7 +45,10 @@
     <dependency>
       <groupId>org.safehaus.subutai</groupId>
       <artifactId>hadoop-plugin-api</artifactId>
-      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.safehaus.subutai</groupId>
+      <artifactId>metric-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
