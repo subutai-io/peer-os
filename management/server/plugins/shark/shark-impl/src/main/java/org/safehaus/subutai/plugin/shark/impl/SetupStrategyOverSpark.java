@@ -72,7 +72,7 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
         }
 
         final Set<ContainerHost> sparkSlaves =
-                environment.getHostsByIds( Sets.newHashSet( sparkConfig.getSlaveIds() ) );
+                environment.getContainerHostsByIds( Sets.newHashSet( sparkConfig.getSlaveIds() ) );
 
         if ( CollectionUtil.isCollectionEmpty( sparkSlaves ) )
         {
@@ -93,7 +93,7 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
             }
         }
 
-        sparkMaster = environment.getContainerHostByUUID( sparkConfig.getMasterNodeId() );
+        sparkMaster = environment.getContainerHostById( sparkConfig.getMasterNodeId() );
 
         if ( sparkMaster == null )
         {

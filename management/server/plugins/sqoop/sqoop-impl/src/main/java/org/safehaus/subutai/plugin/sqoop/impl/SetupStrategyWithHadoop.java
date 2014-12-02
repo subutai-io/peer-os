@@ -25,7 +25,7 @@ class SetupStrategyWithHadoop extends SqoopSetupStrategy
 
         checkConfig();
 
-        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
+        if ( environment.getContainerHosts() == null || environment.getContainerHosts().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
@@ -34,7 +34,7 @@ class SetupStrategyWithHadoop extends SqoopSetupStrategy
         config.getNodes().clear();
         config.getHadoopNodes().clear();
 
-        for ( ContainerHost n : environment.getContainers() )
+        for ( ContainerHost n : environment.getContainerHosts() )
         {
             if ( !n.isConnected() )
             {

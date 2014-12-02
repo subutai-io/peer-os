@@ -240,7 +240,7 @@ public class Manager
                         {
                             Environment zookeeperEnvironment =
                                     environmentManager.getEnvironmentByUUID( zookeeperCluster.getEnvironmentId() );
-                            containerHost = zookeeperEnvironment.getContainerHostByUUID( config.getNimbus() );
+                            containerHost = zookeeperEnvironment.getContainerHostById( config.getNimbus() );
                         }
                     }
 
@@ -274,18 +274,18 @@ public class Manager
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
             Set<ContainerHost> nimbusHost = new HashSet<>();
             if ( ! config.isExternalZookeeper() )
-                nimbusHost.add( environment.getContainerHostByUUID( config.getNimbus() ) );
+                nimbusHost.add( environment.getContainerHostById( config.getNimbus() ) );
             else {
                 ZookeeperClusterConfig zookeeperCluster = zookeeper.getCluster( config.getZookeeperClusterName() );
                 Environment zookeeperEnvironment =
                         environmentManager.getEnvironmentByUUID( zookeeperCluster.getEnvironmentId() );
-                nimbusHost.add( zookeeperEnvironment.getContainerHostByUUID( config.getNimbus() ) );
+                nimbusHost.add( zookeeperEnvironment.getContainerHostById( config.getNimbus() ) );
             }
             populateTable( masterTable, true, nimbusHost );
 
             Set<ContainerHost> supervisorHosts = new HashSet<>();
             for ( UUID uuid : config.getSupervisors() ) {
-                supervisorHosts.add( environment.getContainerHostByUUID( uuid ) );
+                supervisorHosts.add( environment.getContainerHostById( uuid ) );
             }
             populateTable( workersTable, false, supervisorHosts );
         }

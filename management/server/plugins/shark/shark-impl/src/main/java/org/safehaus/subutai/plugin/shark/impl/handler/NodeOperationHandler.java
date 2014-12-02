@@ -139,7 +139,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SharkImpl, Sh
                     String.format( "Underlying Spark cluster '%s' not found.", config.getSparkClusterName() ) );
         }
 
-        ContainerHost sparkMaster = environment.getContainerHostByUUID( sparkConfig.getMasterNodeId() );
+        ContainerHost sparkMaster = environment.getContainerHostById( sparkConfig.getMasterNodeId() );
 
         if ( sparkMaster == null )
         {

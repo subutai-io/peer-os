@@ -239,8 +239,8 @@ public class Manager
         {
             Environment environment = environmentManager.getEnvironmentByUUID( hadoopCluster.getEnvironmentId() );
 
-            populateTable( masterNodesTable, getMasters( environment.getContainers(), hadoopCluster ) );
-            populateTable( slaveNodesTable, getSlaves( environment.getContainers(), hadoopCluster ) );
+            populateTable( masterNodesTable, getMasters( environment.getContainerHosts(), hadoopCluster ) );
+            populateTable( slaveNodesTable, getSlaves( environment.getContainerHosts(), hadoopCluster ) );
 
             replicationFactor.setValue( hadoopCluster.getReplicationFactor().toString() );
             domainName.setValue( hadoopCluster.getDomainName() );
@@ -730,7 +730,7 @@ public class Manager
         Environment environment = environmentManager.getEnvironmentByUUID( hadoopCluster.getEnvironmentId() );
         String lxcHostname = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
 
-        for ( ContainerHost containerHost : environment.getContainers() )
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
             if ( containerHost.getHostname().equals( lxcHostname ) )
             {

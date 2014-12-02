@@ -45,13 +45,13 @@ public class ClusterConfiguration
 
         String configureClusterCommand;
         Set<UUID> nodeUUIDs = config.getNodes();
-        Set<ContainerHost> containerHosts = environment.getHostsByIds( nodeUUIDs );
+        Set<ContainerHost> containerHosts = environment.getContainerHostsByIds( nodeUUIDs );
         Iterator<ContainerHost> iterator = containerHosts.iterator();
 
         int nodeNumber=0;
         List<CommandResult> commandsResultList = new ArrayList<>();
         while( iterator.hasNext() ) {
-            ContainerHost zookeeperNode = environment.getContainerHostByUUID( iterator.next().getId() );
+            ContainerHost zookeeperNode = environment.getContainerHostById( iterator.next().getId() );
             configureClusterCommand = Commands.getConfigureClusterCommand(
                     prepareConfiguration( containerHosts ), ConfigParams.CONFIG_FILE_PATH.getParamValue(), ++nodeNumber );
             CommandResult commandResult = null;
@@ -81,7 +81,7 @@ public class ClusterConfiguration
             String restartCommand = manager.getCommands().getRestartCommand( );
             commandsResultList = new ArrayList<>();
             while( iterator.hasNext() ) {
-                ContainerHost zookeeperNode = environment.getContainerHostByUUID( iterator.next().getId() );
+                ContainerHost zookeeperNode = environment.getContainerHostById( iterator.next().getId() );
                 configureClusterCommand = manager.getCommands().getConfigureClusterCommand(
                         prepareConfiguration( containerHosts ), ConfigParams.CONFIG_FILE_PATH.getParamValue(), ++nodeNumber );
                 CommandResult commandResult = null;

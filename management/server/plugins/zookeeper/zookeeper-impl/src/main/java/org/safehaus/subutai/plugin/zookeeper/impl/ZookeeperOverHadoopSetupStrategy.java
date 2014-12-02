@@ -72,7 +72,7 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy
                     manager.getHadoopManager().getCluster( zookeeperClusterConfig
                             .getHadoopClusterName() ).getEnvironmentId() );
         }
-        Set<ContainerHost> zookeeperNodes = environment.getHostsByIds( zookeeperClusterConfig.getNodes() );
+        Set<ContainerHost> zookeeperNodes = environment.getContainerHostsByIds( zookeeperClusterConfig.getNodes() );
         //check if node agent is connected
         for ( ContainerHost node : zookeeperNodes )
         {

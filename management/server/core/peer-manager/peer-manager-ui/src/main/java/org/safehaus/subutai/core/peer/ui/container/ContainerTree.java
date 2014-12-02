@@ -221,13 +221,13 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
             // not registered containers
             //                for ( ResourceHostInfo resourceHostInfo : hostRegistry.getResourceHostsInfo() )
             //                {
-            //                    if ( resourceHostInfo.getContainers() != null )
+            //                    if ( resourceHostInfo.getContainerHosts() != null )
             //                    {
             //                        Item parentItem = container.getItem( resourceHostInfo.getId() );
             //                        if ( parentItem != null )
             //                        {
             //                            for ( ContainerHostInfo containerHostInfo : resourceHostInfo
-            // .getContainers() )
+            // .getContainerHosts() )
             //                            {
             //                                container.setChildrenAllowed( resourceHostInfo.getId(), true );
             //                                Item containerHostItem = container.getItem( containerHostInfo.getId

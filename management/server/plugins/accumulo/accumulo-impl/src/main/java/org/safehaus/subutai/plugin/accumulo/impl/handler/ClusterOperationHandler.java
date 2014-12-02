@@ -82,7 +82,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<AccumuloIm
     {
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
         CommandResult result = null;
-        ContainerHost containerHost = environment.getContainerHostByUUID( config.getMasterNode() );
+        ContainerHost containerHost = environment.getContainerHostById( config.getMasterNode() );
         switch ( clusterOperationType )
         {
             case START_ALL:
@@ -92,7 +92,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<AccumuloIm
                 result = executeCommand( containerHost, Commands.stopCommand );
                 break;
             case STATUS_ALL:
-                for ( ContainerHost host : environment.getContainers() )
+                for ( ContainerHost host : environment.getContainerHosts() )
                 {
                     result = executeCommand( host, Commands.statusCommand );
                 }
@@ -138,7 +138,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<AccumuloIm
         for ( UUID uuid : config.getAllNodes() )
         {
             ContainerHost host = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopConfig.getEnvironmentId() )
-                                        .getContainerHostByUUID( uuid );
+                                        .getContainerHostById( uuid );
             CommandResult result;
             try
             {
@@ -164,7 +164,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<AccumuloIm
             }
         }
         ContainerHost namenode = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopConfig.getEnvironmentId() )
-                                        .getContainerHostByUUID( hadoopConfig.getNameNode() );
+                                        .getContainerHostById( hadoopConfig.getNameNode() );
         CommandResult result = executeCommand( namenode, Commands.getRemoveAccumuloFromHFDSCommand() );
         if ( result.hasSucceeded() )
         {

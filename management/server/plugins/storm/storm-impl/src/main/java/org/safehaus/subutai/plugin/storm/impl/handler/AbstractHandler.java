@@ -24,7 +24,7 @@ abstract class AbstractHandler extends AbstractOperationHandler<StormImpl, Storm
     {
         Environment environment =
                 manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        ContainerHost containerHost = environment.getContainerHostByUUID( config.getNimbus() );
+        ContainerHost containerHost = environment.getContainerHostById( config.getNimbus() );
         return containerHost.getHostname().equalsIgnoreCase( hostname );
     }
 
@@ -60,7 +60,7 @@ abstract class AbstractHandler extends AbstractOperationHandler<StormImpl, Storm
     {
         Environment environment =
                 manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        ContainerHost containerHost = environment.getContainerHostByUUID( uuid );
+        ContainerHost containerHost = environment.getContainerHostById( uuid );
 
         return containerHost.isConnected();
     }

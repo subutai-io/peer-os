@@ -45,7 +45,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl, Ca
         }
 
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        Iterator iterator = environment.getContainers().iterator();
+        Iterator iterator = environment.getContainerHosts().iterator();
 
         ContainerHost host = null;
         while ( iterator.hasNext() )
