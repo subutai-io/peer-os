@@ -22,7 +22,6 @@ public class SparkClusterConfig implements ConfigBase
     private String hadoopClusterName = "";
     private UUID masterNodeId;
     private Set<UUID> slaveIds = new HashSet<>();
-    private Set<UUID> hadoopNodeIds = new HashSet<>();
     private UUID environmentId;
 
 
@@ -47,12 +46,6 @@ public class SparkClusterConfig implements ConfigBase
     public Set<UUID> getSlaveIds()
     {
         return slaveIds;
-    }
-
-
-    public Set<UUID> getHadoopNodeIds()
-    {
-        return hadoopNodeIds;
     }
 
 
