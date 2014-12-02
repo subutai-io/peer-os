@@ -189,16 +189,22 @@ void SubutaiContainerManager::updateContainerLists()
     _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Update container list and their fields.."));
     char** names;
     lxc_container** cont;
-    int num;
+    int num, index = 0, size_of_containers = _containers.size();
     try {
         num = list_all_containers(_lxc_path.c_str(), &names, &cont);
+        bool destroy_container_check[size_of_containers];
         for (int i = 0; i < num; i++) {
             // Check is there is any new conatiner appears
             bool containerFound = false;
+            destroy_container_check[i] = false;
+            index = 0;
             for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
                 if ((*it).getContainerHostnameValue() == string(names[i])) {
                     containerFound = true;
+                    destroy_container_check[index] = true;
+                    break;
                 }
+                index++;
             }
             if (!containerFound) {
                 SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
@@ -206,6 +212,14 @@ void SubutaiContainerManager::updateContainerLists()
                 _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", c->getContainerHostnameValue() + " added.."));
                 _containers.push_back(*c);
             }
+        }
+
+        for (int i = size_of_containers-1; i >= 0; i--) {
+        	if(!destroy_container_check[i])
+        	{
+        		deleteContainerInfo((_containers.at(i)).getContainerHostnameValue());
+        		_containers.erase (_containers.begin()+i);
+        	}
         }
     } catch (SubutaiException e) {
         _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));
