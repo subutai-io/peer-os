@@ -33,13 +33,6 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger*
     // after crash
     try {
         _containers = findAllContainers();
-
-        for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
-                (*it).getContainerId();
-        }
-
-        deleteContainerInfo("ali");
-
     } catch (SubutaiException e) {
         _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));         
     } catch (std::exception e) {

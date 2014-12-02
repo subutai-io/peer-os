@@ -170,8 +170,6 @@ bool SubutaiContainer::getContainerId()
         {
             stringstream   	linestream(line);
             linestream >> hostname >> id;
-
-            cout << hostname << " " << id << endl;
             if(!strcmp(hostname.c_str(), this->hostname.c_str()))
             {
             	this->id = id;
