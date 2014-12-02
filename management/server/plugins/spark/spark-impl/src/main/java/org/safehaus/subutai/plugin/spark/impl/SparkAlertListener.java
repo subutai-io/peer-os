@@ -27,7 +27,9 @@ public class SparkAlertListener implements AlertListener
     {
         //TODO implement here cluster scaling functionality
 
-        //check if source host belongs to spark cluster
+        //find spark cluster by environment id
+
+        //check if source host belongs to found spark cluster
 
         //if cluster has auto-scaling enabled:
         // obtain current quotas and figure out which one is exceeded
