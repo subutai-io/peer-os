@@ -86,7 +86,7 @@ function management_network {
   local listVNImapping="false"
 
   shift_amount=0;
-  while getopts ":clrfspdNLRTDmM:" opt; do
+  while getopts ":clrfspdNLRTDmvM:" opt; do
      case $opt in
        c)
 	 createTunnel="true"	
@@ -140,7 +140,7 @@ function management_network {
          shift
          ;;
        v)
-         vnivlanMap="true"
+         listVNImapping="true"
          shift
          ;;
        M)
