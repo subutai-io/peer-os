@@ -42,7 +42,7 @@ public class EnvironmentTest
 
         Set<ContainerHost> set = new HashSet<>();
         //        environment.setContainers( set );
-        assertEquals( set, environment.getContainers() );
+        assertEquals( set, environment.getContainerHosts() );
     }
 
 
@@ -56,7 +56,7 @@ public class EnvironmentTest
     @Test
     public void testNodesNotNull() throws Exception
     {
-        Set<ContainerHost> environmentContainers = environment.getContainers();
+        Set<ContainerHost> environmentContainers = environment.getContainerHosts();
         assertNotNull( environmentContainers );
     }
 

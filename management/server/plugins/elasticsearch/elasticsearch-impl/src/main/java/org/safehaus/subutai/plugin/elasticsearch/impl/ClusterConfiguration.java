@@ -33,7 +33,7 @@ public class ClusterConfiguration implements ClusterConfigurationInterface
         ElasticsearchClusterConfiguration esConfiguration = ( ElasticsearchClusterConfiguration ) config;
         String clusterConfigureCommand = Commands.configure + "cluster_name " + config.getClusterName();
 
-        for ( ContainerHost containerHost : environment.getContainers() )
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
             try
             {

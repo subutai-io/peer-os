@@ -148,7 +148,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<LuceneImpl
         {
             ContainerHost containerHost =
                     manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() )
-                           .getContainerHostByUUID( uuid );
+                           .getContainerHostById( uuid );
             CommandResult result = null;
             try
             {

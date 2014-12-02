@@ -1,9 +1,9 @@
 package org.safehaus.subutai.plugin.shark.impl;
 
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.List;
+import java.util.Set;
+
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
@@ -20,13 +20,14 @@ import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Set;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 
 public class SetupStrategyOverSpark implements ClusterSetupStrategy
 {
-    private static final Logger LOG = LoggerFactory.getLogger(SetupStrategyOverSpark.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger( SetupStrategyOverSpark.class.getName() );
 
     private final Environment environment;
     private final SharkImpl manager;
@@ -54,6 +55,8 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
     }
 
 
+    //TODO find all Shark clusters and check if node if Shark installed belongs to them
+    //if belongs then fail otherwise add to non installable nodes
     private void check() throws ClusterSetupException
     {
 
@@ -69,7 +72,7 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
         }
 
         final Set<ContainerHost> sparkSlaves =
-                environment.getHostsByIds( Sets.newHashSet( sparkConfig.getSlaveIds() ) );
+                environment.getContainerHostsByIds( Sets.newHashSet( sparkConfig.getSlaveIds() ) );
 
         if ( CollectionUtil.isCollectionEmpty( sparkSlaves ) )
         {
@@ -90,7 +93,7 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
             }
         }
 
-        sparkMaster = environment.getContainerHostByUUID( sparkConfig.getMasterNodeId() );
+        sparkMaster = environment.getContainerHostById( sparkConfig.getMasterNodeId() );
 
         if ( sparkMaster == null )
         {

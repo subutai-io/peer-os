@@ -9,7 +9,6 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
@@ -46,10 +45,10 @@ public class ClusterConfiguration
 
         StringBuilder sb = new StringBuilder();
         int seedCount = 0;
-        for ( ContainerHost containerHost : environment.getContainers() )
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
             seedCount++;
-            sb.append( AgentUtil.getAgentIpByMask( containerHost.getAgent(), Common.IP_MASK ) ).append( "," );
+            sb.append( containerHost.getIpByMask( Common.IP_MASK ) ).append( "," );
             if ( seedCount == config.getNumberOfSeeds() )
             {
                 break;
@@ -59,7 +58,7 @@ public class ClusterConfiguration
         String seedsParam = "seeds " + sb.toString();
 
 
-        for ( ContainerHost containerHost : environment.getContainers() )
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
             try
             {
@@ -100,13 +99,13 @@ public class ClusterConfiguration
                 // Set RPC address
                 String rpcAddress =
                         String.format( ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s %s", "rpc_address",
-                                AgentUtil.getAgentIpByMask( containerHost.getAgent(), Common.IP_MASK ) );
+                                containerHost.getIpByMask( Common.IP_MASK ) );
                 commandResult = containerHost.execute( new RequestBuilder( rpcAddress ) );
                 po.addLog( commandResult.getStdOut() );
 
                 // Set listen address
                 String listenAddress = String.format( ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s %s",
-                        "listen_address", AgentUtil.getAgentIpByMask( containerHost.getAgent(), Common.IP_MASK ) );
+                        "listen_address", containerHost.getIpByMask( Common.IP_MASK ) );
                 commandResult = containerHost.execute( new RequestBuilder( listenAddress ) );
                 po.addLog( commandResult.getStdOut() );
 

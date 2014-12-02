@@ -119,7 +119,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HBaseImpl, HB
 
     private void checkServiceStatus()
     {
-        ContainerHost host = environment.getContainerHostByUUID( hostId );
+        ContainerHost host = environment.getContainerHostById( hostId );
         try
         {
             CommandResult result = host.execute( Commands.getStatusCommand() );

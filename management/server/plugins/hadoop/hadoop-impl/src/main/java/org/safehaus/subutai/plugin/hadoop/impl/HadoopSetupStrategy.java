@@ -111,11 +111,11 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     {
         Set<UUID> masterNodes = new HashSet<>();
         int masterCount = 0;
-        for ( ContainerHost containerHost : this.environment.getContainers() )
+        for ( ContainerHost containerHost : this.environment.getContainerHosts() )
         {
             if ( masterCount < HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY )
             {
-                masterNodes.add( containerHost.getAgent().getUuid() );
+                masterNodes.add( containerHost.getId() );
                 masterCount++;
             }
         }
@@ -136,11 +136,11 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     protected void setSlaveNodes() throws ClusterSetupException
     {
         Set<UUID> slaveNodes = new HashSet<>();
-        for ( ContainerHost containerHost : environment.getContainers() )
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
-            if ( !hadoopClusterConfig.getAllMasterNodes().contains( containerHost.getAgent().getUuid() ) )
+            if ( !hadoopClusterConfig.getAllMasterNodes().contains( containerHost.getId() ) )
             {
-                slaveNodes.add( containerHost.getAgent().getUuid() );
+                slaveNodes.add( containerHost.getId() );
             }
         }
         if ( slaveNodes.isEmpty() )

@@ -22,7 +22,6 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
@@ -123,7 +122,6 @@ public class RestService
         SparkClusterConfig expandedConfig = new SparkClusterConfig();
         expandedConfig.setClusterName( trimmedSparkConfig.getClusterName() );
         expandedConfig.setHadoopClusterName( trimmedSparkConfig.getHadoopClusterName() );
-        expandedConfig.setSetupType( SetupType.OVER_HADOOP );
         expandedConfig.setMasterNodeId( master.getId() );
         expandedConfig.getSlaveIds().addAll( slaveIds );
 

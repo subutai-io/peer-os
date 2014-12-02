@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.ui.ConfigView;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.shark.api.SetupType;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -43,17 +42,9 @@ public class VerificationStep extends Panel
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
-        if ( config.getSetupType() == SetupType.OVER_SPARK )
-        {
-            cfgView.addStringCfg( "Spark cluster name", config.getSparkClusterName() );
-        }
-        else if ( config.getSetupType() == SetupType.WITH_HADOOP_SPARK )
-        {
-            cfgView.addStringCfg( "Hadoop cluster name", hc.getClusterName() );
-            cfgView.addStringCfg( "Number of Hadoop slave nodes", hc.getCountOfSlaveNodes() + "" );
-            cfgView.addStringCfg( "Replication factor", hc.getReplicationFactor() + "" );
-            cfgView.addStringCfg( "Domain name", hc.getDomainName() );
-        }
+
+        cfgView.addStringCfg( "Spark cluster name", config.getSparkClusterName() );
+
 
         Button install = new Button( "Install" );
         install.setId( "SharkVerInstall" );
@@ -63,15 +54,7 @@ public class VerificationStep extends Panel
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                UUID trackId = null;
-                if ( config.getSetupType() == SetupType.OVER_SPARK )
-                {
-                    trackId = shark.installCluster( wizard.getConfig() );
-                }
-                else if ( config.getSetupType() == SetupType.WITH_HADOOP_SPARK )
-                {
-                    trackId = shark.installCluster( wizard.getConfig(), hc );
-                }
+                UUID trackId = shark.installCluster( wizard.getConfig() );
                 ProgressWindow w = new ProgressWindow( executor, tracker, trackId, SharkClusterConfig.PRODUCT_KEY );
                 w.getWindow().addCloseListener( new Window.CloseListener()
                 {

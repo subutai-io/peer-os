@@ -177,7 +177,7 @@ public class Manager
                     {
                         Set<UUID> nodeIds = new HashSet<>( sparkInfo.getAllNodesIds() );
                         nodeIds.removeAll( config.getNodeIds() );
-                        Set<ContainerHost> availableNodes = environment.getHostsByIds( nodeIds );
+                        Set<ContainerHost> availableNodes = environment.getContainerHostsByIds( nodeIds );
                         if ( !nodeIds.isEmpty() )
                         {
                             AddNodeWindow win =
@@ -308,7 +308,7 @@ public class Manager
         if ( config != null )
         {
             environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-            populateTable( nodesTable, environment.getHostsByIds( config.getNodeIds() ) );
+            populateTable( nodesTable, environment.getContainerHostsByIds( config.getNodeIds() ) );
         }
         else
         {
@@ -323,7 +323,7 @@ public class Manager
         for ( final ContainerHost node : nodes )
         {
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( node.getAgent().getListIP().get( 0 ) + "-sharkDestroy" );
+            destroyBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-sharkDestroy" );
 
             addStyleNameToButtons( destroyBtn );
             PROGRESS_ICON.setVisible( false );
@@ -335,7 +335,7 @@ public class Manager
             addGivenComponents( availableOperations, destroyBtn );
 
             table.addItem( new Object[] {
-                    node.getHostname(), node.getAgent().getListIP().get( 0 ), availableOperations
+                    node.getHostname(), node.getIpByInterfaceName( "eth0" ), availableOperations
             }, null );
 
             destroyBtn.addClickListener( new Button.ClickListener()

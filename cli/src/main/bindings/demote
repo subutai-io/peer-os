@@ -72,7 +72,6 @@ function demote {
 
   fs_demote_template $temp
   ovs_configure_lxc $temp
-  lxc_install_agent $temp
   msg_ok "Successfully demoted $temp"
   unlock_container_read $temp
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi

@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
-import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.settings.Common;
@@ -18,7 +17,6 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
-import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 import org.safehaus.subutai.plugin.presto.impl.SetupHelper;
 
@@ -58,7 +56,7 @@ public class NodeOperationHanler extends AbstractOperationHandler<PrestoImpl, Pr
         }
 
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        Iterator iterator = environment.getContainers().iterator();
+        Iterator iterator = environment.getContainerHosts().iterator();
         ContainerHost host = null;
         while ( iterator.hasNext() )
         {
@@ -74,8 +72,8 @@ public class NodeOperationHanler extends AbstractOperationHandler<PrestoImpl, Pr
             trackerOperation.addLogFailed( String.format( "No Container with ID %s", hostName ) );
             return;
         }
-        ContainerHost coordinator = environment.getContainerHostByUUID( config.getCoordinatorNode() );
-        if( coordinator.getAgent() == null)
+        ContainerHost coordinator = environment.getContainerHostById( config.getCoordinatorNode() );
+        if( !coordinator.isConnected())
         {
             trackerOperation.addLogFailed( String.format( "Coordinator node %s is not connected",
                     coordinator.getHostname() ) );
@@ -121,11 +119,11 @@ public class NodeOperationHanler extends AbstractOperationHandler<PrestoImpl, Pr
         CommandResult result = null;
         try
         {
-            if( host.getAgent() == null)
+            if( !host.isConnected())
             {
                 throw new ClusterSetupException( "New node is not connected" );
             }
-            if( config.getWorkers().contains( host.getAgent().getUuid() ))
+            if( config.getWorkers().contains( host.getId() ))
             {
                 throw new ClusterSetupException( "Node already belongs to cluster" + clusterName );
             }

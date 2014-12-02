@@ -44,7 +44,6 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 
-//import org.safehaus.subutai.common.protocol.Agent;
 
 
 public class Manager
@@ -275,7 +274,7 @@ public class Manager
                         if ( info != null )
                         {
                             set = environmentManager.getEnvironmentByUUID( info.getEnvironmentId() )
-                                                    .getHostsByIds( Sets.newHashSet( info.getAllNodes() ) );
+                                                    .getContainerHostsByIds( Sets.newHashSet( info.getAllNodes() ) );
                             set.removeAll( config.getAllNodes() );
                             if ( !set.isEmpty() )
                             {
@@ -375,17 +374,17 @@ public class Manager
         for ( final ContainerHost node : workers )
         {
             final Label resultHolder = new Label();
-            resultHolder.setId( node.getAgent().getListIP().get( 0 ) + "-prestoResult" );
+            resultHolder.setId( node.getIpByInterfaceName( "eth0" ) + "-prestoResult" );
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId( node.getAgent().getListIP().get( 0 ) + "-prestoCheck" );
+            checkBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-prestoCheck" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.setId( node.getAgent().getListIP().get( 0 ) + "-prestoStart" );
+            startBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-prestoStart" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.setId( node.getAgent().getListIP().get( 0 ) + "-prestoStop" );
+            stopBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-prestoStop" );
 
 
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( node.getAgent().getListIP().get( 0 ) + "-prestoDestroy" );
+            destroyBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-prestoDestroy" );
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn, destroyBtn );
             disableButtons( startBtn, stopBtn );
@@ -399,7 +398,7 @@ public class Manager
             addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn, destroyBtn );
 
             table.addItem( new Object[] {
-                    node.getHostname(), node.getAgent().getListIP().get( 0 ), checkIfCoordinator( node ), resultHolder,
+                    node.getHostname(), node.getIpByInterfaceName( "eth0" ), checkIfCoordinator( node ), resultHolder,
                     availableOperations
             }, null );
 
@@ -412,13 +411,13 @@ public class Manager
 
         /** add Coordinator here */
         final Label resultHolder = new Label();
-        resultHolder.setId( coordinator.getAgent().getListIP().get( 0 ) + "-prestoResult" );
+        resultHolder.setId( coordinator.getIpByInterfaceName( "eth0" ) + "-prestoResult" );
         final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-        checkBtn.setId( coordinator.getAgent().getListIP().get( 0 ) + "-prestoCheck" );
+        checkBtn.setId( coordinator.getIpByInterfaceName( "eth0" ) + "-prestoCheck" );
         final Button startBtn = new Button( START_BUTTON_CAPTION );
-        startBtn.setId( coordinator.getAgent().getListIP().get( 0 ) + "-prestoStart" );
+        startBtn.setId( coordinator.getIpByInterfaceName( "eth0" ) + "-prestoStart" );
         final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-        stopBtn.setId( coordinator.getAgent().getListIP().get( 0 ) + "-prestoStop" );
+        stopBtn.setId( coordinator.getIpByInterfaceName( "eth0" ) + "-prestoStop" );
 
         addStyleNameToButtons( checkBtn, startBtn, stopBtn );
 
@@ -432,7 +431,7 @@ public class Manager
         addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn );
 
         table.addItem( new Object[] {
-                coordinator.getHostname(), coordinator.getAgent().getListIP().get( 0 ),
+                coordinator.getHostname(), coordinator.getIpByInterfaceName( "eth0" ),
                 checkIfCoordinator( coordinator ), resultHolder, availableOperations
         }, null );
 
@@ -692,7 +691,7 @@ public class Manager
                     String containerId =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Set<ContainerHost> containerHosts =
-                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers();
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts();
                     Iterator iterator = containerHosts.iterator();
                     ContainerHost containerHost = null;
                     while ( iterator.hasNext() )
@@ -710,7 +709,7 @@ public class Manager
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Host is not connected" );
                     }
                 }
             }
@@ -756,8 +755,8 @@ public class Manager
         if ( config != null )
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-            populateTable( nodesTable, environment.getHostsByIds( config.getWorkers() ),
-                    environment.getContainerHostByUUID( config.getCoordinatorNode() ) );
+            populateTable( nodesTable, environment.getContainerHostsByIds( config.getWorkers() ),
+                    environment.getContainerHostById( config.getCoordinatorNode() ) );
         }
         else
         {

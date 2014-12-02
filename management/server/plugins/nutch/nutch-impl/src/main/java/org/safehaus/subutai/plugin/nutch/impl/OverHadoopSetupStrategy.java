@@ -60,7 +60,7 @@ class OverHadoopSetupStrategy extends NutchSetupStrategy
                             config.getClusterName() ) );
         }
         //check nodes are connected
-        //        Set<ContainerHost> nodes = environment.getHostsByIds( config.getNodes() );
+        //        Set<ContainerHost> nodes = environment.getContainerHostsByIds( config.getNodes() );
         //        for ( ContainerHost host : nodes )
         //        {
         //            if ( !host.isConnected() )
@@ -86,7 +86,7 @@ class OverHadoopSetupStrategy extends NutchSetupStrategy
         RequestBuilder checkInstalledCommand = new RequestBuilder( Constants.CHECK );
         for( UUID uuid : config.getNodes())
         {
-            ContainerHost node = environment.getContainerHostByUUID( uuid );
+            ContainerHost node = environment.getContainerHostById( uuid );
             try
             {
                 CommandResult result = node.execute( checkInstalledCommand );
@@ -126,7 +126,7 @@ class OverHadoopSetupStrategy extends NutchSetupStrategy
         trackerOperation.addLog( "Cluster info saved to DB\nInstalling Pig..." );
         //install nutch,
         //RequestBuilder installCommand = new RequestBuilder( Commands.INSTALL );
-        for ( ContainerHost node : environment.getHostsByIds( config.getNodes() ) )
+        for ( ContainerHost node : environment.getContainerHostsByIds( config.getNodes() ) )
         {
             try
             {

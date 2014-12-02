@@ -17,17 +17,12 @@ public class SparkClusterConfig implements ConfigBase
 {
 
     public static final String PRODUCT_KEY = "Spark";
-    public static final String TEMPLATE_NAME = "spark";
 
     private String clusterName = "";
     private String hadoopClusterName = "";
-    private SetupType setupType;
     private UUID masterNodeId;
     private Set<UUID> slaveIds = new HashSet<>();
-    // for with-Hadoop installation
     private Set<UUID> hadoopNodeIds = new HashSet<>();
-    // for environment blueprint
-    private int slaveNodesCount;
     private UUID environmentId;
 
 
@@ -103,30 +98,6 @@ public class SparkClusterConfig implements ConfigBase
     public void setHadoopClusterName( String hadoopClusterName )
     {
         this.hadoopClusterName = hadoopClusterName;
-    }
-
-
-    public SetupType getSetupType()
-    {
-        return setupType;
-    }
-
-
-    public void setSetupType( SetupType setupType )
-    {
-        this.setupType = setupType;
-    }
-
-
-    public int getSlaveNodesCount()
-    {
-        return slaveNodesCount;
-    }
-
-
-    public void setSlaveNodesCount( int slaveNodesCount )
-    {
-        this.slaveNodesCount = slaveNodesCount;
     }
 
 

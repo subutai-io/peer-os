@@ -105,23 +105,23 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
                     String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
-        if ( environment.getContainers().isEmpty() )
+        if ( environment.getContainerHosts().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
         int totalNodesRequired =
                 config.getNumberOfRouters() + config.getNumberOfConfigServers() + config.getNumberOfDataNodes();
-        if ( environment.getContainers().size() < totalNodesRequired )
+        if ( environment.getContainerHosts().size() < totalNodesRequired )
         {
             throw new ClusterSetupException(
                     String.format( "Environment needs to have %d but has %d nodes", totalNodesRequired,
-                            environment.getContainers().size() ) );
+                            environment.getContainerHosts().size() ) );
         }
 
         Set<ContainerHost> mongoContainers = new HashSet<>();
         Set<ContainerHost> mongoEnvironmentContainers = new HashSet<>();
-        for ( ContainerHost container : environment.getContainers() )
+        for ( ContainerHost container : environment.getContainerHosts() )
         {
             try
             {

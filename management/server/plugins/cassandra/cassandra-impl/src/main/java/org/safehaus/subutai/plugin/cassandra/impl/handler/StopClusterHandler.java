@@ -41,7 +41,7 @@ public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl, 
         }
 
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        for ( ContainerHost host : environment.getContainers() )
+        for ( ContainerHost host : environment.getContainerHosts() )
         {
             try
             {
