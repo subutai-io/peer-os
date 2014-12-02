@@ -138,7 +138,7 @@ function management_network {
          vnivlanMap="true"
          shift
          ;;
-       v)
+       Z)
          listVNImapping="true"
          shift
          ;;
