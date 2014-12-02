@@ -68,6 +68,7 @@ public class NodeOperationHandlerTest
         sharkClusterConfig = mock(SharkClusterConfig.class);
         when(sharkImpl.getTracker()).thenReturn(tracker);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
+
         nodeOperationHandler = new NodeOperationHandler(sharkImpl, sharkClusterConfig, "test", OperationType.INCLUDE);
         nodeOperationHandler2 = new NodeOperationHandler(sharkImpl, sharkClusterConfig, "test", OperationType.EXCLUDE);
     }
@@ -135,7 +136,7 @@ public class NodeOperationHandlerTest
         when(containerHost.getId()).thenReturn(uuid);
         when(sharkClusterConfig.getNodeIds()).thenReturn(mySet);
         when(sharkClusterConfig.getNodeIds().contains(any())).thenReturn(true);
-
+        when(sharkClusterConfig.getNodeIds().remove(any(UUID.class))).thenReturn(true);
         when(sharkImpl.getPluginDao()).thenReturn(pluginDAO);
         when(pluginDAO.saveInfo(anyString(), anyString(), any())).thenReturn(true);
 
@@ -160,6 +161,7 @@ public class NodeOperationHandlerTest
         assertEquals(uuid, containerHost.getId());
         assertTrue(containerHost.isConnected());
         assertTrue(pluginDAO.saveInfo(anyString(), anyString(), any()));
+        assertTrue(sharkClusterConfig.getNodeIds().remove(any(UUID.class)));
     }
 
 

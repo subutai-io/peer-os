@@ -6,25 +6,22 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterException;
-import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.shark.api.SetupType;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 import javax.sql.DataSource;
-
+import java.sql.*;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
@@ -61,7 +58,6 @@ public class SharkImplTest
     private PreparedStatement preparedStatement;
     private Connection connection;
     private ResultSetMetaData resultSetMetaData;
-    private Clob clob;
 
 
     @Before
@@ -70,7 +66,6 @@ public class SharkImplTest
         clusterSetupStrategy = mock(ClusterSetupStrategy.class);
         environmentBlueprint = mock(EnvironmentBlueprint.class);
         resultSetMetaData = mock(ResultSetMetaData.class);
-        clob = mock(Clob.class);
         preparedStatement = mock(PreparedStatement.class);
         connection = mock(Connection.class);
         hadoopClusterConfig = mock(HadoopClusterConfig.class);
@@ -195,7 +190,6 @@ public class SharkImplTest
         when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
         when(resultSetMetaData.getColumnCount()).thenReturn(5);
         when(resultSetMetaData.getColumnName(anyInt())).thenReturn("test");
-        when(resultSet.getClob(anyString())).thenReturn(clob);
 
         // mock setup method
         sharkImpl.getSparkManager();
@@ -233,13 +227,11 @@ public class SharkImplTest
         sharkClusterConfig2 = new SharkClusterConfig();
         sharkClusterConfig2.setClusterName("test");
         sharkClusterConfig2.setEnvironmentId(uuid);
-        sharkClusterConfig2.setSetupType(SetupType.OVER_SPARK);
         sharkClusterConfig2.setSparkClusterName("test");
 
         sharkImpl.installCluster(sharkClusterConfig2);
 
         assertEquals(trackerOperation, tracker.createTrackerOperation(anyString(), anyString()));
-        assertNotNull(sharkClusterConfig2.getSetupType());
         assertNotNull(sharkImpl.getSparkManager());
         assertNotNull(sharkImpl.getEnvironmentManager());
         assertNotNull(sharkImpl.getClusterSetupStrategy(trackerOperation,sharkClusterConfig2,environment));
@@ -254,7 +246,6 @@ public class SharkImplTest
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
         when(resultSetMetaData.getColumnCount()).thenReturn(1);
-        when(resultSet.getClob(anyString())).thenReturn(clob);
 
         sharkImpl.getClusters();
 
@@ -274,7 +265,6 @@ public class SharkImplTest
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
         when(resultSetMetaData.getColumnCount()).thenReturn(1);
-        when(resultSet.getClob(anyString())).thenReturn(clob);
 
         sharkImpl.getCluster("test");
 
@@ -283,37 +273,6 @@ public class SharkImplTest
         assertEquals(resultSet,preparedStatement.executeQuery());
         assertEquals(resultSetMetaData,resultSet.getMetaData());
         assertNotNull(resultSetMetaData.getColumnCount());
-    }
-
-    @Test
-    public void testInstallCluster1() throws SQLException, ClusterSetupException, EnvironmentBuildException
-    {
-        when(dataSource.getConnection()).thenReturn(connection);
-        when(connection.prepareStatement(any(String.class))).thenReturn(preparedStatement);
-        when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
-        sharkImpl.init();
-        when(abstractOperationHandler.getTrackerId()).thenReturn(uuid);
-        when(trackerOperation.getId()).thenReturn(uuid);
-        when(sharkClusterConfig.getSetupType()).thenReturn(SetupType.WITH_HADOOP_SPARK);
-
-        sharkImpl.getHadoopManager();
-        when(hadoop.getDefaultEnvironmentBlueprint(any(HadoopClusterConfig.class))).thenReturn(environmentBlueprint);
-        sharkImpl.getEnvironmentManager();
-        when(environmentManager.buildEnvironment(environmentBlueprint)).thenReturn(environment);
-        when(hadoop.getClusterSetupStrategy(environment, hadoopClusterConfig, trackerOperation)).thenReturn(clusterSetupStrategy);
-        when(sharkClusterConfig.getSparkClusterName()).thenReturn("test");
-
-        when(sharkClusterConfig.getClusterName()).thenReturn("test");
-        sharkImpl.getSparkManager();
-        when(spark.getCluster(anyString())).thenReturn(sparkClusterConfig);
-        when(spark.getClusterSetupStrategy(trackerOperation,sparkClusterConfig,environment)).thenReturn(clusterSetupStrategy);
-
-        sharkImpl.installCluster(sharkClusterConfig,hadoopClusterConfig);
-
-        assertEquals(trackerOperation, tracker.createTrackerOperation(anyString(), anyString()));
-        assertNotNull(sharkImpl.getEnvironmentManager());
-        assertNotNull(sharkImpl.getClusterSetupStrategy(trackerOperation,sharkClusterConfig,environment));
-        assertEquals(SetupType.WITH_HADOOP_SPARK,sharkClusterConfig.getSetupType());
     }
 
     @Test
