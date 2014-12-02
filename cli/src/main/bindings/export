@@ -31,20 +31,23 @@ function export {
   fi
 
   local container="$1"
-  local switch="$2"
-  local version
-  if [ ! -z  $switch ]; then
-        if [ ! $2 == "-v" ]; then
-           msg_error "Use \"-v\" switch to specify version";
-           exit 1;
-        fi
-        if [ -z $3 ]; then
-           msg_error "Enter a valid version number!"
-           exit 1;
-        fi 
-        version=$3 
-  fi
-  
+  shift
+  while getopts ":v:" opt; do
+    case $opt in
+      v)
+        version="$OPTARG"
+        ;;
+      \?)
+        msg_error "Unrecognized option -$OPTARG"
+        exit 1
+        ;;
+      :)
+        msg_error "Option -$OPTARG requires an argument." >&2
+        exit 1
+        ;;
+    esac
+  done
+
   if [ -z $version ];then
     version=$SUBUTAI_VERSION
   fi
