@@ -7,6 +7,7 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -43,6 +44,7 @@ public class SetupStrategyOverSparkTest
     private SparkClusterConfig sparkClusterConfig;
     private Commands commands;
     private PluginDAO pluginDAO;
+    public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + SharkClusterConfig.PRODUCT_KEY.toLowerCase();
 
     @Before
     public void setUp()
@@ -122,7 +124,7 @@ public class SetupStrategyOverSparkTest
     }
 
     @Test
-    public void testExecuteCommand() throws CommandException, ClusterException
+    public void testExecuteCommand() throws CommandException, ClusterException, ClusterSetupException
     {
         when(containerHost.execute(requestBuilder)).thenReturn(commandResult);
         when(commandResult.hasSucceeded()).thenReturn(true);

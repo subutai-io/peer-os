@@ -82,12 +82,9 @@ public class ClusterOperationHandlerTest
         sharkClusterConfig = mock(SharkClusterConfig.class);
         when(sharkImpl.getTracker()).thenReturn(tracker);
         when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
-        clusterOperationHandler = new ClusterOperationHandler(sharkImpl, sharkClusterConfig, ClusterOperationType
-                .INSTALL, hadoopClusterConfig);
-        clusterOperationHandler2 = new ClusterOperationHandler(sharkImpl, sharkClusterConfig, ClusterOperationType
-                .UNINSTALL, hadoopClusterConfig);
-        clusterOperationHandler3 = new ClusterOperationHandler(sharkImpl, sharkClusterConfig, ClusterOperationType
-                .CUSTOM, hadoopClusterConfig);
+        clusterOperationHandler = new ClusterOperationHandler(sharkImpl, sharkClusterConfig, ClusterOperationType.INSTALL);
+        clusterOperationHandler2 = new ClusterOperationHandler(sharkImpl, sharkClusterConfig, ClusterOperationType.UNINSTALL);
+        clusterOperationHandler3 = new ClusterOperationHandler(sharkImpl, sharkClusterConfig, ClusterOperationType.CUSTOM);
     }
 
     @Test
