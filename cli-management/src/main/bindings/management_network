@@ -84,6 +84,7 @@ function management_network {
   local vnivlanMap="false"  
   local delvnivlanMap="false"
   local listVNImapping="false"
+
   shift_amount=0;
   while getopts ":clrfspdNLRTDmM:" opt; do
      case $opt in
@@ -138,7 +139,7 @@ function management_network {
          vnivlanMap="true"
          shift
          ;;
-       Z)
+       v)
          listVNImapping="true"
          shift
          ;;
