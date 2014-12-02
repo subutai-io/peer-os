@@ -264,12 +264,12 @@ public class Manager
 
                     if ( host != null )
                     {
-                        TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( host ) );
+                        TerminalWindow terminal = new TerminalWindow( host );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Host not found" );
                     }
                 }
             }

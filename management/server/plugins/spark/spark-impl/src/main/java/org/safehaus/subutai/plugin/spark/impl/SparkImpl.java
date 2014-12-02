@@ -41,7 +41,7 @@ public class SparkImpl extends SparkBase implements Spark
         Preconditions.checkNotNull( config, "Configuration is null" );
 
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL, null );
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
 
         executor.execute( operationHandler );
 
@@ -55,7 +55,7 @@ public class SparkImpl extends SparkBase implements Spark
 
         SparkClusterConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL, null );
+                new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL );
 
         executor.execute( operationHandler );
 
@@ -143,7 +143,7 @@ public class SparkImpl extends SparkBase implements Spark
     {
         SparkClusterConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.START_ALL, null );
+                new ClusterOperationHandler( this, config, ClusterOperationType.START_ALL );
 
         executor.execute( operationHandler );
 
@@ -170,7 +170,7 @@ public class SparkImpl extends SparkBase implements Spark
     {
         SparkClusterConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.STOP_ALL, null );
+                new ClusterOperationHandler( this, config, ClusterOperationType.STOP_ALL );
 
         executor.execute( operationHandler );
 

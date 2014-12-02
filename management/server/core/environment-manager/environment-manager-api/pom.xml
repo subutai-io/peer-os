@@ -58,7 +58,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.environment.api</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
+              {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
           </instructions>
         </configuration>

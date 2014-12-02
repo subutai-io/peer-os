@@ -27,17 +27,15 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
 
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
     private ClusterOperationType operationType;
-    private HadoopClusterConfig hadoopConfig;
     private Environment environment;
     private ContainerHost master;
 
 
     public ClusterOperationHandler( final SparkImpl manager, final SparkClusterConfig config,
-                                    final ClusterOperationType operationType, HadoopClusterConfig hadoopClusterConfig )
+                                    final ClusterOperationType operationType )
     {
         super( manager, config );
         this.operationType = operationType;
-        this.hadoopConfig = hadoopClusterConfig;
         trackerOperation = manager.getTracker().createTrackerOperation( SparkClusterConfig.PRODUCT_KEY,
                 String.format( "Executing %s operation on cluster %s", operationType.name(), clusterName ) );
     }
@@ -220,6 +218,14 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
     {
         try
         {
+            HadoopClusterConfig hadoopConfig = manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
+
+            if ( hadoopConfig == null )
+            {
+                throw new ClusterException(
+                        String.format( "Could not find Hadoop cluster %s", config.getHadoopClusterName() ) );
+            }
+
             Environment env = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopConfig.getEnvironmentId() );
             if ( env == null )
             {
