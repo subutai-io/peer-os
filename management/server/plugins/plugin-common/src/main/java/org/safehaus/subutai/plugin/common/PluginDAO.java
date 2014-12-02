@@ -1,23 +1,21 @@
 package org.safehaus.subutai.plugin.common;
 
 
-import java.sql.Clob;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sql.DataSource;
-
-import org.safehaus.subutai.common.util.DbUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import org.safehaus.subutai.common.util.DbUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
+import java.sql.Clob;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -27,7 +25,7 @@ public class PluginDAO
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( PluginDAO.class.getName() );
-    private Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping().create();
 //    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     protected DbUtil dbUtil;
 

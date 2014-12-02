@@ -155,7 +155,7 @@ public class Manager
                     {
                         Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
                         Set<ContainerHost> nodes =
-                                environment.getHostsByIds( new HashSet<UUID>( hadoopConfig.getAllNodes() ) );
+                                environment.getContainerHostsByIds( new HashSet<UUID>( hadoopConfig.getAllNodes() ) );
                         nodes.removeAll( config.getNodes() );
                         if ( !nodes.isEmpty() )
                         {
@@ -288,7 +288,7 @@ public class Manager
         if ( config != null )
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-            Set<ContainerHost> nodes = environment.getHostsByIds( config.getNodes() );
+            Set<ContainerHost> nodes = environment.getContainerHostsByIds( config.getNodes() );
             populateTable( nodesTable, nodes );
         }
         else
@@ -306,7 +306,7 @@ public class Manager
         for ( final ContainerHost host : agents )
         {
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( host.getAgent().getListIP().get( 0 ) + "-hipiDestroy" );
+            destroyBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-hipiDestroy" );
             destroyBtn.addStyleName( "default" );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();
@@ -316,7 +316,7 @@ public class Manager
             addGivenComponents( availableOperations, destroyBtn );
 
             table.addItem( new Object[] {
-                    host.getHostname(), host.getAgent().getListIP().get( 0 ), availableOperations
+                    host.getHostname(), host.getIpByInterfaceName( "eth0" ), availableOperations
             }, null );
             addClickListenerToDestroyButton( host, destroyBtn );
         }

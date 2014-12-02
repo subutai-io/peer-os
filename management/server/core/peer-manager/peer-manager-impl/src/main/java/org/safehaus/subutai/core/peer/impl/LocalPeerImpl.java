@@ -38,6 +38,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.HostEvent;
 import org.safehaus.subutai.core.peer.api.HostEventListener;
+import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostTask;
@@ -50,13 +51,16 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
-import org.safehaus.subutai.core.peer.api.Task;
+import org.safehaus.subutai.core.peer.api.task.Task;
+import org.safehaus.subutai.core.peer.api.task.clone.CloneTask;
+import org.safehaus.subutai.core.peer.impl.dao.ContainerHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.ManagementHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.dao.ResourceHostDataService;
 import org.safehaus.subutai.core.peer.impl.model.ContainerHostEntity;
 import org.safehaus.subutai.core.peer.impl.model.ManagementHostEntity;
 import org.safehaus.subutai.core.peer.impl.model.ResourceHostEntity;
+import org.safehaus.subutai.core.peer.impl.task.CloneTaskImpl;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
@@ -95,6 +99,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     private ConcurrentMap<String, AtomicInteger> sequences;
     private ManagementHostDataService managementHostDataService;
     private ResourceHostDataService resourceHostDataService;
+    private ContainerHostDataService containerHostDataService;
     private HostRegistry hostRegistry;
     private Set<RequestListener> requestListeners;
     private List<HostTask> tasks = Lists.newCopyOnWriteArrayList();
@@ -130,15 +135,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         {
             managementHost = ( ManagementHost ) allManagementHostEntity.iterator().next();
             managementHost.addListener( this );
+            managementHost.setPeer( this );
         }
 
         resourceHostDataService = new ResourceHostDataService( peerManager.getEntityManagerFactory() );
         resourceHosts = Sets.newHashSet();
         resourceHosts.addAll( resourceHostDataService.getAll() );
 
+        containerHostDataService = new ContainerHostDataService( peerManager.getEntityManagerFactory() );
+
         for ( ResourceHost resourceHost : resourceHosts )
         {
             resourceHost.addListener( this );
+            resourceHost.setPeer( this );
+            for ( ContainerHost containerHost : ( ( ResourceHostEntity ) resourceHost ).getContainerHosts() )
+            {
+                containerHost.setPeer( this );
+            }
         }
 
         for ( ResourceHost resourceHost : resourceHosts )
@@ -212,6 +225,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     @Override
+    public ContainerHostState getContainerHostState( final String containerId ) throws PeerException
+    {
+        Host host = bindHost( containerId );
+
+        if ( host instanceof ContainerHost )
+        {
+            ContainerHost containerHost = ( ContainerHost ) host;
+            return containerHost.getState();
+        }
+        else
+        {
+            throw new UnsupportedOperationException( "Unsupported action." );
+        }
+    }
+
+
+    @Override
     public List<HostTask> getTasks()
     {
         return tasks;
@@ -230,14 +260,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         ResourceHost resourceHost = getResourceHostByName( hostName );
 
 
-        String taskGroupId = UUID.randomUUID().toString();
-        CloneTask cloneTask = new CloneTask( taskGroupId, resourceHost, cloneParam );
-        tasks.add( cloneTask );
-        cloneTask.start();
+        UUID taskGroupId = UUID.randomUUID();
+        HostCloneTask hostCloneTask = new HostCloneTask( taskGroupId, resourceHost, cloneParam );
+        tasks.add( hostCloneTask );
+        hostCloneTask.start();
 
         try
         {
-            return waitCloneTasks( Lists.newArrayList( cloneTask ) ).iterator().next();
+            return waitCloneTasks( Lists.newArrayList( hostCloneTask ) ).iterator().next();
         }
         catch ( Exception e )
         {
@@ -309,9 +339,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 cloneNames.put( resourceHost, hostCloneNames );
             }
 
-            List<CloneTask> cloneTasks = new ArrayList<>();
+            List<HostCloneTask> hostCloneTasks = new ArrayList<>();
             Map<ResourceHost, List<CloneParam>> orders = new HashMap<>();
-            String taskGroupId = UUID.randomUUID().toString();
+            UUID taskGroupId = UUID.randomUUID();
             for ( final Map.Entry<ResourceHost, Set<String>> e : cloneNames.entrySet() )
             {
                 ResourceHost rh = e.getKey();
@@ -322,14 +352,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 {
                     CloneParam cloneParam = new CloneParam( cloneName, templates );
                     cloneParams.add( cloneParam );
-                    CloneTask cloneTask = new CloneTask( taskGroupId, resourceHost, cloneParam );
-                    cloneTask.start();
-                    cloneTasks.add( cloneTask );
+                    HostCloneTask hostCloneTask = new HostCloneTask( taskGroupId, resourceHost, cloneParam );
+                    hostCloneTask.start();
+                    hostCloneTasks.add( hostCloneTask );
                 }
                 orders.put( rh, cloneParams );
             }
-            tasks.addAll( cloneTasks );
-            Set<ContainerHost> result = waitCloneTasks( cloneTasks );
+            tasks.addAll( hostCloneTasks );
+            Set<ContainerHost> result = waitCloneTasks( hostCloneTasks );
             for ( ContainerHost containerHost : result )
             {
                 containerHost.setCreatorPeerId( creatorPeerId.toString() );
@@ -348,9 +378,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     }
 
 
-    private Set<ContainerHost> waitCloneTasks( final List<CloneTask> cloneTasks ) throws Exception
+    private Set<ContainerHost> waitCloneTasks( final List<HostCloneTask> hostCloneTasks ) throws Exception
     {
-        int quantity = cloneTasks.size();
+        int quantity = hostCloneTasks.size();
         long threshold = System.currentTimeMillis() + 180 * quantity * 1000;
         DateFormat formatter = new SimpleDateFormat( "HH:mm:ss" );
         formatter.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
@@ -359,21 +389,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         while ( i < quantity && threshold - System.currentTimeMillis() > 0 )
         {
             i = 0;
-            for ( CloneTask cloneTask : cloneTasks )
+            for ( HostCloneTask hostCloneTask : hostCloneTasks )
             {
-                LOG.info(
-                        String.format( "Clone task %s  %s:%s", cloneTask.getPhase(), cloneTask.getHost().getHostname(),
-                                cloneTask.getParameter().getHostname() ) );
-                if ( cloneTask.getPhase() == HostTask.Phase.DONE )
+                LOG.info( String.format( "Clone task %s  %s:%s", hostCloneTask.getPhase(),
+                        hostCloneTask.getHost().getHostname(), hostCloneTask.getParameter().getHostname() ) );
+                if ( hostCloneTask.getPhase() == HostTask.Phase.DONE )
                 {
-                    if ( cloneTask.getResult().isOk() )
+                    if ( hostCloneTask.getResult().isOk() )
                     {
                         i++;
                     }
                     else
                     {
-                        LOG.error( "Container clone error.", cloneTask.getException() );
-                        throw cloneTask.getException();
+                        LOG.error( "Container clone error.", hostCloneTask.getException() );
+                        throw hostCloneTask.getException();
                     }
                 }
             }
@@ -389,9 +418,113 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                     formatter.format( new Date( threshold - System.currentTimeMillis() ) ) ) );
         }
         Set<ContainerHost> result = new HashSet<>();
-        for ( CloneTask cloneTask : cloneTasks )
+        for ( HostCloneTask hostCloneTask : hostCloneTasks )
         {
-            result.add( cloneTask.getResult().getValue() );
+            result.add( hostCloneTask.getResult().getValue() );
+        }
+        return result;
+    }
+
+
+    public boolean schedule( Task task )
+    {
+        CloneTaskImpl cloneTask = new CloneTaskImpl( ( CloneTask ) task );
+        cloneTask.run();
+        return true;
+    }
+
+
+    @Override
+    public Set<HostInfoModel> scheduleCloneContainers( final UUID creatorPeerId, final List<Template> templates,
+                                                       final int quantity, final String strategyId,
+                                                       final List<Criteria> criteria ) throws PeerException
+    {
+        Preconditions.checkNotNull( creatorPeerId, "Creator peer ID is null." );
+        Preconditions.checkNotNull( templates, "Template list is null." );
+        Preconditions.checkState( templates.size() > 0, "Template list is empty" );
+
+        UUID parentTaskId = UUID.randomUUID();
+        LOG.info( String.format( "=============> Order received: %d %s", quantity, creatorPeerId.toString() ) );
+
+        Set<HostInfoModel> result = new HashSet<>();
+        try
+        {
+            for ( Template t : templates )
+            {
+                if ( t.isRemote() )
+                {
+                    tryToRegister( t );
+                }
+            }
+            String templateName = templates.get( templates.size() - 1 ).getTemplateName();
+
+            List<ServerMetric> serverMetricMap = new ArrayList<>();
+            for ( ResourceHost resourceHost : getResourceHosts() )
+            {
+                if ( resourceHost.isConnected() )
+                {
+                    serverMetricMap.add( resourceHost.getMetric() );
+                }
+            }
+            Map<ServerMetric, Integer> slots;
+            try
+            {
+                slots = strategyManager.getPlacementDistribution( serverMetricMap, quantity, strategyId, criteria );
+            }
+            catch ( StrategyException e )
+            {
+                throw new PeerException( e.getMessage() );
+            }
+
+            Set<String> existingContainerNames = getContainerNames();
+
+            // clone specified number of instances and store their names
+            Map<ResourceHost, Set<String>> cloneNames = new HashMap<>();
+
+            for ( Map.Entry<ServerMetric, Integer> e : slots.entrySet() )
+            {
+                Set<String> hostCloneNames = new HashSet<>();
+                for ( int i = 0; i < e.getValue(); i++ )
+                {
+                    String newContainerName = nextHostName( templateName, existingContainerNames );
+                    hostCloneNames.add( newContainerName );
+                }
+                ResourceHost resourceHost = getResourceHostByName( e.getKey().getHostname() );
+                cloneNames.put( resourceHost, hostCloneNames );
+            }
+
+            List<HostCloneTask> hostCloneTasks = new ArrayList<>();
+            Map<ResourceHost, List<CloneParam>> orders = new HashMap<>();
+
+            for ( final Map.Entry<ResourceHost, Set<String>> e : cloneNames.entrySet() )
+            {
+                ResourceHost rh = e.getKey();
+                Set<String> clones = e.getValue();
+                ResourceHost resourceHost = getResourceHostByName( rh.getHostname() );
+                List<CloneParam> cloneParams = new ArrayList<>();
+                for ( String cloneName : clones )
+                {
+                    CloneParam cloneParam = new CloneParam( cloneName, templates );
+                    cloneParams.add( cloneParam );
+                    HostCloneTask hostCloneTask = new HostCloneTask( parentTaskId, resourceHost, cloneParam );
+                    hostCloneTask.start();
+                    hostCloneTasks.add( hostCloneTask );
+                }
+                orders.put( rh, cloneParams );
+            }
+            tasks.addAll( hostCloneTasks );
+
+            Set<ContainerHost> containerHosts = waitCloneTasks( hostCloneTasks );
+            for ( ContainerHost containerHost : containerHosts )
+            {
+                containerHost.setPeer( this );
+                result.add( new HostInfoModel( containerHost ) );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Clone fail.", e );
+            throw new PeerException( e.toString() );
         }
         return result;
     }
@@ -687,7 +820,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             ResourceHost resourceHost =
                     entity.getParent(); //getResourceHostByName( containerHost.getAgent().getParentHostName() );
             resourceHost.destroyContainerHost( containerHost );
-            resourceHostDataService.removeContainer( ( ResourceHostEntity ) resourceHost, containerHost );
+            containerHostDataService.remove( containerHost.getHostId() );
+            entity.getParent().removeContainerHost( entity );
             //            peerDAO.saveInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString(), resourceHost );
         }
         catch ( ResourceHostException e )
@@ -700,7 +834,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     @Override
-    public boolean isConnected( final Host host ) throws PeerException
+    public boolean isConnected( final Host host )
     {
         try
         {
@@ -727,7 +861,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 return true;
             }
         }
-        catch ( HostNotFoundException e )
+        catch ( PeerException e )
         {
             return false;
         }
@@ -1002,6 +1136,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 }
                 managementHostDataService.persist( ( ManagementHostEntity ) managementHost );
                 managementHost.addListener( this );
+                managementHost.setPeer( this );
             }
             managementHost.updateHostInfo( resourceHostInfo );
             //            peerDAO.saveInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId().toString(), managementHost );
@@ -1015,7 +1150,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 host = getResourceHostByName( resourceHostInfo.getHostname() );
                 if ( !resourceHostInfo.getContainers().isEmpty() )
                 {
-                    boolean newContainer = false;
                     for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
                     {
                         if ( containerHostInfo.getInterfaces().size() == 0 )
@@ -1030,14 +1164,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                         catch ( HostNotFoundException hnfe )
                         {
                             containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
+                            containerHost.setPeer( this );
                             host.addContainerHost( ( ContainerHostEntity ) containerHost );
-                            newContainer = true;
+                            containerHostDataService.persist( ( ContainerHostEntity ) containerHost );
                         }
                         containerHost.updateHostInfo( containerHostInfo );
-                    }
-                    if ( newContainer )
-                    {
-                        resourceHostDataService.update( ( ResourceHostEntity ) host );
                     }
                 }
             }
@@ -1048,6 +1179,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 resourceHostDataService.persist( ( ResourceHostEntity ) host );
                 addResourceHost( host );
                 host.addListener( this );
+                host.setPeer( this );
             }
             host.updateHostInfo( resourceHostInfo );
             //            peerDAO.saveInfo( SOURCE_RESOURCE_HOST, host.getId().toString(), host );

@@ -87,7 +87,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
     {
         environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
         Set<UUID> allNodes = config.getAllNodes();
-        for ( ContainerHost host : environment.getHostsByIds( allNodes ) )
+        for ( ContainerHost host : environment.getContainerHostsByIds( allNodes ) )
         {
             try
             {
@@ -115,7 +115,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
     {
         environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
         Set<UUID> allNodes = config.getAllNodes();
-        for ( ContainerHost host : environment.getHostsByIds( allNodes ) )
+        for ( ContainerHost host : environment.getContainerHostsByIds( allNodes ) )
         {
             try
             {
@@ -194,7 +194,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HBaseImpl,
                         String.format( "Environment not found by id %s", config.getEnvironmentId() ) );
             }
 
-            Set<ContainerHost> hbaseNodes = environment.getHostsByIds( config.getAllNodes() );
+            Set<ContainerHost> hbaseNodes = environment.getContainerHostsByIds( config.getAllNodes() );
 
             if ( hbaseNodes.size() < config.getAllNodes().size() )
             {

@@ -140,7 +140,7 @@ public class ConfigurationStep extends Panel
                     config.setHadoopNodes( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
                     hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
                     Set<ContainerHost> hadoopNodes =
-                            hadoopEnvironment.getHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
+                            hadoopEnvironment.getContainerHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
                     select.setValue( null );
                     select.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
                 }
@@ -196,7 +196,7 @@ public class ConfigurationStep extends Panel
                     Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
                     for ( ContainerHost host : nodeList )
                     {
-                        nodes.add( host.getAgent().getUuid() );
+                        nodes.add( host.getId() );
                     }
                     config.getNodes().clear();
                     config.getNodes().addAll( nodes );

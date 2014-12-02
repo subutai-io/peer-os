@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 abstract public class HostTask<H extends Host, P extends HostTaskParam, R extends HostTaskResult> implements Runnable
 {
     protected static final Logger LOG = LoggerFactory.getLogger( HostTask.class );
-    private String groupId;
+    private UUID groupId;
     private String id;
     protected P param;
     protected volatile Phase phase = Phase.NEW;
@@ -19,7 +19,7 @@ abstract public class HostTask<H extends Host, P extends HostTaskParam, R extend
     protected H host;
 
 
-    public HostTask( String groupId, H host, P parameter )
+    public HostTask( UUID groupId, H host, P parameter )
     {
         this.groupId = groupId;
         this.id = UUID.randomUUID().toString();
@@ -28,7 +28,7 @@ abstract public class HostTask<H extends Host, P extends HostTaskParam, R extend
     }
 
 
-    public String getGroupId()
+    public UUID getGroupId()
     {
         return this.groupId;
     }

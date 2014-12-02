@@ -67,7 +67,7 @@ public class SetupStrategyOverHadoop extends SetupHelper implements ClusterSetup
         RequestBuilder checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( );
         for( UUID uuid : config.getAllNodes())
         {
-            ContainerHost node = environment.getContainerHostByUUID( uuid );
+            ContainerHost node = environment.getContainerHostById( uuid );
             try
             {
                 CommandResult result = node.execute( checkInstalledCommand );
@@ -112,15 +112,15 @@ public class SetupStrategyOverHadoop extends SetupHelper implements ClusterSetup
 
             //install presto
             po.addLog( "Installing Presto..." );
-            for ( ContainerHost node : environment.getHostsByIds( config.getAllNodes() ) )
+            for ( ContainerHost node : environment.getContainerHostsByIds( config.getAllNodes() ) )
             {
                 CommandResult result = node.execute( manager.getCommands().getInstallCommand() );
                 processResult( node, result );
             }
             po.addLog( "Configuring cluster..." );
-            configureAsCoordinator( environment.getContainerHostByUUID( config.getCoordinatorNode() ), environment );
-            configureAsWorker( environment.getHostsByIds( config.getWorkers() ) );
-            startNodes( environment.getHostsByIds( config.getAllNodes() ) );
+            configureAsCoordinator( environment.getContainerHostById( config.getCoordinatorNode() ), environment );
+            configureAsWorker( environment.getContainerHostsByIds( config.getWorkers() ) );
+            startNodes( environment.getContainerHostsByIds( config.getAllNodes() ) );
             po.addLog( "Installation succeeded" );
         } catch ( CommandException e )
         {

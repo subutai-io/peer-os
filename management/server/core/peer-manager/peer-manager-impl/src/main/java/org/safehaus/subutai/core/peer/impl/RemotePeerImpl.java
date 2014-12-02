@@ -14,12 +14,14 @@ import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Payload;
@@ -163,6 +165,16 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @Override
+    public Set<HostInfoModel> scheduleCloneContainers( final UUID creatorPeerId, final List<Template> templates,
+                                                       final int quantity, final String strategyId,
+                                                       final List<Criteria> criteria ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.scheduleCloneContainers( creatorPeerId, templates, quantity, strategyId, criteria );
+    }
+
+
     private Set<ContainerHost> getContainerHostImpl( final Set<HostKey> hostKeys )
     {
         Set<ContainerHost> result = new HashSet<>();
@@ -199,7 +211,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public boolean isConnected( final Host host ) throws PeerException
+    public boolean isConnected( final Host host )
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
         return remotePeerRestClient.isConnected( host );
@@ -221,7 +233,8 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host host )
+            throws CommandException
     {
         return execute( requestBuilder, host, null );
     }
@@ -256,7 +269,8 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host )
+            throws CommandException
     {
         executeAsync( requestBuilder, host, null );
     }
@@ -341,6 +355,13 @@ public class RemotePeerImpl implements RemotePeer
     public <T> void sendRequest( final T request, final String recipient, final int timeout ) throws PeerException
     {
         sendRequestInternal( request, recipient, timeout );
+    }
+
+
+    @Override
+    public ContainerHostState getContainerHostState( final String containerId ) throws PeerException
+    {
+        throw new UnsupportedOperationException( "Not implemented yet." );
     }
 
 

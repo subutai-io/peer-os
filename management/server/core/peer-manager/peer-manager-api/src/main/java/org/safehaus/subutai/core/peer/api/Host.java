@@ -10,8 +10,9 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
+import org.safehaus.subutai.core.hostregistry.api.Interface;
 
 
 /**
@@ -19,17 +20,17 @@ import org.safehaus.subutai.core.hostregistry.api.HostInfo;
  */
 public interface Host extends Serializable
 {
-    public Agent getAgent();
+    /**
+     * Returns reference to parent peer
+     *
+     * @return returns Peer interface
+     */
+    public Peer getPeer();
 
-    @Deprecated
-    public Agent getParentAgent();
+    public void setPeer( Peer peer );
 
-    @Deprecated
-    public void setParentAgent( Agent agent );
 
     public String getPeerId();
-
-    //    public void setPeerId( UUID peerId );
 
     public UUID getId();
 
@@ -37,11 +38,11 @@ public interface Host extends Serializable
 
     public String getHostname();
 
-    void addListener( HostEventListener hostEventListener );
+    public void addListener( HostEventListener hostEventListener );
 
-    void removeListener( HostEventListener hostEventListener );
+    public void removeListener( HostEventListener hostEventListener );
 
-    void fireEvent( HostEvent hostEvent );
+    public void fireEvent( HostEvent hostEvent );
 
     public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException;
 
@@ -57,9 +58,17 @@ public interface Host extends Serializable
 
     public long getLastHeartbeat();
 
-    String getIpByMask( String mask );
+    public String getIpByMask( String mask );
 
     void addIpHostToEtcHosts( String domainName, Set<Host> others, String mask ) throws SubutaiException;
 
     void init();
+
+    public Set<Interface> getNetInterfaces();
+
+    public String getIpByInterfaceName( String interfaceName );
+
+    public String getMacByInterfaceName( String interfaceName );
+
+    public HostArchitecture getHostArchitecture();
 }

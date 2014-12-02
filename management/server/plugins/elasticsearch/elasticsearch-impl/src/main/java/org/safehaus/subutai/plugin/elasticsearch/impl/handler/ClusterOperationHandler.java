@@ -89,19 +89,19 @@ public class ClusterOperationHandler extends AbstractOperationHandler<Elasticsea
         switch ( clusterOperationType )
         {
             case START_ALL:
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost containerHost : environment.getContainerHosts() )
                 {
                     result = executeCommand( containerHost, Commands.startCommand );
                 }
                 break;
             case STOP_ALL:
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost containerHost : environment.getContainerHosts() )
                 {
                     result = executeCommand( containerHost, Commands.stopCommand );
                 }
                 break;
             case STATUS_ALL:
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost containerHost : environment.getContainerHosts() )
                 {
                     result = executeCommand( containerHost, Commands.statusCommand );
                 }

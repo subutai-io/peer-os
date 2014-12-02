@@ -52,7 +52,7 @@ public class VerificationStep extends Panel
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
             Environment hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
-            Set<ContainerHost> nodes = hadoopEnvironment.getHostsByIds( wizard.getConfig().getNodes() );
+            Set<ContainerHost> nodes = hadoopEnvironment.getContainerHostsByIds( wizard.getConfig().getNodes() );
             for ( ContainerHost host : nodes )
             {
                 cfgView.addStringCfg( "Node to install", host.getHostname() + "" );

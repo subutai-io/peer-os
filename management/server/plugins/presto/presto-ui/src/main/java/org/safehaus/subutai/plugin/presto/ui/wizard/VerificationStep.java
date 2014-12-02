@@ -51,8 +51,8 @@ public class VerificationStep extends Panel
         {
             Environment hadoopEnvironment = environmentManager.getEnvironmentByUUID( hc.getEnvironmentId() );
             ContainerHost coordinator =
-                    hadoopEnvironment.getContainerHostByUUID( wizard.getConfig().getCoordinatorNode() );
-            Set<ContainerHost> workers = hadoopEnvironment.getHostsByIds( wizard.getConfig().getWorkers() );
+                    hadoopEnvironment.getContainerHostById( wizard.getConfig().getCoordinatorNode() );
+            Set<ContainerHost> workers = hadoopEnvironment.getContainerHostsByIds( wizard.getConfig().getWorkers() );
             cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getHadoopClusterName() );
             cfgView.addStringCfg( "Master Node", coordinator.getHostname() );
             for ( ContainerHost worker : workers )

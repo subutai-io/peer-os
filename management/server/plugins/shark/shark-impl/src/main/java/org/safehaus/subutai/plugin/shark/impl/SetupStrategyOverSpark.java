@@ -7,7 +7,6 @@ import java.util.Set;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
@@ -19,7 +18,6 @@ import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 
@@ -33,7 +31,8 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
 
     private SparkClusterConfig sparkConfig;
     private ContainerHost sparkMaster;
-    private List<ContainerHost> allNodes;
+    private Set<ContainerHost> allNodes;
+    private Set<ContainerHost> nodesToInstallShark;
 
 
     public SetupStrategyOverSpark( Environment environment, SharkImpl manager, SharkClusterConfig config,
@@ -59,7 +58,6 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
         {
             throw new ClusterSetupException( String.format( "Cluster %s already exists", config.getClusterName() ) );
         }
-
         sparkConfig = manager.getSparkManager().getCluster( config.getSparkClusterName() );
         if ( sparkConfig == null )
         {
@@ -68,7 +66,7 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
         }
 
         final Set<ContainerHost> sparkSlaves =
-                environment.getHostsByIds( Sets.newHashSet( sparkConfig.getSlaveIds() ) );
+                environment.getContainerHostsByIds( Sets.newHashSet( sparkConfig.getSlaveIds() ) );
 
         if ( CollectionUtil.isCollectionEmpty( sparkSlaves ) )
         {
@@ -89,7 +87,7 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
             }
         }
 
-        sparkMaster = environment.getContainerHostByUUID( sparkConfig.getMasterNodeId() );
+        sparkMaster = environment.getContainerHostById( sparkConfig.getMasterNodeId() );
 
         if ( sparkMaster == null )
         {
@@ -101,26 +99,36 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
             throw new ClusterSetupException( "Spark master is not connected" );
         }
 
-        trackerOperation.addLog( "Checking installed packages..." );
-        allNodes = Lists.newArrayList( sparkSlaves );
+        allNodes = Sets.newHashSet( sparkSlaves );
         allNodes.add( sparkMaster );
 
-        RequestBuilder checkCommand = manager.getCommands().getCheckInstalledCommand();
-
+        //check if node belongs to some existing spark cluster
+        List<SharkClusterConfig> sparkClusters = manager.getClusters();
         for ( ContainerHost node : allNodes )
         {
-            try
+            for ( SharkClusterConfig cluster : sparkClusters )
             {
-                CommandResult result = executeCommand( node, checkCommand );
-                if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
+                if ( cluster.getNodeIds().contains( node.getId() ) )
                 {
                     throw new ClusterSetupException(
-                            String.format( "Node %s already has Shark installed", node.getHostname() ) );
+                            String.format( "Node %s already belongs to Shark cluster %s", node.getHostname(),
+                                    cluster.getClusterName() ) );
                 }
             }
-            catch ( ClusterException e )
+        }
+
+
+        nodesToInstallShark = Sets.newHashSet();
+
+        trackerOperation.addLog( "Checking prerequisites..." );
+        RequestBuilder checkCommand = manager.getCommands().getCheckInstalledCommand();
+        for ( ContainerHost node : allNodes )
+        {
+
+            CommandResult result = executeCommand( node, checkCommand );
+            if ( !result.getStdOut().contains( Commands.PACKAGE_NAME ) )
             {
-                throw new ClusterSetupException( e );
+                nodesToInstallShark.add( node );
             }
         }
     }
@@ -128,26 +136,33 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
 
     private void configure() throws ClusterSetupException
     {
-        config.getNodeIds().clear();
-        config.getNodeIds().addAll( sparkConfig.getAllNodesIds() );
-        config.setEnvironmentId( environment.getId() );
+
+        if ( !nodesToInstallShark.isEmpty() )
+        {
+            trackerOperation.addLog( "Installing Shark..." );
+
+            //install shark
+            RequestBuilder installCommand = manager.getCommands().getInstallCommand();
+            for ( ContainerHost node : nodesToInstallShark )
+            {
+                executeCommand( node, installCommand );
+            }
+        }
+
 
         trackerOperation.addLog( "Setting master IP..." );
 
         RequestBuilder setMasterIpCommand = manager.getCommands().getSetMasterIPCommand( sparkMaster );
         for ( ContainerHost node : allNodes )
         {
-            try
-            {
-                executeCommand( node, setMasterIpCommand );
-            }
-            catch ( ClusterException e )
-            {
-                throw new ClusterSetupException( e );
-            }
+            executeCommand( node, setMasterIpCommand );
         }
 
-        trackerOperation.addLog( "Updating db..." );
+        trackerOperation.addLog( "Saving cluster info..." );
+
+        config.getNodeIds().clear();
+        config.getNodeIds().addAll( sparkConfig.getAllNodesIds() );
+        config.setEnvironmentId( environment.getId() );
 
         if ( !manager.getPluginDao().saveInfo( SharkClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
         {
@@ -168,49 +183,22 @@ public class SetupStrategyOverSpark implements ClusterSetupStrategy
     }
 
 
-    public CommandResult executeCommand( ContainerHost host, RequestBuilder command ) throws ClusterException
+    public CommandResult executeCommand( ContainerHost host, RequestBuilder command ) throws ClusterSetupException
     {
 
-        return executeCommand( host, command, false );
-    }
-
-
-    public CommandResult executeCommand( ContainerHost host, RequestBuilder command, boolean skipError )
-            throws ClusterException
-    {
-
-        CommandResult result = null;
+        CommandResult result;
         try
         {
             result = host.execute( command );
         }
         catch ( CommandException e )
         {
-            if ( skipError )
-            {
-                trackerOperation
-                        .addLog( String.format( "Error on container %s: %s", host.getHostname(), e.getMessage() ) );
-            }
-            else
-            {
-                throw new ClusterException( e );
-            }
+            throw new ClusterSetupException( e );
         }
-        if ( skipError )
+        if ( !result.hasSucceeded() )
         {
-            if ( result != null && !result.hasSucceeded() )
-            {
-                trackerOperation.addLog( String.format( "Error on container %s: %s", host.getHostname(),
-                        result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
-            }
-        }
-        else
-        {
-            if ( !result.hasSucceeded() )
-            {
-                throw new ClusterException( String.format( "Error on container %s: %s", host.getHostname(),
-                        result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
-            }
+            throw new ClusterSetupException( String.format( "Error on container %s: %s", host.getHostname(),
+                    result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
         }
         return result;
     }

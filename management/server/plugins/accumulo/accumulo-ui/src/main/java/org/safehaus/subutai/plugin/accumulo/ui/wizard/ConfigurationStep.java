@@ -368,7 +368,7 @@ public class ConfigurationStep extends Panel
                         Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
                         for ( ContainerHost host : nodeList )
                         {
-                            nodes.add( host.getAgent().getUuid() );
+                            nodes.add( host.getId() );
                         }
                         wizard.getConfig().setTracers( nodes );
                     }
@@ -385,7 +385,7 @@ public class ConfigurationStep extends Panel
                         Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
                         for ( ContainerHost host : nodeList )
                         {
-                            nodes.add( host.getAgent().getUuid() );
+                            nodes.add( host.getId() );
                         }
                         wizard.getConfig().setSlaves( nodes );
                     }
@@ -824,7 +824,7 @@ public class ConfigurationStep extends Panel
         {
             set.add( environmentManager.getEnvironmentByUUID(
                     hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ).getEnvironmentId() )
-                                       .getContainerHostByUUID( uuid ) );
+                                       .getContainerHostById( uuid ) );
         }
         return set;
     }
@@ -884,7 +884,7 @@ public class ConfigurationStep extends Panel
     {
         return environmentManager.getEnvironmentByUUID(
                 hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ).getEnvironmentId() )
-                                 .getContainerHostByUUID( uuid );
+                                 .getContainerHostById( uuid );
     }
 
 

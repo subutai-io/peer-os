@@ -47,7 +47,7 @@ public class VerificationStep extends Panel
         {
             ZookeeperClusterConfig zookeeperClusterConfig = wizard.getZookeeperClusterConfig();
             Environment zookeeperEnvironment = environmentManager.getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
-            ContainerHost nimbusHost = zookeeperEnvironment.getContainerHostByUUID( config.getNimbus() );
+            ContainerHost nimbusHost = zookeeperEnvironment.getContainerHostById( config.getNimbus() );
             cfgView.addStringCfg( "Master node", nimbusHost.getHostname() );
         }
         cfgView.addStringCfg( "Supervisor nodes count", config.getSupervisorsCount() + "" );

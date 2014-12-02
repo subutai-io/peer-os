@@ -212,29 +212,39 @@ public class WolForm extends CustomComponent implements Disposable
                         i++;
                     }
 
-                    if ( checkMacList( macListArray ) )
+                    //check macList is empty or not ?
+                    if( macList.isEmpty() )
                     {
-                        try
-                        {
-                            Boolean commandresult = wolui.getWolManager().sendMagicPackageByList( macListArray );
-                            if ( commandresult )
-                            {
-                                showNotification( "All Magic Package Sent to Listed Mac Address" );
-                            }
-                            else
-                            {
-                                showNotification( "Operation is  not successfull" );
-                            }
-                        }
-                        catch ( WolManagerException e )
-                        {
-                            showNotification( e.getMessage() );
-                        }
+                        showNotification( "Empty Mac Address Content" );
                     }
                     else
                     {
-                        showNotification( "Invalid Mac Address Content" );
+                        //check macListArray is valid or not ?
+                        if ( checkMacList( macListArray ) )
+                        {
+                            try
+                            {
+                                Boolean commandresult = wolui.getWolManager().sendMagicPackageByList( macListArray );
+                                if ( commandresult )
+                                {
+                                    showNotification( "All Magic Package Sent to Listed Mac Address" );
+                                }
+                                else
+                                {
+                                    showNotification( "Operation is  not successfull" );
+                                }
+                            }
+                            catch ( WolManagerException e )
+                            {
+                                showNotification( e.getMessage() );
+                            }
+                        }
+                        else
+                        {
+                            showNotification( "Invalid Mac Address Content" );
+                        }
                     }
+
                 }
                 catch ( IOException e )
                 {
