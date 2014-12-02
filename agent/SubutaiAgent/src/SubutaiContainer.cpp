@@ -98,7 +98,7 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     pid_t pid;
     try {
         lxc_attach_command_t cmd = {_params[0], _params};
-        result.exit_code = this->container->attach_run_wait(this->container, &opts, program.c_str(), _params);
+        result.exit_code = this->container->attach(this->container, lxc_attach_run_command, &cmd, &opts, &pid);
     } catch (std::exception e) {
         containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Execution failed (LXC): " + string(e.what())));
     }
@@ -617,7 +617,7 @@ string SubutaiContainer::getState()
 bool SubutaiContainer::hasSubCommand(SubutaiCommand* command) {
     vector<string> args = ExplodeCommandArguments(command);
     for (vector<string>::iterator it = args.begin(); it != args.end(); it++) {
-        if (it->compare("|") == 0 || it->compare(">") == 0 || it->compare(">>") == 0) {
+        if (it->compare("|") == 0 || it->compare(">") == 0 || it->compare(">>") == 0 || it->compare(";") || it->compare("&") || it->compare("&&") || it->compare("<")) {
             return true;
         }
     }
