@@ -15,6 +15,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -77,7 +78,8 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     @Transient
     private Peer peer;
 
-    @OneToMany( mappedBy = "host", cascade = CascadeType.ALL, targetEntity = HostInterface.class, orphanRemoval = true )
+    @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = HostInterface
+            .class, orphanRemoval = true )
     protected Set<Interface> interfaces = new HashSet<>();
 
 
