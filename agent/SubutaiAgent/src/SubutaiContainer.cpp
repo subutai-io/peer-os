@@ -445,25 +445,45 @@ ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) {
 
     // Parsing arguments
     vector<string> pr = ExplodeCommandArguments(command);
-    char* args[pr.size() + 1];
-    int i = 0;
-    SubutaiHelper h;
-    for (vector<string>::iterator it = pr.begin(); it != pr.end(); it++, i++) {
-        if (it == pr.begin()) {
-            // This is a first argument which is actually a program name
-            programName = (*it); 
-            args[i] = const_cast<char*>((*it).c_str());
-            continue;
-        }
-        args[i] = const_cast<char*>((*it).c_str());
-    }
-    args[i] = NULL;
-    lxc_attach_command_t cmd = {const_cast<char*>(programName.c_str()), args};
     int ret;
-    try {
-        ret = this->container->attach(this->container, lxc_attach_run_command, &cmd, &opts, &pid);
-    } catch (std::exception e) {
-        containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Daemon Exception: ", string(e.what())));
+    SubutaiHelper h;
+    if (hasSubCommand(command)) {
+        char* args[3];
+        args[0] = "sh";
+        args[1] = "-c";
+        string cmdLine = "echo -e \"$(";
+        for (vector<string>::iterator it = pr.begin(); it != pr.end(); it++) {
+            cmdLine.append((*it));
+            cmdLine.append(" ");
+        }
+        cmdLine.append(")\"");
+        args[2] = const_cast<char*>(cmdLine.c_str());
+        args[3] = NULL;
+        lxc_attach_command_t cmd = {args[0], args};
+        try {
+            ret = this->container->attach(this->container, lxc_attach_run_command, &cmd, &opts, &pid);
+        } catch (std::exception e) {
+            containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Daemon Exception: ", string(e.what())));
+        }
+    } else {
+        char* args[pr.size() + 1];
+        int i = 0;
+        for (vector<string>::iterator it = pr.begin(); it != pr.end(); it++, i++) {
+            if (it == pr.begin()) {
+                // This is a first argument which is actually a program name
+                programName = (*it); 
+                args[i] = const_cast<char*>((*it).c_str());
+                continue;
+            }
+            args[i] = const_cast<char*>((*it).c_str());
+        }
+        args[i] = NULL;
+        lxc_attach_command_t cmd = {const_cast<char*>(programName.c_str()), args};
+        try {
+            ret = this->container->attach(this->container, lxc_attach_run_command, &cmd, &opts, &pid);
+        } catch (std::exception e) {
+            containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Daemon Exception: ", string(e.what())));
+        }
     }
     containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "Daemon pid: ", h.toString(pid)));
     containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "Exit code: ", h.toString(ret)));
