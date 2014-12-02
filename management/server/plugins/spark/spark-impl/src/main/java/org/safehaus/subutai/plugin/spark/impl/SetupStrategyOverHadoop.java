@@ -30,8 +30,7 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
     final SparkImpl manager;
     final SparkClusterConfig config;
     private Environment environment;
-    private Set<ContainerHost> allNodes;
-    private Set<ContainerHost> nodeToInstallSpark;
+    private Set<ContainerHost> nodesToInstallSpark;
 
 
     public SetupStrategyOverHadoop( TrackerOperation po, SparkImpl manager, SparkClusterConfig config,
@@ -116,7 +115,7 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
         po.addLog( "Checking prerequisites..." );
 
         //gather all nodes
-        allNodes = Sets.newHashSet( master );
+        final Set<ContainerHost> allNodes = Sets.newHashSet( master );
         allNodes.addAll( slaves );
 
         //check if node belongs to some existing spark cluster
@@ -134,7 +133,7 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
             }
         }
 
-        nodeToInstallSpark = Sets.newHashSet();
+        nodesToInstallSpark = Sets.newHashSet();
 
         //check hadoop installation & filter nodes needing Spark installation
         RequestBuilder checkInstalledCommand = manager.getCommands().getCheckInstalledCommand();
@@ -147,7 +146,7 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
                 CommandResult result = node.execute( checkInstalledCommand );
                 if ( !result.getStdOut().contains( Commands.PACKAGE_NAME ) )
                 {
-                    nodeToInstallSpark.add( node );
+                    nodesToInstallSpark.add( node );
                 }
                 if ( !result.getStdOut()
                             .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME.toLowerCase() ) )
@@ -178,14 +177,16 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
 
     private void configure() throws ClusterSetupException
     {
-        config.setEnvironmentId( environment.getId() );
 
-        po.addLog( "Installing Spark..." );
-        //install spark
-        RequestBuilder installCommand = manager.getCommands().getInstallCommand();
-        for ( ContainerHost node : nodeToInstallSpark )
+        if ( !nodesToInstallSpark.isEmpty() )
         {
-            executeCommand( node, installCommand );
+            po.addLog( "Installing Spark..." );
+            //install spark
+            RequestBuilder installCommand = manager.getCommands().getInstallCommand();
+            for ( ContainerHost node : nodesToInstallSpark )
+            {
+                executeCommand( node, installCommand );
+            }
         }
 
         po.addLog( "Configuring cluster..." );
@@ -202,6 +203,8 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
         }
 
         po.addLog( "Saving cluster info..." );
+
+        config.setEnvironmentId( environment.getId() );
 
         if ( !manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
         {
