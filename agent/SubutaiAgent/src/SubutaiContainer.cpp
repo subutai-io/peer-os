@@ -126,7 +126,7 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
 void SubutaiContainer::UpdateUsersList() 
 { 
     if (getState() != "RUNNING") return ;
-    containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Updating user list"));
+    containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Updating user list"));
     _users.clear();
     vector<string> params;
     params.push_back("/etc/passwd");
@@ -138,8 +138,8 @@ void SubutaiContainer::UpdateUsersList()
         int uid;
         string uname;
         std::size_t found_first  = line.find(":");
-        std::size_t found_second = line.find(":", found_first+1);
-        std::size_t found_third  = line.find(":", found_second+1);
+        std::size_t found_second = line.find(":", found_first + 1);
+        std::size_t found_third  = line.find(":", found_second + 1);
         uname = line.substr(0, found_first);
         uid   = atoi(line.substr(found_second+1, found_third).c_str());
         _users.insert(make_pair(uid, uname));
@@ -154,8 +154,8 @@ bool SubutaiContainer::getContainerId()
 {
     try
     {
-        containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Get container id"));
-        containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Check uuid.txt.."));
+        containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Get container id"));
+        containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Check uuid.txt.."));
         string path = "/var/lib/lxc/" + this->hostname + "/rootfs/etc/subutai-agent/";
         string uuidFile = path + "uuid.txt";
         ifstream file(uuidFile.c_str());	//opening uuid.txt
