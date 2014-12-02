@@ -26,7 +26,7 @@ public class EnvironmentDestroyerThread implements Runnable
     @Override
     public void run()
     {
-        for ( ContainerHost container : environment.getContainers() )
+        for ( ContainerHost container : environment.getContainerHosts() )
         {
             try
             {

@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.spark.impl;
 
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.safehaus.subutai.common.command.CommandException;
@@ -29,7 +30,7 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
     final SparkImpl manager;
     final SparkClusterConfig config;
     private Environment environment;
-    private Set<ContainerHost> allNodes;
+    private Set<ContainerHost> nodesToInstallSpark;
 
 
     public SetupStrategyOverHadoop( TrackerOperation po, SparkImpl manager, SparkClusterConfig config,
@@ -56,8 +57,7 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
         return config;
     }
 
-    //TODO find all Spark clusters and check if node if Spark installed belongs to them
-    //if belongs then fail otherwise add to non installable nodes
+
     private void check() throws ClusterSetupException
     {
 
@@ -74,7 +74,7 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
             throw new ClusterSetupException( "No slave nodes" );
         }
 
-        ContainerHost master = environment.getContainerHostByUUID( config.getMasterNodeId() );
+        ContainerHost master = environment.getContainerHostById( config.getMasterNodeId() );
         if ( master == null )
         {
             throw new ClusterSetupException( "Master not found in the environment" );
@@ -84,7 +84,7 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
             throw new ClusterSetupException( "Master is not connected" );
         }
 
-        Set<ContainerHost> slaves = environment.getHostsByIds( config.getSlaveIds() );
+        Set<ContainerHost> slaves = environment.getContainerHostsByIds( config.getSlaveIds() );
 
         if ( slaves.size() > config.getSlaveIds().size() )
         {
@@ -114,10 +114,28 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
 
         po.addLog( "Checking prerequisites..." );
 
-        //check installed subutai packages
-        allNodes = Sets.newHashSet( master );
+        //gather all nodes
+        final Set<ContainerHost> allNodes = Sets.newHashSet( master );
         allNodes.addAll( slaves );
 
+        //check if node belongs to some existing spark cluster
+        List<SparkClusterConfig> sparkClusters = manager.getClusters();
+        for ( ContainerHost node : allNodes )
+        {
+            for ( SparkClusterConfig cluster : sparkClusters )
+            {
+                if ( cluster.getAllNodesIds().contains( node.getId() ) )
+                {
+                    throw new ClusterSetupException(
+                            String.format( "Node %s already belongs to Spark cluster %s", node.getHostname(),
+                                    cluster.getClusterName() ) );
+                }
+            }
+        }
+
+        nodesToInstallSpark = Sets.newHashSet();
+
+        //check hadoop installation & filter nodes needing Spark installation
         RequestBuilder checkInstalledCommand = manager.getCommands().getCheckInstalledCommand();
 
         for ( Iterator<ContainerHost> iterator = allNodes.iterator(); iterator.hasNext(); )
@@ -126,16 +144,12 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
             try
             {
                 CommandResult result = node.execute( checkInstalledCommand );
-                if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
+                if ( !result.getStdOut().contains( Commands.PACKAGE_NAME ) )
                 {
-                    po.addLog(
-                            String.format( "Node %s already has Spark installed. Omitting this node from installation",
-                                    node.getHostname() ) );
-                    config.getSlaveIds().remove( node.getId() );
-                    iterator.remove();
+                    nodesToInstallSpark.add( node );
                 }
-                else if ( !result.getStdOut()
-                                 .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME.toLowerCase() ) )
+                if ( !result.getStdOut()
+                            .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME.toLowerCase() ) )
                 {
                     po.addLog(
                             String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
@@ -152,25 +166,27 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
 
         if ( config.getSlaveIds().isEmpty() )
         {
-            throw new ClusterSetupException( "No nodes eligible for installation\nInstallation aborted" );
+            throw new ClusterSetupException( "No slave nodes eligible for installation" );
         }
         if ( !allNodes.contains( master ) )
         {
-            throw new ClusterSetupException( "Master node was omitted\nInstallation aborted" );
+            throw new ClusterSetupException( "Master node was omitted" );
         }
     }
 
 
     private void configure() throws ClusterSetupException
     {
-        config.setEnvironmentId( environment.getId() );
 
-        po.addLog( "Installing Spark..." );
-        //install spark
-        RequestBuilder installCommand = manager.getCommands().getInstallCommand();
-        for ( ContainerHost node : allNodes )
+        if ( !nodesToInstallSpark.isEmpty() )
         {
-            executeCommand( node, installCommand );
+            po.addLog( "Installing Spark..." );
+            //install spark
+            RequestBuilder installCommand = manager.getCommands().getInstallCommand();
+            for ( ContainerHost node : nodesToInstallSpark )
+            {
+                executeCommand( node, installCommand );
+            }
         }
 
         po.addLog( "Configuring cluster..." );
@@ -187,6 +203,8 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
         }
 
         po.addLog( "Saving cluster info..." );
+
+        config.setEnvironmentId( environment.getId() );
 
         if ( !manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
         {

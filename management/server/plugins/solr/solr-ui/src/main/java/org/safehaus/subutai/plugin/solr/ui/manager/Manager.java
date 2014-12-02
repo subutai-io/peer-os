@@ -196,7 +196,7 @@ public class Manager
         if ( solrClusterConfig != null )
         {
             Environment environment = environmentManager.getEnvironmentByUUID( solrClusterConfig.getEnvironmentId() );
-            populateTable( nodesTable, environment.getContainers() );
+            populateTable( nodesTable, environment.getContainerHosts() );
         }
         else
         {
@@ -448,7 +448,7 @@ public class Manager
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION )
                                             .getValue();
                     Set<ContainerHost> containerHosts =
-                            environmentManager.getEnvironmentByUUID( solrClusterConfig.getEnvironmentId() ).getContainers();
+                            environmentManager.getEnvironmentByUUID( solrClusterConfig.getEnvironmentId() ).getContainerHosts();
                     Iterator iterator = containerHosts.iterator();
                     ContainerHost containerHost = null;
                     while ( iterator.hasNext() )

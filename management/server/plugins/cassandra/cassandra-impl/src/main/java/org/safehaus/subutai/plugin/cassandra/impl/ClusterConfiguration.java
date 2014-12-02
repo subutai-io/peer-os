@@ -45,7 +45,7 @@ public class ClusterConfiguration
 
         StringBuilder sb = new StringBuilder();
         int seedCount = 0;
-        for ( ContainerHost containerHost : environment.getContainers() )
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
             seedCount++;
             sb.append( containerHost.getIpByMask( Common.IP_MASK ) ).append( "," );
@@ -58,7 +58,7 @@ public class ClusterConfiguration
         String seedsParam = "seeds " + sb.toString();
 
 
-        for ( ContainerHost containerHost : environment.getContainers() )
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
             try
             {

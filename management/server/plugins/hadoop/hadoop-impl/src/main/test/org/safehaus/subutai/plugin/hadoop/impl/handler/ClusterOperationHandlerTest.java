@@ -71,7 +71,7 @@ public class ClusterOperationHandlerTest
         when(hadoop.getTracker()).thenReturn(tracker);
         when(hadoop.getEnvironmentManager()).thenReturn(environmentManager);
         when(environmentManager.getEnvironmentByUUID(uuid)).thenReturn(environment);
-        when(environment.getContainerHostByUUID(uuid)).thenReturn(containerHost);
+        when(environment.getContainerHostById( uuid )).thenReturn(containerHost);
 
         when(environmentManager.buildEnvironment(hadoop.getDefaultEnvironmentBlueprint(hadoopClusterConfig)))
                 .thenReturn(environment);

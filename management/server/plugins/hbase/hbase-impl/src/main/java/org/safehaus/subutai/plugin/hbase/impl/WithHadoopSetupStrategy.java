@@ -31,7 +31,7 @@ class WithHadoopSetupStrategy extends HBaseSetupStrategy
             throw new ClusterSetupException( "Environment not specified" );
         }
 
-        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
+        if ( environment.getContainerHosts() == null || environment.getContainerHosts().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
@@ -40,7 +40,7 @@ class WithHadoopSetupStrategy extends HBaseSetupStrategy
         config.getAllNodes().clear();
         config.getHadoopNodes().clear();
 
-        for ( ContainerHost host : environment.getContainers() )
+        for ( ContainerHost host : environment.getContainerHosts() )
         {
             if ( !host.isConnected() )
             {

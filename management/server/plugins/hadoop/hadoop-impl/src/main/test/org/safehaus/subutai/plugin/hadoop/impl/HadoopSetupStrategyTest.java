@@ -50,9 +50,9 @@ public class HadoopSetupStrategyTest
 //    @Test
 //    public void testSetup() throws ClusterSetupException
 //    {
-//        when(environment.getContainerHostByUUID(hadoopClusterConfig.getNameNode())).thenReturn(containerHost);
-//        when(environment.getContainerHostByUUID(hadoopClusterConfig.getJobTracker())).thenReturn(containerHost);
-//        when(environment.getContainerHostByUUID(hadoopClusterConfig.getSecondaryNameNode()))
+//        when(environment.getContainerHostById(hadoopClusterConfig.getNameNode())).thenReturn(containerHost);
+//        when(environment.getContainerHostById(hadoopClusterConfig.getJobTracker())).thenReturn(containerHost);
+//        when(environment.getContainerHostById(hadoopClusterConfig.getSecondaryNameNode()))
 //                .thenReturn(containerHost);
 //
 //        Set<UUID> myUUID = mock(Set.class);
@@ -70,7 +70,7 @@ public class HadoopSetupStrategyTest
 //        mySet.add(containerHost3);
 //        mySet.add(containerHost4);
 //
-//        when(environment.getContainers()).thenReturn(mySet).thenReturn(mySet);
+//        when(environment.getContainerHosts()).thenReturn(mySet).thenReturn(mySet);
 //        when(hadoopClusterConfig.getAllMasterNodes()).thenReturn(myUUID);
 //        Iterator<ContainerHost> iterator = mock(Iterator.class);
 //        when(mySet.iterator()).thenReturn(iterator);
@@ -108,7 +108,7 @@ public class HadoopSetupStrategyTest
 //        UUID uuid3 = new UUID(56, 50);
 //        UUID uuid4 = new UUID(58, 50);
 //
-//        when(environment.getContainers()).thenReturn(mySet);
+//        when(environment.getContainerHosts()).thenReturn(mySet);
 //        when(mySet.iterator()).thenReturn(iterator);
 //        when(iterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(true)
 //                .thenReturn(false);
@@ -130,7 +130,7 @@ public class HadoopSetupStrategyTest
 //        verify(containerHost).getAgent();
 //        verify(containerHost2).getAgent();
 //        verify(containerHost3).getAgent();
-//        verify(environment).getContainers();
+//        verify(environment).getContainerHosts();
 //        verify(hadoopClusterConfig).setNameNode(uuid);
 //        verify(hadoopClusterConfig).setJobTracker(uuid2);
 //        verify(hadoopClusterConfig).setSecondaryNameNode(uuid3);
@@ -149,7 +149,7 @@ public class HadoopSetupStrategyTest
 //        mySet.add(containerHost);
 //        mySet.add(containerHost2);
 //
-//        when(environment.getContainers()).thenReturn(mySet);
+//        when(environment.getContainerHosts()).thenReturn(mySet);
 //        when(hadoopClusterConfig.getAllMasterNodes()).thenReturn(myUUID);
 //        when(mySet.iterator()).thenReturn(iterator);
 //        when(iterator.hasNext()).thenReturn(true).thenReturn(false);
@@ -161,7 +161,7 @@ public class HadoopSetupStrategyTest
 //        hadoopSetupStrategy.setSlaveNodes();
 //
 //        assertEquals(uuid, agent.getUuid());
-//        verify(environment).getContainers();
+//        verify(environment).getContainerHosts();
 //        verify(hadoopClusterConfig).setDataNodes(anyList());
 //        verify(hadoopClusterConfig).setTaskTrackers(anyList());
 //    }
@@ -176,7 +176,7 @@ public class HadoopSetupStrategyTest
 //        mySet.add(containerHost3);
 //        mySet.add(containerHost4);
 //
-//        when(environment.getContainers()).thenReturn(mySet);
+//        when(environment.getContainerHosts()).thenReturn(mySet);
 //        when(mySet.iterator()).thenReturn(iterator);
 //        when(iterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(true)
 //                .thenReturn(false);
@@ -205,7 +205,7 @@ public class HadoopSetupStrategyTest
 //        mySet.add(containerHost3);
 //        mySet.add(containerHost4);
 //
-//        when(environment.getContainers()).thenReturn(mySet);
+//        when(environment.getContainerHosts()).thenReturn(mySet);
 //        when(mySet.iterator()).thenReturn(iterator);
 //        when(iterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(true)
 //                .thenReturn(false);

@@ -338,7 +338,7 @@ public class Manager
                 {
                     myHostSet.add( environmentManager.getEnvironmentByUUID(
                             hadoop.getCluster( accumuloClusterConfig.getHadoopClusterName() ).getEnvironmentId() )
-                                                     .getContainerHostByUUID( uuid ) );
+                                                     .getContainerHostById( uuid ) );
                 }
 
                 AddNodeWindow w =
@@ -390,7 +390,7 @@ public class Manager
                 {
                     myHostSet.add( environmentManager.getEnvironmentByUUID(
                             hadoop.getCluster( accumuloClusterConfig.getHadoopClusterName() ).getEnvironmentId() )
-                                                     .getContainerHostByUUID( uuid ) );
+                                                     .getContainerHostById( uuid ) );
                 }
 
                 AddNodeWindow w =
@@ -620,14 +620,14 @@ public class Manager
         {
             Environment environment = environmentManager.getEnvironmentByUUID(
                     hadoop.getCluster( accumuloClusterConfig.getHadoopClusterName() ).getEnvironmentId() );
-            populateTable( slavesTable, environment.getHostsByIds( accumuloClusterConfig.getSlaves() ), false );
-            populateTable( tracersTable, environment.getHostsByIds( accumuloClusterConfig.getTracers() ), false );
+            populateTable( slavesTable, environment.getContainerHostsByIds( accumuloClusterConfig.getSlaves() ), false );
+            populateTable( tracersTable, environment.getContainerHostsByIds( accumuloClusterConfig.getTracers() ), false );
 
 
             Set<ContainerHost> masters = new HashSet<>();
-            masters.add( environment.getContainerHostByUUID( accumuloClusterConfig.getMasterNode() ) );
-            masters.add( environment.getContainerHostByUUID( accumuloClusterConfig.getGcNode() ) );
-            masters.add( environment.getContainerHostByUUID( accumuloClusterConfig.getMonitor() ) );
+            masters.add( environment.getContainerHostById( accumuloClusterConfig.getMasterNode() ) );
+            masters.add( environment.getContainerHostById( accumuloClusterConfig.getGcNode() ) );
+            masters.add( environment.getContainerHostById( accumuloClusterConfig.getMonitor() ) );
             populateTable( mastersTable, masters, true );
         }
         else

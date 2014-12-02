@@ -35,7 +35,7 @@ class SetupStrategyOverHadoop extends SqoopSetupStrategy
         checkConfig();
 
         //check if nodes are connected
-        Set<ContainerHost> nodes = environment.getHostsByIds( config.getNodes() );
+        Set<ContainerHost> nodes = environment.getContainerHostsByIds( config.getNodes() );
         if ( nodes.size() < config.getNodes().size() )
         {
             throw new ClusterSetupException( "Fewer nodes found in the encironment than expected" );

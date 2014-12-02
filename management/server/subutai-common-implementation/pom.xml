@@ -67,7 +67,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.common.impl</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
+              {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
             <import>*</import>
           </instructions>

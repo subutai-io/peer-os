@@ -173,7 +173,8 @@ public class ClusterOperationHandler extends AbstractOperationHandler<FlumeImpl,
 
         for ( UUID uuid : config.getNodes() )
         {
-            ContainerHost containerHost = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHostByUUID( uuid );
+            ContainerHost containerHost = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHostById(
+                    uuid );
             CommandResult result = null;
             try
             {

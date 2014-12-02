@@ -80,7 +80,7 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
             throw new BuildException( e.getMessage() );
         }
 
-        if ( environment.getContainers().size() == containersCreated )
+        if ( environment.getContainerHosts().size() == containersCreated )
         {
             environment.setStatus( EnvironmentStatusEnum.HEALTHY );
         }

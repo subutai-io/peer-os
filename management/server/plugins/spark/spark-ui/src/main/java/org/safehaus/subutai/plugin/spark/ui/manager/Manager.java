@@ -195,7 +195,7 @@ public class Manager
                     HadoopClusterConfig hci = hadoop.getCluster( hn );
                     if ( hci != null )
                     {
-                        set = environment.getHostsByIds( Sets.newHashSet( hci.getAllNodes() ) );
+                        set = environment.getContainerHostsByIds( Sets.newHashSet( hci.getAllNodes() ) );
                     }
                 }
 
@@ -205,7 +205,7 @@ public class Manager
                     show( "Hadoop cluster not found" );
                     return;
                 }
-                set.removeAll( environment.getHostsByIds( Sets.newHashSet( config.getAllNodesIds() ) ) );
+                set.removeAll( environment.getContainerHostsByIds( Sets.newHashSet( config.getAllNodesIds() ) ) );
                 if ( set.isEmpty() )
                 {
                     show( "All nodes in Hadoop cluster have Spark installed" );
@@ -429,8 +429,8 @@ public class Manager
         {
             environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
 
-            populateTable( nodesTable, environment.getHostsByIds( config.getSlaveIds() ),
-                    environment.getContainerHostByUUID( config.getMasterNodeId() ) );
+            populateTable( nodesTable, environment.getContainerHostsByIds( config.getSlaveIds() ),
+                    environment.getContainerHostById( config.getMasterNodeId() ) );
             checkAllNodesStatus();
         }
         else

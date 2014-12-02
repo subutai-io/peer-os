@@ -281,7 +281,7 @@ public class EnvironmentsForm
 
 
         int ipInt = 10;
-        for ( ContainerHost container : environment.getContainers() )
+        for ( ContainerHost container : environment.getContainerHosts() )
         {
 
             TextField fieldHostname = new TextField();
@@ -311,7 +311,7 @@ public class EnvironmentsForm
     private Window envWindow( Environment environment )
     {
         Window window = createWindow( MANAGE_TITLE );
-        window.setContent( genContainersTable( environment, environment.getContainers() ) );
+        window.setContent( genContainersTable( environment, environment.getContainerHosts() ) );
         return window;
     }
 

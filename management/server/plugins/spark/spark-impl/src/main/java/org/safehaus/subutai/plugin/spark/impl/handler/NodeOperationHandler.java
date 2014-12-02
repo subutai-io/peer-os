@@ -1,6 +1,7 @@
 package org.safehaus.subutai.plugin.spark.impl.handler;
 
 
+import java.util.List;
 import java.util.Set;
 
 import org.safehaus.subutai.common.command.CommandException;
@@ -139,7 +140,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
     public void addSlaveNode() throws ClusterException
     {
-        ContainerHost master = environment.getContainerHostByUUID( config.getMasterNodeId() );
+        ContainerHost master = environment.getContainerHostById( config.getMasterNodeId() );
 
         if ( master == null )
         {
@@ -166,8 +167,22 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
             throw new ClusterException( "Node does not belong to Hadoop cluster" );
         }
 
+        //check if node already belongs to some existing Spark cluster
+        List<SparkClusterConfig> clusters = manager.getClusters();
+
+        for ( SparkClusterConfig cluster : clusters )
+        {
+            if ( cluster.getAllNodesIds().contains( node.getId() ) )
+            {
+                throw new ClusterException(
+                        String.format( "Node %s already belongs to Spark cluster %s", node.getHostname(),
+                                cluster.getClusterName() ) );
+            }
+        }
+
         trackerOperation.addLog( "Checking prerequisites..." );
 
+        //if the slave already contains master then we don't need to install Spark since it is already installed
         boolean install = !node.getId().equals( config.getMasterNodeId() );
 
         //check installed subutai packages
@@ -175,13 +190,14 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
         CommandResult result = executeCommand( node, checkInstalledCommand );
 
 
-        if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + SparkClusterConfig.PRODUCT_KEY.toLowerCase() )
-                && install )
+        if ( install )
         {
-            throw new ClusterException( String.format( "Node %s already has Spark installed", hostname ) );
+            //install only if container does not have Spark installed
+            install = !result.getStdOut()
+                             .contains( Common.PACKAGE_PREFIX + SparkClusterConfig.PRODUCT_KEY.toLowerCase() );
         }
-        else if ( !result.getStdOut()
-                         .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_KEY.toLowerCase() ) )
+
+        if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_KEY.toLowerCase() ) )
         {
             throw new ClusterException( String.format( "Node %s has no Hadoop installation", hostname ) );
         }
@@ -257,7 +273,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
         }
 
 
-        ContainerHost master = environment.getContainerHostByUUID( config.getMasterNodeId() );
+        ContainerHost master = environment.getContainerHostById( config.getMasterNodeId() );
 
         if ( master == null )
         {
@@ -328,7 +344,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
             throw new ClusterException( String.format( "Node %s does not belong to this cluster", hostname ) );
         }
 
-        ContainerHost master = environment.getContainerHostByUUID( config.getMasterNodeId() );
+        ContainerHost master = environment.getContainerHostById( config.getMasterNodeId() );
 
         if ( master == null )
         {
@@ -348,8 +364,8 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
         }
 
 
-        Set<ContainerHost> allNodes = environment.getHostsByIds( config.getSlaveIds() );
-        allNodes.add( environment.getContainerHostByUUID( config.getMasterNodeId() ) );
+        Set<ContainerHost> allNodes = environment.getContainerHostsByIds( config.getSlaveIds() );
+        allNodes.add( environment.getContainerHostById( config.getMasterNodeId() ) );
 
         for ( ContainerHost node : allNodes )
         {
@@ -389,7 +405,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SparkImpl, Sp
 
         trackerOperation.addLog( "Adding nodes to new master..." );
 
-        Set<ContainerHost> slaves = environment.getHostsByIds( config.getSlaveIds() );
+        Set<ContainerHost> slaves = environment.getContainerHostsByIds( config.getSlaveIds() );
         Set<String> slaveHostnames = Sets.newHashSet();
         for ( ContainerHost slave : slaves )
         {

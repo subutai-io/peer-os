@@ -357,7 +357,7 @@ public class Manager
         Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
         for ( UUID agentID : config.getNodes() )
         {
-            containerHosts.add( environment.getContainerHostByUUID( agentID ) );
+            containerHosts.add( environment.getContainerHostById( agentID ) );
         }
         for ( ContainerHost host : containerHosts )
         {
@@ -386,7 +386,7 @@ public class Manager
         Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
         for ( UUID agentID : config.getNodes() )
         {
-            containerHosts.add( environment.getContainerHostByUUID( agentID ) );
+            containerHosts.add( environment.getContainerHostById( agentID ) );
         }
 
         for ( ContainerHost host : containerHosts )
@@ -520,7 +520,7 @@ public class Manager
                             Environment hadoopEnvironment =
                                     environmentManager.getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
                             Set<UUID> hadoopNodeIDs = new HashSet<UUID>( hadoopClusterConfig.getAllNodes() );
-                            Set<ContainerHost> hadoopNodes = hadoopEnvironment.getHostsByIds( hadoopNodeIDs );
+                            Set<ContainerHost> hadoopNodes = hadoopEnvironment.getContainerHostsByIds( hadoopNodeIDs );
                             Set<ContainerHost> nodes = new HashSet<>();
                             nodes.addAll( hadoopNodes );
                             nodes.removeAll( config.getNodes() );
@@ -616,7 +616,7 @@ public class Manager
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
 
-            populateTable( nodesTable, getZookeeperNodes( environment.getContainers() ) );
+            populateTable( nodesTable, getZookeeperNodes( environment.getContainerHosts() ) );
         }
         else
         {

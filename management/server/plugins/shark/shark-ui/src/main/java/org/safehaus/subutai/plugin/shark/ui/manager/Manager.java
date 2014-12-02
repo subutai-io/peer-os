@@ -177,7 +177,7 @@ public class Manager
                     {
                         Set<UUID> nodeIds = new HashSet<>( sparkInfo.getAllNodesIds() );
                         nodeIds.removeAll( config.getNodeIds() );
-                        Set<ContainerHost> availableNodes = environment.getHostsByIds( nodeIds );
+                        Set<ContainerHost> availableNodes = environment.getContainerHostsByIds( nodeIds );
                         if ( !nodeIds.isEmpty() )
                         {
                             AddNodeWindow win =
@@ -308,7 +308,7 @@ public class Manager
         if ( config != null )
         {
             environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-            populateTable( nodesTable, environment.getHostsByIds( config.getNodeIds() ) );
+            populateTable( nodesTable, environment.getContainerHostsByIds( config.getNodeIds() ) );
         }
         else
         {

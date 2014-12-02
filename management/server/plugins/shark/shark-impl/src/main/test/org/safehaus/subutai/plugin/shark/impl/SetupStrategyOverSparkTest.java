@@ -82,7 +82,7 @@ public class SetupStrategyOverSparkTest
         ContainerHost[] arr = new ContainerHost[1];
         arr[0] = containerHost;
 
-        when(environment.getHostsByIds(any(Set.class))).thenReturn(mySet);
+        when(environment.getContainerHostsByIds( any( Set.class ) )).thenReturn(mySet);
         Iterator<ContainerHost> iterator = mock(Iterator.class);
         when(mySet.iterator()).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(true).thenReturn(false);
@@ -90,7 +90,7 @@ public class SetupStrategyOverSparkTest
         when(mySet.size()).thenReturn(1);
 
         when(containerHost.isConnected()).thenReturn(true);
-        when(environment.getContainerHostByUUID(any(UUID.class))).thenReturn(containerHost);
+        when(environment.getContainerHostById( any( UUID.class ) )).thenReturn(containerHost);
         when(mySet.toArray()).thenReturn(arr);
 
         when(sharkImpl.getCommands()).thenReturn(commands);
