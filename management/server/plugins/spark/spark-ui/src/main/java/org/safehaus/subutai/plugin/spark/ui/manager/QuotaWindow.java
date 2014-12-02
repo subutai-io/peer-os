@@ -14,6 +14,8 @@ import com.vaadin.ui.Window;
 
 /**
  * Window for managing container resource quotas
+ *
+ * TODO might be useful to put this to vaadin custom module for sharing
  */
 public class QuotaWindow extends Window
 {
@@ -113,6 +115,7 @@ public class QuotaWindow extends Window
     private void readQuotas( ContainerHost host )
     {
         //TODO read current quotas and fill-in relevant input components
+
         ramTxt.setValue( "1G" );
         cpuTxt.setValue( "50%" );
         diskTxt.setValue( "40G" );
