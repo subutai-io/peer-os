@@ -390,7 +390,7 @@ public class ManagerListener
         final ContainerHost host = hadoopManager.getHostByRow( row );
         final ContainerHost containerHost = hadoopManager.getEnvironmentManager().
                 getEnvironmentByUUID( hadoopManager.getHadoopCluster().getEnvironmentId() )
-                                                         .getContainerHostByUUID( host.getId() );
+                                                         .getContainerHostById( host.getId() );
         final String clusterName = hadoopManager.getHadoopCluster().getClusterName();
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
         final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );
@@ -463,7 +463,7 @@ public class ManagerListener
         final ContainerHost host = hadoopManager.getHostByRow( row );
         final ContainerHost containerHost = hadoopManager.getEnvironmentManager().
                 getEnvironmentByUUID( hadoopManager.getHadoopCluster().getEnvironmentId() )
-                                                         .getContainerHostByUUID( host.getId() );
+                                                         .getContainerHostById( host.getId() );
         final String clusterName = hadoopManager.getHadoopCluster().getClusterName();
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
         final Button startStopButton = hadoopManager.getStartStopButton( availableOperationsLayout );
@@ -526,7 +526,7 @@ public class ManagerListener
         final ContainerHost host = hadoopManager.getHostByRow( row );
         final ContainerHost containerHost = hadoopManager.getEnvironmentManager().
                 getEnvironmentByUUID( hadoopManager.getHadoopCluster().getEnvironmentId() )
-                                                         .getContainerHostByUUID( host.getId());
+                                                         .getContainerHostById( host.getId() );
         final String clusterName = hadoopManager.getHadoopCluster().getClusterName();
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
         final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );
@@ -582,7 +582,7 @@ public class ManagerListener
         final ContainerHost host = hadoopManager.getHostByRow( row );
         final ContainerHost containerHost = hadoopManager.getEnvironmentManager().
                 getEnvironmentByUUID( hadoopManager.getHadoopCluster().getEnvironmentId() )
-                                                         .getContainerHostByUUID( host.getId() );
+                                                         .getContainerHostById( host.getId() );
         final String clusterName = hadoopManager.getHadoopCluster().getClusterName();
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
         final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );
@@ -636,7 +636,7 @@ public class ManagerListener
         final ContainerHost host = hadoopManager.getHostByRow( row );
         final ContainerHost containerHost = hadoopManager.getEnvironmentManager().
                 getEnvironmentByUUID( hadoopManager.getHadoopCluster().getEnvironmentId() )
-                                                         .getContainerHostByUUID( host.getId() );
+                                                         .getContainerHostById( host.getId() );
         final String clusterName = hadoopManager.getHadoopCluster().getClusterName();
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
         final Button startStopButton = hadoopManager.getStartStopButton( availableOperationsLayout );
@@ -714,7 +714,7 @@ public class ManagerListener
         final ContainerHost host = hadoopManager.getHostByRow( row );
         final ContainerHost containerHost = hadoopManager.getEnvironmentManager().
                 getEnvironmentByUUID( hadoopManager.getHadoopCluster().getEnvironmentId() )
-                                                         .getContainerHostByUUID( host.getId() );
+                                                         .getContainerHostById( host.getId() );
         final String clusterName = hadoopManager.getHadoopCluster().getClusterName();
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
         final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );

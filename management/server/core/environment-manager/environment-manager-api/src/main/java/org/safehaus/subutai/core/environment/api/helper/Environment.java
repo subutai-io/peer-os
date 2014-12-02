@@ -20,7 +20,7 @@ public interface Environment
 
     public void addContainer( ContainerHost container );
 
-    public Set<ContainerHost> getContainers();
+    public Set<ContainerHost> getContainerHosts();
 
     //    public void destroyContainer( UUID containerId ) throws EnvironmentManagerException;
 
@@ -31,13 +31,13 @@ public interface Environment
     public UUID getId();
 
 
-    public ContainerHost getContainerHostByUUID( UUID uuid );
+    public ContainerHost getContainerHostById( UUID uuid );
 
 
     public ContainerHost getContainerHostByHostname( String hostname );
 
 
-    public Set<ContainerHost> getHostsByIds( Set<UUID> ids );
+    public Set<ContainerHost> getContainerHostsByIds( Set<UUID> ids );
 
 
     public void addContainers( final Set<ContainerHost> containerHosts );

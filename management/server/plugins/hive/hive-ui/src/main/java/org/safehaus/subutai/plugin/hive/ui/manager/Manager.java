@@ -193,7 +193,7 @@ public class Manager
                 {
                     myHostSet.add( environmentManager.getEnvironmentByUUID(
                             hadoop.getCluster( config.getHadoopClusterName() ).getEnvironmentId() )
-                                                     .getContainerHostByUUID( uuid ) );
+                                                     .getContainerHostById( uuid ) );
                 }
 
                 AddNodeWindow w = new AddNodeWindow( hive, executorService, tracker, config,
@@ -360,10 +360,10 @@ public class Manager
         if ( config != null )
         {
             populateTable( serverTable,
-                    getServers( environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers(),
+                    getServers( environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts(),
                             config ) );
             populateTable( clientsTable,
-                    getClients( environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers(),
+                    getClients( environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts(),
                             config ) );
         }
         else

@@ -77,7 +77,7 @@ public class NodeOperationHandlerTest
         when(environmentManager.getEnvironmentByUUID(any(UUID.class))).thenReturn(environment);
         when(environment.getId()).thenReturn(uuid);
 
-        when(environment.getContainers()).thenReturn(mySet);
+        when(environment.getContainerHosts()).thenReturn(mySet);
         Iterator<ContainerHost> iterator = mock(Iterator.class);
         when(mySet.iterator()).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(false);
@@ -174,7 +174,7 @@ public class NodeOperationHandlerTest
         when(environmentManager.getEnvironmentByUUID(any(UUID.class))).thenReturn(environment);
         when(environment.getId()).thenReturn(uuid);
 
-        when(environment.getContainers()).thenReturn(mySet);
+        when(environment.getContainerHosts()).thenReturn(mySet);
         Iterator<ContainerHost> iterator = mock(Iterator.class);
         when(mySet.iterator()).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(false);
@@ -207,7 +207,7 @@ public class NodeOperationHandlerTest
 //        mySet.add(containerHost);
 //        mySet.add(containerHost2);
 //
-//        when(environment.getContainers()).thenReturn(mySet);
+//        when(environment.getContainerHosts()).thenReturn(mySet);
 //        Iterator<ContainerHost> iterator = mock(Iterator.class);
 //        when(mySet.iterator()).thenReturn(iterator);
 //        when(iterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(false);
@@ -230,7 +230,7 @@ public class NodeOperationHandlerTest
 //        when(hadoopImpl.getEnvironmentManager()).thenReturn(environmentManager);
 //        when(environmentManager.getEnvironmentByUUID(any(UUID.class))).thenReturn(environment);
 //        when(environment.getId()).thenReturn(uuid);
-//        when(environment.getContainerHostByUUID(any(UUID.class))).thenReturn(containerHost);
+//        when(environment.getContainerHostById(any(UUID.class))).thenReturn(containerHost);
 //        when(containerHost.getEnvironmentId()).thenReturn(uuid);
 //
 //        PluginDAO pluginDAO = mock(PluginDAO.class);
@@ -256,7 +256,7 @@ public class NodeOperationHandlerTest
 //        mySet.add(containerHost);
 //        mySet.add(containerHost2);
 //
-//        when(environment.getContainers()).thenReturn(mySet);
+//        when(environment.getContainerHosts()).thenReturn(mySet);
 //        Iterator<ContainerHost> iterator = mock(Iterator.class);
 //        when(mySet.iterator()).thenReturn(iterator);
 //        when(iterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(false);
@@ -279,7 +279,7 @@ public class NodeOperationHandlerTest
 //        when(hadoopImpl.getEnvironmentManager()).thenReturn(environmentManager);
 //        when(environmentManager.getEnvironmentByUUID(any(UUID.class))).thenReturn(environment);
 //        when(environment.getId()).thenReturn(uuid);
-//        when(environment.getContainerHostByUUID(any(UUID.class))).thenReturn(containerHost);
+//        when(environment.getContainerHostById(any(UUID.class))).thenReturn(containerHost);
 //        when(containerHost.getEnvironmentId()).thenReturn(uuid);
 //
 //        PluginDAO pluginDAO = mock(PluginDAO.class);

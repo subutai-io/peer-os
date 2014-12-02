@@ -97,9 +97,9 @@ public class ClusterOperationHandler extends AbstractOperationHandler<HadoopImpl
         try
         {
             Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-            ContainerHost namenode = environment.getContainerHostByUUID( config.getNameNode() );
-            ContainerHost jobtracker = environment.getContainerHostByUUID( config.getJobTracker() );
-            ContainerHost secondaryNameNode = environment.getContainerHostByUUID( config.getSecondaryNameNode() );
+            ContainerHost namenode = environment.getContainerHostById( config.getNameNode() );
+            ContainerHost jobtracker = environment.getContainerHostById( config.getJobTracker() );
+            ContainerHost secondaryNameNode = environment.getContainerHostById( config.getSecondaryNameNode() );
 
             CommandResult result = null;
             switch ( clusterOperationType )

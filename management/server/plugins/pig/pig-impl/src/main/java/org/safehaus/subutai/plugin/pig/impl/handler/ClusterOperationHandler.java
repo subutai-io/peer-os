@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.pig.impl.handler;
 
 
-import java.util.Iterator;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -183,7 +182,8 @@ public class ClusterOperationHandler extends AbstractOperationHandler<PigImpl, P
 
         for ( UUID uuid : config.getNodes() )
         {
-            ContainerHost containerHost = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHostByUUID( uuid );
+            ContainerHost containerHost = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHostById(
+                    uuid );
             CommandResult result = null;
             try
             {

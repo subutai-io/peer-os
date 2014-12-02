@@ -43,7 +43,7 @@ public class SetupHelper
             throw new ClusterSetupException( "Coordinator node is not connected" );
         }
 
-        for ( ContainerHost host : environment.getHostsByIds( config.getWorkers() ) )
+        for ( ContainerHost host : environment.getContainerHostsByIds( config.getWorkers() ) )
         {
             if ( !host.isConnected() )
             {
@@ -119,7 +119,7 @@ public class SetupHelper
 
     public ContainerHost getCoordinatorHost( Environment environment )
     {
-        ContainerHost host = environment.getContainerHostByUUID( config.getCoordinatorNode() );
+        ContainerHost host = environment.getContainerHostById( config.getCoordinatorNode() );
         return host;
     }
 }

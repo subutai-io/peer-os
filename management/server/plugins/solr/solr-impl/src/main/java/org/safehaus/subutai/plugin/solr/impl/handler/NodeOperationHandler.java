@@ -2,9 +2,6 @@ package org.safehaus.subutai.plugin.solr.impl.handler;
 
 
 import java.util.Iterator;
-import java.util.UUID;
-
-import javax.xml.soap.Node;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
@@ -53,7 +50,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<SolrImpl, Sol
         }
 
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        Iterator iterator = environment.getContainers().iterator();
+        Iterator iterator = environment.getContainerHosts().iterator();
         ContainerHost host = null;
         while ( iterator.hasNext() )
         {

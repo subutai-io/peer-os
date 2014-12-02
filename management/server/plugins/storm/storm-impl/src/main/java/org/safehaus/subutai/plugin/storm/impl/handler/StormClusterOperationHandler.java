@@ -91,7 +91,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
                 break;
             case START_ALL:
                 environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost containerHost : environment.getContainerHosts() )
                 {
                     if ( config.getNimbus().equals( containerHost.getId() ) ) {
                         commandResultList.add( executeCommand( containerHost,
@@ -106,7 +106,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
                 break;
             case STOP_ALL:
                 environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost containerHost : environment.getContainerHosts() )
                 {
                     if ( config.getNimbus().equals( containerHost.getId() ) ) {
                         commandResultList.add( executeCommand( containerHost, Commands
@@ -121,7 +121,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
                 break;
             case STATUS_ALL:
                 environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost containerHost : environment.getContainerHosts() )
                 {
                     if ( config.getNimbus().equals( containerHost.getId() ) ) {
                         commandResultList.add( executeCommand( containerHost, Commands
@@ -236,7 +236,7 @@ public class StormClusterOperationHandler extends AbstractOperationHandler<Storm
                 Environment zookeeperEnvironment =
                         manager.getEnvironmentManager().getEnvironmentByUUID(
                                 zookeeperClusterConfig.getEnvironmentId() );
-                ContainerHost nimbusNode = zookeeperEnvironment.getContainerHostByUUID( config.getNimbus() );
+                ContainerHost nimbusNode = zookeeperEnvironment.getContainerHostById( config.getNimbus() );
                 nimbusNode.execute( new RequestBuilder( Commands.make( CommandType.PURGE ) ) );
             }
             manager.getPluginDAO().deleteInfo( config.getProductKey(), config.getClusterName() );

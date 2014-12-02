@@ -58,14 +58,14 @@ public class ESSetupStrategy implements ClusterSetupStrategy
                     String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
-        if ( environment.getContainers().size() < config.getNumberOfNodes() )
+        if ( environment.getContainerHosts().size() < config.getNumberOfNodes() )
         {
             throw new ClusterSetupException( String.format( "Environment needs to have %d nodes but has only %d nodes",
-                    config.getNumberOfNodes(), environment.getContainers().size() ) );
+                    config.getNumberOfNodes(), environment.getContainerHosts().size() ) );
         }
 
         Set<UUID> esNodes = new HashSet<>();
-        for ( ContainerHost containerHost : environment.getContainers() )
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
             esNodes.add( containerHost.getId() );
         }
