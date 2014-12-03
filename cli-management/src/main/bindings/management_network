@@ -465,7 +465,7 @@ function management_network {
 	done
       echo "#################################################################################"
      else 
-     echo "Can't open folder $search_dir"
+     echo "It seems no VNi mapping yet cause I can't open folder $search_dir"
      fi
    fi
 
