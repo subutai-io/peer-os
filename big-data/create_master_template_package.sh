@@ -7,14 +7,21 @@
 #   - jenkins_ip_address:
 # @Returns:
 #   - master debian package under /lxc-data/tmpdir directory
-# @LastEdit: 31/10/2014-14:54
+# @LastEdit: 03/12/2014-17:28
 ##################################################
 
 main() {
   # Environment specific variables
-  #bridge_name=eth0
-  jenkins_user="jenkins"
-  jenkins_ip_address="172.16.1.178"  
+  jenkins_user="$1"
+  jenkins_ip_address="$2"
+
+  if [ "x$jenkins_user" == "x" ] || [ "x$jenkins_ip_address" == "x" ] ; then
+    echo "jenkins_user or jenkins_ip_address parameter is empty! Aborting.."
+    exit 1
+  fi
+
+  echo "jenkins_user: $jenkins_user"
+  echo "jenkins_ip_address: $jenkins_ip_address"
 
   # General Variables 
   # These packages should have the latest versions on this machine
@@ -97,5 +104,5 @@ export_master_template() {
   echo "Size of master template package is: " `du -hs /lxc-data/tmpdir/master-subutai-template*.deb`
 }
 
-main
+main "$1" "$2"
 exit 0
