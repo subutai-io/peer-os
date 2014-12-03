@@ -7,7 +7,7 @@
 #   - jenkins_ip_address:
 # @Returns:
 #   - master debian package under /lxc-data/tmpdir directory
-# @LastEdit: 17/10/2014-08:54
+# @LastEdit: 31/10/2014-14:54
 ##################################################
 
 main() {
@@ -18,9 +18,9 @@ main() {
 
   # General Variables 
   # These packages should have the latest versions on this machine
-  local packages_should_be_installed="subutai-cli,subutai-cli-dev,git,lxc,expect"
+  local packages_should_be_installed="subutai-cli,subutai-cli-dev,git,lxc"
   # These packages should be available to be installed on master template
-  local packages_should_be_available="ksks-logstash,jmxtrans,subutai-mastertemplate-setup"
+  local packages_should_be_available=""
 
   jenkins_machine=$jenkins_user@$jenkins_ip_address
 
@@ -47,8 +47,8 @@ assert_root_user() {
 
 assert_packages_available() {
   if [ -z $1 ]; then
-    echo "Please provide the package list to assert_packages_available method!"
-    exit 1
+    echo "No packages provided to check for master template installation procedure"
+    return
   fi
   local packages_should_be_available=$1
   IFS=', ' read -a debian_packages <<< "$packages_should_be_available"
@@ -80,12 +80,7 @@ install_latest_packages() {
 
 destroy_master_template() {
   echo "destroying master template"
-/usr/bin/expect<<EOF
-spawn subutai master_destroy
-expect "Do you wish to destroy master template?"
-send -- "Y\r"
-expect eof
-EOF
+  echo -e "o\nY\n" | subutai master_destroy
   rm -rf /lxc-data/tmpdir/master*
 }
 
