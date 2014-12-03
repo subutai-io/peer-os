@@ -391,15 +391,15 @@ ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command)
     string program;
     vector<string> args;
     if (hasSubCommand(command)) {
+        containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Wrapping command with shell"));
         vector<string> pr = ExplodeCommandArguments(command);
         program = "sh";
         args.push_back("-c");
-        string cmdline = "echo -e \"$(";
+        string cmdline = "";
         for (vector<string>::iterator it = pr.begin(); it != pr.end(); it++) {
             cmdline.append((*it));
             cmdline.append(" ");
         }
-        cmdline.append(")\"");
         args.push_back(cmdline);
     } else {
         vector<string> pr = ExplodeCommandArguments(command);
@@ -451,12 +451,11 @@ ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) {
         char* args[3];
         args[0] = "sh";
         args[1] = "-c";
-        string cmdLine = "echo -e \"$(";
+        string cmdLine = "";
         for (vector<string>::iterator it = pr.begin(); it != pr.end(); it++) {
             cmdLine.append((*it));
             cmdLine.append(" ");
         }
-        cmdLine.append(")\"");
         args[2] = const_cast<char*>(cmdLine.c_str());
         args[3] = NULL;
         lxc_attach_command_t cmd = {args[0], args};
@@ -526,7 +525,6 @@ bool SubutaiContainer::checkUser(string username)
     containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "user not found: "+ username + "on " + this->hostname));
     return false;
 }
-
 
 /*
  * /details     Runs through the list of userid:username pairs
@@ -604,20 +602,6 @@ vector<string> SubutaiContainer::ExplodeCommandArguments(SubutaiCommand* command
     return result;
 }
 
-/**
- * For testing purpose
- *
- * Test if long commands with && can run or not:
- * It waits until all the commands run to return.
- */
-void SubutaiContainer::tryLongCommand() 
-{
-    vector<string> args;
-    args.push_back("-c");
-    args.push_back("ls -la && ls && ls -la && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls && ls && sleep 2 && ls && ls -la && ls && ls -la && ls");
-    cout << RunProgram("/bin/bash", args) << endl;
-}
-
 /*
  * \details Method invokes state() function from lxc api, which returns state of current container
  */
@@ -630,14 +614,13 @@ string SubutaiContainer::getState()
     }
 }
 
-
 /*
  * \details check if this command has |, > or >>
  */
 bool SubutaiContainer::hasSubCommand(SubutaiCommand* command) {
     vector<string> args = ExplodeCommandArguments(command);
     for (vector<string>::iterator it = args.begin(); it != args.end(); it++) {
-        if (it->compare("|") == 0 || it->compare(">") == 0 || it->compare(">>") == 0 || it->compare(";") || it->compare("&") || it->compare("&&") || it->compare("<")) {
+        if (it->compare("|") == 0 || it->compare(">") == 0 || it->compare(">>") == 0 || it->compare(";") == 0 || it->compare("&") == 0 || it->compare("&&") == 0 || it->compare("<") == 0) {
             return true;
         }
     }
