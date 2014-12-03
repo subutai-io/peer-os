@@ -450,23 +450,23 @@ function management_network {
 
 
    if [ "true" == "$listVNImapping" ]; then
-    search_dir="/var/subutai-network"
-    if [ -d "$search_dir" ]; then
-      # Control will enter here if $DIRECTORY exists.
-      echo "#################################################################################"
-      echo -e "  Tunnel name\t |  VNI \t| VLAN ID   "
-       for entry in "$search_dir"/*
-       do
-	    if [ -f "$entry" ]; then  
-	     echo "---------------------------------------------------------------------------------"
-	     echo $(basename $entry)} | awk -F"_" '{print "\t",$1,""}'
-	     cat $entry | awk -F" " '{print "\t\t | ",$1,"\t\t| ",$2}';
-	    fi
-	done
-      echo "#################################################################################"
-     else 
-     echo "It seems no VNi mapping yet cause I can't open folder $search_dir"
-     fi
+      search_dir="/var/subutai-network"
+      if [ -d "$search_dir" ]; then
+         # Control will enter here if $DIRECTORY exists.
+         echo "#################################################################################"
+         echo -e "  Tunnel name\t |  VNI \t| VLAN ID   "
+         for entry in "$search_dir"/*
+           do
+             if [ -f "$entry" ]; then  
+               echo "---------------------------------------------------------------------------------"
+               echo $(basename $entry)} | awk -F"_" '{print "\t",$1,""}'
+               cat $entry | awk -F" " '{print "\t\t | ",$1,"\t\t| ",$2}';
+             fi
+           done
+         echo "#################################################################################"
+      else 
+         echo "It seems no VNi mapping yet cause I can't open folder $search_dir"
+      fi
    fi
 
 
