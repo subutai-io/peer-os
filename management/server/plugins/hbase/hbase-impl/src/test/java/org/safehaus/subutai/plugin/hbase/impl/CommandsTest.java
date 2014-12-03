@@ -24,6 +24,7 @@ public class CommandsTest
     RequestBuilder requestBuilder_for_GetConfigRegionCommand;
     RequestBuilder requestBuilder_for_GetConfigMasterCommand;
     RequestBuilder requestBuilder_for_GetCheckInstalledCommand;
+    RequestBuilder requestBuilder_for_GetInstallCommand;
 
     @Before
     public void setUp() throws Exception
@@ -47,6 +48,9 @@ public class CommandsTest
                         OutputRedirection.NO);
         requestBuilder_for_GetInstallDialogCommand = new RequestBuilder("apt-get --assume-yes --force-yes install " +
                 "dialog").withTimeout(360)
+                .withStdOutRedirection(
+                        OutputRedirection.NO);
+        requestBuilder_for_GetInstallCommand = new RequestBuilder( "apt-get --assume-yes --force-yes install " + PACKAGE_NAME ).withTimeout( 360 )
                 .withStdOutRedirection(
                         OutputRedirection.NO);
         commands = new Commands();
@@ -147,12 +151,11 @@ public class CommandsTest
         assertEquals(requestBuilder_for_GetCheckInstalledCommand, commands.getCheckInstalledCommand());
     }
 
-//    @Test
-//    public void testGetInstallCommand()
-//    {
-//
-//        assertNotNull(commands.getCheckInstalledCommand());
-//        assertEquals(requestBuilder_for_GetCheckInstalledCommand, commands.getCheckInstalledCommand());
-//
-//    }
+    @Test
+    public void testGetInstallCommand()
+    {
+        commands.getInstallCommand();
+        assertNotNull(commands.getInstallCommand());
+        assertEquals(requestBuilder_for_GetInstallCommand, commands.getInstallCommand());
+    }
 }

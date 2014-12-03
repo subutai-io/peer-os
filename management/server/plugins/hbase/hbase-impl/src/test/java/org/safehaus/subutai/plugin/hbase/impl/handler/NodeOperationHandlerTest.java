@@ -17,6 +17,8 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.impl.Commands;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,6 +33,7 @@ public class NodeOperationHandlerTest
 {
     private NodeOperationHandler nodeOperationHandler;
     private NodeOperationHandler nodeOperationHandler2;
+    private NodeOperationHandler nodeOperationHandler3;
     private HBaseImpl hBaseImpl;
     private HBaseConfig hBaseConfig;
     private Tracker tracker;
@@ -70,6 +73,7 @@ public class NodeOperationHandlerTest
 
         nodeOperationHandler = new NodeOperationHandler(hBaseImpl, hBaseConfig, "test", OperationType.EXCLUDE);
         nodeOperationHandler2 = new NodeOperationHandler(hBaseImpl, hBaseConfig, "test", OperationType.STATUS);
+        nodeOperationHandler3 = new NodeOperationHandler(hBaseImpl, hBaseConfig, "test", OperationType.INCLUDE);
     }
 
     @Test
@@ -144,6 +148,50 @@ public class NodeOperationHandlerTest
         assertTrue(containerHost.isConnected());
         assertTrue(commandResult.hasSucceeded());
     }
+
+    @Test
+    public void testRunWithOperationTypeInclude() throws CommandException, ClusterException
+    {
+        // mock run method
+        when(hBaseImpl.getCluster(any(String.class))).thenReturn(hBaseConfig);
+        when(hBaseImpl.getEnvironmentManager()).thenReturn(environmentManager);
+        when(environmentManager.getEnvironmentByUUID(any(UUID.class))).thenReturn(environment);
+        when(environment.getContainerHostByHostname("test")).thenReturn(containerHost);
+        when(containerHost.isConnected()).thenReturn(true);
+
+        // mock addNode method
+        List<UUID> myList = mock(ArrayList.class);
+        myList.add(uuid);
+        when(containerHost.getId()).thenReturn(uuid);
+        when(environment.getContainerHostById( any( UUID.class ) )).thenReturn(containerHost);
+
+        when(commands.getCheckInstalledCommand()).thenReturn(requestBuilder);
+        when(commandResult.getStdOut()).thenReturn("test");
+        when(commands.getInstallCommand()).thenReturn(requestBuilder);
+        when(hBaseImpl.getPluginDAO()).thenReturn(pluginDAO);
+        when(pluginDAO.saveInfo(anyString(), anyString(), any())).thenReturn(true);
+
+        // mock executeCommand method
+        when(hBaseImpl.getCommands()).thenReturn(commands);
+        when(containerHost.execute(requestBuilder)).thenReturn(commandResult);
+        when(commandResult.hasSucceeded()).thenReturn(true);
+        nodeOperationHandler.executeCommand(containerHost, requestBuilder);
+
+
+        nodeOperationHandler3.run();
+
+        // asserts
+        assertNotNull(environment);
+        assertNotNull(containerHost);
+        assertNotNull(hBaseConfig);
+        assertNotNull(commandResult);
+        assertEquals(commandResult, nodeOperationHandler.executeCommand(containerHost, hBaseImpl.getCommands().getInstallCommand()));
+        assertEquals(uuid, containerHost.getId());
+        assertTrue(containerHost.isConnected());
+        assertTrue(pluginDAO.saveInfo(anyString(), anyString(), any()));
+        assertTrue(hBaseConfig.getAllNodes().add(uuid));
+    }
+
 
     @Test(expected = ClusterException.class)
     public void shouldThrowsClusterExceptionInExecuteCommand() throws CommandException, ClusterException
