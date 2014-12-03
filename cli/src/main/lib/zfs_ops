@@ -390,13 +390,13 @@ function fs_copy_ds {
   zfs destroy "$to_ds@$now"
 }
 
-function zfs_get_quota {
+function fs_get_quota {
   local container=$1
 
-  local lxc_home=$(zfs_quota_operations "lxc-data/$container-home")
-  local lxc_var=$(zfs_quota_operations "lxc-data/$container-var")
-  local lxc_opt=$(zfs_quota_operations "lxc/$container-opt")
-  local lxc_rootfs=$(zfs_quota_operations "lxc/$container")
+  local lxc_home=$(fs_quota_operations "lxc-data/$container-home")
+  local lxc_var=$(fs_quota_operations "lxc-data/$container-var")
+  local lxc_opt=$(fs_quota_operations "lxc/$container-opt")
+  local lxc_rootfs=$(fs_quota_operations "lxc/$container")
 
   printf "Container home:\t%s\n" $lxc_home
   printf "Container opt:\t%s\n" $lxc_opt
@@ -404,7 +404,7 @@ function zfs_get_quota {
   printf "Container rootfs:\t%s\n" $lxc_rootfs
 }
 
-function zfs_set_quota {
+function fs_set_quota {
   local container=$1
   local directory=$2
   local quota_value=$3
@@ -432,10 +432,10 @@ function zfs_set_quota {
     echo "Please provide with quota value  for function to work in proper way.";
     exit 1;
   fi
-  zfs_quota_operations $container $quota_value
+  fs_quota_operations $container $quota_value
 }
 
-function zfs_quota_operations {
+function fs_quota_operations {
   local container=$1
   local quota_value=$2
   local cmd=

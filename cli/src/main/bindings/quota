@@ -3,10 +3,13 @@
 
 function quota_usage {
   echo -----------------------------------------------------------------------
-  echo Usage: List containers and/or temlates.
+  echo Usage: Quota management of containers.
   echo
-  echo "        "subutai \[-qh\] quota \[name_list\] \[quota_type\] \[quota_value\]
-  echo
+  echo "        "subutai \[-qh\] quota container quota_parameter \[quota_value\] \[additional_parameters\]
+  echo "           "quota_parameters:
+  echo "                             "memory.quota
+  echo "                             "cpu.cpus
+  echo "                             "hdd.quota
   echo -----------------------------------------------------------------------
 }
 
@@ -19,14 +22,10 @@ function quota {
   local container=$1
   local resource_parameter=$2
   local parameter_value=$3
-
-  if [[ -z $container ]]; then
-    echo "Dancing with container with no name. Aborting...";
-    exit 1;
-  fi
+  lxc_assert "$container" "`quota_usage`"
 
   if [[ -z $resource_parameter ]]; then
-    echo "Resource parameter not provided. Aborting..."
+    msg_error "Resource parameter not provided. Aborting..."
     exit 1;
   fi
 
@@ -39,8 +38,11 @@ function quota {
         lxc_get_cpus $container
       ;;
       "hdd.quota")
-        zfs_get_quota $container
+        fs_get_quota $container
       ;;
+      *)
+	msg_error "$resource_parameter is not a supported parameter! Aborting.."
+        exit 1
     esac
   else
     case $resource_parameter in
@@ -52,15 +54,16 @@ function quota {
       ;;
       "hdd.quota")
         local directory=$4
-        zfs_set_quota $container $directory $parameter_value
+        fs_set_quota $container $directory $parameter_value
       ;;
+      *)
+        msg_error "$resource_parameter is not a supported parameter! Aborting.."
+        exit 1
     esac
   fi
-
 }
 
 
 function quota_description {
   echo sets and gets container quotas;
 }
-
