@@ -230,10 +230,11 @@ function get_debian_package_name {
   fi	
   local package_name=`get_package_name $lxc`
   local architecture=`get_architecture`
+  local file_version=`get_exported_package_version $lxc`
   if [ ! -z $version ]; then
     echo $package_name"_"$version"_"$architecture
   else
-    echo $package_name"_"$SUBUTAI_VERSION"_"$architecture
+    echo $package_name"_"$file_version"_"$architecture
   fi
 }
 
@@ -250,6 +251,20 @@ function get_package_name {
 
 function get_architecture {
   echo "amd64"
+}
+
+
+function get_exported_package_version {
+  local lxc=$1
+  local package_name=`get_package_name $lxc`
+  local debian_file=$SUBUTAI_TMPDIR/$package_name"_*.deb"
+
+  if ls $debian_file 1> /dev/null 2>&1; then
+    # Get the version of latest exported package
+    echo "$(ls -lt $debian_file | cut -d'_' -f2 | sed -n 1p)"
+  else
+    echo "$SUBUTAI_VERSION"
+  fi
 }
 
 
