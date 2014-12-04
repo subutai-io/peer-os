@@ -31,18 +31,19 @@ function monitor {
   local is_create="false"
   local is_destroy="false"
   local is_update="false"
+  local is_alert="false"
   local is_start="false"
   local is_end="false"
   local is_query="false"
   local is_parameter="false"
   shift_amount=0;
-  error_message="Cannot use the -c, -d, -s, -e, -u, and -q options together."
-  while getopts ":c:d:s:e:u:q:p:" opt; do
+  error_message="Cannot use the -c, -d, -s, -e, -u, -a and -q options together."
+  while getopts ":c:d:s:e:u:q:p:a:" opt; do
     case $opt in
       c)
         metric_type="$OPTARG"
         is_create="true"
-        if [[ "true" == "$is_start" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_destroy" ]]; then
+        if [[ "true" == "$is_start" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_destroy" || "true" == "$is_alert" ]]; then
           msg_error "$error_message" >&2
           exit 1
         fi
@@ -50,7 +51,7 @@ function monitor {
       d)
         metric_type="$OPTARG"
         is_destroy="true"
-        if [[ "true" == "$is_start" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_create" ]]; then
+        if [[ "true" == "$is_start" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_create" || "true" == "$is_alert" ]]; then
           msg_error "$error_message" >&2
           exit 1
         fi
@@ -58,15 +59,24 @@ function monitor {
       u)
         metric_type="$OPTARG"
         is_update="true"
-        if [[ "true" == "$is_create" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_start" || "true" == "$is_destroy" ]]; then
+        if [[ "true" == "$is_create" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_start" || "true" == "$is_destroy" || "true" == "$is_alert" ]]; then
           msg_error "$error_message" >&2
           exit 1
         fi
         ;;
+      a)
+        metric_type="$OPTARG"
+        is_alert="true"
+        if [[ "true" == "$is_create" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_start" || "true" == "$is_destroy" || "true" == "$is_update" ]]; then
+          msg_error "$error_message" >&2
+          exit 1
+        fi
+        ;;
+
       s)
 	metric_type="$OPTARG"
         is_start="true"
-	if [[ "true" == "$is_create" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_destroy" ]]; then
+	if [[ "true" == "$is_create" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_destroy" || "true" == "$is_alert" ]]; then
           msg_error "$error_message" >&2
           exit 1
         fi
@@ -74,7 +84,7 @@ function monitor {
       e)
         metric_type="$OPTARG"
         is_end="true"
-        if [[ "true" == "$is_create" || "true" == "$is_query" || "true" == "$is_start" || "true" == "$is_update" || "true" == "$is_destroy" ]]; then
+        if [[ "true" == "$is_create" || "true" == "$is_query" || "true" == "$is_start" || "true" == "$is_update" || "true" == "$is_destroy" || "true" == "$is_alert" ]]; then
           msg_error "$error_message" >&2
           exit 1
         fi
@@ -82,7 +92,7 @@ function monitor {
       q)
         metric_type="$OPTARG"
         is_query="true"
-        if [[ "true" == "$is_start" || "true" == "$is_create" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_destroy" ]]; then
+        if [[ "true" == "$is_start" || "true" == "$is_create" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_destroy" || "true" == "$is_alert" ]]; then
           msg_error "$error_message" >&2
           exit 1
         fi
@@ -90,7 +100,7 @@ function monitor {
       p)
         parameters="$OPTARG"
         is_parameter="true"
-        if [[ "true" == "$is_start" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_destroy" ]]; then
+        if [[ "true" == "$is_start" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_destroy" || "true" == "$is_alert" ]]; then
           msg_error "-p option can only be used together with -c option." >&2
           exit 1
         fi
@@ -173,6 +183,8 @@ function monitor {
     fi
   elif [ $is_query == "true" ]; then
     query_rrd "$hostname" "$metric_type"
+  elif [ $is_alert == "true" ]; then
+    $metric_type"_alert" $hostname
   else
     if [ "x$hostname" == "x`hostname`" ]; then
       get_physical_machine_metrics
