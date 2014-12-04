@@ -77,7 +77,7 @@ public class KeyManagerImpl implements KeyManager
         String eol = System.getProperty( "line.separator" );
         List<String> lines = StringUtil.splitString( output, eol );
         int i = 0;
-        Pattern keyPattern = Pattern.compile( "\\s*(\\w+)\\s*(\\w+(?:\\s*:\\s*\\w+)*)\\s*'(.+)'\\s*(.+)" );
+        Pattern keyPattern = Pattern.compile( "\\s*(\\w+)\\s+(\\w+(?:\\s*:\\s*\\w+)*)\\s+(\\w+(?:\\s+\\w+)*)\\s+(.+@.+)" );
         for ( String line : lines )
         {
             //skip headers
