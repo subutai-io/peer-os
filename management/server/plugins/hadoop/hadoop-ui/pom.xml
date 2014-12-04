@@ -38,7 +38,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>agent-manager-api</artifactId>
+      <artifactId>host-registry-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -46,9 +46,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-    <groupId>${project.groupId}</groupId>
-    <artifactId>plugin-common</artifactId>
-    <version>${project.version}</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>plugin-common</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 

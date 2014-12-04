@@ -1,12 +1,15 @@
 package org.safehaus.subutai.core.environment.impl.environment;
 
 
+import java.util.HashSet;
 import java.util.Observable;
 import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.environment.impl.EnvironmentContainerImpl;
+import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,12 +41,23 @@ public class ContainerCreatorThread extends Observable implements Runnable
     {
         try
         {
-            Set<ContainerHost> containers = peerManager.getPeer( peerManager.getLocalPeer().getId() ).
-                    createContainers( message.getTargetPeerId(), environmentId, message.getTemplates(),
+            Set<HostInfoModel> hostInfos = peerManager.getPeer( message.getTargetPeerId() ).
+                    scheduleCloneContainers( message.getTargetPeerId(), message.getTemplates(),
                             message.getNumberOfNodes(), message.getStrategy().getStrategyId(),
-                            message.getStrategy().getCriteriaAsList(), message.getNodeGroupName() );
-            LOG.info( String.format( "Received %d containers for environment %s", containers.size(), environmentId ) );
+                            message.getStrategy().getCriteriaAsList() );
+            LOG.info( String.format( "Received %d containers for environment %s", hostInfos.size(), environmentId ) );
+            Template template = message.getTemplates().get( message.getTemplates().size() - 1 );
             setChanged();
+            Set<EnvironmentContainerImpl> containers = new HashSet<>();
+            for ( HostInfoModel hostInfo : hostInfos )
+            {
+                EnvironmentContainerImpl container =
+                        new EnvironmentContainerImpl( message.getTargetPeerId(), message.getNodeGroupName(), hostInfo );
+                container.setCreatorPeerId( peerManager.getLocalPeer().getId().toString() );
+                container.setPeer( peerManager.getPeer( message.getTargetPeerId() ) );
+                container.setTemplateName( template.getTemplateName() );
+                containers.add( container );
+            }
             notifyObservers( containers );
         }
         catch ( Exception e )
@@ -52,4 +66,25 @@ public class ContainerCreatorThread extends Observable implements Runnable
             LOG.error( e.getMessage(), e );
         }
     }
+
+    //    @Override
+    //    public void run()
+    //    {
+    //        try
+    //        {
+    //            Set<ContainerHost> containers = peerManager.getPeer( message.getTargetPeerId() ).
+    //                    createContainers( message.getTargetPeerId(), environmentId, message.getTemplates(),
+    //                            message.getNumberOfNodes(), message.getStrategy().getStrategyId(),
+    //                            message.getStrategy().getCriteriaAsList(), message.getNodeGroupName() );
+    //            LOG.info( String.format( "Received %d containers for environment %s", containers.size(),
+    // environmentId ) );
+    //            setChanged();
+    //            notifyObservers( containers );
+    //        }
+    //        catch ( Exception e )
+    //        {
+    //            notifyObservers( e );
+    //            LOG.error( e.getMessage(), e );
+    //        }
+    //    }
 }

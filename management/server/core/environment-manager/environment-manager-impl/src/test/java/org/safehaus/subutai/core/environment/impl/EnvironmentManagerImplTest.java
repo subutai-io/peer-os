@@ -2,9 +2,7 @@ package org.safehaus.subutai.core.environment.impl;
 
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.sql.DataSource;
@@ -15,7 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -31,7 +28,7 @@ import static org.mockito.Mockito.when;
  * Created by bahadyr on 9/25/14.
  */
 @Ignore
-@RunWith(MockitoJUnitRunner.class)
+@RunWith( MockitoJUnitRunner.class )
 public class EnvironmentManagerImplTest
 {
 
@@ -69,16 +66,9 @@ public class EnvironmentManagerImplTest
         Map<String, CloneContainersMessage> map = new HashMap<>();
         CloneContainersMessage ccm = mock( CloneContainersMessage.class );
 
-        Set<Agent> agents = new HashSet<>();
-
-        Agent agent = mock( Agent.class );
-        agent.setHostname( HOSTNAME );
-        agents.add( agent );
-
-
         map.put( "key", ccm );
 
-        when( ccm.getNumberOfNodes() ).thenReturn( agents.size() );
+        when( ccm.getNumberOfNodes() ).thenReturn( 1 );
         when( process.getMessageMap() ).thenReturn( map );
         manager.buildEnvironment( process );
     }

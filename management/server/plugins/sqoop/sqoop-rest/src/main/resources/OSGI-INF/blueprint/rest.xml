@@ -10,13 +10,10 @@
       <cxf:logging />
     </cxf:features>
   </cxf:bus>
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
   <reference id="sqoopManager" availability="mandatory" interface="org.safehaus.subutai.plugin.sqoop.api.Sqoop" />
 
   <bean id="restService" class="org.safehaus.subutai.plugin.sqoop.rest.RestService">
-    <property name="agentManager" ref="agentManager" />
     <property name="sqoopManager" ref="sqoopManager" />
   </bean>
 

@@ -14,10 +14,7 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -29,8 +26,6 @@ import org.safehaus.subutai.plugin.hipi.api.HipiConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
-
-import org.apache.cxf.common.util.CollectionUtils;
 
 import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
@@ -66,8 +61,6 @@ public class Manager
     private final ExecutorService executorService;
     private final Tracker tracker;
     private final Hadoop hadoop;
-    private final AgentManager agentManager;
-    private final CommandRunner commandRunner;
     private final EnvironmentManager environmentManager;
     private HipiConfig config;
 
@@ -78,8 +71,6 @@ public class Manager
         this.hipi = serviceLocator.getService( Hipi.class );
         this.tracker = serviceLocator.getService( Tracker.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
         this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
 
@@ -163,7 +154,8 @@ public class Manager
                     if ( hadoopConfig != null )
                     {
                         Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-                        Set<ContainerHost> nodes = environment.getHostsByIds( new HashSet<UUID>(hadoopConfig.getAllNodes()));
+                        Set<ContainerHost> nodes =
+                                environment.getContainerHostsByIds( new HashSet<UUID>( hadoopConfig.getAllNodes() ) );
                         nodes.removeAll( config.getNodes() );
                         if ( !nodes.isEmpty() )
                         {
@@ -272,13 +264,12 @@ public class Manager
 
                     if ( host != null )
                     {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( host ));
+                        TerminalWindow terminal = new TerminalWindow( host );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Host not found" );
                     }
                 }
             }
@@ -297,7 +288,7 @@ public class Manager
         if ( config != null )
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-            Set<ContainerHost> nodes = environment.getHostsByIds( config.getNodes() );
+            Set<ContainerHost> nodes = environment.getContainerHostsByIds( config.getNodes() );
             populateTable( nodesTable, nodes );
         }
         else
@@ -315,7 +306,7 @@ public class Manager
         for ( final ContainerHost host : agents )
         {
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( host.getAgent().getListIP().get( 0 ) + "-hipiDestroy" );
+            destroyBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-hipiDestroy" );
             destroyBtn.addStyleName( "default" );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();
@@ -325,7 +316,7 @@ public class Manager
             addGivenComponents( availableOperations, destroyBtn );
 
             table.addItem( new Object[] {
-                    host.getHostname(), host.getAgent().getListIP().get( 0 ), availableOperations
+                    host.getHostname(), host.getIpByInterfaceName( "eth0" ), availableOperations
             }, null );
             addClickListenerToDestroyButton( host, destroyBtn );
         }

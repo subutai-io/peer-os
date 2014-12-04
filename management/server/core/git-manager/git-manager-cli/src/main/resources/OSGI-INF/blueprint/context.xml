@@ -2,14 +2,11 @@
 
   <reference id="gitManager" availability="mandatory"
              interface="org.safehaus.subutai.core.git.api.GitManager" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/diff-branches">
       <action class="org.safehaus.subutai.core.git.cli.DiffBranches">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
 
@@ -18,7 +15,6 @@
     <command name="git/diff-file">
       <action class="org.safehaus.subutai.core.git.cli.DiffFile">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -27,7 +23,6 @@
     <command name="git/get-current-branch">
       <action class="org.safehaus.subutai.core.git.cli.GetCurrentBranch">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -36,7 +31,6 @@
     <command name="git/list-branches">
       <action class="org.safehaus.subutai.core.git.cli.ListBranches">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -45,7 +39,6 @@
     <command name="git/commit-all">
       <action class="org.safehaus.subutai.core.git.cli.CommitAll">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -54,7 +47,6 @@
     <command name="git/commit-files">
       <action class="org.safehaus.subutai.core.git.cli.CommitFiles">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -63,7 +55,6 @@
     <command name="git/add-files">
       <action class="org.safehaus.subutai.core.git.cli.AddFiles">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -72,7 +63,6 @@
     <command name="git/add-all">
       <action class="org.safehaus.subutai.core.git.cli.AddAll">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -81,7 +71,6 @@
     <command name="git/delete-files">
       <action class="org.safehaus.subutai.core.git.cli.DeleteFiles">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -90,7 +79,6 @@
     <command name="git/clone">
       <action class="org.safehaus.subutai.core.git.cli.Clone">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -99,7 +87,6 @@
     <command name="git/checkout">
       <action class="org.safehaus.subutai.core.git.cli.Checkout">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -108,7 +95,6 @@
     <command name="git/push">
       <action class="org.safehaus.subutai.core.git.cli.Push">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -117,7 +103,6 @@
     <command name="git/delete-branch">
       <action class="org.safehaus.subutai.core.git.cli.DeleteBranch">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -126,7 +111,6 @@
     <command name="git/pull">
       <action class="org.safehaus.subutai.core.git.cli.Pull">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -135,7 +119,6 @@
     <command name="git/merge">
       <action class="org.safehaus.subutai.core.git.cli.Merge">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -144,7 +127,6 @@
     <command name="git/init">
       <action class="org.safehaus.subutai.core.git.cli.Init">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -153,7 +135,6 @@
     <command name="git/undo-soft">
       <action class="org.safehaus.subutai.core.git.cli.UndoSoft">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -162,7 +143,6 @@
     <command name="git/undo-hard">
       <action class="org.safehaus.subutai.core.git.cli.UndoHard">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -171,7 +151,6 @@
     <command name="git/revert-commit">
       <action class="org.safehaus.subutai.core.git.cli.RevertCommit">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -180,7 +159,6 @@
     <command name="git/stash">
       <action class="org.safehaus.subutai.core.git.cli.Stash">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -189,7 +167,6 @@
     <command name="git/unstash">
       <action class="org.safehaus.subutai.core.git.cli.Unstash">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -198,7 +175,6 @@
     <command name="git/list-stashes">
       <action class="org.safehaus.subutai.core.git.cli.ListStashes">
         <argument ref="gitManager" />
-        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>

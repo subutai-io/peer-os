@@ -10,14 +10,12 @@ import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 import org.slf4j.Logger;
@@ -30,17 +28,15 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
 
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
     private ClusterOperationType operationType;
-    private HadoopClusterConfig hadoopConfig;
     private Environment environment;
     private ContainerHost master;
 
 
     public ClusterOperationHandler( final SparkImpl manager, final SparkClusterConfig config,
-                                    final ClusterOperationType operationType, HadoopClusterConfig hadoopClusterConfig )
+                                    final ClusterOperationType operationType )
     {
         super( manager, config );
         this.operationType = operationType;
-        this.hadoopConfig = hadoopClusterConfig;
         trackerOperation = manager.getTracker().createTrackerOperation( SparkClusterConfig.PRODUCT_KEY,
                 String.format( "Executing %s operation on cluster %s", operationType.name(), clusterName ) );
     }
@@ -85,7 +81,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
             throw new ClusterException( String.format( "Environment not found by id %s", config.getEnvironmentId() ) );
         }
 
-        master = environment.getContainerHostByUUID( config.getMasterNodeId() );
+        master = environment.getContainerHostById( config.getMasterNodeId() );
 
         if ( master == null )
         {
@@ -169,7 +165,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
         {
             checkPrerequisites();
 
-            Set<ContainerHost> allNodes = environment.getHostsByIds( config.getSlaveIds() );
+            Set<ContainerHost> allNodes = environment.getContainerHostsByIds( config.getSlaveIds() );
 
             for ( ContainerHost node : allNodes )
             {
@@ -209,6 +205,15 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
             }
 
             trackerOperation.addLogDone( "Cluster uninstalled successfully" );
+
+            try
+            {
+                manager.unsubscribeFromAlerts( environment );
+            }
+            catch ( MonitorException e )
+            {
+                throw new ClusterException( e );
+            }
         }
         catch ( ClusterException e )
         {
@@ -223,60 +228,45 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
     {
         try
         {
-            Environment env;
-            if ( config.getSetupType() == SetupType.WITH_HADOOP )
+            HadoopClusterConfig hadoopConfig = manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
+
+            if ( hadoopConfig == null )
             {
-
-                if ( hadoopConfig == null )
-                {
-                    throw new ClusterException( "No Hadoop configuration specified" );
-                }
-
-                hadoopConfig.setTemplateName( SparkClusterConfig.TEMPLATE_NAME );
-                try
-                {
-                    trackerOperation.addLog( "Building environment..." );
-                    EnvironmentBlueprint eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
-                    env = manager.getEnvironmentManager().buildEnvironment( eb );
-
-                    ClusterSetupStrategy s =
-                            manager.getHadoopManager().getClusterSetupStrategy( env, hadoopConfig, trackerOperation );
-                    s.setup();
-                }
-
-                catch ( ClusterSetupException | EnvironmentBuildException ex )
-                {
-                    throw new ClusterException( "Failed to build environment: " + ex.getMessage() );
-                }
-
-                trackerOperation.addLog( "Environment built successfully" );
+                throw new ClusterException(
+                        String.format( "Could not find Hadoop cluster %s", config.getHadoopClusterName() ) );
             }
-            else
+
+            Environment env = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopConfig.getEnvironmentId() );
+            if ( env == null )
             {
-                env = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopConfig.getEnvironmentId() );
-                if ( env == null )
-                {
-                    throw new ClusterException( String.format( "Could not find environment of Hadoop cluster by id %s",
-                            hadoopConfig.getEnvironmentId() ) );
-                }
+                throw new ClusterException( String.format( "Could not find environment of Hadoop cluster by id %s",
+                        hadoopConfig.getEnvironmentId() ) );
             }
+
 
             ClusterSetupStrategy s = manager.getClusterSetupStrategy( trackerOperation, config, env );
             try
             {
-                trackerOperation.addLog( "Installing cluster..." );
+                trackerOperation.addLog( "Setting up cluster..." );
                 s.setup();
-                trackerOperation.addLogDone( "Installing cluster completed" );
+                trackerOperation.addLogDone( "Cluster setup completed" );
+
+                //subscribe to alerts
+                manager.subscribeToAlerts( env );
             }
-            catch ( ClusterSetupException ex )
+            catch ( ClusterSetupException e )
             {
-                throw new ClusterException( "Failed to setup cluster: " + ex.getMessage() );
+                throw new ClusterException( "Failed to setup cluster: " + e.getMessage() );
+            }
+            catch ( MonitorException e )
+            {
+                throw new ClusterException( "Failed to subscribe to alerts: " + e.getMessage() );
             }
         }
         catch ( ClusterException e )
         {
             LOG.error( "Error in setupCluster", e );
-            trackerOperation.addLogFailed( String.format( "Failed to install cluster : %s", e.getMessage() ) );
+            trackerOperation.addLogFailed( String.format( "Failed to setup cluster : %s", e.getMessage() ) );
         }
     }
 

@@ -104,17 +104,16 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
             switch ( nodeType )
             {
                 case CONFIG_NODE:
-                    mongoNode = new MongoConfigNodeImpl( containerHost.getAgent(), containerHost.getPeerId(),
-                            containerHost.getEnvironmentId(), config.getDomainName(), config.getCfgSrvPort() );
+                    mongoNode =
+                            new MongoConfigNodeImpl( containerHost, config.getDomainName(), config.getCfgSrvPort() );
                     break;
                 case ROUTER_NODE:
-                    mongoNode = new MongoRouterNodeImpl( containerHost.getAgent(), containerHost.getPeerId(),
-                            containerHost.getEnvironmentId(), config.getDomainName(), config.getRouterPort(),
+                    mongoNode = new MongoRouterNodeImpl( containerHost, config.getDomainName(), config.getRouterPort(),
                             config.getCfgSrvPort() );
                     break;
                 case DATA_NODE:
-                    mongoNode = new MongoDataNodeImpl( containerHost.getAgent(), containerHost.getPeerId(),
-                            containerHost.getEnvironmentId(), config.getDomainName(), config.getDataNodePort() );
+                    mongoNode =
+                            new MongoDataNodeImpl( containerHost, config.getDomainName(), config.getDataNodePort() );
                     break;
             }
             config.addNode( mongoNode, nodeType );
@@ -154,8 +153,12 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
     private boolean addDataNode( TrackerOperation po, final MongoClusterConfig config, MongoDataNode newDataNode )
     {
 
-        Set<Host> clusterMembers = new HashSet<Host>( config.getAllNodes() );
-        clusterMembers.add( newDataNode );
+        Set<Host> clusterMembers = new HashSet<Host>();
+        for ( MongoNode mongoNode : config.getAllNodes() )
+        {
+            clusterMembers.add( mongoNode.getContainerHost() );
+        }
+        clusterMembers.add( newDataNode.getContainerHost() );
         CommandResult commandResult = null;
         try
         {
@@ -301,8 +304,12 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
     private boolean addRouter( TrackerOperation po, final MongoClusterConfig config, MongoRouterNode newRouter )
     {
 
-        Set<Host> clusterMembers = new HashSet<Host>( config.getAllNodes() );
-        clusterMembers.add( newRouter );
+        Set<Host> clusterMembers = new HashSet<Host>();
+        for ( MongoNode mongoNode : config.getAllNodes() )
+        {
+            clusterMembers.add( mongoNode.getContainerHost() );
+        }
+        clusterMembers.add( newRouter.getContainerHost() );
         try
         {
             for ( Host c : clusterMembers )

@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.presto.ui.manager;
 
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -11,10 +10,7 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -47,6 +43,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
+
 
 
 public class Manager
@@ -276,7 +273,8 @@ public class Manager
                         HadoopClusterConfig info = hadoop.getCluster( hn );
                         if ( info != null )
                         {
-                            set = environmentManager.getEnvironmentByUUID( info.getEnvironmentId() ).getHostsByIds( Sets.newHashSet(info.getAllNodes()) );
+                            set = environmentManager.getEnvironmentByUUID( info.getEnvironmentId() )
+                                                    .getContainerHostsByIds( Sets.newHashSet( info.getAllNodes() ) );
                             set.removeAll( config.getAllNodes() );
                             if ( !set.isEmpty() )
                             {
@@ -376,17 +374,17 @@ public class Manager
         for ( final ContainerHost node : workers )
         {
             final Label resultHolder = new Label();
-            resultHolder.setId( node.getAgent().getListIP().get( 0 ) + "-prestoResult" );
+            resultHolder.setId( node.getIpByInterfaceName( "eth0" ) + "-prestoResult" );
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId( node.getAgent().getListIP().get( 0 ) + "-prestoCheck" );
+            checkBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-prestoCheck" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.setId( node.getAgent().getListIP().get( 0 ) + "-prestoStart" );
+            startBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-prestoStart" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.setId( node.getAgent().getListIP().get( 0 ) + "-prestoStop" );
+            stopBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-prestoStop" );
 
 
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( node.getAgent().getListIP().get( 0 ) + "-prestoDestroy" );
+            destroyBtn.setId( node.getIpByInterfaceName( "eth0" ) + "-prestoDestroy" );
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn, destroyBtn );
             disableButtons( startBtn, stopBtn );
@@ -400,7 +398,7 @@ public class Manager
             addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn, destroyBtn );
 
             table.addItem( new Object[] {
-                    node.getHostname(), node.getAgent().getListIP().get( 0 ), checkIfCoordinator( node ), resultHolder,
+                    node.getHostname(), node.getIpByInterfaceName( "eth0" ), checkIfCoordinator( node ), resultHolder,
                     availableOperations
             }, null );
 
@@ -413,13 +411,13 @@ public class Manager
 
         /** add Coordinator here */
         final Label resultHolder = new Label();
-        resultHolder.setId( coordinator.getAgent().getListIP().get( 0 ) + "-prestoResult" );
+        resultHolder.setId( coordinator.getIpByInterfaceName( "eth0" ) + "-prestoResult" );
         final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-        checkBtn.setId( coordinator.getAgent().getListIP().get( 0 ) + "-prestoCheck" );
+        checkBtn.setId( coordinator.getIpByInterfaceName( "eth0" ) + "-prestoCheck" );
         final Button startBtn = new Button( START_BUTTON_CAPTION );
-        startBtn.setId( coordinator.getAgent().getListIP().get( 0 ) + "-prestoStart" );
+        startBtn.setId( coordinator.getIpByInterfaceName( "eth0" ) + "-prestoStart" );
         final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-        stopBtn.setId( coordinator.getAgent().getListIP().get( 0 ) + "-prestoStop" );
+        stopBtn.setId( coordinator.getIpByInterfaceName( "eth0" ) + "-prestoStop" );
 
         addStyleNameToButtons( checkBtn, startBtn, stopBtn );
 
@@ -433,8 +431,8 @@ public class Manager
         addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn );
 
         table.addItem( new Object[] {
-                coordinator.getHostname(), coordinator.getAgent().getListIP().get( 0 ), checkIfCoordinator( coordinator ),
-                resultHolder, availableOperations
+                coordinator.getHostname(), coordinator.getIpByInterfaceName( "eth0" ),
+                checkIfCoordinator( coordinator ), resultHolder, availableOperations
         }, null );
 
         addClickListenerToMasterCheckButton( coordinator, resultHolder, checkBtn, startBtn, stopBtn );
@@ -458,43 +456,6 @@ public class Manager
         {
             b.addStyleName( BUTTON_STYLE_NAME );
         }
-    }
-
-
-    public void addClickListenerToSetCoordinatorButton( final Agent agent, Button setCoordinatorBtn )
-    {
-        setCoordinatorBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                ConfirmationDialog alert = new ConfirmationDialog(
-                        String.format( "Do you want to set %s as coordinator node?", agent.getHostname() ), "Yes",
-                        "No" );
-                alert.getOk().addClickListener( new Button.ClickListener()
-                {
-                    @Override
-                    public void buttonClick( Button.ClickEvent clickEvent )
-                    {
-                        UUID trackID = presto.uninstallCluster( config.getClusterName() );
-
-                        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
-                                PrestoClusterConfig.PRODUCT_KEY );
-
-                        window.getWindow().addCloseListener( new Window.CloseListener()
-                        {
-                            @Override
-                            public void windowClose( Window.CloseEvent closeEvent )
-                            {
-                                refreshClustersInfo();
-                            }
-                        } );
-                        contentRoot.getUI().addWindow( window.getWindow() );
-                    }
-                } );
-                contentRoot.getUI().addWindow( alert.getAlert() );
-            }
-        } );
     }
 
 
@@ -542,19 +503,19 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new NodeOperationTask( presto, tracker, config.getClusterName(), host,
-                                NodeOperationType.START, new org.safehaus.subutai.common.protocol.CompleteEvent()
-                        {
-                            @Override
-                            public void onComplete( NodeState nodeState )
-                            {
-                                synchronized ( PROGRESS_ICON )
+                        new NodeOperationTask( presto, tracker, config.getClusterName(), host, NodeOperationType.START,
+                                new org.safehaus.subutai.common.protocol.CompleteEvent()
                                 {
-                                    enableButtons( getButton( CHECK_BUTTON_CAPTION, buttons ) );
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                }
-                            }
-                        }, null ) );
+                                    @Override
+                                    public void onComplete( NodeState nodeState )
+                                    {
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            enableButtons( getButton( CHECK_BUTTON_CAPTION, buttons ) );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                        }
+                                    }
+                                }, null ) );
             }
         } );
     }
@@ -570,19 +531,19 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new NodeOperationTask( presto, tracker, config.getClusterName(), host,
-                                NodeOperationType.STOP, new org.safehaus.subutai.common.protocol.CompleteEvent()
-                        {
-                            @Override
-                            public void onComplete( NodeState nodeState )
-                            {
-                                synchronized ( PROGRESS_ICON )
+                        new NodeOperationTask( presto, tracker, config.getClusterName(), host, NodeOperationType.STOP,
+                                new org.safehaus.subutai.common.protocol.CompleteEvent()
                                 {
-                                    enableButtons( getButton( CHECK_BUTTON_CAPTION, buttons ) );
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                }
-                            }
-                        }, null ) );
+                                    @Override
+                                    public void onComplete( NodeState nodeState )
+                                    {
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            enableButtons( getButton( CHECK_BUTTON_CAPTION, buttons ) );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                        }
+                                    }
+                                }, null ) );
             }
         } );
     }
@@ -598,31 +559,30 @@ public class Manager
             {
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
-                executorService.execute(
-                        new NodeOperationTask( presto, tracker, config.getClusterName(), coordinator,
-                                NodeOperationType.STATUS, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                executorService.execute( new NodeOperationTask( presto, tracker, config.getClusterName(), coordinator,
+                        NodeOperationType.STATUS, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                {
+                    public void onComplete( NodeState nodeState )
+                    {
+                        synchronized ( PROGRESS_ICON )
                         {
-                            public void onComplete( NodeState nodeState )
+                            resultHolder.setValue( nodeState.name() );
+                            if ( nodeState.name().contains( "STOPPED" ) )
                             {
-                                synchronized ( PROGRESS_ICON )
-                                {
-                                    resultHolder.setValue( nodeState.name() );
-                                    if ( nodeState.name().contains( "STOPPED" )  )
-                                    {
-                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                    }
-                                    else
-                                    {
-                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                    }
-
-                                    PROGRESS_ICON.setVisible( false );
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                }
+                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
                             }
-                        }, null ) );
+                            else
+                            {
+                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                            }
+
+                            PROGRESS_ICON.setVisible( false );
+                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                        }
+                    }
+                }, null ) );
             }
         } );
     }
@@ -639,37 +599,38 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new NodeOperationTask( presto, tracker, config.getClusterName(), host,
-                                NodeOperationType.STATUS, new org.safehaus.subutai.common.protocol.CompleteEvent()
-                        {
-                            public void onComplete( NodeState nodeState )
-                            {
-                                synchronized ( PROGRESS_ICON )
+                        new NodeOperationTask( presto, tracker, config.getClusterName(), host, NodeOperationType.STATUS,
+                                new org.safehaus.subutai.common.protocol.CompleteEvent()
                                 {
-                                    resultHolder.setValue( nodeState.name() );
-                                    if ( nodeState.name().contains( "STOPPED" ) )
+                                    public void onComplete( NodeState nodeState )
                                     {
-                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                    }
-                                    else
-                                    {
-                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                    }
-
-                                    PROGRESS_ICON.setVisible( false );
-                                    for ( Button b : buttons )
-                                    {
-                                        if ( b.getCaption().equals( CHECK_BUTTON_CAPTION ) || b.getCaption().equals(
-                                                DESTROY_BUTTON_CAPTION ) )
+                                        synchronized ( PROGRESS_ICON )
                                         {
-                                            enableButtons( b );
+                                            resultHolder.setValue( nodeState.name() );
+                                            if ( nodeState.name().contains( "STOPPED" ) )
+                                            {
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                            }
+                                            else
+                                            {
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            }
+
+                                            PROGRESS_ICON.setVisible( false );
+                                            for ( Button b : buttons )
+                                            {
+                                                if ( b.getCaption().equals( CHECK_BUTTON_CAPTION ) || b.getCaption()
+                                                                                                       .equals(
+                                                                                                               DESTROY_BUTTON_CAPTION ) )
+                                                {
+                                                    enableButtons( b );
+                                                }
+                                            }
                                         }
                                     }
-                                }
-                            }
-                        }, null ) );
+                                }, null ) );
             }
         } );
     }
@@ -730,7 +691,7 @@ public class Manager
                     String containerId =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Set<ContainerHost> containerHosts =
-                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers();
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts();
                     Iterator iterator = containerHosts.iterator();
                     ContainerHost containerHost = null;
                     while ( iterator.hasNext() )
@@ -743,12 +704,12 @@ public class Manager
                     }
                     if ( containerHost != null )
                     {
-                        TerminalWindow terminal = new TerminalWindow( containerHosts );
+                        TerminalWindow terminal = new TerminalWindow( containerHost );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Host not found" );
                     }
                 }
             }
@@ -778,6 +739,7 @@ public class Manager
         }
     }
 
+
     public String checkIfCoordinator( ContainerHost node )
     {
         if ( config.getCoordinatorNode().equals( node.getId() ) )
@@ -793,7 +755,8 @@ public class Manager
         if ( config != null )
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-            populateTable( nodesTable, environment.getHostsByIds( config.getWorkers() ), environment.getContainerHostByUUID( config.getCoordinatorNode() ) );
+            populateTable( nodesTable, environment.getContainerHostsByIds( config.getWorkers() ),
+                    environment.getContainerHostById( config.getCoordinatorNode() ) );
         }
         else
         {

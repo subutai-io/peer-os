@@ -22,10 +22,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>agent-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>vaadin-custom</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -57,7 +53,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.plugin.common</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
+              {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
           </instructions>
         </configuration>

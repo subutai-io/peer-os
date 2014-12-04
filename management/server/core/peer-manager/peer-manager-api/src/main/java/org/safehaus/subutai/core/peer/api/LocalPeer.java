@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Criteria;
+import org.safehaus.subutai.common.protocol.Template;
 
 
 /**
@@ -13,13 +14,54 @@ import org.safehaus.subutai.common.protocol.Agent;
  */
 public interface LocalPeer extends Peer
 {
-    public Host bindHost( UUID id ) throws PeerException;
+    /**
+     * Binds host with given ID
+     *
+     * @param id ID of the host
+     *
+     * @return if host is registered and connected returns implementation of this host, otherwise throws exception.
+     */
+    public Host bindHost( String id ) throws HostNotFoundException;
 
-    public ResourceHost getResourceHostByName( String hostname ) throws PeerException;
+    /**
+     * Binds host with given ID
+     *
+     * @param id ID of the host
+     *
+     * @return if host is registered and connected returns implementation of this host, otherwise throws exception.
+     */
+    public Host bindHost( UUID id ) throws HostNotFoundException;
 
-    public ContainerHost getContainerHostByName( String hostname ) throws PeerException;
+    /**
+     * Returns implementation of ResourceHost interface.
+     *
+     * @param hostname name of the resource host
+     */
 
-    public ManagementHost getManagementHost() throws PeerException;
+    public ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException;
+
+    public ResourceHost getResourceHostByContainerName( String containerName ) throws HostNotFoundException;
+
+    public ContainerHost getContainerHostImpl( HostKey hostKey );
+
+    /**
+     * Returns implementation of ContainerHost interface.
+     *
+     * @param hostname name of the container
+     */
+
+    public ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException;
+
+    /**
+     * Returns implementation of ContainerHost interface.
+     *
+     * @param hostId ID of the container
+     */
+    public ContainerHost getContainerHostById( String hostId ) throws HostNotFoundException;
+
+    <T extends Host> T bindHost( T host ) throws HostNotFoundException;
+
+    public ManagementHost getManagementHost() throws HostNotFoundException;
 
     public Set<ResourceHost> getResourceHosts();
 
@@ -37,7 +79,9 @@ public interface LocalPeer extends Peer
     public ContainerHost createContainer( String hostName, String templateName, String cloneName, UUID envId )
             throws PeerException;
 
-    Agent waitForAgent( String containerName, int timeout );
+    public List<HostTask> getTasks();
 
-    public void onPeerEvent( PeerEvent event );
+    //    Agent waitForAgent( String containerName, int timeout );
+
+    //    public void onPeerEvent( PeerEvent event );
 }

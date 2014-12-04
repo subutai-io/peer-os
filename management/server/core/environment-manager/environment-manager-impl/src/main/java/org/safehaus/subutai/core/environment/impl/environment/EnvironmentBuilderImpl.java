@@ -13,6 +13,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
+import org.safehaus.subutai.core.environment.impl.EnvironmentImpl;
 import org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.slf4j.Logger;
@@ -30,7 +31,7 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
     private EnvironmentManagerImpl manager;
     private Environment environment;
     private int containersCreated = 0;
-    private int approximateCloneTime = 60; //Seconds
+    private int approximateCloneTime = 90; //Seconds
 
 
     public EnvironmentBuilderImpl( EnvironmentManagerImpl manager )
@@ -43,7 +44,7 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
     public Environment build( final EnvironmentBlueprint blueprint, final EnvironmentBuildProcess process )
             throws BuildException
     {
-        this.environment = new Environment( blueprint.getName() );
+        this.environment = new EnvironmentImpl( blueprint.getName() );
 
         int messageSize = process.getMessageMap().size();
         int containersAmount = 0;
@@ -61,7 +62,8 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
                     new ContainerCreatorThread( this, environment.getId(), message, manager.getPeerManager() );
             creatorThread.addObserver( this );
             containersAmount = containersAmount + message.getNumberOfNodes();
-            LOG.info( String.format( "-----------> Scheduled: %s %d %s", key, message.getNumberOfNodes(), message.getTargetPeerId().toString() ) );
+            LOG.info( String.format( "-----------> Scheduled: %s %d %s", key, message.getNumberOfNodes(),
+                    message.getTargetPeerId().toString() ) );
             executorService.execute( creatorThread );
         }
 
@@ -78,7 +80,7 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
             throw new BuildException( e.getMessage() );
         }
 
-        if ( environment.getContainers().size() == containersCreated )
+        if ( environment.getContainerHosts().size() == containersCreated )
         {
             environment.setStatus( EnvironmentStatusEnum.HEALTHY );
         }

@@ -32,7 +32,7 @@ class OverHadoopSetupStrategy extends HBaseSetupStrategy
     {
         checkConfig();
 
-        Set<ContainerHost> nodes = environment.getHostsByIds( config.getAllNodes() );
+        Set<ContainerHost> nodes = environment.getContainerHostsByIds( config.getAllNodes() );
 
         if ( nodes.size() < config.getAllNodes().size() )
         {

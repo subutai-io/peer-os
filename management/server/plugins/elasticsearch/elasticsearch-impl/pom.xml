@@ -25,14 +25,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>configuration-manager-api</artifactId>-->
-    <!--</dependency>-->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>agent-manager-api</artifactId>
-    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>elasticsearch-plugin-api</artifactId>
@@ -41,14 +33,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>tracker-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>network-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>command-runner-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

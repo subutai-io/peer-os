@@ -55,7 +55,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<HiveImpl, Hiv
         }
 
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        Iterator iterator = environment.getContainers().iterator();
+        Iterator iterator = environment.getContainerHosts().iterator();
         ContainerHost host = null;
         while ( iterator.hasNext() )
         {

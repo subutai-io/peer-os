@@ -2,17 +2,12 @@ package org.safehaus.subutai.plugin.solr.impl;
 
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.protocol.Container;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -48,7 +43,6 @@ public class SolrSetupStrategy implements ClusterSetupStrategy
     }
 
 
-
     @Override
     public ConfigBase setup() throws ClusterSetupException
     {
@@ -64,21 +58,21 @@ public class SolrSetupStrategy implements ClusterSetupStrategy
                     String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
-        if ( environment.getContainers().isEmpty() )
+        if ( environment.getContainerHosts().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
-        if ( environment.getContainers().size() < config.getNumberOfNodes() )
+        if ( environment.getContainerHosts().size() < config.getNumberOfNodes() )
         {
             throw new ClusterSetupException( String.format( "Environment has %d nodes but %d nodes are required",
-                    environment.getContainers().size(), config.getNumberOfNodes() ) );
+                    environment.getContainerHosts().size(), config.getNumberOfNodes() ) );
         }
 
         Set<UUID> solrNodes = new HashSet<>();
-        for ( ContainerHost host : environment.getContainers() )
+        for ( ContainerHost host : environment.getContainerHosts() )
         {
-            solrNodes.add( host.getAgent().getUuid() );
+            solrNodes.add( host.getId() );
         }
 
         config.setNodes( solrNodes );

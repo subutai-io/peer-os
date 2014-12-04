@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -21,6 +22,7 @@ public abstract class SparkBase
     private static final Logger LOG = LoggerFactory.getLogger( SparkBase.class.getName() );
     public PluginDAO pluginDAO;
     public DataSource dataSource;
+    private Monitor monitor;
 
     Tracker tracker;
     EnvironmentManager environmentManager;
@@ -70,24 +72,32 @@ public abstract class SparkBase
     }
 
 
-    public Hadoop getHadoopManager()
-    {
-        return hadoopManager;
-    }
-
-
     public PluginDAO getPluginDAO()
     {
         return pluginDAO;
     }
 
 
+    public Hadoop getHadoopManager()
+    {
+        return hadoopManager;
+    }
+
+
+    public Monitor getMonitor()
+    {
+        return monitor;
+    }
+
+
     protected SparkBase( final DataSource dataSource, final Tracker tracker,
-                         final EnvironmentManager environmentManager, final Hadoop hadoopManager )
+                         final EnvironmentManager environmentManager, final Hadoop hadoopManager,
+                         final Monitor monitor )
     {
         this.dataSource = dataSource;
         this.tracker = tracker;
         this.environmentManager = environmentManager;
         this.hadoopManager = hadoopManager;
+        this.monitor = monitor;
     }
 }

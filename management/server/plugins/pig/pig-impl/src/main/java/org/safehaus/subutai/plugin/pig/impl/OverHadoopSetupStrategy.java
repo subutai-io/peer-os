@@ -56,7 +56,7 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
                             config.getClusterName() ) );
         }
       //check nodes are connected
-//        Set<ContainerHost> nodes = environment.getHostsByIds( config.getNodes() );
+//        Set<ContainerHost> nodes = environment.getContainerHostsByIds( config.getNodes() );
 //        for ( ContainerHost host : nodes )
 //        {
 //            if ( !host.isConnected() )
@@ -82,7 +82,7 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
         RequestBuilder checkInstalledCommand = new RequestBuilder( Commands.checkCommand );
         for( UUID uuid : config.getNodes())
         {
-            ContainerHost node = environment.getContainerHostByUUID( uuid );
+            ContainerHost node = environment.getContainerHostById( uuid );
             try
             {
                 CommandResult result = node.execute( checkInstalledCommand );
@@ -120,7 +120,7 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
         manager.getPluginDao().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config );
         trackerOperation.addLog( "Cluster info saved to DB\nInstalling Pig..." );
         //install pig,
-        for ( ContainerHost node : environment.getHostsByIds( config.getNodes() ) )
+        for ( ContainerHost node : environment.getContainerHostsByIds( config.getNodes() ) )
         {
             try
             {

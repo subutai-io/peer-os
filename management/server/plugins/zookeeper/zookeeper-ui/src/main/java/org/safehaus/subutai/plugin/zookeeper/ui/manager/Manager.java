@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -26,7 +25,6 @@ import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -72,7 +70,6 @@ public class Manager
     private final Table nodesTable;
     private final Hadoop hadoop;
     private final Zookeeper zookeeper;
-    private final CommandRunner commandRunner;
     private final EnvironmentManager environmentManager;
     private final Tracker tracker;
     private final ExecutorService executorService;
@@ -86,7 +83,6 @@ public class Manager
         this.executorService = executorService;
         this.tracker = serviceLocator.getService( Tracker.class );
         this.zookeeper = serviceLocator.getService( Zookeeper.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class );
         this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         contentRoot = new GridLayout();
@@ -358,15 +354,16 @@ public class Manager
 
         Set<ContainerHost> containerHosts = new HashSet<>();
         Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-        for ( UUID agentID : config.getNodes() ) {
-            containerHosts.add( environment.getContainerHostByUUID( agentID ) );
+        for ( UUID agentID : config.getNodes() )
+        {
+            containerHosts.add( environment.getContainerHostById( agentID ) );
         }
-        for ( ContainerHost agent : containerHosts )
+        for ( ContainerHost host : containerHosts )
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StartTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                    new StartTask( zookeeper, tracker, config.getClusterName(), host.getHostname(), new CompleteEvent()
                     {
                         @Override
                         public void onComplete( String result )
@@ -386,16 +383,17 @@ public class Manager
     {
         Set<ContainerHost> containerHosts = new HashSet<>();
         Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-        for ( UUID agentID : config.getNodes() ) {
-            containerHosts.add( environment.getContainerHostByUUID( agentID ) );
+        for ( UUID agentID : config.getNodes() )
+        {
+            containerHosts.add( environment.getContainerHostById( agentID ) );
         }
 
-        for ( ContainerHost agent : containerHosts )
+        for ( ContainerHost host : containerHosts )
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StopTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                    new StopTask( zookeeper, tracker, config.getClusterName(), host.getHostname(), new CompleteEvent()
                     {
                         @Override
                         public void onComplete( String result )
@@ -521,8 +519,8 @@ public class Manager
                             Environment hadoopEnvironment =
                                     environmentManager.getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
                             Set<UUID> hadoopNodeIDs = new HashSet<UUID>( hadoopClusterConfig.getAllNodes() );
-                            Set<ContainerHost> hadoopNodes = hadoopEnvironment.getHostsByIds( hadoopNodeIDs );
-                            Set<ContainerHost> nodes = new HashSet<>( );
+                            Set<ContainerHost> hadoopNodes = hadoopEnvironment.getContainerHostsByIds( hadoopNodeIDs );
+                            Set<ContainerHost> nodes = new HashSet<>();
                             nodes.addAll( hadoopNodes );
                             nodes.removeAll( config.getNodes() );
                             if ( !nodes.isEmpty() )
@@ -592,13 +590,12 @@ public class Manager
                     ContainerHost containerHost = environment.getContainerHostByHostname( lxcHostname );
                     if ( containerHost != null )
                     {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( containerHost ) );
+                        TerminalWindow terminal = new TerminalWindow( containerHost );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Host not found" );
                     }
                 }
             }
@@ -618,7 +615,7 @@ public class Manager
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
 
-            populateTable( nodesTable, getZookeeperNodes( environment.getContainers() ) );
+            populateTable( nodesTable, getZookeeperNodes( environment.getContainerHosts() ) );
         }
         else
         {
@@ -629,15 +626,15 @@ public class Manager
 
     private Set<ContainerHost> getZookeeperNodes( final Set<ContainerHost> containerHosts )
     {
-            Set<ContainerHost> list = new HashSet<>();
-            for ( ContainerHost containerHost : containerHosts )
+        Set<ContainerHost> list = new HashSet<>();
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            if ( config.getNodes().contains( containerHost.getId() ) )
             {
-                if ( config.getNodes().contains( containerHost.getAgent().getUuid() ) )
-                {
-                    list.add( containerHost );
-                }
+                list.add( containerHost );
             }
-            return list;
+        }
+        return list;
     }
 
 
@@ -652,10 +649,10 @@ public class Manager
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
 
-            checkBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperCheck" );
-            startBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperStart" );
-            stopBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperStop" );
-            destroyBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperDestroy" );
+            checkBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-zookeeperCheck" );
+            startBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-zookeeperStart" );
+            stopBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-zookeeperStop" );
+            destroyBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-zookeeperDestroy" );
 
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );
@@ -668,7 +665,8 @@ public class Manager
             PROGRESS_ICON.setVisible( false );
 
             table.addItem( new Object[] {
-                    containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ), resultHolder, availableOperations
+                    containerHost.getHostname(), containerHost.getIpByInterfaceName( "eth0" ), resultHolder,
+                    availableOperations
             }, null );
 
 
@@ -706,7 +704,8 @@ public class Manager
             public void buttonClick( Button.ClickEvent event )
             {
                 ConfirmationDialog alert = new ConfirmationDialog(
-                        String.format( "Do you want to destroy the %s node?", containerHost.getHostname() ), "Yes", "No" );
+                        String.format( "Do you want to destroy the %s node?", containerHost.getHostname() ), "Yes",
+                        "No" );
                 alert.getOk().addClickListener( new Button.ClickListener()
                 {
                     @Override
@@ -773,19 +772,20 @@ public class Manager
             {
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
-                executorService.execute( new StopTask( zookeeper, tracker, config.getClusterName(), containerHost.getHostname(),
-                        new CompleteEvent()
-                        {
-                            @Override
-                            public void onComplete( String result )
-                            {
-                                synchronized ( PROGRESS_ICON )
+                executorService.execute(
+                        new StopTask( zookeeper, tracker, config.getClusterName(), containerHost.getHostname(),
+                                new CompleteEvent()
                                 {
-                                    enableButtons( buttons );
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                }
-                            }
-                        } ) );
+                                    @Override
+                                    public void onComplete( String result )
+                                    {
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            enableButtons( buttons );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                        }
+                                    }
+                                } ) );
             }
         } );
     }
@@ -819,7 +819,8 @@ public class Manager
     }
 
 
-    public void addCheckButtonClickListener( final ContainerHost containerHost, final Label resultHolder, final Button... buttons )
+    public void addCheckButtonClickListener( final ContainerHost containerHost, final Label resultHolder,
+                                             final Button... buttons )
     {
         getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {

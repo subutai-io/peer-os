@@ -49,6 +49,9 @@
 #include <iostream>
 #include <string.h>
 #include <unistd.h>
+#include <deque>
+
+#define COMMAND_ID_MAX 300          // This is a maximum size of commandIdsList
 
 using namespace std;
 
@@ -92,7 +95,7 @@ void threadSend(message_queue *mq,SubutaiConnection *connection,SubutaiLogger* l
  */
 int main(int argc,char *argv[],char *envp[])
 {
-	string serverAddress        = "RESPONSE_TOPIC";              // Default RESPONSE TOPIC
+    string serverAddress        = "RESPONSE_TOPIC";              // Default RESPONSE TOPIC
     string broadcastAddress     = "BROADCAST_TOPIC";	        // Default BROADCAST TOPIC
     string clientAddress;
     SubutaiHelper helper;
@@ -103,6 +106,7 @@ int main(int argc,char *argv[],char *envp[])
     SubutaiEnvironment environment(&logMain);
     string input = "";
     string sendout;
+    deque<string> commandIdsList;
 
     if (!thread.getUserID().checkRootUser()) {
         //user is not root SubutaiAgent Will be closed
@@ -126,9 +130,15 @@ int main(int argc,char *argv[],char *envp[])
         return 200;
     }
 
-    bool hasLxc = true;
-    if (system("which lxc-ls") != 0) {
-        hasLxc = false;
+    bool hasLxc = false;
+    try {
+        if (system("which lxc-ls") != 0) {
+            hasLxc = false;
+        } else {
+            hasLxc = true;
+        }
+    } catch (std::exception e) {
+        logMain.writeLog(6, logMain.setLogData("<SubutaiAgent>", string(e.what())));
     }
 
     logMain.setLogLevel(7);
@@ -284,6 +294,23 @@ int main(int argc,char *argv[],char *envp[])
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request runAs:", command.getRunAs()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request timeout:", helper.toString(command.getTimeout())));
 
+                    bool isCommandNew = true;
+                    for (deque<string>::iterator it = commandIdsList.begin(); it != commandIdsList.end(); it++) {
+                        if ((*it) == command.getCommandId()) {
+                            isCommandNew = false;
+                        }
+                    }
+
+                    if (!isCommandNew) {
+                        continue;
+                    } else {
+                        commandIdsList.push_back(command.getCommandId());
+                        // Remove first command if amount of commands has exceeded maximum size
+                        if (commandIdsList.size() > COMMAND_ID_MAX) {
+                            commandIdsList.pop_front();
+                        }
+                    }
+
                     // Check if this uuid belongs the resource host or one of child containers
                     bool isLocal = true;
                     SubutaiContainer* target_container;
@@ -339,25 +366,25 @@ int main(int argc,char *argv[],char *envp[])
                         if (command.getPid() > 0)
                         {
                             /*if( isLocal)
-                            {*/
-                                logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on resource host: " + command.getPid()));
-                                retstatus = kill(command.getPid(),SIGKILL);
-                                resp = response.createTerminateMessage(environment.getAgentUuidValue(),
-                                        command.getCommandId(), command.getPid(), retstatus);
+                              {*/
+                            logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on resource host: " + command.getPid()));
+                            retstatus = kill(command.getPid(),SIGKILL);
+                            resp = response.createTerminateMessage(environment.getAgentUuidValue(),
+                                    command.getCommandId(), command.getPid(), retstatus);
                             /*}
-                            else
-                            {
-                                logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on container node: " + command.getPid()));
+                              else
+                              {
+                              logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Killing given PID on container node: " + command.getPid()));
 
-                                command.setCommand("/bin/kill -9 " + helper.toString(command.getPid()) );
-                                ExecutionResult execResult = target_container->RunCommand(&command);
-                                retstatus  = execResult.exit_code;
+                              command.setCommand("/bin/kill -9 " + helper.toString(command.getPid()) );
+                              ExecutionResult execResult = target_container->RunCommand(&command);
+                              retstatus  = execResult.exit_code;
 
 
-                                resp = response.createTerminateMessage(target_container->getContainerIdValue(),
-                                        command.getCommandId(), command.getPid(), retstatus);
+                              resp = response.createTerminateMessage(target_container->getContainerIdValue(),
+                              command.getCommandId(), command.getPid(), retstatus);
 
-                            }*/
+                              }*/
 
                             connection->sendMessage(resp);
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Terminate response: " + resp));
@@ -447,7 +474,6 @@ int main(int argc,char *argv[],char *envp[])
                             logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Execute operation is starting.."));
                             SubutaiThread* subprocess = new SubutaiThread;
                             subprocess->getLogger().setLogLevel(logMain.getLogLevel());
-                            //command.setUuid(environment.getAgentUuidValue()); /*command uuid should be set to agents uuid */
                             SubutaiContainer* target_container = cman.findContainerById(command.getUuid());
                             pidList.push_back(subprocess->threadFunction(&messageQueue, &command, argv, target_container));
                             currentProcess++;

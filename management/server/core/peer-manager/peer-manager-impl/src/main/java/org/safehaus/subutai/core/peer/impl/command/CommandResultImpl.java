@@ -25,6 +25,15 @@ public class CommandResultImpl implements CommandResult
     }
 
 
+    public CommandResultImpl( final CommandResult commandResult )
+    {
+        this.exitCode = commandResult.getExitCode();
+        this.stdOut = commandResult.getStdOut();
+        this.stdErr = commandResult.getStdErr();
+        this.status = commandResult.getStatus();
+    }
+
+
     public Integer getExitCode()
     {
         return exitCode;

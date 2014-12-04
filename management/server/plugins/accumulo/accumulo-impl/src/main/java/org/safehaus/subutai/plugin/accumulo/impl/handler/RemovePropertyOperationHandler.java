@@ -56,7 +56,7 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Acc
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
         CommandResult result = null;
         boolean allSuccess = true;
-        for ( ContainerHost containerHost : environment.getHostsByIds( accumuloClusterConfig.getAllNodes() ) )
+        for ( ContainerHost containerHost : environment.getContainerHostsByIds( accumuloClusterConfig.getAllNodes() ) )
         {
             try
             {
@@ -81,7 +81,7 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Acc
         if ( allSuccess )
         {
             trackerOperation.addLog( "Restarting cluster... " );
-            ContainerHost master = environment.getContainerHostByUUID( accumuloClusterConfig.getMasterNode() );
+            ContainerHost master = environment.getContainerHostById( accumuloClusterConfig.getMasterNode() );
             try
             {
                 master.execute( new RequestBuilder( Commands.stopCommand ) );

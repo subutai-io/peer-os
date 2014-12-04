@@ -78,7 +78,7 @@ public class NodeSelectionStep extends Panel
                         Environment zookeeperEnvironment =
                                 environmentManager.getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
                         Set<ContainerHost> zookeeperNodes =
-                                zookeeperEnvironment.getHostsByIds( zookeeperClusterConfig.getNodes() );
+                                zookeeperEnvironment.getContainerHostsByIds( zookeeperClusterConfig.getNodes() );
                         for ( ContainerHost containerHost : zookeeperNodes )
                         {
                             masterNodeCombo.addItem( containerHost );

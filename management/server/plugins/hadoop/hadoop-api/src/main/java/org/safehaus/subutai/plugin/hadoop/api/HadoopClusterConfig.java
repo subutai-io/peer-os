@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -45,23 +44,23 @@ public class HadoopClusterConfig implements ConfigBase
     {
         List<NodeType> nodeRoles = new ArrayList<>();
 
-        if ( clusterConfig.isNameNode( containerHost.getAgent().getUuid() ) )
+        if ( clusterConfig.isNameNode( containerHost.getId() ) )
         {
             nodeRoles.add( NodeType.NAMENODE );
         }
-        if ( clusterConfig.isSecondaryNameNode( containerHost.getAgent().getUuid() ) )
+        if ( clusterConfig.isSecondaryNameNode( containerHost.getId() ) )
         {
             nodeRoles.add( NodeType.SECONDARY_NAMENODE );
         }
-        if ( clusterConfig.isJobTracker( containerHost.getAgent().getUuid() ) )
+        if ( clusterConfig.isJobTracker( containerHost.getId() ) )
         {
             nodeRoles.add( NodeType.JOBTRACKER );
         }
-        if ( clusterConfig.isDataNode( containerHost.getAgent().getUuid() ) )
+        if ( clusterConfig.isDataNode( containerHost.getId() ) )
         {
             nodeRoles.add( NodeType.DATANODE );
         }
-        if ( clusterConfig.isTaskTracker( containerHost.getAgent().getUuid() ) )
+        if ( clusterConfig.isTaskTracker( containerHost.getId() ) )
         {
             nodeRoles.add( NodeType.TASKTRACKER );
         }
@@ -203,20 +202,6 @@ public class HadoopClusterConfig implements ConfigBase
     public void setTemplateName( final String templateName )
     {
         this.templateName = templateName;
-    }
-
-
-    public UUID getNode( Agent agent )
-    {
-        Preconditions.checkNotNull( agent, "Agent is null" );
-        for ( UUID uuid : getAllNodes() )
-        {
-            if ( uuid.equals( agent.getUuid() ) )
-            {
-                return uuid;
-            }
-        }
-        return null;
     }
 
 
@@ -374,6 +359,7 @@ public class HadoopClusterConfig implements ConfigBase
         this.countOfSlaveNodes = countOfSlaveNodes;
     }
 
+
     public Set<UUID> getBlockedAgentUUIDs()
     {
         Set<UUID> blockedAgents = new HashSet<>();
@@ -383,6 +369,7 @@ public class HadoopClusterConfig implements ConfigBase
         }
         return blockedAgents;
     }
+
 
     public Set<UUID> getBlockedAgents()
     {
@@ -398,9 +385,9 @@ public class HadoopClusterConfig implements ConfigBase
 
     public boolean isMasterNode( ContainerHost containerHost )
     {
-        return containerHost.getAgent().getUuid().equals( getNameNode() ) ||
-                containerHost.getAgent().getUuid().equals( getJobTracker() ) ||
-                containerHost.getAgent().getUuid().equals( getSecondaryNameNode() );
+        return containerHost.getId().equals( getNameNode() ) ||
+                containerHost.getId().equals( getJobTracker() ) ||
+                containerHost.getId().equals( getSecondaryNameNode() );
     }
 
 

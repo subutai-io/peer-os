@@ -196,7 +196,7 @@ public class Manager
         if ( solrClusterConfig != null )
         {
             Environment environment = environmentManager.getEnvironmentByUUID( solrClusterConfig.getEnvironmentId() );
-            populateTable( nodesTable, environment.getContainers() );
+            populateTable( nodesTable, environment.getContainerHosts() );
         }
         else
         {
@@ -213,13 +213,13 @@ public class Manager
         for ( final ContainerHost containerHost : containerHosts )
         {
             final Label resultHolder = new Label();
-            resultHolder.setId( containerHost.getAgent().getListIP().get( 0 ) + "-solrResult" );
+            resultHolder.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-solrResult" );
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-solrCheck" );
+            checkBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-solrCheck" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-solrStart" );
+            startBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-solrStart" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-solrStop" );
+            stopBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-solrStop" );
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn );
             enableButtons( startBtn, stopBtn );
@@ -236,7 +236,7 @@ public class Manager
 
 
             table.addItem( new Object[] {
-                    containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ), resultHolder, availableOperations
+                    containerHost.getHostname(), containerHost.getIpByInterfaceName( "eth0" ), resultHolder, availableOperations
             }, null );
 
             addCheckButtonClickListener( containerHost, resultHolder, startBtn, stopBtn, checkBtn );
@@ -448,7 +448,7 @@ public class Manager
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION )
                                             .getValue();
                     Set<ContainerHost> containerHosts =
-                            environmentManager.getEnvironmentByUUID( solrClusterConfig.getEnvironmentId() ).getContainers();
+                            environmentManager.getEnvironmentByUUID( solrClusterConfig.getEnvironmentId() ).getContainerHosts();
                     Iterator iterator = containerHosts.iterator();
                     ContainerHost containerHost = null;
                     while ( iterator.hasNext() )
@@ -461,12 +461,12 @@ public class Manager
                     }
                     if ( containerHost != null )
                     {
-                        TerminalWindow terminal = new TerminalWindow( containerHosts );
+                        TerminalWindow terminal = new TerminalWindow( containerHost );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Host not found" );
                     }
                 }
             }

@@ -131,6 +131,6 @@ public class ClusterConfiguration
 
     private ContainerHost getHost( Environment environment, UUID uuid )
     {
-        return environment.getContainerHostByUUID( uuid );
+        return environment.getContainerHostById( uuid );
     }
 }

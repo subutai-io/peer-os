@@ -46,7 +46,7 @@ class WithHadoopSetupStrategy extends NutchSetupStrategy
                 throw new ClusterSetupException( "Environment not specified" );
             }
 
-            if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
+            if ( environment.getContainerHosts() == null || environment.getContainerHosts().isEmpty() )
             {
                 throw new ClusterSetupException( "Environment has no nodes" );
             }
@@ -60,7 +60,7 @@ class WithHadoopSetupStrategy extends NutchSetupStrategy
             config.setEnvironmentId( environment.getId() );
 
 
-            for ( ContainerHost container : environment.getContainers() )
+            for ( ContainerHost container : environment.getContainerHosts() )
             {
                 if ( !container.isConnected() )
                 {
@@ -70,7 +70,7 @@ class WithHadoopSetupStrategy extends NutchSetupStrategy
 
                 config.getHadoopNodes().add( container.getId() );
 
-                if ( container.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
+                if ( container.getTemplate().getProducts().contains( Constants.PACKAGE_NAME ) )
                 {
                     config.getNodes().add( container.getId() );
                 }

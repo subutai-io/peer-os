@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -155,7 +154,6 @@ public class AddNodeWindow extends Window
         indicator.setHeight( 11, Unit.PIXELS );
         indicator.setWidth( 50, Unit.PIXELS );
         indicator.setVisible( false );
-
 
 
         HorizontalLayout bottomContent = new HorizontalLayout();

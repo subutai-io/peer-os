@@ -3,20 +3,22 @@
 main() {
   # Environment specific variables
   #bridge_name=eth0
-  jenkins_user="jenkins"
-  jenkins_ip_address="172.16.1.178" 
+  jenkins_user="$1"
+  jenkins_ip_address="$2"
 
-  base_template_name=$1
-  target_template_name=$2
-  list_of_packages_to_be_installated_on_target_template=$3
-  
+  base_template_name=$3
+  target_template_name=$4
+  list_of_packages_to_be_installated_on_target_template=$5
+  version=$6
+
+  echo "Parameters: $@"
   export SUBUTAI_OFFLINE_MODE=true  
 
   # General Variables 
   # These packages should have the latest versions on this machine
   local packages_should_be_installed="subutai-cli,subutai-cli-dev,git,lxc,expect"
   # These packages should be available to be installed on master template
-  local packages_should_be_available="ksks-logstash,jmxtrans,subutai-mastertemplate-setup,$list_of_packages_to_be_installated_on_target_template"
+  local packages_should_be_available="$list_of_packages_to_be_installated_on_target_template"
 
   jenkins_machine=$jenkins_user@$jenkins_ip_address
 
@@ -34,16 +36,19 @@ main() {
   clone_container
   install_packages_to_containers
   promote_container
-  export_template
+  export_template $version
 }
 
 
 usage() {
-  echo "arg1 : template name which will be used as base during clone operation"
-  echo "arg2 : template name which will be created"
-  echo "arg3 : list of packages to be installed on target container"
-  echo "Usage: $0 arg1 arg2 arg3"
-  echo "Ex: $0 master cassandra \"subutai-cassandra,openjdk-7-jre,expect\""
+  echo "arg1 : jenkins user"
+  echo "arg2 : jenkins ip address"
+  echo "arg3 : template name which will be used as base during clone operation"
+  echo "arg4 : template name which will be created"
+  echo "arg5 : list of packages to be installed on target container"
+  echo "arg6 : version of the template package"
+  echo "Usage: $0 arg1 arg2 arg3 arg4 arg5 arg6"
+  echo "Ex: $0 jenkins 172.16.9.15 master cassandra \"subutai-cassandra,openjdk-7-jre,expect\" 2.1.3"
   exit 1
 }
 
@@ -117,7 +122,7 @@ install_packages_to_containers() {
 destroy_template() {
   echo "destroying $target_template_name template"
   subutai -q destroy $target_template_name
-  rm -rf /lxc-data/tmpdir/$target_template_name*
+  rm -rf /lxc-data/tmpdir/$target_template_name*_"$version"_*.deb
 }
 
 
@@ -134,9 +139,10 @@ promote_container(){
 
 
 export_template() {
-  echo "exporting $target_template_name template's debian package"
-  subutai -q export $target_template_name 
-  echo "Size of $target_template_name template package is: " `du -hs /lxc-data/tmpdir/$target_template_name*.deb`
+  version=$1
+  echo "exporting $target_template_name template's debian package with version $version"
+  subutai -q export $target_template_name -v $version
+  echo "Size of $target_template_name template package is:" `du -hs /lxc-data/tmpdir/$target_template_name*_"$version"_*.deb`
 }
 
 # waits until the networking comes up on a container (arg $1)
@@ -176,5 +182,5 @@ lxc_assert_name() {
   fi
 }
 
-main $1 $2 $3
+main "$@"
 exit 0

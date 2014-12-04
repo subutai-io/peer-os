@@ -1,17 +1,17 @@
 package org.safehaus.subutai.plugin.flume.ui.manager;
 
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -128,7 +128,9 @@ public class Manager
                         nodes.removeAll( config.getNodes() );
                         if ( !nodes.isEmpty() )
                         {
-                            Set<ContainerHost> hosts = environmentManager.getEnvironmentByUUID( hadoopConfig.getEnvironmentId() ).getHostsByIds( nodes );
+                            Set<ContainerHost> hosts =
+                                    environmentManager.getEnvironmentByUUID( hadoopConfig.getEnvironmentId() )
+                                                      .getContainerHostsByIds( nodes );
                             AddNodeWindow addNodeWindow =
                                     new AddNodeWindow( flume, tracker, executorService, config, hosts );
                             contentRoot.getUI().addWindow( addNodeWindow );
@@ -298,8 +300,8 @@ public class Manager
         if ( config != null )
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-            Set<ContainerHost> hosts = environment.getHostsByIds( config.getNodes() );
-            populateTable( nodesTable, hosts);
+            Set<ContainerHost> hosts = environment.getContainerHostsByIds( config.getNodes() );
+            populateTable( nodesTable, hosts );
         }
         else
         {
@@ -317,14 +319,14 @@ public class Manager
         {
             final Label resultHolder = new Label();
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeDestroy" );
+            destroyBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-flumeDestroy" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeStart" );
+            startBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-flumeStart" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeStop" );
+            stopBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-flumeStop" );
 
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeCheck" );
+            checkBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-flumeCheck" );
 
             enableButton( stopBtn, startBtn, checkBtn, destroyBtn );
 
@@ -335,7 +337,7 @@ public class Manager
             addGivenComponents( availableOperations, startBtn, stopBtn, checkBtn, destroyBtn );
 
             table.addItem( new Object[] {
-                    host.getHostname(), host.getAgent().getListIP().get( 0 ), resultHolder, availableOperations
+                    host.getHostname(), host.getIpByInterfaceName( "eth0" ), resultHolder, availableOperations
             }, null );
 
 
@@ -390,19 +392,19 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new NodeOperationTask( flume, tracker, config.getClusterName(), host,
-                                NodeOperationType.START, new org.safehaus.subutai.common.protocol.CompleteEvent()
-                        {
-                            @Override
-                            public void onComplete( NodeState nodeState )
-                            {
-                                synchronized ( PROGRESS_ICON )
+                        new NodeOperationTask( flume, tracker, config.getClusterName(), host, NodeOperationType.START,
+                                new org.safehaus.subutai.common.protocol.CompleteEvent()
                                 {
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                }
-                            }
-                        }, null ) );
+                                    @Override
+                                    public void onComplete( NodeState nodeState )
+                                    {
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                        }
+                                    }
+                                }, null ) );
             }
         } );
     }
@@ -418,25 +420,26 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new NodeOperationTask( flume, tracker, config.getClusterName(), host,
-                                NodeOperationType.STOP, new org.safehaus.subutai.common.protocol.CompleteEvent()
-                        {
-                            @Override
-                            public void onComplete( NodeState nodeState )
-                            {
-                                synchronized ( PROGRESS_ICON )
+                        new NodeOperationTask( flume, tracker, config.getClusterName(), host, NodeOperationType.STOP,
+                                new org.safehaus.subutai.common.protocol.CompleteEvent()
                                 {
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                }
-                            }
-                        }, null ) );
+                                    @Override
+                                    public void onComplete( NodeState nodeState )
+                                    {
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                        }
+                                    }
+                                }, null ) );
             }
         } );
     }
 
 
-    public void addCheckButtonClickListener( final ContainerHost host, final Label resultHolder, final Button... buttons )
+    public void addCheckButtonClickListener( final ContainerHost host, final Label resultHolder,
+                                             final Button... buttons )
     {
         getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -446,31 +449,31 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new NodeOperationTask( flume, tracker, config.getClusterName(), host,
-                                NodeOperationType.STATUS, new org.safehaus.subutai.common.protocol.CompleteEvent()
-                        {
-                            public void onComplete( NodeState nodeState )
-                            {
-                                synchronized ( PROGRESS_ICON )
+                        new NodeOperationTask( flume, tracker, config.getClusterName(), host, NodeOperationType.STATUS,
+                                new org.safehaus.subutai.common.protocol.CompleteEvent()
                                 {
-                                    resultHolder.setValue( nodeState.name() );
-                                    if ( nodeState.name().contains( "STOPPED" ) )
+                                    public void onComplete( NodeState nodeState )
                                     {
-                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                    }
-                                    else
-                                    {
-                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                    }
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            resultHolder.setValue( nodeState.name() );
+                                            if ( nodeState.name().contains( "STOPPED" ) )
+                                            {
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                            }
+                                            else
+                                            {
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            }
 
-                                    PROGRESS_ICON.setVisible( false );
-                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                    getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                }
-                            }
-                        }, null ) );
+                                            PROGRESS_ICON.setVisible( false );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        }
+                                    }
+                                }, null ) );
             }
         } );
     }
@@ -591,7 +594,7 @@ public class Manager
                     String containerId =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Set<ContainerHost> containerHosts =
-                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers();
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts();
                     Iterator iterator = containerHosts.iterator();
                     ContainerHost containerHost = null;
                     while ( iterator.hasNext() )
@@ -604,12 +607,12 @@ public class Manager
                     }
                     if ( containerHost != null )
                     {
-                        TerminalWindow terminal = new TerminalWindow( containerHosts );
+                        TerminalWindow terminal = new TerminalWindow( containerHost );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Host not found" );
                     }
                 }
             }

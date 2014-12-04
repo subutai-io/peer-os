@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.nutch.impl;
 
 
-import java.util.Iterator;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.command.CommandException;
@@ -61,7 +60,7 @@ class OverHadoopSetupStrategy extends NutchSetupStrategy
                             config.getClusterName() ) );
         }
         //check nodes are connected
-        //        Set<ContainerHost> nodes = environment.getHostsByIds( config.getNodes() );
+        //        Set<ContainerHost> nodes = environment.getContainerHostsByIds( config.getNodes() );
         //        for ( ContainerHost host : nodes )
         //        {
         //            if ( !host.isConnected() )
@@ -84,14 +83,14 @@ class OverHadoopSetupStrategy extends NutchSetupStrategy
 
         trackerOperation.addLog( "Checking prerequisites..." );
 
-        RequestBuilder checkInstalledCommand = new RequestBuilder( Commands.CHECK );
+        RequestBuilder checkInstalledCommand = new RequestBuilder( Constants.CHECK );
         for( UUID uuid : config.getNodes())
         {
-            ContainerHost node = environment.getContainerHostByUUID( uuid );
+            ContainerHost node = environment.getContainerHostById( uuid );
             try
             {
                 CommandResult result = node.execute( checkInstalledCommand );
-                if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
+                if ( result.getStdOut().contains( Constants.PACKAGE_NAME ) )
                 {
                     trackerOperation.addLog(
                             String.format( "Node %s already has Nutch installed. Omitting this node from installation",
@@ -127,11 +126,11 @@ class OverHadoopSetupStrategy extends NutchSetupStrategy
         trackerOperation.addLog( "Cluster info saved to DB\nInstalling Pig..." );
         //install nutch,
         //RequestBuilder installCommand = new RequestBuilder( Commands.INSTALL );
-        for ( ContainerHost node : environment.getHostsByIds( config.getNodes() ) )
+        for ( ContainerHost node : environment.getContainerHostsByIds( config.getNodes() ) )
         {
             try
             {
-                node.execute(new RequestBuilder( Commands.INSTALL ).withTimeout( 600 ));
+                node.execute(new RequestBuilder( Constants.INSTALL ).withTimeout( 600 ));
             }
             catch ( CommandException e )
             {

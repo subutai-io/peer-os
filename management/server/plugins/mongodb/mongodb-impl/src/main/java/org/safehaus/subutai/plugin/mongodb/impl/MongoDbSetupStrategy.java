@@ -105,23 +105,23 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
                     String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
-        if ( environment.getContainers().isEmpty() )
+        if ( environment.getContainerHosts().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
         int totalNodesRequired =
                 config.getNumberOfRouters() + config.getNumberOfConfigServers() + config.getNumberOfDataNodes();
-        if ( environment.getContainers().size() < totalNodesRequired )
+        if ( environment.getContainerHosts().size() < totalNodesRequired )
         {
             throw new ClusterSetupException(
                     String.format( "Environment needs to have %d but has %d nodes", totalNodesRequired,
-                            environment.getContainers().size() ) );
+                            environment.getContainerHosts().size() ) );
         }
 
         Set<ContainerHost> mongoContainers = new HashSet<>();
         Set<ContainerHost> mongoEnvironmentContainers = new HashSet<>();
-        for ( ContainerHost container : environment.getContainers() )
+        for ( ContainerHost container : environment.getContainerHosts() )
         {
             try
             {
@@ -153,25 +153,20 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
             if ( NodeType.CONFIG_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
                 MongoConfigNode mongoConfigNode =
-                        new MongoConfigNodeImpl( environmentContainer.getAgent(), environmentContainer.getPeerId(),
-                                environmentContainer.getEnvironmentId(), config.getDomainName(),
-                                config.getCfgSrvPort() );
+                        new MongoConfigNodeImpl( environmentContainer, config.getDomainName(), config.getCfgSrvPort() );
                 configServers.add( mongoConfigNode );
             }
             else if ( NodeType.ROUTER_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
                 MongoRouterNode mongoRouterNode =
-                        new MongoRouterNodeImpl( environmentContainer.getAgent(), environmentContainer.getPeerId(),
-                                environmentContainer.getEnvironmentId(), config.getDomainName(), config.getRouterPort(),
+                        new MongoRouterNodeImpl( environmentContainer, config.getDomainName(), config.getRouterPort(),
                                 config.getCfgSrvPort() );
                 routers.add( mongoRouterNode );
             }
             else if ( NodeType.DATA_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
                 MongoDataNode mongoDataNode =
-                        new MongoDataNodeImpl( environmentContainer.getAgent(), environmentContainer.getPeerId(),
-                                environmentContainer.getEnvironmentId(), config.getDomainName(),
-                                config.getDataNodePort() );
+                        new MongoDataNodeImpl( environmentContainer, config.getDomainName(), config.getDataNodePort() );
                 dataNodes.add( mongoDataNode );
             }
         }
@@ -189,9 +184,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
             {
                 ContainerHost environmentContainer = it.next();
                 MongoConfigNode mongoConfigNode =
-                        new MongoConfigNodeImpl( environmentContainer.getAgent(), environmentContainer.getPeerId(),
-                                environmentContainer.getEnvironmentId(), config.getDomainName(),
-                                config.getCfgSrvPort() );
+                        new MongoConfigNodeImpl( environmentContainer, config.getDomainName(), config.getCfgSrvPort() );
                 configServers.add( mongoConfigNode );
                 it.remove();
             }
@@ -206,8 +199,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
             {
                 ContainerHost environmentContainer = it.next();
                 MongoRouterNode mongoRouterNode =
-                        new MongoRouterNodeImpl( environmentContainer.getAgent(), environmentContainer.getPeerId(),
-                                environmentContainer.getEnvironmentId(), config.getDomainName(), config.getRouterPort(),
+                        new MongoRouterNodeImpl( environmentContainer, config.getDomainName(), config.getRouterPort(),
                                 config.getCfgSrvPort() );
                 routers.add( mongoRouterNode );
                 it.remove();
@@ -223,9 +215,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
             {
                 ContainerHost environmentContainer = it.next();
                 MongoDataNode mongoDataNode =
-                        new MongoDataNodeImpl( environmentContainer.getAgent(), environmentContainer.getPeerId(),
-                                environmentContainer.getEnvironmentId(), config.getDomainName(),
-                                config.getRouterPort() );
+                        new MongoDataNodeImpl( environmentContainer, config.getDomainName(), config.getRouterPort() );
                 dataNodes.add( mongoDataNode );
                 it.remove();
             }

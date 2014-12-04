@@ -10,8 +10,6 @@
       <cxf:logging />
     </cxf:features>
   </cxf:bus>
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
   <reference id="luceneManager" availability="mandatory" interface="org.safehaus.subutai.plugin.lucene.api.Lucene" />
 

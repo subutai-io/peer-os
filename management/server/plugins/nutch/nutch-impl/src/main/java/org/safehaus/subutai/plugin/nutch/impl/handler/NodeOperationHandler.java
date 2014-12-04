@@ -8,7 +8,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.nutch.api.NutchConfig;
-import org.safehaus.subutai.plugin.nutch.impl.Commands;
+import org.safehaus.subutai.plugin.nutch.impl.Constants;
 import org.safehaus.subutai.plugin.nutch.impl.NutchImpl;
 
 import java.util.Iterator;
@@ -42,7 +42,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<NutchImpl, Nu
         }
 
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        Iterator iterator = environment.getContainers().iterator();
+        Iterator iterator = environment.getContainerHosts().iterator();
         ContainerHost host = null;
         while ( iterator.hasNext() )
         {
@@ -78,7 +78,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<NutchImpl, Nu
         try
         {
             result = host.execute( new RequestBuilder(
-                    Commands.INSTALL ).withTimeout( 600 ) );
+                    Constants.INSTALL ).withTimeout( 600 ) );
             if ( result.hasSucceeded() )
             {
                 config.getNodes().add( host.getId() );
@@ -103,7 +103,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<NutchImpl, Nu
         try
         {
             result = host.execute( new RequestBuilder(
-                    Commands.UNINSTALL ).withTimeout( 600 ) );
+                    Constants.UNINSTALL ).withTimeout( 600 ) );
             if ( result.hasSucceeded() )
             {
                 config.getNodes().remove( host.getId() );

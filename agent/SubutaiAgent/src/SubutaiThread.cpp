@@ -42,7 +42,13 @@ SubutaiThread::~SubutaiThread()
 bool SubutaiThread::checkCWD(SubutaiCommand *command, SubutaiContainer* cont)
 {
     if (cont && command->getWorkingDirectory() != "" ) {
-        return cont->checkCWD(command->getWorkingDirectory());
+        try {
+            return cont->checkCWD(command->getWorkingDirectory());
+        } catch (SubutaiException e) {
+            logger.writeLog(3, logger.setLogData("<SubutaiThread::checkCWD> " "Exception: ", e.displayText()));
+        } catch (std::exception e) {
+            logger.writeLog(3, logger.setLogData("<SubutaiThread::checkCWD> " "Exception:", e.what()));
+        }
     } else {
         if ((chdir(command->getWorkingDirectory().c_str())) < 0) {		
             //changing working directory first
@@ -61,10 +67,15 @@ bool SubutaiThread::checkCWD(SubutaiCommand *command, SubutaiContainer* cont)
 bool SubutaiThread::checkUID(SubutaiCommand *command, SubutaiContainer* container)
 {
     if (container && command->getRunAs() != "") {
-        return container->checkUser(command->getRunAs());
+        try {
+            return container->checkUser(command->getRunAs());
+        } catch (SubutaiException e) {
+            logger.writeLog(3, logger.setLogData("<SubutaiThread::checkCWD> " "Exception: ", e.displayText()));
+        } catch (std::exception e) {
+            logger.writeLog(3, logger.setLogData("<SubutaiThread::checkCWD> " "Exception:", e.what()));
+        }
     } else {
         if (uid.getIDs(ruid, euid, command->getRunAs())) {	
-            //checking user id is on system ?
             logger.writeLog(4, logger.setLogData("<SubutaiThread::checkUID> " "User id successfully found on system..", "pid", helper.toString(getpid()), "RunAs", command->getRunAs()));
             uid.doSetuid(this->euid);
             return true;
@@ -124,35 +135,12 @@ string SubutaiThread::createExecString(SubutaiCommand *command)
  *
  */
 bool SubutaiThread::ExecuteCommand(SubutaiCommand* command, SubutaiContainer* container) {
-    container->RunCommand(command);
+    try {
+        container->RunCommand(command);
+    } catch (SubutaiException e) {
+        logger.writeLog(7, logger.setLogData("<SubutaiThread::createExecString> " "", e.displayText()));
+    }
     return true;
-}
-
-void SubutaiThread::retrieveDaemonOutput(SubutaiCommand* command) {
-    if (!command->getIsDaemon()) { 
-        return;
-    } 
-    stringstream path;
-    // TODO: Add path of unprivileged container
-    if (_container) {
-        path << "/var/lib/lxc/" << _container->getContainerHostnameValue() << "/rootfs";
-    }
-    path << "/tmp/";
-    ifstream outFile(path.str().append(command->getCommandId()).append("_out").c_str());
-    string line;
-    if (outFile.is_open()) {
-        while (getline(outFile, line)) {
-            cout << line.c_str() << "\n"; 
-        }
-        outFile.close();
-    }
-    ifstream errFile(path.str().append(command->getCommandId()).append("_err").c_str());
-    if (errFile.is_open()) {
-        while (getline(errFile, line)) {
-            cout << line.c_str() << "\n"; 
-        }
-        errFile.close();
-    }
 }
 
 void SubutaiThread::captureOutputBuffer(message_queue* messageQueue, SubutaiCommand* command, bool outputBuffer, bool errorBuffer) {
@@ -185,8 +173,6 @@ void SubutaiThread::lastCheckAndSend(message_queue *messageQueue, SubutaiCommand
     this->getLogger().writeLog(6, this->getLogger().setLogData("<SubutaiThread::lastCheckAndSend> " "The method starts..."));
     unsigned int outBuffsize = this->getoutBuff().size();					//real output buffer size
     unsigned int errBuffsize = this->geterrBuff().size();					//real error buffer size
-
-    retrieveDaemonOutput(command);
 
     if (outBuffsize != 0 || errBuffsize != 0) {
         if (outBuffsize != 0 && errBuffsize!= 0) {
@@ -692,18 +678,18 @@ int SubutaiThread::optionReadSend(message_queue* messageQueue, SubutaiCommand* c
  */
 int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *command, char* argv[], SubutaiContainer* container)
 {
-    if (container) {
+    if (container) 
+    {
         _container = container; // Keep container for future use
     }
-    //signal(SIGCHLD, SIG_IGN);	// when the child process done it will be raped by kernel. We do not allowed zombie processes.
     pid = fork();		// creating a child process
     if (pid == 0)		// child process is starting
     {
         int argv0size = strlen(argv[0]);
         strncpy(argv[0], "subutai-agent-child", argv0size);
         logger.openLogFile(getpid(),command->getRequestSequenceNumber());
-        string pidparnumstr = helper.toString(getpid());       //geting pid number of the process
-        string processpid = "";	                        //processpid for execution
+        string pidparnumstr = helper.toString(getpid());        //geting pid number of the process
+        string processpid = "";	                                //processpid for execution
         logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Fork is Starting!!", helper.toString(getpid())));
         this->getOutputStream().setMode(command->getStandardOutput());
         this->getOutputStream().setIdentity("output");
@@ -715,53 +701,6 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
             logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Error opening pipes!!"));
         }
 
-        string executecmd = createExecString(command).c_str();
-        string latest = executecmd.substr(executecmd.length()-3);
-        /*  if (command->getIsDaemon()) {
-            logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Process will be executed as a Daemon process!!"));
-            int myval = daemon(0, 0);
-            if (!checkCWD(command, container)) { //if the CWD does not exist
-            string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
-            "Working Directory Does Not Exist on System","",command->getCommandId());
-            while (!messageQueue->try_send(message.data(), message.size(), 0));
-            myval = 1 ;
-            message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-            this->getResponsecount(),command->getCommandId(),myval);
-            while (!messageQueue->try_send(message.data(), message.size(), 0));
-            logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
-            exit(1);
-        //problem about absolute path
-        }
-        if (!checkUID(command, container)) //if the User does not exist
-        {
-        string message = this->getResponse().createResponseMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(), 1,
-        "User Does Not Exist on System", "", command->getCommandId());
-        while (!messageQueue->try_send(message.data(), message.size(), 0));
-        myval = 1 ;
-        message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
-        this->getResponsecount(),command->getCommandId(),myval);
-        while (!messageQueue->try_send(message.data(), message.size(), 0));
-        logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "User id not found on system..","RunAs:",command->getRunAs()));
-        exit(1);
-        }
-        logger.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getCommand()));
-        if (!container) {
-        //executing the process on background
-        stringstream cmd;
-        cmd << "subutai-run " << createExecString(command) << " " << command->getCommandId();
-        system(cmd.str().c_str());
-        } else {
-        container->RunDaemon(command);
-        }
-        //parent returns with success if the daemon successfully send to process to background
-        string message = this->getResponse().createExitMessage(command->getUuid(), this->getPpid(), command->getRequestSequenceNumber(),
-        this->getResponsecount(), command->getCommandId(), myval);
-        while (!messageQueue->try_send(message.data(), message.size(), 0));
-
-        exit(1);
-        }
-        else
-        {   // not daemon*/
         if (command->getIsDaemon()) {
             logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Process will be executed as a Daemon process!!"));
         } else {
@@ -785,38 +724,41 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                 logger.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
                 kill(getpid(), SIGKILL);		//killing child
                 exit(1);
-                //problem about absolute path
             }
             if (!checkUID(command, container))
             {
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "User id not found on system..","RunAs:",command->getRunAs()));
                 kill(getpid(), SIGKILL);		//killing child
                 exit(1);
-                //problem about UID
             }
 
             if (!container) {
+                // Execute command for host
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is starting!!", "pid", pidchldnumstr));
-                // Execute command
                 string execCmd = createExecString(command);
                 if (command->getIsDaemon()) {
-                    string cmd = createExecString(command);
-                    cmd.append(" &");
-                    system(cmd.c_str());
-                }
+                    execCmd.append(" &");
+                } 
                 val = system(execCmd.c_str());
             } else {
+                // Execute command for container
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is starting!! on a container", "pid", pidchldnumstr));
-                if (command->getIsDaemon()) {
-                    container->RunDaemon(command);
-                } else {
-                    container->RunCommand(command);
+                try {
+                    if (command->getIsDaemon()) {
+                        container->RunDaemon(command);
+                    } else {
+                        container->RunCommand(command);
+                    }
+                } catch (SubutaiException e) {
+                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Exception", e.displayText()));
+                } catch (std::exception e) {
+                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Exception", string(e.what())));
                 }
             }
             close(ret[0]);
             write(ret[1], &val, sizeof(val));
             close(ret[1]);
-            logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is done!!","pid",pidchldnumstr));
+            logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "Execution is done!!", "pid", pidchldnumstr));
             exit(EXIT_SUCCESS);
         }
         else if (newpid == -1)
@@ -840,42 +782,19 @@ int SubutaiThread::threadFunction(message_queue* messageQueue, SubutaiCommand *c
                 logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Thread is Stopping!!","pid",helper.toString(getpid())));
                 logger.closeLogFile();
                 kill(getpid(), SIGKILL);		//killing child
-                return true; //thread successfully done its work.
+                return true;                    //thread successfully done its work.
             }
             catch(const std::exception& error)
             {
-
-                //Parent read the result and send back
-                try
-                {
-                    signal(SIGCHLD, SIG_IGN);
-                    this->getErrorStream().closePipe(1);
-                    this->getOutputStream().closePipe(1);
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend is starting!!","pid",helper.toString(getpid())));
-                    optionReadSend(messageQueue, command, newpid, ret);
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "optionReadSend has finished!!","pid",helper.toString(getpid())));
-                    this->getErrorStream().closePipe(0);
-                    this->getOutputStream().closePipe(0);
-                    logger.writeLog(6, logger.setLogData("<SubutaiThread::threadFunction> " "New Main Thread is Stopping!!","pid",helper.toString(getpid())));
-                    logger.closeLogFile();
-                    kill(getpid(), SIGKILL);		//killing child
-                    return true; //thread successfully done its work.
-                }
-                catch(const std::exception& error)
-                {
-                    logger.writeLog(3, logger.setLogData("<SubutaiThread::threadFunction> " "Problem TF:",error.what()));
-                    cout<<error.what()<<endl;
-                }
+                logger.writeLog(3, logger.setLogData("<SubutaiThread::threadFunction> " "Problem TF:",error.what()));
+                cout<<error.what()<<endl;
             }
         }
-        // } else not daemon
     } else if (pid == -1) {
-        //log.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "ERROR DURING MAIN FORK!!","pid",helper.toString(getpid())));
         return pid;
     }
     else if (pid > 0)	//parent continue its process and return back
     {
-        //logger.writeLog(7, logger.setLogData("<SubutaiThread::threadFunction> " "Parent Process continue!!","pid",helper.toString(getpid())));
         return pid;	//parent successfully done
     }
     return pid;
@@ -1090,3 +1009,4 @@ string SubutaiThread::getProcessPid(const char* cmd)
     pclose(pipe);
     return result;
 }
+

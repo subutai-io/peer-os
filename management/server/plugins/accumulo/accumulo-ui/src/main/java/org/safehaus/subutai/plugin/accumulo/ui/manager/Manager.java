@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -31,7 +30,6 @@ import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -339,7 +337,7 @@ public class Manager
                 {
                     myHostSet.add( environmentManager.getEnvironmentByUUID(
                             hadoop.getCluster( accumuloClusterConfig.getHadoopClusterName() ).getEnvironmentId() )
-                                                     .getContainerHostByUUID( uuid ) );
+                                                     .getContainerHostById( uuid ) );
                 }
 
                 AddNodeWindow w =
@@ -391,7 +389,7 @@ public class Manager
                 {
                     myHostSet.add( environmentManager.getEnvironmentByUUID(
                             hadoop.getCluster( accumuloClusterConfig.getHadoopClusterName() ).getEnvironmentId() )
-                                                     .getContainerHostByUUID( uuid ) );
+                                                     .getContainerHostById( uuid ) );
                 }
 
                 AddNodeWindow w =
@@ -603,12 +601,12 @@ public class Manager
 
                 if ( containerHost != null )
                 {
-                    TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( containerHost ) );
+                    TerminalWindow terminal = new TerminalWindow( containerHost );
                     contentRoot.getUI().addWindow( terminal.getWindow() );
                 }
                 else
                 {
-                    Notification.show( "Agent is not connected" );
+                    Notification.show( "Host not found" );
                 }
             }
         } );
@@ -621,14 +619,16 @@ public class Manager
         {
             Environment environment = environmentManager.getEnvironmentByUUID(
                     hadoop.getCluster( accumuloClusterConfig.getHadoopClusterName() ).getEnvironmentId() );
-            populateTable( slavesTable, environment.getHostsByIds( accumuloClusterConfig.getSlaves() ), false );
-            populateTable( tracersTable, environment.getHostsByIds( accumuloClusterConfig.getTracers() ), false );
+            populateTable( slavesTable, environment.getContainerHostsByIds( accumuloClusterConfig.getSlaves() ),
+                    false );
+            populateTable( tracersTable, environment.getContainerHostsByIds( accumuloClusterConfig.getTracers() ),
+                    false );
 
 
             Set<ContainerHost> masters = new HashSet<>();
-            masters.add( environment.getContainerHostByUUID( accumuloClusterConfig.getMasterNode() ) );
-            masters.add( environment.getContainerHostByUUID( accumuloClusterConfig.getGcNode() ) );
-            masters.add( environment.getContainerHostByUUID( accumuloClusterConfig.getMonitor() ) );
+            masters.add( environment.getContainerHostById( accumuloClusterConfig.getMasterNode() ) );
+            masters.add( environment.getContainerHostById( accumuloClusterConfig.getGcNode() ) );
+            masters.add( environment.getContainerHostById( accumuloClusterConfig.getMonitor() ) );
             populateTable( mastersTable, masters, true );
         }
         else
@@ -646,11 +646,11 @@ public class Manager
         for ( final ContainerHost containerHost : containerHosts )
         {
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-accumuloCheck" );
+            checkBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-accumuloCheck" );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-accumuloDestroy" );
+            destroyBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-accumuloDestroy" );
             final Label resultHolder = new Label();
-            resultHolder.setId( containerHost.getAgent().getListIP().get( 0 ) + "accumuloResult" );
+            resultHolder.setId( containerHost.getIpByInterfaceName( "eth0" ) + "accumuloResult" );
 
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );
@@ -659,9 +659,9 @@ public class Manager
             addGivenComponents( availableOperations, checkBtn );
             addStyleName( checkBtn, destroyBtn, availableOperations );
 
-            final String nodeRole = findNodeRoles( containerHost.getAgent() );
+            final String nodeRole = findNodeRoles( containerHost );
             table.addItem( new Object[] {
-                    containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ), nodeRole, resultHolder,
+                    containerHost.getHostname(), containerHost.getIpByInterfaceName( "eth0" ), nodeRole, resultHolder,
                     availableOperations
             }, null );
 
@@ -831,26 +831,26 @@ public class Manager
     }
 
 
-    private String findNodeRoles( Agent node )
+    private String findNodeRoles( ContainerHost node )
     {
         StringBuilder sb = new StringBuilder();
-        if ( accumuloClusterConfig.getMasterNode().equals( node.getUuid() ) )
+        if ( accumuloClusterConfig.getMasterNode().equals( node.getId() ) )
         {
             sb.append( "Master" ).append( ", " );
         }
-        if ( accumuloClusterConfig.getGcNode().equals( node.getUuid() ) )
+        if ( accumuloClusterConfig.getGcNode().equals( node.getId() ) )
         {
             sb.append( "GC" ).append( ", " );
         }
-        if ( accumuloClusterConfig.getMonitor().equals( node.getUuid() ) )
+        if ( accumuloClusterConfig.getMonitor().equals( node.getId() ) )
         {
             sb.append( "Monitor" ).append( ", " );
         }
-        if ( accumuloClusterConfig.getTracers().contains( node.getUuid() ) )
+        if ( accumuloClusterConfig.getTracers().contains( node.getId() ) )
         {
             sb.append( "Tracer" ).append( ", " );
         }
-        if ( accumuloClusterConfig.getSlaves().contains( node.getUuid() ) )
+        if ( accumuloClusterConfig.getSlaves().contains( node.getId() ) )
         {
             sb.append( "Tablet_Server" ).append( ", " );
         }

@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -122,7 +121,7 @@ public class NodeSelectionStep extends VerticalLayout
 
     private void addOverHadoopControls( ComponentContainer parent, final SqoopConfig config )
     {
-        final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
+        final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<ContainerHost>() );
         select.setId( "sqoopSlaveNodes" );
 
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
@@ -140,7 +139,8 @@ public class NodeSelectionStep extends VerticalLayout
                 {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     Environment env = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
-                    Set<ContainerHost> allNodes = env.getHostsByIds( new HashSet<>( hadoopInfo.getAllNodes() ) );
+                    Set<ContainerHost> allNodes = env.getContainerHostsByIds(
+                            new HashSet<>( hadoopInfo.getAllNodes() ) );
                     select.setValue( null );
                     select.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, allNodes ) );
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
@@ -189,7 +189,7 @@ public class NodeSelectionStep extends VerticalLayout
                 Environment env = environmentManager.getEnvironmentByUUID( hadoopConfig.getEnvironmentId() );
                 if ( env != null )
                 {
-                    Set<ContainerHost> hosts = env.getHostsByIds( config.getNodes() );
+                    Set<ContainerHost> hosts = env.getContainerHostsByIds( config.getNodes() );
                     select.setValue( hosts );
                 }
             }

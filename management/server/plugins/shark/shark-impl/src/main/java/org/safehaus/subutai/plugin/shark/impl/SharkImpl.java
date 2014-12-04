@@ -1,14 +1,7 @@
 package org.safehaus.subutai.plugin.shark.impl;
 
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.sql.DataSource;
-
+import com.google.common.base.Preconditions;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
@@ -19,7 +12,6 @@ import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.impl.handler.ClusterOperationHandler;
@@ -28,13 +20,20 @@ import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
+import javax.sql.DataSource;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class SharkImpl implements Shark
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( SharkImpl.class.getName() );
+    private static
+
+    final Logger LOG = LoggerFactory.getLogger( SharkImpl.class.getName() );
     private Spark sparkManager;
     private Hadoop hadoopManager;
     private Tracker tracker;
@@ -149,16 +148,6 @@ public class SharkImpl implements Shark
     public SharkClusterConfig getCluster( String clusterName )
     {
         return pluginDAO.getInfo( SharkClusterConfig.PRODUCT_KEY, clusterName, SharkClusterConfig.class );
-    }
-
-
-    @Override
-    public UUID installCluster( SharkClusterConfig config, HadoopClusterConfig hadoopConfig )
-    {
-        AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL, hadoopConfig );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
     }
 
 

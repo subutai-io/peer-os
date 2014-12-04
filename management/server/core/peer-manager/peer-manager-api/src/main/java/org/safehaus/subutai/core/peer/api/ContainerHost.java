@@ -1,136 +1,52 @@
 package org.safehaus.subutai.core.peer.api;
 
 
-import java.util.UUID;
-
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 
 
 /**
- * ContainerHost class.
+ * Container host interface.
  */
-public class ContainerHost extends SubutaiHost
+public interface ContainerHost extends Host
 {
-    private UUID environmentId;
-    private UUID creatorPeerId;
-    private String templateName;
-    private String templateArch;
-    private ContainerState state = ContainerState.UNKNOWN;
-    private String nodeGroupName;
 
+    public String getParentHostname();
 
-    public ContainerHost( final Agent agent, UUID peerId, UUID environmentId )
-    {
-        super( agent, peerId );
-        this.environmentId = environmentId;
-    }
+    public String getEnvironmentId();
 
+    public void setNodeGroupName( String nodeGroupName );
 
-    public String getNodeGroupName()
-    {
-        return nodeGroupName;
-    }
+    public void setEnvironmentId( String environmentId );
 
+    public void setCreatorPeerId( String creatorPeerId );
 
-    public void setNodeGroupName( final String nodeGroupName )
-    {
-        this.nodeGroupName = nodeGroupName;
-    }
+    public void setTemplateName( String templateName );
 
+    public String getNodeGroupName();
 
-    public UUID getEnvironmentId()
-    {
-        return environmentId;
-    }
+    String getTemplateArch();
 
+    void setTemplateArch( String templateArch );
 
-    public void setEnvironmentId( final UUID environmentId )
-    {
-        this.environmentId = environmentId;
-    }
+    public ContainerHostState getState() throws PeerException;
 
+    //    public void setParent( ResourceHost resourceHost );
 
-    public UUID getCreatorPeerId()
-    {
-        return creatorPeerId;
-    }
+    String getQuota( QuotaEnum memoryLimitInBytes ) throws PeerException;
 
+    void setQuota( QuotaEnum memoryLimitInBytes, String memoryLimit ) throws PeerException;
 
-    public void setCreatorPeerId( final UUID creatorPeerId )
-    {
-        this.creatorPeerId = creatorPeerId;
-    }
+    String getCreatorPeerId();
 
+    void dispose() throws PeerException;
 
-    public String getTemplateName()
-    {
-        return templateName;
-    }
+    Peer getPeer();
 
+    void setPeer( Peer peer );
 
-    public void setTemplateName( final String templateName )
-    {
-        this.templateName = templateName;
-    }
+    Template getTemplate() throws PeerException;
 
-
-    public String getTemplateArch()
-    {
-        return templateArch;
-    }
-
-
-    public void setTemplateArch( final String templateArch )
-    {
-        this.templateArch = templateArch;
-    }
-
-
-    public ContainerState getState()
-    {
-        return state;
-    }
-
-
-    public void setState( final ContainerState state )
-    {
-        this.state = state;
-    }
-
-
-    public void updateHeartbeat()
-    {
-        lastHeartbeat = System.currentTimeMillis();
-        setState( ContainerState.RUNNING );
-    }
-
-
-    public String getQuota( final QuotaEnum quota ) throws PeerException
-    {
-        Peer peer = getPeer();
-        return peer.getQuota( this, quota );
-    }
-
-
-    public void setQuota( final QuotaEnum quota, final String value ) throws PeerException
-    {
-        Peer peer = getPeer();
-        peer.setQuota( this, quota, value );
-    }
-
-
-    public Template getTemplate() throws PeerException
-    {
-        Peer peer = getPeer();
-        return peer.getTemplate( getTemplateName() );
-    }
-
-
-    public void dispose() throws PeerException
-    {
-        Peer peer = getPeer();
-        peer.destroyContainer( this );
-    }
+    String getTemplateName();
 }

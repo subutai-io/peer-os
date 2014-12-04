@@ -53,6 +53,8 @@
 #include "SubutaiConnection.h"
 #include "SubutaiCommand.h"
 #include "SubutaiHelper.h"
+#include "SubutaiException.h"
+
 using namespace std;
 using std::stringstream;
 using std::string;
@@ -77,12 +79,12 @@ class SubutaiContainer
         SubutaiContainer(SubutaiLogger*, lxc_container*);
         virtual ~SubutaiContainer(void);
         bool getContainerId();
-        void tryLongCommand();
         void UpdateUsersList();
         void getContainerAllFields();
         bool getContainerInterfaces();
         void setContainerHostname(string);
         void setContainerStatus(containerStatus);
+        string getState();
         void write();
         void clear();
         bool checkCWD(string cwd);
@@ -101,6 +103,7 @@ class SubutaiContainer
         ExecutionResult RunCommand(SubutaiCommand* command);
         ExecutionResult RunDaemon(SubutaiCommand* command);
         ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT, bool captureOutput = true);
+        bool hasSubCommand(SubutaiCommand* command);
     protected:
         vector<string> ExplodeCommandArguments(SubutaiCommand* command);
     private:
@@ -113,7 +116,9 @@ class SubutaiContainer
         SubutaiLogger*		containerLogger;
         SubutaiHelper 		_helper;
         string              _arch;
+        string              _logEntry;      // <SubutaiContainer::CONTAINER_NAME>
 };
+
 #endif /* SUBUTAICONTAINER_H_ */
 
 

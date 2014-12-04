@@ -30,7 +30,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 public class EnvironmentsForm
 {
 
@@ -281,12 +281,12 @@ public class EnvironmentsForm
 
 
         int ipInt = 10;
-        for ( ContainerHost container : environment.getContainers() )
+        for ( ContainerHost container : environment.getContainerHosts() )
         {
 
             TextField fieldHostname = new TextField();
             fieldHostname.setWidth( "120px" );
-            fieldHostname.setValue( container.getAgent().getHostname() );
+            fieldHostname.setValue( container.getHostname() );
 
             /*TextField fieldIp = new TextField();
             fieldIp.setWidth( "120px" );
@@ -311,7 +311,7 @@ public class EnvironmentsForm
     private Window envWindow( Environment environment )
     {
         Window window = createWindow( MANAGE_TITLE );
-        window.setContent( genContainersTable( environment, environment.getContainers() ) );
+        window.setContent( genContainersTable( environment, environment.getContainerHosts() ) );
         return window;
     }
 
@@ -349,7 +349,7 @@ public class EnvironmentsForm
         {
 
             containersTable.addItem( new Object[] {
-                    container.getTemplateName(), container.getPeerId().toString(), propertiesButton( container ),
+                    container.getHostname(), container.getPeerId().toString(), propertiesButton( container ),
                     startButton( environment, container ), stopButton( environment, container ),
                     destroyButton( environment, container )
             }, null );

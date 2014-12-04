@@ -49,7 +49,7 @@ class OverHadoopSetupStrategy extends FlumeSetupStrategy
         //install pig,
         String s = Commands.make( CommandType.INSTALL );
         //RequestBuilder installCommand = new RequestBuilder( s ).withTimeout( 1800 );
-        for ( ContainerHost node : environment.getHostsByIds( config.getNodes() ) )
+        for ( ContainerHost node : environment.getContainerHostsByIds( config.getNodes() ) )
         {
             try
             {
@@ -85,7 +85,7 @@ class OverHadoopSetupStrategy extends FlumeSetupStrategy
         RequestBuilder checkInstalledCommand = new RequestBuilder( Commands.make( CommandType.STATUS ) );
         for( UUID uuid : config.getNodes())
         {
-            ContainerHost node = environment.getContainerHostByUUID( uuid );
+            ContainerHost node = environment.getContainerHostById( uuid );
             try
             {
                 CommandResult result = node.execute( checkInstalledCommand );

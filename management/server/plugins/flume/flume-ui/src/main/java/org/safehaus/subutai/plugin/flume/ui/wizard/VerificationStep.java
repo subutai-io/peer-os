@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -29,7 +28,7 @@ public class VerificationStep extends VerticalLayout
 {
 
     public VerificationStep( final Flume flume, final ExecutorService executorService, final Tracker tracker,
-                             final EnvironmentManager environmentManager,final Wizard wizard )
+                             final EnvironmentManager environmentManager, final Wizard wizard )
     {
 
         setSizeFull();
@@ -50,8 +49,9 @@ public class VerificationStep extends VerticalLayout
         cfgView.addStringCfg( "Installation Name", wizard.getConfig().getClusterName() );
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            Environment hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
-            Set<ContainerHost> nodes = hadoopEnvironment.getHostsByIds( wizard.getConfig().getNodes() );
+            Environment hadoopEnvironment =
+                    environmentManager.getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
+            Set<ContainerHost> nodes = hadoopEnvironment.getContainerHostsByIds( wizard.getConfig().getNodes() );
             for ( ContainerHost host : nodes )
             {
                 cfgView.addStringCfg( "Node to install", host.getHostname() + "" );

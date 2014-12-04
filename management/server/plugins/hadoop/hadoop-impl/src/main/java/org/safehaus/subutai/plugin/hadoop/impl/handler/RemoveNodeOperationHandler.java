@@ -2,8 +2,6 @@ package org.safehaus.subutai.plugin.hadoop.impl.handler;
 
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
@@ -109,19 +107,19 @@ public class RemoveNodeOperationHandler extends AbstractOperationHandler<HadoopI
     }
 
 
-    private void logCommand( Command command, TrackerOperation po )
-    {
-        if ( command.hasSucceeded() )
-        {
-            po.addLog( String.format( "Task's operation %s succeeded", command.getDescription() ) );
-        }
-        else if ( command.hasCompleted() )
-        {
-            po.addLogFailed( String.format( "Task's operation %s failed", command.getDescription() ) );
-        }
-        else
-        {
-            po.addLogFailed( String.format( "Task's operation %s timeout", command.getDescription() ) );
-        }
-    }
+    //    private void logCommand( Command command, TrackerOperation po )
+    //    {
+    //        if ( command.hasSucceeded() )
+    //        {
+    //            po.addLog( String.format( "Task's operation %s succeeded", command.getDescription() ) );
+    //        }
+    //        else if ( command.hasCompleted() )
+    //        {
+    //            po.addLogFailed( String.format( "Task's operation %s failed", command.getDescription() ) );
+    //        }
+    //        else
+    //        {
+    //            po.addLogFailed( String.format( "Task's operation %s timeout", command.getDescription() ) );
+    //        }
+    //    }
 }
