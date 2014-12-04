@@ -19,7 +19,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -94,7 +93,7 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public Set<ContainerHost> getContainers()
+    public Set<ContainerHost> getContainerHosts()
     {
         return containers;
     }
@@ -118,9 +117,9 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public ContainerHost getContainerHostByUUID( UUID uuid )
+    public ContainerHost getContainerHostById( UUID uuid )
     {
-        Iterator<ContainerHost> iterator = getContainers().iterator();
+        Iterator<ContainerHost> iterator = getContainerHosts().iterator();
         while ( iterator.hasNext() )
         {
             ContainerHost containerHost = iterator.next();
@@ -135,7 +134,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
     public ContainerHost getContainerHostByHostname( String hostname )
     {
-        Iterator<ContainerHost> iterator = getContainers().iterator();
+        Iterator<ContainerHost> iterator = getContainerHosts().iterator();
         while ( iterator.hasNext() )
         {
             ContainerHost containerHost = iterator.next();
@@ -148,12 +147,12 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public Set<ContainerHost> getHostsByIds( Set<UUID> ids )
+    public Set<ContainerHost> getContainerHostsByIds( Set<UUID> ids )
     {
         Set<ContainerHost> hosts = Sets.newHashSet();
         for ( UUID id : ids )
         {
-            ContainerHost host = getContainerHostByUUID( id );
+            ContainerHost host = getContainerHostById( id );
             if ( host != null )
             {
                 hosts.add( host );
@@ -176,6 +175,6 @@ public class EnvironmentImpl implements Environment, Serializable
 
     public void removeContainer( final ContainerHost containerHost )
     {
-        getContainers().remove( containerHost );
+        getContainerHosts().remove( containerHost );
     }
 }

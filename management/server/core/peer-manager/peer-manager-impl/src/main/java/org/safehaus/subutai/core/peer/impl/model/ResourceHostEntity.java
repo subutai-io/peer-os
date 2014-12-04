@@ -569,7 +569,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
             else
             {
-                LOG.debug(
+                LOG.warn(
                         String.format( "Template %s does not exists on %s.", template.getTemplateName(), hostname ) );
                 return false;
             }
@@ -596,7 +596,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
             else
             {
-                LOG.debug( "Template import failed. ", commandResult );
+                LOG.warn( "Template import failed. ", commandResult );
             }
         }
         catch ( CommandException ce )
@@ -619,15 +619,15 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 CommandResult commandResult = run( Command.ADD_SOURCE, template.getPeerId().toString() );
                 if ( !commandResult.hasSucceeded() )
                 {
-                    throw new ResourceHostException(
-                            String.format( "Could not add repository %s to %s.", template.getPeerId(), hostname ) );
+                    LOG.warn( String.format( "Could not add repository %s to %s.", template.getPeerId(), hostname ),
+                            commandResult );
                 }
                 LOG.debug( String.format( "Updating repository index on %s...", hostname ) );
                 commandResult = run( Command.APT_GET_UPDATE );
                 if ( !commandResult.hasSucceeded() )
                 {
-                    throw new ResourceHostException(
-                            String.format( "Could not update repository %s on %s.", template.getPeerId(), hostname ) );
+                    LOG.warn( String.format( "Could not update repository %s on %s.", template.getPeerId(), hostname ),
+                            commandResult );
                 }
             }
             catch ( CommandException ce )

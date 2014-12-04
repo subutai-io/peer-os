@@ -87,7 +87,7 @@ public class MonitorImpl implements Monitor
         Set<ContainerHostMetric> metrics = new HashSet<>();
 
         //obtain environment containers
-        Set<ContainerHost> containerHosts = environment.getContainers();
+        Set<ContainerHost> containerHosts = environment.getContainerHosts();
 
         Set<Peer> peers = Sets.newHashSet();
 
@@ -283,7 +283,7 @@ public class MonitorImpl implements Monitor
         }
 
         //activate monitoring
-        activateMonitoring( environment.getContainers(), monitoringSettings );
+        activateMonitoring( environment.getContainerHosts(), monitoringSettings );
     }
 
 

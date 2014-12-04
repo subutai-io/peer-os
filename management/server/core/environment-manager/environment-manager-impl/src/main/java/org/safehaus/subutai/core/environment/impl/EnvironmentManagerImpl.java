@@ -211,7 +211,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         result.addAll( environmentDataService.getAll() );
         for ( Environment environment : result )
         {
-            for ( ContainerHost containerHost : environment.getContainers() )
+            for ( ContainerHost containerHost : environment.getContainerHosts() )
             {
                 containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
             }
@@ -224,7 +224,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Environment getEnvironment( final String uuid )
     {
         Environment result = environmentDataService.find( uuid );
-        for ( ContainerHost containerHost : result.getContainers() )
+        for ( ContainerHost containerHost : result.getContainerHosts() )
         {
             containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
         }
@@ -365,8 +365,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             Environment environment = environmentBuilder.build( blueprint, process );
             saveEnvironment( environment );
 
-            configureSshBetweenContainers( blueprint, environment.getContainers() );
-            configureLinkingHostsBetweenContainers( blueprint, environment.getContainers() );
+            configureSshBetweenContainers( blueprint, environment.getContainerHosts() );
+            configureLinkingHostsBetweenContainers( blueprint, environment.getContainerHosts() );
 
             /*process.setProcessStatusEnum( ProcessStatusEnum.SUCCESSFUL );
             saveBuildProcess( process );*/
@@ -431,7 +431,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Environment getEnvironmentByUUID( final UUID environmentId )
     {
         Environment result = environmentDataService.find( environmentId.toString() );
-        for ( ContainerHost containerHost : result.getContainers() )
+        for ( ContainerHost containerHost : result.getContainerHosts() )
         {
             containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
         }
@@ -598,7 +598,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void removeContainer( final UUID environmentId, final UUID hostId ) throws EnvironmentManagerException
     {
         Environment environment = getEnvironmentByUUID( environmentId );
-        ContainerHost host = environment.getContainerHostByUUID( hostId );
+        ContainerHost host = environment.getContainerHostById( hostId );
         try
         {
             host.dispose();

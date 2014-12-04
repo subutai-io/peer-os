@@ -14,6 +14,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -66,7 +67,8 @@ public abstract class AbstractSubutaiHost implements Host
     @Column( name = "net_intf" )
     private String netInterfaces;
 
-    @OneToMany( mappedBy = "host", cascade = CascadeType.ALL, targetEntity = HostInterface.class )
+    @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = HostInterface
+            .class )
     protected Set<Interface> interfaces = new HashSet<>();
 
     @Transient

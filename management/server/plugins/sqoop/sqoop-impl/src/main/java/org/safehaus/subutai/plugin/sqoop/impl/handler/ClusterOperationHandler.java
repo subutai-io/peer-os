@@ -166,7 +166,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SqoopImpl,
                 throw new ClusterException( "Environment not found: " + config.getEnvironmentId() );
             }
 
-            Set<ContainerHost> nodes = env.getHostsByIds( config.getNodes() );
+            Set<ContainerHost> nodes = env.getContainerHostsByIds( config.getNodes() );
             for ( ContainerHost node : nodes )
             {
                 if ( !node.isConnected() )

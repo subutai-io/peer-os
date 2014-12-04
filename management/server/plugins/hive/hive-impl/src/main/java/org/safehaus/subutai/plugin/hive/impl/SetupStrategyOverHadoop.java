@@ -35,14 +35,14 @@ public class SetupStrategyOverHadoop extends HiveSetupStrategy
         checkConfig();
 
         //check if nodes are connected
-        ContainerHost server = environment.getContainerHostByUUID( config.getServer() );
+        ContainerHost server = environment.getContainerHostById( config.getServer() );
         if ( !server.isConnected() )
         {
             throw new ClusterSetupException( "Server node is not connected " );
         }
         for ( UUID uuid : config.getClients() )
         {
-            ContainerHost host = environment.getContainerHostByUUID( uuid );
+            ContainerHost host = environment.getContainerHostById( uuid );
             if ( !host.isConnected() )
             {
                 throw new ClusterSetupException( String.format( "Node %s is not connected", host.getHostname() ) );
@@ -93,7 +93,7 @@ public class SetupStrategyOverHadoop extends HiveSetupStrategy
         trackerOperation.addLog( "Installing clients..." );
         for ( UUID uuid : config.getClients() )
         {
-            ContainerHost client = environment.getContainerHostByUUID( uuid );
+            ContainerHost client = environment.getContainerHostById( uuid );
             try
             {
                 if ( !checkIfProductIsInstalled( client, HiveConfig.PRODUCT_KEY.toLowerCase() ) )

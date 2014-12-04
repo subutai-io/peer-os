@@ -274,7 +274,7 @@ public class Manager
                         if ( info != null )
                         {
                             set = environmentManager.getEnvironmentByUUID( info.getEnvironmentId() )
-                                                    .getHostsByIds( Sets.newHashSet( info.getAllNodes() ) );
+                                                    .getContainerHostsByIds( Sets.newHashSet( info.getAllNodes() ) );
                             set.removeAll( config.getAllNodes() );
                             if ( !set.isEmpty() )
                             {
@@ -691,7 +691,7 @@ public class Manager
                     String containerId =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Set<ContainerHost> containerHosts =
-                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers();
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts();
                     Iterator iterator = containerHosts.iterator();
                     ContainerHost containerHost = null;
                     while ( iterator.hasNext() )
@@ -704,12 +704,12 @@ public class Manager
                     }
                     if ( containerHost != null )
                     {
-                        TerminalWindow terminal = new TerminalWindow( containerHosts );
+                        TerminalWindow terminal = new TerminalWindow( containerHost );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Host is not connected" );
+                        show( "Host not found" );
                     }
                 }
             }
@@ -755,8 +755,8 @@ public class Manager
         if ( config != null )
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-            populateTable( nodesTable, environment.getHostsByIds( config.getWorkers() ),
-                    environment.getContainerHostByUUID( config.getCoordinatorNode() ) );
+            populateTable( nodesTable, environment.getContainerHostsByIds( config.getWorkers() ),
+                    environment.getContainerHostById( config.getCoordinatorNode() ) );
         }
         else
         {

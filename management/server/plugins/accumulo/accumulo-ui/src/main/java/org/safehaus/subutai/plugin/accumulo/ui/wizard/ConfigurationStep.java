@@ -824,7 +824,7 @@ public class ConfigurationStep extends Panel
         {
             set.add( environmentManager.getEnvironmentByUUID(
                     hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ).getEnvironmentId() )
-                                       .getContainerHostByUUID( uuid ) );
+                                       .getContainerHostById( uuid ) );
         }
         return set;
     }
@@ -884,7 +884,7 @@ public class ConfigurationStep extends Panel
     {
         return environmentManager.getEnvironmentByUUID(
                 hadoop.getCluster( wizard.getConfig().getHadoopClusterName() ).getEnvironmentId() )
-                                 .getContainerHostByUUID( uuid );
+                                 .getContainerHostById( uuid );
     }
 
 

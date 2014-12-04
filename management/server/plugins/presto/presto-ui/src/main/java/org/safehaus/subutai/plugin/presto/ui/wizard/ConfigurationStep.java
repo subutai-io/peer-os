@@ -195,7 +195,7 @@ public class ConfigurationStep extends Panel
             config.setHadoopClusterName( hadoopInfo.getClusterName() );
             hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
             Set<ContainerHost> hadoopNodes =
-                    hadoopEnvironment.getHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
+                    hadoopEnvironment.getContainerHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
             workersSelect.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
             for ( ContainerHost hadoopNode : hadoopNodes )
             {
@@ -232,7 +232,7 @@ public class ConfigurationStep extends Panel
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
                     hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
                     Set<ContainerHost> hadoopNodes =
-                            hadoopEnvironment.getHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
+                            hadoopEnvironment.getContainerHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
                     workersSelect.setValue( null );
                     workersSelect.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
                     coordinatorNodeCombo.setValue( null );
@@ -269,7 +269,7 @@ public class ConfigurationStep extends Panel
                     }
                     hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
                     Set<ContainerHost> hadoopNodes =
-                            hadoopEnvironment.getHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
+                            hadoopEnvironment.getContainerHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
                     hadoopNodes.remove( coordinator );
                     workersSelect.getContainerDataSource().removeAllItems();
                     for ( ContainerHost hadoopNode : hadoopNodes )
@@ -277,7 +277,7 @@ public class ConfigurationStep extends Panel
                         workersSelect.getContainerDataSource().addItem( hadoopNode );
                     }
                     workersSelect.removeValueChangeListener( workersSelectChangeListener );
-                    workersSelect.setValue( hadoopEnvironment.getHostsByIds( config.getWorkers() ) );
+                    workersSelect.setValue( hadoopEnvironment.getContainerHostsByIds( config.getWorkers() ) );
                     workersSelect.addValueChangeListener( workersSelectChangeListener );
                 }
             }

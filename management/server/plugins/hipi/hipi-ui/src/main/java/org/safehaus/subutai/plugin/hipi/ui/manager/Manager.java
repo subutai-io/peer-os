@@ -155,7 +155,7 @@ public class Manager
                     {
                         Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
                         Set<ContainerHost> nodes =
-                                environment.getHostsByIds( new HashSet<UUID>( hadoopConfig.getAllNodes() ) );
+                                environment.getContainerHostsByIds( new HashSet<UUID>( hadoopConfig.getAllNodes() ) );
                         nodes.removeAll( config.getNodes() );
                         if ( !nodes.isEmpty() )
                         {
@@ -264,12 +264,12 @@ public class Manager
 
                     if ( host != null )
                     {
-                        TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( host ) );
+                        TerminalWindow terminal = new TerminalWindow( host );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Host not found" );
                     }
                 }
             }
@@ -288,7 +288,7 @@ public class Manager
         if ( config != null )
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-            Set<ContainerHost> nodes = environment.getHostsByIds( config.getNodes() );
+            Set<ContainerHost> nodes = environment.getContainerHostsByIds( config.getNodes() );
             populateTable( nodesTable, nodes );
         }
         else

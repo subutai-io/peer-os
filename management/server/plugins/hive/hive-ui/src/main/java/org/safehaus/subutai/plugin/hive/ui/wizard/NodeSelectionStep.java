@@ -142,12 +142,12 @@ public class NodeSelectionStep extends Panel
                     if ( config.getServer() != null )
                     {
                         selected = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() )
-                                                     .getContainerHostByUUID( config.getServer() );
+                                                     .getContainerHostById( config.getServer() );
                     }
                     else
                     {
                         selected = environmentManager.getEnvironmentByUUID( hc.getEnvironmentId() )
-                                                     .getContainerHostByUUID( hc.getNameNode() );
+                                                     .getContainerHostById( hc.getNameNode() );
                     }
                     fillServerNodeComboBox( config, cmbServerNode, hc, selected );
                     filterNodes( cmbServerNode, hc );
@@ -243,7 +243,7 @@ public class NodeSelectionStep extends Panel
 
     private ContainerHost getHost( HadoopClusterConfig config, UUID uuid )
     {
-        return environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHostByUUID( uuid );
+        return environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHostById( uuid );
     }
 
 
@@ -260,7 +260,7 @@ public class NodeSelectionStep extends Panel
                 {
                     ContainerHost host =
                             environmentManager.getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() )
-                                              .getContainerHostByUUID( uuid );
+                                              .getContainerHostById( uuid );
                     boolean isInstalled = hive.isInstalled( hadoopClusterConfig.getClusterName(), host.getHostname() );
                     if ( isInstalled )
                     {

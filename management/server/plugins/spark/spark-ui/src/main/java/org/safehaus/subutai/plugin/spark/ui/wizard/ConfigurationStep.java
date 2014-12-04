@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.spark.ui.wizard;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -176,7 +177,7 @@ public class ConfigurationStep extends Panel
             config.setHadoopClusterName( hadoopInfo.getClusterName() );
             hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
             Set<ContainerHost> hadoopNodes =
-                    hadoopEnvironment.getHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
+                    hadoopEnvironment.getContainerHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
             slaveNodesSelect.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
             for ( ContainerHost hadoopNode : hadoopNodes )
             {
@@ -195,7 +196,7 @@ public class ConfigurationStep extends Panel
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
                     Set<ContainerHost> hadoopNodes =
-                            hadoopEnvironment.getHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
+                            hadoopEnvironment.getContainerHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
                     slaveNodesSelect.setValue( null );
                     slaveNodesSelect
                             .setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, hadoopNodes ) );
@@ -224,13 +225,22 @@ public class ConfigurationStep extends Panel
                     config.setMasterNodeId( master.getId() );
 
                     //fill slave nodes without newly selected master node
-                    HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
                     config.getSlaveIds().remove( master.getId() );
 
+                    HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
                     hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
                     Set<ContainerHost> hadoopNodes =
-                            hadoopEnvironment.getHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
-                    hadoopNodes.remove( master );
+                            hadoopEnvironment.getContainerHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
+                    for ( Iterator<ContainerHost> iterator = hadoopNodes.iterator(); iterator.hasNext(); )
+                    {
+                        final ContainerHost haddopNode = iterator.next();
+
+                        if ( haddopNode.getId().equals( master.getId() ) )
+                        {
+                            iterator.remove();
+                            break;
+                        }
+                    }
                     slaveNodesSelect.getContainerDataSource().removeAllItems();
                     for ( ContainerHost hadoopNode : hadoopNodes )
                     {
@@ -245,7 +255,7 @@ public class ConfigurationStep extends Panel
                         slaveNodesSelect.removeValueChangeListener( h );
                     }
 
-                    slaveNodesSelect.setValue( hadoopEnvironment.getHostsByIds( config.getSlaveIds() ) );
+                    slaveNodesSelect.setValue( hadoopEnvironment.getContainerHostsByIds( config.getSlaveIds() ) );
                     if ( h != null )
                     {
                         slaveNodesSelect.addValueChangeListener( h );
@@ -256,12 +266,12 @@ public class ConfigurationStep extends Panel
 
         if ( config.getMasterNodeId() != null )
         {
-            masterNodeCombo.setValue( hadoopEnvironment.getContainerHostByUUID( config.getMasterNodeId() ) );
+            masterNodeCombo.setValue( hadoopEnvironment.getContainerHostById( config.getMasterNodeId() ) );
         }
 
         if ( !CollectionUtil.isCollectionEmpty( config.getSlaveIds() ) )
         {
-            slaveNodesSelect.setValue( hadoopEnvironment.getHostsByIds( config.getSlaveIds() ) );
+            slaveNodesSelect.setValue( hadoopEnvironment.getContainerHostsByIds( config.getSlaveIds() ) );
         }
 
         slaveNodesSelect.addValueChangeListener( new Property.ValueChangeListener()

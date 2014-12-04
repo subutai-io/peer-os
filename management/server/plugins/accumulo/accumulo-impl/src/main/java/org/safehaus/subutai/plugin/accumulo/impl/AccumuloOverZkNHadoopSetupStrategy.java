@@ -107,14 +107,14 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy
         for ( UUID node : zookeeperClusterConfig.getNodes() )
         {
             accumuloManager.getZkManager().startNode( zookeeperClusterConfig.getClusterName(),
-                    environment.getContainerHostByUUID( node ).getHostname() );
+                    environment.getContainerHostById( node ).getHostname() );
         }
 
         trackerOperation.addLog( "Installing Accumulo..." );
         for ( UUID uuid : accumuloClusterConfig.getAllNodes() )
         {
             CommandResult result;
-            ContainerHost host = environment.getContainerHostByUUID( uuid );
+            ContainerHost host = environment.getContainerHostById( uuid );
             if ( checkIfProductIsInstalled( host, HadoopClusterConfig.PRODUCT_NAME ) )
             {
                 if ( !checkIfProductIsInstalled( host, AccumuloClusterConfig.PRODUCT_NAME ) )

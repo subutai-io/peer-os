@@ -91,7 +91,8 @@ public class Commands
         appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( containerHost.getHostname() )
                    .append( "' >> '/etc/hosts';" );
 
-        return new CommandDef( "Add ip-host pair to /etc/hosts", appendHosts.toString(), 30 );
+        return new CommandDef( "Add ip-host pair to /etc/hosts",
+                String.format( "sh -c echo `%s`", appendHosts.toString() ), 30 );
     }
 
 

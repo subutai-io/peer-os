@@ -22,7 +22,6 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
@@ -445,7 +444,7 @@ public class ConfigurationStep extends Panel
         Environment hadoopEnvironment =
                 wizard.getEnvironmentManager().getEnvironment( hadoopInfo.getEnvironmentId().toString() );
         Set<ContainerHost> hadoopHosts = new HashSet<>();
-        for ( ContainerHost host : hadoopEnvironment.getContainers() )
+        for ( ContainerHost host : hadoopEnvironment.getContainerHosts() )
         {
             if ( host.getNodeGroupName().toLowerCase().contains( hadoopInfo.getProductName().toLowerCase() ) )
             {
