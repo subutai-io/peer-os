@@ -1,12 +1,14 @@
 #!/bin/bash
 
 main() {
-zfs_user=$1
-zfs_ip_address=$2
-base_template_name=$3
-target_template_name=$4
-list_of_packages_to_be_installed_on_target_container=$5
-version=$6
+jenkins_user=$1
+jenkins_ip=$2
+zfs_user=$3
+zfs_ip_address=$4
+base_template_name=$5
+target_template_name=$6
+list_of_packages_to_be_installed_on_target_container=$7
+version=$8
 
 # Variables
 remote_machine=$zfs_user@$zfs_ip_address
@@ -37,7 +39,7 @@ create_template_on_remote() {
   # Become superuser to be able to run commands that require sudo permissions
   # TODO make sure you added NOPASSWD to sudo on remote machine to disable prompt while becoming sudo
   sudo su
-  . /home/$zfs_user/jenkins/scripts/create_template_package.sh $base_template_name $target_template_name $list_of_packages_to_be_installed_on_target_container $version
+  . /home/$zfs_user/jenkins/scripts/create_template_package.sh $jenkins_user $jenkins_ip $base_template_name $target_template_name $list_of_packages_to_be_installed_on_target_container $version
 EOF
 
 }

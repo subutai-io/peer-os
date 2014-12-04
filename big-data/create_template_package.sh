@@ -3,13 +3,13 @@
 main() {
   # Environment specific variables
   #bridge_name=eth0
-  jenkins_user="jenkins"
-  jenkins_ip_address="172.16.1.178" 
+  jenkins_user="$1"
+  jenkins_ip_address="$2"
 
-  base_template_name=$1
-  target_template_name=$2
-  list_of_packages_to_be_installated_on_target_template=$3
-  version=$4
+  base_template_name=$3
+  target_template_name=$4
+  list_of_packages_to_be_installated_on_target_template=$5
+  version=$6
 
   echo "Parameters: $@"
   export SUBUTAI_OFFLINE_MODE=true  
@@ -41,12 +41,14 @@ main() {
 
 
 usage() {
-  echo "arg1 : template name which will be used as base during clone operation"
-  echo "arg2 : template name which will be created"
-  echo "arg3 : list of packages to be installed on target container"
-  echo "arg4 : version of the template package"
-  echo "Usage: $0 arg1 arg2 arg3 arg4"
-  echo "Ex: $0 master cassandra \"subutai-cassandra,openjdk-7-jre,expect\" 2.1.3"
+  echo "arg1 : jenkins user"
+  echo "arg2 : jenkins ip address"
+  echo "arg3 : template name which will be used as base during clone operation"
+  echo "arg4 : template name which will be created"
+  echo "arg5 : list of packages to be installed on target container"
+  echo "arg6 : version of the template package"
+  echo "Usage: $0 arg1 arg2 arg3 arg4 arg5 arg6"
+  echo "Ex: $0 jenkins 172.16.9.15 master cassandra \"subutai-cassandra,openjdk-7-jre,expect\" 2.1.3"
   exit 1
 }
 
