@@ -6,6 +6,7 @@ zfs_ip_address=$2
 base_template_name=$3
 target_template_name=$4
 list_of_packages_to_be_installed_on_target_container=$5
+version=$6
 
 # Variables
 remote_machine=$zfs_user@$zfs_ip_address
@@ -36,21 +37,27 @@ create_template_on_remote() {
   # Become superuser to be able to run commands that require sudo permissions
   # TODO make sure you added NOPASSWD to sudo on remote machine to disable prompt while becoming sudo
   sudo su
-  . /home/$zfs_user/jenkins/scripts/create_template_package.sh $base_template_name $target_template_name $list_of_packages_to_be_installed_on_target_container
+  . /home/$zfs_user/jenkins/scripts/create_template_package.sh $base_template_name $target_template_name $list_of_packages_to_be_installed_on_target_container $version
 EOF
 
 }
 
 get_template_package_from_remote() {
+  rm -f $directory_to_copy_package/$target_template_name*_"$version"_*.deb
   mkdir -p $directory_to_copy_package
   pushd $directory_to_copy_package > /dev/null
 
   sftp $remote_machine << EOF
-  get /lxc-data/tmpdir/$target_template_name-subutai-template*.deb .
+  get /lxc-data/tmpdir/$target_template_name-*_"$version"_*.deb .
   bye
 EOF
+
+  if [ ! -f $directory_to_copy_package/$target_template_name*_"$version"_*.deb ]; then
+    echo "Could not find $target_template_name package with version $version under $directory_to_copy_package. Aborting!"
+    exit 1
+  fi
   popd
-  echo "Debian package of $target_template_name template is downloaded under $directory_to_copy_package"
+  echo "Debian package of $target_template_name template with version $version is downloaded under $directory_to_copy_package"
 }
 
-main $1 $2 $3 $4 $5
+main "$@"

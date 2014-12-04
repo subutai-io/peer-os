@@ -104,5 +104,5 @@ export_master_template() {
   echo "Size of master template package is: " `du -hs /lxc-data/tmpdir/master-subutai-template*.deb`
 }
 
-main "$1" "$2"
+main "$@"
 exit 0
