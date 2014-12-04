@@ -261,7 +261,7 @@ function get_exported_package_version {
 
   if ls $debian_file 1> /dev/null 2>&1; then
     # Get the version of latest exported package
-    echo "$(ls -lt $debian_file | cut -d'_' -f2 | sed -n 1p)"
+    echo "$(ls -lt $debian_file | awk '{print $9}' | cut -d'_' -f2 | sed -n 1p)"
   else
     echo "$SUBUTAI_VERSION"
   fi
