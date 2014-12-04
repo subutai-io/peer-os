@@ -14,7 +14,7 @@ function get_total_ram {
 
   local physical_total_ram=$(get_physical_total_ram)
   local ram_quota=$(lxc_get_memory $lxc)
-  assert_number "$ram_quota"
+  assert_number "$ram_quota"  > /dev/null
 
   if (( $(bc <<< "$ram_quota <= $physical_total_ram") == 1 )); then
     echo "$ram_quota"
@@ -118,7 +118,7 @@ function get_average_cpu_usage_between_samples {
     exit 1
   fi
 
-  assert_metric $metric_type
+  assert_metric $metric_type > /dev/null
 
   local cpu_values=$(query_rrd $lxc "$metric_type" | tail -$(($sampleCountToAverage + 1)) | grep "e+")
   local line_count=$(echo -e "$cpu_values" | wc -l)
@@ -180,7 +180,7 @@ function get_metric_average {
     msg_error "Sample count to be averaged cannot be less than \"1\". Aborting!"
     exit 1
   fi
-  assert_metric $metric_type
+  assert_metric $metric_type > /dev/null
 
   local maxSampleCount=$(get_max_sample_count)
   if [ $sampleCountToAverage -gt $maxSampleCount ]; then
@@ -643,7 +643,7 @@ function get_update_interval_in_minutes {
     msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
     exit 1
   fi
-  assert_metric $metric_type
+  assert_metric $metric_type > /dev/null
 
   # Get configuration parameters
   get_monitor_configuration "$hostname" "$metric_type"
@@ -665,7 +665,7 @@ function get_alert_interval_in_minutes {
     msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
     exit 1
   fi
-  assert_metric $metric_type
+  assert_metric $metric_type > /dev/null
 
   # Get configuration parameters
   get_monitor_configuration "$hostname" "$metric_type"
@@ -687,7 +687,7 @@ function get_update_sequence {
     msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
     exit 1
   fi
-  assert_metric $metric_type
+  assert_metric $metric_type > /dev/null
 
   local interval_in_minutes=$(get_update_interval_in_minutes $hostname $metric_type)
   echo "$(($interval_in_minutes * 60))"
