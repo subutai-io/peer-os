@@ -1049,6 +1049,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
+            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+            {
+                containerHostDataService.remove( containerHost.getHostId() );
+            }
+            resourceHost.getContainerHosts().clear();
             resourceHostDataService.remove( resourceHost.getHostId() );
             //            peerDAO.deleteInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString() );
         }
