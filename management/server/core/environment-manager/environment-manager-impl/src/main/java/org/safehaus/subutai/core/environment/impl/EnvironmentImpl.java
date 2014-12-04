@@ -48,11 +48,11 @@ public class EnvironmentImpl implements Environment, Serializable
     @Column( name = "create_time" )
     private long creationTimestamp;
 
-    @Column( name = "public_key" )
+    @Column( name = "public_key", length = 3000 )
     private String publicKey;
 
 
-    private EnvironmentImpl()
+    protected EnvironmentImpl()
     {
     }
 
@@ -132,6 +132,7 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
+    @Override
     public void setPublicKey( String publicKey )
     {
         this.publicKey = publicKey;

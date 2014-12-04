@@ -45,7 +45,7 @@ public interface EnvironmentManager
 
     boolean deleteBlueprint( UUID blueprintId );
 
-    void saveEnvironment( final Environment environment ) throws EnvironmentManagerException;
+    void saveEnvironment( final Environment environment );
 
     boolean saveBuildProcess( EnvironmentBuildProcess buildProgress ) throws EnvironmentManagerException;
 

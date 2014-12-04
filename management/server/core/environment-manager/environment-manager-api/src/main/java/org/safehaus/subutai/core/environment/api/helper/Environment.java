@@ -33,6 +33,9 @@ public interface Environment
     public String getPublicKey();
 
 
+    public void setPublicKey( String key );
+
+
     public ContainerHost getContainerHostById( UUID uuid );
 
 

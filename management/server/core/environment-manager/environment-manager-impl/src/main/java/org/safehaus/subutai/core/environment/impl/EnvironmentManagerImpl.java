@@ -315,7 +315,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void saveEnvironment( final Environment environment ) throws EnvironmentManagerException
+    public void saveEnvironment( final Environment environment )
     {
 
         if ( environmentDataService.find( environment.getId().toString() ) == null )
