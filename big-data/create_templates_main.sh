@@ -35,6 +35,8 @@ assert_passwordless_ssh_to_remote() {
 
 
 create_template_on_remote() {
+  # Send the latest create_template_package.sh script to remote machine
+  scp /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/create_template_package.sh $remote_machine:/home/$zfs_user/jenkins/scripts/
   ssh $remote_machine /bin/bash << EOF
   # Become superuser to be able to run commands that require sudo permissions
   # TODO make sure you added NOPASSWD to sudo on remote machine to disable prompt while becoming sudo
