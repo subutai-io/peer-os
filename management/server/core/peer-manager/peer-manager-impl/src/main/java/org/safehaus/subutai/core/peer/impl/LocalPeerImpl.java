@@ -1042,13 +1042,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     {
         if ( managementHost != null && managementHost.getId() != null )
         {
-            peerDAO.deleteInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId().toString() );
+            //            peerDAO.deleteInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId().toString() );
+            managementHostDataService.remove( managementHost.getHostId() );
             managementHost = null;
         }
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
-            peerDAO.deleteInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString() );
+            resourceHostDataService.remove( resourceHost.getHostId() );
+            //            peerDAO.deleteInfo( SOURCE_RESOURCE_HOST, resourceHost.getId().toString() );
         }
         resourceHosts.clear();
     }
