@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.key.impl;
 
 
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,6 +9,7 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.key.api.KeyInfo;
 import org.safehaus.subutai.core.key.api.KeyManager;
 import org.safehaus.subutai.core.key.api.KeyManagerException;
@@ -16,9 +18,7 @@ import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.apache.commons.validator.routines.UrlValidator;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -70,6 +70,52 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
+    protected Set<KeyInfo> parseKeysFromOutput( String output )
+    {
+        Set<KeyInfo> keyInfoSet = Sets.newHashSet();
+
+        String eol = System.getProperty( "line.separator" );
+        List<String> lines = StringUtil.splitString( output, eol );
+        int i = 0;
+        Pattern keyPattern = Pattern.compile( "\\s*(\\w+)\\s*(\\w+(?:\\s*:\\s*\\w+)*)\\s*(\\w+)\\s*(.+)" );
+        for ( String line : lines )
+        {
+            //skip headers
+            if ( i > 0 )
+            {
+                Matcher keyMatcher = keyPattern.matcher( line );
+                if ( keyMatcher.find() )
+                {
+                    String pubKeyId = keyMatcher.group( 1 );
+                    String subKeyIdsString = keyMatcher.group( 2 );
+                    String realName = keyMatcher.group( 3 );
+                    String email = keyMatcher.group( 4 );
+                    //parse sub keys to set
+                    Set<String> subKeyIds = parseSubKeyIds( subKeyIdsString );
+
+                    keyInfoSet.add( new KeyInfoImpl( realName, email, pubKeyId, subKeyIds ) );
+                }
+            }
+            i++;
+        }
+
+        return keyInfoSet;
+    }
+
+
+    protected Set<String> parseSubKeyIds( String subKeyIdsString )
+    {
+        Set<String> subKeys = Sets.newHashSet();
+
+        List<String> subKeyIds = StringUtil.splitString( subKeyIdsString, ":" );
+        for ( String subKeyId : subKeyIds )
+        {
+            subKeys.add( subKeyId );
+        }
+        return subKeys;
+    }
+
+
     @Override
     public KeyInfo generateKey( final String realName, final String email ) throws KeyManagerException
     {
@@ -78,65 +124,72 @@ public class KeyManagerImpl implements KeyManager
 
         String output = execute( commands.getGenerateKeyCommand( realName, email ) );
 
-        Pattern keyPattern = Pattern.compile(
-                "pub id\\s*:\\s*(\\w+)\\s*sub ids\\s*:\\s*(\\w+(?:\\s*,\\s*\\w+)*)\\s*uid\\s*:\\s*(\\w+)"
-                        + "\\s*mail\\s*:\\s*(\\w+)" );
-
-        Matcher keyMatcher = keyPattern.matcher( output );
-
-        if ( keyMatcher.find() )
+        Set<KeyInfo> keyInfoSet = parseKeysFromOutput( output );
+        if ( !keyInfoSet.isEmpty() )
         {
-            //pub id
-            String pubId = keyMatcher.group( 1 );
-            //sub ids
-            String subIds = keyMatcher.group( 2 );
-            //uid
-            String userId = keyMatcher.group( 3 );
-            //email
-            String eMail = keyMatcher.group( 4 );
-            //parse sub ids
-            String[] subIdsArray = StringUtils.split( subIds, ',' );
-            Set<String> subIdsSet = Sets.newHashSet();
-            for ( String subId : subIdsArray )
-            {
-                subIdsSet.add( subId.trim() );
-            }
-
-            return new KeyInfoImpl( userId, eMail, pubId, subIdsSet );
+            return keyInfoSet.iterator().next();
         }
         else
         {
-            throw new KeyManagerException( String.format( "Could not parse output of command:%n%s", output ) );
+            throw new KeyManagerException(
+                    String.format( "Could not obtain key info from command output:%n%s", output ) );
         }
     }
 
 
     @Override
-    public void exportSshKey( final String keyId, final String pathToExportedSshKey ) throws KeyManagerException
+    public void exportSshKey( final String keyId, final String exportPath ) throws KeyManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( pathToExportedSshKey ), "Invalid export path" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( exportPath ), "Invalid export path" );
 
-        execute( commands.getExportSshKeyCommand( keyId, pathToExportedSshKey ) );
+        execute( commands.getExportSshKeyCommand( keyId, exportPath ) );
     }
 
 
     @Override
-    public void signFileWithKey( final String keyId, final String pathToFileToBeSigned ) throws KeyManagerException
+    public void signFileWithKey( final String keyId, final String filePath ) throws KeyManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( pathToFileToBeSigned ), "Invalid file path" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( filePath ), "Invalid file path" );
 
-        execute( commands.getSignCommand( keyId, pathToFileToBeSigned ) );
+        execute( commands.getSignCommand( keyId, filePath ) );
     }
 
 
     @Override
-    public void sendKeyToUrl( final String keyId, final String url ) throws KeyManagerException
+    public void sendKeyToHub( final String keyId ) throws KeyManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
-        Preconditions.checkArgument( UrlValidator.getInstance().isValid( url ), "Invalid url" );
 
-        execute( commands.getSendKeyCommand( keyId, url ) );
+        execute( commands.getSendKeyCommand( keyId ) );
+    }
+
+
+    @Override
+    public KeyInfo getKey( final String keyId ) throws KeyManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
+
+        String output = execute( commands.getListKeyCommand( keyId ) );
+
+        Set<KeyInfo> keyInfoSet = parseKeysFromOutput( output );
+        if ( !keyInfoSet.isEmpty() )
+        {
+            return keyInfoSet.iterator().next();
+        }
+        else
+        {
+            throw new KeyManagerException( String.format( "Key %s not found in command output:%n%s", keyId, output ) );
+        }
+    }
+
+
+    @Override
+    public Set<KeyInfo> getKeys() throws KeyManagerException
+    {
+        String output = execute( commands.getListKeysCommand() );
+
+        return parseKeysFromOutput( output );
     }
 }

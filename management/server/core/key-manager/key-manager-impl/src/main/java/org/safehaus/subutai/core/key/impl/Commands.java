@@ -35,9 +35,9 @@ public class Commands
     }
 
 
-    public RequestBuilder getSendKeyCommand( String keyId, String url )
+    public RequestBuilder getSendKeyCommand( String keyId )
     {
-        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "send", keyId, url ) );
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "send", keyId ) );
     }
 
 
