@@ -11,6 +11,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
@@ -27,17 +28,15 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
 
     private static final Logger LOG = LoggerFactory.getLogger( ClusterOperationHandler.class.getName() );
     private ClusterOperationType operationType;
-    private HadoopClusterConfig hadoopConfig;
     private Environment environment;
     private ContainerHost master;
 
 
     public ClusterOperationHandler( final SparkImpl manager, final SparkClusterConfig config,
-                                    final ClusterOperationType operationType, HadoopClusterConfig hadoopClusterConfig )
+                                    final ClusterOperationType operationType )
     {
         super( manager, config );
         this.operationType = operationType;
-        this.hadoopConfig = hadoopClusterConfig;
         trackerOperation = manager.getTracker().createTrackerOperation( SparkClusterConfig.PRODUCT_KEY,
                 String.format( "Executing %s operation on cluster %s", operationType.name(), clusterName ) );
     }
@@ -206,6 +205,15 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
             }
 
             trackerOperation.addLogDone( "Cluster uninstalled successfully" );
+
+            try
+            {
+                manager.unsubscribeFromAlerts( environment );
+            }
+            catch ( MonitorException e )
+            {
+                throw new ClusterException( e );
+            }
         }
         catch ( ClusterException e )
         {
@@ -220,6 +228,14 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
     {
         try
         {
+            HadoopClusterConfig hadoopConfig = manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
+
+            if ( hadoopConfig == null )
+            {
+                throw new ClusterException(
+                        String.format( "Could not find Hadoop cluster %s", config.getHadoopClusterName() ) );
+            }
+
             Environment env = manager.getEnvironmentManager().getEnvironmentByUUID( hadoopConfig.getEnvironmentId() );
             if ( env == null )
             {
@@ -234,10 +250,17 @@ public class ClusterOperationHandler extends AbstractOperationHandler<SparkImpl,
                 trackerOperation.addLog( "Setting up cluster..." );
                 s.setup();
                 trackerOperation.addLogDone( "Cluster setup completed" );
+
+                //subscribe to alerts
+                manager.subscribeToAlerts( env );
             }
-            catch ( ClusterSetupException ex )
+            catch ( ClusterSetupException e )
             {
-                throw new ClusterException( "Failed to setup cluster: " + ex.getMessage() );
+                throw new ClusterException( "Failed to setup cluster: " + e.getMessage() );
+            }
+            catch ( MonitorException e )
+            {
+                throw new ClusterException( "Failed to subscribe to alerts: " + e.getMessage() );
             }
         }
         catch ( ClusterException e )

@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.spark.ui.wizard;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -224,13 +225,22 @@ public class ConfigurationStep extends Panel
                     config.setMasterNodeId( master.getId() );
 
                     //fill slave nodes without newly selected master node
-                    HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
                     config.getSlaveIds().remove( master.getId() );
 
+                    HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
                     hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopInfo.getEnvironmentId() );
                     Set<ContainerHost> hadoopNodes =
                             hadoopEnvironment.getContainerHostsByIds( Sets.newHashSet( hadoopInfo.getAllNodes() ) );
-                    hadoopNodes.remove( master );
+                    for ( Iterator<ContainerHost> iterator = hadoopNodes.iterator(); iterator.hasNext(); )
+                    {
+                        final ContainerHost haddopNode = iterator.next();
+
+                        if ( haddopNode.getId().equals( master.getId() ) )
+                        {
+                            iterator.remove();
+                            break;
+                        }
+                    }
                     slaveNodesSelect.getContainerDataSource().removeAllItems();
                     for ( ContainerHost hadoopNode : hadoopNodes )
                     {

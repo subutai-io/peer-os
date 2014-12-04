@@ -30,7 +30,8 @@ public abstract class EnvironmentBuildProcessFactory
             throws ProcessBuilderException;
 
 
-    public List<Template> fetchRequiredTemplates( UUID sourcePeerId, final String templateName ) throws ProcessBuilderException
+    public List<Template> fetchRequiredTemplates( UUID sourcePeerId, final String templateName )
+            throws ProcessBuilderException
     {
         List<Template> requiredTemplates = new ArrayList<>();
         List<Template> templates = environmentManager.getTemplateRegistry().getParentTemplates( templateName );
@@ -39,6 +40,10 @@ public abstract class EnvironmentBuildProcessFactory
         if ( installationTemplate != null )
         {
             templates.add( installationTemplate );
+        }
+        else
+        {
+            throw new ProcessBuilderException( String.format( "Template %s is not found in registry", templateName ) );
         }
 
 

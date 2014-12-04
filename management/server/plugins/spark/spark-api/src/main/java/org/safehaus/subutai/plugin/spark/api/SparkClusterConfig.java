@@ -22,8 +22,20 @@ public class SparkClusterConfig implements ConfigBase
     private String hadoopClusterName = "";
     private UUID masterNodeId;
     private Set<UUID> slaveIds = new HashSet<>();
-    private Set<UUID> hadoopNodeIds = new HashSet<>();
     private UUID environmentId;
+    private boolean autoScaling;
+
+
+    public boolean isAutoScaling()
+    {
+        return autoScaling;
+    }
+
+
+    public void setAutoScaling( final boolean autoScaling )
+    {
+        this.autoScaling = autoScaling;
+    }
 
 
     public UUID getEnvironmentId()
@@ -47,12 +59,6 @@ public class SparkClusterConfig implements ConfigBase
     public Set<UUID> getSlaveIds()
     {
         return slaveIds;
-    }
-
-
-    public Set<UUID> getHadoopNodeIds()
-    {
-        return hadoopNodeIds;
     }
 
 

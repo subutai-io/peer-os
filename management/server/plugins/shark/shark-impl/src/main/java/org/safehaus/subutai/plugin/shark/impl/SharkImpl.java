@@ -12,7 +12,6 @@ import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.impl.handler.ClusterOperationHandler;
@@ -34,7 +33,7 @@ public class SharkImpl implements Shark
 
     private static
 
-        final Logger LOG = LoggerFactory.getLogger( SharkImpl.class.getName() );
+    final Logger LOG = LoggerFactory.getLogger( SharkImpl.class.getName() );
     private Spark sparkManager;
     private Hadoop hadoopManager;
     private Tracker tracker;
@@ -149,16 +148,6 @@ public class SharkImpl implements Shark
     public SharkClusterConfig getCluster( String clusterName )
     {
         return pluginDAO.getInfo( SharkClusterConfig.PRODUCT_KEY, clusterName, SharkClusterConfig.class );
-    }
-
-
-    @Override
-    public UUID installCluster( SharkClusterConfig config, HadoopClusterConfig hadoopConfig )
-    {
-        AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL, hadoopConfig );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
     }
 
 

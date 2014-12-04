@@ -24,7 +24,6 @@ import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -337,12 +336,12 @@ public class Manager
 
                 if ( containerHost != null )
                 {
-                    TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( containerHost ) );
+                    TerminalWindow terminal = new TerminalWindow( containerHost );
                     contentRoot.getUI().addWindow( terminal.getWindow() );
                 }
                 else
                 {
-                    show( "Agent is not connected" );
+                    show( "Host not found" );
                 }
             }
         } );
@@ -359,11 +358,11 @@ public class Manager
     {
         if ( config != null )
         {
-            populateTable( serverTable,
-                    getServers( environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts(),
+            populateTable( serverTable, getServers(
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts(),
                             config ) );
-            populateTable( clientsTable,
-                    getClients( environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts(),
+            populateTable( clientsTable, getClients(
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts(),
                             config ) );
         }
         else
@@ -437,15 +436,15 @@ public class Manager
                     public void buttonClick( Button.ClickEvent clickEvent )
                     {
                         ConfirmationDialog alert = new ConfirmationDialog(
-                                String.format( "Do you want to destroy node  %s?",
-                                        containerHost.getHostname() ), "Yes", "No" );
+                                String.format( "Do you want to destroy node  %s?", containerHost.getHostname() ), "Yes",
+                                "No" );
                         alert.getOk().addClickListener( new Button.ClickListener()
                         {
                             @Override
                             public void buttonClick( Button.ClickEvent clickEvent )
                             {
-                                UUID trackID = hive.uninstallNode( config.getClusterName(),
-                                        containerHost.getHostname() );
+                                UUID trackID =
+                                        hive.uninstallNode( config.getClusterName(), containerHost.getHostname() );
                                 ProgressWindow window =
                                         new ProgressWindow( executorService, tracker, trackID, HiveConfig.PRODUCT_KEY );
                                 window.getWindow().addCloseListener( new Window.CloseListener()

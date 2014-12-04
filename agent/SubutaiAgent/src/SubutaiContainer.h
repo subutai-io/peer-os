@@ -79,7 +79,6 @@ class SubutaiContainer
         SubutaiContainer(SubutaiLogger*, lxc_container*);
         virtual ~SubutaiContainer(void);
         bool getContainerId();
-        void tryLongCommand();
         void UpdateUsersList();
         void getContainerAllFields();
         bool getContainerInterfaces();

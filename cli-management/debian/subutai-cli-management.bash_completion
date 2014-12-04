@@ -8,7 +8,7 @@ _subutai_management()
     opts=$(for x in `ls ${bindings}`; do echo ${x} ; done )
     case "${prev}" in
         management_network)
-            localArgs="-c -l -r -b -f -s -p -d -N -L -R -T -D -m -M"
+            localArgs="-c -l -r -b -f -s -p -d -N -L -R -T -D -m -v -M "
             COMPREPLY=( $(compgen -W "${localArgs}" -- ${cur}))
             return 0
             ;;
