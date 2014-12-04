@@ -1,9 +1,7 @@
 package org.safehaus.subutai.plugin.sqoop.ui.manager;
 
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -223,13 +221,12 @@ public class Manager
                     ContainerHost host = environment.getContainerHostByHostname( hostname );
                     if ( host != null && host.isConnected() )
                     {
-                        HashSet<ContainerHost> set = new HashSet<>( Arrays.asList( host ) );
-                        TerminalWindow terminal = new TerminalWindow( set );
+                        TerminalWindow terminal = new TerminalWindow( host );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Node not found or is not connected" );
+                        show( "Host not found" );
                     }
                 }
             }

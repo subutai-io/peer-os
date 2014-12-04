@@ -6,11 +6,16 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
+import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.metric.api.Monitor;
+import org.safehaus.subutai.core.metric.api.MonitorException;
+import org.safehaus.subutai.core.metric.api.MonitoringSettings;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.NodeType;
@@ -27,10 +32,30 @@ import com.google.common.base.Preconditions;
 public class SparkImpl extends SparkBase implements Spark
 {
 
+    private final MonitoringSettings alertSettings = new MonitoringSettings().withIntervalBetweenAlertsInMin( 45 );
+    private SparkAlertListener sparkAlertListener;
+
+
     public SparkImpl( final DataSource dataSource, final Tracker tracker, final EnvironmentManager environmentManager,
-                      final Hadoop hadoopManager )
+                      final Hadoop hadoopManager, final Monitor monitor )
     {
-        super( dataSource, tracker, environmentManager, hadoopManager );
+        super( dataSource, tracker, environmentManager, hadoopManager, monitor );
+
+        //subscribe to alerts
+        sparkAlertListener = new SparkAlertListener( this );
+        monitor.addAlertListener( sparkAlertListener );
+    }
+
+
+    public void subscribeToAlerts( Environment environment ) throws MonitorException
+    {
+        getMonitor().startMonitoring( sparkAlertListener, environment, alertSettings );
+    }
+
+
+    public void subscribeToAlerts( ContainerHost host ) throws MonitorException
+    {
+        getMonitor().activateMonitoring( host, alertSettings );
     }
 
 
@@ -41,7 +66,7 @@ public class SparkImpl extends SparkBase implements Spark
         Preconditions.checkNotNull( config, "Configuration is null" );
 
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL, null );
+                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
 
         executor.execute( operationHandler );
 
@@ -55,7 +80,7 @@ public class SparkImpl extends SparkBase implements Spark
 
         SparkClusterConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL, null );
+                new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL );
 
         executor.execute( operationHandler );
 
@@ -143,7 +168,7 @@ public class SparkImpl extends SparkBase implements Spark
     {
         SparkClusterConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.START_ALL, null );
+                new ClusterOperationHandler( this, config, ClusterOperationType.START_ALL );
 
         executor.execute( operationHandler );
 
@@ -170,7 +195,7 @@ public class SparkImpl extends SparkBase implements Spark
     {
         SparkClusterConfig config = getCluster( clusterName );
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.STOP_ALL, null );
+                new ClusterOperationHandler( this, config, ClusterOperationType.STOP_ALL );
 
         executor.execute( operationHandler );
 
@@ -202,5 +227,23 @@ public class SparkImpl extends SparkBase implements Spark
         Preconditions.checkNotNull( clusterConfig, "Spark cluster config is null" );
 
         return new SetupStrategyOverHadoop( po, this, clusterConfig, environment );
+    }
+
+
+    @Override
+    public void saveConfig( final SparkClusterConfig config ) throws ClusterException
+    {
+        Preconditions.checkNotNull( config );
+
+        if ( !getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
+        {
+            throw new ClusterException( "Could not save cluster info" );
+        }
+    }
+
+
+    public void unsubscribeFromAlerts( final Environment environment ) throws MonitorException
+    {
+        getMonitor().stopMonitoring( sparkAlertListener, environment );
     }
 }

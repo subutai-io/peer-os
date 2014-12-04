@@ -25,7 +25,6 @@ import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -591,12 +590,12 @@ public class Manager
                     ContainerHost containerHost = environment.getContainerHostByHostname( lxcHostname );
                     if ( containerHost != null )
                     {
-                        TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( containerHost ) );
+                        TerminalWindow terminal = new TerminalWindow( containerHost );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Host is not connected" );
+                        show( "Host not found" );
                     }
                 }
             }

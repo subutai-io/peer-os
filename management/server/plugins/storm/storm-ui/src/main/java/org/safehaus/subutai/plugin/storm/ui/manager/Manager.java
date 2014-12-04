@@ -30,7 +30,6 @@ import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -167,7 +166,8 @@ public class Manager
                 }
 
                 UUID trackId = storm.addNode( config.getClusterName() );
-                ProgressWindow pw = new ProgressWindow( executorService, tracker, trackId, StormClusterConfiguration.PRODUCT_NAME );
+                ProgressWindow pw =
+                        new ProgressWindow( executorService, tracker, trackId, StormClusterConfiguration.PRODUCT_NAME );
                 pw.getWindow().addCloseListener( new Window.CloseListener()
                 {
 
@@ -229,14 +229,15 @@ public class Manager
                 {
                     String containerName =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Environment environment =
-                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+                    Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
 
                     ContainerHost containerHost = environment.getContainerHostByHostname( containerName );
 
                     // Check if the node is involved inside Zookeeper cluster
-                    if ( containerHost == null ) {
-                        ZookeeperClusterConfig zookeeperCluster = zookeeper.getCluster( config.getZookeeperClusterName() );
+                    if ( containerHost == null )
+                    {
+                        ZookeeperClusterConfig zookeeperCluster =
+                                zookeeper.getCluster( config.getZookeeperClusterName() );
                         if ( zookeeperCluster != null )
                         {
                             Environment zookeeperEnvironment =
@@ -247,13 +248,12 @@ public class Manager
 
                     if ( containerHost != null )
                     {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( containerHost ) );
+                        TerminalWindow terminal = new TerminalWindow( containerHost );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Host not found" );
                     }
                 }
             }
@@ -274,9 +274,12 @@ public class Manager
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
             Set<ContainerHost> nimbusHost = new HashSet<>();
-            if ( ! config.isExternalZookeeper() )
+            if ( !config.isExternalZookeeper() )
+            {
                 nimbusHost.add( environment.getContainerHostById( config.getNimbus() ) );
-            else {
+            }
+            else
+            {
                 ZookeeperClusterConfig zookeeperCluster = zookeeper.getCluster( config.getZookeeperClusterName() );
                 Environment zookeeperEnvironment =
                         environmentManager.getEnvironmentByUUID( zookeeperCluster.getEnvironmentId() );
@@ -285,7 +288,8 @@ public class Manager
             populateTable( masterTable, true, nimbusHost );
 
             Set<ContainerHost> supervisorHosts = new HashSet<>();
-            for ( UUID uuid : config.getSupervisors() ) {
+            for ( UUID uuid : config.getSupervisors() )
+            {
                 supervisorHosts.add( environment.getContainerHostById( uuid ) );
             }
             populateTable( workersTable, false, supervisorHosts );
@@ -342,14 +346,15 @@ public class Manager
                     {
 
                         ConfirmationDialog alert = new ConfirmationDialog(
-                                String.format( "Do you want to destroy the %s node?", containerHost.getHostname() ), "Yes",
-                                "No" );
+                                String.format( "Do you want to destroy the %s node?", containerHost.getHostname() ),
+                                "Yes", "No" );
                         alert.getOk().addClickListener( new Button.ClickListener()
                         {
                             @Override
                             public void buttonClick( Button.ClickEvent clickEvent )
                             {
-                                UUID trackID = storm.destroyNode( config.getClusterName(), containerHost.getHostname() );
+                                UUID trackID =
+                                        storm.destroyNode( config.getClusterName(), containerHost.getHostname() );
                                 ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                         StormClusterConfiguration.PRODUCT_NAME );
                                 window.getWindow().addCloseListener( new Window.CloseListener()
@@ -385,25 +390,26 @@ public class Manager
                             ( ( Button ) e ).setEnabled( false );
                         }
                     }
-                    executorService.execute( new StormNodeOperationTask( storm, tracker, config.getClusterName(),
-                            containerHost, NodeOperationType.STATUS, new CompleteEvent()
-                    {
-
-                        @Override
-                        public void onComplete( final NodeState state )
-                        {
-                            boolean running = state == NodeState.RUNNING;
-                            checkBtn.setEnabled( true );
-                            startBtn.setEnabled( !running );
-                            stopBtn.setEnabled( running );
-                            restartBtn.setEnabled( running );
-                            if ( destroyBtn != null )
+                    executorService.execute(
+                            new StormNodeOperationTask( storm, tracker, config.getClusterName(), containerHost,
+                                    NodeOperationType.STATUS, new CompleteEvent()
                             {
-                                destroyBtn.setEnabled( true );
-                            }
-                            icon.setVisible( false );
-                        }
-                    }, null ) );
+
+                                @Override
+                                public void onComplete( final NodeState state )
+                                {
+                                    boolean running = state == NodeState.RUNNING;
+                                    checkBtn.setEnabled( true );
+                                    startBtn.setEnabled( !running );
+                                    stopBtn.setEnabled( running );
+                                    restartBtn.setEnabled( running );
+                                    if ( destroyBtn != null )
+                                    {
+                                        destroyBtn.setEnabled( true );
+                                    }
+                                    icon.setVisible( false );
+                                }
+                            }, null ) );
                 }
             } );
 
@@ -421,34 +427,36 @@ public class Manager
                             ( ( Button ) e ).setEnabled( false );
                         }
                     }
-                    executorService.execute( new StormNodeOperationTask( storm, tracker, config.getClusterName(),
-                            containerHost, NodeOperationType.START, new CompleteEvent()
-                    {
-
-                        @Override
-                        public void onComplete( final NodeState state )
-                        {
-                            executorService.execute( new StormNodeOperationTask( storm, tracker, config.getClusterName(),
-                                    containerHost, NodeOperationType.STATUS, new CompleteEvent() {
+                    executorService.execute(
+                            new StormNodeOperationTask( storm, tracker, config.getClusterName(), containerHost,
+                                    NodeOperationType.START, new CompleteEvent()
+                            {
 
                                 @Override
                                 public void onComplete( final NodeState state )
                                 {
-                                    boolean running = state == NodeState.RUNNING;
-                                    checkBtn.setEnabled( true );
-                                    startBtn.setEnabled( !running );
-                                    stopBtn.setEnabled( running );
-                                    restartBtn.setEnabled( running );
-                                    if ( destroyBtn != null )
-                                    {
-                                        destroyBtn.setEnabled( true );
-                                    }
-                                    icon.setVisible( false );
-                                }
-                            }, null ) ) ;
+                                    executorService.execute(
+                                            new StormNodeOperationTask( storm, tracker, config.getClusterName(),
+                                                    containerHost, NodeOperationType.STATUS, new CompleteEvent()
+                                            {
 
-                        }
-                    }, null ) );
+                                                @Override
+                                                public void onComplete( final NodeState state )
+                                                {
+                                                    boolean running = state == NodeState.RUNNING;
+                                                    checkBtn.setEnabled( true );
+                                                    startBtn.setEnabled( !running );
+                                                    stopBtn.setEnabled( running );
+                                                    restartBtn.setEnabled( running );
+                                                    if ( destroyBtn != null )
+                                                    {
+                                                        destroyBtn.setEnabled( true );
+                                                    }
+                                                    icon.setVisible( false );
+                                                }
+                                            }, null ) );
+                                }
+                            }, null ) );
                 }
             } );
 
@@ -466,34 +474,36 @@ public class Manager
                             ( ( Button ) e ).setEnabled( false );
                         }
                     }
-                    executorService.execute( new StormNodeOperationTask( storm, tracker, config.getClusterName(),
-                            containerHost, NodeOperationType.STOP, new CompleteEvent()
-                    {
-
-                        @Override
-                        public void onComplete( final NodeState state )
-                        {
-                            executorService.execute( new StormNodeOperationTask( storm, tracker, config.getClusterName(),
-                                    containerHost, NodeOperationType.STATUS, new CompleteEvent() {
+                    executorService.execute(
+                            new StormNodeOperationTask( storm, tracker, config.getClusterName(), containerHost,
+                                    NodeOperationType.STOP, new CompleteEvent()
+                            {
 
                                 @Override
                                 public void onComplete( final NodeState state )
                                 {
-                                    boolean running = state == NodeState.RUNNING;
-                                    checkBtn.setEnabled( true );
-                                    startBtn.setEnabled( !running );
-                                    stopBtn.setEnabled( running );
-                                    restartBtn.setEnabled( running );
-                                    if ( destroyBtn != null )
-                                    {
-                                        destroyBtn.setEnabled( true );
-                                    }
-                                    icon.setVisible( false );
+                                    executorService.execute(
+                                            new StormNodeOperationTask( storm, tracker, config.getClusterName(),
+                                                    containerHost, NodeOperationType.STATUS, new CompleteEvent()
+                                            {
+
+                                                @Override
+                                                public void onComplete( final NodeState state )
+                                                {
+                                                    boolean running = state == NodeState.RUNNING;
+                                                    checkBtn.setEnabled( true );
+                                                    startBtn.setEnabled( !running );
+                                                    stopBtn.setEnabled( running );
+                                                    restartBtn.setEnabled( running );
+                                                    if ( destroyBtn != null )
+                                                    {
+                                                        destroyBtn.setEnabled( true );
+                                                    }
+                                                    icon.setVisible( false );
+                                                }
+                                            }, null ) );
                                 }
                             }, null ) );
-
-                        }
-                    }, null ) );
                 }
             } );
 
@@ -564,7 +574,8 @@ public class Manager
 
         UUID trackID = storm.uninstallCluster( config.getClusterName() );
 
-        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID, StormClusterConfiguration.PRODUCT_NAME );
+        ProgressWindow window =
+                new ProgressWindow( executorService, tracker, trackID, StormClusterConfiguration.PRODUCT_NAME );
         window.getWindow().addCloseListener( new Window.CloseListener()
         {
             @Override

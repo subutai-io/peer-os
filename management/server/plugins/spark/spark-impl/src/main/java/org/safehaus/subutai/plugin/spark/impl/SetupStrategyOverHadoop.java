@@ -9,6 +9,7 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
+import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
@@ -206,9 +207,13 @@ public class SetupStrategyOverHadoop implements ClusterSetupStrategy
 
         config.setEnvironmentId( environment.getId() );
 
-        if ( !manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
+        try
         {
-            throw new ClusterSetupException( "Could not save cluster info" );
+            manager.saveConfig( config );
+        }
+        catch ( ClusterException e )
+        {
+            throw new ClusterSetupException( e );
         }
     }
 

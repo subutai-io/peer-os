@@ -75,9 +75,14 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
                     Host host = ( Host ) item.getItemProperty( "value" ).getValue();
                     if ( host != null )
                     {
+                        String intfName = "br-int";
+                        if ( host instanceof ContainerHost )
+                        {
+                            intfName = "eth0";
+                        }
                         description = "Hostname: " + host.getHostname() + "<br>" + "MAC: " + host
-                                .getMacByInterfaceName( "eth0" ) + "<br>" + "UUID: " + host.getHostId() + "<br>"
-                                + "IP: " + host.getIpByInterfaceName( "eth0" );
+                                .getMacByInterfaceName( intfName ) + "<br>" + "UUID: " + host.getHostId() + "<br>"
+                                + "IP: " + host.getIpByInterfaceName( intfName );
                     }
                 }
 
