@@ -30,6 +30,7 @@ function export {
      exit 1
   fi
 
+  OPTIND=0
   local container="$1"
   lxc_assert $container "`usage`"
 
