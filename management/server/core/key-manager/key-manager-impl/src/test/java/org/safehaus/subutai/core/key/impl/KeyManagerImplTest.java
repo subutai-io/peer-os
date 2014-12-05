@@ -119,6 +119,24 @@ public class KeyManagerImplTest
 
 
     @Test
+    public void testDeleteKey() throws Exception
+    {
+        keyManager.deleteKey( KEY_ID );
+
+        verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
+    }
+
+
+    @Test
+    public void testRevokeKey() throws Exception
+    {
+        keyManager.revokeKey( KEY_ID );
+
+        verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
+    }
+
+
+    @Test
     public void testSignFileWithKey() throws Exception
     {
         keyManager.signFileWithKey( KEY_ID, PATH );

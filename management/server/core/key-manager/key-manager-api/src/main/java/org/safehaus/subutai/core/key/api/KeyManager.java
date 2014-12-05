@@ -59,4 +59,20 @@ public interface KeyManager
      * @return - set of {@code KeyInfo}
      */
     public Set<KeyInfo> getKeys() throws KeyManagerException;
+
+
+    /**
+     * Deletes a key
+     *
+     * @param keyId - id of pgp key to delete
+     */
+    public void deleteKey( String keyId ) throws KeyManagerException;
+
+
+    /**
+     * Revokes a key
+     *
+     * @param keyId - id of pgp key to revoke
+     */
+    public void revokeKey( String keyId ) throws KeyManagerException;
 }

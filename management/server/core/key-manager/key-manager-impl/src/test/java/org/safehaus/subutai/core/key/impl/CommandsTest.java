@@ -21,5 +21,7 @@ public class CommandsTest
         assertNotNull( commands.getSendKeyCommand( ARGUMENT ) );
         assertNotNull( commands.getListKeyCommand( ARGUMENT ) );
         assertNotNull( commands.getListKeysCommand() );
+        assertNotNull( commands.getDeleteKeyCommand( ARGUMENT ) );
+        assertNotNull( commands.getRevokeKeyCommand( ARGUMENT ) );
     }
 }

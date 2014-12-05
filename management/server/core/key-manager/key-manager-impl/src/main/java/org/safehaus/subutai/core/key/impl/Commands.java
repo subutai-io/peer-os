@@ -51,4 +51,16 @@ public class Commands
     {
         return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "list" ) );
     }
+
+
+    public RequestBuilder getDeleteKeyCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "delete", keyId ) );
+    }
+
+
+    public RequestBuilder getRevokeKeyCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "revoke", keyId ) );
+    }
 }
