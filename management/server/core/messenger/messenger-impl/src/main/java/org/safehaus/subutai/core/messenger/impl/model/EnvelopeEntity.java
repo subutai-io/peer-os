@@ -1,19 +1,23 @@
-package org.safehaus.subutai.core.messenger.impl;
+package org.safehaus.subutai.core.messenger.impl.model;
 
 
 import java.sql.Timestamp;
 import java.util.UUID;
 
+import javax.persistence.Entity;
+
 import org.safehaus.subutai.core.messenger.api.Message;
+import org.safehaus.subutai.core.messenger.impl.MessageImpl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
 /**
- * Message envelope (for internal use)
+ * Message envelope entity
  */
-public class Envelope
+@Entity
+public class EnvelopeEntity
 {
     private final MessageImpl message;
     private final UUID targetPeerId;
@@ -23,7 +27,7 @@ public class Envelope
     private transient Timestamp createDate;
 
 
-    public Envelope( final Message message, UUID targetPeerId, String recipient, int timeToLive )
+    public EnvelopeEntity( final MessageImpl message, UUID targetPeerId, String recipient, int timeToLive )
     {
 
         Preconditions.checkNotNull( targetPeerId, "Target peer id is null" );
@@ -31,22 +35,7 @@ public class Envelope
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
         Preconditions.checkArgument( timeToLive > 0, "Invalid time-to-live" );
 
-        this.message = new MessageImpl( message );
-        this.targetPeerId = targetPeerId;
-        this.recipient = recipient;
-        this.timeToLive = timeToLive;
-    }
-
-
-    public Envelope( final MessageImpl message, UUID targetPeerId, String recipient, int timeToLive )
-    {
-
-        Preconditions.checkNotNull( targetPeerId, "Target peer id is null" );
-        Preconditions.checkNotNull( message, "Message is null" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
-        Preconditions.checkArgument( timeToLive > 0, "Invalid time-to-live" );
-
-        this.message = new MessageImpl( message );
+        this.message = message;
         this.targetPeerId = targetPeerId;
         this.recipient = recipient;
         this.timeToLive = timeToLive;

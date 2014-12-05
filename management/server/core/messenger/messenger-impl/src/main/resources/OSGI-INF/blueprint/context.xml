@@ -7,6 +7,9 @@
     <property name="password" value="" />
   </bean>
 
+  <reference id="entityManagerFactory" interface="javax.persistence.EntityManagerFactory"
+             filter="(osgi.unit.name=messengerUnit)" />
+
   <reference id="peerManager" availability="optional"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
@@ -15,6 +18,7 @@
         destroy-method="destroy">
     <argument ref="dataSource" />
     <argument ref="peerManager" />
+    <property name="entityManagerFactory" ref="entityManagerFactory" />
   </bean>
 
   <service ref="messenger" interface="org.safehaus.subutai.core.messenger.api.Messenger" />
