@@ -132,41 +132,58 @@ generateRepoPackage() {
   fi
   
   #Basic path definitions
-  productName=$1
-  productNameUppercase="$(tr '[:lower:]' '[:upper:]' <<< ${productName:0:1})${productName:1}"
-  BASE=/var/lib/jenkins/jobs/master.bigdata.$productName/$productNameUppercase
-  SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
-  TARGET="/var/lib/jenkins/Automation/Bigdata/$productName"
-  PACK="/var/lib/jenkins/Automation/Automation_ISO/mgmt-repo/template-repo-package/"
-  ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
- 
+  productName=$1  
+
+  #it's template package operation
+  if [[ $productName == *"template"* ]]; then
+    BASE=/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName
+    SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
+    TARGET="/var/lib/jenkins/Automation/Bigdata/$productName"
+    PACK="/var/lib/jenkins/Automation/Automation_ISO/mgmt-repo/template-repo-package/"
+    ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
+  else
+    productNameUppercase="$(tr '[:lower:]' '[:upper:]' <<< ${productName:0:1})${productName:1}"
+    BASE=/var/lib/jenkins/jobs/master.bigdata.$productName/$productNameUppercase
+    SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
+    TARGET="/var/lib/jenkins/Automation/Bigdata/$productName"
+    PACK="/var/lib/jenkins/Automation/Automation_ISO/mgmt-repo/template-repo-package/"
+    ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
+  fi
+
   pushd $BASE
 
-  #get package latest package from ISOPATH to remove it
+  #get latest package from ISOPATH to remove it
   removedPackage=`ls -lt $ISOPATH | grep "subutai-repo-$productName" | awk '{ print $9 }' | grep .deb | head -1`
   echo "removedPackageName: $removedPackage" 
-   if [ "$removedPackage" != "" ]; then
-      rm $ISOPATH/$removedPackage
-   fi
+  if [ "$removedPackage" != "" ]; then
+    rm $ISOPATH/$removedPackage
+  fi
 
   #get package full name, for example:subutai-hadoop_1.0.12_all.deb
   currentPackage=`ls -lt $TARGET | awk '{ print $9 }' | grep .deb | head -1` 
   echo "CurrentPackageName: $currentPackage"
-  
+
   #delete repo package: subutai-repo-hadoop_1.0.12_all.deb
   if [ -f "$ISOPATH/subutai-repo-$currentPackage" ]; then
       rm $ISOPATH/subutai-repo-$currentPackage 
   fi
-
-  #check package starts with subutai tag
-  if [[ "$currentPackage" == "subutai"* ]]; then
+  
+  if [[ "$currentPackage" == *"template"* ]]; then
+     productVersion=$2
+     shortCurrentPackage="$productName""_""$productVersion""_amd64"
+     purePackageName=$productName
+     echo "shortCurrentPackage: $shortCurrentPackage"
+  
+  elif [[ "$currentPackage" == *"subutai"* ]]; then
      shortCurrentPackage=`echo "$currentPackage" | awk '{print substr($1,9); }'  | awk '{print substr($0, 0, length($0)-4)}'`
      echo "shortCurrentPackage: $shortCurrentPackage"
+     purePackageName=`echo $shortCurrentPackage | awk -F "." '{print $1}' | awk '{print substr($0, 0, length($0)-2)}'`
+     echo "purePackageName: $purePackageName"
+  else
+     echo "pure packagename cannot be resolved."
+     exit 1
   fi
 
-  purePackageName=`echo $shortCurrentPackage | awk -F "." '{print $1}' | awk '{print substr($0, 0, length($0)-2)}'`
-  echo "purePackageName: $purePackageName"
- 
   #check purePackageName is empty or not
   if [ -z $purePackageName ] || [ "x$purePackageName" == "x" ]; then
      echo "Pure package name is empty. Aborting..."
@@ -179,9 +196,8 @@ generateRepoPackage() {
   if [ -d "$templateName" ]; then
     rm -rf "$BASE/$templateName"
   fi
-    cp -a $PACK $BASE/$templateName
+  cp -a $PACK $BASE/$templateName
 
-  
   sed -i "s/template/subutai-repo-$purePackageName/g" $BASE/$templateName/DEBIAN/control
   cp $currentPackage $BASE/$templateName/repo/ksks/amd64/trusty/
   mv $BASE/$templateName/ $BASE/subutai-repo-$shortCurrentPackage
