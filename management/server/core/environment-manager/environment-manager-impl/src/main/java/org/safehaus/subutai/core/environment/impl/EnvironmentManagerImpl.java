@@ -464,6 +464,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             factory = new NodeGroup2PeerGroupBuilder( this );
         }
+        else
+        {
+            throw new EnvironmentManagerException( "Unsupported topology data: " + topologyData );
+        }
 
         try
         {
