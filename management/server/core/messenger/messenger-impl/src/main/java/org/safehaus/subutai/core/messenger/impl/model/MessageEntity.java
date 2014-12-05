@@ -32,9 +32,9 @@ public class MessageEntity implements Message, Serializable
     public static final int MAX_SENDER_LEN = 50;
     @Id
     @Column( name = "message_id" )
-    private final String id;
+    private String id;
     @Column( name = "source_peer_id" )
-    private final String sourcePeerId;
+    private String sourcePeerId;
     @Column( name = "sender" )
     private String sender;
     @Column( name = "payload" )
