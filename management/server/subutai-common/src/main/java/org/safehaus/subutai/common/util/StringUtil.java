@@ -1,7 +1,10 @@
 package org.safehaus.subutai.common.util;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 
 /**
@@ -13,6 +16,19 @@ public class StringUtil
 
     private StringUtil()
     {
+    }
+
+
+    public static List<String> splitString( String str, String delimiter )
+    {
+        List<String> result = new ArrayList();
+        StringTokenizer t = new StringTokenizer( str, delimiter );
+        while ( t.hasMoreTokens() )
+        {
+            result.add( t.nextToken().trim() );
+        }
+
+        return result;
     }
 
 
