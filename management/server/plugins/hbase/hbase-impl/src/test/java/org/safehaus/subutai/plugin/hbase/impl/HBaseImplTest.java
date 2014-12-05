@@ -221,7 +221,7 @@ public class HBaseImplTest
     @Test
     public void testStopCluster() throws Exception
     {
-//        hBaseImpl.stopCluster("test");
+
     }
 
     @Test
@@ -273,7 +273,6 @@ public class HBaseImplTest
         when(cachedRowSet.getClob(anyString())).thenReturn(clob);
 
         hBaseImpl.getCluster("test");
-
 //        assertNull(hBaseImpl.getCluster("test"));
     }
 
