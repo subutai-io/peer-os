@@ -356,7 +356,7 @@ setRepoOnJenkinsPeer()
 		
 		#remove the latest debian package from jenkins peer
 		fullPathOfPckg=$path_to_repo$latestPack
-		removePackagePeerSync $fullPathOfPckg $mgmt_ip_address
+		removePackagePeerSync $fullPathOfPackage $mgmt_ip_address
 
 		#copy the latest debian packagefrom jenkins to jenkins peer
 		scp $pack_path_jenkins/$deb_name $mgmt_ip_address:$path_to_repo
