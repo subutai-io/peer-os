@@ -54,6 +54,9 @@
     <org.osgi.version>4.3.1</org.osgi.version>
 
     <vaadin-version>7.3.3</vaadin-version>
+
+    <!-- apache shiro -->
+    <org.apache.shiro.version>1.2.3</org.apache.shiro.version>
   </properties>
 
   <dependencyManagement>
@@ -98,7 +101,6 @@
         <artifactId>key-manager-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
-
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- environment-manager -->
