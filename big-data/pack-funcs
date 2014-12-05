@@ -306,3 +306,70 @@ checkVersion() {
      fi
   fi
 }
+
+
+
+removePackagePeerSync() {
+
+ echo "Remove Operation is starting.."
+ removePackageName=$1
+ echo "RemovePackageName= "$removePackageName
+
+ if [ ! -z "$removePackageName" ]; then
+   #removing missing or changed packages in the list
+    echo "Removing $removePackageName from $2"
+    ssh $2 "rm $removePackageName"
+ fi
+
+}
+
+#parameters $1 : ip of management $2 : dependency list seperated by `,`
+setRepoOnJenkinsPeer()
+{
+	#Defining absolute
+	mgmt_ip_address="root@$1"
+	path_to_repo="/repo/ksks/amd64/trusty/"
+	dependencies=""
+
+	echo "mgmt ip: $mgmt_ip_address"
+
+	#for each dependency do the following
+	IFS=',' read -ra template_name <<< "$2"
+	for name in "${template_name[@]}"; do
+		
+		echo "***********************working on $name************************"
+		target_template_name=$(echo $name | awk -F"-" '{print $2}')
+		dependencies="$dependencies amd64/trusty/$name*.deb"	
+		# echoes example: template name subutai-cassandra, target template name cassandra
+		echo "template name $name"
+		echo "target template name $target_template_name"
+	 
+		#get the name of latest debian on jenkins
+		pack_path_jenkins="/var/lib/jenkins/Automation/Bigdata/$target_template_name"
+		deb_name=`ls -lt $pack_path_jenkins | grep "subutai-$target_template_name" | awk '{ print $9 }' | grep .deb  | head -1`
+		echo "deb name: $deb_name"
+
+		#get the name of latest debian on jenkins peer
+		latestPack=`ssh $mgmt_ip_address "ls -t $path_to_repo | grep subutai-$target_template_name | awk '{ print $9 }' | grep .deb | head -1"`
+
+		echo "latest pack: $latestPack"
+		
+		#remove the latest debian package from jenkins peer
+		fullPathOfPckg=$path_to_repo$latestPack
+		removePackagePeerSync $fullPathOfPackage $mgmt_ip_address
+
+		#copy the latest debian packagefrom jenkins to jenkins peer
+		scp $pack_path_jenkins/$deb_name $mgmt_ip_address:$path_to_repo
+		echo "copying package from $pack_path_jenkins/$deb_name to $mgmt_ip_address:$path_to_repo"
+	done
+
+	echo "************************dependencies are finished****************************"
+	
+	#do reprepro
+	echo " start reprepro for $dependencies"
+	ssh $mgmt_ip_address "cd /repo/ksks; reprepro includedeb trusty $dependencies"
+	echo "reprepro finished."
+
+	exit 0
+}
+
