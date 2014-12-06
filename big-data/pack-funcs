@@ -346,9 +346,11 @@ setRepoOnJenkinsPeer() {
   dependencies=""
 
   echo "mgmt ip: $mgmt_ip_address"
+  depList=$(echo $2 | awk -F"\"" '{print $2}')
+  echo "deplist=$depList"
 
   #for each dependency do the following
-  IFS=',' read -ra template_name <<< "$2"
+  IFS=',' read -ra template_name <<< "$depList"
   for name in "${template_name[@]}"; do		
     echo "***********************working on $name************************"
     target_template_name=$(echo $name | awk -F"-" '{print $2}')
