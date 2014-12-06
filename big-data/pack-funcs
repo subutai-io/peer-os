@@ -360,7 +360,7 @@ setRepoOnJenkinsPeer() {
     echo "deb name: $deb_name"
 
     #get the name of latest debian on jenkins peer
-    latestPack=`ssh $mgmt_ip_address "ls -t $path_to_repo | grep subutai-$target_template_name | awk '{ print $9 }' | grep .deb | head -1"`
+    latestPack=`ssh $mgmt_ip_address "ls -t $path_to_repo | grep subutai-$target_template_name | grep .deb | head -1"`
 
     echo "latest pack: $latestPack"
 	
