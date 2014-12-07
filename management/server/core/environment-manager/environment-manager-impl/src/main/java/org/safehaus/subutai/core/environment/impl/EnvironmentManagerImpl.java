@@ -153,7 +153,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             LOG.error( e.getMessage(), e );
         }
-        entityManagerFactory.createEntityManager();
+        entityManagerFactory.createEntityManager().close();
         environmentDataService = new EnvironmentDataService( entityManagerFactory );
     }
 
