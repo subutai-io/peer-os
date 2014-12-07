@@ -63,7 +63,7 @@ public class TrackerImplPersistenceTest
         when( metadata.getColumnType( 1 ) ).thenReturn( java.sql.Types.CLOB );
         when( resultSet.getMetaData() ).thenReturn( metadata );
         when( resultSet.next() ).thenReturn( true ).thenReturn( false );
-        ti = new TrackerImpl( dataSource );
+        //        ti = new TrackerImpl( dataSource );
     }
 
 

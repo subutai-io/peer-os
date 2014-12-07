@@ -104,7 +104,7 @@ public class TrackerImplTest
     @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullDataSource() throws Exception
     {
-        new TrackerImpl( null );
+        //        new TrackerImpl( (DataSource)null );
     }
 
 

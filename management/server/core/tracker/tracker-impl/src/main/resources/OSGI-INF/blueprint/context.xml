@@ -4,15 +4,18 @@
   <!--<reference id="dataSource" interface="javax.sql.DataSource"-->
   <!--filter="(osgi.jndi.service.name=jdbc/tracker)" />-->
 
-  <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:~/tracker" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
-  </bean>
+  <!--<bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">-->
+  <!--<property name="URL" value="jdbc:h2:~/tracker" />-->
+  <!--<property name="user" value="sa" />-->
+  <!--<property name="password" value="" />-->
+  <!--</bean>-->
+
+  <reference id="emf" interface="javax.persistence.EntityManagerFactory"
+             filter="(osgi.unit.name=trackerUnit)" />
 
   <bean id="tracker" class="org.safehaus.subutai.core.tracker.impl.TrackerImpl"
-        scope="singleton" activation="eager">
-    <argument ref="dataSource" />
+        scope="singleton" activation="eager" init-method="init">
+    <property name="emf" ref="emf" />
   </bean>
 
   <service ref="tracker" interface="org.safehaus.subutai.core.tracker.api.Tracker" />
