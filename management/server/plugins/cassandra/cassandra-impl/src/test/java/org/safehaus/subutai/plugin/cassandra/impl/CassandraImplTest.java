@@ -74,7 +74,6 @@ public class CassandraImplTest
     ExecutorService executor;
 
 
-
     @Before
     public void setUp() throws SQLException
     {
@@ -92,6 +91,12 @@ public class CassandraImplTest
         cassandraImpl.setEnvironmentManager(environmentManager);
         cassandraImpl.getEnvironmentManager();
 
+        // mock InstallClusterHandler
+        when(cassandraClusterConfig.getClusterName()).thenReturn("test");
+        when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
+        when(trackerOperation.getId()).thenReturn(uuid);
+
+
         // asserts
         assertEquals(connection, dataSource.getConnection());
         verify(connection).prepareStatement(any(String.class));
@@ -100,38 +105,38 @@ public class CassandraImplTest
     }
 
     @Test
-    public void testGetTracker() 
+    public void testGetTracker()
     {
         cassandraImpl.getTracker();
 
         // assertions
         assertNotNull(cassandraImpl.getTracker());
-        assertEquals(tracker,cassandraImpl.getTracker());
+        assertEquals(tracker, cassandraImpl.getTracker());
 
     }
 
     @Test
-    public void testSetTracker() 
+    public void testSetTracker()
     {
         cassandraImpl.setTracker(tracker);
 
         // assertions
         assertNotNull(cassandraImpl.getTracker());
-        assertEquals(tracker,cassandraImpl.getTracker());
+        assertEquals(tracker, cassandraImpl.getTracker());
 
     }
 
     @Test
-    public void testGetEnvironmentManager() 
+    public void testGetEnvironmentManager()
     {
         cassandraImpl.getEnvironmentManager();
 
         assertNotNull(cassandraImpl.getEnvironmentManager());
-        assertEquals(environmentManager,cassandraImpl.getEnvironmentManager());
+        assertEquals(environmentManager, cassandraImpl.getEnvironmentManager());
     }
 
     @Test
-    public void testSetEnvironmentManager() 
+    public void testSetEnvironmentManager()
     {
         cassandraImpl.setEnvironmentManager(environmentManager);
 
@@ -140,26 +145,21 @@ public class CassandraImplTest
     }
 
     @Test
-    public void testInit() 
+    public void testInit()
     {
         cassandraImpl.init();
     }
 
     @Test
-    public void testDestroy() 
+    public void testDestroy()
     {
         cassandraImpl.destroy();
     }
 
     @Test
-    public void testInstallCluster() 
+    public void testInstallCluster()
     {
         cassandraImpl.executor = executor;
-
-        // mock InstallClusterHandler
-        when(cassandraClusterConfig.getClusterName()).thenReturn("test");
-        when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
-        when(trackerOperation.getId()).thenReturn(uuid);
 
         UUID id = cassandraImpl.installCluster(cassandraClusterConfig);
 
@@ -170,14 +170,9 @@ public class CassandraImplTest
     }
 
     @Test
-    public void testUninstallCluster() 
+    public void testUninstallCluster()
     {
         cassandraImpl.executor = executor;
-
-        // mock InstallClusterHandler
-        when(cassandraClusterConfig.getClusterName()).thenReturn("test");
-        when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
-        when(trackerOperation.getId()).thenReturn(uuid);
 
         UUID id = cassandraImpl.uninstallCluster("test");
 
@@ -188,19 +183,21 @@ public class CassandraImplTest
     }
 
     @Test
-    public void testGetClusters() 
+    public void testGetClusters()
     {
         cassandraImpl.getClusters();
+
+        assertNotNull(cassandraImpl.getClusters());
     }
 
     @Test
-    public void testGetCluster() 
+    public void testGetCluster()
     {
         cassandraImpl.getCluster("test");
     }
 
     @Test
-    public void testGetPluginDAO() 
+    public void testGetPluginDAO()
     {
         PluginDAO pl = cassandraImpl.getPluginDAO();
 
@@ -208,14 +205,9 @@ public class CassandraImplTest
     }
 
     @Test
-    public void testStartCluster() 
+    public void testStartCluster()
     {
         cassandraImpl.executor = executor;
-
-        // mock InstallClusterHandler
-        when(cassandraClusterConfig.getClusterName()).thenReturn("test");
-        when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
-        when(trackerOperation.getId()).thenReturn(uuid);
 
         UUID id = cassandraImpl.startCluster("test");
 
@@ -226,14 +218,9 @@ public class CassandraImplTest
     }
 
     @Test
-    public void testCheckCluster() 
+    public void testCheckCluster()
     {
         cassandraImpl.executor = executor;
-
-        // mock InstallClusterHandler
-        when(cassandraClusterConfig.getClusterName()).thenReturn("test");
-        when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
-        when(trackerOperation.getId()).thenReturn(uuid);
 
         UUID id = cassandraImpl.checkCluster("test");
 
@@ -244,14 +231,9 @@ public class CassandraImplTest
     }
 
     @Test
-    public void testStopCluster() 
+    public void testStopCluster()
     {
         cassandraImpl.executor = executor;
-
-        // mock InstallClusterHandler
-        when(cassandraClusterConfig.getClusterName()).thenReturn("test");
-        when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
-        when(trackerOperation.getId()).thenReturn(uuid);
 
         UUID id = cassandraImpl.stopCluster("test");
 
@@ -262,16 +244,11 @@ public class CassandraImplTest
     }
 
     @Test
-    public void testStartService() 
+    public void testStartService()
     {
         cassandraImpl.executor = executor;
 
-        // mock InstallClusterHandler
-        when(cassandraClusterConfig.getClusterName()).thenReturn("test");
-        when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
-        when(trackerOperation.getId()).thenReturn(uuid);
-
-        UUID id = cassandraImpl.startService("test",uuid);
+        UUID id = cassandraImpl.startService("test", uuid);
 
         // asserts
         verify(executor).execute(isA(AbstractOperationHandler.class));
@@ -280,14 +257,9 @@ public class CassandraImplTest
     }
 
     @Test
-    public void testStopService() 
+    public void testStopService()
     {
         cassandraImpl.executor = executor;
-
-        // mock InstallClusterHandler
-        when(cassandraClusterConfig.getClusterName()).thenReturn("test");
-        when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
-        when(trackerOperation.getId()).thenReturn(uuid);
 
         UUID id = cassandraImpl.stopService("test", uuid);
 
@@ -298,14 +270,9 @@ public class CassandraImplTest
     }
 
     @Test
-    public void testStatusService() 
+    public void testStatusService()
     {
         cassandraImpl.executor = executor;
-
-        // mock InstallClusterHandler
-        when(cassandraClusterConfig.getClusterName()).thenReturn("test");
-        when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
-        when(trackerOperation.getId()).thenReturn(uuid);
 
         UUID id = cassandraImpl.statusService("test", uuid);
 
@@ -316,26 +283,21 @@ public class CassandraImplTest
     }
 
     @Test
-    public void testAddNode() 
+    public void testAddNode()
     {
-        cassandraImpl.addNode("test","test");
+        cassandraImpl.addNode("test", "test");
     }
 
     @Test
-    public void testDestroyNode() 
+    public void testDestroyNode()
     {
-        cassandraImpl.destroyNode("test",uuid);
+        cassandraImpl.destroyNode("test", uuid);
     }
 
     @Test
-    public void testCheckNode() 
+    public void testCheckNode()
     {
         cassandraImpl.executor = executor;
-
-        // mock InstallClusterHandler
-        when(cassandraClusterConfig.getClusterName()).thenReturn("test");
-        when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
-        when(trackerOperation.getId()).thenReturn(uuid);
 
         UUID id = cassandraImpl.checkNode("test", uuid);
 
@@ -346,18 +308,19 @@ public class CassandraImplTest
     }
 
     @Test
-    public void testGetClusterSetupStrategy() 
+    public void testGetClusterSetupStrategy()
     {
-        cassandraImpl.getClusterSetupStrategy(environment,cassandraClusterConfig,trackerOperation);
+        cassandraImpl.getClusterSetupStrategy(environment, cassandraClusterConfig, trackerOperation);
     }
 
-    @Test (expected = NullPointerException.class)
-    public void shouldThrowsNullPointerExceptionInGetClusterSetupStrategy(){
-        cassandraImpl.getClusterSetupStrategy(null,null,null);
+    @Test(expected = NullPointerException.class)
+    public void shouldThrowsNullPointerExceptionInGetClusterSetupStrategy()
+    {
+        cassandraImpl.getClusterSetupStrategy(null, null, null);
     }
 
     @Test
-    public void testGetDefaultEnvironmentBlueprint() 
+    public void testGetDefaultEnvironmentBlueprint()
     {
         EnvironmentBlueprint blueprint = cassandraImpl.getDefaultEnvironmentBlueprint(cassandraClusterConfig);
 
@@ -366,14 +329,9 @@ public class CassandraImplTest
     }
 
     @Test
-    public void testConfigureEnvironmentCluster() 
+    public void testConfigureEnvironmentCluster()
     {
         cassandraImpl.executor = executor;
-
-        // mock InstallClusterHandler
-        when(cassandraClusterConfig.getClusterName()).thenReturn("test");
-        when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
-        when(trackerOperation.getId()).thenReturn(uuid);
 
         UUID id = cassandraImpl.configureEnvironmentCluster(cassandraClusterConfig);
 

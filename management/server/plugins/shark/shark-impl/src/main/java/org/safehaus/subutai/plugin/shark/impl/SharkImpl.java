@@ -38,7 +38,7 @@ public class SharkImpl implements Shark
     private Hadoop hadoopManager;
     private Tracker tracker;
     private EnvironmentManager environmentManager;
-    private ExecutorService executor;
+    protected ExecutorService executor;
     private PluginDAO pluginDAO;
     private DataSource dataSource;
     protected Commands commands;

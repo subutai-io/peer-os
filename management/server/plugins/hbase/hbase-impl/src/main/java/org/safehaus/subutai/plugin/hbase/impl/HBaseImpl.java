@@ -34,7 +34,7 @@ public class HBaseImpl implements HBase
     private static final Logger LOG = LoggerFactory.getLogger( HBaseImpl.class.getName() );
     private Hadoop hadoopManager;
     private Tracker tracker;
-    private ExecutorService executor;
+    protected ExecutorService executor;
     private EnvironmentManager environmentManager;
     private PluginDAO pluginDAO;
     private DataSource dataSource;
