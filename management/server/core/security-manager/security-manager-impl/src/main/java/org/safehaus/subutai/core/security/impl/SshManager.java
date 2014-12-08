@@ -16,7 +16,7 @@ import com.google.common.base.Strings;
 
 
 /**
- * Ssh manager for exchanging ssh keys and enabling passwordless communication
+ * Ssh manager for adding/exchanging ssh keys and enabling password-less communication
  */
 public class SshManager
 {
