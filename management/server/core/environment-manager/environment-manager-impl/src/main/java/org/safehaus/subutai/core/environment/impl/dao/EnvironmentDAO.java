@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 
 
@@ -32,6 +31,10 @@ public class EnvironmentDAO
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDAO.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+
+    private static final String ERR_NO_SOURCE = "Source is null or empty";
+    private static final String ERR_NO_KEY = "Key is null or empty";
+
     protected DbUtil dbUtil;
 
 
@@ -44,13 +47,13 @@ public class EnvironmentDAO
     }
 
 
-    protected void setupDb() throws SQLException
+    private void setupDb() throws SQLException
     {
 
         String sql1 = "create table if not exists blueprint (id uuid, info clob, PRIMARY KEY (id));";
-        String sql2 =
-                "create table if not exists process (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
-                        + "id));";
+        String sql2
+                = "create table if not exists process (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
+                + "id));";
         String sql3 = "create table if not exists environment (source varchar(100), id uuid, info clob, "
                 + "PRIMARY KEY (source, id));";
 
@@ -62,14 +65,14 @@ public class EnvironmentDAO
 
     public boolean saveInfo( String source, String key, Object info ) throws EnvironmentPersistenceException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), ERR_NO_SOURCE );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), ERR_NO_KEY );
         Preconditions.checkNotNull( info, "Info is null" );
 
         try
         {
             dbUtil.update( "merge into environment (source, id, info) values (? , ?, ?)", source,
-                    UUID.fromString( key ), GSON.toJson( info ) );
+                           UUID.fromString( key ), GSON.toJson( info ) );
 
             return true;
         }
@@ -91,7 +94,7 @@ public class EnvironmentDAO
      */
     public <T> List<T> getInfo( String source, Class<T> clazz )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), ERR_NO_SOURCE );
         Preconditions.checkNotNull( clazz, "Class is null" );
 
         List<T> list = new ArrayList<>();
@@ -127,15 +130,15 @@ public class EnvironmentDAO
      */
     public <T> T getInfo( String source, String key, Class<T> clazz )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), ERR_NO_SOURCE );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), ERR_NO_KEY );
         Preconditions.checkNotNull( clazz, "Class is null" );
 
         try
         {
 
             ResultSet rs = dbUtil.select( "select info from environment where source = ? and id = ?", source,
-                    UUID.fromString( key ) );
+                                          UUID.fromString( key ) );
             if ( rs != null && rs.next() )
             {
                 Clob infoClob = rs.getClob( "info" );
@@ -162,8 +165,8 @@ public class EnvironmentDAO
      */
     public boolean deleteInfo( String source, String key )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), ERR_NO_SOURCE );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), ERR_NO_KEY );
 
         try
         {
@@ -186,8 +189,9 @@ public class EnvironmentDAO
             dbUtil.update( "merge into blueprint (id, info) values (? , ?)", blueprint.getId(), json );
             return blueprint.getId();
         }
-        catch ( JsonParseException | SQLException e )
+        catch ( SQLException e )
         {
+            LOG.error( "Failed to save blueprint", e );
             throw new EnvironmentPersistenceException( e.getMessage() );
         }
     }
@@ -211,6 +215,7 @@ public class EnvironmentDAO
         }
         catch ( JsonSyntaxException | SQLException e )
         {
+            LOG.error( "Failed to get blueprints", e );
             throw new EnvironmentPersistenceException( e.getMessage() );
         }
         return blueprints;
@@ -222,12 +227,11 @@ public class EnvironmentDAO
         try
         {
             dbUtil.update( "delete from blueprint where id = ?", blueprintId );
-            EnvironmentBlueprint b = getBlueprint( blueprintId );
-
             return true;
         }
         catch ( SQLException e )
         {
+            LOG.error( "Failed to delete blueorint", e );
             throw new EnvironmentPersistenceException( e.getMessage() );
         }
     }
@@ -257,3 +261,4 @@ public class EnvironmentDAO
         return null;
     }
 }
+

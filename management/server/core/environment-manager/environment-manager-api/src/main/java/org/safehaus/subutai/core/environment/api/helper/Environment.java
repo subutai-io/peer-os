@@ -20,15 +20,20 @@ public interface Environment
 
     public void addContainer( ContainerHost container );
 
-    public Set<ContainerHost> getContainerHosts();
 
-    //    public void destroyContainer( UUID containerId ) throws EnvironmentManagerException;
+    public Set<ContainerHost> getContainerHosts();
 
 
     public String getName();
 
 
     public UUID getId();
+
+
+    public String getPublicKey();
+
+
+    public void setPublicKey( String key );
 
 
     public ContainerHost getContainerHostById( UUID uuid );
@@ -45,3 +50,4 @@ public interface Environment
 
     public void removeContainer( final ContainerHost containerHost );
 }
+
