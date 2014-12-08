@@ -24,7 +24,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
@@ -190,7 +189,6 @@ public class EnvironmentsForm
         VerticalLayout vl = new VerticalLayout();
         final ComboBox peersCombo = new ComboBox();
         List<Peer> peers = managerUI.getPeerManager().getPeers();
-        //        BeanItemContainer<Peer> container = new BeanItemContainer<Peer>( Peer.class );
         peersCombo.addItems( peers );
         peersCombo.setCaption( "name" );
         vl.addComponent( peersCombo );
@@ -287,13 +285,9 @@ public class EnvironmentsForm
         int ipInt = 10;
         for ( ContainerHost container : environment.getContainerHosts() )
         {
-
             TextField fieldHostname = new TextField();
             fieldHostname.setWidth( "120px" );
             fieldHostname.setValue( container.getHostname() );
-
-            /* TextField fieldIp = new TextField(); fieldIp.setWidth( "120px" ); fieldIp.setValue(
-             * container.getAgent().getListIP().get( 0 ) ); */
 
             TextField fieldIp2 = new TextField();
             fieldIp2.setWidth( "120px" );
@@ -301,7 +295,7 @@ public class EnvironmentsForm
 
             containersTable.addItem( new Object[]
             {
-                container.getTemplateName(), container.getPeerId().toString(), fieldHostname, /* fieldIp, */ fieldIp2,
+                container.getTemplateName(), container.getPeerId(), fieldHostname, fieldIp2,
             }, null );
         }
 
@@ -370,9 +364,10 @@ public class EnvironmentsForm
     {
         VerticalLayout vl = new VerticalLayout();
 
-        final TextArea txtPublicKey = new TextArea( "GPG public key of the environment" );
+        final TextArea txtPublicKey = new TextArea( "Public key of the environment" );
+        txtPublicKey.setStyleName( "default" );
         txtPublicKey.setWidth( 70, Sizeable.Unit.PERCENTAGE );
-        txtPublicKey.setRows( 20 );
+        txtPublicKey.setRows( 10 );
         if ( env.getPublicKey() != null )
         {
             txtPublicKey.setValue( env.getPublicKey() );
@@ -389,7 +384,6 @@ public class EnvironmentsForm
             }
         } );
 
-        vl.addComponent( new Label( "GPG public key of the environment" ) );
         vl.addComponent( txtPublicKey );
         vl.addComponent( btn );
 
@@ -426,11 +420,11 @@ public class EnvironmentsForm
         table.addContainerProperty( "Value", String.class, null );
         table.addItem( new Object[]
         {
-            "Peer", container.getPeerId().toString()
+            "Peer", container.getPeerId()
         }, null );
         table.addItem( new Object[]
         {
-            "Environment ID", container.getEnvironmentId().toString()
+            "Environment ID", container.getEnvironmentId()
         }, null );
         return table;
     }
