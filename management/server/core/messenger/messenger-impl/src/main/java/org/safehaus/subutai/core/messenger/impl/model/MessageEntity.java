@@ -69,6 +69,11 @@ public class MessageEntity implements Message, Serializable
     }
 
 
+    public MessageEntity()
+    {
+    }
+
+
     @Override
     public UUID getSourcePeerId()
     {
@@ -167,5 +172,17 @@ public class MessageEntity implements Message, Serializable
     public Integer getTimeToLive()
     {
         return timeToLive;
+    }
+
+
+    public Boolean getIsSent()
+    {
+        return isSent;
+    }
+
+
+    public Long getCreateDate()
+    {
+        return createDate;
     }
 }

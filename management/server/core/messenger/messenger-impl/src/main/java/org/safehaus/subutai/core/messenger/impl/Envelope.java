@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 import org.safehaus.subutai.core.messenger.api.Message;
+import org.safehaus.subutai.core.messenger.impl.model.MessageEntity;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -35,6 +36,19 @@ public class Envelope
         this.targetPeerId = targetPeerId;
         this.recipient = recipient;
         this.timeToLive = timeToLive;
+    }
+
+
+    public Envelope( MessageEntity message )
+    {
+        Preconditions.checkNotNull( message, "Message is null" );
+
+        this.message = new MessageImpl( message );
+        this.targetPeerId = message.getTargetPeerId();
+        this.recipient = message.getRecipient();
+        this.timeToLive = message.getTimeToLive();
+        this.isSent = message.getIsSent();
+        this.createDate = new Timestamp( message.getCreateDate() );
     }
 
 

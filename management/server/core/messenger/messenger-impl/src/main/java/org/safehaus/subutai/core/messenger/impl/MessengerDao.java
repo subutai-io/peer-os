@@ -111,6 +111,7 @@ public class MessengerDao
         {
             List<MessageEntity> messages =
                     messageDataService.getSelectMessages( targetPeer, WIDENING_INTERVAL_SEC, MESSAGE_LIMIT_PER_PEER );
+            //                    ( List<MessageEntity> ) messageDataService.getAll();
 
             Set<Envelope> envelopes = new HashSet<>();
             envelopes.addAll( buildEnvelopes( messages ) );
@@ -161,8 +162,7 @@ public class MessengerDao
         List<Envelope> result = new ArrayList<>();
         for ( final MessageEntity message : messages )
         {
-            Envelope envelope =
-                    new Envelope( message, message.getTargetPeerId(), message.getRecipient(), message.getTimeToLive() );
+            Envelope envelope = new Envelope( message );
             result.add( envelope );
         }
         return result;
