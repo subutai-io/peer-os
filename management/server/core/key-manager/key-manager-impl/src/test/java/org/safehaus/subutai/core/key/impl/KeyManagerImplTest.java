@@ -110,11 +110,22 @@ public class KeyManagerImplTest
 
 
     @Test
-    public void testExportSshKey() throws Exception
+    public void testReadKey() throws Exception
     {
-        keyManager.exportSshKey( KEY_ID, PATH );
+        String output = keyManager.readKey( KEY_ID );
 
         verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
+        assertEquals( OUTPUT, output );
+    }
+
+
+    @Test
+    public void testReadSshKey() throws Exception
+    {
+        String output = keyManager.readSshKey( KEY_ID );
+
+        verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
+        assertEquals( OUTPUT, output );
     }
 
 

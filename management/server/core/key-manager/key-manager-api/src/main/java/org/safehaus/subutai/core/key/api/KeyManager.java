@@ -20,12 +20,18 @@ public interface KeyManager
     public KeyInfo generateKey( String realName, String email ) throws KeyManagerException;
 
     /**
-     * Exports PGP key as SSH key. Resulting key file name format will be %keyId%.pub
+     * Returns PGP public key
      *
      * @param keyId - id of pgp key
-     * @param exportPath -  path to directory where exported ssh key will be placed
      */
-    public void exportSshKey( String keyId, String exportPath ) throws KeyManagerException;
+    public String readKey( String keyId ) throws KeyManagerException;
+
+    /**
+     * Returns PGP public key as SSH key
+     *
+     * @param keyId - id of pgp key
+     */
+    public String readSshKey( String keyId ) throws KeyManagerException;
 
 
     /**

@@ -139,12 +139,20 @@ public class KeyManagerImpl implements KeyManager
 
 
     @Override
-    public void exportSshKey( final String keyId, final String exportPath ) throws KeyManagerException
+    public String readKey( final String keyId ) throws KeyManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( exportPath ), "Invalid export path" );
 
-        execute( commands.getExportSshKeyCommand( keyId, exportPath ) );
+        return execute( commands.getReadKeyCommand( keyId ) );
+    }
+
+
+    @Override
+    public String readSshKey( final String keyId ) throws KeyManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
+
+        return execute( commands.getReadSshKeyCommand( keyId ) );
     }
 
 
