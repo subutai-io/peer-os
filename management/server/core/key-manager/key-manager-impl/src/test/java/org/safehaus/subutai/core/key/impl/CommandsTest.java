@@ -16,10 +16,13 @@ public class CommandsTest
     public void testGetCommands() throws Exception
     {
         assertNotNull( commands.getGenerateKeyCommand( ARGUMENT, ARGUMENT ) );
-        assertNotNull( commands.getExportSshKeyCommand( ARGUMENT, ARGUMENT ) );
+        assertNotNull( commands.getReadKeyCommand( ARGUMENT ) );
+        assertNotNull( commands.getReadSshKeyCommand( ARGUMENT ) );
         assertNotNull( commands.getSignCommand( ARGUMENT, ARGUMENT ) );
         assertNotNull( commands.getSendKeyCommand( ARGUMENT ) );
         assertNotNull( commands.getListKeyCommand( ARGUMENT ) );
         assertNotNull( commands.getListKeysCommand() );
+        assertNotNull( commands.getDeleteKeyCommand( ARGUMENT ) );
+        assertNotNull( commands.getRevokeKeyCommand( ARGUMENT ) );
     }
 }
