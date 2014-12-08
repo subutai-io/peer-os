@@ -250,11 +250,6 @@ checkVersion() {
     versionThird_new=$(echo $version_tmp | awk -F"-" '{print $1}')
     patch_new=$(echo $version_tmp | awk -F"-" '{print $2}')
 
-    echo "versionFirst_new= $versionFirst_new"
-    echo "versionSecond_new= $versionSecond_new"
-    echo "versionThird_new= $versionThird_new"
-    echo "patch_new= $patch_new"
-
     deb_name=`ls -lt $TARGET | awk '{ print $9 }' | grep .deb | head -1`
     version_prev=$(echo $deb_name | awk -F"_" '{print $2}')
     versionFirst_prev=$(echo $version_prev | awk -F"." '{print $1}')
@@ -346,9 +341,11 @@ setRepoOnJenkinsPeer() {
   dependencies=""
 
   echo "mgmt ip: $mgmt_ip_address"
+  depList=$(echo $2 | awk -F"\"" '{print $2}')
+  echo "deplist=$depList"
 
   #for each dependency do the following
-  IFS=',' read -ra template_name <<< "$2"
+  IFS=',' read -ra template_name <<< "$depList"
   for name in "${template_name[@]}"; do		
     echo "***********************working on $name************************"
     target_template_name=$(echo $name | awk -F"-" '{print $2}')
@@ -363,7 +360,7 @@ setRepoOnJenkinsPeer() {
     echo "deb name: $deb_name"
 
     #get the name of latest debian on jenkins peer
-    latestPack=`ssh $mgmt_ip_address "ls -t $path_to_repo | grep subutai-$target_template_name | awk '{ print $9 }' | grep .deb | head -1"`
+    latestPack=`ssh $mgmt_ip_address "ls -t $path_to_repo | grep subutai-$target_template_name | grep .deb | head -1"`
 
     echo "latest pack: $latestPack"
 	
