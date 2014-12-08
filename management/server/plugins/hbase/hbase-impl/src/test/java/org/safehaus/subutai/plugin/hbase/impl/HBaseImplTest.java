@@ -22,7 +22,12 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
 
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
@@ -91,7 +96,7 @@ public class HBaseImplTest
         when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
         when(resultSetMetaData.getColumnCount()).thenReturn(1);
 
-
+        uuid = UUID.randomUUID();
         hBaseImpl = new HBaseImpl(dataSource);
         hBaseImpl.init();
         hBaseImpl.setPluginDAO(pluginDAO);
@@ -99,7 +104,15 @@ public class HBaseImplTest
         hBaseImpl.setTracker(tracker);
         hBaseImpl.setExecutor(executorService);
         hBaseImpl.setHadoopManager(hadoop);
+        hBaseImpl.setPluginDAO(pluginDAO);
 
+
+        hBaseImpl.executor = executor;
+        when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
+        when(trackerOperation.getId()).thenReturn(uuid);
+
+        when(pluginDAO.getInfo(HBaseConfig.PRODUCT_KEY, "test",
+                HBaseConfig.class)).thenReturn(hBaseConfig);
 
         // assertions
         assertEquals(connection, dataSource.getConnection());
@@ -114,7 +127,7 @@ public class HBaseImplTest
 
         // assertions
         assertNotNull(hBaseImpl.getPluginDAO());
-        assertEquals(pluginDAO,plug);
+        assertEquals(pluginDAO, plug);
     }
 
     @Test
@@ -124,7 +137,7 @@ public class HBaseImplTest
         hBaseImpl.getPluginDAO();
 
         // assertions
-        assertEquals(pluginDAO,hBaseImpl.getPluginDAO());
+        assertEquals(pluginDAO, hBaseImpl.getPluginDAO());
     }
 
     @Test
@@ -144,7 +157,7 @@ public class HBaseImplTest
         hBaseImpl.getTracker();
 
         // assertions
-        assertEquals(tracker,hBaseImpl.getTracker());
+        assertEquals(tracker, hBaseImpl.getTracker());
     }
 
     @Test
@@ -154,7 +167,7 @@ public class HBaseImplTest
 
         // assertions
         assertNotNull(hBaseImpl.getExecutor());
-        assertEquals(executorService,hBaseImpl.getExecutor());
+        assertEquals(executor, hBaseImpl.getExecutor());
     }
 
     @Test
@@ -174,7 +187,7 @@ public class HBaseImplTest
 
         // assertions
         assertNotNull(hBaseImpl.getEnvironmentManager());
-        assertEquals(environmentManager,hBaseImpl.getEnvironmentManager());
+        assertEquals(environmentManager, hBaseImpl.getEnvironmentManager());
 
     }
 
@@ -206,6 +219,7 @@ public class HBaseImplTest
     {
         hBaseImpl.getCommands();
 
+        // assertions
         assertNotNull(hBaseImpl.getCommands());
     }
 
@@ -216,7 +230,7 @@ public class HBaseImplTest
 
         // assertions
         assertNotNull(hBaseImpl.getHadoopManager());
-        assertEquals(hadoop,hBaseImpl.getHadoopManager());
+        assertEquals(hadoop, hBaseImpl.getHadoopManager());
     }
 
     @Test
@@ -232,10 +246,6 @@ public class HBaseImplTest
     @Test
     public void testInstallCluster() throws Exception
     {
-        hBaseImpl.executor = executor;
-        when(tracker.createTrackerOperation(anyString(), anyString())).thenReturn(trackerOperation);
-        when(trackerOperation.getId()).thenReturn(uuid);
-
         UUID id = hBaseImpl.installCluster(hBaseConfig);
 
         // asserts
@@ -247,6 +257,11 @@ public class HBaseImplTest
     @Test
     public void testDestroyNode() throws Exception
     {
+        UUID id = hBaseImpl.destroyNode("test", "test");
+
+        // asserts
+        verify(executor).execute(isA(AbstractOperationHandler.class));
+        assertEquals(uuid, id);
 
     }
 
@@ -254,51 +269,75 @@ public class HBaseImplTest
     public void testGetClusterSetupStrategy() throws Exception
     {
         // without hadoop
-        hBaseImpl.getClusterSetupStrategy(trackerOperation,hBaseConfig,environment);
+        hBaseImpl.getClusterSetupStrategy(trackerOperation, hBaseConfig, environment);
         // with hadoop
         when(hBaseConfig.getSetupType()).thenReturn(SetupType.OVER_HADOOP);
-        hBaseImpl.getClusterSetupStrategy(trackerOperation,hBaseConfig,environment);
+        hBaseImpl.getClusterSetupStrategy(trackerOperation, hBaseConfig, environment);
     }
 
     @Test
     public void testStopCluster() throws Exception
     {
+        UUID id = hBaseImpl.stopCluster("test");
 
+        // asserts
+        assertEquals(uuid, id);
     }
 
     @Test
     public void testStartCluster() throws Exception
     {
+        UUID id = hBaseImpl.startCluster("test");
 
-    }
-
-    @Test
-    public void testCheckNode() throws Exception
-    {
+        // asserts
+        assertEquals(uuid, id);
 
     }
 
     @Test
     public void testUninstallCluster() throws Exception
     {
+        UUID id = hBaseImpl.uninstallCluster("test");
+
+        // asserts
+        assertEquals(uuid, id);
 
     }
 
     @Test
     public void testGetClusters() throws Exception
     {
+        List<HBaseConfig> myList = new ArrayList<>();
+        myList.add(hBaseConfig);
+        when(pluginDAO.getInfo(HBaseConfig.PRODUCT_KEY, HBaseConfig.class )).thenReturn(myList);
+
+
         hBaseImpl.getClusters();
+
+        // assertions
+        assertNotNull(hBaseImpl.getClusters());
+        assertEquals(myList,hBaseImpl.getClusters());
+
     }
 
     @Test
     public void testGetCluster() throws Exception
     {
         hBaseImpl.getCluster("test");
+
+        // assertions
+        assertNotNull(hBaseImpl.getCluster("test"));
+        assertEquals(hBaseConfig,hBaseImpl.getCluster("test"));
+
     }
 
     @Test
     public void testAddNode() throws Exception
     {
+        UUID id = hBaseImpl.addNode("test", "test");
+
+        // asserts
+        assertEquals(uuid, id);
 
     }
 }
