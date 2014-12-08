@@ -65,6 +65,18 @@ public class SshManager
     }
 
 
+    public void execute( ContainerHost containerHost ) throws SSHManagerException
+    {
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+
+        create( containerHost );
+        containerHosts.add( containerHost );
+        read();
+        write();
+        config();
+    }
+
+
     private void create() throws SSHManagerException
     {
         for ( ContainerHost host : containerHosts )
@@ -141,18 +153,6 @@ public class SshManager
                 throw new SSHManagerException( e.getMessage() );
             }
         }
-    }
-
-
-    public void execute( ContainerHost containerHost ) throws SSHManagerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-
-        create( containerHost );
-        containerHosts.add( containerHost );
-        read();
-        write();
-        config();
     }
 
 
