@@ -11,8 +11,10 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 
 
 /**
@@ -58,9 +60,9 @@ public interface Peer
 
     public boolean isLocal();
 
-    public String getQuota( ContainerHost host, QuotaEnum quota ) throws PeerException;
+    public PeerQuotaInfo getQuota( ContainerHost host, QuotaType quotaType ) throws PeerException;
 
-    public void setQuota( ContainerHost host, QuotaEnum quota, String value ) throws PeerException;
+    public void setQuota( ContainerHost host, QuotaInfo quota ) throws PeerException;
 
     public Template getTemplate( String templateName ) throws PeerException;
 

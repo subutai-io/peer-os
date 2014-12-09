@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.peer.ui.container.manage;
 
 import java.math.BigInteger;
 
-import org.safehaus.subutai.core.lxc.quota.api.MemoryUnit;
+import org.safehaus.subutai.common.quota.MemoryUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,10 +85,10 @@ public class QuotaMemoryComponent extends VerticalLayout
     {
         String value = memoryTextField.getValue().replaceAll( "\n", "" );
         BigInteger memory = new BigInteger( value );
-        while ( defaultUnit.getValue() > 0 )
+        while ( defaultUnit.getUnitIdx() > 0 )
         {
             memory = convertToLess( memory );
-            defaultUnit = MemoryUnit.getMemoryUnit( defaultUnit.getValue() - 1 );
+            defaultUnit = MemoryUnit.getMemoryUnit( defaultUnit.getUnitIdx() - 1 );
         }
         return memory.toString();
     }
@@ -121,22 +121,22 @@ public class QuotaMemoryComponent extends VerticalLayout
         BigInteger value = new BigInteger( str );
 
         BigInteger currentUnitValue = new BigInteger( str );
-        if ( defaultUnit.getValue() < newValue.getValue() )
+        if ( defaultUnit.getUnitIdx() < newValue.getUnitIdx() )
         {
-            while ( defaultUnit.getValue() < newValue.getValue() )
+            while ( defaultUnit.getUnitIdx() < newValue.getUnitIdx() )
             {
                 currentUnitValue = convertToBigger( currentUnitValue );
                 conversionResult = String.valueOf( currentUnitValue );
-                defaultUnit = MemoryUnit.getMemoryUnit( defaultUnit.getValue() + 1 );
+                defaultUnit = MemoryUnit.getMemoryUnit( defaultUnit.getUnitIdx() + 1 );
             }
         }
-        else if ( defaultUnit.getValue() > newValue.getValue() )
+        else if ( defaultUnit.getUnitIdx() > newValue.getUnitIdx() )
         {
-            while ( defaultUnit.getValue() > newValue.getValue() )
+            while ( defaultUnit.getUnitIdx() > newValue.getUnitIdx() )
             {
                 currentUnitValue = convertToLess( currentUnitValue );
                 conversionResult = String.valueOf( currentUnitValue );
-                defaultUnit = MemoryUnit.getMemoryUnit( defaultUnit.getValue() - 1 );
+                defaultUnit = MemoryUnit.getMemoryUnit( defaultUnit.getUnitIdx() - 1 );
             }
         }
         memoryTextField.setValue( conversionResult );

@@ -24,13 +24,15 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.CloneParam;
@@ -875,7 +877,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     @Override
-    public String getQuota( ContainerHost host, final QuotaEnum quota ) throws PeerException
+    public PeerQuotaInfo getQuota( ContainerHost host, final QuotaType quota ) throws PeerException
     {
         try
         {
@@ -890,12 +892,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     @Override
-    public void setQuota( ContainerHost host, final QuotaEnum quota, final String value ) throws PeerException
+    public void setQuota( ContainerHost host, final QuotaInfo quota ) throws PeerException
     {
         try
         {
             Host c = bindHost( host.getHostId() );
-            quotaManager.setQuota( c.getHostname(), quota, value );
+            quotaManager.setQuota( c.getHostname(), quota );
         }
         catch ( QuotaException e )
         {
