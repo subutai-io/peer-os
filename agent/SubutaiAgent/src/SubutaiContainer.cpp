@@ -97,8 +97,7 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
     }
     pid_t pid;
     try {
-        lxc_attach_command_t cmd = {_params[0], _params};
-        result.exit_code = this->container->attach(this->container, lxc_attach_run_command, &cmd, &opts, &pid);
+        result.exit_code = this->container->attach_run_wait(this->container, &opts, _params[0], _params);
     } catch (std::exception e) {
         containerLogger->writeLog(3, containerLogger->setLogData(_logEntry, "Execution failed (LXC): " + string(e.what())));
     }
