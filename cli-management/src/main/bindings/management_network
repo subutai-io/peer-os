@@ -45,6 +45,9 @@ Usage:   Create VNI-VLAN Mapping on a Tunnel
 
 Usage:   Delete VNI-VLAN Mapping on a Tunnel                 
         "subutai \[-qh\] management_network -M TUNNELPORTNAME VNI VLANID
+Usage:   List  VNI-VLAN Mapping on a Tunnel                 
+        "subutai \[-qh\] management_network -v 
+
 -------------------------------------------------------------------------------
 EOF
 }
@@ -80,9 +83,10 @@ function management_network {
   local removeGateway="false"
   local vnivlanMap="false"  
   local delvnivlanMap="false"
-  
+  local listVNImapping="false"
+
   shift_amount=0;
-  while getopts ":clrfspdNLRTDmM:" opt; do
+  while getopts ":clrfspdNLRTDmvM:" opt; do
      case $opt in
        c)
 	 createTunnel="true"	
@@ -133,6 +137,10 @@ function management_network {
          ;;
        m)
          vnivlanMap="true"
+         shift
+         ;;
+       v)
+         listVNImapping="true"
          shift
          ;;
        M)
@@ -372,6 +380,7 @@ function management_network {
       net_check_N2N_IpAddress $supernodeIpAddress $localPeerIpAddress
       net_check_portNumber $supernodePort
       net_check_keyType $keyType
+      net_create_tap_device $interfaceName $localPeerIpAddress 
       
       if [ $keyType = "string" ]; then 
          edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -k $keyFile -r -a $localPeerIpAddress
@@ -439,6 +448,28 @@ function management_network {
       ovs-vsctl del-port br-int intto$vlanID
       msg_info "Gateway removed for $vlanID"
    fi
+
+
+   if [ "true" == "$listVNImapping" ]; then
+      search_dir="/var/subutai-network"
+      if [ -d "$search_dir" ]; then
+         # Control will enter here if $DIRECTORY exists.
+         echo "#################################################################################"
+         echo -e "  Tunnel name\t |  VNI \t| VLAN ID   "
+         for entry in "$search_dir"/*
+           do
+             if [ -f "$entry" ]; then  
+               echo "---------------------------------------------------------------------------------"
+               echo $(basename $entry)} | awk -F"_" '{print "\t",$1,""}'
+               cat $entry | awk -F" " '{print "\t\t | ",$1,"\t\t| ",$2}';
+             fi
+           done
+         echo "#################################################################################"
+      else 
+         echo "It seems no VNi mapping yet cause I can't open folder $search_dir"
+      fi
+   fi
+
 
    if [ "true" == "$delvnivlanMap" ]; then
      tunnelName="$1"
