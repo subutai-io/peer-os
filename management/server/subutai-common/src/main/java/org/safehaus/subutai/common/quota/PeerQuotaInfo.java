@@ -27,6 +27,15 @@ public class PeerQuotaInfo
     }
 
 
+    public PeerQuotaInfo( final QuotaInfo quotaInfo )
+    {
+        if ( quotaInfo instanceof CpuQuotaInfo )
+        {
+            this.cpuQuotaInfo = new CpuQuotaInfo( quotaInfo.getQuotaValue() );
+        }
+    }
+
+
     public CpuQuotaInfo getCpuQuotaInfo()
     {
         return cpuQuotaInfo;
