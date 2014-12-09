@@ -8,6 +8,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 
+import javax.ws.rs.core.Response;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -31,76 +32,83 @@ public class RestServiceImplTest
     public void setUp() throws Exception
     {
         restService = new RestServiceImpl();
+        restService.setHbaseManager(hBase);
+
     }
 
     @Test
     public void testGetHbaseManager() throws Exception
     {
-        restService.setHbaseManager(hBase);
         restService.getHbaseManager();
 
         // assertions
         assertNotNull(restService.getHbaseManager());
-        assertEquals(hBase,restService.getHbaseManager());
+        assertEquals(hBase, restService.getHbaseManager());
 
     }
 
-    @Test
-    public void testSetHbaseManager() throws Exception
-    {
-        restService.setHbaseManager(hBase);
-        restService.getHbaseManager();
-
-        // assertions
-        assertNotNull(restService.getHbaseManager());
-        assertEquals(hBase,restService.getHbaseManager());
-    }
 
     @Test
     public void testCreateCluster() throws Exception
     {
-        restService.setHbaseManager(hBase);
-
         when(hBase.installCluster(any(HBaseConfig.class))).thenReturn(UUID.randomUUID());
+        Response response = restService.createCluster("test");
 
-//        restService.createCluster("test");
+        // assertions
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     }
 
     @Test
     public void testDestroyCluster() throws Exception
     {
-        restService.setHbaseManager(hBase);
         when(hBase.uninstallCluster(anyString())).thenReturn(UUID.randomUUID());
-//        restService.destroyCluster("test");
+        Response response = restService.destroyCluster("test");
+
+        // assertions
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
 
     @Test
     public void testStartCluster() throws Exception
     {
+        when(hBase.startCluster(anyString())).thenReturn(UUID.randomUUID());
+        Response response = restService.startCluster("test");
 
+        // assertions
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
 
     @Test
     public void testStopCluster() throws Exception
     {
+        when(hBase.stopCluster(anyString())).thenReturn(UUID.randomUUID());
+        Response response = restService.stopCluster("test");
+
+        // assertions
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
     }
 
     @Test
     public void testDestroyNode() throws Exception
     {
+        when(hBase.destroyNode(anyString(), anyString())).thenReturn(UUID.randomUUID());
+        Response response = restService.destroyNode("test", "test", "test");
 
-    }
-
-    @Test
-    public void testCheckNode() throws Exception
-    {
+        // assertions
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
     }
 
     @Test
     public void testAddNode() throws Exception
     {
+        when(hBase.addNode(anyString(), anyString())).thenReturn(UUID.randomUUID());
+        Response response = restService.addNode("test","test");
+
+        // assertions
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
     }
+
 }

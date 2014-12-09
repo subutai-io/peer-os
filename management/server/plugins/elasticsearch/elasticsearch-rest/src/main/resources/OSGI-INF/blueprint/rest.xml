@@ -14,7 +14,7 @@
   <reference id="elasticsearch" availability="mandatory"
              interface="org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch" />
 
-  <bean id="restService" class="org.safehaus.subutai.plugin.elasticsearch.rest.RestService">
+  <bean id="restService" class="org.safehaus.subutai.plugin.elasticsearch.rest.RestServiceImpl">
     <property name="elasticsearch" ref="elasticsearch" />
   </bean>
 

@@ -13,6 +13,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -63,5 +64,18 @@ public class ListClustersCommandTest
 
         // assertions
         verify(hadoop).getClusters();
+    }
+
+    @Test
+    public void testDoExecuteWhenNoHadoopCluster() throws Exception
+    {
+        List<HadoopClusterConfig> myList = new ArrayList<>();
+        when(hadoop.getClusters()).thenReturn(myList);
+
+        listClustersCommand.doExecute();
+
+        // assertions
+        verify(hadoop).getClusters();
+        assertTrue(myList.isEmpty());
     }
 }

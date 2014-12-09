@@ -61,11 +61,9 @@
       <artifactId>org.apache.servicemix.bundles.junit</artifactId>
       <scope>test</scope>
     </dependency>
-    <!--CXF-->
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-      <version>${org.apache.cxf.version}</version>
     </dependency>
 
   </dependencies>
