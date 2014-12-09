@@ -34,6 +34,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <list>
+#include <algorithm>
 #include <sys/utsname.h>
 #include "pugixml.hpp"
 #include <boost/uuid/uuid.hpp>

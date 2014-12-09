@@ -40,4 +40,28 @@
     </service-properties>
   </service>
 
+  <bean id="messengerJDBC" class="org.h2.jdbcx.JdbcDataSource">
+    <property name="URL" value="jdbc:h2:/root/db/messengerDb" />
+    <property name="user" value="sa" />
+    <property name="password" value="" />
+  </bean>
+
+  <service interface="javax.sql.DataSource" ref="messengerJDBC">
+    <service-properties>
+      <entry key="osgi.jndi.service.name" value="openjpa/messengerDS" />
+    </service-properties>
+  </service>
+
+  <bean id="trackerJDBC" class="org.h2.jdbcx.JdbcDataSource">
+    <property name="URL" value="jdbc:h2:/root/db/trackerDb" />
+    <property name="user" value="sa" />
+    <property name="password" value="" />
+  </bean>
+
+  <service interface="javax.sql.DataSource" ref="trackerJDBC">
+    <service-properties>
+      <entry key="osgi.jndi.service.name" value="openjpa/trackerDS" />
+    </service-properties>
+  </service>
+
 </blueprint>

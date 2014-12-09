@@ -34,18 +34,25 @@ public class EnvironmentImpl implements Environment, Serializable
     @Id
     @Column( name = "environment_id" )
     private String environmentId;
+
     @Column( name = "name" )
     private String name;
+
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentContainerImpl.class,
-            cascade = CascadeType.ALL, orphanRemoval = true )
+                cascade = CascadeType.ALL, orphanRemoval = true )
     private Set<ContainerHost> containers = new HashSet<>();
+
     @Enumerated( EnumType.STRING )
     private EnvironmentStatusEnum status;
+
     @Column( name = "create_time" )
     private long creationTimestamp;
 
+    @Column( name = "public_key", length = 3000 )
+    private String publicKey;
 
-    private EnvironmentImpl()
+
+    protected EnvironmentImpl()
     {
     }
 
@@ -59,24 +66,28 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
+    @Override
     public long getCreationTimestamp()
     {
         return creationTimestamp;
     }
 
 
+    @Override
     public EnvironmentStatusEnum getStatus()
     {
         return status;
     }
 
 
+    @Override
     public void setStatus( final EnvironmentStatusEnum status )
     {
         this.status = status;
     }
 
 
+    @Override
     public void addContainer( ContainerHost container )
     {
         if ( container == null )
@@ -93,30 +104,42 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
+    @Override
     public Set<ContainerHost> getContainerHosts()
     {
         return containers;
     }
 
-    //
-    //    public void setContainers( final Set<ContainerHost> containers )
-    //    {
-    //        this.containers = containers;
-    //    }
 
-
+    @Override
     public String getName()
     {
         return name;
     }
 
 
+    @Override
     public UUID getId()
     {
         return UUID.fromString( environmentId );
     }
 
 
+    @Override
+    public String getPublicKey()
+    {
+        return publicKey;
+    }
+
+
+    @Override
+    public void setPublicKey( String publicKey )
+    {
+        this.publicKey = publicKey;
+    }
+
+
+    @Override
     public ContainerHost getContainerHostById( UUID uuid )
     {
         Iterator<ContainerHost> iterator = getContainerHosts().iterator();
@@ -132,6 +155,7 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
+    @Override
     public ContainerHost getContainerHostByHostname( String hostname )
     {
         Iterator<ContainerHost> iterator = getContainerHosts().iterator();
@@ -147,6 +171,7 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
+    @Override
     public Set<ContainerHost> getContainerHostsByIds( Set<UUID> ids )
     {
         Set<ContainerHost> hosts = Sets.newHashSet();
@@ -162,6 +187,7 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
+    @Override
     public void addContainers( final Set<ContainerHost> containerHosts )
     {
         for ( ContainerHost containerHost : containerHosts )
@@ -173,8 +199,10 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
+    @Override
     public void removeContainer( final ContainerHost containerHost )
     {
         getContainerHosts().remove( containerHost );
     }
 }
+

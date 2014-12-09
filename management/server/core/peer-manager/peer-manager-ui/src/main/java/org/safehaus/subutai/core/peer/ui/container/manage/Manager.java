@@ -8,8 +8,13 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.safehaus.subutai.common.quota.CpuQuotaInfo;
+import org.safehaus.subutai.common.quota.Memory;
+import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.ContainerState;
@@ -431,11 +436,11 @@ public class Manager extends VerticalLayout
                 Label containerStatus = new Label();
                 Button updateQuota = new Button( "Update" );
                 updateQuota.addStyleName( "default" );
-                String containerMemory;
+                PeerQuotaInfo containerMemory;
                 final QuotaMemoryComponent memoryQuotaComponent = new QuotaMemoryComponent();
                 final QuotaComponents modifyQuota = new QuotaComponents();
 
-                String containerCpu = "Cpu Shares";
+                //                String containerCpu = "Cpu Shares";
                 final TextField containerCpuTextField = new TextField();
                 final String lxcHostname = containerHost.getHostname();
                 ContainerHostState state = null;
@@ -454,14 +459,14 @@ public class Manager extends VerticalLayout
 
                     try
                     {
-                        containerMemory = containerHost.getQuota( QuotaEnum.MEMORY_LIMIT_IN_BYTES );
-                        containerCpu = containerHost.getQuota( QuotaEnum.CPUSET_CPUS );
-                        containerCpuTextField.setValue( containerCpu );
+                        containerMemory = containerHost.getQuota( QuotaType.QUOTA_ALL_JSON );
+                        containerCpuTextField.setValue( containerMemory.getCpuQuotaInfo().getQuotaValue() );
 
-                        modifyQuota.setValueFormemoryTextField2( containerMemory );
-                        modifyQuota.setValueForCoresUsedTextField( containerCpu );
+                        modifyQuota.setValueForMemoryTextField2( containerMemory.getMemoryQuota().getQuotaValue() );
+                        modifyQuota.setValueForCoresUsedTextField( containerMemory.getCpuQuotaInfo().getQuotaValue() );
 
-                        memoryQuotaComponent.setValueForMemoryTextField( containerMemory );
+                        memoryQuotaComponent
+                                .setValueForMemoryTextField( containerMemory.getMemoryQuota().getQuotaValue() );
                         updateQuota.addClickListener( new Button.ClickListener()
                         {
                             @Override
@@ -497,8 +502,13 @@ public class Manager extends VerticalLayout
                                 {
                                     String memoryLimit = modifyQuota.getMemoryLimitValue();
                                     String cpuLimit = modifyQuota.getValueFromCpuCoresUsed();
-                                    containerHost.setQuota( QuotaEnum.MEMORY_LIMIT_IN_BYTES, memoryLimit );
-                                    containerHost.setQuota( QuotaEnum.CPUSET_CPUS, cpuLimit );
+
+                                    Memory memory = new Memory( memoryLimit );
+                                    QuotaInfo memoryQuota = new MemoryQuotaInfo( memory );
+                                    QuotaInfo cpuQuota = new CpuQuotaInfo( cpuLimit );
+
+                                    containerHost.setQuota( memoryQuota );
+                                    containerHost.setQuota( cpuQuota );
                                 }
                                 catch ( PeerException pe )
                                 {

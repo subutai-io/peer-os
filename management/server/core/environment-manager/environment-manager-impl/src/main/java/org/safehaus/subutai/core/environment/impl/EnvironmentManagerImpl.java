@@ -153,7 +153,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             LOG.error( e.getMessage(), e );
         }
-        entityManagerFactory.createEntityManager();
+        entityManagerFactory.createEntityManager().close();
         environmentDataService = new EnvironmentDataService( entityManagerFactory );
     }
 
@@ -315,7 +315,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void saveEnvironment( final Environment environment ) throws EnvironmentManagerException
+    public void saveEnvironment( final Environment environment )
     {
 
         if ( environmentDataService.find( environment.getId().toString() ) == null )
@@ -463,6 +463,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         else if ( topologyData instanceof NodeGroup2PeerGroupData )
         {
             factory = new NodeGroup2PeerGroupBuilder( this );
+        }
+        else
+        {
+            throw new EnvironmentManagerException( "Unsupported topology data: " + topologyData );
         }
 
         try

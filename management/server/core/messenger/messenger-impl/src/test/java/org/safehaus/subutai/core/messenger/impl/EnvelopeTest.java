@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -18,6 +19,7 @@ import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.fail;
 
 
+@Ignore
 @RunWith( MockitoJUnitRunner.class )
 public class EnvelopeTest
 {

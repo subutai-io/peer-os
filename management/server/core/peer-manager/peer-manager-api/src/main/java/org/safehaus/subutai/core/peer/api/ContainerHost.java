@@ -2,8 +2,10 @@ package org.safehaus.subutai.core.peer.api;
 
 
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 
 
 /**
@@ -34,9 +36,9 @@ public interface ContainerHost extends Host
 
     //    public void setParent( ResourceHost resourceHost );
 
-    String getQuota( QuotaEnum memoryLimitInBytes ) throws PeerException;
+    public PeerQuotaInfo getQuota( QuotaType quotaType ) throws PeerException;
 
-    void setQuota( QuotaEnum memoryLimitInBytes, String memoryLimit ) throws PeerException;
+    public void setQuota( QuotaInfo quota ) throws PeerException;
 
     String getCreatorPeerId();
 

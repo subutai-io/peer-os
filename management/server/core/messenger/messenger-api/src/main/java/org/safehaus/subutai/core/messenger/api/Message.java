@@ -48,4 +48,6 @@ public interface Message
      * @param sender - sender of message
      */
     public void setSender( String sender );
+
+    String getPayload();
 }
