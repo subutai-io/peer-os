@@ -7,7 +7,6 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.HddQuotaInfo;
-import org.safehaus.subutai.common.quota.Memory;
 import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
@@ -81,29 +80,44 @@ public class QuotaManagerImpl implements QuotaManager
                 JSONObject jsonObject = new JSONObject( commandResult.getStdOut() );
 
                 CpuQuotaInfo cpuQuota = new CpuQuotaInfo( jsonObject.getString( QuotaType.QUOTA_CPU_CPUS.getKey() ) );
-                HddQuotaInfo hddHomeQuota = new HddQuotaInfo( "home",
-                        new Memory( jsonObject.getString( QuotaType.QUOTA_HDD_HOME.getKey() ) ) );
-                HddQuotaInfo hddVarQuota = new HddQuotaInfo( "var",
-                        new Memory( jsonObject.getString( QuotaType.QUOTA_HDD_VAR.getKey() ) ) );
-                HddQuotaInfo hddOptQuota = new HddQuotaInfo( "opt",
-                        new Memory( jsonObject.getString( QuotaType.QUOTA_HDD_OPT.getKey() ) ) );
-                HddQuotaInfo hddRootfsQuota = new HddQuotaInfo( "rootfs",
-                        new Memory( jsonObject.getString( QuotaType.QUOTA_HDD_ROOTFS.getKey() ) ) );
-                MemoryQuotaInfo memoryQuotaInfo = new MemoryQuotaInfo(
-                        new Memory( jsonObject.getString( QuotaType.QUOTA_MEMORY_QUOTA.getKey() ) ) );
+                HddQuotaInfo hddHomeQuota =
+                        new HddQuotaInfo( "home", jsonObject.getString( QuotaType.QUOTA_HDD_HOME.getKey() ) );
+                HddQuotaInfo hddVarQuota =
+                        new HddQuotaInfo( "var", jsonObject.getString( QuotaType.QUOTA_HDD_VAR.getKey() ) );
+                HddQuotaInfo hddOptQuota =
+                        new HddQuotaInfo( "opt", jsonObject.getString( QuotaType.QUOTA_HDD_OPT.getKey() ) );
+                HddQuotaInfo hddRootfsQuota =
+                        new HddQuotaInfo( "rootfs", jsonObject.getString( QuotaType.QUOTA_HDD_ROOTFS.getKey() ) );
+                MemoryQuotaInfo memoryQuotaInfo =
+                        new MemoryQuotaInfo( jsonObject.getString( QuotaType.QUOTA_MEMORY_QUOTA.getKey() ) );
 
                 return new PeerQuotaInfo( cpuQuota, hddHomeQuota, hddVarQuota, hddOptQuota, hddRootfsQuota,
                         memoryQuotaInfo );
             }
             else if ( quotaType == QuotaType.QUOTA_MEMORY_QUOTA )
             {
-                Memory memory = new Memory( commandResult.getStdOut() );
-                return new PeerQuotaInfo( null, null, null, null, null, new MemoryQuotaInfo( memory ) );
+                return new PeerQuotaInfo( new MemoryQuotaInfo( commandResult.getStdOut() ) );
             }
             else if ( quotaType == QuotaType.QUOTA_CPU_CPUS )
             {
                 CpuQuotaInfo cpuQuotaInfo = new CpuQuotaInfo( commandResult.getStdOut() );
-                return new PeerQuotaInfo( cpuQuotaInfo, null, null, null, null, null );
+                return new PeerQuotaInfo( cpuQuotaInfo );
+            }
+            else if ( quotaType == QuotaType.QUOTA_HDD_HOME )
+            {
+                return new PeerQuotaInfo( new HddQuotaInfo( "home", commandResult.getStdOut() ) );
+            }
+            else if ( quotaType == QuotaType.QUOTA_HDD_OPT )
+            {
+                return new PeerQuotaInfo( new HddQuotaInfo( "opt", commandResult.getStdOut() ) );
+            }
+            else if ( quotaType == QuotaType.QUOTA_HDD_ROOTFS )
+            {
+                return new PeerQuotaInfo( new HddQuotaInfo( "rootfs", commandResult.getStdOut() ) );
+            }
+            else if ( quotaType == QuotaType.QUOTA_HDD_VAR )
+            {
+                return new PeerQuotaInfo( new HddQuotaInfo( "var", commandResult.getStdOut() ) );
             }
             else
             {
