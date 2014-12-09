@@ -156,3 +156,21 @@ function net_check_keyFile {
     show_usage "`management_network_usage`"
   fi
 }
+
+function net_create_tap_device {
+  local interfaceName=$1
+  local localPeerIpAddress=$2
+ 
+  #get IP list Array via hostname function
+  deviceExist=`hostname -I`
+
+  #check tap device is created or not.
+  if [[ $deviceExist == *"$localPeerIpAddress"* ]]; then
+    #device exist, skip re-create tap device operation continue with edge command
+    msg_info "Device $interfaceName : exist with $localPeerIpAddress"
+  else
+    #create device with its name and ip address, call "tap_create"
+    msg_info "Device $interfaceName : does not exist creating tap device.."
+    tap_create -d $interfaceName -a $localPeerIpAddress &
+  fi
+}
