@@ -282,6 +282,7 @@ string SubutaiContainer::getContainerArch()
             if (found != string::npos) {
                 _arch = _arch.substr(0, found);
             }
+            std::transform(_arch.begin(), _arch.end(), _arch.begin(), ::toupper);
         } catch (std::exception e) {
             containerLogger->writeLog(3, containerLogger->setLogData(_logEntry, "Exception: " + string(e.what())));
         }
