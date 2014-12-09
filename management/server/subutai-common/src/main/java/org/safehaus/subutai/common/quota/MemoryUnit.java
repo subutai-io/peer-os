@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.lxc.quota.api;
+package org.safehaus.subutai.common.quota;
 
 
 /**
@@ -6,20 +6,26 @@ package org.safehaus.subutai.core.lxc.quota.api;
  */
 public enum MemoryUnit
 {
-    BYTES( "b", "Bytes", 0 ),
-    KILOBYTES( "k", "Kilobytes", 1 ),
-    MEGABYTES( "m", "Megabytes", 2 ),
-    GIGABYTES( "g", "Gigabytes", 3 );
+    BYTES( "B", "Bytes", 0 ),
+    KILOBYTES( "K", "Kilobytes", 1 ),
+    MEGABYTES( "M", "Megabytes", 2 ),
+    GIGABYTES( "G", "Gigabytes", 3 ),
+    TERABYTES( "T", "Terabytes", 4 ),
+    PETABYTES( "P", "Petabytes", 5 ),
+    EXABYTES( "E", "Exabytes", 6 ),
+    ZETTABYTES( "Z", "Zetabytes", 7 ),
+    YOTTABYTES( "Y", "Yottabytes", 8 ),
+    NONE( "none", "None", 9 );
     private String shortName;
     private String longName;
-    private int value;
+    private int unitIdx;
 
 
-    private MemoryUnit( String shortName, String longName, int value )
+    private MemoryUnit( String shortName, String longName, int unitIdx )
     {
         this.shortName = shortName;
         this.longName = longName;
-        this.value = value;
+        this.unitIdx = unitIdx;
     }
 
 
@@ -35,9 +41,9 @@ public enum MemoryUnit
     }
 
 
-    public int getValue()
+    public int getUnitIdx()
     {
-        return value;
+        return unitIdx;
     }
 
 
@@ -64,15 +70,19 @@ public enum MemoryUnit
         switch ( unit )
         {
             case "b":
+            case "B":
             case "Bytes":
                 return BYTES;
             case "k":
+            case "K":
             case "Kilobytes":
                 return KILOBYTES;
             case "m":
+            case "M":
             case "Megabytes":
                 return MEGABYTES;
             case "g":
+            case "G":
             case "Gigabytes":
                 return GIGABYTES;
             default:

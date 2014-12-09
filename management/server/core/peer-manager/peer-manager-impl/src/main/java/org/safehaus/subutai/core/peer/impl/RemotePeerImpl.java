@@ -14,8 +14,10 @@ import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
@@ -219,14 +221,14 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public String getQuota( final ContainerHost host, final QuotaEnum quota ) throws PeerException
+    public PeerQuotaInfo getQuota( final ContainerHost host, final QuotaType quotaType ) throws PeerException
     {
         throw new PeerException( "Operation not allowed." );
     }
 
 
     @Override
-    public void setQuota( final ContainerHost host, final QuotaEnum quota, final String value ) throws PeerException
+    public void setQuota( final ContainerHost host, final QuotaInfo quota ) throws PeerException
     {
         throw new PeerException( "Operation not allowed." );
     }
