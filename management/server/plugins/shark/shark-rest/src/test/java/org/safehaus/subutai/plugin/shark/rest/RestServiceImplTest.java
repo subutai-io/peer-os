@@ -23,6 +23,7 @@ public class RestServiceImplTest
 {
     private RestServiceImpl restService;
     @Mock
+
     Shark shark;
     @Mock
     SharkClusterConfig sharkClusterConfig;
@@ -65,6 +66,7 @@ public class RestServiceImplTest
     @Test
     public void testInstallCluster() 
     {
+
         when(shark.installCluster(any(SharkClusterConfig.class))).thenReturn(UUID.randomUUID());
         restService.installCluster("test");
 
