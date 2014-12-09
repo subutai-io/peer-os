@@ -4,7 +4,9 @@
 # Set of functions for monitoring functionality
 # ==========================================================================
 
-metric_list=("ram" "cpu" "disk")
+metric_list=("ram" "cpu" "diskVar" "diskOpt" "diskHome" "diskRootfs")
+dataset_list=("var" "opt" "home" "rootfs")
+pool_list=("lxc" "lxc-data")
 parameter_list=("metricCollectionIntervalInMin" "maxSampleCount" "metricCountToAverageToAlert" "intervalBetweenAlertsInMin" "ramAlertThreshold" "cpuAlertThreshold" "diskAlertThreshold")
 
 
@@ -261,39 +263,249 @@ function get_physical_used_cpu {
 }
 
 
-function get_available_disk {
+function get_available_disk_by_dataset {
+  local lxc=$1
+  local dataset=$2
+  lxc_assert $lxc > /dev/null
+  assert_dataset $dataset
+  echo $(fs_get_available_disk "$lxc" "$dataset")
+}
+
+
+function get_available_disk_var {
   local lxc=$1
   lxc_assert $lxc > /dev/null
-  echo "100000"
+  echo $(get_available_disk_by_dataset "$lxc" "var")
 }
 
 
-function get_used_disk {
+function get_available_disk_opt {
   local lxc=$1
   lxc_assert $lxc > /dev/null
-  echo "50000"
+  echo $(get_available_disk_by_dataset "$lxc" "opt")
 }
 
 
-function get_total_disk {
+function get_available_disk_home {
   local lxc=$1
   lxc_assert $lxc > /dev/null
-  echo "150000"
+  echo $(get_available_disk_by_dataset "$lxc" "home")
 }
 
 
-function get_physical_available_disk {
-  echo "400000"
+function get_available_disk_rootfs {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_available_disk_by_dataset "$lxc" "rootfs")
 }
 
 
-function get_physical_used_disk {
-  echo "150000"
+function get_used_disk_by_dataset {
+  local lxc=$1
+  local dataset=$2
+  lxc_assert $lxc > /dev/null
+  assert_dataset $dataset
+  echo $(fs_get_used_disk "$lxc" "$dataset")
 }
 
 
-function get_physical_total_disk {
-  echo "550000"
+function get_used_disk_var {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_used_disk_by_dataset "$lxc" "var")
+}
+
+
+function get_used_disk_opt {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_used_disk_by_dataset "$lxc" "opt")
+}
+
+
+function get_used_disk_home {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_used_disk_by_dataset "$lxc" "home")
+}
+
+
+function get_used_disk_rootfs {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_used_disk_by_dataset "$lxc" "rootfs")
+}
+
+
+function get_total_disk_by_dataset {
+  local lxc=$1
+  local dataset=$2
+  assert_dataset $dataset
+
+  local disk_quota=$(fs_get_quota $lxc | grep "$dataset" | cut -d':' -f2 | tr -d '\040\011\015')
+  local physical_total_disk_dataset=$(get_physical_total_disk_"$dataset")
+  local numberExpression='^[0-9]+$'
+
+  if [ -z "$disk_quota" ]; then
+    echo "$physical_total_disk_dataset"
+    return
+  fi
+  # Check if the value is a number
+  if ! [[ $disk_quota =~ $numberExpression ]] ; then
+    echo "$physical_total_disk_dataset"
+    return
+  fi
+
+  assert_number "$disk_quota"  > /dev/null
+
+  if (( $(bc <<< "$disk_quota <= $physical_total_disk_dataset") == 1 )); then
+    echo "$disk_quota"
+    return
+  fi
+  echo "$physical_total_disk_dataset"
+  return
+}
+
+
+function get_total_disk_var {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_total_disk_by_dataset "$lxc" "var")
+}
+
+
+function get_total_disk_opt {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_total_disk_by_dataset "$lxc" "opt")
+}
+
+
+function get_total_disk_home {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_total_disk_by_dataset "$lxc" "home")
+}
+
+
+function get_total_disk_rootfs {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_total_disk_by_dataset "$lxc" "rootfs")
+}
+
+
+function get_var_dataset_pool {
+  echo "lxc-data"
+}
+
+
+function get_opt_dataset_pool {
+  echo "lxc"
+}
+
+
+function get_home_dataset_pool {
+  echo "lxc-data"
+}
+
+
+function get_rootfs_dataset_pool {
+  echo "lxc"
+}
+
+
+function get_physical_available_disk_by_pool_name {
+  local pool_name=$1
+  assert_pool $pool_name
+  echo $(fs_get_physical_available_disk "$pool_name")
+}
+
+
+function get_physical_available_disk_var {
+  local pool=$(get_var_dataset_pool)
+  get_physical_available_disk_by_pool_name $pool
+}
+
+
+function get_physical_available_disk_opt {
+  local pool=$(get_opt_dataset_pool)
+  get_physical_available_disk_by_pool_name $pool
+}
+
+
+function get_physical_available_disk_home {
+  local pool=$(get_home_dataset_pool)
+  get_physical_available_disk_by_pool_name $pool
+}
+
+
+function get_physical_available_disk_rootfs {
+  local pool=$(get_rootfs_dataset_pool)
+  get_physical_available_disk_by_pool_name $pool
+}
+
+
+function get_physical_used_disk_by_pool_name {
+  local pool_name=$1
+  assert_pool $pool_name
+  echo $(fs_get_physical_used_disk "$pool_name")
+}
+
+
+function get_physical_used_disk_var {
+  local pool=$(get_var_dataset_pool)
+  get_physical_used_disk_by_pool_name $pool
+}
+
+
+function get_physical_used_disk_opt {
+  local pool=$(get_opt_dataset_pool)
+  get_physical_used_disk_by_pool_name $pool
+}
+
+
+function get_physical_used_disk_home {
+  local pool=$(get_home_dataset_pool)
+  get_physical_used_disk_by_pool_name $pool
+}
+
+
+function get_physical_used_disk_rootfs {
+  local pool=$(get_rootfs_dataset_pool)
+  get_physical_used_disk_by_pool_name $pool
+}
+
+
+function get_physical_total_disk_by_pool_name {
+  local pool_name=$1
+  assert_pool $pool
+  echo $(fs_get_physical_total_disk $pool_name)
+  return
+}
+
+
+function get_physical_total_disk_var {
+  local pool=$(get_var_dataset_pool)
+  get_physical_total_disk_by_pool_name $pool
+}
+
+
+function get_physical_total_disk_opt {
+  local pool=$(get_opt_dataset_pool)
+  get_physical_total_disk_by_pool_name $pool
+}
+
+
+function get_physical_total_disk_home {
+  local pool=$(get_home_dataset_pool)
+  get_physical_total_disk_by_pool_name $pool
+}
+
+
+function get_physical_total_disk_rootfs {
+  local pool=$(get_rootfs_dataset_pool)
+  get_physical_total_disk_by_pool_name $pool
 }
 
 
@@ -572,6 +784,36 @@ function assert_metric {
   if [ $(contains "${metric_list[@]}" "$metric_type") != "y" ]; then
     msg_error "    - $metric_type is not supported metric type. Please provide one of the followings:"
     echo "      ${metric_list[@]}"
+    exit 1
+  fi
+}
+
+
+function assert_dataset {
+  local dataset=$1
+  if [ -z "$dataset" ]; then
+    msg_error "Dataset is empty. Aborting!"
+    exit 1
+  fi
+
+  if [ $(contains "${dataset_list[@]}" "$dataset") != "y" ]; then
+    msg_error "    - $dataset is not supported dataset. Please provide one of the followings:"
+    echo "      ${dataset_list[@]}"
+    exit 1
+  fi
+}
+
+
+function assert_pool {
+  local pool_name=$1
+  if [ -z "$pool_name" ]; then
+    msg_error "Pool name is empty. Aborting!"
+    exit 1
+  fi
+
+  if [ $(contains "${pool_list[@]}" "$pool_name") != "y" ]; then
+    msg_error "    - $pool_name is not supported dataset. Please provide one of the followings:"
+    echo "      ${pool_list[@]}"
     exit 1
   fi
 }

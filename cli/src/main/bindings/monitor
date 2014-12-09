@@ -191,6 +191,7 @@ function monitor {
     else
       lxc=$1
       lxc_assert "$lxc" > /dev/null
+      lxc_assert_running "$lxc"
       get_container_metrics $lxc
     fi
     print_results
@@ -205,9 +206,18 @@ function get_physical_machine_metrics {
   availableRam=$(get_physical_available_ram)
   usedRam=$(get_physical_used_ram)
   usedCpu=$(get_physical_used_cpu)
-  availableDisk=$(get_physical_available_disk)
-  usedDisk=$(get_physical_used_disk)
-  totalDisk=$(get_physical_total_disk)
+  availableDiskVar=$(get_physical_available_disk_var)
+  availableDiskOpt=$(get_physical_available_disk_opt)
+  availableDiskHome=$(get_physical_available_disk_home)
+  availableDiskRootfs=$(get_physical_available_disk_rootfs)
+  usedDiskVar=$(get_physical_used_disk_var)
+  usedDiskOpt=$(get_physical_used_disk_opt)
+  usedDiskHome=$(get_physical_used_disk_home)
+  usedDiskRootfs=$(get_physical_used_disk_rootfs)
+  totalDiskVar=$(get_physical_total_disk_var)
+  totalDiskOpt=$(get_physical_total_disk_opt)
+  totalDiskHome=$(get_physical_total_disk_home)
+  totalDiskRootfs=$(get_physical_total_disk_rootfs)
 }
 
 
@@ -218,15 +228,24 @@ function get_container_metrics {
   availableRam=$(get_available_ram $lxc)
   usedRam=$(get_used_ram $lxc)
   usedCpu=$(get_used_cpu $lxc)
-  availableDisk=$(get_available_disk $lxc)
-  usedDisk=$(get_used_disk $lxc)
-  totalDisk=$(get_total_disk $lxc)
+  availableDiskVar=$(get_available_disk_var $lxc)
+  availableDiskOpt=$(get_available_disk_opt $lxc)
+  availableDiskHome=$(get_available_disk_home $lxc)
+  availableDiskRootfs=$(get_available_disk_rootfs $lxc)
+  usedDiskVar=$(get_used_disk_var $lxc)
+  usedDiskOpt=$(get_used_disk_opt $lxc)
+  usedDiskHome=$(get_used_disk_home $lxc)
+  usedDiskRootfs=$(get_used_disk_rootfs $lxc)
+  totalDiskVar=$(get_total_disk_var $lxc)
+  totalDiskOpt=$(get_total_disk_opt $lxc)
+  totalDiskHome=$(get_total_disk_home $lxc)
+  totalDiskRootfs=$(get_total_disk_rootfs $lxc)
 }
 
 
 function print_results {
   # Result
-  printf '{"host":"%s", "totalRam":"%s", "availableRam":"%s", "usedRam":"%s", "usedCpu":"%s", "availableDisk":"%s", "usedDisk":"%s", "totalDisk":"%s"}\n' "$host" "$totalRam" "$availableRam" "$usedRam" "$usedCpu" "$availableDisk" "$usedDisk" "$totalDisk"
+  printf '{"host":"%s", "totalRam":"%s", "availableRam":"%s", "usedRam":"%s", "usedCpu":"%s", "availableDiskRootfs":"%s", "availableDiskVar":"%s", "availableDiskHome":"%s", "availableDiskOpt":"%s", "usedDiskRootfs":"%s", "usedDiskVar":"%s", "usedDiskHome":"%s", "usedDiskOpt":"%s", "totalDiskRootfs":"%s", "totalDiskVar":"%s", "totalDiskHome":"%s", "totalDiskOpt":"%s"}\n' "$host" "$totalRam" "$availableRam" "$usedRam" "$usedCpu" "$availableDiskRootfs" "$availableDiskVar" "$availableDiskHome" "$availableDiskOpt" "$usedDiskRootfs" "$usedDiskVar" "$usedDiskHome" "$usedDiskOpt" "$totalDiskRootfs" "$totalDiskVar" "$totalDiskHome" "$totalDiskOpt"
 }
 
 
