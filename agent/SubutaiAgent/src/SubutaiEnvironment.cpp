@@ -163,7 +163,7 @@ string SubutaiEnvironment::getAgentArch() {
     } else {
         std::string arch(info.machine);
         std::transform(arch.begin(), arch.end(), arch.begin(), ::toupper);
-        environmentLogger->writeLog(3, environmentLogger->setLogData("<SubutaiAgent>", "Machine architecture:", arch));
+        environmentLogger->writeLog(7, environmentLogger->setLogData("<SubutaiAgent>", "Machine architecture:", arch));
         return arch;
     }
 }
