@@ -14,7 +14,7 @@ import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -27,84 +27,54 @@ import com.google.common.base.Preconditions;
 public class QuotaManagerImpl implements QuotaManager
 {
 
-    private PeerManager peerManager;
     private static Logger LOGGER = LoggerFactory.getLogger( QuotaManagerImpl.class );
+    private PeerManager peerManager;
+    private CommandUtil commandUtil;
 
 
     public QuotaManagerImpl( PeerManager peerManager )
     {
         Preconditions.checkNotNull( peerManager );
         this.peerManager = peerManager;
+        this.commandUtil = new CommandUtil();
     }
 
 
     @Override
-    public void setQuota( String containerHostId, QuotaInfo quotaInfo ) throws QuotaException
+    public void setQuota( String containerName, QuotaInfo quotaInfo ) throws QuotaException
     {
-        Preconditions.checkNotNull( containerHostId, "ContainerName cannot be null" );
+        Preconditions.checkNotNull( containerName, "ContainerName cannot be null" );
         Preconditions.checkNotNull( quotaInfo, "QuotaInfo cannot be null." );
 
-        ContainerHost containerHost;
-        try
-        {
-            containerHost = peerManager.getLocalPeer().getContainerHostByName( containerHostId );
-        }
-        catch ( HostNotFoundException e )
-        {
-            e.printStackTrace();
-            throw new QuotaException( e );
-        }
 
-        String cmd = String.format( "subutai quota %s %s %s", containerHost.getHostname(), quotaInfo.getQuotaKey(),
+        String cmd = String.format( "subutai quota %s %s %s", containerName, quotaInfo.getQuotaKey(),
                 quotaInfo.getQuotaValue() );
         try
         {
-            ResourceHost resourceHost =
-                    peerManager.getLocalPeer().getResourceHostByContainerName( containerHost.getHostname() );
-            RequestBuilder requestBuilder = new RequestBuilder( cmd );
-            try
-            {
-                CommandResult commandResult = resourceHost.execute( requestBuilder );
-                if ( commandResult == null || !commandResult.hasSucceeded() )
-                {
-                    throw new QuotaException( "Error setting quota value for command: " + cmd );
-                }
-            }
-            catch ( CommandException ignored )
-            {
-                throw new QuotaException( "Error setting quota value for command: " + cmd, ignored );
-            }
+            ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerName( containerName );
+
+            commandUtil.execute( new RequestBuilder( cmd ), resourceHost );
         }
-        catch ( HostNotFoundException e )
+        catch ( CommandException | HostNotFoundException e )
         {
+            LOGGER.error( "Error in setQuota", e );
             throw new QuotaException( "Error setting quota value for command: " + cmd, e );
         }
     }
 
 
     @Override
-    public PeerQuotaInfo getQuota( String containerHostId, QuotaType quotaType ) throws QuotaException
+    public PeerQuotaInfo getQuota( String containerName, QuotaType quotaType ) throws QuotaException
     {
         Preconditions.checkNotNull( quotaType, "QuotaType cannot be null." );
-        Preconditions.checkNotNull( containerHostId, "ContainerName cannot be null." );
+        Preconditions.checkNotNull( containerName, "ContainerName cannot be null." );
 
-        ContainerHost containerHost;
-        try
-        {
-            containerHost = peerManager.getLocalPeer().getContainerHostByName( containerHostId );
-        }
-        catch ( HostNotFoundException e )
-        {
-            throw new QuotaException( e );
-        }
-
-        String cmd = String.format( "subutai quota %s %s", containerHost.getHostname(), quotaType.getKey() );
+        String cmd = String.format( "subutai quota %s %s", containerName, quotaType.getKey() );
 
         try
         {
-            ResourceHost resourceHost =
-                    peerManager.getLocalPeer().getResourceHostByContainerName( containerHost.getHostname() );
-            CommandResult commandResult = resourceHost.execute( new RequestBuilder( cmd ) );
+            ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerName( containerName );
+            CommandResult commandResult = commandUtil.execute( new RequestBuilder( cmd ), resourceHost );
 
             if ( quotaType == QuotaType.QUOTA_ALL_JSON )
             {
@@ -135,13 +105,16 @@ public class QuotaManagerImpl implements QuotaManager
                 CpuQuotaInfo cpuQuotaInfo = new CpuQuotaInfo( commandResult.getStdOut() );
                 return new PeerQuotaInfo( cpuQuotaInfo, null, null, null, null, null );
             }
-            return null;
+            else
+            {
+                //TODO fail here with exception
+                throw new QuotaException( "Don't check one enum and let it be default" );
+            }
         }
         catch ( CommandException | HostNotFoundException e )
         {
-            LOGGER.error( "Error getting quota.", e );
-            throw new QuotaException( e );
+            LOGGER.error( "Error int getQuota.", e );
+            throw new QuotaException( "Error getting quota value for command: " + cmd, e );
         }
-        //        CommandRequest commandRequest = new CommandRequest( new RequestBuilder( cmd ), host.getId() );
     }
 }
