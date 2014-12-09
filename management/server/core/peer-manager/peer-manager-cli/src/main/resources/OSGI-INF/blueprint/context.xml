@@ -51,24 +51,6 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/clone">
-      <action class="org.safehaus.subutai.core.peer.cli.CloneCommand">
-        <property name="peerManager" ref="peerManager" />
-        <property name="templateRegistry" ref="templateRegistry" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/remote-clone">
-      <action class="org.safehaus.subutai.core.peer.cli.RemoteCloneCommand">
-        <property name="peerManager" ref="peerManager" />
-        <property name="templateRegistry" ref="templateRegistry" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/hosts">
       <action class="org.safehaus.subutai.core.peer.cli.HostsCommand">
         <property name="peerManager" ref="peerManager" />

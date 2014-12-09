@@ -33,9 +33,6 @@ public interface Peer
 
     public Set<ContainerHost> getContainerHostsByEnvironmentId( UUID environmentId ) throws PeerException;
 
-    public Set<ContainerHost> createContainers( UUID creatorPeerId, UUID environmentId, List<Template> templates,
-                                                int quantity, String strategyId, List<Criteria> criteria,
-                                                String nodeGroupName ) throws PeerException;
 
     Set<HostInfoModel> scheduleCloneContainers( UUID creatorPeerId, List<Template> templates, int quantity,
                                                 String strategyId, List<Criteria> criteria ) throws PeerException;

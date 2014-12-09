@@ -38,7 +38,6 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 
@@ -188,7 +187,7 @@ public class RestServiceImpl implements RestService
             QuotaType q = GSON.fromJson( quotaType, QuotaType.class );
             LocalPeer localPeer = peerManager.getLocalPeer();
             PeerQuotaInfo quotaInfo = localPeer.getQuota( localPeer.getContainerHostById( hostId ), q );
-            return Response.ok(GSON.toJson( quotaInfo )).build();
+            return Response.ok( GSON.toJson( quotaInfo ) ).build();
         }
         catch ( JsonParseException | PeerException e )
         {
@@ -232,31 +231,6 @@ public class RestServiceImpl implements RestService
         Message message = PhaseInterceptorChain.getCurrentMessage();
         HttpServletRequest request = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
         return request.getRemoteAddr();
-    }
-
-
-    @Override
-    public Response createContainers( final String ownerPeerId, final String environmentId, final String templates,
-                                      final int quantity, final String strategyId, final String criteria,
-                                      final String nodeGroupName )
-    {
-
-        //TODO: Implement criteria restoring
-        List<Criteria> criteriaList = new ArrayList();
-        try
-        {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            Set<ContainerHost> result = localPeer
-                    .createContainers( UUID.fromString( ownerPeerId ), UUID.fromString( environmentId ),
-                            ( List<Template> ) JsonUtil.fromJson( templates, new TypeToken<List<Template>>()
-                            {}.getType() ), quantity, strategyId, criteriaList, nodeGroupName );
-            return Response.ok( JsonUtil.toJson( result ) ).build();
-            //            return Response.ok().entity( result ).build();
-        }
-        catch ( PeerException e )
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
     }
 
 
