@@ -107,7 +107,7 @@ public class QuotaManagerImpl implements QuotaManager
             }
             else
             {
-                //TODO fail here with exception
+                //TODO implement default case here
                 throw new QuotaException( "Don't check one enum and let it be default" );
             }
         }
