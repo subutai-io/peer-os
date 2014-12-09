@@ -62,7 +62,7 @@ public interface Peer
 
     public PeerQuotaInfo getQuota( ContainerHost host, QuotaType quotaType ) throws PeerException;
 
-    public void setQuota( ContainerHost host, QuotaInfo quota ) throws PeerException;
+    public void setQuota( ContainerHost host, QuotaInfo quotaInfo ) throws PeerException;
 
     public Template getTemplate( String templateName ) throws PeerException;
 

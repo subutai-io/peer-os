@@ -223,20 +223,21 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public PeerQuotaInfo getQuota( final ContainerHost host, final QuotaType quotaType ) throws PeerException
     {
-        throw new PeerException( "Operation not allowed." );
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.getQuota( host, quotaType );
     }
 
 
     @Override
-    public void setQuota( final ContainerHost host, final QuotaInfo quota ) throws PeerException
+    public void setQuota( final ContainerHost host, final QuotaInfo quotaInfo ) throws PeerException
     {
-        throw new PeerException( "Operation not allowed." );
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+        remotePeerRestClient.setQuota( host, quotaInfo );
     }
 
 
     @Override
-    public CommandResult execute( final RequestBuilder requestBuilder, final Host host )
-            throws CommandException
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
         return execute( requestBuilder, host, null );
     }
@@ -271,8 +272,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void executeAsync( final RequestBuilder requestBuilder, final Host host )
-            throws CommandException
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
         executeAsync( requestBuilder, host, null );
     }

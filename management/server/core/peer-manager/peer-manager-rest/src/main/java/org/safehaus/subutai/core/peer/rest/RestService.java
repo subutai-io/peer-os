@@ -99,4 +99,14 @@ public interface RestService
     @Path( "update" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response updatePeer( @QueryParam( "peer" ) String peer );
+
+
+    @POST
+    @Path( "container/quota" )
+    Response setQuota( @FormParam( "hostId" ) String hostId, @FormParam( "quotaInfo" ) String quotaInfo );
+
+    @GET
+    @Path( "container/quota" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getQuota( @QueryParam( "hostId" ) String hostId, @QueryParam( "quotaType" ) String quotaType );
 }

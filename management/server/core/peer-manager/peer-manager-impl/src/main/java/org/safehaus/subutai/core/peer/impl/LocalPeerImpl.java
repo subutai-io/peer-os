@@ -886,7 +886,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         }
         catch ( QuotaException e )
         {
-            throw new PeerException( e.toString() );
+            throw new PeerException( e );
         }
     }
 
@@ -901,7 +901,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         }
         catch ( QuotaException e )
         {
-            throw new PeerException( e.toString() );
+            throw new PeerException( e );
         }
     }
 
