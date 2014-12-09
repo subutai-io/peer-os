@@ -76,7 +76,7 @@ string SubutaiContainer::RunProgram(string program, vector<string> params)
 ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> params, bool return_result, lxc_attach_options_t opts, bool captureOutput) 
 {
     if (this->getState() != "RUNNING") throw new SubutaiException("Execution command on a not running container", 101);
-    containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Running program: ", program));
+    containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "Running program: ", program));
     // get arguments list of the command which will be run on lxc
 
     char* _params[params.size() + 2];
@@ -100,7 +100,7 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
         lxc_attach_command_t cmd = {_params[0], _params};
         result.exit_code = this->container->attach(this->container, lxc_attach_run_command, &cmd, &opts, &pid);
     } catch (std::exception e) {
-        containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Execution failed (LXC): " + string(e.what())));
+        containerLogger->writeLog(3, containerLogger->setLogData(_logEntry, "Execution failed (LXC): " + string(e.what())));
     }
     if (captureOutput) {
         char outbuf[4000];
@@ -112,7 +112,7 @@ ExecutionResult SubutaiContainer::RunProgram(string program, vector<string> para
         close(outfd[0]);
         close(outfd[1]);
     }
-    containerLogger->writeLog(1, containerLogger->setLogData(
+    containerLogger->writeLog(6, containerLogger->setLogData(
                 _logEntry,
                 program + " executed. Exit code: " + _helper.toString(result.exit_code)
                 + ", out stream: " + result.out + ", err stream: " + result.err));
@@ -164,7 +164,7 @@ bool SubutaiContainer::getContainerId()
 
         if (this->id.empty())		//if uuid is null or not reading successfully
         {
-            containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "uuid.txt is empty. Generate uuid.."));
+            containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "uuid.txt is empty. Generate uuid.."));
             boost::uuids::random_generator gen;
             boost::uuids::uuid u = gen();
             const std::string tmp = boost::lexical_cast<std::string>(u);
@@ -173,17 +173,17 @@ bool SubutaiContainer::getContainerId()
             struct stat sb;
             if (!(stat(path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)))
             {
-                containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "create directory: subutai-agent.."));
+                containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "create directory: subutai-agent.."));
                 int status = mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH);
-                if (status != 0) containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "\"subutai-agent\" folder cannot be created under /etc/"));
+                if (status != 0) containerLogger->writeLog(2, containerLogger->setLogData(_logEntry, "\"subutai-agent\" folder cannot be created under /etc/"));
             }
 
-            containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "write generated uuid into uuid.txt.."));
+            containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "write generated uuid into uuid.txt.."));
             ofstream file(uuidFile.c_str());
             file << this->id;
             file.close();
 
-            containerLogger->writeLog(1,containerLogger->setLogData(_logEntry,"Subutai Agent UUID: ",this->id));
+            containerLogger->writeLog(6,containerLogger->setLogData(_logEntry,"Subutai Agent UUID: ",this->id));
             return false;
         }
         return true;
@@ -199,13 +199,13 @@ bool SubutaiContainer::getContainerId()
 bool SubutaiContainer::getContainerInterfaces()
 {
     interfaces.clear();
-    containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Interfaces"));
-    containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "State " + getState()));
+    containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Interfaces"));
+    containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "State " + getState()));
 
     if (getState() != "RUNNING") return false;
 
     vector<string> v;
-    containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Run ifconfig on LXC"));
+    containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Run ifconfig on LXC"));
     string result = RunProgram("/sbin/ifconfig", v);
     vector<string> lines = _helper.splitResult(result, "\n");
     string nic = "", address = "", ip = ""; bool found_name=false, found_mac = false, found_ip = false;
@@ -248,7 +248,7 @@ bool SubutaiContainer::getContainerInterfaces()
                 struct Interface interface_n;
                 interface_n.name = nic; interface_n.mac = address; interface_n.ip = ip;
                 interfaces.push_back(interface_n);
-                containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Adding interface: " + nic + " " + address + " " + ip));
+                containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Adding interface: " + nic + " " + address + " " + ip));
                 found_mac = false; found_ip = false; found_name = false; nic = ""; address = ""; ip = "";
             }
         }
@@ -282,8 +282,9 @@ string SubutaiContainer::getContainerArch()
             if (found != string::npos) {
                 _arch = _arch.substr(0, found);
             }
+            std::transform(_arch.begin(), _arch.end(), _arch.begin(), ::toupper);
         } catch (std::exception e) {
-            containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Exception: " + string(e.what())));
+            containerLogger->writeLog(3, containerLogger->setLogData(_logEntry, "Exception: " + string(e.what())));
         }
     }
     return _arch;
@@ -347,7 +348,7 @@ vector<Interface> SubutaiContainer::getContainerInterfaceValues()
  */
 void SubutaiContainer::getContainerAllFields()
 {
-    containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "get all container fields"));
+    containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "get all container fields"));
     clear();
     getContainerId();
     getContainerInterfaces();
@@ -361,19 +362,19 @@ void SubutaiContainer::getContainerAllFields()
  */
 ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command) 
 {
-    containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Running command.. "));
+    containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "Running command.. "));
     // set default lxc attach options
     lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT;
 
     // set working directory for lxc_attach
     if (command->getWorkingDirectory() != "" && checkCWD(command->getWorkingDirectory())) {
-        containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "change working directory.."));
+        containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "change working directory.."));
         opts.initial_cwd = const_cast<char*>(command->getWorkingDirectory().c_str());
     }
 
     // set run as parameter
     if (command->getRunAs() != "" && checkUser(command->getRunAs())) {
-        containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "change user running command by.."));
+        containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "change user running command by.."));
         opts.uid = getRunAsUserId(command->getRunAs());
     }
 
@@ -384,14 +385,14 @@ ExecutionResult SubutaiContainer::RunCommand(SubutaiCommand* command)
         stringstream ss;
         ss << it->first << "=" << it->second;
         strcpy(opts.extra_env_vars[i], ss.str().c_str());
-        containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "set environment " + ss.str()));
+        containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "set environment " + ss.str()));
     }
 
     // divide program and arguments if all arguments are given in program field of command
     string program;
     vector<string> args;
     if (hasSubCommand(command)) {
-        containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Wrapping command with shell"));
+        containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Wrapping command with shell"));
         vector<string> pr = ExplodeCommandArguments(command);
         program = "sh";
         args.push_back("-c");
@@ -433,13 +434,13 @@ ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) {
 
     // set working directory for lxc_attach
     if (command->getWorkingDirectory() != "" && checkCWD(command->getWorkingDirectory())) {
-        containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "change working directory.."));
+        containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "change working directory.."));
         opts.initial_cwd = const_cast<char*>(command->getWorkingDirectory().c_str());
     }
 
     // set run as parameter
     if (command->getRunAs() != "" && checkUser(command->getRunAs())) {
-        containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "change user running command by.."));
+        containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "change user running command by.."));
         opts.uid = getRunAsUserId(command->getRunAs());
     }
 
@@ -462,7 +463,7 @@ ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) {
         try {
             ret = this->container->attach(this->container, lxc_attach_run_command, &cmd, &opts, &pid);
         } catch (std::exception e) {
-            containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Daemon Exception: ", string(e.what())));
+            containerLogger->writeLog(3, containerLogger->setLogData(_logEntry, "Daemon Exception: ", string(e.what())));
         }
     } else {
         char* args[pr.size() + 1];
@@ -484,7 +485,7 @@ ExecutionResult SubutaiContainer::RunDaemon(SubutaiCommand* command) {
             containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Daemon Exception: ", string(e.what())));
         }
     }
-    containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "Daemon pid: ", h.toString(pid)));
+    containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Daemon pid: ", h.toString(pid)));
     containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "Exit code: ", h.toString(ret)));
     ExecutionResult res;
     res.pid = pid;
@@ -502,7 +503,7 @@ bool SubutaiContainer::checkCWD(string cwd)
     if (result.exit_code == 0) { 
         return true;
     } else {
-        containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "working directory not found: "+ cwd + "on " + this->hostname));
+        containerLogger->writeLog(3, containerLogger->setLogData(_logEntry, "working directory not found: "+ cwd + "on " + this->hostname));
         return false;
     }
 }
@@ -522,7 +523,7 @@ bool SubutaiContainer::checkUser(string username)
             return true;
         }
     } 
-    containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "user not found: "+ username + "on " + this->hostname));
+    containerLogger->writeLog(3, containerLogger->setLogData(_logEntry, "user not found: "+ username + "on " + this->hostname));
     return false;
 }
 
@@ -540,7 +541,7 @@ int SubutaiContainer::getRunAsUserId(string username)
             return (*it).first;
         }
     } 
-    containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "user not found: "+ username + "on " + this->hostname));
+    containerLogger->writeLog(3, containerLogger->setLogData(_logEntry, "user not found: "+ username + "on " + this->hostname));
     return -1;
 }
 
@@ -555,7 +556,7 @@ void SubutaiContainer::PutToFile(string filename, string text) {
     args.push_back(">");
     args.push_back(filename);
     args.push_back("'");
-    containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Echo "+ text + "in " + filename));
+    containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Echo "+ text + "in " + filename));
     RunProgram("/bin/bash", args);
 }
 
@@ -575,7 +576,7 @@ string SubutaiContainer::findFullProgramPath(string program_name)
  */
 string SubutaiContainer::RunPsCommand() {
     vector<string> args;
-    containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, "Running ps command.."));
+    containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "Running ps command.."));
     return RunProgram("/opt/psrun", args);
 }
 
@@ -610,7 +611,7 @@ string SubutaiContainer::getState()
     try {
         return string(this->container->state(this->container));
     } catch (std::exception e) {
-        containerLogger->writeLog(1, containerLogger->setLogData(_logEntry, string(e.what())));
+        containerLogger->writeLog(3, containerLogger->setLogData(_logEntry, string(e.what())));
     }
 }
 

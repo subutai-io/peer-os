@@ -9,10 +9,10 @@ public class MemoryQuotaInfo extends QuotaInfo
     private Memory memoryQuota;
 
 
-    public MemoryQuotaInfo( final Memory memoryQuota )
+    public MemoryQuotaInfo( final String memoryQuota )
     {
-        this.memoryQuota = memoryQuota;
-        if ( memoryQuota.getValue() > Long.MAX_VALUE )
+        this.memoryQuota = new Memory( memoryQuota );
+        if ( this.memoryQuota.getValue() > Long.MAX_VALUE )
         {
             this.memoryQuota.unit = MemoryUnit.NONE;
         }

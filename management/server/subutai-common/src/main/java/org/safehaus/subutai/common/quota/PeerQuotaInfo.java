@@ -27,6 +27,38 @@ public class PeerQuotaInfo
     }
 
 
+    public PeerQuotaInfo( final QuotaInfo quotaInfo )
+    {
+        if ( quotaInfo instanceof CpuQuotaInfo )
+        {
+            this.cpuQuotaInfo = ( CpuQuotaInfo ) quotaInfo;
+        }
+        else if ( quotaInfo instanceof HddQuotaInfo )
+        {
+            if ( quotaInfo.getQuotaKey().equals( QuotaType.QUOTA_HDD_HOME.getKey() ) )
+            {
+                this.homePartitionQuota = ( HddQuotaInfo ) quotaInfo;
+            }
+            else if ( quotaInfo.getQuotaKey().equals( QuotaType.QUOTA_HDD_VAR.getKey() ) )
+            {
+                this.varPartitionQuota = ( HddQuotaInfo ) quotaInfo;
+            }
+            else if ( quotaInfo.getQuotaKey().equals( QuotaType.QUOTA_HDD_OPT.getKey() ) )
+            {
+                this.optPartitionQuota = ( HddQuotaInfo ) quotaInfo;
+            }
+            else if ( quotaInfo.getQuotaKey().equals( QuotaType.QUOTA_HDD_ROOTFS.getKey() ) )
+            {
+                this.rootfsPartitionQuota = ( HddQuotaInfo ) quotaInfo;
+            }
+        }
+        else if ( quotaInfo instanceof MemoryQuotaInfo )
+        {
+            this.memoryQuota = ( MemoryQuotaInfo ) quotaInfo;
+        }
+    }
+
+
     public CpuQuotaInfo getCpuQuotaInfo()
     {
         return cpuQuotaInfo;
