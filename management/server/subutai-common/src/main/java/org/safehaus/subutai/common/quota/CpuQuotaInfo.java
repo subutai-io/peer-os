@@ -16,9 +16,11 @@ public class CpuQuotaInfo extends QuotaInfo
 
     public CpuQuotaInfo( String cpuIndexes )
     {
+        cpuIndexes = cpuIndexes.replace( "\n", "" );
         String[] ranges = cpuIndexes.split( "," );
-        for ( final String range : ranges )
+        for ( String range : ranges )
         {
+            range = range.replace( " ", "" );
             String[] neighbour = range.split( "-" );
             Integer start = Integer.parseInt( neighbour[0] );
             Integer end = Integer.parseInt( neighbour[neighbour.length - 1] );

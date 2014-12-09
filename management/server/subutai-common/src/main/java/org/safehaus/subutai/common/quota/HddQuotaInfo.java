@@ -10,10 +10,10 @@ public class HddQuotaInfo extends QuotaInfo
     private Memory memory;
 
 
-    public HddQuotaInfo( final String partitionName, final Memory memory )
+    public HddQuotaInfo( final String partitionName, final String memory )
     {
         this.partitionName = partitionName;
-        this.memory = memory;
+        this.memory = new Memory( memory );
     }
 
 

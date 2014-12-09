@@ -465,3 +465,46 @@ function lxc_install_agent {
     msg_warn "    - subutai agent already installed on $container"
   fi
 }
+
+function lxc_get_memory {
+  local container=$1
+  local resource_parameter="memory.limit_in_bytes"
+
+  lxc_quota_modification $container $resource_parameter
+}
+
+function lxc_set_memory {
+  local container=$1
+  local resource_parameter="memory.limit_in_bytes"
+  local parameter_value=$2
+
+  lxc_quota_modification $container $resource_parameter $parameter_value
+}
+
+function lxc_get_cpus {
+  local container=$1
+  local resource_parameter="cpuset.cpus"
+
+  lxc_quota_modification $container $resource_parameter
+}
+
+function lxc_set_cpus {
+  local container=$1
+  local resource_parameter="cpuset.cpus"
+  local parameter_value=$2
+
+  lxc_quota_modification $container $resource_parameter $parameter_value
+}
+
+function lxc_quota_modification {
+  local container=$1
+  local resource_parameter=$2
+  local parameter_value=$3
+
+  if [ -z "$parameter_value" ]; then
+    lxc-cgroup -n $container $resource_parameter
+  else
+    lxc-cgroup -n $container $resource_parameter $parameter_value
+  fi
+
+}
