@@ -103,6 +103,22 @@ public class QuotaManagerImpl implements QuotaManager
                 CpuQuotaInfo cpuQuotaInfo = new CpuQuotaInfo( commandResult.getStdOut() );
                 return new PeerQuotaInfo( cpuQuotaInfo );
             }
+            else if ( quotaType == QuotaType.QUOTA_HDD_HOME )
+            {
+                return new PeerQuotaInfo( new HddQuotaInfo( "home", commandResult.getStdOut() ) );
+            }
+            else if ( quotaType == QuotaType.QUOTA_HDD_OPT )
+            {
+                return new PeerQuotaInfo( new HddQuotaInfo( "opt", commandResult.getStdOut() ) );
+            }
+            else if ( quotaType == QuotaType.QUOTA_HDD_ROOTFS )
+            {
+                return new PeerQuotaInfo( new HddQuotaInfo( "rootfs", commandResult.getStdOut() ) );
+            }
+            else if ( quotaType == QuotaType.QUOTA_HDD_VAR )
+            {
+                return new PeerQuotaInfo( new HddQuotaInfo( "var", commandResult.getStdOut() ) );
+            }
             else
             {
                 //TODO implement default case here

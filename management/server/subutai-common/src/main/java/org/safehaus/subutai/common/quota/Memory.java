@@ -16,6 +16,7 @@ public class Memory
 
     public Memory( String memory )
     {
+        memory = memory.replace( "\n", "" );
         Pattern p = Pattern.compile( "-?\\d+" );
 
         Matcher m = p.matcher( memory );
