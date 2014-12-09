@@ -8,9 +8,6 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
-/**
- * Commands for NetworkManager
- */
 public class Commands
 {
 
@@ -34,6 +31,15 @@ public class Commands
         return new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
                 "chmod 700 /root/.ssh && " +
                 "echo '%s' > /root/.ssh/authorized_keys && " +
+                "chmod 644 /root/.ssh/authorized_keys", key ) );
+    }
+
+
+    public RequestBuilder getAppendSSHCommand( String key )
+    {
+        return new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
+                "chmod 700 /root/.ssh && " +
+                "echo '%s' >> /root/.ssh/authorized_keys && " +
                 "chmod 644 /root/.ssh/authorized_keys", key ) );
     }
 
