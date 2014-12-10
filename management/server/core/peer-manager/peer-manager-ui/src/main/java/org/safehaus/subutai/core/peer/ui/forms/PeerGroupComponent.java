@@ -145,7 +145,16 @@ public class PeerGroupComponent extends CustomComponent
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                Notification.show( "Checking characteristics" );
+                List<PeerGroup> groups = peerManagerPortalModule.getPeerManager().peersGroups();
+                for ( PeerGroup g : groups )
+                {
+                    if ( g.getName().equalsIgnoreCase( groupName.getValue() ) )
+                    {
+                        Notification.show( "Peer group with given name already exists" );
+                        return;
+                    }
+                }
+                Notification.show( "Group name is available" );
             }
         } );
 
