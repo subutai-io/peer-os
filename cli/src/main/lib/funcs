@@ -21,6 +21,7 @@ fi
 . $subutai_lib_base/lock_ops
 . $subutai_lib_base/ovs_ops
 . $subutai_lib_base/monitor_ops
+. $subutai_lib_base/gpg_ops
 # Function addmount:
 # -----------------------------------------------------------------------------
 # 
