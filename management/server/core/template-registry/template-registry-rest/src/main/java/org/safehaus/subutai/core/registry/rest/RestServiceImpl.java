@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.registry.rest;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -75,7 +76,38 @@ public class RestServiceImpl implements RestService
     @Override
     public Response downloadTemplate( final String templateName )
     {
-        return null;
+        try
+        {
+            String packageName = String.format( "%s-subutai-template", templateName );
+            String fullPackageName = repositoryManager.getFullPackageName( packageName );
+            String fullPackagePath =
+                    String.format( "%s%s%s", Common.APT_REPO_PATH, Common.APT_REPO_AMD64_PACKAGES_SUBPATH,
+                            fullPackageName );
+
+            File packageFile = new File( fullPackagePath );
+
+            if ( packageFile.exists() )
+            {
+                if ( packageFile.isFile() )
+                {
+                    return Response.ok( packageFile ).header( "Content-Disposition",
+                            String.format( "attachment; filename=%s", fullPackageName ) ).build();
+                }
+                else
+                {
+                    return Response.status( Response.Status.BAD_REQUEST ).entity( "File is directory" ).build();
+                }
+            }
+            else
+            {
+                return Response.status( Response.Status.NOT_FOUND ).build();
+            }
+        }
+        catch ( RepositoryException e )
+        {
+            LOG.error( "Error in downloadTemplate", e );
+            return Response.serverError().entity( e ).build();
+        }
     }
 
 
