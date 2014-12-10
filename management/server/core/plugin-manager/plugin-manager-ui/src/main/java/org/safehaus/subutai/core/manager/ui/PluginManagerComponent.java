@@ -1,19 +1,15 @@
-package org.safehaus.subutai.core.plugin.ui;
+package org.safehaus.subutai.core.manager.ui;
 
 
 import java.awt.Label;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.plugin.api.PluginInfo;
-import org.safehaus.subutai.core.plugin.api.PluginManager;
+import org.safehaus.subutai.core.manager.api.PluginInfo;
+import org.safehaus.subutai.core.manager.api.PluginManager;
 
-import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Embedded;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Layout;
@@ -73,6 +69,8 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
 
         contentRoot.addComponent( controlsContent,0,0 );
         contentRoot.addComponent( pluginsTable, 0, 1, 0, 9 );
+
+        setCompositionRoot( contentRoot );
 
     }
 

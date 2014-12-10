@@ -1,12 +1,12 @@
-package org.safehaus.subutai.core.plugin.impl;
+package org.safehaus.subutai.core.manager.impl;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.plugin.api.PluginInfo;
-import org.safehaus.subutai.core.plugin.api.PluginManager;
+import org.safehaus.subutai.core.manager.api.PluginInfo;
+import org.safehaus.subutai.core.manager.api.PluginManager;
 
 
 /**
@@ -61,7 +61,21 @@ public class PluginManagerImpl implements PluginManager
 
 
     @Override
-    public List<String> getPluginNames()
+    public List<PluginInfo> getAvailablePlugins()
+    {
+        return null;
+    }
+
+
+    @Override
+    public List<String> getAvailablePluginNames()
+    {
+        return null;
+    }
+
+
+    @Override
+    public List<String> getInstalledPluginNames()
     {
         List<String> names = new ArrayList<>();
         for( PluginInfo p : getInstalledPlugins() )
@@ -70,7 +84,6 @@ public class PluginManagerImpl implements PluginManager
         }
         return names;
     }
-
 
     @Override
     public String getPluginVersion( final String pluginName )

@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.plugin.ui;
+package org.safehaus.subutai.core.manager.ui;
 
 
 
@@ -6,7 +6,7 @@ import java.io.File;
 import com.vaadin.ui.Component;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.core.plugin.api.PluginManager;
+import org.safehaus.subutai.core.manager.api.PluginManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 
@@ -19,6 +19,15 @@ public class PluginManagerPortalModule implements PortalModule
     public static final String MODULE_NAME = "Plugin";
     private PluginManager pluginManager;
 
+    public PluginManagerPortalModule( PluginManager pluginManager)
+    {
+        this.pluginManager = pluginManager;
+    }
+
+    public PluginManager getPluginManager()
+    {
+        return pluginManager;
+    }
     public void setPluginManager( final PluginManager pluginManager ) {
         this.pluginManager = pluginManager;
     }

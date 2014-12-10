@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.plugin.impl;
+package org.safehaus.subutai.core.manager.impl;
 
 import org.safehaus.subutai.common.command.RequestBuilder;
 /**

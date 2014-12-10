@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.plugin.api;
+package org.safehaus.subutai.core.manager.api;
 
 
 import java.util.List;
@@ -17,7 +17,11 @@ public interface PluginManager
 
     public List<PluginInfo> getInstalledPlugins();
 
-    public List<String> getPluginNames();
+    public List<PluginInfo> getAvailablePlugins();
+
+    public List<String> getAvailablePluginNames();
+
+    public List<String> getInstalledPluginNames();
 
     public String getPluginVersion( String pluginName);
 }
