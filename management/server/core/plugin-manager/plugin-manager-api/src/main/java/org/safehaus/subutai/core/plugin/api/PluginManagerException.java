@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.manager.api;
+package org.safehaus.subutai.core.plugin.api;
 
 
 /**

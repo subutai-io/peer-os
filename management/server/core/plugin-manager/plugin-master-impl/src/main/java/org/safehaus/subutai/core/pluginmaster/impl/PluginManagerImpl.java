@@ -1,12 +1,12 @@
-package org.safehaus.subutai.core.manager.impl;
+package org.safehaus.subutai.core.pluginmaster.impl;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.manager.api.PluginInfo;
-import org.safehaus.subutai.core.manager.api.PluginManager;
+import org.safehaus.subutai.core.pluginmaster.api.PluginInfo;
+import org.safehaus.subutai.core.pluginmaster.api.PluginManager;
 
 
 /**
@@ -30,6 +30,7 @@ public class PluginManagerImpl implements PluginManager
 
     }
 
+
     @Override
     public void removePlugin( final String packageName )
     {
@@ -48,7 +49,7 @@ public class PluginManagerImpl implements PluginManager
     public List<PluginInfo> getInstalledPlugins()
     {
         PluginInfo hadoop = new PluginInfoImpl();
-        hadoop.setPackageName("hadoop-subutai-plugin");
+        hadoop.setPackageName( "hadoop-subutai-plugin" );
         hadoop.setPluginName( "hadoop" );
         hadoop.setPackageVersion( "2.0.0" );
 
@@ -64,7 +65,7 @@ public class PluginManagerImpl implements PluginManager
     public List<String> getPluginNames()
     {
         List<String> names = new ArrayList<>();
-        for( PluginInfo p : getInstalledPlugins() )
+        for ( PluginInfo p : getInstalledPlugins() )
         {
             names.add( p.getPluginName() );
         }

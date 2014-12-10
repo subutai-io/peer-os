@@ -2,19 +2,17 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>plugin-manager-parent</artifactId>
+    <groupId>org.safehaus.subutai</groupId>
+    <version>2.0.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>plugin-manager-parent</artifactId>
-        <version>2.0.0</version>
-    </parent>
-
-  <artifactId>plugin-manager-ui</artifactId>
+  <artifactId>plugin-master-ui</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Plugin Manager UI</name>
-  <description>Subutai Plugin Manager UI</description>
-
+  <name>Subutai Plugin Master UI</name>
+  <description>Subutai Plugin Master UI</description>
 
   <dependencies>
     <dependency>
@@ -23,7 +21,8 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>plugin-manager-api</artifactId>
+      <artifactId>plugin-master-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -58,11 +57,11 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.plugin.ui</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.pluginmaster.ui</Bundle-SymbolicName>
           </instructions>
         </configuration>
       </plugin>
     </plugins>
   </build>
 
-    </project>
+</project>

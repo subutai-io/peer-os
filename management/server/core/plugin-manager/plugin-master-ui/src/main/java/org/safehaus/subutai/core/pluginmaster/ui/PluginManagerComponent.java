@@ -1,11 +1,11 @@
-package org.safehaus.subutai.core.manager.ui;
+package org.safehaus.subutai.core.pluginmaster.ui;
 
 
 import java.awt.Label;
 
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.manager.api.PluginInfo;
-import org.safehaus.subutai.core.manager.api.PluginManager;
+import org.safehaus.subutai.core.pluginmaster.api.PluginInfo;
+import org.safehaus.subutai.core.pluginmaster.api.PluginManager;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -39,7 +39,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         this.managerUI = managerUI;
         this.pluginManager = pluginManager;
 
-        contentRoot = new GridLayout( );
+        contentRoot = new GridLayout();
         contentRoot.setColumns( 1 );
         contentRoot.setRows( 20 );
         contentRoot.setSpacing( true );
@@ -49,7 +49,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         pluginsTable = createTableTemplate( "Plugins" );
         pluginsTable.setId( "PluginsTable" );
 
-        HorizontalLayout controlsContent = new HorizontalLayout( );
+        HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
 
         /*URL url = null;
@@ -65,15 +65,14 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         browser.setType(Embedded.TYPE_BROWSER);
         controlsContent.addComponent(browser);*/
 
-        getListPluginsButton( controlsContent);
+        getListPluginsButton( controlsContent );
 
-        contentRoot.addComponent( controlsContent,0,0 );
+        contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( pluginsTable, 0, 1, 0, 9 );
-
     }
 
 
-    private void getListPluginsButton(HorizontalLayout controlsContent)
+    private void getListPluginsButton( HorizontalLayout controlsContent )
     {
         Button listPluginsBtn = new Button( LIST_PLUGINS_CAPTION );
         listPluginsBtn.setId( "listPluginsBtn" );
@@ -95,7 +94,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     {
         pluginsTable.removeAllItems();
 
-        for( PluginInfo p : pluginManager.getInstalledPlugins() )
+        for ( PluginInfo p : pluginManager.getInstalledPlugins() )
         {
             final Label version = new Label();
             version.setText( p.getPackageVersion() );
@@ -107,10 +106,9 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
             pluginsTable.addItem( new Object[] {
                     p.getPluginName(), version, availableOperations
             }, null );
-
         }
-
     }
+
 
     private void addStyleName( Component... components )
     {
@@ -119,6 +117,8 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
             c.addStyleName( STYLE_NAME );
         }
     }
+
+
     private void addGivenComponents( Layout layout, Button... buttons )
     {
         for ( Button b : buttons )
@@ -128,8 +128,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     }
 
 
-
-    private Table createTableTemplate( String caption)
+    private Table createTableTemplate( String caption )
     {
         final Table table = new Table( caption );
         table.setStyleName( "Reindeer.TABLE_STRONG" );
@@ -141,13 +140,12 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         table.setSelectable( false );
         table.setImmediate( true );
         return table;
-
-
     }
+
+
     @Override
     public void dispose()
     {
         this.pluginManager = null;
-
     }
 }

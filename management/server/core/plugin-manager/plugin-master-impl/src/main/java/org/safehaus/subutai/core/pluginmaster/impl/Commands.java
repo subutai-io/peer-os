@@ -1,6 +1,6 @@
-package org.safehaus.subutai.core.manager.impl;
+package org.safehaus.subutai.core.pluginmaster.impl;
 
-import org.safehaus.subutai.common.command.RequestBuilder;
+
 /**
  * Created by ebru on 08.12.2014.
  */
