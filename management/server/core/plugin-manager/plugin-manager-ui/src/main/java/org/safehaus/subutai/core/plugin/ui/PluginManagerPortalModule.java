@@ -15,14 +15,19 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
  */
 public class PluginManagerPortalModule implements PortalModule
 {
-    public static final String MODULE_IMAGE = "plug.png";
-    public static final String MODULE_NAME = "plugins";
+    public static final String MODULE_IMAGE = "plugs.png";
+    public static final String MODULE_NAME = "Plugin";
     private PluginManager pluginManager;
 
-    public PluginManager getPluginManager()
-    {
-        return pluginManager;
+    public void setPluginManager( final PluginManager pluginManager ) {
+        this.pluginManager = pluginManager;
     }
+
+    public void init()
+    {
+
+    }
+
     @Override
     public String getId()
     {
@@ -47,7 +52,7 @@ public class PluginManagerPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-        return null;
+        return new PluginManagerComponent( this, pluginManager );
     }
 
 

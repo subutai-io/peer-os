@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+  <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>plugin-manager</artifactId>
+        <artifactId>plugin-manager-parent</artifactId>
         <version>2.0.0</version>
     </parent>
-  <modelVersion>4.0.0</modelVersion>
+
 
   <artifactId>plugin-manager-api</artifactId>
   <name>Subutai Plugin Manager Api</name>
@@ -21,8 +20,8 @@
       <artifactId>subutai-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
+      <groupId>org.safehaus.subutai</groupId>
+      <artifactId>peer-manager-api</artifactId>
     </dependency>
   </dependencies>
 

@@ -24,6 +24,7 @@
     <module>network-manager</module>
     <module>security-manager</module>
     <module>peer-manager</module>
+    <module>plugin-manager</module>
     <module>strategy-manager</module>
     <module>template-registry</module>
     <module>tracker</module>
@@ -36,7 +37,6 @@
     <module>command-executor</module>
     <module>wol-manager</module>
     <module>key-manager</module>
-    <module>plugin-manager</module>
   </modules>
 
 </project>

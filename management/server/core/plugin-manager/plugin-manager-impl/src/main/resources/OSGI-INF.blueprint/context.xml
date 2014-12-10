@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+
+
+  <bean id="pluginManager" scope="singleton" class="org.safehaus.subutai.core.plugin.impl.PluginManagerImpl">
+    <argument ref="peerManager" />
+  </bean>
+
+  <service ref="pluginManager" interface="org.safehaus.subutai.core.plugin.api.PluginManager" />
+
+</blueprint>

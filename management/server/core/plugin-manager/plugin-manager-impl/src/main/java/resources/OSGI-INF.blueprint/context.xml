@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-
-<service ref="keyManager" interface="org.safehaus.subutai.core.plugin.api.PluginManager" />
-
-</blueprint>

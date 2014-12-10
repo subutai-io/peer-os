@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.plugin.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.plugin.api.PluginInfo;
 import org.safehaus.subutai.core.plugin.api.PluginManager;
 
@@ -12,7 +13,17 @@ import org.safehaus.subutai.core.plugin.api.PluginManager;
  * Created by ebru on 08.12.2014.
  */
 public class PluginManagerImpl implements PluginManager
+
 {
+    private final PeerManager peerManager;
+
+
+    public PluginManagerImpl( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
+    }
+
+
     @Override
     public void installPlugin( final String packageName )
     {
@@ -46,6 +57,18 @@ public class PluginManagerImpl implements PluginManager
         plugins.add( hadoop );
 
         return plugins;
+    }
+
+
+    @Override
+    public List<String> getPluginNames()
+    {
+        List<String> names = new ArrayList<>();
+        for( PluginInfo p : getInstalledPlugins() )
+        {
+            names.add( p.getPluginName() );
+        }
+        return names;
     }
 
 

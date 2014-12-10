@@ -17,5 +17,7 @@ public interface PluginManager
 
     public List<PluginInfo> getInstalledPlugins();
 
+    public List<String> getPluginNames();
+
     public String getPluginVersion( String pluginName);
 }

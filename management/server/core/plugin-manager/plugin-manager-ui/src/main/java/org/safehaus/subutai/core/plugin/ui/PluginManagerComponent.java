@@ -1,12 +1,22 @@
 package org.safehaus.subutai.core.plugin.ui;
 
 
-import org.safehaus.subutai.common.protocol.Disposable;
+import java.awt.Label;
+import java.net.MalformedURLException;
+import java.net.URL;
 
+import org.safehaus.subutai.common.protocol.Disposable;
+import org.safehaus.subutai.core.plugin.api.PluginInfo;
+import org.safehaus.subutai.core.plugin.api.PluginManager;
+
+import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.Table;
 
 
@@ -25,11 +35,13 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     private GridLayout contentRoot;
     private Table pluginsTable;
     private PluginManagerPortalModule managerUI;
+    private PluginManager pluginManager;
 
 
-    public PluginManagerComponent( PluginManagerPortalModule managerUI )
+    public PluginManagerComponent( PluginManagerPortalModule managerUI, PluginManager pluginManager )
     {
         this.managerUI = managerUI;
+        this.pluginManager = pluginManager;
 
         contentRoot = new GridLayout( );
         contentRoot.setColumns( 1 );
@@ -44,12 +56,28 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         HorizontalLayout controlsContent = new HorizontalLayout( );
         controlsContent.setSpacing( true );
 
-        getListPluginsButton();
+        /*URL url = null;
+        try
+        {
+            url = new URL("http://dev.vaadin.com/");
+        }
+        catch ( MalformedURLException e )
+        {
+            e.printStackTrace();
+        }
+        Embedded browser = new Embedded("", new ExternalResource(url));
+        browser.setType(Embedded.TYPE_BROWSER);
+        controlsContent.addComponent(browser);*/
+
+        getListPluginsButton( controlsContent);
+
+        contentRoot.addComponent( controlsContent,0,0 );
+        contentRoot.addComponent( pluginsTable, 0, 1, 0, 9 );
 
     }
 
 
-    private void getListPluginsButton()
+    private void getListPluginsButton(HorizontalLayout controlsContent)
     {
         Button listPluginsBtn = new Button( LIST_PLUGINS_CAPTION );
         listPluginsBtn.setId( "listPluginsBtn" );
@@ -62,13 +90,47 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
                 refreshPluginsInfo();
             }
         } );
+
+        controlsContent.addComponent( listPluginsBtn );
     }
 
 
     private void refreshPluginsInfo()
     {
+        pluginsTable.removeAllItems();
+
+        for( PluginInfo p : pluginManager.getInstalledPlugins() )
+        {
+            final Label version = new Label();
+            version.setText( p.getPackageVersion() );
+            final Button upgradeButton = new Button( UPGRADE_CAPTION );
+            final HorizontalLayout availableOperations = new HorizontalLayout();
+            addStyleName( upgradeButton, availableOperations );
+            addGivenComponents( availableOperations, upgradeButton );
+
+            pluginsTable.addItem( new Object[] {
+                    p.getPluginName(), version, availableOperations
+            }, null );
+
+        }
 
     }
+
+    private void addStyleName( Component... components )
+    {
+        for ( Component c : components )
+        {
+            c.addStyleName( STYLE_NAME );
+        }
+    }
+    private void addGivenComponents( Layout layout, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            layout.addComponent( b );
+        }
+    }
+
 
 
     private Table createTableTemplate( String caption)
@@ -89,6 +151,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     @Override
     public void dispose()
     {
+        this.pluginManager = null;
 
     }
 }

@@ -20,15 +20,36 @@ public class PluginInfoImpl implements PluginInfo
 
 
     @Override
+    public void setPluginName( final String pluginName )
+    {
+        this.pluginName = pluginName;
+    }
+
+
+    @Override
+    public void setPackageName( final String packageName )
+    {
+        this.packageName = packageName;
+    }
+
+
+    @Override
     public String getPackageName()
     {
-        return null;
+        return packageName;
     }
 
 
     @Override
     public String getPackageVersion()
     {
-        return null;
+        return packageVersion;
+    }
+
+
+    @Override
+    public void setPackageVersion( final String version )
+    {
+        this.packageVersion = version;
     }
 }

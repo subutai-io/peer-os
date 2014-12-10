@@ -6,50 +6,44 @@
 
     <parent>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>plugin-manager</artifactId>
+        <artifactId>plugin-manager-parent</artifactId>
         <version>2.0.0</version>
     </parent>
 
   <artifactId>plugin-manager-ui</artifactId>
+  <packaging>bundle</packaging>
   <name>Subutai Plugin Manager UI</name>
   <description>Subutai Plugin Manager UI</description>
-  <packaging>bundle</packaging>
+
 
   <dependencies>
-  <dependency>
-    <groupId>org.osgi</groupId>
-    <artifactId>org.osgi.core</artifactId>
-  </dependency>
-  <dependency>
-    <groupId>com.google.guava</groupId>
-    <artifactId>guava</artifactId>
-  </dependency>
-  <dependency>
-    <groupId>com.vaadin</groupId>
-    <artifactId>vaadin-server</artifactId>
-  </dependency>
-  <dependency>
-    <groupId>${project.groupId}</groupId>
-    <artifactId>vaadin-api</artifactId>
-    <version>2.0.0</version>
-  </dependency>
-  <dependency>
-    <groupId>${project.groupId}</groupId>
-    <artifactId>vaadin-custom</artifactId>
-  </dependency>
-  <dependency>
-    <groupId>${project.groupId}</groupId>
-    <artifactId>subutai-common</artifactId>
-  </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>plugin-manager-api</artifactId>
-      <version>2.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
-      <artifactId>vaadin</artifactId>
-      <version>6.8.15</version>
+      <artifactId>vaadin-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>vaadin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>vaadin-custom</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-common</artifactId>
     </dependency>
   </dependencies>
 

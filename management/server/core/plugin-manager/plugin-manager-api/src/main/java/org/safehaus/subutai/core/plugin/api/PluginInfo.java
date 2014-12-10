@@ -6,15 +6,17 @@ package org.safehaus.subutai.core.plugin.api;
  */
 public interface PluginInfo
 {
-    public String getPluginName();
+    public void setPackageVersion(String version);
 
-    public String setPluginName(String pluginName);
+    public void setPluginName(String pluginName);
 
-    public String setPackageName(String packageName);
+    public void setPackageName(String packageName);
 
     public String getPackageName();
 
     public String getPackageVersion();
 
-    public String setPackageVersion(String version);
+    public String getPluginName();
+
+
 }
