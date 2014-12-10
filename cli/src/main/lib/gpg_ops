@@ -195,7 +195,8 @@ print_keys(){
   declare -a list=("${!1}")
   for (( i=0; i<${#list[@]}; i++ ));
   do
-    if [ $i == 0 ]; then
+    ## print header
+    if [ $i == 0 ]; then 
       if [ ${#list[@]} == 1 ];then
         space_list=`find_white_space_amount ${list[$i]}`
       else
@@ -210,6 +211,7 @@ print_keys(){
         printf "\n"
       fi
     fi
+    # print keys in summarized format
     summary=`summarize_key ${list[$i]}`
     # echo "index " $i " : "  ${list[$i]}
     # echo "summary: " $summary
@@ -219,6 +221,8 @@ print_keys(){
 }
 
 
+# finds the amount of white space to be inserted 
+# between columns while printing output of list commands.
 find_white_space_amount(){
   white_space_size_pub=`find_len $1 'pub'`
   white_space_size_sub=`find_len $1 'sub'`
