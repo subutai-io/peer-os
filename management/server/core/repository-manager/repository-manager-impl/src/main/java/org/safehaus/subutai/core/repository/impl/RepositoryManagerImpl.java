@@ -3,6 +3,8 @@ package org.safehaus.subutai.core.repository.impl;
 
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
@@ -136,5 +138,25 @@ public class RepositoryManagerImpl implements RepositoryManager
         CommandResult result = executeCommand( commands.getPackageInfoCommand( packageName ) );
 
         return result.getStdOut();
+    }
+
+
+    @Override
+    public String getFullPackageName( final String shortPackageName ) throws RepositoryException
+    {
+        String packageName = String.format( "%s-subutai-template", shortPackageName );
+        String packageInfo = getPackageInfo( packageName );
+        Pattern p = Pattern.compile( "Filename:.+/(.+deb)" );
+        Matcher m = p.matcher( packageInfo );
+        if ( m.find() )
+        {
+            return m.group( 1 );
+        }
+        else
+        {
+            throw new RepositoryException(
+                    String.format( "Could not obtain full name by short name %s from:%n%s", shortPackageName,
+                            packageInfo ) );
+        }
     }
 }
