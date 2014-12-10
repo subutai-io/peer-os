@@ -562,8 +562,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public UUID addContainers( final UUID environmentId, final String template, PlacementStrategy strategy,
-                               String nodeGroupName, final Peer peer ) throws EnvironmentManagerException
+    public UUID addContainer( final UUID environmentId, final String template, PlacementStrategy strategy,
+                              String nodeGroupName, final Peer peer ) throws EnvironmentManagerException
     {
         EnvironmentBuildProcessFactory builder = new Node2PeerBuilder( this );
         try

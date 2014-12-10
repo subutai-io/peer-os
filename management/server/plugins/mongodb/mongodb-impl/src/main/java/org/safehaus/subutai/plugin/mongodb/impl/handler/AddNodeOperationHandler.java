@@ -92,7 +92,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
                 templates.add( 0, template );
             }
             UUID hostId = manager.getEnvironmentManager()
-                                 .addContainers( config.getEnvironmentId(), config.getTemplateName(),
+                                 .addContainer( config.getEnvironmentId(), config.getTemplateName(),
                                          MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( nodeType ),
                                          nodeType.name(), localPeer );
             Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
