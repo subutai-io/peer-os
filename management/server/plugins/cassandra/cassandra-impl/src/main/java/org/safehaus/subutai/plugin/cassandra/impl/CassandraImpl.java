@@ -10,11 +10,15 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
+import org.safehaus.subutai.plugin.cassandra.api.NodeOperationTask;
 import org.safehaus.subutai.plugin.cassandra.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.*;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +43,7 @@ public class CassandraImpl implements Cassandra
     private EnvironmentManager environmentManager;
     private PluginDAO pluginDAO;
     private DataSource dataSource;
-    //    private ServiceLocator serviceLocator;
+    private PeerManager peerManager;
 
 
     public CassandraImpl( DataSource dataSource )
@@ -60,18 +64,6 @@ public class CassandraImpl implements Cassandra
     }
 
 
-    /*public ExecutorService getExecutor()
-    {
-        return executor;
-    }
-
-
-    public void setExecutor( final ExecutorService executor )
-    {
-        this.executor = executor;
-    }*/
-
-
     public EnvironmentManager getEnvironmentManager()
     {
         return environmentManager;
@@ -84,13 +76,22 @@ public class CassandraImpl implements Cassandra
     }
 
 
+    public PeerManager getPeerManager()
+    {
+        return peerManager;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
+    }
+
+
     public void init()
     {
         try
         {
-            //            this.serviceLocator = new ServiceLocator();
-            //            this.tracker = serviceLocator.getService( Tracker.class );
-            //            this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
             this.pluginDAO = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
@@ -116,8 +117,7 @@ public class CassandraImpl implements Cassandra
 
     public UUID installCluster( final CassandraClusterConfig config )
     {
-        Preconditions.checkNotNull( config, "Configuration is null" );
-        AbstractOperationHandler operationHandler = new InstallClusterHandler( this, config );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -125,7 +125,8 @@ public class CassandraImpl implements Cassandra
 
     public UUID uninstallCluster( final String clusterName )
     {
-        AbstractOperationHandler operationHandler = new UninstallClusterHandler( this, clusterName );
+        CassandraClusterConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -155,7 +156,8 @@ public class CassandraImpl implements Cassandra
     @Override
     public UUID startCluster( final String clusterName )
     {
-        AbstractOperationHandler operationHandler = new StartClusterHandler( this, clusterName );
+        CassandraClusterConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.START_ALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -164,7 +166,8 @@ public class CassandraImpl implements Cassandra
     @Override
     public UUID checkCluster( final String clusterName )
     {
-        AbstractOperationHandler operationHandler = new CheckClusterHandler( this, clusterName );
+        CassandraClusterConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.STATUS_ALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -173,34 +176,38 @@ public class CassandraImpl implements Cassandra
     @Override
     public UUID stopCluster( final String clusterName )
     {
-        AbstractOperationHandler operationHandler = new StopClusterHandler( this, clusterName );
+        CassandraClusterConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.STOP_ALL );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID startService( final String clusterName, final UUID containerId )
+    public UUID startService( final String clusterName, final String hostname )
     {
-        AbstractOperationHandler operationHandler = new StartServiceHandler( this, clusterName, containerId );
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, clusterName, hostname, NodeOperationType.START );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID stopService( final String clusterName, final UUID containerId )
+    public UUID stopService( final String clusterName, final String hostname )
     {
-        AbstractOperationHandler operationHandler = new StopServiceHandler( this, clusterName, containerId );
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, clusterName, hostname, NodeOperationType.STOP );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID statusService( final String clusterName, final UUID containerId )
+    public UUID statusService( final String clusterName, final String hostname )
     {
-        AbstractOperationHandler operationHandler = new CheckServiceHandler( this, clusterName, containerId );
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, clusterName, hostname, NodeOperationType.STATUS );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -223,9 +230,10 @@ public class CassandraImpl implements Cassandra
 
 
     @Override
-    public UUID checkNode( final String clusterName, final UUID containerId )
+    public UUID checkNode( final String clusterName, final String hostname )
     {
-        AbstractOperationHandler operationHandler = new CheckNodeHandler( this, clusterName, containerId );
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, clusterName, hostname, NodeOperationType.STATUS );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -252,7 +260,7 @@ public class CassandraImpl implements Cassandra
         blueprint.setExchangeSshKeys( true );
 
         NodeGroup nodeGroup = new NodeGroup();
-        nodeGroup.setName( config.PRODUCT_NAME );
+        nodeGroup.setName( CassandraClusterConfig.PRODUCT_NAME );
         nodeGroup.setLinkHosts( true );
         nodeGroup.setExchangeSshKeys( true );
         nodeGroup.setDomainName( Common.DEFAULT_DOMAIN_NAME );

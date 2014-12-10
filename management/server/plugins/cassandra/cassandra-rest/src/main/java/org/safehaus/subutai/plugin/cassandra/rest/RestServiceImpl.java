@@ -117,9 +117,9 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response checkNode( final String clusterName, final String containerId )
+    public Response checkNode( final String clusterName, final String hostname )
     {
-        UUID uuid = cassandraManager.checkNode( clusterName, UUID.fromString( containerId ) );
+        UUID uuid = cassandraManager.checkNode( clusterName, hostname );
         String operationId = wrapUUID( uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }

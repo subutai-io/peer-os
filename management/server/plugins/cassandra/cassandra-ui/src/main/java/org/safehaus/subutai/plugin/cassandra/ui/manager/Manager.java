@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -21,6 +22,8 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
+import org.safehaus.subutai.plugin.cassandra.api.NodeOperationTask;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -457,19 +460,19 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StopTask( cassandra, tracker, config.getClusterName(), containerHost.getId(),
-                                new CompleteEvent()
+                        new NodeOperationTask( cassandra, tracker, config.getClusterName(), containerHost,
+                                NodeOperationType.STOP, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        }, null ) );
             }
         } );
     }
@@ -485,19 +488,19 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StartTask( cassandra, tracker, config.getClusterName(), containerHost.getId(),
-                                new CompleteEvent()
+                        new NodeOperationTask( cassandra, tracker, config.getClusterName(), containerHost,
+                                NodeOperationType.START, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        }, null ) );
             }
         } );
     }
@@ -514,29 +517,35 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new CheckTask( cassandra, tracker, config.getClusterName(), containerHost.getId(),
-                                new CompleteEvent()
+                        new NodeOperationTask( cassandra, tracker, config.getClusterName(), containerHost,
+                                NodeOperationType.STATUS, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    public void onComplete( String result )
+                                    if ( nodeState.equals( NodeState.RUNNING ) )
                                     {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            resultHolder.setValue( result );
-                                            if ( result.contains( "not" ) )
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                            }
-                                            else
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            }
-                                            PROGRESS_ICON.setVisible( false );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                        }
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
                                     }
-                                } ) );
+                                    else if ( nodeState.equals( NodeState.STOPPED ) )
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                    }
+                                    else if ( nodeState.equals( NodeState.UNKNOWN ) )
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    }
+                                    resultHolder.setValue( nodeState.name() );
+                                    PROGRESS_ICON.setVisible( false );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                }
+                            }
+                        }, null ) );
             }
         } );
     }
@@ -573,14 +582,16 @@ public class Manager
     {
         for ( UUID containerId : config.getNodes() )
         {
-            //            Agent agent = agentManager.getAgentByUUID( agentUUID );
+            ContainerHost containerHost = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() )
+                                                            .getContainerHostById( containerId );
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StopTask( cassandra, tracker, config.getClusterName(), containerId, new CompleteEvent()
+                    new NodeOperationTask( cassandra, tracker, config.getClusterName(), containerHost,
+                            NodeOperationType.STOP, new org.safehaus.subutai.common.protocol.CompleteEvent()
                     {
                         @Override
-                        public void onComplete( String result )
+                        public void onComplete( NodeState nodeState )
                         {
                             synchronized ( PROGRESS_ICON )
                             {
@@ -588,7 +599,7 @@ public class Manager
                                 checkAllNodes();
                             }
                         }
-                    } ) );
+                    }, null ) );
         }
     }
 
@@ -597,13 +608,16 @@ public class Manager
     {
         for ( UUID containerId : config.getNodes() )
         {
+            ContainerHost containerHost = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() )
+                                                            .getContainerHostById( containerId );
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StartTask( cassandra, tracker, config.getClusterName(), containerId, new CompleteEvent()
+                    new NodeOperationTask( cassandra, tracker, config.getClusterName(), containerHost,
+                            NodeOperationType.START, new org.safehaus.subutai.common.protocol.CompleteEvent()
                     {
                         @Override
-                        public void onComplete( String result )
+                        public void onComplete( NodeState nodeState )
                         {
                             synchronized ( PROGRESS_ICON )
                             {
@@ -611,7 +625,7 @@ public class Manager
                                 checkAllNodes();
                             }
                         }
-                    } ) );
+                    }, null ) );
         }
     }
 
