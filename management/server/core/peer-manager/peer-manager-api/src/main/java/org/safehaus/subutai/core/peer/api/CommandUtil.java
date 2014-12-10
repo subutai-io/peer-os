@@ -46,9 +46,7 @@ public class CommandUtil
         Preconditions.checkNotNull( requestBuilder );
         Preconditions.checkNotNull( host );
 
-        CommandResult result;
-
-        result = host.execute( requestBuilder );
+        CommandResult result = host.execute( requestBuilder );
 
         if ( !result.hasSucceeded() )
         {

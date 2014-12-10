@@ -114,10 +114,12 @@ public class SshManager
                 throw new SSHManagerException( e.getMessage() );
             }
         }
-        if ( Strings.isNullOrEmpty( keys ) )
+
+        if ( Strings.isNullOrEmpty( value.toString() ) )
         {
             throw new SSHManagerException( "Could not read ssh keys from containers" );
         }
+
         keys = value.toString();
     }
 
