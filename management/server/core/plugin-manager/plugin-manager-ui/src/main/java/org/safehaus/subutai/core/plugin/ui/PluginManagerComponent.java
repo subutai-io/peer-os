@@ -30,14 +30,12 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     //Reindeer.TABLE_STRONG
     private GridLayout contentRoot;
     private Table pluginsTable;
-    private PluginManagerPortalModule managerUI;
-    private PluginManager pluginManager;
+    private PluginManager pManager;
 
 
-    public PluginManagerComponent( PluginManagerPortalModule managerUI, PluginManager pluginManager )
+    public PluginManagerComponent( PluginManager pManager )
     {
-        this.managerUI = managerUI;
-        this.pluginManager = pluginManager;
+        this.pManager = pManager;
 
         contentRoot = new GridLayout( );
         contentRoot.setColumns( 1 );
@@ -70,6 +68,8 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         contentRoot.addComponent( controlsContent,0,0 );
         contentRoot.addComponent( pluginsTable, 0, 1, 0, 9 );
 
+        setCompositionRoot( contentRoot );
+
     }
 
 
@@ -95,7 +95,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     {
         pluginsTable.removeAllItems();
 
-        for( PluginInfo p : pluginManager.getInstalledPlugins() )
+        for( PluginInfo p : pManager.getInstalledPlugins() )
         {
             final Label version = new Label();
             version.setText( p.getPackageVersion() );
@@ -147,7 +147,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     @Override
     public void dispose()
     {
-        this.pluginManager = null;
+        //this.pluginManager = null;
 
     }
 }

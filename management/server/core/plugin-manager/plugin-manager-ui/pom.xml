@@ -2,36 +2,29 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>plugin-manager-parent</artifactId>
-        <version>2.0.0</version>
-    </parent>
+  <parent>
+    <groupId>org.safehaus.subutai</groupId>
+    <artifactId>plugin-manager-parent</artifactId>
+    <version>2.0.0</version>
+  </parent>
 
   <artifactId>plugin-manager-ui</artifactId>
   <packaging>bundle</packaging>
   <name>Subutai Plugin Manager UI</name>
   <description>Subutai Plugin Manager UI</description>
-
+  <version>2.0.0</version>
 
   <dependencies>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-common</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>plugin-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-server</artifactId>
+      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -42,8 +35,12 @@
       <artifactId>vaadin-custom</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-common</artifactId>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-server</artifactId>
     </dependency>
   </dependencies>
 
@@ -65,4 +62,4 @@
     </plugins>
   </build>
 
-    </project>
+</project>

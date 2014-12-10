@@ -13,15 +13,12 @@
   <name>Subutai Plugin Manager Api</name>
   <description>Subutai Plugin Manager Api</description>
   <packaging>bundle</packaging>
+  <version>2.0.0</version>
 
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>peer-manager-api</artifactId>
     </dependency>
   </dependencies>
 

@@ -61,7 +61,21 @@ public class PluginManagerImpl implements PluginManager
 
 
     @Override
-    public List<String> getPluginNames()
+    public List<PluginInfo> getAvailablePlugins()
+    {
+        return null;
+    }
+
+
+    @Override
+    public List<String> getAvailablePluginNames()
+    {
+        return null;
+    }
+
+
+    @Override
+    public List<String> getInstalledPluginNames()
     {
         List<String> names = new ArrayList<>();
         for( PluginInfo p : getInstalledPlugins() )
@@ -70,7 +84,6 @@ public class PluginManagerImpl implements PluginManager
         }
         return names;
     }
-
 
     @Override
     public String getPluginVersion( final String pluginName )

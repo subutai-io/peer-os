@@ -17,7 +17,11 @@ public interface PluginManager
 
     public List<PluginInfo> getInstalledPlugins();
 
-    public List<String> getPluginNames();
+    public List<PluginInfo> getAvailablePlugins();
+
+    public List<String> getAvailablePluginNames();
+
+    public List<String> getInstalledPluginNames();
 
     public String getPluginVersion( String pluginName);
 }

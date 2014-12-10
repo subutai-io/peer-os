@@ -5,6 +5,7 @@ import java.io.File;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.plugin.api.PluginManager;
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -17,16 +18,21 @@ public class PluginManagerPortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "plugs.png";
     public static final String MODULE_NAME = "Plugin";
-    private PluginManager pluginManager;
+    private PluginManager pManager;
+    private ServiceLocator serviceLocator;
 
+    public PluginManagerPortalModule( PluginManager pManager )
+    {
+        this.pManager = pManager;
+    }
+
+    /*public PluginManager getPluginManager()
+    {
+        return pluginManager;
+    }
     public void setPluginManager( final PluginManager pluginManager ) {
         this.pluginManager = pluginManager;
-    }
-
-    public void init()
-    {
-
-    }
+    }*/
 
     @Override
     public String getId()
@@ -52,7 +58,7 @@ public class PluginManagerPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-        return new PluginManagerComponent( this, pluginManager );
+        return new PluginManagerComponent( pManager );
     }
 
 
