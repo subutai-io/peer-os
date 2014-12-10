@@ -4,9 +4,9 @@ package org.safehaus.subutai.core.manager.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.safehaus.subutai.core.manager.api.PluginManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.manager.api.PluginInfo;
-import org.safehaus.subutai.core.manager.api.PluginManager;
 
 
 /**

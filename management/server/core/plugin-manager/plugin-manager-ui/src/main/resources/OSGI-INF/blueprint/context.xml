@@ -3,11 +3,10 @@
     default-activation="eager"
     xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="pluginManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.manager.api.PluginManager"/>
+  <reference id="pManager" availability="mandatory" interface="org.safehaus.subutai.core.manager.api.PluginManager"/>
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.manager.ui.PluginManagerPortalModule" init-method="init">
-    <argument ref="pluginManager"></argument>
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.manager.ui.PluginManagerPortalModule">
+    <argument ref="pManager"/>
     <!--<property name="pluginManager" ref="pluginManager" />-->
   </bean>
 

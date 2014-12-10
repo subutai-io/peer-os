@@ -14,6 +14,7 @@
   <packaging>bundle</packaging>
   <name>Subutai Plugin Manager UI</name>
   <description>Subutai Plugin Manager UI</description>
+  <version>2.0.0</version>
 
 
   <dependencies>
@@ -24,6 +25,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>plugin-manager-api</artifactId>
+      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -55,6 +57,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.manager.ui</Bundle-SymbolicName>
+            <_removeheaders>Import-Package,Export-Package,Import-Service,Export-Service</_removeheaders>
           </instructions>
         </configuration>
       </plugin>

@@ -301,7 +301,7 @@
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- wol-manager -->
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>wol-manager-api</artifactId>
     </dependency>
@@ -312,7 +312,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>wol-manager-ui</artifactId>
-    </dependency>
+    </dependency>-->
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- strategy-manager -->
