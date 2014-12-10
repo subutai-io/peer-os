@@ -75,6 +75,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response downloadTemplate( final String templateName )
+    {
+        return null;
+    }
+
+
+    @Override
     public Response getTemplate( final String templateName )
     {
         Template template = templateRegistry.getTemplate( templateName );
