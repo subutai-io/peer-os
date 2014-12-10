@@ -144,8 +144,7 @@ public class RepositoryManagerImpl implements RepositoryManager
     @Override
     public String getFullPackageName( final String shortPackageName ) throws RepositoryException
     {
-        String packageName = String.format( "%s-subutai-template", shortPackageName );
-        String packageInfo = getPackageInfo( packageName );
+        String packageInfo = getPackageInfo( shortPackageName );
         Pattern p = Pattern.compile( "Filename:.+/(.+deb)" );
         Matcher m = p.matcher( packageInfo );
         if ( m.find() )

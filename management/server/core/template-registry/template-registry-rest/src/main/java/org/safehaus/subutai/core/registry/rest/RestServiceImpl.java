@@ -266,7 +266,7 @@ public class RestServiceImpl implements RestService
                 Matcher m = p.matcher( packageInfo );
                 if ( m.find() )
                 {
-                    String fullPackageName = m.group( 1 );
+                    String fullPackageName = repositoryManager.getFullPackageName( templateName );
                     repositoryManager.removePackageByName( fullPackageName );
                     return Response.ok().build();
                 }
