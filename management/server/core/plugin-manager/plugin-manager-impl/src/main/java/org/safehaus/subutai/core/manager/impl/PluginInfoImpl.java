@@ -1,7 +1,7 @@
-package org.safehaus.subutai.core.plugin.impl;
+package org.safehaus.subutai.core.manager.impl;
 
 
-import org.safehaus.subutai.core.plugin.api.PluginInfo;
+import org.safehaus.subutai.core.manager.api.PluginInfo;
 
 
 /**
