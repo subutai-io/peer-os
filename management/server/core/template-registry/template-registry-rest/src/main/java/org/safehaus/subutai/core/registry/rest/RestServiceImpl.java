@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.ws.rs.core.Response;
 
@@ -261,19 +259,9 @@ public class RestServiceImpl implements RestService
             try
             {
                 String packageName = String.format( "%s-subutai-template", templateName );
-                String packageInfo = repositoryManager.getPackageInfo( packageName );
-                Pattern p = Pattern.compile( "Filename:.+/(.+deb)" );
-                Matcher m = p.matcher( packageInfo );
-                if ( m.find() )
-                {
-                    String fullPackageName = repositoryManager.getFullPackageName( templateName );
-                    repositoryManager.removePackageByName( fullPackageName );
-                    return Response.ok().build();
-                }
-                else
-                {
-                    return Response.serverError().header( EXCEPTION_HEADER, "Could not get full package name" ).build();
-                }
+                String fullPackageName = repositoryManager.getFullPackageName( packageName );
+                repositoryManager.removePackageByName( fullPackageName );
+                return Response.ok().build();
             }
             catch ( RepositoryException e )
             {
