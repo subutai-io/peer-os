@@ -20,8 +20,8 @@
       <artifactId>subutai-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>peer-manager-api</artifactId>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
     </dependency>
   </dependencies>
 

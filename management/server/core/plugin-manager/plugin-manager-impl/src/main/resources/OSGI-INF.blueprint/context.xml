@@ -4,10 +4,10 @@
   <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
 
-  <bean id="pluginManager" scope="singleton" class="org.safehaus.subutai.core.plugin.impl.PluginManagerImpl">
+  <bean id="pluginManager" scope="singleton" class="org.safehaus.subutai.core.manager.impl.PluginManagerImpl">
     <argument ref="peerManager" />
   </bean>
 
-  <service ref="pluginManager" interface="org.safehaus.subutai.core.plugin.api.PluginManager" />
+  <service ref="pluginManager" interface="org.safehaus.subutai.core.manager.api.PluginManager" />
 
 </blueprint>

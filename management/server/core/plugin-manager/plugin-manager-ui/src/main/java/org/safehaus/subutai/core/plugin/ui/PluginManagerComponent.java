@@ -151,7 +151,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     @Override
     public void dispose()
     {
-        this.pluginManager = null;
+        //this.pluginManager = null;
 
     }
 }
