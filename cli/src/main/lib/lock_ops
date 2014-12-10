@@ -40,11 +40,13 @@ function is_system_all_locked {
 function lock_container_write {
   mkdir -p $SUBUTAI_LOCK_PATH/write/
   touch $SUBUTAI_LOCK_PATH/write/$1-$2
+  echo $$ > $SUBUTAI_LOCK_PATH/write/$1-$2
 }
 
 function lock_container_read {
   mkdir -p $SUBUTAI_LOCK_PATH/read/
   touch $SUBUTAI_LOCK_PATH/read/$1-$2
+  echo $$ > $SUBUTAI_LOCK_PATH/read/$1-$2
 }
 
 function unlock_container_write {
@@ -68,6 +70,7 @@ function unlock_container_read {
 function are_containers_readable {
   if [[ -z "$2" ]]
   then
+    wipe_outstanding_read_locks
     (ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$1\b") > /dev/null 2>&1
     if [ $? == 0 ]
     then
@@ -76,6 +79,7 @@ function are_containers_readable {
       echo "false"
     fi
   else
+    wipe_outstanding_read_locks
     (ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$1\b" \
      || ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$2\b") \
       > /dev/null 2>&1
@@ -91,6 +95,7 @@ function are_containers_readable {
 function are_containers_writable {
   if [[ -z "$2" ]]
   then
+    wipe_outstanding_write_locks
     (ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$1\b" \
      || ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$1\b") > /dev/null 2>&1
     if [ $? == 0 ]
@@ -100,6 +105,7 @@ function are_containers_writable {
       echo "false"
     fi
   else
+    wipe_outstanding_write_locks
     (ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$1\b" \
      || ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$2\b" \
      || ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$1\b" \
@@ -114,3 +120,24 @@ function are_containers_writable {
   fi
 }
 
+function wipe_outstanding_read_locks {
+  for lockfile in $SUBUTAI_LOCK_PATH/read/*;
+  do
+    PROCESS_ID=`cat $lockfile`
+    if [ "`ps -p $PROCESS_ID -o comm=`" == "" ]
+    then
+      rm $lockfile
+    fi
+  done
+}
+
+function wipe_outstanding_write_locks {
+  for lockfile in $SUBUTAI_LOCK_PATH/write/*;
+  do
+    PROCESS_ID=`cat $lockfile`
+    if [ "`ps -p $PROCESS_ID -o comm=`" == "" ]
+    then
+      rm $lockfile
+    fi
+  done
+}
