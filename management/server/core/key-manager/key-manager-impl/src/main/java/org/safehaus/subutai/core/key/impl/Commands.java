@@ -40,6 +40,13 @@ public class Commands
     }
 
 
+    public RequestBuilder getSignKeyCommand( String signerKeyId, String signedKeyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING )
+                .withCmdArgs( Lists.newArrayList( "sign_key", signerKeyId, signedKeyId ) );
+    }
+
+
     public RequestBuilder getSendKeyCommand( String keyId )
     {
         return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "send", keyId ) );

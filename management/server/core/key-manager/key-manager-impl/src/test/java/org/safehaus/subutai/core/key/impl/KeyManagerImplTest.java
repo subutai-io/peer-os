@@ -157,6 +157,15 @@ public class KeyManagerImplTest
 
 
     @Test
+    public void testSignKeyWithKey() throws Exception
+    {
+        keyManager.signKeyWithKey( KEY_ID, KEY_ID );
+
+        verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
+    }
+
+
+    @Test
     public void testSendKeyToHub() throws Exception
     {
         keyManager.sendKeyToHub( KEY_ID );
