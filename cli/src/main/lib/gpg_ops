@@ -345,7 +345,7 @@ assert_email_validity(){
      msg_error "Empty email string !"
      exit 1
   fi 
-  echo "$email" | grep '^[a-zA-Z0-9]*@[a-zA-Z0-9]*\.[a-zA-Z0-9]*$'
+  echo "$email" | grep '^[a-zA-Z0-9]*@[a-zA-Z0-9]*\.[a-zA-Z0-9]*$' > /dev/null 2>&1
   if [ ! $? -eq 0 ]; then
     msg_error "Invalid email address !"
     exit 1
