@@ -67,6 +67,11 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.plugin.flume.impl</Bundle-SymbolicName>
+            <Import-Package>
+              org.safehaus.subutai.*,org.h2.*,javax.sql.*,com.google.common.*,
+              com.google.guava.*,com.h2database.*,org.apache.geronimo.specs.*,
+              org.apache.openjpa.*,org.osgi.*,org.slf4j.*,javax.persistence.*
+            </Import-Package>
           </instructions>
         </configuration>
       </plugin>
