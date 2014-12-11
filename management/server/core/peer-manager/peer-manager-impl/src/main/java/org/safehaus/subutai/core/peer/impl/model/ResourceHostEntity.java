@@ -545,6 +545,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             return;
         }
         // trying add repository
+        /* TODO
+           download each template except master in ancestry lineage if not installed already
+           install it using dpkg -i
+           then proceed
+          */
         updateRepository( p );
         importTemplate( p );
         if ( !isTemplateExist( p ) )

@@ -36,6 +36,7 @@
 #include <csignal>
 #include <sstream>
 #include <list>
+#include <algorithm>
 #include <lxc/lxccontainer.h>
 #include "pugixml.hpp"
 #include <stdio.h>

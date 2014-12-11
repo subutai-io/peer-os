@@ -133,47 +133,28 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
-                                                final List<Template> templates, final int quantity,
-                                                final String strategyId, final List<Criteria> criteria,
-                                                String nodeGroupName ) throws PeerException
-    {
-        try
-        {
-            //send create request
-            CreateContainerRequest request =
-                    new CreateContainerRequest( creatorPeerId, environmentId, templates, quantity, strategyId, criteria,
-                            nodeGroupName );
-
-            CreateContainerResponse response = sendRequest( request, RecipientType.CONTAINER_CREATE_REQUEST.name(),
-                    Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainerResponse.class );
-
-            if ( response != null )
-            {
-                Set<HostKey> hostKeys = response.getHostKeys();
-                Set<ContainerHost> result = getContainerHostImpl( hostKeys );
-                return result;
-            }
-            else
-            {
-                throw new PeerException( "Received null response" );
-            }
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( "Error in createContainers", e );
-            throw new PeerException( e.getMessage() );
-        }
-    }
-
-
-    @Override
     public Set<HostInfoModel> scheduleCloneContainers( final UUID creatorPeerId, final List<Template> templates,
                                                        final int quantity, final String strategyId,
                                                        final List<Criteria> criteria ) throws PeerException
     {
-        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(), "8181" );
-        return remotePeerRestClient.scheduleCloneContainers( creatorPeerId, templates, quantity, strategyId, criteria );
+        //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(),
+        // "8181" );
+        //        return remotePeerRestClient.scheduleCloneContainers( creatorPeerId, templates, quantity,
+        // strategyId, criteria );
+
+        CreateContainerResponse response =
+                sendRequest( new CreateContainerRequest( creatorPeerId, templates, quantity, strategyId, criteria ),
+                        RecipientType.CONTAINER_CREATE_REQUEST.name(), Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT,
+                        CreateContainerResponse.class );
+
+        if ( response != null )
+        {
+            return response.getHosts();
+        }
+        else
+        {
+            throw new PeerException( "Command timed out" );
+        }
     }
 
 
@@ -223,20 +204,21 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public PeerQuotaInfo getQuota( final ContainerHost host, final QuotaType quotaType ) throws PeerException
     {
-        throw new PeerException( "Operation not allowed." );
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.getQuota( host, quotaType );
     }
 
 
     @Override
-    public void setQuota( final ContainerHost host, final QuotaInfo quota ) throws PeerException
+    public void setQuota( final ContainerHost host, final QuotaInfo quotaInfo ) throws PeerException
     {
-        throw new PeerException( "Operation not allowed." );
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+        remotePeerRestClient.setQuota( host, quotaInfo );
     }
 
 
     @Override
-    public CommandResult execute( final RequestBuilder requestBuilder, final Host host )
-            throws CommandException
+    public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
         return execute( requestBuilder, host, null );
     }
@@ -271,8 +253,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void executeAsync( final RequestBuilder requestBuilder, final Host host )
-            throws CommandException
+    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
         executeAsync( requestBuilder, host, null );
     }

@@ -19,6 +19,7 @@ public class CommandsTest
         assertNotNull( commands.getReadKeyCommand( ARGUMENT ) );
         assertNotNull( commands.getReadSshKeyCommand( ARGUMENT ) );
         assertNotNull( commands.getSignCommand( ARGUMENT, ARGUMENT ) );
+        assertNotNull( commands.getSignKeyCommand( ARGUMENT, ARGUMENT ) );
         assertNotNull( commands.getSendKeyCommand( ARGUMENT ) );
         assertNotNull( commands.getListKeyCommand( ARGUMENT ) );
         assertNotNull( commands.getListKeysCommand() );

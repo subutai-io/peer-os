@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.peer.impl.container;
 
 import java.util.Set;
 
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -36,10 +36,9 @@ public class CreateContainerRequestListener extends RequestListener
         {
             try
             {
-                Set<ContainerHost> containerHosts = localPeer
-                        .createContainers( request.getCreatorPeerId(), request.getEnvironmentId(),
-                                request.getTemplates(), request.getQuantity(), request.getStrategyId(),
-                                request.getCriteria(), request.getNodeGroupName() );
+                Set<HostInfoModel> containerHosts = localPeer
+                        .scheduleCloneContainers( request.getCreatorPeerId(), request.getTemplates(),
+                                request.getQuantity(), request.getStrategyId(), request.getCriteria() );
 
                 return new CreateContainerResponse( containerHosts );
             }

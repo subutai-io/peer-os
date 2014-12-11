@@ -13,6 +13,8 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
@@ -89,18 +91,17 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
                 template = localPeer.getTemplate( template.getParentTemplateName() );
                 templates.add( 0, template );
             }
-            Set<ContainerHost> containerHosts = localPeer
-                    .createContainers( localPeer.getId(), config.getEnvironmentId(), templates, 1,
-                            MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( nodeType ).getStrategyId(),
-                            MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( nodeType ).getCriteriaAsList(),
-                            nodeType.name() );
-
-            if ( containerHosts.size() != 1 )
+            UUID hostId = manager.getEnvironmentManager()
+                                 .addContainer( config.getEnvironmentId(), config.getTemplateName(),
+                                         MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( nodeType ),
+                                         nodeType.name(), localPeer );
+            Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
+            if ( environment == null )
             {
-                throw new PeerException( "Could not create container" );
+                throw new PeerException( "Could not obtain cluster environment" );
             }
 
-            ContainerHost containerHost = containerHosts.iterator().next();
+            ContainerHost containerHost = environment.getContainerHostById( hostId );
             switch ( nodeType )
             {
                 case CONFIG_NODE:
@@ -119,7 +120,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
             config.addNode( mongoNode, nodeType );
             po.addLog( "Lxc container created successfully\nConfiguring cluster..." );
         }
-        catch ( PeerException e )
+        catch ( EnvironmentManagerException | PeerException e )
         {
             po.addLogFailed( e.toString() );
             return;

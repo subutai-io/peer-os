@@ -47,12 +47,10 @@ public class PeerManagerImpl implements PeerManager
     private static final String SOURCE_REMOTE_PEER = "PEER_REMOTE";
     private static final String SOURCE_LOCAL_PEER = "PEER_LOCAL";
     private static final String PEER_GROUP = "PEER_GROUP";
-    //    private AgentManager agentManager;
     private PeerDAO peerDAO;
     private QuotaManager quotaManager;
     private TemplateRegistry templateRegistry;
     private DataSource dataSource;
-    //    private CommunicationManager communicationManager;
     private CommandExecutor commandExecutor;
     private LocalPeer localPeer;
     private StrategyManager strategyManager;
@@ -85,6 +83,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    @Override
     public EntityManagerFactory getEntityManagerFactory()
     {
         return entityManagerFactory;
@@ -106,7 +105,7 @@ public class PeerManagerImpl implements PeerManager
         if ( result.isEmpty() )
         {
             peerInfo = new PeerInfo();
-            peerInfo.setId( generatePeerId() );
+            peerInfo.setId( UUID.randomUUID() );
             peerInfo.setName( "Local Subutai server" );
             peerInfo.setOwnerId( UUID.randomUUID() );
             peerDAO.saveInfo( SOURCE_LOCAL_PEER, peerInfo.getId().toString(), peerInfo );
@@ -116,7 +115,7 @@ public class PeerManagerImpl implements PeerManager
             peerInfo = result.get( 0 );
         }
         localPeer = new LocalPeerImpl( this, templateRegistry, peerDAO, quotaManager, strategyManager, requestListeners,
-                commandExecutor, hostRegistry );
+                                       commandExecutor, hostRegistry );
         localPeer.init();
 
         //add command request listener
@@ -140,12 +139,6 @@ public class PeerManagerImpl implements PeerManager
     {
         localPeer.shutdown();
     }
-    //
-    //
-    //    public void setCommunicationManager( final CommunicationManager communicationManager )
-    //    {
-    //        this.communicationManager = communicationManager;
-    //    }
 
 
     public void setCommandExecutor( final CommandExecutor commandExecutor )
@@ -185,12 +178,6 @@ public class PeerManagerImpl implements PeerManager
     public boolean update( final PeerInfo peerInfo )
     {
         return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId().toString(), peerInfo );
-    }
-
-
-    private UUID generatePeerId()
-    {
-        return UUID.randomUUID();
     }
 
 
@@ -236,19 +223,7 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public List<PeerGroup> peersGroups()
     {
-        List<PeerGroup> peerGroups = peerDAO.getInfo( PEER_GROUP, PeerGroup.class );
-        /*Set<PeerGroup> peerGroups = new HashSet<>();
-        for ( int i = 0; i < 10; i++ )
-        {
-            PeerGroup peerGroup = new PeerGroup();
-            peerGroup.setName( "Group " + i );
-            for ( int j = 0; j < 10; j++ )
-            {
-                peerGroup.addPeerUUID( UUID.randomUUID() );
-            }
-            peerGroups.add( peerGroup );
-        }*/
-        return peerGroups;
+        return peerDAO.getInfo( PEER_GROUP, PeerGroup.class );
     }
 
 
@@ -281,12 +256,11 @@ public class PeerManagerImpl implements PeerManager
             return localPeer;
         }
 
-        PeerInfo peerInfo = getPeerInfo( peerId );
+        PeerInfo pi = getPeerInfo( peerId );
 
-        if ( peerInfo != null )
+        if ( pi != null )
         {
-            return new RemotePeerImpl( localPeer, peerInfo, messenger, commandResponseListener,
-                    messageResponseListener );
+            return new RemotePeerImpl( localPeer, pi, messenger, commandResponseListener, messageResponseListener );
         }
         return null;
     }
@@ -332,3 +306,4 @@ public class PeerManagerImpl implements PeerManager
         }
     }
 }
+

@@ -1,19 +1,10 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl;
 
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.sql.DataSource;
-
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+import org.safehaus.subutai.common.protocol.*;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -30,16 +21,19 @@ import org.safehaus.subutai.plugin.elasticsearch.impl.handler.NodeOperationHandl
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
+import javax.sql.DataSource;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class ElasticsearchImpl implements Elasticsearch
 {
     private static final Logger LOG = LoggerFactory.getLogger( ElasticsearchImpl.class.getName() );
     private Tracker tracker;
-    private ExecutorService executor;
+    protected ExecutorService executor;
     private EnvironmentManager environmentManager;
     private PluginDAO pluginDAO;
     private DataSource dataSource;

@@ -11,10 +11,15 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
@@ -32,6 +37,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
 
@@ -154,6 +160,42 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response setQuota( @FormParam( "hostId" ) final String hostId,
+                              @FormParam( "quotaInfo" ) final String quotaInfo )
+    {
+        try
+        {
+            QuotaInfo q = GSON.fromJson( quotaInfo, QuotaInfo.class );
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.setQuota( localPeer.getContainerHostById( hostId ), q );
+            return Response.ok().build();
+        }
+        catch ( JsonParseException | PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getQuota( @QueryParam( "hostId" ) final String hostId,
+                              @QueryParam( "quotaType" ) final String quotaType )
+    {
+        try
+        {
+            QuotaType q = GSON.fromJson( quotaType, QuotaType.class );
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            PeerQuotaInfo quotaInfo = localPeer.getQuota( localPeer.getContainerHostById( hostId ), q );
+            return Response.ok( GSON.toJson( quotaInfo ) ).build();
+        }
+        catch ( JsonParseException | PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
     private static String getLocalIp()
     {
         Enumeration<NetworkInterface> n;
@@ -193,32 +235,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createContainers( final String ownerPeerId, final String environmentId, final String templates,
-                                      final int quantity, final String strategyId, final String criteria,
-                                      final String nodeGroupName )
-    {
-
-        //TODO: Implement criteria restoring
-        List<Criteria> criteriaList = new ArrayList();
-        try
-        {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            Set<ContainerHost> result = localPeer
-                    .createContainers( UUID.fromString( ownerPeerId ), UUID.fromString( environmentId ),
-                            ( List<Template> ) JsonUtil.fromJson( templates, new TypeToken<List<Template>>()
-                            {
-                            }.getType() ), quantity, strategyId, criteriaList, nodeGroupName );
-            return Response.ok( JsonUtil.toJson( result ) ).build();
-            //            return Response.ok().entity( result ).build();
-        }
-        catch ( PeerException e )
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
     public Response scheduleCloneContainers( final String creatorPeerId, final String templates, final int quantity,
                                              final String strategyId, final String criteria )
     {
@@ -229,11 +245,9 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             Set<HostInfoModel> result = localPeer.scheduleCloneContainers( UUID.fromString( creatorPeerId ),
                     ( List<Template> ) JsonUtil.fromJson( templates, new TypeToken<List<Template>>()
-                    {
-                    }.getType() ), quantity, strategyId,
+                    {}.getType() ), quantity, strategyId,
                     ( List<Criteria> ) JsonUtil.fromJson( templates, new TypeToken<List<Criteria>>()
-                    {
-                    }.getType() ) );
+                    {}.getType() ) );
             return Response.ok( JsonUtil.toJson( result ) ).build();
             //            return Response.ok().entity( result ).build();
         }

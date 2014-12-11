@@ -279,107 +279,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     }
 
 
-    @Override
-    public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
-                                                final List<Template> templates, final int quantity,
-                                                final String strategyId, final List<Criteria> criteria,
-                                                String nodeGroupName ) throws PeerException
-    {
-        Preconditions.checkNotNull( creatorPeerId, "Creator peer ID is null." );
-        Preconditions.checkNotNull( nodeGroupName, "Node group name is null." );
-        Preconditions.checkNotNull( environmentId, "Environment ID is null." );
-        Preconditions.checkNotNull( templates, "Template list is null." );
-        Preconditions.checkState( templates.size() > 0, "Template list is empty" );
-
-        LOG.info( String.format( "=============> Order received: %s %d %s", nodeGroupName, quantity,
-                creatorPeerId.toString() ) );
-
-        try
-        {
-            for ( Template t : templates )
-            {
-                if ( t.isRemote() )
-                {
-                    tryToRegister( t );
-                }
-            }
-            String templateName = templates.get( templates.size() - 1 ).getTemplateName();
-
-
-            List<ServerMetric> serverMetricMap = new ArrayList<>();
-            for ( ResourceHost resourceHost : getResourceHosts() )
-            {
-                if ( resourceHost.isConnected() )
-                {
-                    serverMetricMap.add( resourceHost.getMetric() );
-                }
-            }
-            Map<ServerMetric, Integer> slots;
-            try
-            {
-                slots = strategyManager.getPlacementDistribution( serverMetricMap, quantity, strategyId, criteria );
-            }
-            catch ( StrategyException e )
-            {
-                throw new PeerException( e.getMessage() );
-            }
-
-            Set<String> existingContainerNames = getContainerNames();
-
-            // clone specified number of instances and store their names
-            Map<ResourceHost, Set<String>> cloneNames = new HashMap<>();
-
-            for ( Map.Entry<ServerMetric, Integer> e : slots.entrySet() )
-            {
-                Set<String> hostCloneNames = new HashSet<>();
-                for ( int i = 0; i < e.getValue(); i++ )
-                {
-                    String newContainerName = nextHostName( templateName, existingContainerNames );
-                    hostCloneNames.add( newContainerName );
-                }
-                ResourceHost resourceHost = getResourceHostByName( e.getKey().getHostname() );
-                cloneNames.put( resourceHost, hostCloneNames );
-            }
-
-            List<HostCloneTask> hostCloneTasks = new ArrayList<>();
-            Map<ResourceHost, List<CloneParam>> orders = new HashMap<>();
-            UUID taskGroupId = UUID.randomUUID();
-            for ( final Map.Entry<ResourceHost, Set<String>> e : cloneNames.entrySet() )
-            {
-                ResourceHost rh = e.getKey();
-                Set<String> clones = e.getValue();
-                ResourceHost resourceHost = getResourceHostByName( rh.getHostname() );
-                List<CloneParam> cloneParams = new ArrayList<>();
-                for ( String cloneName : clones )
-                {
-                    CloneParam cloneParam = new CloneParam( cloneName, templates );
-                    cloneParams.add( cloneParam );
-                    HostCloneTask hostCloneTask = new HostCloneTask( taskGroupId, resourceHost, cloneParam );
-                    hostCloneTask.start();
-                    hostCloneTasks.add( hostCloneTask );
-                }
-                orders.put( rh, cloneParams );
-            }
-            tasks.addAll( hostCloneTasks );
-            Set<ContainerHost> result = waitCloneTasks( hostCloneTasks );
-            for ( ContainerHost containerHost : result )
-            {
-                containerHost.setCreatorPeerId( creatorPeerId.toString() );
-                containerHost.setNodeGroupName( nodeGroupName );
-                containerHost.setEnvironmentId( environmentId.toString() );
-                containerHost.setTemplateName( templateName );
-            }
-            return result;
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Clone fail.", e );
-            //TODO: destroy environment containers
-            throw new PeerException( e.toString() );
-        }
-    }
-
-
     private Set<ContainerHost> waitCloneTasks( final List<HostCloneTask> hostCloneTasks ) throws Exception
     {
         int quantity = hostCloneTasks.size();
@@ -886,7 +785,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         }
         catch ( QuotaException e )
         {
-            throw new PeerException( e.toString() );
+            throw new PeerException( e );
         }
     }
 
@@ -901,7 +800,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         }
         catch ( QuotaException e )
         {
-            throw new PeerException( e.toString() );
+            throw new PeerException( e );
         }
     }
 
