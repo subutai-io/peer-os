@@ -71,4 +71,9 @@ public interface RepositoryManager
      * @throws RepositoryException - thrown if some error occurs
      */
     public String getPackageInfo( String packageName ) throws RepositoryException;
+
+    /**
+     * Returns full package name by short package name
+     */
+    public String getFullPackageName( String shortPackageName ) throws RepositoryException;
 }
