@@ -135,8 +135,9 @@ public class PluginDataService
             result = gson.fromJson( info, clazz );
             em.getTransaction().commit();
         }
-        catch ( NoResultException ignore )
+        catch ( NoResultException e )
         {
+            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
