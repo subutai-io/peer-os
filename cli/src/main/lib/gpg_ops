@@ -77,44 +77,16 @@ assert_key_exists(){
 # This function is used to print output table in an alinged fashion.
 # It caclucates the length of strings in column, and puts white spaces accordingly.
 find_len(){
-  if [ $# == 1 ];then
-    target=$1
-    max_size=0
-    all_pubs=`list_pubkeys`
-    IFS=' ' read -a array <<< "$all_pubs"
-    for element in "${array[@]}"
-    do
-      case $target in
-        sub | pub )
-          sub_ids=$(echo `gpg2 --list-key  $element | grep $target' ' | cut -d "/" -f2 | cut -d " " -f1`)
-          result=""
-          IFS=' ' read -a array <<< "$sub_ids"
-          for element in "${array[@]}"
-          do
-            result=$result$element:
-          done
-          result=$(echo $result | sed s'/.$//')
-          ;;
-        name )
-          result=$(echo `gpg2 --list-key $element | grep 'uid'  | sed 's/([^)]*[^(]//g' | awk '{print $(NF-1)}'`)
-          ;;
-        mail )
-          result=$(echo `gpg2 --list-key $element | grep 'uid'  | awk '{print $NF}' |  sed 's/^.\(.*\).$/\1/'`)
-          ;;
-      esac
-      size=${#result}
-      if (( $size > $max_size ));then
-        max_size=$size;
-      fi
-   done
-   echo $max_size
-  elif [ $# == 2 ]; then
-    key_id=$1
-    assert_key_exists $key_id
-    target=$2
+  target=$1
+  max_size=0
+  all_pubs=`list_pubkeys`
+  IFS=' ' read -a array <<< "$all_pubs"
+  for element in "${array[@]}"
+  do
     case $target in
       sub | pub )
-        sub_ids=$(echo `gpg2 --list-key  $key_id | grep $target' ' | cut -d "/" -f2 | cut -d " " -f1`)
+        sub_ids=$(echo `gpg2 --list-key  $element | grep $target' ' | cut -d "/" -f2 | cut -d " " -f1`)
+        result=""
         IFS=' ' read -a array <<< "$sub_ids"
         for element in "${array[@]}"
         do
@@ -128,10 +100,19 @@ find_len(){
       mail )
         result=$(echo `gpg2 --list-key $element | grep 'uid'  | awk '{print $NF}' |  sed 's/^.\(.*\).$/\1/'`)
         ;;
+      expiry)
+        result=$(echo `gpg2 --list-key $element | grep '^pub' | awk '{print $3}'`)
+        ;;
+      trust)
+        result=$(echo `gpg2 --list-key $element | grep '^pub' | awk '{print $3}'`)
+        ;;
     esac
     size=${#result}
-    echo $size
-  fi
+    if (( $size > $max_size ));then
+      max_size=$size;
+    fi
+  done
+  echo $max_size
 }
 
 
@@ -149,9 +130,36 @@ list_subkeys(){
 
 # Lists all key pairs in summarized format
 list_all(){
+  params=`getopt -o te -n "$0" -- "$@"`
+  if [ $? -ne 0 ];then
+      echo "invalid option"
+      exit 1
+  fi
+  eval set -- "$params"
+  switches=""
+  while true ; do
+    case "$1" in
+      -t)
+        switches=$switches" -t"
+        shift
+        ;;
+      -e)
+        switches=$switches" -e"
+        shift 
+        ;;
+      --) 
+        shift
+        break 
+        ;;
+      *) 
+        echo "Internal error!" 
+        exit 1 
+        ;;
+    esac
+  done
   all_pubs=`list_pubkeys`
   IFS=' ' read -a array <<< "$all_pubs"
-  print_keys array[@]
+  print_keys $switches array[@]
 }
 
 
@@ -165,6 +173,32 @@ list_all(){
 # parameters:
 #   1) key id
 summarize_key(){
+  params=`getopt -o te -n '$0' -- "$@"`
+  eval set -- "$params"
+  date=false
+  trust=false
+  # extract options and their arguments into variables.
+  while true ; do
+      case "$1" in
+        -t)
+          trust=true
+          shift
+          ;;
+        -e)
+          date=true;
+          shift 
+          ;;
+        --) 
+          shift;
+          break 
+          ;;
+        *) 
+          echo "Internal error!" 
+          exit 1 
+          ;;
+      esac
+  done
+
   key_id=$1
   assert_key_exists $key_id
   if [ -z `is_subkey $key_id` ]; then
@@ -176,8 +210,13 @@ summarize_key(){
   sub_ids=$(echo `echo -e "$output" | grep '^sub' | cut -d "/" -f2 | cut -d " " -f1`)
   email=`echo -e "$output" | grep uid  | awk '{print $NF}' |  sed 's/^.\(.*\).$/\1/'`
   name=`echo -e "$output" | grep uid  | sed 's/([^)]*[^(]//g' | awk '{print $(NF-1)}'`
-  # trustLevel=`echo -e "$output" | grep uid  | sed 's/([^)]*[^(]//g' | cut -d "[" -f2 | cut -d "]" -f1`
-  # expiry=`echo -e "$output" | grep '^pub'  | sed 's/([^)]*[^(]//g' | awk '{print $(3)}'`
+
+  if [ $trust == true ]; then
+    trustLevel=`echo -e "$output" | grep uid  | sed 's/([^)]*[^(]//g' | cut -d "[" -f2 | cut -d "]" -f1`
+  fi
+  if [ $date == true ]; then
+    expiry=`echo -e "$output" | grep '^pub'  | sed 's/([^)]*[^(]//g' | awk '{print $(3)}'`
+  fi
 
   concatinate=""
   IFS=' ' read -a array <<< "$sub_ids"
@@ -186,37 +225,105 @@ summarize_key(){
     concatinate=$concatinate$element:
   done
   concatinate=$(echo $concatinate | sed s'/.$//')
-  echo $pub_id $concatinate $name $email
+  echo $pub_id $concatinate $name $email $expiry $trustLevel
 }
 
 
 # prints header part of list commands
 print_keys(){
+  params=`getopt -o te -n '$0' -- "$@"`
+  eval set -- "$params"
+  date=false
+  trust=false
+  # extract options and their arguments into variables.
+  while true ; do
+      case "$1" in
+        -t)
+          trust=true
+          shift
+          ;;
+        -e)
+          date=true;
+          shift 
+          ;;
+        --) 
+          shift;
+          break 
+          ;;
+        *) 
+          echo "Internal error!" 
+          exit 1 
+          ;;
+      esac
+  done
+
   declare -a list=("${!1}")
   for (( i=0; i<${#list[@]}; i++ ));
   do
     ## print header
     if [ $i == 0 ]; then 
-      if [ ${#list[@]} == 1 ];then
-        space_list=`find_white_space_amount ${list[$i]}`
-      else
-        space_list=`find_white_space_amount`
-      fi
+      # if [ ${#list[@]} == 1 ];then
+      #   space_list=`find_white_space_amount ${list[$i]}`
+      # else
+      #   space_list=`find_white_space_amount`
+      # fi
+      space_list=`find_white_space_amount`
       IFS=' ' read -a spaces <<< $space_list
       subutai_quiet=false
       if [ "false" == "$subutai_quiet" ];then
-        printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s" "pubkey" "subkey" "name" "email"
-        printf "\n"
-        printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s" "------" "------" "----" "-----"
-        printf "\n"
+        if [[ $date == true && $trust == true ]]; then
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s %-${spaces[5]}s" "pubkey" "subkey" "name" "email" "expiry" "trust"
+          printf "\n"
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s %-${spaces[5]}s" "------" "------" "----" "-----" "------" "-----"
+          printf "\n"
+        elif [[ $date == false && $trust == true ]]; then
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s" "pubkey" "subkey" "name" "email" "trust"
+          printf "\n"
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s" "------" "------" "----" "-----" "-----"
+          printf "\n"
+        elif [[ $date == true && $trust == false ]]; then
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s" "pubkey" "subkey" "name" "email" "expiry"
+          printf "\n"
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s" "------" "------" "----" "-----" "------"
+          printf "\n"
+        elif [[ $date == false && $trust == false ]]; then
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s" "pubkey" "subkey" "name" "email" 
+          printf "\n"
+          printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s" "------" "------" "----" "-----"
+          printf "\n"
+        fi
       fi
     fi
-    # print keys in summarized format
-    summary=`summarize_key ${list[$i]}`
-    # echo "index " $i " : "  ${list[$i]}
-    # echo "summary: " $summary
-    printf "%${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s" $summary
-    printf "\n"
+
+    if [[ $date == true && $trust == true ]]; then
+      # print keys in summarized format
+      summary=`summarize_key -et ${list[$i]} `
+      # echo "index " $i " : "  ${list[$i]}
+      # echo "summary: " $summary
+      printf "%${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s %-${spaces[5]}s" $summary
+      printf "\n"
+    elif [[ $date == false && $trust == true ]]; then
+      # print keys in summarized format
+      summary=`summarize_key -t ${list[$i]} `
+      # echo "index " $i " : "  ${list[$i]}
+      # echo "summary: " $summary
+      printf "%${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s" $summary
+      printf "\n"      
+    elif [[ $date == true && $trust == false ]]; then
+      # print keys in summarized format
+      summary=`summarize_key -e ${list[$i]} `
+      # echo "index " $i " : "  ${list[$i]}
+      # echo "summary: " $summary
+      printf "%${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s" $summary
+      printf "\n"      
+    elif [[ $date == false && $trust == false ]]; then
+      # print keys in summarized format
+      summary=`summarize_key ${list[$i]} `
+      # echo "index " $i " : "  ${list[$i]}
+      # echo "summary: " $summary
+      printf "%${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s" $summary
+      printf "\n"      
+    fi
   done
 }
 
@@ -224,10 +331,12 @@ print_keys(){
 # finds the amount of white space to be inserted 
 # between columns while printing output of list commands.
 find_white_space_amount(){
-  white_space_size_pub=`find_len $1 'pub'`
-  white_space_size_sub=`find_len $1 'sub'`
-  white_space_size_name=`find_len $1 'name'`
-  white_space_size_email=`find_len $1 'mail'`
+  white_space_size_pub=`find_len 'pub'`
+  white_space_size_sub=`find_len 'sub'`
+  white_space_size_name=`find_len 'name'`
+  white_space_size_email=`find_len 'mail'`
+  white_space_size_expiry=`find_len 'expiry'`
+  white_space_size_trust=`find_len 'trust'`
   echo $white_space_size_pub $white_space_size_sub $white_space_size_name $white_space_size_email
 }
 

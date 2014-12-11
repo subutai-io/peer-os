@@ -70,18 +70,44 @@ EOF
 # parameters:
 #   1) key id (optional)
 list(){
+  params=`getopt -o te -n "$0" -- "$@"`
+  if [ $? -ne 0 ];then
+      echo "invalid option"
+      exit 1
+  fi
+  eval set -- "$params"
+  switches=""
+  while true ; do
+    case "$1" in
+      -t)
+        switches=$switches" -t"
+        shift
+        ;;
+      -e)
+        switches=$switches" -e"
+        shift 
+        ;;
+      --) 
+        shift
+        break 
+        ;;
+      *) 
+        echo "Internal error!" 
+        exit 1 
+        ;;
+    esac
+  done
   key_id=$1
   if [ -z $key_id ];then
-    list_all
+    list_all $switches
     return
   fi
   assert_key_exists $key_id
-  IFS=' ' read -a array <<< "$key_id"
-  print_keys array[@]
+  IFS=' ' read -a array <<< $key_id
+  print_keys $switches array[@]
   printf "\n"
   gpg2 --list-keys $key_id
 }
-
 
 # Revokes the key
 # parameters
