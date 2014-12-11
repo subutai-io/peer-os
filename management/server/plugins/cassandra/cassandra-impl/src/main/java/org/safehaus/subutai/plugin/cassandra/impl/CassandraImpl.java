@@ -14,7 +14,6 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
-import org.safehaus.subutai.plugin.cassandra.api.NodeOperationTask;
 import org.safehaus.subutai.plugin.cassandra.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.*;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
@@ -28,10 +27,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-//import org.safehaus.subutai.plugin.common.PluginDao;
-//
-//import org.safehaus.subutai.core.agent.api.AgentManager;
 
 
 public class CassandraImpl implements Cassandra
@@ -105,7 +100,6 @@ public class CassandraImpl implements Cassandra
 
     public void destroy()
     {
-        //        this.serviceLocator = null;
         this.tracker = null;
         this.environmentManager = null;
         this.pluginDAO = null;
@@ -144,6 +138,13 @@ public class CassandraImpl implements Cassandra
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class );
+    }
+
+
+    @Override
+    public UUID addNode( final String clusterName, final String agentHostName )
+    {
+        return null;
     }
 
 
@@ -214,18 +215,22 @@ public class CassandraImpl implements Cassandra
 
 
     @Override
-    public UUID addNode( final String clusterName, final String nodetype )
+    public UUID addNode( final String clusterName )
     {
-        // TODO
-        return null;
+        CassandraClusterConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.ADD );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID destroyNode( final String clusterName, UUID containerId )
+    public UUID destroyNode( final String clusterName, String hostname )
     {
-        // TODO
-        return null;
+        AbstractOperationHandler operationHandler =
+                new NodeOperationHandler( this, clusterName, hostname, NodeOperationType.DESTROY );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 

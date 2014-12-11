@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -10,12 +11,15 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
@@ -27,6 +31,7 @@ import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+import org.safehaus.subutai.plugin.cassandra.impl.ClusterConfiguration;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationHandlerInterface;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
@@ -36,6 +41,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 
 /**
@@ -85,38 +92,52 @@ public class ClusterOperationHandler extends AbstractOperationHandler<CassandraI
 
 
     public void addNode(){
-
         LocalPeer localPeer = manager.getPeerManager().getLocalPeer();
+        EnvironmentManager environmentManager = manager.getEnvironmentManager();
+        NodeGroup nodeGroup = new NodeGroup();
+        nodeGroup.setName( CassandraClusterConfig.PRODUCT_NAME );
+        nodeGroup.setLinkHosts( true );
+        nodeGroup.setExchangeSshKeys( true );
+        nodeGroup.setDomainName( Common.DEFAULT_DOMAIN_NAME );
+        nodeGroup.setTemplateName( config.getTemplateName() );
+        nodeGroup.setPlacementStrategy( new PlacementStrategy( "ROUND_ROBIN" ) );
+        nodeGroup.setNumberOfNodes( 1 );
+
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        String ngJSON = gson.toJson(nodeGroup);
+
         try
         {
-            List<Template> templates = new ArrayList();
-            Template template = localPeer.getTemplate( config.getTemplateName() );
-            templates.add( template );
-            while ( ! "master".equals( template.getTemplateName() ) )
+            environmentManager.createAdditionalContainers( config.getEnvironmentId(), ngJSON, localPeer );
+            Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+            // update cluster configuration on DB
+            for ( ContainerHost containerHost : environment.getContainerHosts() )
             {
-                template = localPeer.getTemplate( template.getParentTemplateName() );
-                templates.add( 0, template );
-            }
-            UUID hostId = manager.getEnvironmentManager()
-                                 .addContainers( config.getEnvironmentId(), config.getTemplateName(),
-                                         new PlacementStrategy( "ROUND_ROBIN" ),
-                                         NodeType.SEED.name(), localPeer );
-            Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-            if ( environment == null )
-            {
-                throw new PeerException( "Could not obtain cluster environment" );
-            }
 
-            ContainerHost containerHost = environment.getContainerHostById( hostId );
-            config.getNodes().add( containerHost.getId() );
-            trackerOperation.addLog( "Lxc container created successfully\nConfiguring cluster..." );
+                if ( ! config.getNodes().contains( containerHost.getId() ) ){
+                    config.getNodes().add( containerHost.getId() );
+                }
+            }
+            manager.getPluginDAO().saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+
+            ClusterConfiguration configurator = new ClusterConfiguration( trackerOperation, manager );
+            try
+            {
+                configurator.configureCluster( config, environmentManager.getEnvironmentByUUID( config
+                            .getEnvironmentId() ) );
+            }
+            catch ( ClusterConfigurationException e )
+            {
+                e.printStackTrace();
+            }
         }
-        catch ( EnvironmentManagerException | PeerException e )
+        catch ( EnvironmentBuildException e )
         {
-            trackerOperation.addLogFailed( e.toString() );
-            return;
+            e.printStackTrace();
         }
     }
+
 
     @Override
     public void runOperationOnContainers( ClusterOperationType clusterOperationType )

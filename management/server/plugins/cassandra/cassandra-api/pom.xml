@@ -11,7 +11,7 @@
 
   <artifactId>cassandra-plugin-api</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Cassandra Api</name>
+  <name>Subutai Cassandra Plugin Api</name>
   <description>Subutai Cassandra Api</description>
 
   <dependencies>

@@ -62,7 +62,7 @@ public class ClusterConfiguration
         {
             try
             {
-                po.addLog( "Configuring node: " + containerHost.getId() );
+                po.addLog( "Configuring node: " + containerHost.getHostname() );
 
                 // Setting permission
                 CommandResult commandResult = containerHost.execute( new RequestBuilder( permissionParam ) );

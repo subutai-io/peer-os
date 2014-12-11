@@ -158,7 +158,7 @@ public class ProgressWindow
     {
         try
         {
-//            VaadinSession.getCurrent().getLockInstance().lock();
+            VaadinSession.getCurrent().getLockInstance().lock();
 
 
             if ( !Strings.isNullOrEmpty( output ) )
@@ -169,7 +169,7 @@ public class ProgressWindow
         }
         finally
         {
-//            VaadinSession.getCurrent().getLockInstance().unlock();
+            VaadinSession.getCurrent().getLockInstance().unlock();
 
         }
     }

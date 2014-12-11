@@ -8,6 +8,8 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
@@ -86,12 +88,33 @@ public class NodeOperationHandler extends AbstractOperationHandler<CassandraImpl
                 case STATUS:
                     result = host.execute( new RequestBuilder( Commands.statusCommand ) );
                     break;
+                case DESTROY:
+                    destroyNode( host );
+                    break;
             }
             logResults( trackerOperation, result );
         }
         catch ( CommandException e )
         {
             trackerOperation.addLogFailed( String.format( "Command failed, %s", e.getMessage() ) );
+        }
+    }
+
+    // TODO: check if this method is working properly
+    public void destroyNode( ContainerHost host ){
+        EnvironmentManager environmentManager  = manager.getEnvironmentManager();
+        try
+        {
+            CassandraClusterConfig config = manager.getCluster( clusterName );
+            environmentManager.removeContainer( config.getEnvironmentId(), host.getId() );
+            config.getNodes().remove( host.getId() );
+            manager.getPluginDAO().saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            trackerOperation.addLog( String.format( "Cluster information is updated" ) );
+            trackerOperation.addLogDone( String.format( "Container %s is removed from cluster", host.getHostname() ) );
+        }
+        catch ( EnvironmentManagerException e )
+        {
+            e.printStackTrace();
         }
     }
 

@@ -25,9 +25,9 @@ public interface Cassandra extends ApiBase<CassandraClusterConfig>
 
     UUID statusService( String clusterName, String hostname );
 
-    UUID addNode( String clusterName, String nodetype );
+    UUID addNode( String clusterName );
 
-    UUID destroyNode( String clusterName, UUID containerId );
+    UUID destroyNode( String clusterName, String hostname );
 
     UUID checkNode( String clusterName, String hostname );
 
