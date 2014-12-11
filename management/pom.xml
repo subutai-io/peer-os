@@ -372,23 +372,7 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- plugin-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>plugin-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>plugin-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>plugin-manager-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
+      <!-- plugin-master -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>plugin-master-api</artifactId>
@@ -407,7 +391,7 @@
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- wol-manager -->
-      <!--<dependency>
+      <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>wol-manager-api</artifactId>
         <version>${project.version}</version>
@@ -421,7 +405,8 @@
         <groupId>${project.groupId}</groupId>
         <artifactId>wol-manager-ui</artifactId>
         <version>${project.version}</version>
-      </dependency>-->
+      </dependency>
+
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- strategy-manager -->
       <dependency>
