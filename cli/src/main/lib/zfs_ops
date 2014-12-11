@@ -405,6 +405,21 @@ function fs_get_quota {
 }
 
 
+function fs_get_quota_exact_values {
+  local container=$1
+
+  local lxc_home=$(fs_quota_operations_exact_value "lxc-data/$container-home")
+  local lxc_var=$(fs_quota_operations_exact_value "lxc-data/$container-var")
+  local lxc_opt=$(fs_quota_operations_exact_value "lxc/$container-opt")
+  local lxc_rootfs=$(fs_quota_operations_exact_value "lxc/$container")
+
+  printf "Container home:\t%s\n" $lxc_home
+  printf "Container opt:\t%s\n" $lxc_opt
+  printf "Container var:\t%s\n" $lxc_var
+  printf "Container rootfs:\t%s\n" $lxc_rootfs
+}
+
+
 function fs_set_quota {
   local container=$1
   local directory=$2
@@ -520,3 +535,11 @@ function fs_quota_operations {
   fi
 }
 
+
+function fs_quota_operations_exact_value {
+  local container=$1
+  local cmd=
+  if [ -z $quota_value ]; then
+    zfs get -p quota $container | grep "$container" | awk '{print $3}'
+  fi
+}

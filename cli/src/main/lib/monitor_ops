@@ -16,7 +16,7 @@ function get_total_ram {
 
   local physical_total_ram=$(get_physical_total_ram)
   local ram_quota=$(lxc_get_memory $lxc)
-  assert_number "$ram_quota"  > /dev/null
+  assert_number "$ram_quota" > /dev/null
 
   if (( $(bc <<< "$ram_quota <= $physical_total_ram") == 1 )); then
     echo "$ram_quota"
@@ -97,6 +97,14 @@ function get_average_used_ram {
   local lxc=$1
   local sampleCountToAverage=$2
   local metric_type="ram"
+  get_metric_average $lxc $sampleCountToAverage $metric_type
+}
+
+
+function get_average_used_disk_by_metric_type {
+  local lxc=$1
+  local metric_type=$2
+  local sampleCountToAverage=$3
   get_metric_average $lxc $sampleCountToAverage $metric_type
 }
 
@@ -272,28 +280,28 @@ function get_available_disk_by_dataset {
 }
 
 
-function get_available_disk_var {
+function get_available_diskVar {
   local lxc=$1
   lxc_assert $lxc > /dev/null
   echo $(get_available_disk_by_dataset "$lxc" "var")
 }
 
 
-function get_available_disk_opt {
+function get_available_diskOpt {
   local lxc=$1
   lxc_assert $lxc > /dev/null
   echo $(get_available_disk_by_dataset "$lxc" "opt")
 }
 
 
-function get_available_disk_home {
+function get_available_diskHome {
   local lxc=$1
   lxc_assert $lxc > /dev/null
   echo $(get_available_disk_by_dataset "$lxc" "home")
 }
 
 
-function get_available_disk_rootfs {
+function get_available_diskRootfs {
   local lxc=$1
   lxc_assert $lxc > /dev/null
   echo $(get_available_disk_by_dataset "$lxc" "rootfs")
@@ -309,28 +317,28 @@ function get_used_disk_by_dataset {
 }
 
 
-function get_used_disk_var {
+function get_used_diskVar {
   local lxc=$1
   lxc_assert $lxc > /dev/null
   echo $(get_used_disk_by_dataset "$lxc" "var")
 }
 
 
-function get_used_disk_opt {
+function get_used_diskOpt {
   local lxc=$1
   lxc_assert $lxc > /dev/null
   echo $(get_used_disk_by_dataset "$lxc" "opt")
 }
 
 
-function get_used_disk_home {
+function get_used_diskHome {
   local lxc=$1
   lxc_assert $lxc > /dev/null
   echo $(get_used_disk_by_dataset "$lxc" "home")
 }
 
 
-function get_used_disk_rootfs {
+function get_used_diskRootfs {
   local lxc=$1
   lxc_assert $lxc > /dev/null
   echo $(get_used_disk_by_dataset "$lxc" "rootfs")
@@ -342,15 +350,17 @@ function get_total_disk_by_dataset {
   local dataset=$2
   assert_dataset $dataset
 
-  local disk_quota=$(fs_get_quota $lxc | grep "$dataset" | cut -d':' -f2 | tr -d '\040\011\015')
-  local physical_total_disk_dataset=$(get_physical_total_disk_"$dataset")
+  local disk_quota=$(fs_get_quota_exact_values $lxc | grep "$dataset" | cut -d':' -f2 | tr -d '\040\011\015')
+  local metric_type=$(get_disk_metric_type_by_dataset $dataset)
+  local physical_total_disk_dataset=$(get_physical_total_"$metric_type")
   local numberExpression='^[0-9]+$'
 
+  # Return physical total disk if the disk quota is empty
   if [ -z "$disk_quota" ]; then
     echo "$physical_total_disk_dataset"
     return
   fi
-  # Check if the value is a number
+  # Return physical total disk if the disk quota is not a number
   if ! [[ $disk_quota =~ $numberExpression ]] ; then
     echo "$physical_total_disk_dataset"
     return
@@ -358,37 +368,41 @@ function get_total_disk_by_dataset {
 
   assert_number "$disk_quota"  > /dev/null
 
-  if (( $(bc <<< "$disk_quota <= $physical_total_disk_dataset") == 1 )); then
+  # Return quota value set for disk if it is less than or equal to
+  # physical total disk and if quota is not 0 meaning no limit defined
+  if (( $(bc <<< "$disk_quota <= $physical_total_disk_dataset") == 1 )) && (("$disk_quota" > "0")); then
     echo "$disk_quota"
     return
   fi
+  # Return physical total disk size if the quota set is greater than
+  # the physical total disk
   echo "$physical_total_disk_dataset"
   return
 }
 
 
-function get_total_disk_var {
+function get_total_diskVar {
   local lxc=$1
   lxc_assert $lxc > /dev/null
   echo $(get_total_disk_by_dataset "$lxc" "var")
 }
 
 
-function get_total_disk_opt {
+function get_total_diskOpt {
   local lxc=$1
   lxc_assert $lxc > /dev/null
   echo $(get_total_disk_by_dataset "$lxc" "opt")
 }
 
 
-function get_total_disk_home {
+function get_total_diskHome {
   local lxc=$1
   lxc_assert $lxc > /dev/null
   echo $(get_total_disk_by_dataset "$lxc" "home")
 }
 
 
-function get_total_disk_rootfs {
+function get_total_diskRootfs {
   local lxc=$1
   lxc_assert $lxc > /dev/null
   echo $(get_total_disk_by_dataset "$lxc" "rootfs")
@@ -422,25 +436,25 @@ function get_physical_available_disk_by_pool_name {
 }
 
 
-function get_physical_available_disk_var {
+function get_physical_available_diskVar {
   local pool=$(get_var_dataset_pool)
   get_physical_available_disk_by_pool_name $pool
 }
 
 
-function get_physical_available_disk_opt {
+function get_physical_available_diskOpt {
   local pool=$(get_opt_dataset_pool)
   get_physical_available_disk_by_pool_name $pool
 }
 
 
-function get_physical_available_disk_home {
+function get_physical_available_diskHome {
   local pool=$(get_home_dataset_pool)
   get_physical_available_disk_by_pool_name $pool
 }
 
 
-function get_physical_available_disk_rootfs {
+function get_physical_available_diskRootfs {
   local pool=$(get_rootfs_dataset_pool)
   get_physical_available_disk_by_pool_name $pool
 }
@@ -453,25 +467,25 @@ function get_physical_used_disk_by_pool_name {
 }
 
 
-function get_physical_used_disk_var {
+function get_physical_used_diskVar {
   local pool=$(get_var_dataset_pool)
   get_physical_used_disk_by_pool_name $pool
 }
 
 
-function get_physical_used_disk_opt {
+function get_physical_used_diskOpt {
   local pool=$(get_opt_dataset_pool)
   get_physical_used_disk_by_pool_name $pool
 }
 
 
-function get_physical_used_disk_home {
+function get_physical_used_diskHome {
   local pool=$(get_home_dataset_pool)
   get_physical_used_disk_by_pool_name $pool
 }
 
 
-function get_physical_used_disk_rootfs {
+function get_physical_used_diskRootfs {
   local pool=$(get_rootfs_dataset_pool)
   get_physical_used_disk_by_pool_name $pool
 }
@@ -485,25 +499,25 @@ function get_physical_total_disk_by_pool_name {
 }
 
 
-function get_physical_total_disk_var {
+function get_physical_total_diskVar {
   local pool=$(get_var_dataset_pool)
   get_physical_total_disk_by_pool_name $pool
 }
 
 
-function get_physical_total_disk_opt {
+function get_physical_total_diskOpt {
   local pool=$(get_opt_dataset_pool)
   get_physical_total_disk_by_pool_name $pool
 }
 
 
-function get_physical_total_disk_home {
+function get_physical_total_diskHome {
   local pool=$(get_home_dataset_pool)
   get_physical_total_disk_by_pool_name $pool
 }
 
 
-function get_physical_total_disk_rootfs {
+function get_physical_total_diskRootfs {
   local pool=$(get_rootfs_dataset_pool)
   get_physical_total_disk_by_pool_name $pool
 }
@@ -596,10 +610,24 @@ function update_rrd {
   local tag=$(get_metric_tag $metric_type)
   local dataset_name=$(get_dataset_name $metric_type)
   local update_sequence=$(get_update_sequence $hostname $metric_type)
-  local metric_value=$(subutai monitor $hostname | awk -F"$tag" '{print $2}' | awk -F"," '{print $1}' | awk -F"\"" '{print $3}')
-
-  msg_info "    - $metric_value is stored at `date +%s`"
+  local function_name=$(get_resource_usage_function_name_by_metric_type $hostname $metric_type)
+  local metric_value=$($function_name $hostname)
+  local current_time=`date +%s`
+  message="$metric_value is stored at $current_time for $metric_type($hostname) metric"
+  msg_info "    - $message"
   rrdtool update  "$database_file" --template "$dataset_name" N:"$metric_value"
+}
+
+
+function get_resource_usage_function_name_by_metric_type {
+  local hostname=$1
+  local metric_type=$2
+  # Check if the hostname is the physical host or a container
+  if [ `hostname` != $hostname  ]; then
+    echo "get_used_$metric_type"
+  else
+    echo "get_physical_used_$metric_type"
+  fi
 }
 
 
@@ -621,6 +649,12 @@ function start_update_rrd {
   stop_update_rrd "$hostname" "$metric_type" > /dev/null
   #write out current crontab
   crontab -l > mycron
+  #echo path variable to cron file if not set(this is for sbin directory due to zfs)
+  local path_entry="PATH=\/bin:\/usr\/bin:\/sbin"
+  if ! grep -q "PATH=" mycron
+  then
+    sed -i "1s/^/$path_entry\n/" mycron
+  fi
   #echo new cron into cron file
   local update_entry=$(get_update_entry $hostname $metric_type)
   echo "*/$(get_update_interval_in_minutes $hostname $metric_type) * * * * $update_entry" >> mycron
@@ -630,8 +664,6 @@ function start_update_rrd {
   #install new cron file
   crontab mycron
   rm mycron
-
-
 }
 
 
@@ -1097,8 +1129,9 @@ function get_cpu_threshold_percentage {
 
 function get_disk_threshold_percentage {
   local hostname=$1
+  local dataset=$2
   # Get configuration parameters
-  get_monitor_configuration "$hostname" "disk"
+  get_monitor_configuration "$hostname" "$dataset"
 
   if [ -z "$diskAlertThreshold" ]; then
     echo "80"
@@ -1146,6 +1179,25 @@ function get_cpu_alert_threshold_nanoseconds {
 }
 
 
+function get_disk_alert_threshold_bytes {
+  local lxc=$1
+  local dataset=$2
+  local metric_type=$(get_disk_metric_type_by_dataset $dataset)
+  local disk_threshold_percentage=$(get_disk_threshold_percentage $lxc $metric_type)
+  local disk_quota=$(get_total_disk_by_dataset $lxc $dataset)
+
+  local result=$(echo $disk_quota*$disk_threshold_percentage/100 | bc)
+  echo "$result"
+  return
+}
+
+
+function get_disk_metric_type_by_dataset {
+  local dataset=$1
+  echo "disk$(tr '[:lower:]' '[:upper:]' <<< ${dataset:0:1})${dataset:1}"
+}
+
+
 function ram_alert {
   local lxc=$1
   local metric_type="ram"
@@ -1164,7 +1216,7 @@ function ram_alert {
   local metricCountToAverageToAlert=$(get_metric_count_to_average_to_alert $lxc $metric_type)
   local average_used_ram=$(get_average_used_ram $lxc $metricCountToAverageToAlert)
 
-  local last_N_values=$(query_rrd $lxc "$metric_type" | grep "e+" |tail -$metricCountToAverageToAlert)
+  local last_N_values=$(query_rrd $lxc "$metric_type" | tail -$metricCountToAverageToAlert | grep "e+")
   if [ -z "$last_N_values" ]; then
     msg_error "No data found for $metric_type metric for $lxc! Aborting.."
     exit 1
@@ -1202,7 +1254,7 @@ function cpu_alert {
   local average_cpu_usage_between_samples=$(get_average_cpu_usage_between_samples $lxc $metricCountToAverageToAlert)
 
 
-  local last_N_values=$(query_rrd $lxc "$metric_type" | grep "e+" |tail -$metricCountToAverageToAlert)
+  local last_N_values=$(query_rrd $lxc "$metric_type" | tail -$metricCountToAverageToAlert | grep "e+")
   if [ -z "$last_N_values" ]; then
     msg_error "No data found for $metric_type metric_type for $lxc! Aborting.."
     exit 1
@@ -1219,6 +1271,72 @@ function cpu_alert {
   else
     msg_info "Cpu usage $average_cpu_usage_between_samples($metricCountToAverageToAlert) is lower than threshold $cpu_alert_threshold_nanoseconds"
   fi
+}
+
+
+function disk_alert {
+  local lxc=$1
+  local dataset=$2
+  local metric_type=$(get_disk_metric_type_by_dataset $dataset)
+  local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $lxc $metric_type)"
+
+  lxc_assert $lxc
+  lxc_assert_running "$lxc"
+
+  if [ ! -f $database_file ]; then
+    msg_error "Database file of $metric_type rrd for $lxc does not exist. Aborting!"
+    exit 1
+  fi
+
+  local disk_alert_threshold_bytes=$(get_disk_alert_threshold_bytes $lxc $dataset)
+  local metricCountToAverageToAlert=$(get_metric_count_to_average_to_alert $lxc $metric_type)
+  local average_used_disk=$(get_average_used_disk_by_metric_type $lxc $metric_type $metricCountToAverageToAlert)
+
+  local last_N_values=$(query_rrd $lxc "$metric_type" | tail -$metricCountToAverageToAlert | grep "e+")
+  if [ -z "$last_N_values" ]; then
+    msg_error "No data found for $metric_type metric for $lxc! Aborting.."
+    exit 1
+  fi
+
+  assert_number "$average_used_disk"
+  assert_number "$disk_alert_threshold_bytes"
+
+  if (( $(bc <<< "$average_used_disk >= $disk_alert_threshold_bytes") == 1 )); then
+    msg_info "Disk alert threshold $disk_alert_threshold_bytes is exceeded with usage $average_used_disk($metricCountToAverageToAlert)!"
+    local url=`build_rest_url monitor/alert`
+    local current_metrics=$(subutai monitor $lxc)
+    curl --data "$current_metrics" "$url"
+  else
+    msg_info "Disk usage $average_used_disk($metricCountToAverageToAlert) is lower than threshold $disk_alert_threshold_bytes"
+  fi
+}
+
+
+function diskOpt_alert {
+  local lxc=$1
+  local dataset="opt"
+  disk_alert $lxc $dataset
+}
+
+
+function diskVar_alert {
+  local lxc=$1
+  local dataset="var"
+  disk_alert $lxc $dataset
+}
+
+
+function diskHome_alert {
+  local lxc=$1
+  local dataset="home"
+  disk_alert $lxc $dataset
+}
+
+
+function diskRootfs_alert {
+  local lxc=$1
+  local dataset="rootfs"
+  disk_alert $lxc $dataset
 }
 
 
