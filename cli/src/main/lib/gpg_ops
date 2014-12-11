@@ -262,14 +262,8 @@ print_keys(){
   do
     ## print header
     if [ $i == 0 ]; then 
-      # if [ ${#list[@]} == 1 ];then
-      #   space_list=`find_white_space_amount ${list[$i]}`
-      # else
-      #   space_list=`find_white_space_amount`
-      # fi
       space_list=`find_white_space_amount`
       IFS=' ' read -a spaces <<< $space_list
-      subutai_quiet=false
       if [ "false" == "$subutai_quiet" ];then
         if [[ $date == true && $trust == true ]]; then
           printf "%-${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s %-${spaces[5]}s" "pubkey" "subkey" "name" "email" "expiry" "trust"
@@ -337,7 +331,7 @@ find_white_space_amount(){
   white_space_size_email=`find_len 'mail'`
   white_space_size_expiry=`find_len 'expiry'`
   white_space_size_trust=`find_len 'trust'`
-  echo $white_space_size_pub $white_space_size_sub $white_space_size_name $white_space_size_email
+  echo $white_space_size_pub $white_space_size_sub $white_space_size_name $white_space_size_email $white_space_size_expiry $white_space_size_trust
 }
 
 
