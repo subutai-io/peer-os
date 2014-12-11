@@ -6,13 +6,25 @@
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.wol.ui.WolUI"
           init-method="init" destroy-method="destroy">
-        <property name="wolManager" ref="wolManager"/>
+        <property name="wolManager" ref="wolManager" />
     </bean>
 
     <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule">
         <service-properties>
-            <!--<entry key="service.exported.interfaces" value="*" />-->
+
         </service-properties>
     </service>
+
+    <!--Plugin Manager UI-->
+
+    <reference id="pluginManager" availability="mandatory"
+               interface="org.safehaus.subutai.wol.api.PluginManager" />
+
+    <bean id="module2" scope="singleton" class="org.safehaus.subutai.wol.ui.PluginManagerPortalModule"
+          init-method="init" destroy-method="destroy">
+        <property name="pluginManager" ref="pluginManager" />
+    </bean>
+
+    <service ref="module2" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
 
 </blueprint>
