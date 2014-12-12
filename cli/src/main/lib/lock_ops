@@ -125,6 +125,7 @@ function wipe_outstanding_read_locks {
   do
     PROCESS_ID=`cat $lockfile`
     if [ $? -ne 0 ]
+    then
         continue
     fi
     if [ "`ps -p $PROCESS_ID -o comm=`" == "" ]
@@ -139,6 +140,7 @@ function wipe_outstanding_write_locks {
   do
     PROCESS_ID=`cat $lockfile`
     if [ $? -ne 0 ]
+    then
         continue
     fi
     if [ "`ps -p $PROCESS_ID -o comm=`" == "" ]
