@@ -9,14 +9,17 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.common.ui.AddNodeWindow;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.api.NodeOperationTask;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -363,10 +366,11 @@ public class Manager
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StartTask( zookeeper, tracker, config.getClusterName(), host.getHostname(), new CompleteEvent()
+                    new NodeOperationTask( zookeeper, tracker, config.getClusterName(), host,
+                            NodeOperationType.START, new org.safehaus.subutai.common.protocol.CompleteEvent()
                     {
                         @Override
-                        public void onComplete( String result )
+                        public void onComplete( NodeState nodeState )
                         {
                             synchronized ( PROGRESS_ICON )
                             {
@@ -374,7 +378,19 @@ public class Manager
                                 checkNodesStatus();
                             }
                         }
-                    } ) );
+                    }, null ) );
+//                    new StartTask( zookeeper, tracker, config.getClusterName(), host.getHostname(), new CompleteEvent()
+//                    {
+//                        @Override
+//                        public void onComplete( String result )
+//                        {
+//                            synchronized ( PROGRESS_ICON )
+//                            {
+//                                disableOREnableAllButtonsOnTable( nodesTable, true );
+//                                checkNodesStatus();
+//                            }
+//                        }
+//                    } ) );
         }
     }
 
@@ -393,10 +409,11 @@ public class Manager
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StopTask( zookeeper, tracker, config.getClusterName(), host.getHostname(), new CompleteEvent()
+                    new NodeOperationTask( zookeeper, tracker, config.getClusterName(), host,
+                            NodeOperationType.STOP, new org.safehaus.subutai.common.protocol.CompleteEvent()
                     {
                         @Override
-                        public void onComplete( String result )
+                        public void onComplete( NodeState nodeState )
                         {
                             synchronized ( PROGRESS_ICON )
                             {
@@ -404,7 +421,19 @@ public class Manager
                                 checkNodesStatus();
                             }
                         }
-                    } ) );
+                    }, null ) );
+//                    new StopTask( zookeeper, tracker, config.getClusterName(), host.getHostname(), new CompleteEvent()
+//                    {
+//                        @Override
+//                        public void onComplete( String result )
+//                        {
+//                            synchronized ( PROGRESS_ICON )
+//                            {
+//                                disableOREnableAllButtonsOnTable( nodesTable, true );
+//                                checkNodesStatus();
+//                            }
+//                        }
+//                    } ) );
         }
     }
 
@@ -773,19 +802,32 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StopTask( zookeeper, tracker, config.getClusterName(), containerHost.getHostname(),
-                                new CompleteEvent()
+                        new NodeOperationTask( zookeeper, tracker, config.getClusterName(), containerHost,
+                                NodeOperationType.STOP, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            enableButtons( buttons );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    disableOREnableAllButtonsOnTable( nodesTable, true );
+                                    checkNodesStatus();
+                                }
+                            }
+                        }, null ) );
+//                        new StopTask( zookeeper, tracker, config.getClusterName(), containerHost.getHostname(),
+//                                new CompleteEvent()
+//                                {
+//                                    @Override
+//                                    public void onComplete( String result )
+//                                    {
+//                                        synchronized ( PROGRESS_ICON )
+//                                        {
+//                                            enableButtons( buttons );
+//                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+//                                        }
+//                                    }
+//                                } ) );
             }
         } );
     }
@@ -801,19 +843,32 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StartTask( zookeeper, tracker, config.getClusterName(), containerHost.getHostname(),
-                                new CompleteEvent()
+                        new NodeOperationTask( zookeeper, tracker, config.getClusterName(), containerHost,
+                                NodeOperationType.START, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            enableButtons( buttons );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    disableOREnableAllButtonsOnTable( nodesTable, true );
+                                    checkNodesStatus();
+                                }
+                            }
+                        }, null ) );
+//                        new StartTask( zookeeper, tracker, config.getClusterName(), containerHost.getHostname(),
+//                                new CompleteEvent()
+//                                {
+//                                    @Override
+//                                    public void onComplete( String result )
+//                                    {
+//                                        synchronized ( PROGRESS_ICON )
+//                                        {
+//                                            enableButtons( buttons );
+//                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+//                                        }
+//                                    }
+//                                } ) );
             }
         } );
     }
@@ -830,30 +885,77 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new CheckTask( zookeeper, tracker, config.getClusterName(), containerHost.getHostname(),
-                                new CompleteEvent()
+                        new NodeOperationTask( zookeeper, tracker, config.getClusterName(), containerHost,
+                                NodeOperationType.STATUS, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    public void onComplete( String result )
+                                    if ( nodeState.equals( NodeState.RUNNING ) )
                                     {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            resultHolder.setValue( result );
-                                            if ( resultHolder.getValue().toLowerCase().contains( "not" ) )
-                                            {
-                                                enableButtons( buttons );
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                            }
-                                            else
-                                            {
-                                                enableButtons( buttons );
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            }
-                                            PROGRESS_ICON.setVisible( false );
-                                        }
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
                                     }
-                                } ) );
+                                    else if ( nodeState.equals( NodeState.STOPPED ) )
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                    }
+                                    else if ( nodeState.equals( NodeState.UNKNOWN ) )
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    }
+                                    resultHolder.setValue( nodeState.name() );
+                                    PROGRESS_ICON.setVisible( false );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+
+
+
+//                                    resultHolder.setValue( result );
+//                                    if ( resultHolder.getValue().toLowerCase().contains( "not" ) )
+//                                    {
+//                                        enableButtons( buttons );
+//                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+//                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+//                                    }
+//                                    else
+//                                    {
+//                                        enableButtons( buttons );
+//                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+//                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+//                                    }
+//                                    PROGRESS_ICON.setVisible( false );
+                                }
+                            }
+                        }, null ) );
+
+//                        new CheckTask( zookeeper, tracker, config.getClusterName(), containerHost.getHostname(),
+//                                new CompleteEvent()
+//                                {
+//                                    public void onComplete( String result )
+//                                    {
+//                                        synchronized ( PROGRESS_ICON )
+//                                        {
+//                                            resultHolder.setValue( result );
+//                                            if ( resultHolder.getValue().toLowerCase().contains( "not" ) )
+//                                            {
+//                                                enableButtons( buttons );
+//                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+//                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+//                                            }
+//                                            else
+//                                            {
+//                                                enableButtons( buttons );
+//                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+//                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+//                                            }
+//                                            PROGRESS_ICON.setVisible( false );
+//                                        }
+//                                    }
+//                                } ) );
             }
         } );
     }
