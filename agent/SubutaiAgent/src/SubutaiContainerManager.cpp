@@ -32,7 +32,13 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger*
     // Check for running containers in case we just started an app
     // after crash
     try {
-        _containers = findAllContainers();
+    	/*remove the containerIdList to get rid of the previous list and create a clean one*/
+    	if( remove( "/etc/subutai-agent/containerIdList.txt" ) != 0 )
+    		_logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Cannot clean container id list."));
+    	else
+    		_logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Container id list is removed.."));
+
+    	_containers = findAllContainers();
     } catch (SubutaiException e) {
         _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));         
     } catch (std::exception e) {
@@ -193,10 +199,11 @@ void SubutaiContainerManager::updateContainerLists()
     try {
         num = list_all_containers(_lxc_path.c_str(), &names, &cont);
         bool destroy_container_check[size_of_containers];
+        /* hold destroy container check array to control which container is deleted. */
+        for (int i = 0; i < size_of_containers; i++) destroy_container_check[i] = false;
         for (int i = 0; i < num; i++) {
             // Check is there is any new conatiner appears
             bool containerFound = false;
-            destroy_container_check[i] = false;
             index = 0;
             for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
                 if ((*it).getContainerHostnameValue() == string(names[i])) {
@@ -214,7 +221,9 @@ void SubutaiContainerManager::updateContainerLists()
             }
         }
 
+
         for (int i = size_of_containers-1; i >= 0; i--) {
+        	/*if this container is destroyed, clean both containerIdList and containers array on containerManager*/
         	if(!destroy_container_check[i])
         	{
         		deleteContainerInfo((_containers.at(i)).getContainerHostnameValue());
@@ -227,6 +236,7 @@ void SubutaiContainerManager::updateContainerLists()
         _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", string(e.what())));
     }
     for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+    	/*If new container is added, containerIdList is updated in getContainerId() method*/
         (*it).getContainerAllFields();
     }
 }
