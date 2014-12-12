@@ -113,6 +113,8 @@ function get_average_cpu_usage_between_samples {
   local lxc=$1
   local sampleCountToAverage=$2
   local metric_type="cpu"
+  local update_sequence=$(get_update_sequence $lxc $metric_type)
+  local lxc_uptime_in_seconds=$(lxc_get_uptime_in_seconds $lxc)
 
   lxc_assert $lxc > /dev/null
   local numberExpression='^[0-9]+$'
@@ -130,17 +132,38 @@ function get_average_cpu_usage_between_samples {
 
   assert_metric $metric_type > /dev/null
 
-  local cpu_values=$(query_rrd $lxc "$metric_type" | tail -$(($sampleCountToAverage + 1)) | grep "e+")
-  local line_count=$(echo -e "$cpu_values" | wc -l)
+  local lxc_max_cpu_sample_count=$(echo $lxc_uptime_in_seconds/$update_sequence | bc)
+#  msg_debug "lxc_max_cpu_sample_count: $lxc_max_cpu_sample_count"
+  # Check if lxc is restarted within the interval of the samples
+  if (( $(bc <<< "$lxc_max_cpu_sample_count <= $sampleCountToAverage") == 1 )); then
+    sampleCountToAverage=$(echo $lxc_max_cpu_sample_count - 1 | bc)
+  fi
+#  msg_debug "sampleCountToAverage: $sampleCountToAverage"
+  local interval_time_in_seconds=$(echo $(($sampleCountToAverage+1))*$update_sequence | bc)
+  local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $lxc $metric_type)"
+  local cpu_values=$(rrdtool fetch "$database_file" LAST -e $(date +%s) -s e-"$interval_time_in_seconds"sec | grep "e+")
 
+  local line_count=$(echo -e "$cpu_values" | wc -l)
+#  msg_debug "line_count: $line_count"
+
+  # without at least one sample, average cannot be calculated
   if [ $line_count -lt 2 ]; then
+    local first_value=$(echo -e "$cpu_values" | sed -n 1p | cut -d':' -f2 | tr -d ' ' | sed -e 's/[eE]+*/*10^/')
+    if [ "`is_number $first_value`" == "true" ]; then
+      echo "$first_value"
+      return
+    fi
     echo "0"
     return
   fi
+
   local first_value=$(echo -e "$cpu_values" | sed -n 1p | cut -d':' -f2 | tr -d ' ' | sed -e 's/[eE]+*/*10^/')
+  local first_timestamp=$(echo -e "$cpu_values" | sed -n 1p | cut -d':' -f1 | tr -d ' ')
   local last_value=$(echo -e "$cpu_values" | sed -e '$!d' | cut -d':' -f2 | tr -d ' ' | sed -e 's/[eE]+*/*10^/')
+  local last_timestamp=$(echo -e "$cpu_values" | sed -e '$!d' | cut -d':' -f1 | tr -d ' ')
 
   local cpu_usage=$(echo $last_value - $first_value | bc)
+  local time_elapsed=$(echo $last_timestamp - $first_timestamp | bc)
   # Remove insignificant bits
   cpu_usage=$(echo $cpu_usage | cut -d'.' -f1)
 
@@ -149,20 +172,22 @@ function get_average_cpu_usage_between_samples {
     return
   fi
 
+  # In case the first sample is greater than the last sample for cpu usage,
+  # it means the container is restarted and calculate the average
+  # via the next sample which would be the first sample of the restarted container
   if (( $(bc <<< "$last_value <= $first_value") == 1 )); then
-    echo "0"
+    get_average_cpu_usage_between_samples $lxc $(echo $sampleCountToAverage -1 | bc)
     return
   fi
 
-  local update_sequence=$(get_update_sequence $lxc $metric_type)
-  if [ $line_count -lt $sampleCountToAverage  ]; then
-    sampleCountToAverage=$(($line_count - 1))
-  fi
 #  msg_debug "first_value: $first_value"
+#  msg_debug "first_timestamp: $first_timestamp"
 #  msg_debug "last_value:  $last_value"
+#  msg_debug "last_timestamp: $last_timestamp"
 #  msg_debug "line_count:  $line_count"
 #  msg_debug "sampleCount: $sampleCountToAverage"
-  echo $(($cpu_usage / $sampleCountToAverage / $update_sequence))
+#  msg_debug "time_elapsed: $time_elapsed"
+  echo $(($cpu_usage / $time_elapsed))
   return
 }
 
@@ -1249,16 +1274,15 @@ function cpu_alert {
     exit 1
   fi
 
-  local cpu_alert_threshold_nanoseconds=$(get_cpu_alert_threshold_nanoseconds $lxc)
-  local metricCountToAverageToAlert=$(get_metric_count_to_average_to_alert $lxc $metric_type)
-  local average_cpu_usage_between_samples=$(get_average_cpu_usage_between_samples $lxc $metricCountToAverageToAlert)
-
-
   local last_N_values=$(query_rrd $lxc "$metric_type" | tail -$metricCountToAverageToAlert | grep "e+")
   if [ -z "$last_N_values" ]; then
     msg_error "No data found for $metric_type metric_type for $lxc! Aborting.."
     exit 1
   fi
+
+  local cpu_alert_threshold_nanoseconds=$(get_cpu_alert_threshold_nanoseconds $lxc)
+  local metricCountToAverageToAlert=$(get_metric_count_to_average_to_alert $lxc $metric_type)
+  local average_cpu_usage_between_samples=$(get_average_cpu_usage_between_samples $lxc $metricCountToAverageToAlert)
 
   assert_number "$average_cpu_usage_between_samples"
   assert_number "$cpu_alert_threshold_nanoseconds"
@@ -1352,4 +1376,22 @@ function assert_number {
     msg_error "$variable is not a number! Aborting.."
     exit 1
   fi
+}
+
+
+function is_number {
+  local variable="$1"
+  local numberExpression='^[0-9]+$'
+  if [ -z "$variable" ]; then
+    echo "false"
+    return
+  fi
+
+  if ! [[ $variable =~ $numberExpression ]] ; then
+    echo "false"
+    return
+  fi
+
+  echo "true"
+  return
 }

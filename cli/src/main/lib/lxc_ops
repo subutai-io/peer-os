@@ -431,6 +431,25 @@ function lxc_rename {
   lxc_stop "$dst"
 }
 
+
+function lxc_get_pid {
+  local lxc=$1
+  echo $(lxc-info -n $lxc 2>/dev/null | grep "PID" | cut -d':' -f2 | tr -d ' ')
+}
+
+
+function lxc_get_uptime_in_seconds {
+  local lxc=$1
+  local pid=$(lxc_get_pid $lxc)
+  if [ "`is_number $pid`" != "true" ]; then
+    echo "0"
+    return
+  fi
+
+  local elapsed_time_in_second=$(ps -p $pid -o etimes= | tr -d ' ')
+  echo $elapsed_time_in_second
+}
+
 function lxc_remove_agent {
   container=$1
   agent_package="subutai-agent"
