@@ -128,10 +128,6 @@ function wipe_outstanding_read_locks {
       continue
     fi
     PROCESS_ID=`cat $lockfile`
-    if [ $? -ne 0 ]
-    then
-        continue
-    fi
     if [ "`ps -p $PROCESS_ID -o comm=`" == "" ]
     then
       rm $lockfile
