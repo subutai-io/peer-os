@@ -124,6 +124,9 @@ function wipe_outstanding_read_locks {
   for lockfile in $SUBUTAI_LOCK_PATH/read/*;
   do
     PROCESS_ID=`cat $lockfile`
+    if [ $? -ne 0 ]
+        continue
+    fi
     if [ "`ps -p $PROCESS_ID -o comm=`" == "" ]
     then
       rm $lockfile
@@ -135,6 +138,9 @@ function wipe_outstanding_write_locks {
   for lockfile in $SUBUTAI_LOCK_PATH/write/*;
   do
     PROCESS_ID=`cat $lockfile`
+    if [ $? -ne 0 ]
+        continue
+    fi
     if [ "`ps -p $PROCESS_ID -o comm=`" == "" ]
     then
       rm $lockfile
