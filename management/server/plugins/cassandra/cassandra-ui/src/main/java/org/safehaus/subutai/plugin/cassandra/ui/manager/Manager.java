@@ -493,9 +493,9 @@ public class Manager
                     resultHolder, availableOperations
             }, null );
 
-            addClickListenerToCheckButton( containerHost, resultHolder, checkButton, startButton, stopButton );
-            addClickListenerToStartButton( containerHost, checkButton, startButton, stopButton );
-            addClickListenerToStopButton( containerHost, checkButton, startButton, stopButton );
+            addClickListenerToCheckButton( containerHost, resultHolder, checkButton, startButton, stopButton, destroyButton );
+            addClickListenerToStartButton( containerHost, checkButton, startButton, stopButton, destroyButton );
+            addClickListenerToStopButton( containerHost, checkButton, startButton, stopButton, destroyButton );
             addClickListenerToDestroyButton( containerHost, checkButton, startButton, stopButton, destroyButton );
         }
     }
@@ -554,30 +554,6 @@ public class Manager
                 }
             }
         } );
-//
-//        getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
-//        {
-//            @Override
-//            public void buttonClick( Button.ClickEvent clickEvent )
-//            {
-//                PROGRESS_ICON.setVisible( true );
-//                disableButtons( buttons );
-//                executorService.execute(
-//                        new NodeOperationTask( cassandra, tracker, config.getClusterName(), containerHost,
-//                                NodeOperationType.STOP, new org.safehaus.subutai.common.protocol.CompleteEvent()
-//                        {
-//                            @Override
-//                            public void onComplete( NodeState nodeState )
-//                            {
-//                                synchronized ( PROGRESS_ICON )
-//                                {
-//                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-//                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-//                                }
-//                            }
-//                        }, null ) );
-//            }
-//        } );
     }
 
 
@@ -674,6 +650,7 @@ public class Manager
                                     resultHolder.setValue( nodeState.name() );
                                     PROGRESS_ICON.setVisible( false );
                                     getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( DESTROY_NODE_BUTTON_CAPTION, buttons ).setEnabled( true );
                                 }
                             }
                         }, null ) );

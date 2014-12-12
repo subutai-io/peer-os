@@ -22,8 +22,6 @@ import com.google.common.base.Preconditions;
 
 /**
  * This class handles operations that are related to just one node.
- *
- * TODO: add nodes and delete node operation should be implemented.
  */
 public class NodeOperationHandler extends AbstractOperationHandler<CassandraImpl, CassandraClusterConfig>
 {
@@ -81,18 +79,20 @@ public class NodeOperationHandler extends AbstractOperationHandler<CassandraImpl
             {
                 case START:
                     result = host.execute( new RequestBuilder( Commands.startCommand ) );
+                    logResults( trackerOperation, result );
                     break;
                 case STOP:
                     result = host.execute( new RequestBuilder( Commands.stopCommand ) );
+                    logResults( trackerOperation, result );
                     break;
                 case STATUS:
                     result = host.execute( new RequestBuilder( Commands.statusCommand ) );
+                    logResults( trackerOperation, result );
                     break;
                 case DESTROY:
                     destroyNode( host );
                     break;
             }
-            logResults( trackerOperation, result );
         }
         catch ( CommandException e )
         {
@@ -100,7 +100,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<CassandraImpl
         }
     }
 
-    // TODO: check if this method is working properly
+
     public void destroyNode( ContainerHost host ){
         EnvironmentManager environmentManager  = manager.getEnvironmentManager();
         try
