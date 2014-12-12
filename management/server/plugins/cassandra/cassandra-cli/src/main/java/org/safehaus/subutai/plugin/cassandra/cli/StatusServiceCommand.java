@@ -23,9 +23,9 @@ public class StatusServiceCommand extends OsgiCommandSupport
     @Argument(index = 0, name = "clusterName", description = "Name of the cluster.", required = true,
             multiValued = false)
     String clusterName = null;
-    @Argument( index = 1, name = "containerId", description = "UUID of the agent.", required = true,
+    @Argument( index = 1, name = "hostanme", description = "UUID of the agent.", required = true,
             multiValued = false )
-    String containerId = null;
+    String hostanme = null;
     private Cassandra cassandraManager;
     private Tracker tracker;
 
@@ -57,7 +57,7 @@ public class StatusServiceCommand extends OsgiCommandSupport
     protected Object doExecute() throws IOException
     {
 
-        UUID uuid = cassandraManager.statusService( clusterName, UUID.fromString( containerId ) );
+        UUID uuid = cassandraManager.statusService( clusterName, hostanme );
         tracker.printOperationLog( CassandraClusterConfig.PRODUCT_KEY, uuid, 30000 );
 
         return null;

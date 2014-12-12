@@ -9,12 +9,14 @@
 
   <reference id="tracker" interface="org.safehaus.subutai.core.tracker.api.Tracker" />
   <reference id="environmentManager" interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
+  <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
   <bean id="cassandra-impl" scope="singleton" class="org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl"
         init-method="init" destroy-method="destroy">
     <argument ref="dataSource" />
     <property name="tracker" ref="tracker" />
     <property name="environmentManager" ref="environmentManager" />
+    <property name="peerManager" ref="peerManager" />
   </bean>
 
   <service ref="cassandra-impl" interface="org.safehaus.subutai.plugin.cassandra.api.Cassandra" />

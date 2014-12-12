@@ -16,6 +16,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -26,14 +27,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
 @RunWith(MockitoJUnitRunner.class)
-public class StopServiceHandlerTest
+public class StopClusterTest
 {
-    private StopServiceHandler stopServiceHandler;
-    private UUID uuid;
+    private ClusterOperationHandler stopClusterHandler;
     @Mock
     CassandraImpl cassandraImpl;
     @Mock
@@ -58,11 +58,10 @@ public class StopServiceHandlerTest
     @Before
     public void setup()
     {
-        uuid = new UUID(50,50);
         when(cassandraImpl.getTracker()).thenReturn(tracker);
         when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
-
-        stopServiceHandler = new StopServiceHandler(cassandraImpl,"test",uuid);
+        when(cassandraClusterConfig.getClusterName()).thenReturn( "test" );
+        stopClusterHandler = new ClusterOperationHandler(cassandraImpl, cassandraClusterConfig, ClusterOperationType.STOP_ALL );
     }
 
     @Test
@@ -76,35 +75,15 @@ public class StopServiceHandlerTest
         when(mySet.iterator()).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(true).thenReturn(false);
         when(iterator.next()).thenReturn(containerHost);
-        when(containerHost.getId()).thenReturn(uuid);
         when(containerHost.execute(any(RequestBuilder.class))).thenReturn(commandResult);
         when(commandResult.hasSucceeded()).thenReturn(true);
 
-        stopServiceHandler.run();
+        stopClusterHandler.run();
 
+        // asserts
         assertNotNull(cassandraImpl.getCluster("test"));
         assertEquals(environment, environmentManager.getEnvironmentByUUID(any(UUID.class)));
         assertTrue(commandResult.hasSucceeded());
-        verify(trackerOperation).addLog(commandResult.getStdOut());
-        verify(trackerOperation).addLogDone("Stop succeeded");
-    }
-
-    @Test
-    public void testRunWhenCommandResultNotSucceeded() throws CommandException
-    {
-        // mock run method
-        when(cassandraImpl.getCluster("test")).thenReturn(cassandraClusterConfig);
-        when(cassandraImpl.getEnvironmentManager()).thenReturn(environmentManager);
-        when(environmentManager.getEnvironmentByUUID(any(UUID.class))).thenReturn(environment);
-        when(environment.getContainerHosts()).thenReturn(mySet);
-        when(mySet.iterator()).thenReturn(iterator);
-        when(iterator.hasNext()).thenReturn(true).thenReturn(false);
-        when(iterator.next()).thenReturn(containerHost);
-        when(containerHost.getId()).thenReturn(uuid);
-        when(containerHost.execute(any(RequestBuilder.class))).thenReturn(commandResult);
-        when(commandResult.hasSucceeded()).thenReturn(false);
-
-        stopServiceHandler.run();
     }
 
     @Test
@@ -112,9 +91,24 @@ public class StopServiceHandlerTest
     {
         when(cassandraImpl.getCluster("test")).thenReturn(null);
 
-        stopServiceHandler.run();
+        stopClusterHandler.run();
     }
 
+    @Test
+    public void testRunWhenCommandResultNotSucceeded() throws CommandException
+    {
+        // mock run method
+        when(cassandraImpl.getCluster( "test" )).thenReturn(cassandraClusterConfig);
+        when(cassandraImpl.getEnvironmentManager()).thenReturn(environmentManager);
+        when(environmentManager.getEnvironmentByUUID( any( UUID.class ) )).thenReturn(environment);
+        when(environment.getContainerHosts()).thenReturn(mySet);
+        when( mySet.iterator() ).thenReturn(iterator);
+        when(iterator.hasNext()).thenReturn( true ).thenReturn(false);
+        when(iterator.next()).thenReturn(containerHost);
+        when(containerHost.execute( any( RequestBuilder.class ) )).thenReturn(commandResult);
+        when(commandResult.hasSucceeded()).thenReturn(false);
 
+        stopClusterHandler.run();
+    }
 
 }
