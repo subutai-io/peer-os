@@ -1,9 +1,7 @@
 package org.safehaus.subutai.plugin.hbase.impl;
 
 
-import java.util.Iterator;
-import java.util.Set;
-
+import com.google.common.base.Strings;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
@@ -14,7 +12,8 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 
-import com.google.common.base.Strings;
+import java.util.Iterator;
+import java.util.Set;
 
 
 class OverHadoopSetupStrategy extends HBaseSetupStrategy
@@ -32,7 +31,7 @@ class OverHadoopSetupStrategy extends HBaseSetupStrategy
     {
         checkConfig();
 
-        Set<ContainerHost> nodes = environment.getHostsByIds( config.getAllNodes() );
+        Set<ContainerHost> nodes = environment.getContainerHostsByIds( config.getAllNodes() );
 
         if ( nodes.size() < config.getAllNodes().size() )
         {
@@ -103,7 +102,7 @@ class OverHadoopSetupStrategy extends HBaseSetupStrategy
             ContainerHost node = it.next();
             try
             {
-                CommandResult result = node.execute( Commands.getInstallCommand() );
+                CommandResult result = node.execute(  manager.getCommands().getInstallCommand() );
 
                 if ( result.hasSucceeded() )
                 {

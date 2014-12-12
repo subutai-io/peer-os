@@ -153,7 +153,8 @@ public class Manager
                         nodes.removeAll( config.getNodes() );
                         if ( !nodes.isEmpty() )
                         {
-                            Set<ContainerHost> hosts = environmentManager.getEnvironmentByUUID( hadoopConfig.getEnvironmentId() ).getHostsByIds( nodes );
+                            Set<ContainerHost> hosts = environmentManager.getEnvironmentByUUID( hadoopConfig.getEnvironmentId() ).getContainerHostsByIds(
+                                    nodes );
                             AddNodeWindow addNodeWindow =
                                     new AddNodeWindow( lucene, tracker, executorService, config, hosts  );
                             contentRoot.getUI().addWindow( addNodeWindow );
@@ -255,7 +256,7 @@ public class Manager
                     String containerId =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Set<ContainerHost> containerHosts =
-                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers();
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts();
                     Iterator iterator = containerHosts.iterator();
                     ContainerHost containerHost = null;
                     while ( iterator.hasNext() )
@@ -268,12 +269,12 @@ public class Manager
                     }
                     if ( containerHost != null )
                     {
-                        TerminalWindow terminal = new TerminalWindow( containerHosts );
+                        TerminalWindow terminal = new TerminalWindow( containerHost );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Host not found" );
                     }
                 }
             }
@@ -292,7 +293,7 @@ public class Manager
         if ( config != null )
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-            Set<ContainerHost> hosts = environment.getHostsByIds( config.getNodes() );
+            Set<ContainerHost> hosts = environment.getContainerHostsByIds( config.getNodes() );
             populateTable( nodesTable, hosts);
         }
         else
@@ -310,7 +311,7 @@ public class Manager
         for ( final ContainerHost host : containerHosts )
         {
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( host.getAgent().getListIP().get( 0 ) + "-luceneDestroy" );
+            destroyBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-luceneDestroy" );
             destroyBtn.addStyleName( "default" );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();
@@ -320,7 +321,7 @@ public class Manager
             addGivenComponents( availableOperations, destroyBtn );
 
             table.addItem( new Object[] {
-                    host.getHostname(), host.getAgent().getListIP().get( 0 ), availableOperations
+                    host.getHostname(), host.getIpByInterfaceName( "eth0" ), availableOperations
             }, null );
             addClickListenerToDestroyButton( host, destroyBtn );
         }

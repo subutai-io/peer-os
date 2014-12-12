@@ -36,6 +36,7 @@
 #include <csignal>
 #include <sstream>
 #include <list>
+#include <algorithm>
 #include <lxc/lxccontainer.h>
 #include "pugixml.hpp"
 #include <stdio.h>
@@ -79,7 +80,6 @@ class SubutaiContainer
         SubutaiContainer(SubutaiLogger*, lxc_container*);
         virtual ~SubutaiContainer(void);
         bool getContainerId();
-        void tryLongCommand();
         void UpdateUsersList();
         void getContainerAllFields();
         bool getContainerInterfaces();
@@ -104,6 +104,7 @@ class SubutaiContainer
         ExecutionResult RunCommand(SubutaiCommand*);
         ExecutionResult RunDaemon(SubutaiCommand* );
         ExecutionResult RunProgram(string , vector<string>, bool , lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT, bool captureOutput = true);
+        bool hasSubCommand(SubutaiCommand* command);
     protected:
         vector<string> ExplodeCommandArguments(SubutaiCommand* command);
     private:

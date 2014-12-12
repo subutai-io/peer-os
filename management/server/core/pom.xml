@@ -16,13 +16,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>agent-manager</module>
-    <!--<module>command-runner</module>-->
-    <module>communication-manager</module>
-    <!--<module>template-manager</module>-->
-    <!--<module>apt-repository-manager</module>-->
-    <!--<module>container-manager</module>-->
-    <!--<module>monitoring</module>-->
     <module>file-tracker</module>
     <module>environment-manager</module>
     <module>environment-terminal</module>

@@ -41,7 +41,7 @@ class WithHadoopSetupStrategy extends PigSetupStrategy
                 throw new ClusterSetupException( "Environment not specified" );
             }
 
-            if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
+            if ( environment.getContainerHosts() == null || environment.getContainerHosts().isEmpty() )
             {
                 throw new ClusterSetupException( "Environment has no nodes" );
             }
@@ -55,7 +55,7 @@ class WithHadoopSetupStrategy extends PigSetupStrategy
             config.setEnvironmentId( environment.getId() );
 
 
-            for ( ContainerHost container : environment.getContainers() )
+            for ( ContainerHost container : environment.getContainerHosts() )
             {
                 if ( !container.isConnected() )
                 {

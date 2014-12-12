@@ -130,7 +130,7 @@ public class Manager
                         {
                             Set<ContainerHost> hosts =
                                     environmentManager.getEnvironmentByUUID( hadoopConfig.getEnvironmentId() )
-                                                      .getHostsByIds( nodes );
+                                                      .getContainerHostsByIds( nodes );
                             AddNodeWindow addNodeWindow =
                                     new AddNodeWindow( flume, tracker, executorService, config, hosts );
                             contentRoot.getUI().addWindow( addNodeWindow );
@@ -300,7 +300,7 @@ public class Manager
         if ( config != null )
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
-            Set<ContainerHost> hosts = environment.getHostsByIds( config.getNodes() );
+            Set<ContainerHost> hosts = environment.getContainerHostsByIds( config.getNodes() );
             populateTable( nodesTable, hosts );
         }
         else
@@ -319,14 +319,14 @@ public class Manager
         {
             final Label resultHolder = new Label();
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeDestroy" );
+            destroyBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-flumeDestroy" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeStart" );
+            startBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-flumeStart" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeStop" );
+            stopBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-flumeStop" );
 
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId( host.getAgent().getListIP().get( 0 ) + "-flumeCheck" );
+            checkBtn.setId( host.getIpByInterfaceName( "eth0" ) + "-flumeCheck" );
 
             enableButton( stopBtn, startBtn, checkBtn, destroyBtn );
 
@@ -337,7 +337,7 @@ public class Manager
             addGivenComponents( availableOperations, startBtn, stopBtn, checkBtn, destroyBtn );
 
             table.addItem( new Object[] {
-                    host.getHostname(), host.getAgent().getListIP().get( 0 ), resultHolder, availableOperations
+                    host.getHostname(), host.getIpByInterfaceName( "eth0" ), resultHolder, availableOperations
             }, null );
 
 
@@ -594,7 +594,7 @@ public class Manager
                     String containerId =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Set<ContainerHost> containerHosts =
-                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers();
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts();
                     Iterator iterator = containerHosts.iterator();
                     ContainerHost containerHost = null;
                     while ( iterator.hasNext() )
@@ -607,12 +607,12 @@ public class Manager
                     }
                     if ( containerHost != null )
                     {
-                        TerminalWindow terminal = new TerminalWindow( containerHosts );
+                        TerminalWindow terminal = new TerminalWindow( containerHost );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Host not found" );
                     }
                 }
             }

@@ -351,7 +351,7 @@ public class Manager
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION )
                                             .getValue();
                     Set<ContainerHost> containerHosts =
-                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers();
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts();
                     Iterator iterator = containerHosts.iterator();
                     ContainerHost containerHost = null;
                     while ( iterator.hasNext() )
@@ -364,12 +364,12 @@ public class Manager
                     }
                     if ( containerHost != null )
                     {
-                        TerminalWindow terminal = new TerminalWindow( containerHosts );
+                        TerminalWindow terminal = new TerminalWindow( containerHost );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Host not found" );
                     }
                 }
             }
@@ -401,13 +401,13 @@ public class Manager
         {
 
             final Label resultHolder = new Label();
-            resultHolder.setId( containerHost.getAgent().getListIP().get( 0 ) + "-cassandraResult" );
+            resultHolder.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-cassandraResult" );
             final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
-            checkButton.setId( containerHost.getAgent().getListIP().get( 0 ) + "-cassandraCheck" );
+            checkButton.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-cassandraCheck" );
             final Button startButton = new Button( START_BUTTON_CAPTION );
-            startButton.setId( containerHost.getAgent().getListIP().get( 0 ) + "-cassandraStart" );
+            startButton.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-cassandraStart" );
             final Button stopButton = new Button( STOP_BUTTON_CAPTION );
-            stopButton.setId( containerHost.getAgent().getListIP().get( 0 ) + "-cassandraStop" );
+            stopButton.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-cassandraStop" );
 
             addStyleNameToButtons( checkButton, startButton, stopButton );
 
@@ -420,10 +420,10 @@ public class Manager
 
             addGivenComponents( availableOperations, checkButton, startButton, stopButton );
 
-            String isSeed = checkIfSeed( containerHost.getAgent().getUuid() );
+            String isSeed = checkIfSeed( containerHost.getId() );
 
             table.addItem( new Object[] {
-                    containerHost.getAgent().getHostname(), containerHost.getAgent().getListIP().get( 0 ), isSeed,
+                    containerHost.getHostname(), containerHost.getIpByInterfaceName( "eth0" ), isSeed,
                     resultHolder, availableOperations
             }, null );
 
@@ -669,7 +669,7 @@ public class Manager
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
             if ( environment != null )
             {
-                populateTable( nodesTable, environment.getContainers() );
+                populateTable( nodesTable, environment.getContainerHosts() );
             }
             else
             {

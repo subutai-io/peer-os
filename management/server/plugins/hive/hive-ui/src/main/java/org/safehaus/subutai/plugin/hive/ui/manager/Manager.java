@@ -24,7 +24,6 @@ import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -193,7 +192,7 @@ public class Manager
                 {
                     myHostSet.add( environmentManager.getEnvironmentByUUID(
                             hadoop.getCluster( config.getHadoopClusterName() ).getEnvironmentId() )
-                                                     .getContainerHostByUUID( uuid ) );
+                                                     .getContainerHostById( uuid ) );
                 }
 
                 AddNodeWindow w = new AddNodeWindow( hive, executorService, tracker, config,
@@ -337,12 +336,12 @@ public class Manager
 
                 if ( containerHost != null )
                 {
-                    TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( containerHost ) );
+                    TerminalWindow terminal = new TerminalWindow( containerHost );
                     contentRoot.getUI().addWindow( terminal.getWindow() );
                 }
                 else
                 {
-                    show( "Agent is not connected" );
+                    show( "Host not found" );
                 }
             }
         } );
@@ -359,11 +358,11 @@ public class Manager
     {
         if ( config != null )
         {
-            populateTable( serverTable,
-                    getServers( environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers(),
+            populateTable( serverTable, getServers(
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts(),
                             config ) );
-            populateTable( clientsTable,
-                    getClients( environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainers(),
+            populateTable( clientsTable, getClients(
+                            environmentManager.getEnvironmentByUUID( config.getEnvironmentId() ).getContainerHosts(),
                             config ) );
         }
         else
@@ -379,7 +378,7 @@ public class Manager
         Set<ContainerHost> list = new HashSet<>();
         for ( ContainerHost containerHost : containerHosts )
         {
-            if ( config.getServer().equals( containerHost.getAgent().getUuid() ) )
+            if ( config.getServer().equals( containerHost.getId() ) )
             {
                 list.add( containerHost );
             }
@@ -393,7 +392,7 @@ public class Manager
         Set<ContainerHost> list = new HashSet<>();
         for ( ContainerHost containerHost : containerHosts )
         {
-            if ( config.getClients().contains( containerHost.getAgent().getUuid() ) )
+            if ( config.getClients().contains( containerHost.getId() ) )
             {
                 list.add( containerHost );
             }
@@ -409,13 +408,13 @@ public class Manager
         for ( final ContainerHost containerHost : containerHosts )
         {
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hiveCheck" );
+            checkBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-hiveCheck" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hiveStart" );
+            startBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-hiveStart" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hiveStop" );
+            stopBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-hiveStop" );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-hiveDestroy" );
+            destroyBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-hiveDestroy" );
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn, destroyBtn );
             disableButtons( startBtn, stopBtn );
@@ -437,15 +436,15 @@ public class Manager
                     public void buttonClick( Button.ClickEvent clickEvent )
                     {
                         ConfirmationDialog alert = new ConfirmationDialog(
-                                String.format( "Do you want to destroy node  %s?",
-                                        containerHost.getAgent().getHostname() ), "Yes", "No" );
+                                String.format( "Do you want to destroy node  %s?", containerHost.getHostname() ), "Yes",
+                                "No" );
                         alert.getOk().addClickListener( new Button.ClickListener()
                         {
                             @Override
                             public void buttonClick( Button.ClickEvent clickEvent )
                             {
-                                UUID trackID = hive.uninstallNode( config.getClusterName(),
-                                        containerHost.getAgent().getHostname() );
+                                UUID trackID =
+                                        hive.uninstallNode( config.getClusterName(), containerHost.getHostname() );
                                 ProgressWindow window =
                                         new ProgressWindow( executorService, tracker, trackID, HiveConfig.PRODUCT_KEY );
                                 window.getWindow().addCloseListener( new Window.CloseListener()
@@ -468,7 +467,7 @@ public class Manager
             }
 
             table.addItem( new Object[] {
-                    containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ),
+                    containerHost.getHostname(), containerHost.getIpByInterfaceName( "eth0" ),
                     checkNodeRole( containerHost ), availableOperations
             }, null );
 

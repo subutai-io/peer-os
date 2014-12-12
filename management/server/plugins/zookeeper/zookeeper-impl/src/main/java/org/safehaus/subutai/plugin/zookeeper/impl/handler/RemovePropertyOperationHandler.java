@@ -69,7 +69,7 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Zoo
 
         Environment environment =
                 manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        Set<ContainerHost> zookeeperNodes = environment.getHostsByIds( config.getNodes() );
+        Set<ContainerHost> zookeeperNodes = environment.getContainerHostsByIds( config.getNodes() );
         List<CommandResult> commandResultList = new ArrayList<>();
         for ( ContainerHost zookeeperNode : zookeeperNodes ) {
             try

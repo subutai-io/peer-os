@@ -57,20 +57,20 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
             throw new ClusterSetupException( "Environment not specified" );
         }
 
-        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
+        if ( environment.getContainerHosts() == null || environment.getContainerHosts().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
         // check installed packages
-        for ( ContainerHost n : environment.getContainers() )
+        for ( ContainerHost n : environment.getContainerHosts() )
         {
             try
             {
                 if ( !n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
                 {
                     throw new ClusterSetupException(
-                            String.format( "Node %s does not have Storm installed", n.getAgent().getHostname() ) );
+                            String.format( "Node %s does not have Storm installed", n.getHostname() ) );
                 }
             }
             catch ( PeerException e )
@@ -107,7 +107,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         else
         // find out nimbus node in environment
         {
-            for ( ContainerHost n : environment.getContainers() )
+            for ( ContainerHost n : environment.getContainerHosts() )
             {
                 if ( n.getNodeGroupName().equals( StormService.NIMBUS.toString() ) )
                 {
@@ -117,7 +117,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         }
 
         // collect worker nodes in environment
-        for ( ContainerHost n : environment.getContainers() )
+        for ( ContainerHost n : environment.getContainerHosts() )
         {
             if ( n.getNodeGroupName().equals( StormService.SUPERVISOR.toString() ) )
             {
@@ -135,7 +135,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
                             config.getSupervisorsCount() ) );
         }
 
-        ContainerHost containerHost = environment.getContainerHostByUUID( config.getNimbus() );
+        ContainerHost containerHost = environment.getContainerHostById( config.getNimbus() );
 
         //TODO enable these checks when isConnected method working OK
 //        if ( !containerHost.isConnected() )
@@ -145,7 +145,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
 //        for ( UUID supervisorUuids : config.getSupervisors() )
 //        {
 //            if ( ! environment
-//                    .getContainerHostByUUID( supervisorUuids ).isConnected() )
+//                    .getContainerHostById( supervisorUuids ).isConnected() )
 //            {
 //                throw new ClusterSetupException( "Not all worker nodes are connected" );
 //            }
@@ -178,14 +178,14 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
                     manager.getZookeeperManager().getCluster( config.getZookeeperClusterName() );
             Environment zookeeperEnvironment =
                     environmentManager.getEnvironmentByUUID( zookeeperClusterConfig.getEnvironmentId() );
-            nimbusHost = zookeeperEnvironment.getContainerHostByUUID( config.getNimbus() );
+            nimbusHost = zookeeperEnvironment.getContainerHostById( config.getNimbus() );
         }
         else {
-            nimbusHost = environment.getContainerHostByUUID( config.getNimbus() );
+            nimbusHost = environment.getContainerHostById( config.getNimbus() );
         }
-        paramValues.put( "nimbus.host", nimbusHost.getAgent().getListIP().get( 0 ) );
+        paramValues.put( "nimbus.host", nimbusHost.getIpByInterfaceName( "eth0" ) );
 
-        Set<ContainerHost> supervisorNodes = environment.getHostsByIds( config.getSupervisors() );
+        Set<ContainerHost> supervisorNodes = environment.getContainerHostsByIds( config.getSupervisors() );
 
         Set<ContainerHost> allNodes = new HashSet<>(  );
         allNodes.add( nimbusHost );
@@ -267,22 +267,22 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
             {
                 StringBuilder sb = new StringBuilder();
                 Environment zookeeperEnvironment = environmentManager.getEnvironmentByUUID( zk_config.getEnvironmentId() );
-                Set<ContainerHost> zookeeperNodes = zookeeperEnvironment.getHostsByIds( zk_config.getNodes() );
+                Set<ContainerHost> zookeeperNodes = zookeeperEnvironment.getContainerHostsByIds( zk_config.getNodes() );
                 for ( ContainerHost containerHost : zookeeperNodes )
                 {
                     if ( sb.length() > 0 )
                     {
                         sb.append( "," );
                     }
-                    sb.append( containerHost.getAgent().getListIP().get( 0 ) );
+                    sb.append( containerHost.getIpByInterfaceName( "eth0" ) );
                 }
                 return sb.toString();
             }
         }
         else if ( config.getNimbus() != null )
         {
-            ContainerHost nimbusHost = environment.getContainerHostByUUID( config.getNimbus() );
-            return nimbusHost.getAgent().getListIP().get( 0 );
+            ContainerHost nimbusHost = environment.getContainerHostById( config.getNimbus() );
+            return nimbusHost.getIpByInterfaceName( "eth0" );
         }
 
         return null;

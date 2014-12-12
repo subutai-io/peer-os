@@ -14,12 +14,16 @@ import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Payload;
@@ -129,36 +133,27 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
-                                                final List<Template> templates, final int quantity,
-                                                final String strategyId, final List<Criteria> criteria,
-                                                String nodeGroupName ) throws PeerException
+    public Set<HostInfoModel> scheduleCloneContainers( final UUID creatorPeerId, final List<Template> templates,
+                                                       final int quantity, final String strategyId,
+                                                       final List<Criteria> criteria ) throws PeerException
     {
-        try
+        //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(),
+        // "8181" );
+        //        return remotePeerRestClient.scheduleCloneContainers( creatorPeerId, templates, quantity,
+        // strategyId, criteria );
+
+        CreateContainerResponse response =
+                sendRequest( new CreateContainerRequest( creatorPeerId, templates, quantity, strategyId, criteria ),
+                        RecipientType.CONTAINER_CREATE_REQUEST.name(), Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT,
+                        CreateContainerResponse.class );
+
+        if ( response != null )
         {
-            //send create request
-            CreateContainerRequest request =
-                    new CreateContainerRequest( creatorPeerId, environmentId, templates, quantity, strategyId, criteria,
-                            nodeGroupName );
-
-            CreateContainerResponse response = sendRequest( request, RecipientType.CONTAINER_CREATE_REQUEST.name(),
-                    Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainerResponse.class );
-
-            if ( response != null )
-            {
-                Set<HostKey> hostKeys = response.getHostKeys();
-                Set<ContainerHost> result = getContainerHostImpl( hostKeys );
-                return result;
-            }
-            else
-            {
-                throw new PeerException( "Received null response" );
-            }
+            return response.getHosts();
         }
-        catch ( PeerException e )
+        else
         {
-            LOG.error( "Error in createContainers", e );
-            throw new PeerException( e.getMessage() );
+            throw new PeerException( "Command timed out" );
         }
     }
 
@@ -199,7 +194,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public boolean isConnected( final Host host ) throws PeerException
+    public boolean isConnected( final Host host )
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
         return remotePeerRestClient.isConnected( host );
@@ -207,16 +202,18 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public String getQuota( final ContainerHost host, final QuotaEnum quota ) throws PeerException
+    public PeerQuotaInfo getQuota( final ContainerHost host, final QuotaType quotaType ) throws PeerException
     {
-        throw new PeerException( "Operation not allowed." );
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.getQuota( host, quotaType );
     }
 
 
     @Override
-    public void setQuota( final ContainerHost host, final QuotaEnum quota, final String value ) throws PeerException
+    public void setQuota( final ContainerHost host, final QuotaInfo quotaInfo ) throws PeerException
     {
-        throw new PeerException( "Operation not allowed." );
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+        remotePeerRestClient.setQuota( host, quotaInfo );
     }
 
 
@@ -341,6 +338,13 @@ public class RemotePeerImpl implements RemotePeer
     public <T> void sendRequest( final T request, final String recipient, final int timeout ) throws PeerException
     {
         sendRequestInternal( request, recipient, timeout );
+    }
+
+
+    @Override
+    public ContainerHostState getContainerHostState( final String containerId ) throws PeerException
+    {
+        throw new UnsupportedOperationException( "Not implemented yet." );
     }
 
 

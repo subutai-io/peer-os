@@ -1,15 +1,14 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.safehaus.subutai.common.exception.ClusterSetupException;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -22,8 +21,8 @@ import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 /**
@@ -89,19 +88,19 @@ public class ClusterOperationHandler extends AbstractOperationHandler<Elasticsea
         switch ( clusterOperationType )
         {
             case START_ALL:
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost containerHost : environment.getContainerHosts() )
                 {
                     result = executeCommand( containerHost, Commands.startCommand );
                 }
                 break;
             case STOP_ALL:
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost containerHost : environment.getContainerHosts() )
                 {
                     result = executeCommand( containerHost, Commands.stopCommand );
                 }
                 break;
             case STATUS_ALL:
-                for ( ContainerHost containerHost : environment.getContainers() )
+                for ( ContainerHost containerHost : environment.getContainerHosts() )
                 {
                     result = executeCommand( containerHost, Commands.statusCommand );
                 }
@@ -146,7 +145,6 @@ public class ClusterOperationHandler extends AbstractOperationHandler<Elasticsea
         {
             Environment env = manager.getEnvironmentManager()
                                      .buildEnvironment( manager.getDefaultEnvironmentBlueprint( config ) );
-
             ClusterSetupStrategy clusterSetupStrategy =
                     manager.getClusterSetupStrategy( env, config, trackerOperation );
             clusterSetupStrategy.setup();

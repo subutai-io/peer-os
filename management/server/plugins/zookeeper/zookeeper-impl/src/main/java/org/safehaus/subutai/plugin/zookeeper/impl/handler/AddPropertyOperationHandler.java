@@ -69,7 +69,7 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Zookee
 
         Environment zookeeperEnvironment = manager.getEnvironmentManager().
                 getEnvironmentByUUID( config.getEnvironmentId() );
-        Set<ContainerHost> zookeeperNodes = zookeeperEnvironment.getHostsByIds( config.getNodes() );
+        Set<ContainerHost> zookeeperNodes = zookeeperEnvironment.getContainerHostsByIds( config.getNodes() );
 
 
         String addPropertyCommand =

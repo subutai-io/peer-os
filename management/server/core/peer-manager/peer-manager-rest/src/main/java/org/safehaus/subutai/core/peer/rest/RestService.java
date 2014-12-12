@@ -21,74 +21,82 @@ public interface RestService
 
 
     @POST
-    @Path("peer")
+    @Path( "peer" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    @Consumes(MediaType.TEXT_PLAIN)
-    public PeerInfo registerPeer( @QueryParam("peer") String peer );
+    @Consumes( MediaType.TEXT_PLAIN )
+    public PeerInfo registerPeer( @QueryParam( "peer" ) String peer );
 
     @GET
-    @Path("id")
-    @Produces({ MediaType.TEXT_PLAIN })
+    @Path( "id" )
+    @Produces( { MediaType.TEXT_PLAIN } )
     public String getId();
 
 
     @POST
-    @Path("container/create")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response createContainers( @FormParam("ownerPeerId") String ownerPeerId,
-                                      @FormParam("environmentId") String environmentId,
-                                      @FormParam("templates") String templates, @FormParam("quantity") int quantity,
-                                      @FormParam("strategyId") String strategyId,
-                                      @FormParam("criteria") String criteria,
-                                      @FormParam( "nodeGroupName" ) String nodeGroupName );
+    @Path( "container/schedule" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response scheduleCloneContainers( @FormParam( "creatorPeerId" ) String creatorPeerId,
+                                      @FormParam( "templates" ) String templates, @FormParam( "quantity" ) int quantity,
+                                      @FormParam( "strategyId" ) String strategyId,
+                                      @FormParam( "criteria" ) String criteria );
 
     @POST
-    @Path("container/destroy")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response destroyContainer( @FormParam("hostId") String host );
+    @Path( "container/destroy" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response destroyContainer( @FormParam( "hostId" ) String host );
 
     @POST
-    @Path("container/start")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response startContainer( @FormParam("hostId") String host );
+    @Path( "container/start" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response startContainer( @FormParam( "hostId" ) String host );
 
     @POST
-    @Path("container/stop")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response stopContainer( @FormParam("hostId") String host );
+    @Path( "container/stop" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response stopContainer( @FormParam( "hostId" ) String host );
 
     @POST
-    @Path("container/isconnected")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response isContainerConnected( @FormParam("hostId") String hostId );
+    @Path( "container/isconnected" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response isContainerConnected( @FormParam( "hostId" ) String hostId );
 
 
     @POST
-    @Path("template/get")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getTemplate( @FormParam("templateName") String templateName );
+    @Path( "template/get" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getTemplate( @FormParam( "templateName" ) String templateName );
 
     @POST
-    @Path("environment/containers")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response environmentContainers( @FormParam("environmentId") String envId );
+    @Path( "environment/containers" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response environmentContainers( @FormParam( "environmentId" ) String envId );
 
     @GET
-    @Path("ping")
+    @Path( "ping" )
     public Response ping();
 
     @POST
-    @Path("register")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response processRegisterRequest( @QueryParam("peer") String peer );
+    @Path( "register" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response processRegisterRequest( @QueryParam( "peer" ) String peer );
 
     @DELETE
-    @Path("unregister")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response unregisterPeer( @QueryParam("peerId") String peerId );
+    @Path( "unregister" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response unregisterPeer( @QueryParam( "peerId" ) String peerId );
 
     @PUT
-    @Path("update")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response updatePeer( @QueryParam("peer") String peer );
+    @Path( "update" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response updatePeer( @QueryParam( "peer" ) String peer );
+
+
+    @POST
+    @Path( "container/quota" )
+    Response setQuota( @FormParam( "hostId" ) String hostId, @FormParam( "quotaInfo" ) String quotaInfo );
+
+    @GET
+    @Path( "container/quota" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getQuota( @QueryParam( "hostId" ) String hostId, @QueryParam( "quotaType" ) String quotaType );
 }

@@ -58,21 +58,21 @@ public class SolrSetupStrategy implements ClusterSetupStrategy
                     String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
-        if ( environment.getContainers().isEmpty() )
+        if ( environment.getContainerHosts().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
-        if ( environment.getContainers().size() < config.getNumberOfNodes() )
+        if ( environment.getContainerHosts().size() < config.getNumberOfNodes() )
         {
             throw new ClusterSetupException( String.format( "Environment has %d nodes but %d nodes are required",
-                    environment.getContainers().size(), config.getNumberOfNodes() ) );
+                    environment.getContainerHosts().size(), config.getNumberOfNodes() ) );
         }
 
         Set<UUID> solrNodes = new HashSet<>();
-        for ( ContainerHost host : environment.getContainers() )
+        for ( ContainerHost host : environment.getContainerHosts() )
         {
-            solrNodes.add( host.getAgent().getUuid() );
+            solrNodes.add( host.getId() );
         }
 
         config.setNodes( solrNodes );

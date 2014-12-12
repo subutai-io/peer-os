@@ -3,18 +3,15 @@ package org.safehaus.subutai.plugin.spark.api;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.common.exception.ClusterException;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 
 public interface Spark extends ApiBase<SparkClusterConfig>
 {
-
-    public UUID installCluster( SparkClusterConfig config, HadoopClusterConfig hadoopConfig );
 
     public UUID addSlaveNode( String clusterName, String lxcHostname );
 
@@ -79,8 +76,13 @@ public interface Spark extends ApiBase<SparkClusterConfig>
     public UUID checkNode( String clusterName, String lxcHostName, boolean master );
 
 
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( SparkClusterConfig config );
-
     public ClusterSetupStrategy getClusterSetupStrategy( TrackerOperation po, SparkClusterConfig clusterConfig,
                                                          Environment environment );
+
+    /**
+     * Saves/Updates cluster config in database
+     *
+     * @param config - config to update
+     */
+    public void saveConfig( SparkClusterConfig config ) throws ClusterException;
 }

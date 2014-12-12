@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+
+  <persistence-unit name="envManagerUnit" transaction-type="RESOURCE_LOCAL">
+    <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
+    <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/envManagerDS)
+    </non-jta-data-source>
+    <class>org.safehaus.subutai.core.environment.impl.HostInterface</class>
+    <class>org.safehaus.subutai.core.environment.impl.EnvironmentImpl</class>
+    <class>org.safehaus.subutai.core.environment.impl.EnvironmentContainerImpl</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <properties>
+      <!--
+      <property name="openjpa.ConnectionProperties"
+                value="driverClass=org.h2.jdbcx.JdbcDataSource,jdbcUrl=jdbc:h2:/root/db/environmentDb" />
+      -->
+      <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO" />
+      <!--<property name="openjpa.Log" value="DefaultLevel=WARN, Runtime=TRACE, Tool=INFO, SQL=TRACE" />-->
+      <property name="openjpa.ConnectionFactoryProperties" value="PrintParameters=true" />
+      <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />
+      <property name="openjpa.jdbc.DBDictionary" value="h2" />
+      <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
+    </properties>
+  </persistence-unit>
+
+</persistence>

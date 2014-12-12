@@ -23,10 +23,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>peer-manager-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>agent-manager-api</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -44,10 +40,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>lxc-quota-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>host-registry-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -76,6 +68,12 @@
       <artifactId>slf4j-simple</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20131018</version>
+    </dependency>
+    <!--
+    <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-jta_1.1_spec</artifactId>
       <version>1.1.1</version>
@@ -88,7 +86,6 @@
     <dependency>
       <groupId>org.apache.openjpa</groupId>
       <artifactId>openjpa</artifactId>
-      <!-- set the version to be the same as the level in your runtime -->
       <version>2.3.0</version>
     </dependency>
 
@@ -97,6 +94,7 @@
       <artifactId>h2</artifactId>
       <version>1.4.181</version>
     </dependency>
+    -->
   </dependencies>
 
   <build>
@@ -113,7 +111,7 @@
             <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
             <Bundle-SymbolicName>${project.groupId}.core.peer.impl</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages}, {local-packages}.*;version=${project.version};-noimport:=true
+                {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
           </instructions>
         </configuration>

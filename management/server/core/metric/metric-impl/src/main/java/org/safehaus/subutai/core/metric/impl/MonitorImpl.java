@@ -87,7 +87,7 @@ public class MonitorImpl implements Monitor
         Set<ContainerHostMetric> metrics = new HashSet<>();
 
         //obtain environment containers
-        Set<ContainerHost> containerHosts = environment.getContainers();
+        Set<ContainerHost> containerHosts = environment.getContainerHosts();
 
         Set<Peer> peers = Sets.newHashSet();
 
@@ -98,7 +98,7 @@ public class MonitorImpl implements Monitor
             {
                 peers.add( containerHost.getPeer() );
             }
-            catch ( PeerException e )
+            catch ( Exception e )
             {
                 LOG.error( String.format( "Could not obtain peer for container %s", containerHost.getHostname() ), e );
                 throw new MonitorException( e );
@@ -283,7 +283,7 @@ public class MonitorImpl implements Monitor
         }
 
         //activate monitoring
-        activateMonitoring( environment.getContainers(), monitoringSettings );
+        activateMonitoring( environment.getContainerHosts(), monitoringSettings );
     }
 
 
@@ -346,7 +346,7 @@ public class MonitorImpl implements Monitor
 
                 containers.add( containerHost );
             }
-            catch ( PeerException e )
+            catch ( Exception e )
             {
                 LOG.error( String.format( "Could not obtain peer for container %s", containerHost.getHostname() ), e );
                 throw new MonitorException( e );

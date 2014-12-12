@@ -13,6 +13,8 @@ import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -24,9 +26,9 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.Interface;
@@ -35,7 +37,6 @@ import org.safehaus.subutai.core.peer.api.HostEvent;
 import org.safehaus.subutai.core.peer.api.HostEventListener;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
-import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -59,16 +60,24 @@ public abstract class AbstractSubutaiHost implements Host
     @Column( name = "host_name", nullable = false )
     protected String hostname;
 
+    @Column( name = "arch" )
+    @Enumerated
+    private HostArchitecture hostArchitecture;
+
     @Column( name = "net_intf" )
     private String netInterfaces;
 
-    @OneToMany( mappedBy = "host", cascade = CascadeType.ALL )
-    protected Set<HostInterface> interfaces = new HashSet<>();
+    @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = HostInterface
+            .class )
+    protected Set<Interface> interfaces = new HashSet<>();
 
     @Transient
     protected volatile long lastHeartbeat = 0;
     @Transient
     protected Set<HostEventListener> eventListeners = Sets.newConcurrentHashSet();
+
+    @Transient
+    private Peer peer;
 
 
     @Override
@@ -83,8 +92,8 @@ public abstract class AbstractSubutaiHost implements Host
         Preconditions.checkNotNull( hostInfo, "Host information is null" );
         Preconditions.checkNotNull( peerId, "Peer ID is null" );
 
-        this.hostId = hostInfo.getId().toString();
         this.peerId = peerId;
+        this.hostId = hostInfo.getId().toString();
         this.hostname = hostInfo.getHostname();
 
         StringBuilder sb = new StringBuilder();
@@ -134,24 +143,33 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    public Peer getPeer() throws PeerException
+    @Override
+    public Peer getPeer()
     {
-        Peer result;
-        try
-        {
-            PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
-            result = peerManager.getPeer( UUID.fromString( peerId ) );
-            if ( result == null )
-            {
-                throw new PeerException( "Peer not registered." );
-            }
-        }
-        catch ( NamingException e )
-        {
-            throw new PeerException( "Could not locate PeerManager" );
-        }
+        return peer;
+        //        Peer result;
+        //        try
+        //        {
+        //            PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
+        //            result = peerManager.getPeer( UUID.fromString( peerId ) );
+        //            if ( result == null )
+        //            {
+        //                throw new PeerException( "Peer not registered." );
+        //            }
+        //        }
+        //        catch ( NamingException e )
+        //        {
+        //            throw new PeerException( "Could not locate PeerManager" );
+        //        }
+        //
+        //        return result;
+    }
 
-        return result;
+
+    @Override
+    public void setPeer( Peer peer )
+    {
+        this.peer = peer;
     }
 
 
@@ -180,15 +198,7 @@ public abstract class AbstractSubutaiHost implements Host
     public CommandResult execute( final RequestBuilder requestBuilder, final CommandCallback callback )
             throws CommandException
     {
-        try
-        {
-            Peer peer = getPeer();
-            return peer.execute( requestBuilder, this, callback );
-        }
-        catch ( PeerException e )
-        {
-            throw new CommandException( e.toString() );
-        }
+        return peer.execute( requestBuilder, this, callback );
     }
 
 
@@ -203,15 +213,7 @@ public abstract class AbstractSubutaiHost implements Host
     public void executeAsync( final RequestBuilder requestBuilder, final CommandCallback callback )
             throws CommandException
     {
-        try
-        {
-            Peer peer = getPeer();
-            peer.executeAsync( requestBuilder, this, callback );
-        }
-        catch ( PeerException e )
-        {
-            throw new CommandException( e.toString() );
-        }
+        peer.executeAsync( requestBuilder, this, callback );
     }
 
 
@@ -238,7 +240,7 @@ public abstract class AbstractSubutaiHost implements Host
     @Override
     public String getHostname()
     {
-        return getAgent().getHostname();
+        return hostname;
     }
 
 
@@ -252,15 +254,7 @@ public abstract class AbstractSubutaiHost implements Host
     @Override
     public boolean isConnected()
     {
-        try
-        {
-            Peer peer = getPeer();
-            return peer.isConnected( this );
-        }
-        catch ( PeerException e )
-        {
-            return false;
-        }
+        return peer.isConnected( this );
     }
 
 
@@ -300,15 +294,40 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
-    public Set<HostInterface> getInterfaces()
+    @Override
+    public Set<Interface> getNetInterfaces()
     {
         return this.interfaces;
     }
 
 
-    public void setInterfaces( final Set<HostInterface> interfaces )
+    @Override
+    public String getIpByInterfaceName( String interfaceName )
     {
-        this.interfaces = interfaces;
+        for ( Interface iface : interfaces )
+        {
+            if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
+            {
+                return iface.getIp();
+            }
+        }
+
+        return null;
+    }
+
+
+    @Override
+    public String getMacByInterfaceName( final String interfaceName )
+    {
+        for ( Interface iface : interfaces )
+        {
+            if ( iface.getInterfaceName().equalsIgnoreCase( interfaceName ) )
+            {
+                return iface.getMac();
+            }
+        }
+
+        return null;
     }
 
 
@@ -361,18 +380,13 @@ public abstract class AbstractSubutaiHost implements Host
 
         try
         {
-            execute( new RequestBuilder( appendHosts.toString() ).withTimeout( 30 ) );
+            execute( new RequestBuilder( String.format( "sh -c echo `%s`", appendHosts.toString() ) )
+                    .withTimeout( 30 ) );
         }
         catch ( CommandException e )
         {
             throw new SubutaiException( "Could not add to /etc/hosts: " + e.toString() );
         }
-    }
-
-
-    public Agent getAgent()
-    {
-        return new Agent( getId(), hostname, null, null, getIps(), false, null );
     }
 
 
@@ -386,20 +400,6 @@ public abstract class AbstractSubutaiHost implements Host
             result.add( s );
         }
         return result;
-    }
-
-
-    @Override
-    public Agent getParentAgent()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-
-    @Override
-    public void setParentAgent( final Agent agent )
-    {
-        throw new UnsupportedOperationException();
     }
 
 
@@ -430,6 +430,13 @@ public abstract class AbstractSubutaiHost implements Host
 
         hostInterface.setHost( this );
         interfaces.add( hostInterface );
+    }
+
+
+    @Override
+    public HostArchitecture getHostArchitecture()
+    {
+        return this.hostArchitecture;
     }
 
 

@@ -12,7 +12,6 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.ui.ConfigView;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -50,26 +49,18 @@ public class VerificationStep extends Panel
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", config.getClusterName() );
-        if ( config.getSetupType() == SetupType.OVER_HADOOP )
+
+        HadoopClusterConfig hadoopCluster = hadoop.getCluster( config.getHadoopClusterName() );
+        Environment hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopCluster.getEnvironmentId() );
+        ContainerHost master = hadoopEnvironment.getContainerHostById( config.getMasterNodeId() );
+        Set<ContainerHost> slaves = hadoopEnvironment.getContainerHostsByIds( config.getSlaveIds() );
+        cfgView.addStringCfg( "Hadoop cluster Name", config.getHadoopClusterName() );
+        cfgView.addStringCfg( "Master Node", master.getHostname() );
+        for ( ContainerHost slave : slaves )
         {
-            HadoopClusterConfig hadoopCluster = hadoop.getCluster( config.getHadoopClusterName() );
-            Environment hadoopEnvironment = environmentManager.getEnvironmentByUUID( hadoopCluster.getEnvironmentId() );
-            ContainerHost master = hadoopEnvironment.getContainerHostByUUID( config.getMasterNodeId() );
-            Set<ContainerHost> slaves = hadoopEnvironment.getHostsByIds( config.getSlaveIds() );
-            cfgView.addStringCfg( "Hadoop cluster Name", config.getHadoopClusterName() );
-            cfgView.addStringCfg( "Master Node", master.getHostname() );
-            for ( ContainerHost slave : slaves )
-            {
-                cfgView.addStringCfg( "Slave nodes", slave.getHostname() );
-            }
+            cfgView.addStringCfg( "Slave nodes", slave.getHostname() );
         }
-        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
-        {
-            cfgView.addStringCfg( "Hadoop cluster name", hc.getClusterName() );
-            cfgView.addStringCfg( "Number of Hadoop slave nodes", hc.getCountOfSlaveNodes() + "" );
-            cfgView.addStringCfg( "Replication factor", hc.getReplicationFactor() + "" );
-            cfgView.addStringCfg( "Domain name", hc.getDomainName() );
-        }
+
 
         Button install = new Button( "Install" );
         install.setId( "sparkVerificationInstall" );
@@ -79,16 +70,7 @@ public class VerificationStep extends Panel
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                UUID trackId = null;
-                if ( config.getSetupType() == SetupType.OVER_HADOOP )
-                {
-                    trackId = spark.installCluster( config );
-                }
-                else if ( config.getSetupType() == SetupType.WITH_HADOOP )
-                {
-                    trackId = spark.installCluster( config, hc );
-                }
-
+                UUID trackId = spark.installCluster( config );
                 ProgressWindow window =
                         new ProgressWindow( executor, tracker, trackId, SparkClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()

@@ -1,6 +1,9 @@
 package org.safehaus.subutai.core.lxc.quota.api;
 
 
+import org.safehaus.subutai.common.quota.QuotaType;
+
+
 /**
  * Created by talas on 10/7/14.
  */
@@ -30,13 +33,13 @@ public class QuotaException extends Exception
     }
 
 
-    public QuotaException( String message, QuotaEnum parameter )
+    public QuotaException( String message, QuotaType parameter )
     {
         super( parameter.getKey() + message );
     }
 
 
-    public QuotaException( String message, Throwable cause, QuotaEnum parameter )
+    public QuotaException( String message, Throwable cause, QuotaType parameter )
     {
         super( parameter.getKey() + message, cause );
     }

@@ -161,8 +161,10 @@ string SubutaiEnvironment::getAgentArch() {
         environmentLogger->writeLog(3, environmentLogger->setLogData("<SubutaiAgent>", "Error: Failed to extract machine information"));
         return "UNKNOWN";
     } else {
-        environmentLogger->writeLog(3, environmentLogger->setLogData("<SubutaiAgent>", "Machine architecture:", info.machine));
-        return info.machine;
+        std::string arch(info.machine);
+        std::transform(arch.begin(), arch.end(), arch.begin(), ::toupper);
+        environmentLogger->writeLog(7, environmentLogger->setLogData("<SubutaiAgent>", "Machine architecture:", arch));
+        return arch;
     }
 }
 

@@ -46,7 +46,7 @@
     <com.google.guava.version>16.0.1</com.google.guava.version>
     <!-- REST -->
     <restlet-version>2.2.2</restlet-version>
-    <org.apache.cxf.version>3.0.1</org.apache.cxf.version>
+    <org.apache.cxf.version>2.7.12</org.apache.cxf.version>
     <!-- TEST -->
     <org.mockito.version>1.9.5</org.mockito.version>
     <com.jayway.awaitility.version>1.5.0</com.jayway.awaitility.version>
@@ -54,6 +54,9 @@
     <org.osgi.version>4.3.1</org.osgi.version>
 
     <vaadin-version>7.3.3</vaadin-version>
+
+    <!-- apache shiro -->
+    <org.apache.shiro.version>1.2.3</org.apache.shiro.version>
   </properties>
 
   <dependencyManagement>
@@ -82,29 +85,6 @@
       <!-- core -->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- agent-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>agent-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>agent-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>agent-manager-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>agent-manager-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- key-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -119,32 +99,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>key-manager-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- command-dispatcher -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>command-dispatcher-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>command-dispatcher-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- communication-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>communication-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>communication-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -227,24 +181,11 @@
         <artifactId>lxc-quota-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- monitoring -->
-      <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>monitoring-api</artifactId>-->
-      <!--<version>${project.version}</version>-->
-      <!--</dependency>-->
-      <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>monitoring-impl</artifactId>-->
-      <!--<version>${project.version}</version>-->
-      <!--</dependency>-->
-      <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>monitoring-cli</artifactId>-->
-      <!--<version>${project.version}</version>-->
-      <!--</dependency>-->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>lxc-quota-manager-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- script-manager -->
@@ -287,7 +228,7 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- container registry -->
+      <!-- host registry -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>host-registry-api</artifactId>
@@ -361,7 +302,7 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- queue -->
+      <!-- messenger -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>messenger-api</artifactId>
@@ -406,24 +347,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>network-manager-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- package-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>package-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>package-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>package-manager-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -771,9 +694,14 @@
         <artifactId>org.apache.servicemix.specs.activation-api-1.1</artifactId>
         <version>2.4.0</version>
       </dependency>
+      <dependency>
+          <groupId>commons-validator</groupId>
+          <artifactId>commons-validator</artifactId>
+          <version>1.4.0</version>
+      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- communication-manager -->
+      <!-- broker -->
       <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-all</artifactId>

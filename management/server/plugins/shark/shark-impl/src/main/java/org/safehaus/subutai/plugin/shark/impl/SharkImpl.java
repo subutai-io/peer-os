@@ -1,14 +1,7 @@
 package org.safehaus.subutai.plugin.shark.impl;
 
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.sql.DataSource;
-
+import com.google.common.base.Preconditions;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
@@ -19,7 +12,6 @@ import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.impl.handler.ClusterOperationHandler;
@@ -28,25 +20,32 @@ import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
+import javax.sql.DataSource;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class SharkImpl implements Shark
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( SharkImpl.class.getName() );
+    private static
+
+    final Logger LOG = LoggerFactory.getLogger(SharkImpl.class.getName());
     private Spark sparkManager;
     private Hadoop hadoopManager;
     private Tracker tracker;
     private EnvironmentManager environmentManager;
-    private ExecutorService executor;
+    protected ExecutorService executor;
     private PluginDAO pluginDAO;
     private DataSource dataSource;
     protected Commands commands;
 
 
-    public SharkImpl( Tracker tracker, EnvironmentManager environmentManager, Hadoop hadoopManager, Spark sparkManager,
-                      DataSource dataSource )
+    public SharkImpl(Tracker tracker, EnvironmentManager environmentManager, Hadoop hadoopManager, Spark sparkManager,
+                     DataSource dataSource)
     {
         this.tracker = tracker;
         this.environmentManager = environmentManager;
@@ -55,6 +54,10 @@ public class SharkImpl implements Shark
         this.dataSource = dataSource;
     }
 
+    public void setPluginDAO(final PluginDAO pluginDAO)
+    {
+        this.pluginDAO = pluginDAO;
+    }
 
     public Spark getSparkManager()
     {
@@ -84,11 +87,10 @@ public class SharkImpl implements Shark
     {
         try
         {
-            this.pluginDAO = new PluginDAO( dataSource );
-        }
-        catch ( SQLException e )
+            this.pluginDAO = new PluginDAO(dataSource);
+        } catch (SQLException e)
         {
-            LOG.error( e.getMessage(), e );
+            LOG.error(e.getMessage(), e);
         }
         this.commands = new Commands();
         executor = Executors.newCachedThreadPool();
@@ -114,26 +116,26 @@ public class SharkImpl implements Shark
 
 
     @Override
-    public UUID installCluster( final SharkClusterConfig config )
+    public UUID installCluster(final SharkClusterConfig config)
     {
-        Preconditions.checkNotNull( config, "Configuration is null" );
+        Preconditions.checkNotNull(config, "Configuration is null");
 
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL );
+                new ClusterOperationHandler(this, config, ClusterOperationType.INSTALL);
 
-        executor.execute( operationHandler );
+        executor.execute(operationHandler);
 
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID uninstallCluster( final String clusterName )
+    public UUID uninstallCluster(final String clusterName)
     {
-        SharkClusterConfig config = getCluster( clusterName );
+        SharkClusterConfig config = getCluster(clusterName);
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.UNINSTALL );
-        executor.execute( operationHandler );
+                new ClusterOperationHandler(this, config, ClusterOperationType.UNINSTALL);
+        executor.execute(operationHandler);
         return operationHandler.getTrackerId();
     }
 
@@ -141,65 +143,55 @@ public class SharkImpl implements Shark
     @Override
     public List<SharkClusterConfig> getClusters()
     {
-        return pluginDAO.getInfo( SharkClusterConfig.PRODUCT_KEY, SharkClusterConfig.class );
+        return pluginDAO.getInfo(SharkClusterConfig.PRODUCT_KEY, SharkClusterConfig.class);
     }
 
 
     @Override
-    public SharkClusterConfig getCluster( String clusterName )
+    public SharkClusterConfig getCluster(String clusterName)
     {
-        return pluginDAO.getInfo( SharkClusterConfig.PRODUCT_KEY, clusterName, SharkClusterConfig.class );
+        return pluginDAO.getInfo(SharkClusterConfig.PRODUCT_KEY, clusterName, SharkClusterConfig.class);
     }
 
 
     @Override
-    public UUID installCluster( SharkClusterConfig config, HadoopClusterConfig hadoopConfig )
+    public UUID addNode(final String clusterName, final String hostname)
     {
+        SharkClusterConfig config = getCluster(clusterName);
         AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.INSTALL, hadoopConfig );
-        executor.execute( operationHandler );
+                new NodeOperationHandler(this, config, hostname, OperationType.INCLUDE);
+        executor.execute(operationHandler);
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID addNode( final String clusterName, final String hostname )
+    public UUID destroyNode(final String clusterName, final String lxcHostname)
     {
-        SharkClusterConfig config = getCluster( clusterName );
+        SharkClusterConfig config = getCluster(clusterName);
         AbstractOperationHandler operationHandler =
-                new NodeOperationHandler( this, config, hostname, OperationType.INCLUDE );
-        executor.execute( operationHandler );
+                new NodeOperationHandler(this, config, lxcHostname, OperationType.EXCLUDE);
+        executor.execute(operationHandler);
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID destroyNode( final String clusterName, final String lxcHostname )
+    public UUID actualizeMasterIP(final String clusterName)
     {
-        SharkClusterConfig config = getCluster( clusterName );
+        SharkClusterConfig config = getCluster(clusterName);
         AbstractOperationHandler operationHandler =
-                new NodeOperationHandler( this, config, lxcHostname, OperationType.EXCLUDE );
-        executor.execute( operationHandler );
+                new ClusterOperationHandler(this, config, ClusterOperationType.CUSTOM);
+        executor.execute(operationHandler);
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID actualizeMasterIP( final String clusterName )
+    public ClusterSetupStrategy getClusterSetupStrategy(TrackerOperation po, SharkClusterConfig config,
+                                                        Environment environment)
     {
-        SharkClusterConfig config = getCluster( clusterName );
-        AbstractOperationHandler operationHandler =
-                new ClusterOperationHandler( this, config, ClusterOperationType.CUSTOM );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
-    }
-
-
-    @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( TrackerOperation po, SharkClusterConfig config,
-                                                         Environment environment )
-    {
-        return new SetupStrategyOverSpark( environment, this, config, po );
+        return new SetupStrategyOverSpark(environment, this, config, po);
     }
 }
 

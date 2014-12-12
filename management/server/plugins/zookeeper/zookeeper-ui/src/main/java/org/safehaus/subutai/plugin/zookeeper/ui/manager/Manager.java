@@ -25,7 +25,6 @@ import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -357,14 +356,14 @@ public class Manager
         Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
         for ( UUID agentID : config.getNodes() )
         {
-            containerHosts.add( environment.getContainerHostByUUID( agentID ) );
+            containerHosts.add( environment.getContainerHostById( agentID ) );
         }
-        for ( ContainerHost agent : containerHosts )
+        for ( ContainerHost host : containerHosts )
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StartTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                    new StartTask( zookeeper, tracker, config.getClusterName(), host.getHostname(), new CompleteEvent()
                     {
                         @Override
                         public void onComplete( String result )
@@ -386,15 +385,15 @@ public class Manager
         Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
         for ( UUID agentID : config.getNodes() )
         {
-            containerHosts.add( environment.getContainerHostByUUID( agentID ) );
+            containerHosts.add( environment.getContainerHostById( agentID ) );
         }
 
-        for ( ContainerHost agent : containerHosts )
+        for ( ContainerHost host : containerHosts )
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StopTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                    new StopTask( zookeeper, tracker, config.getClusterName(), host.getHostname(), new CompleteEvent()
                     {
                         @Override
                         public void onComplete( String result )
@@ -520,7 +519,7 @@ public class Manager
                             Environment hadoopEnvironment =
                                     environmentManager.getEnvironmentByUUID( hadoopClusterConfig.getEnvironmentId() );
                             Set<UUID> hadoopNodeIDs = new HashSet<UUID>( hadoopClusterConfig.getAllNodes() );
-                            Set<ContainerHost> hadoopNodes = hadoopEnvironment.getHostsByIds( hadoopNodeIDs );
+                            Set<ContainerHost> hadoopNodes = hadoopEnvironment.getContainerHostsByIds( hadoopNodeIDs );
                             Set<ContainerHost> nodes = new HashSet<>();
                             nodes.addAll( hadoopNodes );
                             nodes.removeAll( config.getNodes() );
@@ -591,12 +590,12 @@ public class Manager
                     ContainerHost containerHost = environment.getContainerHostByHostname( lxcHostname );
                     if ( containerHost != null )
                     {
-                        TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( containerHost ) );
+                        TerminalWindow terminal = new TerminalWindow( containerHost );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
                     {
-                        show( "Agent is not connected" );
+                        show( "Host not found" );
                     }
                 }
             }
@@ -616,7 +615,7 @@ public class Manager
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
 
-            populateTable( nodesTable, getZookeeperNodes( environment.getContainers() ) );
+            populateTable( nodesTable, getZookeeperNodes( environment.getContainerHosts() ) );
         }
         else
         {
@@ -630,7 +629,7 @@ public class Manager
         Set<ContainerHost> list = new HashSet<>();
         for ( ContainerHost containerHost : containerHosts )
         {
-            if ( config.getNodes().contains( containerHost.getAgent().getUuid() ) )
+            if ( config.getNodes().contains( containerHost.getId() ) )
             {
                 list.add( containerHost );
             }
@@ -650,10 +649,10 @@ public class Manager
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
 
-            checkBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperCheck" );
-            startBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperStart" );
-            stopBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperStop" );
-            destroyBtn.setId( containerHost.getAgent().getListIP().get( 0 ) + "-zookeeperDestroy" );
+            checkBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-zookeeperCheck" );
+            startBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-zookeeperStart" );
+            stopBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-zookeeperStop" );
+            destroyBtn.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-zookeeperDestroy" );
 
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );
@@ -666,7 +665,7 @@ public class Manager
             PROGRESS_ICON.setVisible( false );
 
             table.addItem( new Object[] {
-                    containerHost.getHostname(), containerHost.getAgent().getListIP().get( 0 ), resultHolder,
+                    containerHost.getHostname(), containerHost.getIpByInterfaceName( "eth0" ), resultHolder,
                     availableOperations
             }, null );
 

@@ -39,7 +39,7 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger*
         _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", e.what()));         
     }
 
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Initializing"));
+    _logger->writeLog(6, _logger->setLogData("<SubutaiContainerManager>", "Initializing"));
 }
 /**
  * \details 	Default destructor of SubutaiContainerManager
@@ -60,7 +60,7 @@ bool SubutaiContainerManager::isContainerRunning(string container_name)
             return true;
         }
     }
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
+    _logger->writeLog(1, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
     return false;
 }
 
@@ -75,7 +75,7 @@ bool SubutaiContainerManager::isContainerStopped(string container_name)
             return true;
         }
     }
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
+    _logger->writeLog(1, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
     return false;
 }
 
@@ -90,7 +90,7 @@ bool SubutaiContainerManager::isContainerFrozen(string container_name)
             return true;
         }
     }
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
+    _logger->writeLog(1, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
     return false;
 }
 
@@ -142,9 +142,9 @@ vector<SubutaiContainer> SubutaiContainerManager::findAllContainers()
             containers.push_back(*c);
         }
     } catch (SubutaiException e) {
-        _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));
+        _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));
     } catch (std::exception e) {
-        _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", string(e.what())));
+        _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", string(e.what())));
     }
     return containers;
 }
@@ -161,7 +161,7 @@ SubutaiContainer* SubutaiContainerManager::findContainerByName(string container_
             return &(*it);
         }
     }
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
+    _logger->writeLog(1, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
     return NULL;
 }
 
@@ -177,7 +177,7 @@ SubutaiContainer* SubutaiContainerManager::findContainerById(string container_id
             return &(*it);
         }
     }
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_id));
+    _logger->writeLog(1, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_id));
     return NULL;
 }
 
@@ -222,9 +222,9 @@ void SubutaiContainerManager::updateContainerLists()
         	}
         }
     } catch (SubutaiException e) {
-        _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));
+        _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));
     } catch (std::exception e) {
-        _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", string(e.what())));
+        _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", string(e.what())));
     }
     for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
         (*it).getContainerAllFields();

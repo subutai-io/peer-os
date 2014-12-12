@@ -1,18 +1,17 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
-import java.util.Iterator;
-import java.util.logging.Logger;
-
 import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+
+import java.util.Iterator;
+import java.util.logging.Logger;
 
 
 public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl, CassandraClusterConfig>
@@ -45,7 +44,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl,
         }
 
         Environment environment = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
-        Iterator iterator = environment.getContainers().iterator();
+        Iterator iterator = environment.getContainerHosts().iterator();
 
         ContainerHost host = null;
         while ( iterator.hasNext() )
@@ -55,10 +54,10 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl,
             try
             {
                 CommandResult result = host.execute( new RequestBuilder( startCommand ) );
-                if ( result.getExitCode() == 0 )
+                if ( result.hasSucceeded() )
                 {
                     result = host.execute( new RequestBuilder( serviceStatusCommand ) );
-                    if ( result.getExitCode() == 0 )
+                    if ( result.hasSucceeded() )
                     {
                         if ( result.getStdOut().contains( "running..." ) )
                         {
@@ -89,27 +88,27 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl,
     }
 
 
-    private void logStatusResults( TrackerOperation po, CommandResult result )
-    {
-
-        StringBuilder log = new StringBuilder();
-
-        String status = "UNKNOWN";
-        if ( result.getExitCode() == 0 )
-        {
-            status = "Cassandra is running";
-        }
-        else if ( result.getExitCode() == 768 )
-        {
-            status = "Cassandra is not running";
-        }
-        else
-        {
-            status = result.getStdOut();
-        }
-
-        log.append( String.format( "%s", status ) );
-
-        po.addLogDone( log.toString() );
-    }
+//    private void logStatusResults( TrackerOperation po, CommandResult result )
+//    {
+//
+//        StringBuilder log = new StringBuilder();
+//
+//        String status = "UNKNOWN";
+//        if ( result.getExitCode() == 0 )
+//        {
+//            status = "Cassandra is running";
+//        }
+//        else if ( result.getExitCode() == 768 )
+//        {
+//            status = "Cassandra is not running";
+//        }
+//        else
+//        {
+//            status = result.getStdOut();
+//        }
+//
+//        log.append( String.format( "%s", status ) );
+//
+//        po.addLogDone( log.toString() );
+//    }
 }

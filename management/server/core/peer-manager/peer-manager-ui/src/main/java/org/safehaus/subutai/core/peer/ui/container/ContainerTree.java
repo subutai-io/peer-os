@@ -75,11 +75,14 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
                     Host host = ( Host ) item.getItemProperty( "value" ).getValue();
                     if ( host != null )
                     {
-                        //TODO: remove agent
-                        description =
-                                "Hostname: " + host.getHostname() + "<br>" + "MAC: " + host.getAgent().getMacAddress()
-                                        + "<br>" + "UUID: " + host.getHostId() + "<br>" + "IP: " + host.getAgent()
-                                                                                                       .getListIP();
+                        String intfName = "br-int";
+                        if ( host instanceof ContainerHost )
+                        {
+                            intfName = "eth0";
+                        }
+                        description = "Hostname: " + host.getHostname() + "<br>" + "MAC: " + host
+                                .getMacByInterfaceName( intfName ) + "<br>" + "UUID: " + host.getHostId() + "<br>"
+                                + "IP: " + host.getIpByInterfaceName( intfName );
                     }
                 }
 
@@ -223,13 +226,13 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
             // not registered containers
             //                for ( ResourceHostInfo resourceHostInfo : hostRegistry.getResourceHostsInfo() )
             //                {
-            //                    if ( resourceHostInfo.getContainers() != null )
+            //                    if ( resourceHostInfo.getContainerHosts() != null )
             //                    {
             //                        Item parentItem = container.getItem( resourceHostInfo.getId() );
             //                        if ( parentItem != null )
             //                        {
             //                            for ( ContainerHostInfo containerHostInfo : resourceHostInfo
-            // .getContainers() )
+            // .getContainerHosts() )
             //                            {
             //                                container.setChildrenAllowed( resourceHostInfo.getId(), true );
             //                                Item containerHostItem = container.getItem( containerHostInfo.getId

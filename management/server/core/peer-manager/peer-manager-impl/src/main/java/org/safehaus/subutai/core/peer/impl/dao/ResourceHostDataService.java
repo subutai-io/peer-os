@@ -7,7 +7,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.impl.model.ResourceHostEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,12 +113,13 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
 
 
     @Override
-    public void remove( final ResourceHostEntity item )
+    public void remove( final String id )
     {
         EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
+            ResourceHostEntity item = em.find( ResourceHostEntity.class, id );
             em.remove( item );
             em.getTransaction().commit();
         }
@@ -146,31 +146,6 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
         {
             em.getTransaction().begin();
             em.merge( item );
-            em.getTransaction().commit();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.toString(), e );
-            if ( em.getTransaction().isActive() )
-            {
-                em.getTransaction().rollback();
-            }
-        }
-        finally
-        {
-            em.close();
-        }
-    }
-
-
-    public void removeContainer( final ResourceHostEntity item, final ContainerHost containerHost )
-    {
-        EntityManager em = emf.createEntityManager();
-        try
-        {
-            em.getTransaction().begin();
-            em.merge( item );
-            item.removeContainerHost( containerHost );
             em.getTransaction().commit();
         }
         catch ( Exception e )

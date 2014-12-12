@@ -1,8 +1,11 @@
 package org.safehaus.subutai.plugin.hadoop.impl;
 
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.UUID;
+
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -11,11 +14,11 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildExcep
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.UUID;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 
 /**
@@ -23,6 +26,7 @@ import java.util.UUID;
  */
 public class HadoopSetupStrategy implements ClusterSetupStrategy
 {
+    private static final Logger LOG = LoggerFactory.getLogger( HadoopSetupStrategy.class.getName() );
 
     private Environment environment;
     private HadoopImpl hadoopManager;
@@ -30,20 +34,21 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     private HadoopClusterConfig hadoopClusterConfig;
 
 
-//    public HadoopSetupStrategy( TrackerOperation po, HadoopImpl hadoopManager, HadoopClusterConfig hadoopClusterConfig )
-//    {
-//        Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop cluster config is null" );
-//        Preconditions.checkNotNull( po, "Product operation tracker is null" );
-//        Preconditions.checkNotNull( hadoopManager, "Hadoop manager is null" );
-//
-//        this.hadoopManager = hadoopManager;
-//        this.trackerOperation = po;
-//        this.hadoopClusterConfig = hadoopClusterConfig;
-//    }
+    //    public HadoopSetupStrategy( TrackerOperation po, HadoopImpl hadoopManager, HadoopClusterConfig
+    // hadoopClusterConfig )
+    //    {
+    //        Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop cluster config is null" );
+    //        Preconditions.checkNotNull( po, "Product operation tracker is null" );
+    //        Preconditions.checkNotNull( hadoopManager, "Hadoop manager is null" );
+    //
+    //        this.hadoopManager = hadoopManager;
+    //        this.trackerOperation = po;
+    //        this.hadoopClusterConfig = hadoopClusterConfig;
+    //    }
 
 
-    public HadoopSetupStrategy( Environment environment, HadoopClusterConfig hadoopClusterConfig,
-                                TrackerOperation po, HadoopImpl hadoopManager )
+    public HadoopSetupStrategy( Environment environment, HadoopClusterConfig hadoopClusterConfig, TrackerOperation po,
+                                HadoopImpl hadoopManager )
     {
         Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop cluster config is null" );
         Preconditions.checkNotNull( environment, "Environment is null" );
@@ -91,8 +96,8 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
 
             try
             {
-                new ClusterConfiguration( trackerOperation, hadoopManager ).configureCluster( hadoopClusterConfig,
-                        environment );
+                new ClusterConfiguration( trackerOperation, hadoopManager )
+                        .configureCluster( hadoopClusterConfig, environment );
             }
             catch ( ClusterConfigurationException e )
             {
@@ -101,7 +106,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
         }
         catch ( EnvironmentBuildException e )
         {
-            e.printStackTrace();
+            LOG.error( "Error setting up Hadoop cluster", e );
         }
         return hadoopClusterConfig;
     }
@@ -111,11 +116,11 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     {
         Set<UUID> masterNodes = new HashSet<>();
         int masterCount = 0;
-        for ( ContainerHost containerHost : this.environment.getContainers() )
+        for ( ContainerHost containerHost : this.environment.getContainerHosts() )
         {
             if ( masterCount < HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY )
             {
-                masterNodes.add( containerHost.getAgent().getUuid() );
+                masterNodes.add( containerHost.getId() );
                 masterCount++;
             }
         }
@@ -136,11 +141,11 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     protected void setSlaveNodes() throws ClusterSetupException
     {
         Set<UUID> slaveNodes = new HashSet<>();
-        for ( ContainerHost containerHost : environment.getContainers() )
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
         {
-            if ( !hadoopClusterConfig.getAllMasterNodes().contains( containerHost.getAgent().getUuid() ) )
+            if ( !hadoopClusterConfig.getAllMasterNodes().contains( containerHost.getId() ) )
             {
-                slaveNodes.add( containerHost.getAgent().getUuid() );
+                slaveNodes.add( containerHost.getId() );
             }
         }
         if ( slaveNodes.isEmpty() )

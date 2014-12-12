@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import javax.sql.DataSource;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -211,6 +212,7 @@ public class MessengerImplTest
     }
 
 
+    @Ignore
     @Test
     public void testProcessMessage() throws Exception
     {

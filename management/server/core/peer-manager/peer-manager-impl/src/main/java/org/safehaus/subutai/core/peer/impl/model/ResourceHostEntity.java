@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
@@ -47,7 +46,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 {
     private static final String CONTAINER_DOES_NOT_EXISTS = "Container \"%s\" does NOT exist. Aborting ...";
     private static final String CONTAINER_DESTROYED = "Destruction of \"%s\" completed successfully";
-    private static final String TEMPLATE_EXISTS = "Container \"%s\" exists. Aborting ...";
+    private static final String TEMPLATE_EXISTS = "Template \"%s\" seems already installed, please destroy first";
 
     @javax.persistence.Transient
     transient protected static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
@@ -63,7 +62,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @javax.persistence.Transient
     transient private ExecutorService cachedThredPoolService;
 
-    @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true,
+    @OneToMany( mappedBy = "parent", fetch = FetchType.EAGER,
             targetEntity = ContainerHostEntity.class )
     Set<ContainerHost> containersHosts = new HashSet();
 
@@ -546,14 +545,18 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             return;
         }
         // trying add repository
+        /* TODO
+           download each template except master in ancestry lineage if not installed already
+           install it using dpkg -i
+           then proceed
+          */
         updateRepository( p );
         importTemplate( p );
         if ( !isTemplateExist( p ) )
         {
             LOG.debug( String.format( "Could not prepare template %s on %s.", p.getTemplateName(), hostname ) );
             throw new ResourceHostException( "Prepare template exception.",
-                    String.format( "Could not prepare template %s on %s", p.getTemplateName(),
-                            getAgent().getHostname() ) );
+                    String.format( "Could not prepare template %s on %s", p.getTemplateName(), hostname ) );
         }
     }
 
@@ -571,7 +574,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
             else
             {
-                LOG.debug(
+                LOG.warn(
                         String.format( "Template %s does not exists on %s.", template.getTemplateName(), hostname ) );
                 return false;
             }
@@ -598,17 +601,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
             else
             {
-                if ( CommandUtil.isStdOutContains( commandResult,
-                        String.format( TEMPLATE_EXISTS, template.getTemplateName() ) ) )
-                {
-                    return;
-                }
-                else
-                {
-                    LOG.error( "Unexpected command result: " + commandResult );
-                    throw new ResourceHostException( "Unexpected command result on importing template.",
-                            commandResult.getStdOut() );
-                }
+                LOG.warn( "Template import failed. ", commandResult );
             }
         }
         catch ( CommandException ce )
@@ -631,15 +624,15 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 CommandResult commandResult = run( Command.ADD_SOURCE, template.getPeerId().toString() );
                 if ( !commandResult.hasSucceeded() )
                 {
-                    throw new ResourceHostException(
-                            String.format( "Could not add repository %s to %s.", template.getPeerId(), hostname ) );
+                    LOG.warn( String.format( "Could not add repository %s to %s.", template.getPeerId(), hostname ),
+                            commandResult );
                 }
                 LOG.debug( String.format( "Updating repository index on %s...", hostname ) );
                 commandResult = run( Command.APT_GET_UPDATE );
                 if ( !commandResult.hasSucceeded() )
                 {
-                    throw new ResourceHostException(
-                            String.format( "Could not update repository %s on %s.", template.getPeerId(), hostname ) );
+                    LOG.warn( String.format( "Could not update repository %s on %s.", template.getPeerId(), hostname ),
+                            commandResult );
                 }
             }
             catch ( CommandException ce )
@@ -876,7 +869,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     enum Command
     {
         LIST_TEMPLATES( "subutai list -t %s" ),
-        CLONE( "subutai clone %s %s", 90 ),
+        CLONE( "subutai clone %s %s", 1, true ),
         DESTROY( "subutai destroy %s" ),
         IMPORT( "subutai import %s" ),
         PROMOTE( "promote %s" ),

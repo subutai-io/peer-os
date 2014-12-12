@@ -78,7 +78,7 @@ public class HostInterface implements Interface, Serializable
     @Override
     public String getIp()
     {
-        return null;
+        return ip;
     }
 
 
@@ -91,7 +91,7 @@ public class HostInterface implements Interface, Serializable
     @Override
     public String getMac()
     {
-        return null;
+        return mac;
     }
 
 

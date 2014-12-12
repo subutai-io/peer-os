@@ -45,7 +45,7 @@ public interface EnvironmentManager
 
     boolean deleteBlueprint( UUID blueprintId );
 
-    void saveEnvironment( final Environment environment ) throws EnvironmentManagerException;
+    void saveEnvironment( final Environment environment );
 
     boolean saveBuildProcess( EnvironmentBuildProcess buildProgress ) throws EnvironmentManagerException;
 
@@ -65,8 +65,8 @@ public interface EnvironmentManager
 
     void createAdditionalContainers( UUID id, String ngJson, Peer peer ) throws EnvironmentBuildException;
 
-    public UUID addContainers( final UUID environmentId, final String template, PlacementStrategy strategy,
-                               String nodeGroupName, final Peer peer ) throws EnvironmentManagerException;
+    public UUID addContainer( final UUID environmentId, final String template, PlacementStrategy strategy,
+                              String nodeGroupName, final Peer peer ) throws EnvironmentManagerException;
 
     void removeContainer( UUID environmentId, UUID hostId ) throws EnvironmentManagerException;
 }
