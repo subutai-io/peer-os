@@ -13,6 +13,12 @@ public class PluginInfoImpl implements PluginInfo
     private String packageName;
     private String packageVersion;
 
+    public PluginInfoImpl ( String pluginName, String packageName, String packageVersion )
+    {
+        this.pluginName = pluginName;
+        this.packageName = packageName;
+        this.packageVersion = packageVersion;
+    }
 
     @Override
     public String getPackageName()

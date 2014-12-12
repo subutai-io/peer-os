@@ -17,7 +17,17 @@ public interface PluginManager
 
     public List<PluginInfo> getInstalledPlugins();
 
-    public List<String> getPluginNames();
+    public List<PluginInfo> getAvailablePlugins();
+
+    public List<String> getAvailablePluginNames();
+
+    public List<String> getAvaileblePluginVersions();
+
+    public List<String> getInstalledPluginVersions();
+
+    public List<String> getInstalledPluginNames();
 
     public String getPluginVersion( String pluginName );
+
+    public boolean isUpgradeAvailable( String pluginName);
 }

@@ -1,17 +1,21 @@
 package org.safehaus.subutai.wol.ui;
 
 
-import java.awt.Label;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.wol.api.PluginInfo;
 import org.safehaus.subutai.wol.api.PluginManager;
 
+import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Table;
 
@@ -22,10 +26,16 @@ import com.vaadin.ui.Table;
 public class PluginManagerComponent extends CustomComponent implements Disposable
 {
     protected static final String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
-    protected static final String LIST_PLUGINS_CAPTION = "List Plugins";
-    protected static final String UPGRADE_CAPTION = "Upgrade";
+    protected static final String MARKET_PLACE_BUTTON_CAPTION = "Market Place";
+    protected static final String LIST_INSTALLED_PLUGINS_BUTTON_CAPTION = "List Installed Plugins";
+    protected static final String LIST_AVAILABLE_PLUGINS_BUTTON_CAPTION = "List Available Plugins";
+    protected static final String SEARCH_BUTTON_CAPTION = "Search";
+    protected static final String INSTALL_BUTTON_CAPTION = "Install";
+    protected static final String REMOVE_BUTTON_CAPTION = "Remove";
+    protected static final String UPGRADE_BUTTON_CAPTION = "Upgrade";
     protected static final String PLUGIN_COLUMN_CAPTION = "Plugin";
     protected static final String VERSION_COLUMN_CAPTION = "Version";
+    protected static final String RATE_COLUMN_CAPTION = "Rate";
     protected static final String STYLE_NAME = "default";
     //Reindeer.TABLE_STRONG
     private GridLayout contentRoot;
@@ -65,43 +75,130 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         browser.setType(Embedded.TYPE_BROWSER);
         controlsContent.addComponent(browser);*/
 
-        getListPluginsButton( controlsContent );
+        getListInstalledPluginsButton( controlsContent );
+        getListAvailablePluginsButton( controlsContent );
+
 
         contentRoot.addComponent( controlsContent, 0, 0 );
+        contentRoot.addComponent( pluginsTable, 0, 1, 0, 9 );
+
+        setCompositionRoot( contentRoot );
+    }
+    private void addTableToContent()
+    {
         contentRoot.addComponent( pluginsTable, 0, 1, 0, 9 );
     }
 
 
-    private void getListPluginsButton( HorizontalLayout controlsContent )
+    private void getListInstalledPluginsButton( HorizontalLayout controlsContent )
     {
-        Button listPluginsBtn = new Button( LIST_PLUGINS_CAPTION );
-        listPluginsBtn.setId( "listPluginsBtn" );
-        listPluginsBtn.addStyleName( "default" );
+        Button listPluginsBtn = new Button( LIST_INSTALLED_PLUGINS_BUTTON_CAPTION );
+        listPluginsBtn.setId( "listInstalledPluginsBtn" );
+        listPluginsBtn.addStyleName( STYLE_NAME );
         listPluginsBtn.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                refreshPluginsInfo();
+                listInstalledPluginsClickHandler();
             }
         } );
 
         controlsContent.addComponent( listPluginsBtn );
     }
 
+    private void getListAvailablePluginsButton( HorizontalLayout controlsContent )
+    {
+        Button listAvailablePluginsBtn = new Button( LIST_AVAILABLE_PLUGINS_BUTTON_CAPTION );
+        listAvailablePluginsBtn.setId( "listAvailablePluginsBtn" );
+        listAvailablePluginsBtn.addStyleName( STYLE_NAME );
+        listAvailablePluginsBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                listInstalledPluginsClickHandler();
+            }
+        }  );
 
-    private void refreshPluginsInfo()
+        controlsContent.addComponent( listAvailablePluginsBtn );
+    }
+
+    private void getMarketPlaceButton( final HorizontalLayout controlsContent)
+    {
+        Button marketPlaceBtn = new Button( MARKET_PLACE_BUTTON_CAPTION );
+        marketPlaceBtn.setId( "marketPlaceBtn" );
+        marketPlaceBtn.addStyleName( STYLE_NAME );
+        marketPlaceBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                marketPlaceButtonClickListener( controlsContent );
+            }
+        } );
+        controlsContent.addComponent( marketPlaceBtn );
+
+    }
+
+    private void marketPlaceButtonClickListener( HorizontalLayout controlsContent )
+    {
+        URL url = null;
+        try
+        {
+            url = new URL("http://dev.vaadin.com/");
+        }
+        catch ( MalformedURLException e )
+        {
+            e.printStackTrace();
+        }
+        Embedded browser = new Embedded("", new ExternalResource(url));
+        controlsContent.addComponent(browser);
+    }
+
+
+    private void listInstalledPluginsClickHandler()
     {
         pluginsTable.removeAllItems();
+        boolean isUpgradeAvailable = false;
 
         for ( PluginInfo p : pluginManager.getInstalledPlugins() )
         {
             final Label version = new Label();
-            version.setText( p.getPackageVersion() );
-            final Button upgradeButton = new Button( UPGRADE_CAPTION );
+            version.setValue( p.getPackageVersion() );
+            final Button upgradeButton = new Button( UPGRADE_BUTTON_CAPTION );
+            final Button removeButton = new Button (REMOVE_BUTTON_CAPTION );
+            isUpgradeAvailable = pluginManager.isUpgradeAvailable( p.getPluginName() );
+            if( isUpgradeAvailable )
+            {
+               upgradeButton.setVisible( true );
+            }
+            else
+            {
+                upgradeButton.setVisible( false );
+            }
             final HorizontalLayout availableOperations = new HorizontalLayout();
-            addStyleName( upgradeButton, availableOperations );
-            addGivenComponents( availableOperations, upgradeButton );
+            addStyleName( upgradeButton, removeButton, availableOperations );
+            addGivenComponents( availableOperations, upgradeButton, removeButton );
+
+            pluginsTable.addItem( new Object[] {
+                    p.getPluginName(), version, availableOperations
+            }, null );
+        }
+    }
+
+    private void listAvailablePluginsClickHandler()
+    {
+        pluginsTable.removeAllItems();
+
+        for( PluginInfo p : pluginManager.getAvailablePlugins() )
+        {
+            final Label version = new Label();
+            version.setValue( p.getPackageVersion() );
+            final Button installButton = new Button( INSTALL_BUTTON_CAPTION );
+            final HorizontalLayout availableOperations = new HorizontalLayout();
+            addStyleName( installButton, availableOperations );
+            addGivenComponents( availableOperations, installButton );
 
             pluginsTable.addItem( new Object[] {
                     p.getPluginName(), version, availableOperations
@@ -133,8 +230,8 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         final Table table = new Table( caption );
         table.setStyleName( "Reindeer.TABLE_STRONG" );
         table.addContainerProperty( PLUGIN_COLUMN_CAPTION, String.class, null );
-        table.addContainerProperty( VERSION_COLUMN_CAPTION, String.class, null );
-        table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( VERSION_COLUMN_CAPTION, Label.class, null );
+        table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
         table.setSizeFull();
         table.setPageLength( 20 );
         table.setSelectable( false );

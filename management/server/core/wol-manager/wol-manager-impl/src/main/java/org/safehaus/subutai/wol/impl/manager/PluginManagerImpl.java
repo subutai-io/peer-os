@@ -7,6 +7,9 @@ import java.util.List;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.wol.api.PluginInfo;
 import org.safehaus.subutai.wol.api.PluginManager;
+import org.safehaus.subutai.wol.api.PluginManagerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -15,12 +18,17 @@ import org.safehaus.subutai.wol.api.PluginManager;
 public class PluginManagerImpl implements PluginManager
 
 {
+    private static final Logger LOG = LoggerFactory.getLogger( PluginManagerImpl.class.getName() );
     private final PeerManager peerManager;
+    private Commands commands;
+    private ManagerHelper managerHelper;
 
 
     public PluginManagerImpl( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
+        commands = new Commands();
+        this.managerHelper = new ManagerHelper( peerManager );
     }
 
 
@@ -48,21 +56,61 @@ public class PluginManagerImpl implements PluginManager
     @Override
     public List<PluginInfo> getInstalledPlugins()
     {
-        PluginInfo hadoop = new PluginInfoImpl();
-        hadoop.setPackageName( "hadoop-subutai-plugin" );
-        hadoop.setPluginName( "hadoop" );
-        hadoop.setPackageVersion( "2.0.0" );
+        String result = null;
+        try
+        {
+            result = managerHelper.execute( commands.makeCheckCommand() );
 
 
-        List<PluginInfo> plugins = new ArrayList<>();
-        plugins.add( hadoop );
+        }
+        catch ( PluginManagerException e )
+        {
+            LOG.error( e.getMessage() );
+            e.printStackTrace();
+        }
 
+        List<PluginInfo> plugins = managerHelper.parsePluginNamesAndVersions( result );
         return plugins;
+
     }
 
 
     @Override
-    public List<String> getPluginNames()
+    public List<PluginInfo> getAvailablePlugins()
+    {
+        return null;
+    }
+
+
+    @Override
+    public List<String> getAvailablePluginNames()
+    {
+        return null;
+    }
+
+
+    @Override
+    public List<String> getAvaileblePluginVersions()
+    {
+        return null;
+    }
+
+
+    @Override
+    public List<String> getInstalledPluginVersions()
+    {
+
+        List<String> versions = new ArrayList<>();
+        for( PluginInfo p : getInstalledPlugins() )
+        {
+            versions.add( p.getPackageVersion() );
+        }
+        return versions;
+    }
+
+
+    @Override
+    public List<String> getInstalledPluginNames()
     {
         List<String> names = new ArrayList<>();
         for ( PluginInfo p : getInstalledPlugins() )
@@ -77,5 +125,12 @@ public class PluginManagerImpl implements PluginManager
     public String getPluginVersion( final String pluginName )
     {
         return null;
+    }
+
+
+    @Override
+    public boolean isUpgradeAvailable( final String pluginName )
+    {
+        return true;
     }
 }

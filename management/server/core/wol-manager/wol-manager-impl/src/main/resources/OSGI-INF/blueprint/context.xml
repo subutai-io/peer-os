@@ -18,9 +18,9 @@
 
   <service ref="pluginManager" interface="org.safehaus.subutai.wol.api.PluginManager" />
 
-  <bean id="pluginInfo" class="org.safehaus.subutai.wol.impl.manager.PluginInfoImpl" activation="eager">
-  </bean>
+  <!--<bean id="pluginInfo" class="org.safehaus.subutai.wol.impl.manager.PluginInfoImpl" activation="eager">-->
+  <!--</bean>-->
 
-  <service ref="pluginInfo" interface="org.safehaus.subutai.wol.api.PluginInfo" />
+  <!--<service ref="pluginInfo" interface="org.safehaus.subutai.wol.api.PluginInfo" />-->
 
 </blueprint>
