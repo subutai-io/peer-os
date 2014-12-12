@@ -88,18 +88,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
-    private static final String SOURCE_MANAGEMENT_HOST = "MANAGEMENT_HOST";
-    private static final String SOURCE_RESOURCE_HOST = "RESOURCE_HOST";
     private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60; // 5 min
     private static final int MAX_LXC_NAME = 15;
     private PeerManager peerManager;
     private TemplateRegistry templateRegistry;
-    //    private CommunicationManager communicationManager;
     private PeerDAO peerDAO;
     private ManagementHost managementHost;
     private Set<ResourceHost> resourceHosts = Sets.newHashSet();
     private CommandExecutor commandExecutor;
-    //    private AgentManager agentManager;
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private ConcurrentMap<String, AtomicInteger> sequences;
@@ -142,6 +138,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             managementHost = ( ManagementHost ) allManagementHostEntity.iterator().next();
             managementHost.addListener( this );
             managementHost.setPeer( this );
+            managementHost.init();
         }
 
         resourceHostDataService = new ResourceHostDataService( peerManager.getEntityManagerFactory() );
@@ -154,16 +151,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         {
             resourceHost.addListener( this );
             resourceHost.setPeer( this );
-            for ( ContainerHost containerHost : ( ( ResourceHostEntity ) resourceHost ).getContainerHosts() )
+            for ( ContainerHost containerHost : ( resourceHost ).getContainerHosts() )
             {
                 containerHost.setPeer( this );
             }
         }
 
-        for ( ResourceHost resourceHost : resourceHosts )
-        {
-            //            resourceHost.resetHeartbeat();
-        }
+
         hostRegistry.addHostListener( this );
         sequences = new ConcurrentHashMap<>();
     }
@@ -520,7 +514,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     {
         Host host = null;
 
-        if ( getId().equals( hostKey.getCreatorId() ) )
+        if ( getId().toString().equals( hostKey.getCreatorId() ) )
         {
             try
             {
@@ -783,11 +777,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 //                containerHost.setState( ContainerState.STOPPED );
             }
         }
-        catch ( ResourceHostException e )
-        {
-            //            containerHost.setState( ContainerState.UNKNOWN );
-            throw new PeerException( String.format( "Could not stop LXC container [%s]", e.toString() ) );
-        }
         catch ( Exception e )
         {
             throw new PeerException( String.format( "Could not stop LXC container [%s]", e.toString() ) );
@@ -827,24 +816,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
             if ( h instanceof ContainerHost )
             {
-                if ( ContainerHostState.RUNNING.equals( ( ( ContainerHost ) h ).getState() ) )
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return ContainerHostState.RUNNING.equals( ( ( ContainerHost ) h ).getState() );
             }
 
-            if ( isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME ) )
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return !isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME );
         }
         catch ( PeerException e )
         {
@@ -1131,8 +1106,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 managementHost.setPeer( this );
             }
             managementHost.updateHostInfo( resourceHostInfo );
-            //            peerDAO.saveInfo( SOURCE_MANAGEMENT_HOST, managementHost.getId().toString(), managementHost );
-            return;
         }
         else
         {
@@ -1174,8 +1147,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 host.setPeer( this );
             }
             host.updateHostInfo( resourceHostInfo );
-            //            peerDAO.saveInfo( SOURCE_RESOURCE_HOST, host.getId().toString(), host );
-            return;
         }
     }
 }
