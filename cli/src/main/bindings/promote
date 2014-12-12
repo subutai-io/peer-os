@@ -112,7 +112,7 @@ function promote {
   fi
 
   # check to make sure container is NOT registered as a template
-  if [ "`is_registered $lxc`" == "true" -a "x$SUBUTAI_OFFLINE_MODE" != "xtrue" ]; then
+  if [ "`is_registered $lxc`" == "true" ]; then
     msg_error "A template with name \"$lxc\" is registered. Aborting ..."
     unlock_container_read $lxc
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi

@@ -11,8 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.Criteria;
@@ -161,8 +159,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setQuota( @FormParam( "hostId" ) final String hostId,
-                              @FormParam( "quotaInfo" ) final String quotaInfo )
+    public Response setQuota( final String hostId, final String quotaInfo )
     {
         try
         {
@@ -179,8 +176,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getQuota( @QueryParam( "hostId" ) final String hostId,
-                              @QueryParam( "quotaType" ) final String quotaType )
+    public Response getQuota( final String hostId, final String quotaType )
     {
         try
         {

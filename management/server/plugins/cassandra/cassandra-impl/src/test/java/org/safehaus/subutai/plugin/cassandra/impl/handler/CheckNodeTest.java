@@ -1,6 +1,5 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +15,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -29,9 +29,9 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CheckServiceHandlerTest
+public class CheckNodeTest
 {
-    private CheckServiceHandler checkServiceHandler;
+    private NodeOperationHandler checkNodeHandler;
     private UUID uuid;
     @Mock
     CassandraImpl cassandraImpl;
@@ -54,39 +54,40 @@ public class CheckServiceHandlerTest
     @Mock
     CommandResult commandResult;
 
-
     @Before
-    public void setup()
+    public void setUp() throws Exception
     {
         uuid = new UUID(50,50);
         when(cassandraImpl.getTracker()).thenReturn(tracker);
         when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
 
-        checkServiceHandler = new CheckServiceHandler(cassandraImpl,"test",uuid);
+        checkNodeHandler = new NodeOperationHandler(cassandraImpl, "test", "test", NodeOperationType.STATUS);
     }
 
     @Test
-    public void testRun() throws CommandException
+    public void testRun() throws Exception
     {
         // mock run method
         when(cassandraImpl.getCluster("test")).thenReturn(cassandraClusterConfig);
         when(cassandraImpl.getEnvironmentManager()).thenReturn(environmentManager);
-        when(environmentManager.getEnvironmentByUUID(any(UUID.class))).thenReturn(environment);
+        when(environmentManager.getEnvironmentByUUID( any( UUID.class ) )).thenReturn(environment);
         when(environment.getContainerHosts()).thenReturn(mySet);
         when(mySet.iterator()).thenReturn(iterator);
-        when(iterator.hasNext()).thenReturn(true).thenReturn(false);
-        when(iterator.next()).thenReturn(containerHost);
+        when(iterator.hasNext()).thenReturn( true ).thenReturn(false);
+        when( iterator.next() ).thenReturn(containerHost);
         when(containerHost.getId()).thenReturn(uuid);
-        when(containerHost.execute(any(RequestBuilder.class))).thenReturn(commandResult);
+        when(containerHost.getHostname()).thenReturn( "test" );
+        when( containerHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when(commandResult.hasSucceeded()).thenReturn(true);
 
 
-        checkServiceHandler.run();
+        checkNodeHandler.run();
 
         assertNotNull(cassandraImpl.getCluster("test"));
         assertEquals(environment, environmentManager.getEnvironmentByUUID(any(UUID.class)));
         assertTrue(commandResult.hasSucceeded());
     }
+
 
     @Test
     public void testRunWhenCommandResultNotSucceeded() throws CommandException
@@ -94,16 +95,17 @@ public class CheckServiceHandlerTest
         // mock run method
         when(cassandraImpl.getCluster("test")).thenReturn(cassandraClusterConfig);
         when(cassandraImpl.getEnvironmentManager()).thenReturn(environmentManager);
-        when(environmentManager.getEnvironmentByUUID(any(UUID.class))).thenReturn(environment);
+        when(environmentManager.getEnvironmentByUUID( any( UUID.class ) )).thenReturn(environment);
         when(environment.getContainerHosts()).thenReturn(mySet);
         when(mySet.iterator()).thenReturn(iterator);
-        when(iterator.hasNext()).thenReturn(true).thenReturn(false);
+        when( iterator.hasNext() ).thenReturn(true).thenReturn(false);
         when(iterator.next()).thenReturn(containerHost);
         when(containerHost.getId()).thenReturn(uuid);
+        when(containerHost.getHostname()).thenReturn( "test" );
         when(containerHost.execute(any(RequestBuilder.class))).thenReturn(commandResult);
         when(commandResult.hasSucceeded()).thenReturn(false);
 
-        checkServiceHandler.run();
+        checkNodeHandler.run();
     }
 
     @Test
@@ -111,8 +113,7 @@ public class CheckServiceHandlerTest
     {
         when(cassandraImpl.getCluster("test")).thenReturn(null);
 
-        checkServiceHandler.run();
+        checkNodeHandler.run();
     }
-
 
 }

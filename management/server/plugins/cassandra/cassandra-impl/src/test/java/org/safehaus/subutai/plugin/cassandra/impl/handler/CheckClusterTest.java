@@ -16,22 +16,22 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
+
 @RunWith(MockitoJUnitRunner.class)
-public class StartClusterHandlerTest
+public class CheckClusterTest
 {
-    private StartClusterHandler startClusterHandler;
+    private ClusterOperationHandler checkClusterHandler;
     @Mock
     CassandraImpl cassandraImpl;
     @Mock
@@ -54,17 +54,7 @@ public class StartClusterHandlerTest
     CommandResult commandResult;
 
     @Before
-    public void setup()
-    {
-        when(cassandraImpl.getTracker()).thenReturn(tracker);
-        when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
-
-        startClusterHandler = new StartClusterHandler(cassandraImpl,"test");
-    }
-
-
-    @Test
-    public void testRun() throws CommandException
+    public void setup() throws CommandException
     {
         // mock run method
         when(cassandraImpl.getCluster("test")).thenReturn(cassandraClusterConfig);
@@ -76,13 +66,29 @@ public class StartClusterHandlerTest
         when(iterator.next()).thenReturn(containerHost);
         when(containerHost.execute(any(RequestBuilder.class))).thenReturn(commandResult);
         when(commandResult.hasSucceeded()).thenReturn(true);
+        when(cassandraClusterConfig.getClusterName()).thenReturn( "test" );
 
-        startClusterHandler.run();
+
+        when( cassandraImpl.getTracker() ).thenReturn(tracker);
+        when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
+
+        checkClusterHandler = new ClusterOperationHandler(cassandraImpl, cassandraClusterConfig, ClusterOperationType.STATUS_ALL );
+    }
+
+
+    @Test
+    public void testRun() throws CommandException
+    {
+        // mock run method
+        when(commandResult.getStdOut()).thenReturn("running...");
+
+        checkClusterHandler.run();
 
         // asserts
         assertNotNull(cassandraImpl.getCluster("test"));
-        assertEquals(environment, environmentManager.getEnvironmentByUUID(any(UUID.class)));
+        assertEquals(environment,environmentManager.getEnvironmentByUUID(any(UUID.class)));
         assertTrue(commandResult.hasSucceeded());
+        assertTrue(commandResult.getStdOut().contains("running..."));
 
     }
 
@@ -91,25 +97,25 @@ public class StartClusterHandlerTest
     {
         when(cassandraImpl.getCluster("test")).thenReturn(null);
 
-        startClusterHandler.run();
+        checkClusterHandler.run();
     }
 
     @Test
     public void testRunWhenCommandResultNotSucceeded() throws CommandException
     {
         // mock run method
-        when(cassandraImpl.getCluster("test")).thenReturn(cassandraClusterConfig);
-        when(cassandraImpl.getEnvironmentManager()).thenReturn(environmentManager);
-        when(environmentManager.getEnvironmentByUUID(any(UUID.class))).thenReturn(environment);
-        when(environment.getContainerHosts()).thenReturn(mySet);
-        when(mySet.iterator()).thenReturn(iterator);
-        when(iterator.hasNext()).thenReturn(true).thenReturn(false);
-        when(iterator.next()).thenReturn(containerHost);
-        when(containerHost.execute(any(RequestBuilder.class))).thenReturn(commandResult);
         when(commandResult.hasSucceeded()).thenReturn(false);
 
-        startClusterHandler.run();
+        checkClusterHandler.run();
     }
 
+    @Test
+    public void testRunWhenCommandResultDoesNotContainRunning() throws CommandException
+    {
+        // mock run method
+        when(commandResult.getStdOut()).thenReturn("test");
 
+        checkClusterHandler.run();
+
+    }
 }

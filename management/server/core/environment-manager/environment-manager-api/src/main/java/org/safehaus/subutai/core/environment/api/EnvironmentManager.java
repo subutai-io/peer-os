@@ -55,9 +55,7 @@ public interface EnvironmentManager
 
     void deleteBuildProcess( EnvironmentBuildProcess environmentBuildProcess );
 
-
     Environment getEnvironmentByUUID( UUID environmentId );
-
 
     UUID saveBuildProcess( TopologyData topologyData ) throws EnvironmentManagerException;
 
