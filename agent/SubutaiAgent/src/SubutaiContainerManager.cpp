@@ -34,7 +34,7 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger*
     try {
     	/*remove the containerIdList to get rid of the previous list and create a clean one*/
     	if( remove( "/etc/subutai-agent/containerIdList.txt" ) != 0 )
-    		_logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Cannot clean container id list."));
+    		_logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", "Cannot clean container id list."));
     	else
     		_logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Container id list is removed.."));
 
@@ -111,12 +111,12 @@ void SubutaiContainerManager::deleteContainerInfo(string hostname)
     string uuidFile = path + "containerIdList.txt";
 
     ifstream file(uuidFile.c_str());
-    ofstream temp("temp.txt"); // temp file for input of every student except the one user wants to delete
+    ofstream temp("temp.txt"); // put id-hostname matchings which wont be deleted in temp
 
 
     while(file >> hostname_file >> id)
     {
-        if(strcmp(hostname_file.c_str(),hostname.c_str())){ // if there are students with different name, input their data into temp file
+        if(strcmp(hostname_file.c_str(),hostname.c_str())){ // if the entry is different from hostname which will be deleted, put it in temp file.
             temp << hostname_file << " " << id << endl;
         }
     }
