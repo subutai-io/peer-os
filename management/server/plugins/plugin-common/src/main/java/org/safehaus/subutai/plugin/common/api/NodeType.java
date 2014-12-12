@@ -22,8 +22,5 @@ public enum NodeType
     ACCUMULO_TRACER,
     ACCUMULO_MONITOR,
     ACCUMULO_TABLET_SERVER,
-    ACCUMULO_LOGGER,
-
-    /** cassandra */
-    SEED
+    ACCUMULO_LOGGER
 }

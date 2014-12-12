@@ -14,16 +14,16 @@ public class NodeOperationTask extends AbstractNodeOperationTask implements Runn
 {
     private final String clusterName;
     private final ContainerHost containerHost;
-    private final Cassandra elasticsearch;
+    private final Cassandra cassandra;
     private NodeOperationType operationType;
 
 
-    public NodeOperationTask( Cassandra elasticsearch, Tracker tracker, String clusterName,
+    public NodeOperationTask( Cassandra cassandra, Tracker tracker, String clusterName,
                               ContainerHost containerHost, NodeOperationType operationType, CompleteEvent completeEvent,
                               UUID trackID )
     {
-        super( tracker, elasticsearch.getCluster( clusterName ), completeEvent, trackID, containerHost );
-        this.elasticsearch = elasticsearch;
+        super( tracker, cassandra.getCluster( clusterName ), completeEvent, trackID, containerHost );
+        this.cassandra = cassandra;
         this.clusterName = clusterName;
         this.containerHost = containerHost;
         this.operationType = operationType;
@@ -37,13 +37,13 @@ public class NodeOperationTask extends AbstractNodeOperationTask implements Runn
         switch ( operationType )
         {
             case START:
-                trackID = elasticsearch.startService( clusterName, containerHost.getHostname() );
+                trackID = cassandra.startService( clusterName, containerHost.getHostname() );
                 break;
             case STOP:
-                trackID = elasticsearch.stopService( clusterName, containerHost.getHostname() );
+                trackID = cassandra.stopService( clusterName, containerHost.getHostname() );
                 break;
             case STATUS:
-                trackID = elasticsearch.statusService( clusterName, containerHost.getHostname() );
+                trackID = cassandra.statusService( clusterName, containerHost.getHostname() );
                 break;
         }
         return trackID;

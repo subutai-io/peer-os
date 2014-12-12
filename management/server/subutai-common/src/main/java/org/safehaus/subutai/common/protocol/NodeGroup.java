@@ -106,18 +106,6 @@ public class NodeGroup
     }
 
 
-    public String toJSON(){
-        return "NodeGroup{" +
-                "\"name\" : \"" + name + '\"' +
-                ", \"numberOfNodes\" : " + numberOfNodes +
-                ", \"templateName=\" : \"" + templateName + '\"' +
-                ", \"placementStrategy\" : \"" + placementStrategy + '\"' +
-                ", \"linkHosts\" : " + linkHosts +
-                ", \"exchangeSshKeys\" : " + exchangeSshKeys  +
-                ", \"domainName\" : \"" + domainName + '\"' +
-                '}';
-    }
-
     @Override
     public String toString()
     {

@@ -130,7 +130,7 @@ public class NodeOperationHandler extends AbstractOperationHandler<CassandraImpl
         }
         else if ( result.getExitCode() == 768 )
         {
-            status = "elasticsearch is not running";
+            status = "cassandra is not running";
         }
         else
         {

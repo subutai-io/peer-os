@@ -213,7 +213,7 @@ public class ClusterOperationHandler extends AbstractOperationHandler<CassandraI
         catch ( EnvironmentBuildException | ClusterSetupException e )
         {
             trackerOperation.addLogFailed(
-                    String.format( "Failed to setup Elasticsearch cluster %s : %s", clusterName, e.getMessage() ) );
+                    String.format( "Failed to setup Cassandra cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }
 
