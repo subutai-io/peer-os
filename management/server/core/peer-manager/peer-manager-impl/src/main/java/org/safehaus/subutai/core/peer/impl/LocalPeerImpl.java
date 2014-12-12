@@ -27,6 +27,8 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
@@ -36,6 +38,7 @@ import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.CloneParam;
+import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.HostEvent;
@@ -47,6 +50,7 @@ import org.safehaus.subutai.core.peer.api.HostTask;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.Payload;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -105,6 +109,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     private HostRegistry hostRegistry;
     private Set<RequestListener> requestListeners;
     private List<HostTask> tasks = Lists.newCopyOnWriteArrayList();
+    private CommandUtil commandUtil;
+    private Commands commands;
 
 
     public LocalPeerImpl( PeerManager peerManager, TemplateRegistry templateRegistry, PeerDAO peerDao,
@@ -113,18 +119,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                           HostRegistry hostRegistry )
 
     {
-        //        this.agentManager = agentManager;
         this.strategyManager = strategyManager;
         this.peerManager = peerManager;
-        //        this.containerManager = containerManager;
         this.templateRegistry = templateRegistry;
         this.peerDAO = peerDao;
-        //        this.communicationManager = communicationManager;
         this.quotaManager = quotaManager;
         this.requestListeners = requestListeners;
-        //        this.managementHostDataService = managementHostDataService;
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
+        this.commandUtil = new CommandUtil();
+        this.commands = new Commands();
     }
 
 
@@ -332,6 +336,86 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         CloneTaskImpl cloneTask = new CloneTaskImpl( ( CloneTask ) task );
         cloneTask.run();
         return true;
+    }
+
+
+    /**
+     * Imports remote templates without registering them with template registry.
+     *
+     * After this call all imported templates can be cloned
+     *
+     * @param sourcePeer - peer from which to import templates
+     * @param templates - templates to import
+     */
+    protected void importTemplates( Peer sourcePeer, final Set<Template> templates ) throws PeerException
+    {
+        Preconditions.checkNotNull( sourcePeer );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( templates ) );
+
+        //import only remote templates, otherwise no-op
+        if ( !sourcePeer.isLocal() )
+        {
+            //import templates one by one
+            for ( Template template : templates )
+            {
+                //import each template's ancestry lineage
+                importTemplateLineage( sourcePeer, template );
+            }
+        }
+    }
+
+
+    /**
+     * Imports a template's whole ancestry lineage including the template itself from remote peer without registering
+     * with template registry.
+     *
+     * After this call an imported template can be cloned
+     *
+     * @param sourcePeer - peer from which to import ancestry lineage
+     * @param template - template whose ancestry lineage to import
+     */
+    private void importTemplateLineage( Peer sourcePeer, Template template ) throws PeerException
+    {
+        //construct template lineage
+        List<Template> templateLineage = Lists.newArrayList();
+
+        Template parentTemplate = template;
+        while ( parentTemplate != null && !Common.MASTER_TEMPLATE_NAME
+                .equalsIgnoreCase( parentTemplate.getTemplateName() ) )
+        {
+            //add parent template to the beginning of collection to maintain correct order of import
+            templateLineage.add( 0, parentTemplate );
+
+            //obtain parent template metadata from source peer
+            parentTemplate = sourcePeer.getTemplate( parentTemplate.getParentTemplateName() );
+        }
+
+
+        //import template lineage
+        for ( Template remoteTemplate : templateLineage )
+        {
+            try
+            {
+                //check if template is already imported
+                CommandResult result =
+                        managementHost.execute( commands.getCheckTemplateCommand( remoteTemplate.getTemplateName() ) );
+
+                //template is not imported -> import it
+                if ( result.getExitCode() == 1 )
+                {
+                    //download target template
+                    commandUtil.execute( commands.getDownloadTemplateCommand( sourcePeer.getPeerInfo().getIp(),
+                            sourcePeer.getPeerInfo().getPort(), remoteTemplate.getTemplateName() ), managementHost );
+                    //import target template
+                    commandUtil.execute( commands.getImportTemplateCommand( remoteTemplate.getTemplateName() ),
+                            managementHost );
+                }
+            }
+            catch ( CommandException e )
+            {
+                throw new PeerException( e );
+            }
+        }
     }
 
 

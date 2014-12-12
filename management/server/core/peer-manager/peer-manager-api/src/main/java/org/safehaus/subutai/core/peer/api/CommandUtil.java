@@ -205,7 +205,7 @@ public class CommandUtil
     }
 
 
-    public static boolean isStdOutContains( CommandResult commandResult, String text )
+    public static boolean stdOutContains( CommandResult commandResult, String text )
     {
         Preconditions.checkNotNull( commandResult, "CommandResult is null" );
         Preconditions.checkNotNull( text, "Text is null" );
