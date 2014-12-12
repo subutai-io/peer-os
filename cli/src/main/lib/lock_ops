@@ -95,7 +95,7 @@ function are_containers_readable {
 function are_containers_writable {
   if [[ -z "$2" ]]
   then
-    wipe_outstanding_write_locks
+    wipe_outstanding_locks
     (ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$1\b" \
      || ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$1\b") > /dev/null 2>&1
     if [ $? == 0 ]
@@ -105,7 +105,7 @@ function are_containers_writable {
       echo "false"
     fi
   else
-    wipe_outstanding_write_locks
+    wipe_outstanding_locks
     (ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$1\b" \
      || ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$2\b" \
      || ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$1\b" \
@@ -120,10 +120,15 @@ function are_containers_writable {
   fi
 }
 
+function wipe_outstanding_locks {
+  wipe_outstanding_read_locks
+  wipe_outstanding_write_locks
+}
+
 function wipe_outstanding_read_locks {
   for lockfile in $SUBUTAI_LOCK_PATH/read/*;
   do
-    if [ ! -f $f ]
+    if [ ! -f $lockfile ]
     then
       continue
     fi
@@ -138,7 +143,7 @@ function wipe_outstanding_read_locks {
 function wipe_outstanding_write_locks {
   for lockfile in $SUBUTAI_LOCK_PATH/write/*;
   do
-    if [ ! -f $f ]
+    if [ ! -f $lockfile ]
     then
       continue
     fi
