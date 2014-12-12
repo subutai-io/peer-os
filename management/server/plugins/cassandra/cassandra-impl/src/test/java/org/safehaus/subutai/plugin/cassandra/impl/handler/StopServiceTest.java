@@ -16,6 +16,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -26,13 +27,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 @RunWith(MockitoJUnitRunner.class)
-public class StopClusterHandlerTest
+public class StopServiceTest
 {
-    private StopClusterHandler stopClusterHandler;
+    private NodeOperationHandler stopServiceHandler;
+    private UUID uuid;
     @Mock
     CassandraImpl cassandraImpl;
     @Mock
@@ -57,10 +59,11 @@ public class StopClusterHandlerTest
     @Before
     public void setup()
     {
+        uuid = new UUID(50,50);
         when(cassandraImpl.getTracker()).thenReturn(tracker);
         when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
 
-        stopClusterHandler = new StopClusterHandler(cassandraImpl,"test");
+        stopServiceHandler = new NodeOperationHandler(cassandraImpl, "test", "test", NodeOperationType.STOP );
     }
 
     @Test
@@ -74,23 +77,16 @@ public class StopClusterHandlerTest
         when(mySet.iterator()).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(true).thenReturn(false);
         when(iterator.next()).thenReturn(containerHost);
+        when(containerHost.getId()).thenReturn(uuid);
+        when(containerHost.getHostname()).thenReturn( "test" );
         when(containerHost.execute(any(RequestBuilder.class))).thenReturn(commandResult);
         when(commandResult.hasSucceeded()).thenReturn(true);
 
-        stopClusterHandler.run();
+        stopServiceHandler.run();
 
-        // asserts
         assertNotNull(cassandraImpl.getCluster("test"));
         assertEquals(environment, environmentManager.getEnvironmentByUUID(any(UUID.class)));
         assertTrue(commandResult.hasSucceeded());
-    }
-
-    @Test
-    public void testRunWhenClusterDoesNotExist()
-    {
-        when(cassandraImpl.getCluster("test")).thenReturn(null);
-
-        stopClusterHandler.run();
     }
 
     @Test
@@ -104,10 +100,22 @@ public class StopClusterHandlerTest
         when(mySet.iterator()).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(true).thenReturn(false);
         when(iterator.next()).thenReturn(containerHost);
+        when(containerHost.getId()).thenReturn(uuid);
+        when(containerHost.getHostname()).thenReturn( "test" );
         when(containerHost.execute(any(RequestBuilder.class))).thenReturn(commandResult);
         when(commandResult.hasSucceeded()).thenReturn(false);
 
-        stopClusterHandler.run();
+        stopServiceHandler.run();
     }
+
+    @Test
+    public void testRunWhenClusterDoesNotExist()
+    {
+        when(cassandraImpl.getCluster("test")).thenReturn(null);
+
+        stopServiceHandler.run();
+    }
+
+
 
 }

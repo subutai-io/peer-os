@@ -55,9 +55,7 @@ public interface EnvironmentManager
 
     void deleteBuildProcess( EnvironmentBuildProcess environmentBuildProcess );
 
-
     Environment getEnvironmentByUUID( UUID environmentId );
-
 
     UUID saveBuildProcess( TopologyData topologyData ) throws EnvironmentManagerException;
 
@@ -65,8 +63,8 @@ public interface EnvironmentManager
 
     void createAdditionalContainers( UUID id, String ngJson, Peer peer ) throws EnvironmentBuildException;
 
-    public UUID addContainers( final UUID environmentId, final String template, PlacementStrategy strategy,
-                               String nodeGroupName, final Peer peer ) throws EnvironmentManagerException;
+    public UUID addContainer( final UUID environmentId, final String template, PlacementStrategy strategy,
+                              String nodeGroupName, final Peer peer ) throws EnvironmentManagerException;
 
     void removeContainer( UUID environmentId, UUID hostId ) throws EnvironmentManagerException;
 }

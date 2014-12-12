@@ -10,6 +10,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>plugin-common</artifactId>
+  <packaging>bundle</packaging>
+  <name>Subutai Plugin Common</name>
+  <description>Subutai Plugin Common</description>
 
   <dependencies>
     <dependency>
@@ -38,6 +41,21 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-jpa_2.0_spec</artifactId>
+      <version>1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <version>4.3.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.enterprise</artifactId>
+      <version>4.2.0</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -52,11 +70,45 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.plugin.common</Bundle-SymbolicName>
+            <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
             <Export-Package>
-              {local-packages};version=${project.version};-noimport:=true
+              {local-packages},org.safehaus.subutai.plugin.common.model.ClusterDataEntity,
+              org.safehaus.subutai.plugin.common.*;version=${project.version};-noimport:=true
             </Export-Package>
+            <Import-Package>*</Import-Package>
           </instructions>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <configuration>
+              <target>
+                <!--<path id="enhance.path.ref">-->
+                <!--<fileset dir="${project.build.outputDirectory}">-->
+                <!--<include name="Agent.class" />-->
+                <!--</fileset>-->
+                <!--</path>-->
+                <!--<pathconvert property="enhance.files" refid="enhance.path.ref" pathsep=" " />-->
+                <java classname="org.apache.openjpa.enhance.PCEnhancer">
+                  <arg line="-p persistence.xml" />
+                  <!--<arg line="${enhance.files}" />-->
+                  <classpath>
+                    <path refid="maven.dependency.classpath" />
+                    <path refid="maven.compile.classpath" />
+                  </classpath>
+                </java>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

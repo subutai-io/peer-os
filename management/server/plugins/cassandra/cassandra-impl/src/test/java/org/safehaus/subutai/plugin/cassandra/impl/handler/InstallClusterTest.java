@@ -16,6 +16,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -29,9 +30,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class InstallClusterHandlerTest
+public class InstallClusterTest
 {
-    private InstallClusterHandler installClusterHandler;
+    private ClusterOperationHandler installClusterHandler;
     private UUID uuid;
     @Mock
     CassandraImpl cassandraImpl;
@@ -57,18 +58,18 @@ public class InstallClusterHandlerTest
     ClusterSetupStrategy clusterSetupStrategy;
 
     @Before
-    public void setUp() 
+    public void setUp()
     {
         uuid = new UUID(50,50);
         when(cassandraImpl.getTracker()).thenReturn(tracker);
         when(tracker.createTrackerOperation(anyString(),anyString())).thenReturn(trackerOperation);
         when(cassandraClusterConfig.getClusterName()).thenReturn("test");
 
-        installClusterHandler = new InstallClusterHandler(cassandraImpl,cassandraClusterConfig);
+        installClusterHandler = new ClusterOperationHandler(cassandraImpl, cassandraClusterConfig, ClusterOperationType.INSTALL );
     }
 
     @Test
-    public void testGetTrackerId() 
+    public void testGetTrackerId()
     {
         when(trackerOperation.getId()).thenReturn(uuid);
 
@@ -91,8 +92,7 @@ public class InstallClusterHandlerTest
         installClusterHandler.run();
 
         // asserts
-        verify(trackerOperation).addLog("Building environment...");
-        assertEquals(environment,environmentManager.buildEnvironment(any(EnvironmentBlueprint.class)));
+        assertEquals( environment, environmentManager.buildEnvironment( any( EnvironmentBlueprint.class ) ) );
         assertEquals(clusterSetupStrategy, cassandraImpl.getClusterSetupStrategy(environment, cassandraClusterConfig,
                 trackerOperation));
 

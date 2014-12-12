@@ -53,7 +53,7 @@ public class CassandraSetupStrategyTest
 
 
     @Before
-    public void setUp() 
+    public void setUp()
     {
         uuid = new UUID(50,50);
 

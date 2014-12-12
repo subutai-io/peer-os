@@ -21,6 +21,11 @@ public interface RestService
 {
 
     @GET
+    @Path( "templates/{templateName}/download" )
+    @Produces( { MediaType.APPLICATION_OCTET_STREAM } )
+    public Response downloadTemplate( @PathParam( "templateName" ) String templateName );
+
+    @GET
     @Path( "templates/{templateName}" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getTemplate( @PathParam( "templateName" ) String templateName );

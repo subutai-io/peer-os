@@ -115,14 +115,10 @@ public class QuotaManagerImpl implements QuotaManager
             {
                 return new PeerQuotaInfo( new HddQuotaInfo( "rootfs", commandResult.getStdOut() ) );
             }
-            else if ( quotaType == QuotaType.QUOTA_HDD_VAR )
-            {
-                return new PeerQuotaInfo( new HddQuotaInfo( "var", commandResult.getStdOut() ) );
-            }
             else
             {
-                //TODO implement default case here
-                throw new QuotaException( "Don't check one enum and let it be default" );
+                //defaul QuotaType.QUOTA_HDD_VAR
+                return new PeerQuotaInfo( new HddQuotaInfo( "var", commandResult.getStdOut() ) );
             }
         }
         catch ( CommandException | HostNotFoundException e )
