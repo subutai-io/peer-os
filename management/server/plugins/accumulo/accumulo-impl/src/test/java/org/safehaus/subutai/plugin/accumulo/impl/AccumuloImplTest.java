@@ -92,7 +92,7 @@ public class AccumuloImplTest
 
         uuid = new UUID(50, 50);
         accumuloImpl = new AccumuloImpl(dataSource);
-        accumuloImpl.init();
+//        accumuloImpl.init();
         accumuloImpl.setExecutor(executor);
         accumuloImpl.setEnvironmentManager(environmentManager);
         accumuloImpl.setHadoopManager(hadoop);
@@ -183,7 +183,7 @@ public class AccumuloImplTest
     @Test
     public void testInit() throws Exception
     {
-        accumuloImpl.init();
+//        accumuloImpl.init();
     }
 
     @Test

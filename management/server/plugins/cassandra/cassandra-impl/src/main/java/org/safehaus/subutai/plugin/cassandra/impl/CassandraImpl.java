@@ -82,6 +82,10 @@ public class CassandraImpl implements Cassandra
         this.peerManager = peerManager;
     }
 
+    public void setPluginDAO(final PluginDAO pluginDAO)
+    {
+        this.pluginDAO = pluginDAO;
+    }
 
     public void init()
     {

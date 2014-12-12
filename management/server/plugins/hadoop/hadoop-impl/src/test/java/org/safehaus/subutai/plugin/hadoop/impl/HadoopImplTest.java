@@ -1,16 +1,7 @@
 package org.safehaus.subutai.plugin.hadoop.impl;
 
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-
-import javax.sql.DataSource;
-
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -21,6 +12,7 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 import javax.sql.DataSource;
@@ -35,7 +27,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-@Ignore
 public class HadoopImplTest
 {
     private HadoopImpl hadoopImpl;
@@ -64,6 +55,8 @@ public class HadoopImplTest
     ResultSetMetaData resultSetMetaData;
     @Mock
     ResultSet resultSet;
+    @Mock
+    PluginDAO pluginDAO;
 
 
     @Before
@@ -78,9 +71,10 @@ public class HadoopImplTest
 
 
         hadoopImpl = new HadoopImpl(dataSource);
-        hadoopImpl.init();
+//        hadoopImpl.init();
         hadoopImpl.setExecutor(executorService);
         hadoopImpl.setTracker(tracker);
+        hadoopImpl.setPluginDAO(pluginDAO);
         hadoopImpl.setEnvironmentManager(environmentManager);
         uuid = new UUID(50, 50);
 
@@ -97,7 +91,7 @@ public class HadoopImplTest
     @Test
     public void testInit() throws SQLException
     {
-        hadoopImpl.init();
+        //hadoopImpl.init();
     }
 
 

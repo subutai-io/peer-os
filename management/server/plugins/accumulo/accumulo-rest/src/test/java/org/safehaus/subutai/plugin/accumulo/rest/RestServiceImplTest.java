@@ -29,7 +29,10 @@ public class RestServiceImplTest
 {
     private RestServiceImpl restService;
     private String config2 =
-    "{\"clusterName\": \"my-accumulo-cluster\",\"instanceName\": \"instance-name\",\"password\": \"password\",\"masterNode\": \"master-node-hostname\",\"gcNode\": \"gc-node-hostname\",\"monitor\": \"monitor-node-hostname\",\"tracers\": [\"lxc-2\",\"lxc-1\"],\"slaves\": [\"lxc-3\",\"lxc-4\"]}";
+            "{\"clusterName\": \"my-accumulo-cluster\",\"instanceName\": \"instance-name\",\"password\": " +
+                    "\"password\",\"masterNode\": \"master-node-hostname\",\"gcNode\": \"gc-node-hostname\"," +
+                    "\"monitor\": \"monitor-node-hostname\",\"tracers\": [\"lxc-2\",\"lxc-1\"],\"slaves\": " +
+                    "[\"lxc-3\",\"lxc-4\"]}";
     @Mock
     Accumulo accumulo;
     @Mock
@@ -129,7 +132,7 @@ public class RestServiceImplTest
     public void testAddNode() throws Exception
     {
         when(accumulo.addNode(anyString(), anyString(), any(NodeType.class))).thenReturn(UUID.randomUUID());
-        Response response = restService.addNode("test","test","MASTER_NODE");
+        Response response = restService.addNode("test", "test", "MASTER_NODE");
 
         // assertions
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
@@ -139,7 +142,7 @@ public class RestServiceImplTest
     @Test
     public void testDestroyNode() throws Exception
     {
-        when(accumulo.destroyNode(anyString(), anyString(),any(NodeType.class))).thenReturn(UUID.randomUUID());
+        when(accumulo.destroyNode(anyString(), anyString(), any(NodeType.class))).thenReturn(UUID.randomUUID());
         Response response = restService.destroyNode("test", "test", "MASTER_NODE");
 
         // assertions

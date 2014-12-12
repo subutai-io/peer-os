@@ -60,12 +60,13 @@ public class RestServiceImplTest
     @Test
     public void testGetCluster() throws Exception
     {
-        when(hadoop.getCluster("test")).thenReturn(hadoopClusterConfig);
+        HadoopClusterConfig hadoopClusterConfig1 = new HadoopClusterConfig();
+        when(hadoop.getCluster("test")).thenReturn(hadoopClusterConfig1);
 
-//        Response response = restService.getCluster("test");
+        Response response = restService.getCluster("test");
 
         // assertions
-//        assertEquals(Response.Status.OK.getStatusCode(),response.getStatus());
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -183,7 +184,7 @@ public class RestServiceImplTest
         Response response = restService.addNode("test");
 
         // assertions
-        assertEquals(Response.Status.CREATED.getStatusCode(),response.getStatus());
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -191,10 +192,10 @@ public class RestServiceImplTest
     {
         when(hadoop.getCluster("test")).thenReturn(hadoopClusterConfig);
 
-        Response response = restService.statusDataNode("test","test");
+        Response response = restService.statusDataNode("test", "test");
 
         // assertions
-        assertEquals(Response.Status.OK.getStatusCode(),response.getStatus());
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -202,9 +203,9 @@ public class RestServiceImplTest
     {
         when(hadoop.getCluster("test")).thenReturn(hadoopClusterConfig);
 
-        Response response = restService.statusTaskTracker("test","test");
+        Response response = restService.statusTaskTracker("test", "test");
 
         // assertions
-        assertEquals(Response.Status.OK.getStatusCode(),response.getStatus());
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
 }
