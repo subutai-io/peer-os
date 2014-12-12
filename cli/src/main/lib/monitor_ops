@@ -132,11 +132,11 @@ function get_average_cpu_usage_between_samples {
 
   assert_metric $metric_type > /dev/null
 
-  local lxc_max_cpu_sample_count=$(echo $lxc_uptime_in_seconds/$update_sequence | bc)
+  local lxc_max_cpu_sample_count=$(echo $lxc_uptime_in_seconds/$update_sequence + 1 | bc)
 #  msg_debug "lxc_max_cpu_sample_count: $lxc_max_cpu_sample_count"
   # Check if lxc is restarted within the interval of the samples
-  if (( $(bc <<< "$lxc_max_cpu_sample_count <= $sampleCountToAverage") == 1 )); then
-    sampleCountToAverage=$(echo $lxc_max_cpu_sample_count - 1 | bc)
+  if (( $(bc <<< "$lxc_max_cpu_sample_count < $sampleCountToAverage") == 1 )); then
+    sampleCountToAverage=$lxc_max_cpu_sample_count
   fi
 #  msg_debug "sampleCountToAverage: $sampleCountToAverage"
   local interval_time_in_seconds=$(echo $(($sampleCountToAverage+1))*$update_sequence | bc)
