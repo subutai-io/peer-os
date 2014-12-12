@@ -123,6 +123,10 @@ function are_containers_writable {
 function wipe_outstanding_read_locks {
   for lockfile in $SUBUTAI_LOCK_PATH/read/*;
   do
+    if [ ! -f $f ]
+    then
+      continue
+    fi
     PROCESS_ID=`cat $lockfile`
     if [ $? -ne 0 ]
     then
@@ -138,11 +142,11 @@ function wipe_outstanding_read_locks {
 function wipe_outstanding_write_locks {
   for lockfile in $SUBUTAI_LOCK_PATH/write/*;
   do
-    PROCESS_ID=`cat $lockfile`
-    if [ $? -ne 0 ]
+    if [ ! -f $f ]
     then
-        continue
+      continue
     fi
+    PROCESS_ID=`cat $lockfile`
     if [ "`ps -p $PROCESS_ID -o comm=`" == "" ]
     then
       rm $lockfile
