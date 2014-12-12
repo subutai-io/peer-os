@@ -52,6 +52,21 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>plugin-common</artifactId>
         </dependency>
+      <dependency>
+        <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-jpa_2.0_spec</artifactId>
+        <version>1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.core</artifactId>
+        <version>4.3.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.enterprise</artifactId>
+        <version>4.2.0</version>
+      </dependency>
     </dependencies>
 
     <build>

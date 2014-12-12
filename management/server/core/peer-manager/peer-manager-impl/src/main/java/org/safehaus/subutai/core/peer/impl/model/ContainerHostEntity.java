@@ -17,7 +17,6 @@ import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostKey;
@@ -178,27 +177,15 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public void setQuota( QuotaInfo quota ) throws PeerException
     {
-        try
-        {
-            quotaManager.setQuota( this.getHostname(), quota );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
+        Peer peer = getPeer();
+        peer.setQuota( this, quota );
     }
 
 
     public PeerQuotaInfo getQuota( final QuotaType quotaType ) throws PeerException
     {
-        try
-        {
-            return quotaManager.getQuota( this.getHostname(), quotaType );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
+        Peer peer = getPeer();
+        return peer.getQuota( this, quotaType );
     }
 
 
