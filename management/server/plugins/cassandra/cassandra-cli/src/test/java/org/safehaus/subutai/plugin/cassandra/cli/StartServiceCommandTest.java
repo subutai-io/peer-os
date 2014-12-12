@@ -8,8 +8,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 
+import java.io.IOException;
+import java.util.UUID;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StartServiceCommandTest
@@ -24,24 +28,14 @@ public class StartServiceCommandTest
     public void setUp() 
     {
         startServiceCommand = new StartServiceCommand();
+        startServiceCommand.setTracker(tracker);
+        startServiceCommand.setCassandraManager(cassandra);
+
     }
 
     @Test
     public void testGetCassandraManager() 
     {
-        startServiceCommand.setCassandraManager(cassandra);
-        startServiceCommand.getCassandraManager();
-
-        // assertions
-        assertNotNull(startServiceCommand.getCassandraManager());
-        assertEquals(cassandra, startServiceCommand.getCassandraManager());
-
-    }
-
-    @Test
-    public void testSetCassandraManager() 
-    {
-        startServiceCommand.setCassandraManager(cassandra);
         startServiceCommand.getCassandraManager();
 
         // assertions
@@ -53,7 +47,6 @@ public class StartServiceCommandTest
     @Test
     public void testGetTracker() 
     {
-        startServiceCommand.setTracker(tracker);
         startServiceCommand.getTracker();
 
         // assertions
@@ -63,13 +56,11 @@ public class StartServiceCommandTest
     }
 
     @Test
-    public void testSetTracker() 
+    public void testDoExecute() throws IOException
     {
-        startServiceCommand.setTracker(tracker);
-        startServiceCommand.getTracker();
+        when(cassandra.startService(null, null)).thenReturn(UUID.randomUUID());
 
-        // assertions
-        assertNotNull(startServiceCommand.getTracker());
-        assertEquals(tracker, startServiceCommand.getTracker());
+        startServiceCommand.doExecute();
     }
+
 }

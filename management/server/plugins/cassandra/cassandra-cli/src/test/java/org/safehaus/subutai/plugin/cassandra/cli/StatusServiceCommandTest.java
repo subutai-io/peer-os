@@ -8,8 +8,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 
+import java.io.IOException;
+import java.util.UUID;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StatusServiceCommandTest
@@ -24,36 +28,24 @@ public class StatusServiceCommandTest
     public void setUp() 
     {
         statusServiceCommand = new StatusServiceCommand();
+        statusServiceCommand.setCassandraManager(cassandra);
+        statusServiceCommand.setTracker(tracker);
     }
 
     @Test
     public void testGetCassandraManager() 
     {
-        statusServiceCommand.setCassandraManager(cassandra);
         statusServiceCommand.getCassandraManager();
 
         // assertions
         assertNotNull(statusServiceCommand.getCassandraManager());
         assertEquals(cassandra, statusServiceCommand.getCassandraManager());
 
-    }
-
-    @Test
-    public void testSetCassandraManager() 
-    {
-        statusServiceCommand.setCassandraManager(cassandra);
-        statusServiceCommand.getCassandraManager();
-
-        // assertions
-        assertNotNull(statusServiceCommand.getCassandraManager());
-        assertEquals(cassandra, statusServiceCommand.getCassandraManager());
-        
     }
 
     @Test
     public void testGetTracker() 
     {
-        statusServiceCommand.setTracker(tracker);
         statusServiceCommand.getTracker();
 
         // assertions
@@ -63,14 +55,10 @@ public class StatusServiceCommandTest
     }
 
     @Test
-    public void testSetTracker() 
+    public void testDoExecute() throws IOException
     {
-        statusServiceCommand.setTracker(tracker);
-        statusServiceCommand.getTracker();
+        when(cassandra.statusService(null, null)).thenReturn(UUID.randomUUID());
 
-        // assertions
-        assertNotNull(statusServiceCommand.getTracker());
-        assertEquals(tracker, statusServiceCommand.getTracker());
-
+        statusServiceCommand.doExecute();
     }
 }

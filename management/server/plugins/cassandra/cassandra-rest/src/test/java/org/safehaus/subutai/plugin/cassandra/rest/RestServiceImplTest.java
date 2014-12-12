@@ -22,6 +22,12 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class RestServiceImplTest
 {
+    private String config2 =
+            "{\"clusterName\": \"my-accumulo-cluster\",\"instanceName\": \"instance-name\",\"password\": " +
+                    "\"password\",\"masterNode\": \"master-node-hostname\",\"gcNode\": \"gc-node-hostname\"," +
+                    "\"monitor\": \"monitor-node-hostname\",\"tracers\": [\"lxc-2\",\"lxc-1\"],\"slaves\": " +
+                    "[\"lxc-3\",\"lxc-4\"]}";
+
     private RestServiceImpl restService;
     @Mock
     Cassandra cassandra;
@@ -45,18 +51,9 @@ public class RestServiceImplTest
         Cassandra cas = restService.getCassandraManager();
 
         // asserts
-        assertEquals(cassandra,cas);
-    }
-
-    @Test
-    public void testSetCassandraManager() throws Exception
-    {
-        restService.setCassandraManager(cassandra);
-        Cassandra cas = restService.getCassandraManager();
-
-        // asserts
         assertEquals(cassandra, cas);
     }
+
 
     @Test
     public void testListClusters() throws Exception
@@ -72,16 +69,23 @@ public class RestServiceImplTest
     @Test
     public void testGetCluster() throws Exception
     {
-        when(cassandra.getCluster(anyString())).thenReturn(cassandraClusterConfig);
+        CassandraClusterConfig cassandraClusterConfig1 = new CassandraClusterConfig();
+        when(cassandra.getCluster(anyString())).thenReturn(cassandraClusterConfig1);
 
-//        restService.getCluster("test");
+        Response response = restService.getCluster("test");
+
+        // assertions
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
 
     @Test
     public void testCreateCluster() throws Exception
     {
         when(cassandra.installCluster(any(CassandraClusterConfig.class))).thenReturn(UUID.randomUUID());
-//        restService.createCluster("BEGIN_OBJECT");
+        Response response = restService.createCluster(config2);
+
+        // assertions
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -121,7 +125,7 @@ public class RestServiceImplTest
     public void testAddNode() throws Exception
     {
         when(cassandra.addNode(anyString(), anyString())).thenReturn(UUID.randomUUID());
-        Response response = restService.addNode("test","test");
+        Response response = restService.addNode("test", "test");
 
         // assertions
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
@@ -131,6 +135,23 @@ public class RestServiceImplTest
     @Test
     public void testCheckNode() throws Exception
     {
+        when(cassandra.checkNode(anyString(), anyString())).thenReturn(UUID.randomUUID());
 
+        Response response = restService.checkNode("test", "test");
+
+        // assertions
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
+
+    @Test
+    public void testDestroyNode() throws Exception
+    {
+        when(cassandra.destroyNode(anyString(), anyString())).thenReturn(UUID.randomUUID());
+
+        Response response = restService.destroyNode("test", "test");
+
+        // assertions
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    }
+
 }
