@@ -9,11 +9,14 @@
 
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <reference id="emf" interface="javax.persistence.EntityManagerFactory"
+             filter="(osgi.unit.name=metricUnit)" />
 
   <bean id="monitor" class="org.safehaus.subutai.core.metric.impl.MonitorImpl"
         scope="singleton" activation="eager" destroy-method="destroy">
     <argument ref="dataSource" />
     <argument ref="peerManager" />
+    <argument ref="emf" />
   </bean>
 
   <service ref="monitor" interface="org.safehaus.subutai.core.metric.api.Monitor" />

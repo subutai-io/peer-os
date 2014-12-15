@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.command.CommandException;
@@ -67,6 +68,27 @@ public class MonitorImpl implements Monitor
         try
         {
             this.monitorDao = new MonitorDao( dataSource );
+            this.peerManager = peerManager;
+            peerManager.addRequestListener( new RemoteAlertListener( this ) );
+            peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
+            peerManager.addRequestListener( new MonitoringActivationListener( this, peerManager ) );
+        }
+        catch ( DaoException e )
+        {
+            throw new MonitorException( e );
+        }
+    }
+
+
+    public MonitorImpl( final DataSource dataSource, PeerManager peerManager, EntityManagerFactory emf )
+            throws MonitorException
+    {
+        Preconditions.checkNotNull( dataSource, "Data source is null" );
+        Preconditions.checkNotNull( peerManager, "Peer manager is null" );
+        Preconditions.checkNotNull( emf, "EntityManagerFactory is null." );
+        try
+        {
+            this.monitorDao = new MonitorDao( emf );
             this.peerManager = peerManager;
             peerManager.addRequestListener( new RemoteAlertListener( this ) );
             peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );

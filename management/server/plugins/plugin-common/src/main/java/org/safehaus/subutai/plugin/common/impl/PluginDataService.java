@@ -62,7 +62,7 @@ public class PluginDataService
             source = source.toUpperCase();
             key = key.toUpperCase();
             em.getTransaction().begin();
-            ClusterDataEntity entity = new ClusterDataEntity( source, key, info.toString() );
+            ClusterDataEntity entity = new ClusterDataEntity( source, key, gson.toJson( info ) );
             em.merge( entity );
             em.getTransaction().commit();
         }
@@ -131,8 +131,11 @@ public class PluginDataService
             query.setParameter( "source", source );
             query.setParameter( "id", key );
 
-            String info = query.getSingleResult();
-            result = gson.fromJson( info, clazz );
+            List<String> infoList = query.getResultList();
+            if ( infoList.size() > 0 )
+            {
+                result = gson.fromJson( infoList.get( 0 ), clazz );
+            }
             em.getTransaction().commit();
         }
         catch ( NoResultException e )
