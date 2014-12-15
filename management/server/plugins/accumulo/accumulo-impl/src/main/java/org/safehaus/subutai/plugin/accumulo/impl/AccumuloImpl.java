@@ -1,19 +1,10 @@
 package org.safehaus.subutai.plugin.accumulo.impl;
 
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.sql.DataSource;
-
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+import org.safehaus.subutai.common.protocol.*;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
@@ -35,9 +26,12 @@ import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
+import javax.sql.DataSource;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class AccumuloImpl implements Accumulo
@@ -58,6 +52,10 @@ public class AccumuloImpl implements Accumulo
         this.dataSource = dataSource;
     }
 
+    public void setPluginDAO(final PluginDAO pluginDAO)
+    {
+        this.pluginDAO = pluginDAO;
+    }
 
     public PluginDAO getPluginDAO()
     {
