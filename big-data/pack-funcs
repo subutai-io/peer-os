@@ -54,6 +54,7 @@ checkPackageVersion() {
 generateDebianPackage() {
   updatePackageContent $1
   pushd $BASE
+  generateConfFiles $1
   generateMD5Sum $1
   dpkg-deb -z8 -Zgzip --build $packageName/
   cp $packageName".deb" $TARGET/
@@ -107,6 +108,29 @@ updatePackageContent() {
   if [ -f "$packageName/DEBIAN/md5sums" ]; then
     rm $packageName/DEBIAN/md5sums
   fi
+  popd
+}
+
+
+generateConfFiles() {
+  echo "Generating conf files"
+  local product_name=$1
+  initializeVariables $product_name
+  local confFile="$packageName/DEBIAN/conffile"
+  pushd $BASE
+  local FILES="$packageName/etc/$product_name/*"
+  echo "FILES: $FILES"
+  if [ ! "$(ls -A $package_name/etc/$product_name)" ]; then
+    echo "No configuration file found for $product_name. Not generating conffile.."
+    return
+  fi
+  > $confFile
+  for f in $FILES
+  do
+    local confFilePath=$(echo $f | awk -F"etc/" '{print $2}')
+    echo "Processing /etc/$confFilePath"
+    echo "/etc/$confFilePath" >> $confFile
+  done
   popd
 }
 
@@ -220,10 +244,12 @@ getTemplateVersion() {
   productName=$1
   productVersion=$2
 
-  CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin/debian/changelog"
+  CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin/debian/control"
 
-  local version_new=`cat $CONTROL | grep $productName-subutai-plugin | awk -F" " '{print $2}'`
-  version_new=`echo ${version_new//[()]/}`
+  local version_new=`cat $CONTROL | grep "Pre-Depends:" | awk -F"(" '{print $2}'| awk -F")" '{print $1}'`
+    version_new=$(echo $version_new | awk -F" " '{print $2}')
+    echo "Version= $version_new"
+
   productVersion=$version_new
 }
 
@@ -232,17 +258,18 @@ checkTemplatePackageVersion() {
   checkVersion $productName "template"
 }
 
+
 #check version of package based on type
 checkVersion() {
   mode=$2
   echo "MODE: $mode"
   if [ "$mode" = "template" ]; then
- 
-    CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin/debian/changelog"
-    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-subutai-template"
 
-    version_new=`cat $CONTROL | grep $productName-subutai-plugin | awk -F" " '{print $2}'`
-    version_new=`echo ${version_new//[()]/}`
+    CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin/debian/control"
+    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-subutai-template"
+  
+    version_new=`cat $CONTROL | grep "Pre-Depends:" | awk -F"(" '{print $2}'| awk -F")" '{print $1}'`
+    version_new=$(echo $version_new | awk -F" " '{print $2}')
     echo "Version= $version_new"
     
   elif [ "$mode" = "n2n" ]; then
@@ -375,6 +402,5 @@ setRepoOnJenkinsPeer() {
   echo " start reprepro for $dependencies"
   ssh $mgmt_ip_address "cd /repo/ksks; reprepro includedeb trusty $dependencies"
   echo "reprepro finished."
-  exit 0
 }
 

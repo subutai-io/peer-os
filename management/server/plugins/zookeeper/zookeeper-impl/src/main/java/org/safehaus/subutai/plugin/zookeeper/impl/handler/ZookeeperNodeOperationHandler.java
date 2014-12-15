@@ -7,11 +7,15 @@ import java.util.List;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.impl.ClusterConfiguration;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 
@@ -90,7 +94,7 @@ public class ZookeeperNodeOperationHandler extends AbstractPluginOperationHandle
                         }
                     }
                     else {
-                        trackerOperation.addLogFailed( "Cluster node deletion is not supported yet!" );
+                        destroyNode( containerHost );
                     }
 
                     break;
@@ -102,6 +106,34 @@ public class ZookeeperNodeOperationHandler extends AbstractPluginOperationHandle
             trackerOperation.addLogFailed( String.format( "Command failed, %s", e.getMessage() ) );
             e.printStackTrace();
 
+        }
+    }
+
+
+    public void destroyNode( ContainerHost host ){
+        EnvironmentManager environmentManager  = manager.getEnvironmentManager();
+        try
+        {
+            ZookeeperClusterConfig config = manager.getCluster( clusterName );
+            environmentManager.removeContainer( config.getEnvironmentId(), host.getId() );
+            config.getNodes().remove( host.getId() );
+            manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            ClusterConfiguration configurator = new ClusterConfiguration( manager, trackerOperation );
+            try
+            {
+                configurator.configureCluster( config, environmentManager.getEnvironmentByUUID( config
+                        .getEnvironmentId() ) );
+            }
+            catch ( ClusterConfigurationException e )
+            {
+                e.printStackTrace();
+            }
+            trackerOperation.addLog( String.format( "Cluster information is updated" ) );
+            trackerOperation.addLogDone( String.format( "Container %s is removed from cluster", host.getHostname() ) );
+        }
+        catch ( EnvironmentManagerException e )
+        {
+            e.printStackTrace();
         }
     }
 }
