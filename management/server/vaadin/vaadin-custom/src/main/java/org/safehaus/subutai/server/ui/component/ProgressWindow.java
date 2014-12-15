@@ -16,13 +16,13 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -47,7 +47,9 @@ public class ProgressWindow
         final VerticalLayout l = new VerticalLayout();
         window = new Window( "Operation progress", l );
         window.setImmediate( true );
-        window.setModal( true );
+        window.setModal( false );
+        window.setResizable( true );
+        window.center();
         window.setWidth( 650, Sizeable.Unit.PIXELS );
 
         this.trackID = trackID;
@@ -120,10 +122,9 @@ public class ProgressWindow
                     {
                         setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
 
-                        if ( po.getState() == OperationState.SUCCEEDED
-                                || po.getState() == OperationState.FAILED )
+                        if ( po.getState() == OperationState.SUCCEEDED || po.getState() == OperationState.FAILED )
                         {
-                            hideProgress();
+                            hideProgress( po );
                             break;
                         }
                     }
@@ -175,10 +176,12 @@ public class ProgressWindow
     }
 
 
-    private void hideProgress()
+    private void hideProgress( final TrackerOperationView to )
     {
         indicator.setVisible( false );
         ok.setEnabled( true );
+
+        Notification.show( to.getDescription(), to.getLog(), Notification.Type.WARNING_MESSAGE );
     }
 
 
