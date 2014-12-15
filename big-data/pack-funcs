@@ -256,17 +256,18 @@ checkTemplatePackageVersion() {
   checkVersion $productName "template"
 }
 
+
 #check version of package based on type
 checkVersion() {
   mode=$2
   echo "MODE: $mode"
   if [ "$mode" = "template" ]; then
- 
-    CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin/debian/changelog"
-    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-subutai-template"
 
-    version_new=`cat $CONTROL | grep $productName-subutai-plugin | awk -F" " '{print $2}'`
-    version_new=`echo ${version_new//[()]/}`
+    CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin/debian/control"
+    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-subutai-template"
+  
+    version_new=`cat $CONTROL | grep "Pre-Depends:" | awk -F"(" '{print $2}'| awk -F")" '{print $1}'`
+    version_new=$(echo $version_new | awk -F" " '{print $2}')
     echo "Version= $version_new"
     
   elif [ "$mode" = "n2n" ]; then
