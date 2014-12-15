@@ -8,9 +8,9 @@ package org.safehaus.subutai.plugin.hadoop.ui.wizard;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
-
+import java.util.Arrays;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Button;
@@ -31,6 +31,7 @@ public class ConfigurationStep extends VerticalLayout
 
 
     public ConfigurationStep( final Wizard wizard, HostRegistry hostRegistry )
+
     {
         setSizeFull();
         GridLayout content = new GridLayout( 2, 7 );
@@ -75,7 +76,6 @@ public class ConfigurationStep extends VerticalLayout
 
         ComboBox slaveNodesComboBox = new ComboBox( "Choose number of slave nodes", slaveNodeCountList );
         slaveNodesComboBox.setId( "HadoopSlavesNodeComboBox" );
-        //        slaveNodesComboBox.setMultiSelect(false);
         slaveNodesComboBox.setImmediate( true );
         slaveNodesComboBox.setTextInputAllowed( false );
         slaveNodesComboBox.setNullSelectionAllowed( false );
@@ -104,13 +104,13 @@ public class ConfigurationStep extends VerticalLayout
             }
         } );
 
-        slaveNodeCountList.remove( connected_fai_count - 1 );
-        slaveNodeCountList.add( connected_fai_count - 1, connected_fai_count + "" );
+//        slaveNodeCountList.remove( connected_fai_count - 1 );
+//        slaveNodeCountList.add( connected_fai_count - 1, connected_fai_count + "" );
+
         //configuration replication factor
         ComboBox replicationFactorComboBox =
-                new ComboBox( "Choose replication factor for slave nodes", slaveNodeCountList );
+                new ComboBox( "Choose replication factor for slave nodes", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
         replicationFactorComboBox.setId( "HadoopReplicationFactorComboBox" );
-        //        replicationFactorComboBox.setMultiSelect(false);
         replicationFactorComboBox.setImmediate( true );
         replicationFactorComboBox.setTextInputAllowed( false );
         replicationFactorComboBox.setNullSelectionAllowed( false );

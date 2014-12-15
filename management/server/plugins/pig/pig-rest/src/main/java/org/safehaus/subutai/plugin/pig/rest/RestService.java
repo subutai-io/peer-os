@@ -30,12 +30,10 @@ public class RestService
 
     private Pig pigManager;
 
-
     public void setPigManager( Pig pigManager )
     {
         this.pigManager = pigManager;
     }
-
 
     //create cluster
     @POST

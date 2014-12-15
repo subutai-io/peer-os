@@ -47,8 +47,6 @@ public class StartTask implements Runnable
     public void run()
     {
 
-        UUID trackID = mongo.startNode( clusterName, lxcHostname );
-
         long start = System.currentTimeMillis();
         NodeState state = NodeState.UNKNOWN;
         int waitTimeout = Timeouts.START_DATE_NODE_TIMEOUT_SEC;
@@ -59,7 +57,52 @@ public class StartTask implements Runnable
         else if ( nodeType == NodeType.ROUTER_NODE )
         {
             waitTimeout = Timeouts.START_ROUTER_TIMEOUT_SEC;
+
+            //            Set<MongoConfigNode> list = mongo.getCluster( clusterName ).getConfigServers();
+            //            for ( MongoConfigNode node : list ){
+            //                try
+            //                {
+            //                    node.start();
+            //                }
+            //                catch ( MongoException e )
+            //                {
+            //                    e.printStackTrace();
+            //                }
+            //
+            //                UUID track = mongo.checkNode( clusterName, node.getHostname() );
+            //
+            //                while ( !Thread.interrupted() )
+            //                {
+            //                    TrackerOperationView po = tracker.getTrackerOperation( MongoClusterConfig
+            // .PRODUCT_KEY, track );
+            //                    if ( po != null )
+            //                    {
+            //                        if ( po.getState() != OperationState.RUNNING )
+            //                        {
+            //                            if ( po.getState() == OperationState.SUCCEEDED )
+            //                            {
+            //                                state = NodeState.RUNNING;
+            //                            }
+            //                            break;
+            //                        }
+            //                    }
+            //                    try
+            //                    {
+            //                        Thread.sleep( 1000 );
+            //                    }
+            //                    catch ( InterruptedException ex )
+            //                    {
+            //                        break;
+            //                    }
+            //                    if ( System.currentTimeMillis() - start > ( waitTimeout + 3 ) * 1000 )
+            //                    {
+            //                        break;
+            //                    }
+            //                }
+            //            }
         }
+
+        UUID trackID = mongo.startNode( clusterName, lxcHostname );
 
         while ( !Thread.interrupted() )
         {

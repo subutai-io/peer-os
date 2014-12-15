@@ -30,7 +30,8 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
         try
         {
             CommandDef commandDef = Commands.getStartDataNodeCommandLine( port );
-            CommandResult commandResult = containerHost.execute( commandDef.build( true ) );
+            CommandResult commandResult = execute( commandDef.build( true ).withTimeout( 10 ) );
+
 
             if ( !commandResult.getStdOut().contains( "child process started successfully, parent exiting" ) )
             {
@@ -51,7 +52,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
         try
         {
             CommandDef commandDef = Commands.getSetReplicaSetNameCommandLine( replicaSetName );
-            CommandResult commandResult = containerHost.execute( commandDef.build() );
+            CommandResult commandResult = execute( commandDef.build().withTimeout( 90 ) );
             LOG.info( commandResult.toString() );
         }
         catch ( CommandException e )
@@ -67,7 +68,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
         CommandDef commandDef = Commands.getFindPrimaryNodeCommandLine( port );
         try
         {
-            CommandResult commandResult = containerHost.execute( commandDef.build() );
+            CommandResult commandResult = execute( commandDef.build().withTimeout( 90 ) );
             Pattern p = Pattern.compile( "primary\" : \"(.*)\"" );
             Matcher m = p.matcher( commandResult.getStdOut() );
             if ( m.find() )
@@ -96,7 +97,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
                 Commands.getRegisterSecondaryNodeWithPrimaryCommandLine( dataNode.getHostname(), port, domainName );
         try
         {
-            CommandResult commandResult = dataNode.execute( commandDef.build() );
+            CommandResult commandResult = execute( commandDef.build().withTimeout( 90 ) );
 
             if ( !commandResult.getStdOut().contains( "connecting to:" ) )
             {
@@ -112,34 +113,12 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
 
 
     @Override
-    public void unRegisterSecondaryNode( final MongoDataNode dataNode ) throws MongoException
-    {
-        CommandDef commandDef =
-                Commands.getUnregisterSecondaryNodeFromPrimaryCommandLine( port, dataNode.getHostname(), domainName );
-        try
-        {
-            CommandResult commandResult = execute( commandDef.build() );
-
-            if ( !commandResult.getStdOut().contains( "connecting to:" ) )
-            {
-                throw new CommandException( "Could not remove secondary node." );
-            }
-        }
-        catch ( CommandException e )
-        {
-            LOG.error( commandDef.getDescription(), e );
-            throw new MongoException( "Error on removing secondary node." );
-        }
-    }
-
-
-    @Override
     public void initiateReplicaSet() throws MongoException
     {
         CommandDef commandDef = Commands.getInitiateReplicaSetCommandLine( port );
         try
         {
-            CommandResult commandResult = execute( commandDef.build() );
+            CommandResult commandResult = execute( commandDef.build().withTimeout( 90 ) );
 
             if ( !commandResult.getStdOut().contains( "connecting to:" ) )
             {
@@ -150,6 +129,28 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
         {
             LOG.error( commandDef.getDescription(), e );
             throw new MongoException( "Initiate replica set error." );
+        }
+    }
+
+
+    @Override
+    public void unRegisterSecondaryNode( final MongoDataNode dataNode ) throws MongoException
+    {
+        CommandDef commandDef =
+                Commands.getUnregisterSecondaryNodeFromPrimaryCommandLine( port, dataNode.getHostname(), domainName );
+        try
+        {
+            CommandResult commandResult = execute( commandDef.build().withTimeout( 90 ) );
+
+            if ( !commandResult.getStdOut().contains( "connecting to:" ) )
+            {
+                throw new CommandException( "Could not remove secondary node." );
+            }
+        }
+        catch ( CommandException e )
+        {
+            LOG.error( commandDef.getDescription(), e );
+            throw new MongoException( "Error on removing secondary node." );
         }
     }
 }
