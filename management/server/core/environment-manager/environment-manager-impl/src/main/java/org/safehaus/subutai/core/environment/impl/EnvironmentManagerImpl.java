@@ -40,6 +40,7 @@ import org.safehaus.subutai.core.environment.impl.builder.Node2PeerBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.NodeGroup2PeerBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.NodeGroup2PeerGroupBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.ProcessBuilderException;
+import org.safehaus.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDataService;
 import org.safehaus.subutai.core.environment.impl.environment.BuildException;
@@ -86,6 +87,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private DataSource dataSource;
     private EntityManagerFactory entityManagerFactory;
     private EnvironmentDataService environmentDataService;
+    private EnvironmentContainerDataService environmentContainerDataService;
 
 
     public EnvironmentManagerImpl( final DataSource dataSource ) throws SQLException
@@ -155,6 +157,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         entityManagerFactory.createEntityManager().close();
         environmentDataService = new EnvironmentDataService( entityManagerFactory );
+        environmentContainerDataService = new EnvironmentContainerDataService( entityManagerFactory );
     }
 
 
@@ -214,6 +217,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             for ( ContainerHost containerHost : environment.getContainerHosts() )
             {
                 containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
+                containerHost.setDataService( environmentContainerDataService );
             }
         }
         return result;
@@ -227,6 +231,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         for ( ContainerHost containerHost : result.getContainerHosts() )
         {
             containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
+            containerHost.setDataService( environmentContainerDataService );
         }
         return result;
         //        return environmentDAO.getInfo( ENVIRONMENT, uuid, Environment.class );
@@ -434,6 +439,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         for ( ContainerHost containerHost : result.getContainerHosts() )
         {
             containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
+            containerHost.setDataService( environmentContainerDataService );
         }
         return result;
         //        return environmentDAO.getInfo( ENVIRONMENT, environmentId.toString(), Environment.class );
@@ -619,6 +625,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public PeerManager getPeerManager()
     {
         return peerManager;
+    }
+
+
+    public EnvironmentDataService getEnvironmentDataService()
+    {
+        return environmentDataService;
+    }
+
+
+    public EnvironmentContainerDataService getEnvironmentContainerDataService()
+    {
+        return environmentContainerDataService;
     }
 
 

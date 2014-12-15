@@ -154,6 +154,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             for ( ContainerHost containerHost : ( resourceHost ).getContainerHosts() )
             {
                 containerHost.setPeer( this );
+                containerHost.setDataService( containerHostDataService );
             }
         }
 
@@ -497,6 +498,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             for ( ContainerHost containerHost : containerHosts )
             {
                 containerHost.setPeer( this );
+                containerHost.setDataService( containerHostDataService );
                 result.add( new HostInfoModel( containerHost ) );
             }
         }
@@ -1129,6 +1131,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                         catch ( HostNotFoundException hnfe )
                         {
                             containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
+                            ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
                             containerHost.setPeer( this );
                             host.addContainerHost( ( ContainerHostEntity ) containerHost );
                             containerHostDataService.persist( ( ContainerHostEntity ) containerHost );

@@ -9,12 +9,14 @@ import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -60,12 +62,21 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     private QuotaManager quotaManager;
 
-    @ElementCollection( targetClass = String.class )
+    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();
+    @Transient
+    private DataService dataService;
 
 
     private ContainerHostEntity()
     {
+    }
+
+
+    @Override
+    public void setDataService( final DataService dataService )
+    {
+        this.dataService = dataService;
     }
 
 
@@ -150,6 +161,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
         this.tags.add( tag );
+        this.dataService.update( this );
     }
 
 
@@ -158,6 +170,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
         this.tags.remove( tag );
+        this.dataService.update( this );
     }
 
 

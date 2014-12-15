@@ -29,6 +29,7 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -75,7 +76,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     private String templateArch;
 
     @ElementCollection( targetClass = String.class )
-    private Set<String> tags = new HashSet<>(  );
+    private Set<String> tags = new HashSet<>();
 
     @ManyToOne( targetEntity = EnvironmentImpl.class )
     @JoinColumn( name = "environment_id" )
@@ -87,6 +88,8 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
     @Transient
     private Peer peer;
+    @Transient
+    private DataService dataService;
 
     @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = HostInterface
             .class, orphanRemoval = true )
@@ -113,6 +116,13 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
             hostInterface.setHost( this );
             this.interfaces.add( hostInterface );
         }
+    }
+
+
+    @Override
+    public void setDataService( final DataService dataService )
+    {
+        this.dataService = dataService;
     }
 
 
@@ -245,6 +255,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
         this.tags.add( tag );
+        dataService.update( this );
     }
 
 
@@ -253,6 +264,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
         this.tags.remove( tag );
+        dataService.update( this );
     }
 
 
