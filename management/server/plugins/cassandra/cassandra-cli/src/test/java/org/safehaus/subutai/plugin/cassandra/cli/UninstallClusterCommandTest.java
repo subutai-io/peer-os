@@ -8,8 +8,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 
+import java.util.UUID;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UninstallClusterCommandTest
@@ -24,22 +27,12 @@ public class UninstallClusterCommandTest
     public void setUp() 
     {
         uninstallClusterCommand = new UninstallClusterCommand();
+        uninstallClusterCommand.setCassandraManager(cassandra);
+        uninstallClusterCommand.setTracker(tracker);
     }
 
     @Test
     public void testGetTracker() 
-    {
-        uninstallClusterCommand.setTracker(tracker);
-        uninstallClusterCommand.getTracker();
-
-        // assertions
-        assertNotNull(uninstallClusterCommand.getTracker());
-        assertEquals(tracker, uninstallClusterCommand.getTracker());
-
-    }
-
-    @Test
-    public void testSetTracker() 
     {
         uninstallClusterCommand.setTracker(tracker);
         uninstallClusterCommand.getTracker();
@@ -63,14 +56,9 @@ public class UninstallClusterCommandTest
     }
 
     @Test
-    public void testSetCassandraManager() 
+    public void test()
     {
-        uninstallClusterCommand.setCassandraManager(cassandra);
-        uninstallClusterCommand.getCassandraManager();
-
-        // assertions
-        assertNotNull(uninstallClusterCommand.getCassandraManager());
-        assertEquals(cassandra, uninstallClusterCommand.getCassandraManager());
-
+        when(cassandra.uninstallCluster(null)).thenReturn(UUID.randomUUID());
+        uninstallClusterCommand.doExecute();
     }
 }

@@ -29,6 +29,8 @@ public class RestServiceImplTest
     @Before
     public void setUp() throws Exception
     {
+        when(elasticsearch.getCluster("test")).thenReturn(elasticsearchClusterConfiguration);
+
         restService = new RestServiceImpl();
         restService.setElasticsearch(elasticsearch);
     }
@@ -72,7 +74,6 @@ public class RestServiceImplTest
     @Test
     public void testCheckAllNodes() throws Exception
     {
-        when(elasticsearch.getCluster("test")).thenReturn(elasticsearchClusterConfiguration);
         when(elasticsearch.checkAllNodes(elasticsearchClusterConfiguration)).thenReturn(UUID.randomUUID());
 
         Response response = restService.checkAllNodes("test");
@@ -84,7 +85,6 @@ public class RestServiceImplTest
     @Test
     public void testStartAllNodes() throws Exception
     {
-        when(elasticsearch.getCluster(anyString())).thenReturn(elasticsearchClusterConfiguration);
         when(elasticsearch.startAllNodes(elasticsearchClusterConfiguration)).thenReturn(UUID.randomUUID());
 
         Response response = restService.startAllNodes("test");
@@ -96,7 +96,6 @@ public class RestServiceImplTest
     @Test
     public void testStopAllNodes() throws Exception
     {
-        when(elasticsearch.getCluster(anyString())).thenReturn(elasticsearchClusterConfiguration);
         when(elasticsearch.stopAllNodes(elasticsearchClusterConfiguration)).thenReturn(UUID.randomUUID());
 
         Response response = restService.stopAllNodes("test");

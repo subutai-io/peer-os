@@ -29,6 +29,7 @@ public class DescribeClusterCommandTest
         hBase = mock(HBase.class);
 
         describeClusterCommand = new DescribeClusterCommand();
+        describeClusterCommand.setHbaseManager(hBase);
     }
 
     @Test
@@ -40,17 +41,6 @@ public class DescribeClusterCommandTest
         // assertions
         assertNotNull(describeClusterCommand.getHbaseManager());
         assertEquals(hBase,describeClusterCommand.getHbaseManager());
-    }
-
-    @Test
-    public void testSetHbaseManager() throws Exception
-    {
-        describeClusterCommand.setHbaseManager(hBase);
-        describeClusterCommand.getHbaseManager();
-
-        // assertions
-        assertNotNull(describeClusterCommand.getHbaseManager());
-        assertEquals(hBase, describeClusterCommand.getHbaseManager());
     }
 
     @Test
@@ -84,8 +74,9 @@ public class DescribeClusterCommandTest
         verify(hBaseConfig).getBackupMasters();
     }
 
-    @Test (expected = NullPointerException.class)
-    public void testDoExecuteWhenHBaseConfigIsNull() {
+    @Test
+    public void testDoExecuteWhenHbaseConfigIsNull()
+    {
         when(hBase.getCluster(anyString())).thenReturn(null);
 
         describeClusterCommand.doExecute();

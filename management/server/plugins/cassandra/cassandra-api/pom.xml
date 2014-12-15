@@ -11,7 +11,7 @@
 
   <artifactId>cassandra-plugin-api</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Cassandra Api</name>
+  <name>Subutai Cassandra Plugin Api</name>
   <description>Subutai Cassandra Api</description>
 
   <dependencies>
@@ -23,6 +23,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>environment-manager-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>plugin-common</artifactId>
     </dependency>
   </dependencies>
 

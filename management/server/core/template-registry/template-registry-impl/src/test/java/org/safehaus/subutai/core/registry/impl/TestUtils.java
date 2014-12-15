@@ -1,12 +1,12 @@
 package org.safehaus.subutai.core.registry.impl;
 
 
+import org.safehaus.subutai.common.protocol.Template;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Properties;
-
-import org.safehaus.subutai.common.protocol.Template;
 
 
 /**
@@ -17,7 +17,7 @@ public class TestUtils
 
 
     public static final String CONFIG_FILE =
-            "lxc.include = /usr/share/lxc/config/ubuntu.common.conf\n" + "\n" + "# Container specific configuration\n"
+            "lxc.include = /usr/share/lxc/taconfig/ubuntu.common.conf\n" + "\n" + "# Container specific configuration\n"
                     + "lxc.rootfs = /var/lib/lxc/master/rootfs\n" + "lxc.mount = /var/lib/lxc/master/fstab\n"
                     + "lxc.utsname = master\n" + "lxc.arch = amd64\n" + "\n" + "# Network configuration\n"
                     + "lxc.network.type = veth\n" + "lxc.network.flags = up\n" + "lxc.network.link = br0\n"
