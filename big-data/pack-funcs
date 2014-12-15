@@ -400,6 +400,5 @@ setRepoOnJenkinsPeer() {
   echo " start reprepro for $dependencies"
   ssh $mgmt_ip_address "cd /repo/ksks; reprepro includedeb trusty $dependencies"
   echo "reprepro finished."
-  exit 0
 }
 
