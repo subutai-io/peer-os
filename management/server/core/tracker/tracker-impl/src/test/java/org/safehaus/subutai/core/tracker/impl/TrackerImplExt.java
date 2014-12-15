@@ -15,7 +15,7 @@ public class TrackerImplExt extends TrackerImpl
 {
     public TrackerImplExt( final DataSource dataSource, DbUtil dbUtil ) throws SQLException
     {
-        super( dataSource );
+        //        super( dataSource );
         this.dbUtil = dbUtil;
     }
 

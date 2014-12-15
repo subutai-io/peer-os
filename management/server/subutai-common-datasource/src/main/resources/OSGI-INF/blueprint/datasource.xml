@@ -5,7 +5,7 @@
     >
 
   <bean id="envManagerJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/root/db/environmentDb" />
+    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/environmentDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -17,7 +17,7 @@
   </service>
 
   <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/root/db/commonDb" />
+    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/commonDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -29,7 +29,7 @@
   </service>
 
   <bean id="peerManagerJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:/root/db/peerManagerDb" />
+    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/peerManagerDb" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -37,6 +37,43 @@
   <service interface="javax.sql.DataSource" ref="peerManagerJDBC">
     <service-properties>
       <entry key="osgi.jndi.service.name" value="openjpa/peerManagerDS" />
+    </service-properties>
+  </service>
+
+  <bean id="messengerJDBC" class="org.h2.jdbcx.JdbcDataSource">
+    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/messengerDb" />
+    <property name="user" value="sa" />
+    <property name="password" value="" />
+  </bean>
+
+  <service interface="javax.sql.DataSource" ref="messengerJDBC">
+    <service-properties>
+      <entry key="osgi.jndi.service.name" value="openjpa/messengerDS" />
+    </service-properties>
+  </service>
+
+  <bean id="trackerJDBC" class="org.h2.jdbcx.JdbcDataSource">
+    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/trackerDb" />
+    <property name="user" value="sa" />
+    <property name="password" value="" />
+  </bean>
+
+  <service interface="javax.sql.DataSource" ref="trackerJDBC">
+    <service-properties>
+      <entry key="osgi.jndi.service.name" value="openjpa/trackerDS" />
+    </service-properties>
+  </service>
+
+  <!--Plugins DataSource-->
+  <bean id="pluginsJDBC" class="org.h2.jdbcx.JdbcDataSource">
+    <property name="URL" value="jdbc:h2:/var/lib/subutai/db/plugins/pluginsDb" />
+    <property name="user" value="sa" />
+    <property name="password" value="" />
+  </bean>
+
+  <service interface="javax.sql.DataSource" ref="pluginsJDBC">
+    <service-properties>
+      <entry key="osgi.jndi.service.name" value="openjpa/pluginsDS" />
     </service-properties>
   </service>
 

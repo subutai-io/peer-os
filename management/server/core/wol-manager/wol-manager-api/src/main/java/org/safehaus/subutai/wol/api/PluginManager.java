@@ -2,6 +2,8 @@ package org.safehaus.subutai.wol.api;
 
 
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 
 /**
@@ -9,15 +11,15 @@ import java.util.List;
  */
 public interface PluginManager
 {
-    public void installPlugin( String packageName );
+    public UUID installPlugin( String packageName );
 
-    public void removePlugin( String packageName );
+    public UUID removePlugin( String packageName );
 
     public void upgradePlugin( String packageName );
 
-    public List<PluginInfo> getInstalledPlugins();
+    public Set<PluginInfo> getInstalledPlugins();
 
-    public List<PluginInfo> getAvailablePlugins();
+    public Set<PluginInfo> getAvailablePlugins();
 
     public List<String> getAvailablePluginNames();
 
@@ -30,4 +32,6 @@ public interface PluginManager
     public String getPluginVersion( String pluginName );
 
     public boolean isUpgradeAvailable( String pluginName);
+
+    public String getProductKey();
 }

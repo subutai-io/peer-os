@@ -11,10 +11,13 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -47,6 +50,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     private volatile ContainerHostState state = ContainerHostState.STOPPED;
     @Column( name = "node_group_name", nullable = false )
     private String nodeGroupName = "UNKNOWN";
+
+    private QuotaManager quotaManager;
     //    @Column( name = "parent_host_name", nullable = false )
     //    protected String parentHostname;
 
@@ -170,17 +175,17 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public String getQuota( final QuotaEnum quota ) throws PeerException
+    public void setQuota( QuotaInfo quota ) throws PeerException
     {
         Peer peer = getPeer();
-        return peer.getQuota( this, quota );
+        peer.setQuota( this, quota );
     }
 
 
-    public void setQuota( final QuotaEnum quota, final String value ) throws PeerException
+    public PeerQuotaInfo getQuota( final QuotaType quotaType ) throws PeerException
     {
         Peer peer = getPeer();
-        peer.setQuota( this, quota, value );
+        return peer.getQuota( this, quotaType );
     }
 
 

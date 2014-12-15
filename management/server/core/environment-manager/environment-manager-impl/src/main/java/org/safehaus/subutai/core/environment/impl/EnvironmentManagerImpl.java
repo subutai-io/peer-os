@@ -153,7 +153,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             LOG.error( e.getMessage(), e );
         }
-        entityManagerFactory.createEntityManager();
+        entityManagerFactory.createEntityManager().close();
         environmentDataService = new EnvironmentDataService( entityManagerFactory );
     }
 
@@ -315,7 +315,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void saveEnvironment( final Environment environment ) throws EnvironmentManagerException
+    public void saveEnvironment( final Environment environment )
     {
 
         if ( environmentDataService.find( environment.getId().toString() ) == null )
@@ -464,6 +464,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             factory = new NodeGroup2PeerGroupBuilder( this );
         }
+        else
+        {
+            throw new EnvironmentManagerException( "Unsupported topology data: " + topologyData );
+        }
 
         try
         {
@@ -558,8 +562,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public UUID addContainers( final UUID environmentId, final String template, PlacementStrategy strategy,
-                               String nodeGroupName, final Peer peer ) throws EnvironmentManagerException
+    public UUID addContainer( final UUID environmentId, final String template, PlacementStrategy strategy,
+                              String nodeGroupName, final Peer peer ) throws EnvironmentManagerException
     {
         EnvironmentBuildProcessFactory builder = new Node2PeerBuilder( this );
         try

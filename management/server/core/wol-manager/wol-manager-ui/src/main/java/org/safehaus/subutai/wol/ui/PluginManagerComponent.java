@@ -3,11 +3,20 @@ package org.safehaus.subutai.wol.ui;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.protocol.Disposable;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.wol.api.PluginInfo;
 import org.safehaus.subutai.wol.api.PluginManager;
 
+import com.google.common.collect.Sets;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -18,6 +27,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.Window;
 
 
 /**
@@ -42,12 +52,16 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     private Table pluginsTable;
     private PluginManagerPortalModule managerUI;
     private PluginManager pluginManager;
+    private final ExecutorService executorService;
+    private Tracker tracker;
 
 
-    public PluginManagerComponent( PluginManagerPortalModule managerUI, PluginManager pluginManager )
+    public PluginManagerComponent( final ExecutorService executorService, PluginManagerPortalModule managerUI, PluginManager pluginManager, Tracker tracker )
     {
         this.managerUI = managerUI;
         this.pluginManager = pluginManager;
+        this.executorService = executorService;
+        this.tracker = tracker;
 
         contentRoot = new GridLayout();
         contentRoot.setColumns( 1 );
@@ -117,7 +131,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                listInstalledPluginsClickHandler();
+                listAvailablePluginsClickHandler();
             }
         }  );
 
@@ -165,7 +179,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         for ( PluginInfo p : pluginManager.getInstalledPlugins() )
         {
             final Label version = new Label();
-            version.setValue( p.getPackageVersion() );
+            version.setValue( p.getVersion() );
             final Button upgradeButton = new Button( UPGRADE_BUTTON_CAPTION );
             final Button removeButton = new Button (REMOVE_BUTTON_CAPTION );
             isUpgradeAvailable = pluginManager.isUpgradeAvailable( p.getPluginName() );
@@ -184,8 +198,14 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
             pluginsTable.addItem( new Object[] {
                     p.getPluginName(), version, availableOperations
             }, null );
+            List<Object> itemIds = new ArrayList<>( pluginsTable.getItemIds() );
+            int count = itemIds.size();
+            Object itemId = itemIds.get( count-1 );
+
+            addClickListenerToRemoveButton( removeButton, p.getPluginName(), itemId );
         }
     }
+
 
     private void listAvailablePluginsClickHandler()
     {
@@ -194,7 +214,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         for( PluginInfo p : pluginManager.getAvailablePlugins() )
         {
             final Label version = new Label();
-            version.setValue( p.getPackageVersion() );
+            version.setValue( p.getVersion() );
             final Button installButton = new Button( INSTALL_BUTTON_CAPTION );
             final HorizontalLayout availableOperations = new HorizontalLayout();
             addStyleName( installButton, availableOperations );
@@ -203,7 +223,90 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
             pluginsTable.addItem( new Object[] {
                     p.getPluginName(), version, availableOperations
             }, null );
+
+            List<Object> itemIds = new ArrayList<>( pluginsTable.getItemIds() );
+            int count = itemIds.size();
+            Object itemId = itemIds.get( count-1 );
+
+            addClickListenerToInstallButton( installButton, p.getPluginName(), itemId );
         }
+
+    }
+
+
+    private void addClickListenerToInstallButton( Button installButton, final String pluginName, final Object itemId)
+    {
+        installButton.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                ConfirmationDialog alert = new ConfirmationDialog(
+                        String.format( "Do you want to remove the %s plugin?", pluginName ), "Yes",
+                        "No" );
+                alert.getOk().addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( Button.ClickEvent clickEvent )
+                    {
+
+                        UUID trackID = pluginManager.installPlugin( pluginName );
+
+                        ProgressWindow window =
+                                new ProgressWindow( executorService, tracker, trackID, pluginManager.getProductKey());
+                        window.getWindow().addCloseListener( new Window.CloseListener()
+                        {
+                            @Override
+                            public void windowClose( Window.CloseEvent closeEvent )
+                            {
+                                pluginsTable.removeItem( itemId );
+                            }
+                        } );
+                        contentRoot.getUI().addWindow( window.getWindow() );
+                    }
+                } );
+
+                contentRoot.getUI().addWindow( alert.getAlert() );
+            }
+        } );
+    }
+
+
+    private void addClickListenerToRemoveButton( Button removeButton, final String pluginName, final Object itemId )
+    {
+        removeButton.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                ConfirmationDialog alert = new ConfirmationDialog(
+                        String.format( "Do you want to remove the %s plugin?", pluginName ), "Yes",
+                        "No" );
+                alert.getOk().addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( Button.ClickEvent clickEvent )
+                    {
+
+                        UUID trackID = pluginManager.removePlugin( pluginName );
+
+                        ProgressWindow window =
+                                new ProgressWindow( executorService, tracker, trackID, pluginManager.getProductKey());
+                        window.getWindow().addCloseListener( new Window.CloseListener()
+                        {
+                            @Override
+                            public void windowClose( Window.CloseEvent closeEvent )
+                            {
+                                pluginsTable.removeItem( itemId );
+                            }
+                        } );
+                        contentRoot.getUI().addWindow( window.getWindow() );
+                    }
+                } );
+
+                contentRoot.getUI().addWindow( alert.getAlert() );
+            }
+        } );
     }
 
 

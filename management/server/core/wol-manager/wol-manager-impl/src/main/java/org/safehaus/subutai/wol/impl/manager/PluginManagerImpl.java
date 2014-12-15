@@ -3,13 +3,21 @@ package org.safehaus.subutai.wol.impl.manager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.wol.api.PluginInfo;
 import org.safehaus.subutai.wol.api.PluginManager;
 import org.safehaus.subutai.wol.api.PluginManagerException;
+import org.safehaus.subutai.wol.impl.manager.handler.OperationType;
+import org.safehaus.subutai.wol.impl.manager.handler.PluginOperationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.safehaus.subutai.core.tracker.api.Tracker;
 
 
 /**
@@ -22,6 +30,10 @@ public class PluginManagerImpl implements PluginManager
     private final PeerManager peerManager;
     private Commands commands;
     private ManagerHelper managerHelper;
+    protected Tracker tracker;
+    protected ExecutorService executor;
+
+    public static final String PRODUCT_KEY = "Plugin";
 
 
     public PluginManagerImpl( final PeerManager peerManager )
@@ -29,20 +41,40 @@ public class PluginManagerImpl implements PluginManager
         this.peerManager = peerManager;
         commands = new Commands();
         this.managerHelper = new ManagerHelper( peerManager );
+        executor = Executors.newCachedThreadPool();
+    }
+
+    public Tracker getTracker()
+    {
+        return tracker;
+    }
+
+    public Commands getCommands()
+    {
+        return commands;
+    }
+
+    public void setTracker( final Tracker tracker )
+    {
+        this.tracker = tracker;
     }
 
 
     @Override
-    public void installPlugin( final String packageName )
+    public UUID installPlugin( final String pluginName )
     {
-
+        PluginOperationHandler handler = new PluginOperationHandler( this, managerHelper, pluginName, OperationType.INSTALL );
+        executor.execute( handler );
+        return handler.getTrackerId();
     }
 
 
     @Override
-    public void removePlugin( final String packageName )
+    public UUID removePlugin( final String pluginName )
     {
-
+        PluginOperationHandler handler = new PluginOperationHandler( this, managerHelper, pluginName, OperationType.REMOVE );
+        executor.execute( handler );
+        return handler.getTrackerId();
     }
 
 
@@ -54,7 +86,7 @@ public class PluginManagerImpl implements PluginManager
 
 
     @Override
-    public List<PluginInfo> getInstalledPlugins()
+    public Set<PluginInfo> getInstalledPlugins()
     {
         String result = null;
         try
@@ -69,16 +101,16 @@ public class PluginManagerImpl implements PluginManager
             e.printStackTrace();
         }
 
-        List<PluginInfo> plugins = managerHelper.parsePluginNamesAndVersions( result );
+        Set<PluginInfo> plugins = managerHelper.parsePluginNamesAndVersions( result );
         return plugins;
 
     }
 
 
     @Override
-    public List<PluginInfo> getAvailablePlugins()
+    public Set<PluginInfo> getAvailablePlugins()
     {
-        return null;
+        return managerHelper.getDifferenceBetweenPlugins( getInstalledPlugins(), managerHelper.parseJson());
     }
 
 
@@ -103,7 +135,7 @@ public class PluginManagerImpl implements PluginManager
         List<String> versions = new ArrayList<>();
         for( PluginInfo p : getInstalledPlugins() )
         {
-            versions.add( p.getPackageVersion() );
+            versions.add( p.getVersion() );
         }
         return versions;
     }
@@ -132,5 +164,12 @@ public class PluginManagerImpl implements PluginManager
     public boolean isUpgradeAvailable( final String pluginName )
     {
         return true;
+    }
+
+
+    @Override
+    public String getProductKey()
+    {
+        return PRODUCT_KEY;
     }
 }

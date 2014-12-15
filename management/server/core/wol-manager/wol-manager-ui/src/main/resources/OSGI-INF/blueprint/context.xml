@@ -17,12 +17,16 @@
 
     <!--Plugin Manager UI-->
 
+  <reference id="tracker" availability="mandatory"
+             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+
     <reference id="pluginManager" availability="mandatory"
                interface="org.safehaus.subutai.wol.api.PluginManager" />
 
     <bean id="module2" scope="singleton" class="org.safehaus.subutai.wol.ui.PluginManagerPortalModule"
           init-method="init" destroy-method="destroy">
         <property name="pluginManager" ref="pluginManager" />
+        <property name="tracker" ref="tracker" />
     </bean>
 
     <service ref="module2" interface="org.safehaus.subutai.server.ui.api.PortalModule" />

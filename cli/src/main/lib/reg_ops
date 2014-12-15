@@ -9,7 +9,6 @@ function is_registered {
   local template=$1
   local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template
   if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
-    echo true
     return
   fi
 
@@ -90,8 +89,10 @@ function is_template_in_use {
   # response should contain quoted template name
   if [[ -n "$response" && "$response" == *true* ]]; then
     echo true
+    return
   else
     echo false
+    return
   fi
 }
 
@@ -110,6 +111,7 @@ function are_md5sums_equal {
 
   if [ "`is_registered $template`" == "false" ]; then
     echo "false"
+    return
   fi
   resp=`curl -s -XGET $url`
   md5sum_of_remote_package=$(echo $resp | awk '{split($0,a,"md5sum"); print a[2]}' | cut -d '"' -f 3)
@@ -117,8 +119,10 @@ function are_md5sums_equal {
   md5sum_of_local_package=$(echo `md5sum $debian_file` | awk '{split($0,a," "); print a[1]}')
   if [ "$md5sum_of_remote_package" == "$md5sum_of_local_package" ];then
     echo "true"
+    return
   else
     echo "false"
+    return
   fi
 }
 

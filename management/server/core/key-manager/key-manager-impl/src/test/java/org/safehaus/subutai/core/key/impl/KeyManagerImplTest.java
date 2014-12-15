@@ -110,9 +110,38 @@ public class KeyManagerImplTest
 
 
     @Test
-    public void testExportSshKey() throws Exception
+    public void testReadKey() throws Exception
     {
-        keyManager.exportSshKey( KEY_ID, PATH );
+        String output = keyManager.readKey( KEY_ID );
+
+        verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
+        assertEquals( OUTPUT, output );
+    }
+
+
+    @Test
+    public void testReadSshKey() throws Exception
+    {
+        String output = keyManager.readSshKey( KEY_ID );
+
+        verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
+        assertEquals( OUTPUT, output );
+    }
+
+
+    @Test
+    public void testDeleteKey() throws Exception
+    {
+        keyManager.deleteKey( KEY_ID );
+
+        verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
+    }
+
+
+    @Test
+    public void testRevokeKey() throws Exception
+    {
+        keyManager.revokeKey( KEY_ID );
 
         verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
     }
@@ -122,6 +151,15 @@ public class KeyManagerImplTest
     public void testSignFileWithKey() throws Exception
     {
         keyManager.signFileWithKey( KEY_ID, PATH );
+
+        verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
+    }
+
+
+    @Test
+    public void testSignKeyWithKey() throws Exception
+    {
+        keyManager.signKeyWithKey( KEY_ID, KEY_ID );
 
         verify( commandUtil ).execute( isA( RequestBuilder.class ), isA( Host.class ) );
     }

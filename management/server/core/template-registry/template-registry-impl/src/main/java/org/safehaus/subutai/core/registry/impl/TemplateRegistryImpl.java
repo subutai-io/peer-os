@@ -116,9 +116,10 @@ public class TemplateRegistryImpl implements TemplateRegistry
             String subutaiParent = properties.getProperty( "subutai.parent" );
             String subutaiGitBranch = properties.getProperty( "subutai.git.branch" );
             String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
+            String templateVersion = properties.getProperty( "SUBUTAI_VERSION" );
 
             Template template = new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch,
-                    subutaiGitUuid, packagesFile, md5sum );
+                    subutaiGitUuid, packagesFile, md5sum, templateVersion );
 
             //check if template with such name already exists
             if ( getTemplate( template.getTemplateName() ) != null )
@@ -314,7 +315,37 @@ public class TemplateRegistryImpl implements TemplateRegistry
         //retrieve template from storage
         try
         {
-            return templateService.getTemplateByName( templateName, lxcArch );
+            return templateService.getTemplate( templateName, lxcArch );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in getTemplate", e );
+            return null;
+        }
+    }
+
+
+    /**
+     * Returns template by name and lxc arch
+     *
+     * @param templateName - name of template
+     * @param lxcArch - lxc architecture
+     * @param md5sum - lxc md5sum
+     * @param templateVersion - lxc templateVersion
+     *
+     * @return {@code Template}
+     */
+    @Override
+    public Template getTemplate( final String templateName, String lxcArch, String md5sum, String templateVersion )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), TEMPLATE_IS_NULL_MSG );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), LXC_ARCH_IS_NULL_MSG );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( md5sum ), "Template md5sum cannot be null." );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateVersion ), "Template version cannot be null." );
+        //retrieve template from storage
+        try
+        {
+            return templateService.getTemplate( templateName, lxcArch, md5sum, templateVersion );
         }
         catch ( Exception e )
         {

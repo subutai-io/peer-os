@@ -28,13 +28,15 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.Interface;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.HostEvent;
@@ -176,15 +178,13 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     }
 
 
-    @Override
-    public String getQuota( final QuotaEnum memoryLimitInBytes ) throws PeerException
+    public PeerQuotaInfo getQuota( QuotaType quotaType ) throws PeerException
     {
         throw new UnsupportedOperationException( "Unsupported operation." );
     }
 
 
-    @Override
-    public void setQuota( final QuotaEnum memoryLimitInBytes, final String memoryLimit ) throws PeerException
+    public void setQuota( QuotaInfo quota ) throws PeerException
     {
         throw new UnsupportedOperationException( "Unsupported operation." );
     }

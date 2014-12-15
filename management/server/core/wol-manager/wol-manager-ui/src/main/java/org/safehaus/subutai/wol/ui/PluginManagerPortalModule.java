@@ -2,8 +2,11 @@ package org.safehaus.subutai.wol.ui;
 
 
 import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.wol.api.PluginManager;
 
@@ -18,6 +21,8 @@ public class PluginManagerPortalModule implements PortalModule
     public static final String MODULE_IMAGE = "plugs.png";
     public static final String MODULE_NAME = "Plugin";
     private PluginManager pluginManager;
+    private ExecutorService executor;
+    private Tracker tracker;
 
 
     public void setPluginManager( final PluginManager pluginManager )
@@ -26,15 +31,21 @@ public class PluginManagerPortalModule implements PortalModule
     }
 
 
+    public void setTracker( final Tracker tracker )
+    {
+        this.tracker = tracker;
+    }
+
+
     public void init()
     {
-
+        executor = Executors.newCachedThreadPool();
     }
 
 
     public void destroy()
     {
-
+        executor.shutdown();
     }
 
 
@@ -62,7 +73,7 @@ public class PluginManagerPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-        return new PluginManagerComponent( this, pluginManager );
+        return new PluginManagerComponent( executor, this, pluginManager, tracker );
     }
 
 

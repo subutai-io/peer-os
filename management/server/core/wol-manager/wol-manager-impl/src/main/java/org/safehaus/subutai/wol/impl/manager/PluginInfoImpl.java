@@ -9,49 +9,39 @@ import org.safehaus.subutai.wol.api.PluginInfo;
  */
 public class PluginInfoImpl implements PluginInfo
 {
+    private String type;
     private String pluginName;
-    private String packageName;
-    private String packageVersion;
+    private String version;
+    private String rating;
 
-    public PluginInfoImpl ( String pluginName, String packageName, String packageVersion )
+
+
+    /*public PluginInfoImpl ( String pluginName, String packageName, String packageVersion )
     {
         this.pluginName = pluginName;
         this.packageName = packageName;
         this.packageVersion = packageVersion;
-    }
-
-    @Override
-    public String getPackageName()
-    {
-        return packageName;
-    }
+    }*/
 
 
     @Override
-    public void setPackageName( final String packageName )
+    public String getVersion()
     {
-        this.packageName = packageName;
+        return version;
     }
 
 
     @Override
-    public String getPackageVersion()
+    public void setVersion( final String version )
     {
-        return packageVersion;
-    }
-
-
-    @Override
-    public void setPackageVersion( final String version )
-    {
-        this.packageVersion = version;
+        this.version = version;
     }
 
 
     @Override
     public String getPluginName()
     {
-        return null;
+        return pluginName;
     }
 
 
@@ -59,5 +49,33 @@ public class PluginInfoImpl implements PluginInfo
     public void setPluginName( final String pluginName )
     {
         this.pluginName = pluginName;
+    }
+
+
+    @Override
+    public String getType()
+    {
+        return type;
+    }
+
+
+    @Override
+    public void setType( final String type )
+    {
+        this.type = type;
+    }
+
+
+    @Override
+    public String getRating()
+    {
+        return rating;
+    }
+
+
+    @Override
+    public void setRating( final String rating )
+    {
+        this.rating = rating;
     }
 }

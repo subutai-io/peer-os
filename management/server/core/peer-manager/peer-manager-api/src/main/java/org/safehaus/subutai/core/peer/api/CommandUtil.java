@@ -46,9 +46,7 @@ public class CommandUtil
         Preconditions.checkNotNull( requestBuilder );
         Preconditions.checkNotNull( host );
 
-        CommandResult result;
-
-        result = host.execute( requestBuilder );
+        CommandResult result = host.execute( requestBuilder );
 
         if ( !result.hasSucceeded() )
         {
@@ -207,7 +205,7 @@ public class CommandUtil
     }
 
 
-    public static boolean isStdOutContains( CommandResult commandResult, String text )
+    public static boolean stdOutContains( CommandResult commandResult, String text )
     {
         Preconditions.checkNotNull( commandResult, "CommandResult is null" );
         Preconditions.checkNotNull( text, "Text is null" );

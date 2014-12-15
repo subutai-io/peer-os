@@ -77,7 +77,8 @@ public class KeyManagerImpl implements KeyManager
         String eol = System.getProperty( "line.separator" );
         List<String> lines = StringUtil.splitString( output, eol );
         int i = 0;
-        Pattern keyPattern = Pattern.compile( "\\s*(\\w+)\\s+(\\w+(?:\\s*:\\s*\\w+)*)\\s+(\\w+(?:\\s+\\w+)*)\\s+(.+@.+)" );
+        Pattern keyPattern =
+                Pattern.compile( "\\s*(\\w+)\\s+(\\w+(?:\\s*:\\s*\\w+)*)\\s+(\\w+(?:\\s+\\w+)*)\\s+(.+@.+)" );
         for ( String line : lines )
         {
             //skip headers
@@ -138,12 +139,20 @@ public class KeyManagerImpl implements KeyManager
 
 
     @Override
-    public void exportSshKey( final String keyId, final String exportPath ) throws KeyManagerException
+    public String readKey( final String keyId ) throws KeyManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( exportPath ), "Invalid export path" );
 
-        execute( commands.getExportSshKeyCommand( keyId, exportPath ) );
+        return execute( commands.getReadKeyCommand( keyId ) );
+    }
+
+
+    @Override
+    public String readSshKey( final String keyId ) throws KeyManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
+
+        return execute( commands.getReadSshKeyCommand( keyId ) );
     }
 
 
@@ -154,6 +163,16 @@ public class KeyManagerImpl implements KeyManager
         Preconditions.checkArgument( !Strings.isNullOrEmpty( filePath ), "Invalid file path" );
 
         execute( commands.getSignCommand( keyId, filePath ) );
+    }
+
+
+    @Override
+    public void signKeyWithKey( final String signerKeyId, final String signedKeyId ) throws KeyManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( signerKeyId ), "Invalid signer key id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( signedKeyId ), "Invalid signed key id" );
+
+        execute( commands.getSignKeyCommand( signerKeyId, signedKeyId ) );
     }
 
 
@@ -191,5 +210,23 @@ public class KeyManagerImpl implements KeyManager
         String output = execute( commands.getListKeysCommand() );
 
         return parseKeysFromOutput( output );
+    }
+
+
+    @Override
+    public void deleteKey( final String keyId ) throws KeyManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
+
+        execute( commands.getDeleteKeyCommand( keyId ) );
+    }
+
+
+    @Override
+    public void revokeKey( final String keyId ) throws KeyManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
+
+        execute( commands.getRevokeKeyCommand( keyId ) );
     }
 }

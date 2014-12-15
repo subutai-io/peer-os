@@ -22,16 +22,28 @@ public class Commands
     }
 
 
-    public RequestBuilder getExportSshKeyCommand( String keyId, String exportPath )
+    public RequestBuilder getReadKeyCommand( String keyId )
     {
-        return new RequestBuilder( KEY_MANAGER_BINDING )
-                .withCmdArgs( Lists.newArrayList( "export", keyId, exportPath ) );
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "export", keyId ) );
+    }
+
+
+    public RequestBuilder getReadSshKeyCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "export", "-ssh", keyId ) );
     }
 
 
     public RequestBuilder getSignCommand( String keyId, String filePath )
     {
         return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "sign", keyId, filePath ) );
+    }
+
+
+    public RequestBuilder getSignKeyCommand( String signerKeyId, String signedKeyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING )
+                .withCmdArgs( Lists.newArrayList( "sign_key", signerKeyId, signedKeyId ) );
     }
 
 
@@ -50,5 +62,17 @@ public class Commands
     public RequestBuilder getListKeysCommand()
     {
         return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "list" ) );
+    }
+
+
+    public RequestBuilder getDeleteKeyCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "delete", keyId ) );
+    }
+
+
+    public RequestBuilder getRevokeKeyCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "revoke", keyId ) );
     }
 }

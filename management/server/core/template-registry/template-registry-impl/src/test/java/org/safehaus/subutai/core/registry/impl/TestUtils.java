@@ -1,12 +1,12 @@
 package org.safehaus.subutai.core.registry.impl;
 
 
+import org.safehaus.subutai.common.protocol.Template;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Properties;
-
-import org.safehaus.subutai.common.protocol.Template;
 
 
 /**
@@ -17,12 +17,13 @@ public class TestUtils
 
 
     public static final String CONFIG_FILE =
-            "lxc.include = /usr/share/lxc/config/ubuntu.common.conf\n" + "\n" + "# Container specific configuration\n"
+            "lxc.include = /usr/share/lxc/taconfig/ubuntu.common.conf\n" + "\n" + "# Container specific configuration\n"
                     + "lxc.rootfs = /var/lib/lxc/master/rootfs\n" + "lxc.mount = /var/lib/lxc/master/fstab\n"
                     + "lxc.utsname = master\n" + "lxc.arch = amd64\n" + "\n" + "# Network configuration\n"
                     + "lxc.network.type = veth\n" + "lxc.network.flags = up\n" + "lxc.network.link = br0\n"
                     + "lxc.network.hwaddr = 00:16:3e:aa:bd:80\n" + "subutai.config.path = /etc\n"
                     + "lxc.hook.pre-start = /usr/bin/pre_start_hook\n" + "subutai.parent = master\n"
+                    + "SUBUTAI_VERSION = 2.3\n"
                     + "subutai.git.branch = master\n" + "subutai.git.uuid = 76cc7a05286c25889fb611661b63d45896cf13af\n"
                     + "lxc.mount.entry = /lxc/master-opt opt none bind,rw 0 0\n"
                     + "lxc.mount.entry = /lxc-data/master-home home none bind,rw 0 0\n"
@@ -35,7 +36,7 @@ public class TestUtils
                     + "\n" + "# Network configuration\n" + "lxc.network.type = veth\n" + "lxc.network.flags = up\n"
                     + "lxc.network.link = br0\n" + "lxc.network.hwaddr = 00:16:3e:82:6e:f0\n"
                     + "subutai.config.path = /etc\n" + "lxc.hook.pre-start = /usr/bin/pre_start_hook\n"
-                    + "subutai.parent = master\n" + "subutai.git.branch = cassandra\n"
+                    + "subutai.parent = master\n" + "subutai.git.branch = cassandra\n" + "SUBUTAI_VERSION = 2.3\n"
                     + "lxc.mount.entry = /lxc/cassandra-opt opt none bind,rw 0 0\n"
                     + "lxc.mount.entry = /lxc-data/cassandra-home home none bind,rw 0 0\n"
                     + "lxc.mount.entry = /lxc-data/cassandra-var var none bind,rw 0 0\n"
@@ -76,9 +77,10 @@ public class TestUtils
         String subutaiParent = properties.getProperty( "subutai.parent" );
         String subutaiGitBranch = properties.getProperty( "subutai.git.branch" );
         String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
+        String templateVersion = properties.getProperty( "SUBUTAI_VERSION" );
 
         return new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch, subutaiGitUuid,
-                packagesFile, md5sum );
+                packagesFile, md5sum, templateVersion );
     }
 
 

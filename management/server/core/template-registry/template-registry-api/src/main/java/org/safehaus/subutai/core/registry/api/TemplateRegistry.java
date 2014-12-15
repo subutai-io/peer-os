@@ -66,6 +66,19 @@ public interface TemplateRegistry
      */
     public Template getTemplate( String templateName, String lxcArch );
 
+
+    /**
+     * Returns template by name
+     *
+     * @param templateName - name of template
+     * @param lxcArch - lxc architecture
+     * @param md5sum - lxc md5sum
+     * @param templateVersion - lxc version
+     *
+     * @return - {@code Template}
+     */
+    public Template getTemplate( String templateName, String lxcArch, String md5sum, String templateVersion );
+
     /**
      * Returns templates belonging to this parent
      *

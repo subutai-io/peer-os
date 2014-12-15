@@ -6,15 +6,20 @@ package org.safehaus.subutai.wol.api;
  */
 public interface PluginInfo
 {
-    public String getPackageName();
+    public String getVersion();
 
-    public void setPackageName( String packageName );
-
-    public String getPackageVersion();
-
-    public void setPackageVersion( String version );
+    public void setVersion( String version );
 
     public String getPluginName();
 
     public void setPluginName( String pluginName );
+
+    public String getType();
+
+    public void setType( String type );
+
+    public String getRating();
+
+    public void setRating( String rating );
+
 }

@@ -20,12 +20,18 @@ public interface KeyManager
     public KeyInfo generateKey( String realName, String email ) throws KeyManagerException;
 
     /**
-     * Exports PGP key as SSH key. Resulting key file name format will be %keyId%.pub
+     * Returns PGP public key
      *
      * @param keyId - id of pgp key
-     * @param exportPath -  path to directory where exported ssh key will be placed
      */
-    public void exportSshKey( String keyId, String exportPath ) throws KeyManagerException;
+    public String readKey( String keyId ) throws KeyManagerException;
+
+    /**
+     * Returns PGP public key as SSH key
+     *
+     * @param keyId - id of pgp key
+     */
+    public String readSshKey( String keyId ) throws KeyManagerException;
 
 
     /**
@@ -35,6 +41,14 @@ public interface KeyManager
      * @param filePath - full path to file to be signed
      */
     public void signFileWithKey( String keyId, String filePath ) throws KeyManagerException;
+
+    /**
+     * Sign key with specified key
+     *
+     * @param signerKeyId - id of pgp key which is used to sign
+     * @param signedKeyId - id of pgp key which is to be signed
+     */
+    public void signKeyWithKey( String signerKeyId, String signedKeyId ) throws KeyManagerException;
 
     /**
      * Sends key to HUB
@@ -59,4 +73,20 @@ public interface KeyManager
      * @return - set of {@code KeyInfo}
      */
     public Set<KeyInfo> getKeys() throws KeyManagerException;
+
+
+    /**
+     * Deletes a key
+     *
+     * @param keyId - id of pgp key to delete
+     */
+    public void deleteKey( String keyId ) throws KeyManagerException;
+
+
+    /**
+     * Revokes a key
+     *
+     * @param keyId - id of pgp key to revoke
+     */
+    public void revokeKey( String keyId ) throws KeyManagerException;
 }

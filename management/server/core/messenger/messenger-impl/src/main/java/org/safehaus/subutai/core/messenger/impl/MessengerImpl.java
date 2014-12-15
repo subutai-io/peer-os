@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.exception.DaoException;
@@ -40,21 +42,37 @@ public class MessengerImpl implements Messenger, MessageProcessor
     private final PeerManager peerManager;
     protected MessengerDao messengerDao;
     protected MessageSender messageSender;
+    private EntityManagerFactory entityManagerFactory;
 
 
     public MessengerImpl( final DataSource dataSource, final PeerManager peerManager ) throws MessengerException
     {
         Preconditions.checkNotNull( dataSource, "Data source is null" );
 
+        this.peerManager = peerManager;
+    }
+
+
+    public void setEntityManagerFactory( final EntityManagerFactory entityManagerFactory )
+    {
+        this.entityManagerFactory = entityManagerFactory;
+        EntityManager entityManager = null;
         try
         {
-            this.peerManager = peerManager;
-            this.messengerDao = new MessengerDao( dataSource );
+            entityManager = entityManagerFactory.createEntityManager();
+            this.messengerDao = new MessengerDao( entityManagerFactory );
             this.messageSender = new MessageSender( peerManager, messengerDao, this );
         }
-        catch ( DaoException e )
+        catch ( Exception ex )
         {
-            throw new MessengerException( e );
+            LOG.error( "Error on creating entity manager.", ex );
+        }
+        finally
+        {
+            if ( entityManager != null )
+            {
+                entityManager.close();
+            }
         }
     }
 

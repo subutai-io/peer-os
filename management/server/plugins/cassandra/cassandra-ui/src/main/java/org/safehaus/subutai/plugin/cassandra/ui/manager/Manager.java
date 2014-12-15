@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -22,6 +23,8 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
+import org.safehaus.subutai.plugin.cassandra.api.NodeOperationTask;
+import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -55,13 +58,15 @@ public class Manager
     protected static final String STOP_ALL_BUTTON_CAPTION = "Stop All";
     protected static final String STOP_BUTTON_CAPTION = "Stop";
     protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    protected static final String DESTROY_NODE_BUTTON_CAPTION = "Destroy";
     protected static final String HOST_COLUMN_CAPTION = "Host";
     protected static final String IP_COLUMN_CAPTION = "IP List";
     protected static final String NODE_ROLE_COLUMN_CAPTION = "Node Role";
     protected static final String STATUS_COLUMN_CAPTION = "Status";
+    protected static final String ADD_NODE_BUTTON_CAPTION = "Add Node";
     protected static final String BUTTON_STYLE_NAME = "default";
     private static final String MESSAGE = "No cluster is installed !";
-    final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn;
+    final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn, addNodeBtn;
     private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final ExecutorService executorService;
     private final Tracker tracker;
@@ -161,13 +166,66 @@ public class Manager
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
 
-        addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn );
+
+        /** Add Node button */
+        addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
+        addNodeBtn.setId( "CassAddClusterBtn" );
+        addClickListenerToAddNewNodeButton();
+        controlsContent.addComponent( addNodeBtn );
+        controlsContent.setComponentAlignment( addNodeBtn, Alignment.MIDDLE_CENTER );
+
+
+
+        addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn, addNodeBtn );
 
         PROGRESS_ICON.setVisible( false );
         PROGRESS_ICON.setId( "indicator" );
         controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
+    }
+
+
+    private void addClickListenerToAddNewNodeButton()
+    {
+        addNodeBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config != null )
+                {
+                    ConfirmationDialog alert = new ConfirmationDialog(
+                            String.format( "Do you want to add new node to the %s cluster?", config.getClusterName() ), "Yes",
+                            "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
+                        @Override
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
+                            UUID track = cassandra.addNode( config.getClusterName() );
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, track,
+                                    CassandraClusterConfig.PRODUCT_KEY );
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
+                                @Override
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
+                                    refreshClustersInfo();
+                                }
+                            } );
+                            contentRoot.getUI().addWindow( window.getWindow() );
+                        }
+                    } );
+
+                    contentRoot.getUI().addWindow( alert.getAlert() );
+                }
+                else
+                {
+                    show( "Please, select cluster" );
+                }
+            }
+        } );
     }
 
 
@@ -409,8 +467,10 @@ public class Manager
             startButton.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-cassandraStart" );
             final Button stopButton = new Button( STOP_BUTTON_CAPTION );
             stopButton.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-cassandraStop" );
+            final Button destroyButton = new Button( DESTROY_NODE_BUTTON_CAPTION );
+            destroyButton.setId( containerHost.getIpByInterfaceName( "eth0" ) + "-cassandraStop" );
 
-            addStyleNameToButtons( checkButton, startButton, stopButton );
+            addStyleNameToButtons( checkButton, startButton, stopButton, destroyButton );
 
             disableButtons( startButton, stopButton );
             PROGRESS_ICON.setVisible( false );
@@ -419,18 +479,25 @@ public class Manager
             availableOperations.addStyleName( "default" );
             availableOperations.setSpacing( true );
 
-            addGivenComponents( availableOperations, checkButton, startButton, stopButton );
-
             String isSeed = checkIfSeed( containerHost.getId() );
+
+            if ( ! isSeed.toLowerCase().equals( "seed" ) ){
+                addGivenComponents( availableOperations, checkButton, startButton, stopButton, destroyButton );
+            }
+            else{
+                addGivenComponents( availableOperations, checkButton, startButton, stopButton );
+            }
+
 
             table.addItem( new Object[] {
                     containerHost.getHostname(), containerHost.getIpByInterfaceName( "eth0" ), isSeed,
                     resultHolder, availableOperations
             }, null );
 
-            addClickListenerToCheckButton( containerHost, resultHolder, checkButton, startButton, stopButton );
-            addClickListenerToStartButton( containerHost, checkButton, startButton, stopButton );
-            addClickListenerToStopButton( containerHost, checkButton, startButton, stopButton );
+            addClickListenerToCheckButton( containerHost, resultHolder, checkButton, startButton, stopButton, destroyButton );
+            addClickListenerToStartButton( containerHost, checkButton, startButton, stopButton, destroyButton );
+            addClickListenerToStopButton( containerHost, checkButton, startButton, stopButton, destroyButton );
+            addClickListenerToDestroyButton( containerHost, checkButton, startButton, stopButton, destroyButton );
         }
     }
 
@@ -448,6 +515,49 @@ public class Manager
     }
 
 
+    private void addClickListenerToDestroyButton( final ContainerHost containerHost, final Button... buttons )
+    {
+        getButton( DESTROY_NODE_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config != null )
+                {
+                    ConfirmationDialog alert = new ConfirmationDialog(
+                            String.format( "Do you want to destroy %s node ?", containerHost.getHostname() ), "Yes",
+                            "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
+                        @Override
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
+                            UUID track = cassandra.destroyNode( config.getClusterName(), containerHost.getHostname() );
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, track,
+                                    CassandraClusterConfig.PRODUCT_KEY );
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
+                                @Override
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
+                                    refreshClustersInfo();
+                                }
+                            } );
+                            contentRoot.getUI().addWindow( window.getWindow() );
+                        }
+                    } );
+
+                    contentRoot.getUI().addWindow( alert.getAlert() );
+                }
+                else
+                {
+                    show( "Please, select cluster" );
+                }
+            }
+        } );
+    }
+
+
     private void addClickListenerToStopButton( final ContainerHost containerHost, final Button... buttons )
     {
         getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
@@ -458,19 +568,19 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StopTask( cassandra, tracker, config.getClusterName(), containerHost.getId(),
-                                new CompleteEvent()
+                        new NodeOperationTask( cassandra, tracker, config.getClusterName(), containerHost,
+                                NodeOperationType.STOP, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        }, null ) );
             }
         } );
     }
@@ -486,19 +596,19 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StartTask( cassandra, tracker, config.getClusterName(), containerHost.getId(),
-                                new CompleteEvent()
+                        new NodeOperationTask( cassandra, tracker, config.getClusterName(), containerHost,
+                                NodeOperationType.START, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        }, null ) );
             }
         } );
     }
@@ -515,29 +625,36 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new CheckTask( cassandra, tracker, config.getClusterName(), containerHost.getId(),
-                                new CompleteEvent()
+                        new NodeOperationTask( cassandra, tracker, config.getClusterName(), containerHost,
+                                NodeOperationType.STATUS, new org.safehaus.subutai.common.protocol.CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( NodeState nodeState )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    public void onComplete( String result )
+                                    if ( nodeState.equals( NodeState.RUNNING ) )
                                     {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            resultHolder.setValue( result );
-                                            if ( result.contains( "not" ) )
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                            }
-                                            else
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            }
-                                            PROGRESS_ICON.setVisible( false );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                        }
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
                                     }
-                                } ) );
+                                    else if ( nodeState.equals( NodeState.STOPPED ) )
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                    }
+                                    else if ( nodeState.equals( NodeState.UNKNOWN ) )
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    }
+                                    resultHolder.setValue( nodeState.name() );
+                                    PROGRESS_ICON.setVisible( false );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( DESTROY_NODE_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                }
+                            }
+                        }, null ) );
             }
         } );
     }
@@ -574,14 +691,16 @@ public class Manager
     {
         for ( UUID containerId : config.getNodes() )
         {
-            //            Agent agent = agentManager.getAgentByUUID( agentUUID );
+            ContainerHost containerHost = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() )
+                                                            .getContainerHostById( containerId );
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StopTask( cassandra, tracker, config.getClusterName(), containerId, new CompleteEvent()
+                    new NodeOperationTask( cassandra, tracker, config.getClusterName(), containerHost,
+                            NodeOperationType.STOP, new org.safehaus.subutai.common.protocol.CompleteEvent()
                     {
                         @Override
-                        public void onComplete( String result )
+                        public void onComplete( NodeState nodeState )
                         {
                             synchronized ( PROGRESS_ICON )
                             {
@@ -589,7 +708,7 @@ public class Manager
                                 checkAllNodes();
                             }
                         }
-                    } ) );
+                    }, null ) );
         }
     }
 
@@ -598,13 +717,16 @@ public class Manager
     {
         for ( UUID containerId : config.getNodes() )
         {
+            ContainerHost containerHost = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() )
+                                                            .getContainerHostById( containerId );
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StartTask( cassandra, tracker, config.getClusterName(), containerId, new CompleteEvent()
+                    new NodeOperationTask( cassandra, tracker, config.getClusterName(), containerHost,
+                            NodeOperationType.START, new org.safehaus.subutai.common.protocol.CompleteEvent()
                     {
                         @Override
-                        public void onComplete( String result )
+                        public void onComplete( NodeState nodeState )
                         {
                             synchronized ( PROGRESS_ICON )
                             {
@@ -612,7 +734,7 @@ public class Manager
                                 checkAllNodes();
                             }
                         }
-                    } ) );
+                    }, null ) );
         }
     }
 

@@ -33,16 +33,6 @@ public interface RestService
 
 
     @POST
-    @Path( "container/create" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response createContainers( @FormParam( "ownerPeerId" ) String ownerPeerId,
-                                      @FormParam( "environmentId" ) String environmentId,
-                                      @FormParam( "templates" ) String templates, @FormParam( "quantity" ) int quantity,
-                                      @FormParam( "strategyId" ) String strategyId,
-                                      @FormParam( "criteria" ) String criteria,
-                                      @FormParam( "nodeGroupName" ) String nodeGroupName );
-
-    @POST
     @Path( "container/schedule" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response scheduleCloneContainers( @FormParam( "creatorPeerId" ) String creatorPeerId,
@@ -99,4 +89,14 @@ public interface RestService
     @Path( "update" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response updatePeer( @QueryParam( "peer" ) String peer );
+
+
+    @POST
+    @Path( "container/quota" )
+    Response setQuota( @FormParam( "hostId" ) String hostId, @FormParam( "quotaInfo" ) String quotaInfo );
+
+    @GET
+    @Path( "container/quota" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getQuota( @QueryParam( "hostId" ) String hostId, @QueryParam( "quotaType" ) String quotaType );
 }

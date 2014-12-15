@@ -22,7 +22,7 @@ public class Commands
     }
 
 
-    public static RequestBuilder getInstallCommand()
+    public RequestBuilder getInstallCommand()
     {
 
         return new RequestBuilder( "apt-get --assume-yes --force-yes install " + PACKAGE_NAME ).withTimeout( 360 )
