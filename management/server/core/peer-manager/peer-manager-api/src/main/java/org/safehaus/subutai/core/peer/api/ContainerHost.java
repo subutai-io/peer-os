@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.peer.api;
 
 
+import java.util.Set;
+
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
@@ -51,4 +53,10 @@ public interface ContainerHost extends Host
     Template getTemplate() throws PeerException;
 
     String getTemplateName();
+
+    public void addTag( String tag );
+
+    public void removeTag( String tag );
+
+    public Set<String> getTags();
 }

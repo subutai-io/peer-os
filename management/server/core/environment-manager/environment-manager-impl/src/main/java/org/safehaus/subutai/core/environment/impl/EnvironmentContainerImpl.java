@@ -13,6 +13,7 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
@@ -45,6 +46,9 @@ import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 
 /**
  * Created by timur on 11/29/14.
@@ -69,6 +73,10 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     private String templateName;
     @Column( name = "template_arch" )
     private String templateArch;
+
+    @ElementCollection( targetClass = String.class )
+    private Set<String> tags = new HashSet<>(  );
+
     @ManyToOne( targetEntity = EnvironmentImpl.class )
     @JoinColumn( name = "environment_id" )
     private Environment environment;
@@ -229,6 +237,29 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public String getTemplateName()
     {
         return this.templateName;
+    }
+
+
+    @Override
+    public void addTag( final String tag )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+        this.tags.add( tag );
+    }
+
+
+    @Override
+    public void removeTag( final String tag )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+        this.tags.remove( tag );
+    }
+
+
+    @Override
+    public Set<String> getTags()
+    {
+        return this.tags;
     }
 
 

@@ -1,9 +1,13 @@
 package org.safehaus.subutai.core.peer.impl.model;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -23,6 +27,9 @@ import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 /**
@@ -52,8 +59,9 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     private String nodeGroupName = "UNKNOWN";
 
     private QuotaManager quotaManager;
-    //    @Column( name = "parent_host_name", nullable = false )
-    //    protected String parentHostname;
+
+    @ElementCollection( targetClass = String.class )
+    private Set<String> tags = new HashSet<>();
 
 
     private ContainerHostEntity()
@@ -134,6 +142,29 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public String getTemplateName()
     {
         return templateName;
+    }
+
+
+    @Override
+    public void addTag( final String tag )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+        this.tags.add( tag );
+    }
+
+
+    @Override
+    public void removeTag( final String tag )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+        this.tags.remove( tag );
+    }
+
+
+    @Override
+    public Set<String> getTags()
+    {
+        return this.tags;
     }
 
 
