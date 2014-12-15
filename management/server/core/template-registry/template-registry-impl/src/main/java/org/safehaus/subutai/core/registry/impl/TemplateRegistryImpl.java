@@ -24,6 +24,9 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.TemplateService;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.StringUtil;
+import org.safehaus.subutai.core.git.api.GitChangedFile;
+import org.safehaus.subutai.core.git.api.GitException;
+import org.safehaus.subutai.core.git.api.GitManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
@@ -45,6 +48,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
     private static final String TEMPLATE_IS_NULL_MSG = "Template name is null or empty";
     private static final String LXC_ARCH_IS_NULL_MSG = "Lxc Arch is null or empty";
     private static final String TEMPLATE_NOT_FOUND_MSG = "Template %s not found";
+    private static final String REPO_ROOT_PATH = "/var/lib/git/subutai.git/";
 
 
     public void setTemplateService( final TemplateService templateDAO )
@@ -54,6 +58,8 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
 
     protected TemplateService templateService;
+
+    private GitManager gitManager;
 
 
     public TemplateRegistryImpl() throws DaoException
@@ -626,6 +632,43 @@ public class TemplateRegistryImpl implements TemplateRegistry
                     String.format( "Error saving template %s, %s", template.getTemplateName(), e.getMessage() ) );
         }
         return true;
+    }
+
+
+    public List<GitChangedFile> getChangedFiles( Template template ) throws RegistryException
+    {
+        String parentBranch = template.getParentTemplateName();
+        String templateBranch = template.getTemplateName();
+        if ( parentBranch == null || "".equals( parentBranch ) )
+        {
+            parentBranch = templateBranch;
+        }
+        return getChangedFiles( parentBranch, templateBranch );
+    }
+
+
+    private List<GitChangedFile> getChangedFiles( String parentBranch, String childBranch ) throws RegistryException
+    {
+        try
+        {
+            return getGitManager().diffBranches( REPO_ROOT_PATH, parentBranch, childBranch );
+        }
+        catch ( GitException e )
+        {
+            return Collections.emptyList();
+        }
+    }
+
+
+    public GitManager getGitManager()
+    {
+        return gitManager;
+    }
+
+
+    public void setGitManager( final GitManager gitManager )
+    {
+        this.gitManager = gitManager;
     }
 
 
