@@ -702,7 +702,7 @@ public class Manager
             addCheckButtonClickListener( containerHost, resultHolder, startBtn, stopBtn, destroyBtn, checkBtn );
             addStartButtonClickListener( containerHost, startBtn, stopBtn, destroyBtn, checkBtn );
             addStopButtonClickListener( containerHost, startBtn, stopBtn, destroyBtn, checkBtn );
-            addDestroyButtonClickListener( containerHost, destroyBtn );
+            addDestroyButtonClickListener( containerHost, startBtn, stopBtn, destroyBtn, checkBtn, destroyBtn );
         }
     }
 
@@ -732,6 +732,11 @@ public class Manager
             @Override
             public void buttonClick( Button.ClickEvent event )
             {
+                if ( config.getNodes().size() == 1 ){
+                    show( "This is the last node in cluster, please destroy whole cluster !" );
+                    return;
+                }
+
                 ConfirmationDialog alert = new ConfirmationDialog(
                         String.format( "Do you want to destroy the %s node?", containerHost.getHostname() ), "Yes",
                         "No" );
@@ -815,19 +820,6 @@ public class Manager
                                 }
                             }
                         }, null ) );
-//                        new StopTask( zookeeper, tracker, config.getClusterName(), containerHost.getHostname(),
-//                                new CompleteEvent()
-//                                {
-//                                    @Override
-//                                    public void onComplete( String result )
-//                                    {
-//                                        synchronized ( PROGRESS_ICON )
-//                                        {
-//                                            enableButtons( buttons );
-//                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-//                                        }
-//                                    }
-//                                } ) );
             }
         } );
     }
@@ -856,19 +848,6 @@ public class Manager
                                 }
                             }
                         }, null ) );
-//                        new StartTask( zookeeper, tracker, config.getClusterName(), containerHost.getHostname(),
-//                                new CompleteEvent()
-//                                {
-//                                    @Override
-//                                    public void onComplete( String result )
-//                                    {
-//                                        synchronized ( PROGRESS_ICON )
-//                                        {
-//                                            enableButtons( buttons );
-//                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-//                                        }
-//                                    }
-//                                } ) );
             }
         } );
     }
@@ -911,51 +890,10 @@ public class Manager
                                     resultHolder.setValue( nodeState.name() );
                                     PROGRESS_ICON.setVisible( false );
                                     getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-
-
-
-//                                    resultHolder.setValue( result );
-//                                    if ( resultHolder.getValue().toLowerCase().contains( "not" ) )
-//                                    {
-//                                        enableButtons( buttons );
-//                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-//                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-//                                    }
-//                                    else
-//                                    {
-//                                        enableButtons( buttons );
-//                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-//                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-//                                    }
-//                                    PROGRESS_ICON.setVisible( false );
+                                    getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
                                 }
                             }
                         }, null ) );
-
-//                        new CheckTask( zookeeper, tracker, config.getClusterName(), containerHost.getHostname(),
-//                                new CompleteEvent()
-//                                {
-//                                    public void onComplete( String result )
-//                                    {
-//                                        synchronized ( PROGRESS_ICON )
-//                                        {
-//                                            resultHolder.setValue( result );
-//                                            if ( resultHolder.getValue().toLowerCase().contains( "not" ) )
-//                                            {
-//                                                enableButtons( buttons );
-//                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-//                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-//                                            }
-//                                            else
-//                                            {
-//                                                enableButtons( buttons );
-//                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-//                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-//                                            }
-//                                            PROGRESS_ICON.setVisible( false );
-//                                        }
-//                                    }
-//                                } ) );
             }
         } );
     }
