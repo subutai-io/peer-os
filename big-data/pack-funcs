@@ -120,6 +120,10 @@ generateConfFiles() {
   pushd $BASE
   local FILES="$packageName/etc/$product_name/*"
   echo "FILES: $FILES"
+  if [ ! "$(ls -A $package_name/etc/$product_name)" ]; then
+    echo "No configuration file found for $product_name. Not generating conffile.."
+    return
+  fi
   > $confFile
   for f in $FILES
   do
