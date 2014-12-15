@@ -75,7 +75,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     @Column( name = "template_arch" )
     private String templateArch;
 
-    @ElementCollection( targetClass = String.class )
+    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();
 
     @ManyToOne( targetEntity = EnvironmentImpl.class )
