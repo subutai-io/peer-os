@@ -31,7 +31,7 @@ public class TestUtilsDuplicate
     public static final String CHILD_CONFIG_FILE =
             "# Common configuration\n" + "lxc.include = /usr/share/lxc/config/ubuntu.common.conf\n" + "\n"
                     + "# Container specific configuration\n" + "lxc.rootfs = /var/lib/lxc/cassandra/rootfs\n"
-                    + "lxc.mount = /var/lib/lxc/cassandra/fstab\n" + "lxc.utsname = elasticsearch\n"
+                    + "lxc.mount = /var/lib/lxc/cassandra/fstab\n" + "lxc.utsname = zookeeper\n"
                     + "lxc.arch = amd64\n" + "\n" + "# Network configuration\n" + "lxc.network.type = veth\n"
                     + "lxc.network.flags = up\n" + "lxc.network.link = br0\n"
                     + "lxc.network.hwaddr = 00:16:3e:82:6e:f0\n" + "subutai.config.path = /etc\n"
