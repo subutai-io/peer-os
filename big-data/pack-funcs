@@ -54,6 +54,7 @@ checkPackageVersion() {
 generateDebianPackage() {
   updatePackageContent $1
   pushd $BASE
+  generateConfFiles $1
   generateMD5Sum $1
   dpkg-deb -z8 -Zgzip --build $packageName/
   cp $packageName".deb" $TARGET/
@@ -107,6 +108,25 @@ updatePackageContent() {
   if [ -f "$packageName/DEBIAN/md5sums" ]; then
     rm $packageName/DEBIAN/md5sums
   fi
+  popd
+}
+
+
+generateConfFiles() {
+  echo "Generating conf files"
+  local product_name=$1
+  initializeVariables $product_name
+  local confFile="$packageName/DEBIAN/conffile"
+  pushd $BASE
+  local FILES="$packageName/etc/$product_name/*"
+  echo "FILES: $FILES"
+  > $confFile
+  for f in $FILES
+  do
+    local confFilePath=$(echo $f | awk -F"etc/" '{print $2}')
+    echo "Processing /etc/$confFilePath"
+    echo "/etc/$confFilePath" >> $confFile
+  done
   popd
 }
 
