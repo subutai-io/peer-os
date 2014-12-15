@@ -70,11 +70,11 @@ public class PluginDAO
     {
         Preconditions.checkNotNull( dataSource, "DataSource is null" );
         Preconditions.checkNotNull( dataSource, "GsonBuilder is null" );
-        this.dbUtil = new DbUtil( dataSource );
+        //        this.dbUtil = new DbUtil( dataSource );
         gson = gsonBuilder.setPrettyPrinting().disableHtmlEscaping().create();
-
+        this.dataService = new PluginDataService( emfUtil.getEmf(), gsonBuilder );
         //        this.dataService = new PluginDataService( emfUtil.getEmf(), gsonBuilder );
-        setupDb();
+        //        setupDb();
     }
 
 
