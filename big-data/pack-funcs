@@ -244,10 +244,12 @@ getTemplateVersion() {
   productName=$1
   productVersion=$2
 
-  CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin/debian/changelog"
+  CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin/debian/control"
 
-  local version_new=`cat $CONTROL | grep $productName-subutai-plugin | awk -F" " '{print $2}'`
-  version_new=`echo ${version_new//[()]/}`
+  local version_new=`cat $CONTROL | grep "Pre-Depends:" | awk -F"(" '{print $2}'| awk -F")" '{print $1}'`
+    version_new=$(echo $version_new | awk -F" " '{print $2}')
+    echo "Version= $version_new"
+
   productVersion=$version_new
 }
 
