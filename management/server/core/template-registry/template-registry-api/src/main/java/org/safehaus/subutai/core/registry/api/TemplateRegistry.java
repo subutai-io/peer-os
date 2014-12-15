@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.git.api.GitChangedFile;
 
 
 /**
@@ -186,4 +187,9 @@ public interface TemplateRegistry
      * @param template - template
      */
     public boolean registerTemplate( Template template ) throws RegistryException;
+
+    /**
+     * Returns list of GitChangedFile between two templates
+     */
+    public List<GitChangedFile> getChangedFiles( Template template ) throws RegistryException;
 }
