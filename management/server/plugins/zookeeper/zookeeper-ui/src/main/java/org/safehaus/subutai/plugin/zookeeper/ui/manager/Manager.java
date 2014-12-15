@@ -379,18 +379,6 @@ public class Manager
                             }
                         }
                     }, null ) );
-//                    new StartTask( zookeeper, tracker, config.getClusterName(), host.getHostname(), new CompleteEvent()
-//                    {
-//                        @Override
-//                        public void onComplete( String result )
-//                        {
-//                            synchronized ( PROGRESS_ICON )
-//                            {
-//                                disableOREnableAllButtonsOnTable( nodesTable, true );
-//                                checkNodesStatus();
-//                            }
-//                        }
-//                    } ) );
         }
     }
 
@@ -422,18 +410,6 @@ public class Manager
                             }
                         }
                     }, null ) );
-//                    new StopTask( zookeeper, tracker, config.getClusterName(), host.getHostname(), new CompleteEvent()
-//                    {
-//                        @Override
-//                        public void onComplete( String result )
-//                        {
-//                            synchronized ( PROGRESS_ICON )
-//                            {
-//                                disableOREnableAllButtonsOnTable( nodesTable, true );
-//                                checkNodesStatus();
-//                            }
-//                        }
-//                    } ) );
         }
     }
 
