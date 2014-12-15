@@ -24,6 +24,8 @@ public class InstallClusterCommandTest
     public void setUp() 
     {
         installClusterCommand = new InstallClusterCommand();
+        installClusterCommand.setTracker(tracker);
+        installClusterCommand.setCassandraManager(cassandra);
     }
 
     @Test
@@ -39,31 +41,7 @@ public class InstallClusterCommandTest
     }
 
     @Test
-    public void testSetCassandraManager() 
-    {
-        installClusterCommand.setCassandraManager(cassandra);
-        installClusterCommand.getCassandraManager();
-
-        // assertions
-        assertNotNull(installClusterCommand.getCassandraManager());
-        assertEquals(cassandra,installClusterCommand.getCassandraManager());
-
-    }
-
-    @Test
     public void testGetTracker() 
-    {
-        installClusterCommand.setTracker(tracker);
-        installClusterCommand.getTracker();
-
-        // assertions
-        assertNotNull(installClusterCommand.getTracker());
-        assertEquals(tracker,installClusterCommand.getTracker());
-
-    }
-
-    @Test
-    public void testSetTracker() 
     {
         installClusterCommand.setTracker(tracker);
         installClusterCommand.getTracker();

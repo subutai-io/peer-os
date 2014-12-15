@@ -39,6 +39,10 @@
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>git-manager-api</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

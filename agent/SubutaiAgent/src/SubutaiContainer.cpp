@@ -145,6 +145,8 @@ void SubutaiContainer::UpdateUsersList()
         containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Adding user: " + _helper.toString(uid) + " " + uname));
     }
 }
+
+
 /**
  *  \details   ID of the Subutai Container is fetched from statically using this function.
  *  		   Example id:"ff28d7c7-54b4-4291-b246-faf3dd493544"
@@ -155,36 +157,50 @@ bool SubutaiContainer::getContainerId()
     {
         containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Get container id"));
         containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "Check uuid.txt.."));
-        string path = "/var/lib/lxc/" + this->hostname + "/rootfs/etc/subutai-agent/";
-        string uuidFile = path + "uuid.txt";
-        ifstream file(uuidFile.c_str());	//opening uuid.txt
-        getline(file, this->id);
-        file.close();
+        string path = "/etc/subutai-agent/";
+        string uuidFile = path + "containerIdList.txt";
 
-        if (this->id.empty())		//if uuid is null or not reading successfully
+        ifstream file(uuidFile.c_str());	//opening uuid.txt
+        string  line;
+        string	hostname = "";
+        string 	id = "";
+
+        bool found = false;
+        while(std::getline(file, line))
         {
-            containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "uuid.txt is empty. Generate uuid.."));
+            stringstream   	linestream(line);
+            linestream >> hostname >> id;
+            if(!strcmp(hostname.c_str(), this->hostname.c_str()))
+            {
+            	this->id = id;
+            	break;
+            }
+            hostname = "";
+        }
+
+        if (hostname.empty())		//if uuid is null or not reading successfully
+        {
+            containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, this->hostname, " cannot be found in containerId.txt. Generate uuid.."));
+
             boost::uuids::random_generator gen;
             boost::uuids::uuid u = gen();
             const std::string tmp = boost::lexical_cast<std::string>(u);
             this->id = tmp;
 
-            struct stat sb;
-            if (!(stat(path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)))
-            {
-                containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "create directory: subutai-agent.."));
-                int status = mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH);
-                if (status != 0) containerLogger->writeLog(2, containerLogger->setLogData(_logEntry, "\"subutai-agent\" folder cannot be created under /etc/"));
-            }
+            containerLogger->writeLog(7, containerLogger->setLogData(_logEntry, "write generated uuid into containerId.txt.."));
 
-            containerLogger->writeLog(6, containerLogger->setLogData(_logEntry, "write generated uuid into uuid.txt.."));
-            ofstream file(uuidFile.c_str());
-            file << this->id;
-            file.close();
+            ofstream ofs;
+            ofs.open (uuidFile.c_str(), std::ofstream::out | std::ofstream::app);
+            ofs << this->hostname << " " << this->id << endl;
+            ofs.close();
 
-            containerLogger->writeLog(6,containerLogger->setLogData(_logEntry,"Subutai Agent UUID: ",this->id));
+            containerLogger->writeLog(7,containerLogger->setLogData(_logEntry,"Subutai container ID: ",this->id));
+
             return false;
         }
+        containerLogger->writeLog(7,containerLogger->setLogData(_logEntry,"Found container ID: ",this->id));
+
+        file.close();
         return true;
     } catch(const std::exception& error) {
         cout << error.what()<< endl;

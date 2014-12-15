@@ -9,6 +9,8 @@ import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -47,6 +49,42 @@ public class RestServiceImplTest
 
     }
 
+    @Test
+    public void testCheckNode()
+    {
+        when(hBase.checkNode(anyString(), any(UUID.class))).thenReturn(UUID.randomUUID());
+
+        Response response = restService.checkNode("test", UUID.randomUUID().toString());
+
+        // assertions
+        assertEquals(Response.Status.OK.getStatusCode(),response.getStatus());
+    }
+
+    @Test
+    public void testGetCluster()
+    {
+        HBaseConfig hBaseConfig1 = new HBaseConfig();
+        when(hBase.getCluster("test")).thenReturn(hBaseConfig1);
+
+        Response response = restService.getCluster("test");
+
+        // assertions
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testListClusters()
+    {
+        HBaseConfig hBaseConfig1 = new HBaseConfig();
+        List<HBaseConfig> myList = new ArrayList<>();
+        myList.add(hBaseConfig1);
+        when(hBase.getClusters()).thenReturn(myList);
+
+        Response response = restService.listClusters();
+
+        // assertions
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    }
 
     @Test
     public void testCreateCluster() throws Exception
