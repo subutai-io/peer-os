@@ -313,6 +313,10 @@ checkVersion() {
   patch_new=$(echo $version_tmp | awk -F"-" '{print $2}')
 
   deb_name=`ls -lt $TARGET | awk '{ print $9 }' | grep .deb | head -1`
+  if [ -z "$deb_name" ]; then
+     echo "There is no previous package found.. Skipping Version Check"
+     return
+  fi
   version_prev=$(echo $deb_name | awk -F"_" '{print $2}')
   versionFirst_prev=$(echo $version_prev | awk -F"." '{print $1}')
   versionSecond_prev=$(echo $version_prev | awk -F"." '{print $2}')
@@ -368,6 +372,8 @@ removePackagePeerSync() {
     #removing missing or changed packages in the list
     echo "Removing $removePackageName from $2"
     ssh $2 "rm $removePackageName"
+    purePackageName=$(echo $removePackageName | awk -F"/" '{print $6}' | awk -F"_" '{print $1}')
+    ssh $2 "cd /repo/ksks && reprepro remove trusty $purePackageName"
   fi
 }
 
