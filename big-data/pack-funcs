@@ -16,15 +16,17 @@ initializeVariables() {
   echo "mode: $mode"
   productName=$1
   mode=$2
-  if [ "$mode" == "default" ]; then 
+  if [ "$mode" == "plugin" ]; then 
+    BASE=/var/lib/jenkins/jobs/master.plugin.$productName
+    SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin"
+    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-plugin"
+
+  else
     productNameUppercase="$(tr '[:lower:]' '[:upper:]' <<< ${productName:0:1})${productName:1}"
     BASE=/var/lib/jenkins/jobs/master.bigdata.$productName/$productNameUppercase
     SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
     TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
-  else
-    BASE=/var/lib/jenkins/jobs/master.plugin.$productName
-    SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin"
-    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-plugin"
+
   fi
 
   pushd $BASE
@@ -33,10 +35,10 @@ initializeVariables() {
   fi
   fileName=`ls | grep subutai | awk '{print $1}' | head -1`
   if [[ $fileName == "" ]]; then
-    if [ "$mode" == "default"]; then 
-      fileName="subutai-$productName"
-    else
+    if [ "$mode" == "plugin" ]; then 
       fileName="subutai-$productName-plugin"
+    else
+      fileName="subutai-$productName"
     fi
     mkdir -p $fileName
   fi
@@ -71,14 +73,12 @@ checkPackageVersion() {
 
 generateDebianPackagePlugins() {
   makeDirectory=$BASE/$fileName
-  ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
   pushd $makeDirectory
   if [ -d target ]; then
     rm -rf target/
   fi
   make
   cp target/*".deb" $TARGET/
- cp target/*".deb" $ISOPATH/
   popd
 }
 
@@ -244,14 +244,14 @@ generateRepoPackage() {
   fi
   
   #starting to genereate template repo package
-  genereateTemplateRepo
+  generateTemplateRepo
   echo "Repo wrapper package Successfully created."
 
   popd
 }
 
 #generete Template repo package structure
-genereteTemplateRepo (){
+generateTemplateRepo() {
   pushd $BASE
   local arch="amd64"
   templateName="temp"
