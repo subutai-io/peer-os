@@ -157,7 +157,8 @@ public class MonitorImpl implements Monitor
             //send request and obtain metrics
             ContainerHostMetricResponse response =
                     peer.sendRequest( request, RecipientType.METRIC_REQUEST_RECIPIENT.name(),
-                            Constants.METRIC_REQUEST_TIMEOUT, ContainerHostMetricResponse.class );
+                            Constants.METRIC_REQUEST_TIMEOUT, ContainerHostMetricResponse.class,
+                            Constants.METRIC_REQUEST_TIMEOUT );
 
             //if response contains metrics, add them to result
             if ( response != null && !CollectionUtil.isCollectionEmpty( response.getMetrics() ) )
