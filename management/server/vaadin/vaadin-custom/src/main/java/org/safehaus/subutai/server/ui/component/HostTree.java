@@ -50,6 +50,8 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
     private HierarchicalContainer container;
     private Set<HostInfo> presentHosts = Sets.newHashSet();
     private Set<HostInfo> selectedHosts = Sets.newHashSet();
+    private static final String VALUE_PROPERTY = "value";
+    private static final String ICON_PROPERTY = "icon";
 
 
     public HostTree( HostRegistry hostRegistry )
@@ -61,7 +63,7 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
 
         tree = new Tree( "Hosts" );
         tree.setContainerDataSource( getNodeContainer() );
-        tree.setItemIconPropertyId( "icon" );
+        tree.setItemIconPropertyId( ICON_PROPERTY );
         tree.setItemDescriptionGenerator( new AbstractSelect.ItemDescriptionGenerator()
         {
 
@@ -73,7 +75,7 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
                 Item item = tree.getItem( itemId );
                 if ( item != null )
                 {
-                    HostInfo host = ( HostInfo ) item.getItemProperty( "value" ).getValue();
+                    HostInfo host = ( HostInfo ) item.getItemProperty( VALUE_PROPERTY ).getValue();
                     if ( host != null )
                     {
                         description = "Hostname: " + host.getHostname() + "<br>" + "ID: " + host.getId();
@@ -98,9 +100,10 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
 
                     for ( Object o : ( Iterable<?> ) t.getValue() )
                     {
-                        if ( tree.getItem( o ).getItemProperty( "value" ).getValue() != null )
+                        if ( tree.getItem( o ) != null && tree.getItem( o ).getItemProperty( VALUE_PROPERTY ) != null
+                                && tree.getItem( o ).getItemProperty( VALUE_PROPERTY ).getValue() != null )
                         {
-                            HostInfo host = ( HostInfo ) tree.getItem( o ).getItemProperty( "value" ).getValue();
+                            HostInfo host = ( HostInfo ) tree.getItem( o ).getItemProperty( VALUE_PROPERTY ).getValue();
                             selectedList.add( host );
                         }
                     }
@@ -118,8 +121,8 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
     public HierarchicalContainer getNodeContainer()
     {
         container = new HierarchicalContainer();
-        container.addContainerProperty( "value", HostInfo.class, null );
-        container.addContainerProperty( "icon", Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
+        container.addContainerProperty( VALUE_PROPERTY, HostInfo.class, null );
+        container.addContainerProperty( ICON_PROPERTY, Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
         refreshTree( hostRegistry.getResourceHostsInfo() );
         return container;
     }
@@ -168,12 +171,9 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
     {
         try
         {
-            if ( Strings.isNullOrEmpty( tag ) )
-            {
-                //show all present containers
-                container.removeAllContainerFilters();
-            }
-            else
+            container.removeAllContainerFilters();
+
+            if ( !Strings.isNullOrEmpty( tag ) )
             {
                 PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
 
@@ -192,7 +192,15 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
                     }
                 }
 
-                container.addContainerFilter( new MyCustomFilter( "value", matchedContainerNames ) );
+                container.addContainerFilter( new MyCustomFilter( VALUE_PROPERTY, matchedContainerNames ) );
+
+                for ( HostInfo hostInfo : presentHosts )
+                {
+                    if ( !matchedContainerNames.contains( hostInfo.getHostname() ) )
+                    {
+                        tree.unselect( hostInfo.getId() );
+                    }
+                }
             }
         }
         catch ( HostNotFoundException | NamingException e )
@@ -222,7 +230,7 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
                 if ( parent != null )
                 {
                     tree.setItemCaption( resourceHostInfo.getId(), resourceHostInfo.getHostname() );
-                    parent.getItemProperty( "value" ).setValue( resourceHostInfo );
+                    parent.getItemProperty( VALUE_PROPERTY ).setValue( resourceHostInfo );
                     if ( !CollectionUtil.isCollectionEmpty( resourceHostInfo.getContainers() ) )
                     {
                         container.setChildrenAllowed( resourceHostInfo.getId(), true );
@@ -239,8 +247,8 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
                             if ( child != null )
                             {
                                 tree.setItemCaption( containerHostInfo.getId(), containerHostInfo.getHostname() );
-                                child.getItemProperty( "value" ).setValue( containerHostInfo );
-                                child.getItemProperty( "icon" ).setValue(
+                                child.getItemProperty( VALUE_PROPERTY ).setValue( containerHostInfo );
+                                child.getItemProperty( ICON_PROPERTY ).setValue(
                                         containerHostInfo.getStatus() == ContainerHostState.RUNNING ?
                                         new ThemeResource( "img/lxc/virtual.png" ) :
                                         new ThemeResource( "img/lxc/virtual_offline.png" ) );
@@ -266,7 +274,7 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
             }
 
             //sort hosts
-            container.sort( new Object[] { "value" }, new boolean[] { true } );
+            container.sort( new Object[] { VALUE_PROPERTY }, new boolean[] { true } );
         }
         catch ( Property.ReadOnlyException | Converter.ConversionException ex )
         {
