@@ -162,14 +162,14 @@ generateRepoPackage() {
   if [[ $productName == *"template"* ]]; then
     BASE=/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName
     SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
-    TARGET="/var/lib/jenkins/Automation/Bigdata/$productName"
+    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
     PACK="/var/lib/jenkins/Automation/Automation_ISO/mgmt-repo/template-repo-package/"
     ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
   else
     productNameUppercase="$(tr '[:lower:]' '[:upper:]' <<< ${productName:0:1})${productName:1}"
     BASE=/var/lib/jenkins/jobs/master.bigdata.$productName/$productNameUppercase
     SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
-    TARGET="/var/lib/jenkins/Automation/Bigdata/$productName"
+    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
     PACK="/var/lib/jenkins/Automation/Automation_ISO/mgmt-repo/template-repo-package/"
     ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
   fi
@@ -298,7 +298,7 @@ checkVersion() {
   elif [ "$mode" = "bdproduct" ]; then
 
     CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName/DEBIAN/control"
-    TARGET="/var/lib/jenkins/Automation/Bigdata/$productName"
+    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
 
     lineNumberVersion=$(sed -n '/Version:/=' $CONTROL)
     lineVersion=$(sed $lineNumberVersion!d $CONTROL)
@@ -393,7 +393,7 @@ setRepoOnJenkinsPeer() {
     echo "target template name $target_template_name"
 	 
     #get the name of latest debian on jenkins
-    pack_path_jenkins="/var/lib/jenkins/Automation/Bigdata/$target_template_name"
+    pack_path_jenkins="/var/lib/jenkins/Automation/Automation_ISO/Packages/$target_template_name"
     deb_name=`ls -lt $pack_path_jenkins | grep "subutai-$target_template_name" | awk '{ print $9 }' | grep .deb  | head -1`
     echo "deb name: $deb_name"
 
