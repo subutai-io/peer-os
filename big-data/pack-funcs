@@ -73,12 +73,14 @@ checkPackageVersion() {
 
 generateDebianPackagePlugins() {
   makeDirectory=$BASE/$fileName
+  ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
   pushd $makeDirectory
   if [ -d target ]; then
     rm -rf target/
   fi
   make
   cp target/*".deb" $TARGET/
+  cp target/*".deb" $ISOPATH/
   popd
 }
 
