@@ -16,9 +16,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.safehaus.subutai.common.cache.ExpiringCache;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.TemplateService;
@@ -49,6 +51,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
     private static final String LXC_ARCH_IS_NULL_MSG = "Lxc Arch is null or empty";
     private static final String TEMPLATE_NOT_FOUND_MSG = "Template %s not found";
     private static final String REPO_ROOT_PATH = "/var/lib/git/subutai.git/";
+    private final ExpiringCache<String, Boolean> templateDownloadTokens = new ExpiringCache<>();
 
 
     public void setTemplateService( final TemplateService templateDAO )
@@ -694,5 +697,31 @@ public class TemplateRegistryImpl implements TemplateRegistry
         {
             LOG.error( "Error while saving template: ", e );
         }
+    }
+
+
+    public void dispose()
+    {
+        templateDownloadTokens.dispose();
+    }
+
+
+    @Override
+    public String getTemplateDownloadToken( final int timeout )
+    {
+        Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
+
+        String templateDownloadToken = UUID.randomUUID().toString();
+        templateDownloadTokens.put( templateDownloadToken, false, timeout * 1000 );
+        return templateDownloadToken;
+    }
+
+
+    @Override
+    public boolean checkTemplateDownloadToken( final String token )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token" );
+
+        return templateDownloadTokens.get( token ) != null;
     }
 }

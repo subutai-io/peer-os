@@ -342,7 +342,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
      * @param sourcePeer - peer from which to import templates
      * @param templates - templates to import
      */
-    protected void importTemplates( Peer sourcePeer, final Set<Template> templates ) throws PeerException
+    protected void importTemplates( Peer sourcePeer, Set<Template> templates, String templateDownloadToken )
+            throws PeerException
     {
         Preconditions.checkNotNull( sourcePeer );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( templates ) );
@@ -354,7 +355,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             for ( Template template : templates )
             {
                 //import each template's ancestry lineage
-                importTemplateLineage( sourcePeer, template );
+                importTemplateLineage( sourcePeer, template, templateDownloadToken );
             }
         }
     }
@@ -369,7 +370,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
      * @param sourcePeer - peer from which to import ancestry lineage
      * @param template - template whose ancestry lineage to import
      */
-    private void importTemplateLineage( Peer sourcePeer, Template template ) throws PeerException
+    private void importTemplateLineage( Peer sourcePeer, Template template, String templateDownloadToken )
+            throws PeerException
     {
         //construct template lineage
         List<Template> templateLineage = Lists.newArrayList();
@@ -400,7 +402,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 {
                     //download target template
                     commandUtil.execute( commands.getDownloadTemplateCommand( sourcePeer.getPeerInfo().getIp(),
-                            sourcePeer.getPeerInfo().getPort(), remoteTemplate.getTemplateName() ), managementHost );
+                            sourcePeer.getPeerInfo().getPort(), remoteTemplate.getTemplateName(),
+                            templateDownloadToken ), managementHost );
                     //import target template
                     commandUtil.execute( commands.getImportTemplateCommand( remoteTemplate.getTemplateName() ),
                             managementHost );

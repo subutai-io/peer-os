@@ -28,11 +28,12 @@ public class Commands
     }
 
 
-    public RequestBuilder getDownloadTemplateCommand( String peerIp, int peerPort, String templateName )
+    public RequestBuilder getDownloadTemplateCommand( String peerIp, int peerPort, String templateName,
+                                                      String templateDownloadToken )
     {
         return new RequestBuilder( "curl" ).withCmdArgs( Lists.newArrayList( "-O", "-J", "-L",
-                String.format( "http://%s:%d/cxf/registry/templates/%s/download ", peerIp, peerPort, templateName ) ) )
-                                           .withCwd( "/lxc-data/tmpdir" ).withTimeout( 24 * 60 * 60 );
+                String.format( "http://%s:%d/cxf/registry/templates/%s/download/%s ", peerIp, peerPort, templateName,
+                        templateDownloadToken ) ) ).withCwd( "/lxc-data/tmpdir" ).withTimeout( 24 * 60 * 60 );
     }
 
 
