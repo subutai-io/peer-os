@@ -17,7 +17,7 @@ initializeVariables() {
   productNameUppercase="$(tr '[:lower:]' '[:upper:]' <<< ${productName:0:1})${productName:1}"
   BASE=/var/lib/jenkins/jobs/master.bigdata.$productName/$productNameUppercase
   SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
-  TARGET="/var/lib/jenkins/Automation/Bigdata/$productName"
+  TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
 
   pushd $BASE
   if ls *.deb ; then
