@@ -260,12 +260,8 @@ genereteTemplateRepo (){
   fi
 
   #creating main folders  
-  mkdir $BASE/$templateName
-  mkdir $BASE/$templateName/DEBIAN
-  mkdir $BASE/$templateName/repo
-  mkdir $BASE/$templateName/repo/ksks
-  mkdir $BASE/$templateName/repo/ksks/amd64
-  mkdir $BASE/$templateName/repo/ksks/amd64/trusty
+  mkdir -p $BASE/$templateName/DEBIAN
+  mkdir -p $BASE/$templateName/repo/ksks/amd64/trusty
 
   #generating and filling control file 
   touch $BASE/$templateName/DEBIAN/control
