@@ -247,8 +247,16 @@ getTemplateVersion() {
   CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin/debian/control"
 
   local version_new=`cat $CONTROL | grep "Pre-Depends:" | awk -F"(" '{print $2}'| awk -F")" '{print $1}'`
-  version_new=$(echo $version_new | awk -F" " '{print $2}')
+  version_tmp=$(echo $version_new | awk -F" " '{print $2}')
+
+  if [ "$version_tmp" = "" ]; then
+      echo "Version given in Pre-Depends structure wrong. Example (= 2.0.0)"
+      exit 1
+  else
+      version_new=$version_tmp
+  fi
   echo "Version= $version_new"
+
   target_template_version=$version_new
 }
 
@@ -268,7 +276,14 @@ checkVersion() {
     TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-subutai-template"
   
     version_new=`cat $CONTROL | grep "Pre-Depends:" | awk -F"(" '{print $2}'| awk -F")" '{print $1}'`
-    version_new=$(echo $version_new | awk -F" " '{print $2}')
+    version_tmp=$(echo $version_new | awk -F" " '{print $2}')
+
+    if [ "$version_tmp" = "" ]; then
+      echo "Version given in Pre-Depends structure wrong. Example (= 2.0.0)"
+      exit 1
+    else
+      version_new=$version_tmp
+    fi
     echo "Version= $version_new"
     
   elif [ "$mode" = "n2n" ]; then
