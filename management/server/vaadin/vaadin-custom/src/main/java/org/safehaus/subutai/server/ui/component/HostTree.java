@@ -5,18 +5,26 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.naming.NamingException;
+
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
@@ -114,6 +122,83 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
         container.addContainerProperty( "icon", Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
         refreshTree( hostRegistry.getResourceHostsInfo() );
         return container;
+    }
+
+
+    class MyCustomFilter implements Container.Filter
+    {
+
+        private String propertyId;
+        private Set<String> containerNames;
+
+
+        public MyCustomFilter( final String propertyId, final Set<String> containerNames )
+        {
+            this.propertyId = propertyId;
+            this.containerNames = containerNames;
+        }
+
+
+        @Override
+        public boolean passesFilter( final Object itemId, final Item item ) throws UnsupportedOperationException
+        {
+            Property p = item.getItemProperty( propertyId );
+
+            // Should always check validity
+            if ( p == null || !p.getType().equals( HostInfo.class ) )
+            {
+                return false;
+            }
+            HostInfo value = ( HostInfo ) p.getValue();
+
+            // The actual filter logic
+            return containerNames.contains( value.getHostname() );
+        }
+
+
+        @Override
+        public boolean appliesToProperty( final Object propertyId )
+        {
+            return propertyId != null && propertyId.equals( this.propertyId );
+        }
+    }
+
+
+    public void filterContainerHostsByTag( String tag )
+    {
+        try
+        {
+            if ( Strings.isNullOrEmpty( tag ) )
+            {
+                //show all present containers
+                container.removeAllContainerFilters();
+            }
+            else
+            {
+                PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
+
+                Set<String> matchedContainerNames = Sets.newHashSet();
+
+                for ( HostInfo hostInfo : presentHosts )
+                {
+                    if ( hostInfo instanceof ContainerHostInfo )
+                    {
+                        ContainerHost containerHost =
+                                peerManager.getLocalPeer().getContainerHostById( hostInfo.getId().toString() );
+                        if ( containerHost.getTags().contains( tag ) )
+                        {
+                            matchedContainerNames.add( containerHost.getHostname() );
+                        }
+                    }
+                }
+
+                container.addContainerFilter( new MyCustomFilter( "value", matchedContainerNames ) );
+            }
+        }
+        catch ( HostNotFoundException | NamingException e )
+        {
+            LOG.error( "Error in filterContainerHostsByTag", e );
+        }
     }
 
 
