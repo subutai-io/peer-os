@@ -192,4 +192,24 @@ public interface TemplateRegistry
      * Returns list of GitChangedFile between two templates
      */
     public List<GitChangedFile> getChangedFiles( Template template ) throws RegistryException;
+
+
+    /**
+     * Returns template download token, with which a template package can be downloaded from registry REST endpoint
+     * within the specified timeout
+     *
+     * @param timeout - timeout of template download token in seconds
+     *
+     * @return - template download token
+     */
+    public String getTemplateDownloadToken( int timeout );
+
+    /**
+     * Returns true if token is valid or false if token is expired or does not exist
+     *
+     * @param token -template download token
+     *
+     * @return - {@code Boolean}
+     */
+    public boolean checkTemplateDownloadToken( String token );
 }

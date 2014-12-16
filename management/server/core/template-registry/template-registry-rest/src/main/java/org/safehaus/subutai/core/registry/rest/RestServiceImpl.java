@@ -74,10 +74,16 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response downloadTemplate( final String templateName )
+    public Response downloadTemplate( final String templateName, final String templateDownloadToken )
     {
         try
         {
+            //check template download token
+            if ( !templateRegistry.checkTemplateDownloadToken( templateDownloadToken ) )
+            {
+                return Response.status( Response.Status.FORBIDDEN ).entity( "Invalid template download token" ).build();
+            }
+
             String packageName = String.format( "%s-subutai-template", templateName );
             String fullPackageName = repositoryManager.getFullPackageName( packageName );
             String fullPackagePath =
