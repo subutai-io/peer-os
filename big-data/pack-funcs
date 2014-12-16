@@ -13,11 +13,19 @@ initializeVariables() {
   if [[ $1 == "" ]]; then
     usage
   fi
+  echo "mode: $mode"
   productName=$1
-  productNameUppercase="$(tr '[:lower:]' '[:upper:]' <<< ${productName:0:1})${productName:1}"
-  BASE=/var/lib/jenkins/jobs/master.bigdata.$productName/$productNameUppercase
-  SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
-  TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
+  mode=$2
+  if [ "$mode" == "default" ]; then 
+    productNameUppercase="$(tr '[:lower:]' '[:upper:]' <<< ${productName:0:1})${productName:1}"
+    BASE=/var/lib/jenkins/jobs/master.bigdata.$productName/$productNameUppercase
+    SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
+    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
+  else
+    BASE=/var/lib/jenkins/jobs/master.plugin.$productName
+    SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin"
+    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-plugin"
+  fi
 
   pushd $BASE
   if ls *.deb ; then
@@ -25,7 +33,11 @@ initializeVariables() {
   fi
   fileName=`ls | grep subutai | awk '{print $1}' | head -1`
   if [[ $fileName == "" ]]; then
-    fileName="subutai-$productName"
+    if [ "$mode" == "default"]; then 
+      fileName="subutai-$productName"
+    else
+      fileName="subutai-$productName-plugin"
+    fi
     mkdir -p $fileName
   fi
   popd
@@ -33,13 +45,20 @@ initializeVariables() {
 
 
 getSourcesToRelevantDirectories() {
-  initializeVariables $1
+  if [ "$2" == "" ]; then
+    mode="default"
+  else
+    mode=$2
+  fi
+  initializeVariables $1 $mode
+  echo "BASE: $BASE"
   pushd $BASE
   # Clear the previous contents of the directory
   if [ -d $BASE/$fileName ]; then
     rm -r $BASE/$fileName
   fi
   mkdir $BASE/$fileName
+  echo "copy $BASE"
   # Copy the sources that are pulled from the version control system
   cp -a -r $SOURCE/* $BASE/$fileName
   popd
@@ -48,6 +67,17 @@ getSourcesToRelevantDirectories() {
 #check version of given bigdata product 
 checkPackageVersion() {
   checkVersion $productName "bdproduct"
+}
+
+generateDebianPackagePlugins() {
+  makeDirectory=$BASE/$fileName
+  pushd $makeDirectory
+  if [ -d target ]; then
+    rm -rf target/
+  fi
+  make
+  cp target/*".deb" $TARGET/
+  popd
 }
 
 
@@ -285,7 +315,16 @@ checkVersion() {
       version_new=$version_tmp
     fi
     echo "Version= $version_new"
-    
+        
+  elif [ "$mode" = "plugin" ]; then
+
+    CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin/debian/changelog"
+    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-plugin"
+
+    version_new=`cat $CONTROL | grep "$productName-subutai-plugin" | awk -F" " '{print $2}'`
+    version_new=`echo ${version_new//[()]/}`
+    echo "Version= $version_new"
+
   elif [ "$mode" = "n2n" ]; then
 
     CONTROL="/var/lib/jenkins/jobs/master.get_repo_github/workspace/subutai_n2n/debian/changelog"
