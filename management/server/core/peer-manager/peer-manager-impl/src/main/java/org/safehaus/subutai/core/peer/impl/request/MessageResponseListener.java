@@ -11,7 +11,6 @@ import org.safehaus.subutai.common.cache.ExpiringCache;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageListener;
 import org.safehaus.subutai.core.peer.impl.RecipientType;
-import org.safehaus.subutai.core.peer.impl.Timeouts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,7 @@ public class MessageResponseListener extends MessageListener
     }
 
 
-    public MessageResponse waitResponse( UUID requestId, int timeout )
+    public MessageResponse waitResponse( UUID requestId, int requestTimeout, int responseTimeout )
     {
         //put semaphore to map so that response can release it
         semaphoreMap.put( requestId, new Semaphore( 0 ) );
@@ -38,8 +37,7 @@ public class MessageResponseListener extends MessageListener
         //wait for response
         try
         {
-            semaphoreMap.get( requestId )
-                        .tryAcquire( Timeouts.PEER_MESSAGE_TIMEOUT * 2 + timeout + 5, TimeUnit.SECONDS );
+            semaphoreMap.get( requestId ).tryAcquire( requestTimeout + responseTimeout + 5, TimeUnit.SECONDS );
         }
         catch ( InterruptedException e )
         {
