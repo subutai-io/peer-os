@@ -51,10 +51,12 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     //Reindeer.TABLE_STRONG
     private GridLayout contentRoot;
     private Table pluginsTable;
+    private BrowserFrame browser;
     private PluginManagerPortalModule managerUI;
     private PluginManager pluginManager;
     private final ExecutorService executorService;
     private Tracker tracker;
+    private boolean isTableRemoved = false;
 
 
     public PluginManagerComponent( final ExecutorService executorService, PluginManagerPortalModule managerUI, PluginManager pluginManager, Tracker tracker )
@@ -106,7 +108,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     }
 
 
-    private void getListInstalledPluginsButton( HorizontalLayout controlsContent )
+    private void getListInstalledPluginsButton( final HorizontalLayout controlsContent )
     {
         Button listPluginsBtn = new Button( LIST_INSTALLED_PLUGINS_BUTTON_CAPTION );
         listPluginsBtn.setId( "listInstalledPluginsBtn" );
@@ -116,7 +118,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                listInstalledPluginsClickHandler();
+                listInstalledPluginsClickHandler( controlsContent );
             }
         } );
 
@@ -124,7 +126,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         //contentRoot.addComponent( pluginsTable, 0, 1, 0, 9 );
     }
 
-    private void getListAvailablePluginsButton( HorizontalLayout controlsContent )
+    private void getListAvailablePluginsButton( final HorizontalLayout controlsContent )
     {
         Button listAvailablePluginsBtn = new Button( LIST_AVAILABLE_PLUGINS_BUTTON_CAPTION );
         listAvailablePluginsBtn.setId( "listAvailablePluginsBtn" );
@@ -134,7 +136,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                listAvailablePluginsClickHandler();
+                listAvailablePluginsClickHandler( controlsContent );
             }
         }  );
 
@@ -162,29 +164,27 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     private void marketPlaceButtonClickListener( HorizontalLayout controlsContent )
     {
         contentRoot.removeComponent( pluginsTable );
-        URL url = null;
-        try
-        {
-            url = new URL("http://www.google.com/");
-        }
-        catch ( MalformedURLException e )
-        {
-            e.printStackTrace();
-        }
+        isTableRemoved = true;
         //Embedded browser = new Embedded("", new ExternalResource(url));
-        BrowserFrame sample = new BrowserFrame("vaadin.com", new ExternalResource(
+        browser = new BrowserFrame("vaadin.com", new ExternalResource(
                 "https://vaadin.com/home"));
-        sample.setWidth( "600px" );
-        sample.setHeight( "400px" );
-        sample.setSizeUndefined();
-        controlsContent.addComponent( sample );
+        browser.setWidth( "700px" );
+        browser.setHeight( "600px" );
+        controlsContent.addComponent( browser );
     }
 
 
-    private void listInstalledPluginsClickHandler()
+    private void listInstalledPluginsClickHandler( HorizontalLayout controlsContent )
     {
+        if( browser != null )
+        {
+            controlsContent.removeComponent( browser );
+        }
         pluginsTable.removeAllItems();
-        contentRoot.addComponent( pluginsTable );
+        if( isTableRemoved )
+        {
+            contentRoot.addComponent( pluginsTable );
+        }
         boolean isUpgradeAvailable = false;
 
         for ( PluginInfo p : pluginManager.getInstalledPlugins() )
@@ -215,14 +215,25 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
 
             addClickListenerToRemoveButton( removeButton, p.getPluginName(), itemId );
             addClickListenetToUpgradeButton( upgradeButton, p.getPluginName());
+            isTableRemoved = false;
         }
     }
 
 
-    private void listAvailablePluginsClickHandler()
+    private void listAvailablePluginsClickHandler( HorizontalLayout controlsContent )
     {
+        if( browser != null)
+        {
+            controlsContent.removeComponent( browser );
+        }
+
+
         pluginsTable.removeAllItems();
-        contentRoot.addComponent( pluginsTable );
+        if( isTableRemoved )
+        {
+            contentRoot.addComponent( pluginsTable );
+        }
+
 
         for( PluginInfo p : pluginManager.getAvailablePlugins() )
         {
@@ -242,6 +253,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
             Object itemId = itemIds.get( count-1 );
 
             addClickListenerToInstallButton( installButton, p.getPluginName(), itemId );
+            isTableRemoved = false;
         }
 
     }
