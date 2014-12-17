@@ -16,10 +16,11 @@ public class MessageCommand extends OsgiCommandSupport
 {
     @Argument( index = 0, name = "peer id", multiValued = false, required = true, description = "Id of target peer" )
     private String peerId;
-    @Argument( index = 1, name = "message", multiValued = false, required = true,  description = "Message to send" )
+    @Argument( index = 1, name = "message", multiValued = false, required = true, description = "Message to send" )
     private String message;
 
     private final PeerManager peerManager;
+    private static final int TIMEOUT = 5;
 
 
     public MessageCommand( final PeerManager peerManager )
@@ -33,7 +34,7 @@ public class MessageCommand extends OsgiCommandSupport
     {
         Peer targetPeer = peerManager.getPeer( UUID.fromString( peerId ) );
 
-        System.out.println( targetPeer.sendRequest( message, "ECHO_LISTENER", 5, String.class ) );
+        System.out.println( targetPeer.sendRequest( message, "ECHO_LISTENER", TIMEOUT, String.class, TIMEOUT ) );
 
         return null;
     }

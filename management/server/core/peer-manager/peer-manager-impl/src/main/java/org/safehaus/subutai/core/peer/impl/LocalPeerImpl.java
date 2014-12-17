@@ -154,6 +154,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             for ( ContainerHost containerHost : ( resourceHost ).getContainerHosts() )
             {
                 containerHost.setPeer( this );
+                containerHost.setDataService( containerHostDataService );
             }
         }
 
@@ -341,7 +342,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
      * @param sourcePeer - peer from which to import templates
      * @param templates - templates to import
      */
-    protected void importTemplates( Peer sourcePeer, final Set<Template> templates ) throws PeerException
+    protected void importTemplates( Peer sourcePeer, Set<Template> templates, String templateDownloadToken )
+            throws PeerException
     {
         Preconditions.checkNotNull( sourcePeer );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( templates ) );
@@ -353,7 +355,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             for ( Template template : templates )
             {
                 //import each template's ancestry lineage
-                importTemplateLineage( sourcePeer, template );
+                importTemplateLineage( sourcePeer, template, templateDownloadToken );
             }
         }
     }
@@ -368,7 +370,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
      * @param sourcePeer - peer from which to import ancestry lineage
      * @param template - template whose ancestry lineage to import
      */
-    private void importTemplateLineage( Peer sourcePeer, Template template ) throws PeerException
+    private void importTemplateLineage( Peer sourcePeer, Template template, String templateDownloadToken )
+            throws PeerException
     {
         //construct template lineage
         List<Template> templateLineage = Lists.newArrayList();
@@ -399,7 +402,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 {
                     //download target template
                     commandUtil.execute( commands.getDownloadTemplateCommand( sourcePeer.getPeerInfo().getIp(),
-                            sourcePeer.getPeerInfo().getPort(), remoteTemplate.getTemplateName() ), managementHost );
+                            sourcePeer.getPeerInfo().getPort(), remoteTemplate.getTemplateName(),
+                            templateDownloadToken ), managementHost );
                     //import target template
                     commandUtil.execute( commands.getImportTemplateCommand( remoteTemplate.getTemplateName() ),
                             managementHost );
@@ -497,6 +501,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             for ( ContainerHost containerHost : containerHosts )
             {
                 containerHost.setPeer( this );
+                containerHost.setDataService( containerHostDataService );
                 result.add( new HostInfoModel( containerHost ) );
             }
         }
@@ -1036,29 +1041,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     @Override
-    public <T, V> V sendRequest( final T request, final String recipient, final int timeout,
-                                 final Class<V> responseType ) throws PeerException
+    public <T, V> V sendRequest( final T request, final String recipient, final int requestTimeout,
+                                 final Class<V> responseType, final int responseTimeout ) throws PeerException
     {
         Preconditions.checkNotNull( responseType, "Invalid response type" );
 
-        return sendRequestInternal( request, recipient, timeout, responseType );
+        return sendRequestInternal( request, recipient, responseType );
     }
 
 
     @Override
-    public <T> void sendRequest( final T request, final String recipient, final int timeout ) throws PeerException
+    public <T> void sendRequest( final T request, final String recipient, final int requestTimeout )
+            throws PeerException
     {
-        sendRequestInternal( request, recipient, timeout, null );
+        sendRequestInternal( request, recipient, null );
     }
 
 
-    private <T, V> V sendRequestInternal( final T request, final String recipient, final int timeout,
-                                          final Class<V> responseType ) throws PeerException
+    private <T, V> V sendRequestInternal( final T request, final String recipient, final Class<V> responseType )
+            throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
-        Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
-
 
         for ( RequestListener requestListener : requestListeners )
         {
@@ -1129,6 +1133,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                         catch ( HostNotFoundException hnfe )
                         {
                             containerHost = new ContainerHostEntity( getId().toString(), containerHostInfo );
+                            ( ( ContainerHostEntity ) containerHost ).setDataService( containerHostDataService );
                             containerHost.setPeer( this );
                             host.addContainerHost( ( ContainerHostEntity ) containerHost );
                             containerHostDataService.persist( ( ContainerHostEntity ) containerHost );

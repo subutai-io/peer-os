@@ -10,7 +10,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 @Command( scope = "peer", name = "tasks" )
-public class TaksCommand extends OsgiCommandSupport
+public class TaskCommand extends OsgiCommandSupport
 {
 
     private PeerManager peerManager;
