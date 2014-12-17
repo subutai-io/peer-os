@@ -13,9 +13,6 @@ import org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.peer.api.Peer;
 
 
-/**
- * Created by bahadyr on 11/6/14.
- */
 public class Node2PeerBuilder extends EnvironmentBuildProcessFactory
 {
 
@@ -47,9 +44,9 @@ public class Node2PeerBuilder extends EnvironmentBuildProcessFactory
                 ccm.setNodeGroupName( nodeGroup.getName() );
                 ccm.setNumberOfNodes( 1 );
                 ccm.setStrategy( nodeGroup.getPlacementStrategy() );
-                List<Template> templates =
-                        fetchRequiredTemplates( environmentManager.getPeerManager().getLocalPeer().getId(),
-                                nodeGroup.getTemplateName() );
+                List<Template> templates
+                        = fetchRequiredTemplates( environmentManager.getPeerManager().getLocalPeer().getId(),
+                                                  nodeGroup.getTemplateName() );
 
                 if ( templates.isEmpty() )
                 {
@@ -66,8 +63,7 @@ public class Node2PeerBuilder extends EnvironmentBuildProcessFactory
             }
         }
 
-
-
         return process;
     }
 }
+
