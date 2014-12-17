@@ -11,11 +11,11 @@ import java.util.UUID;
  */
 public interface PluginManager
 {
-    public UUID installPlugin( String packageName );
+    public UUID installPlugin( String pluginName );
 
-    public UUID removePlugin( String packageName );
+    public UUID removePlugin( String pluginName );
 
-    public void upgradePlugin( String packageName );
+    public UUID upgradePlugin( String pluginName );
 
     public Set<PluginInfo> getInstalledPlugins();
 

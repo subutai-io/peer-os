@@ -29,7 +29,7 @@ public class ManagerHelper
     private CommandUtil commandUtil;
 
     private static final String INFO_JSON = String.format(
-            "[{\"type\":\"plugin\", \"pluginName\":\"lucene\", \"version\":\"2.0.4\", \"rating\":\"5\" }, " +
+            "[{\"type\":\"plugin\", \"pluginName\":\"lucene\", \"version\":\"2.0.5\", \"rating\":\"5\" }, " +
                     "{\"type\":\"plugin\", \"pluginName\":\"hipi\", \"version\":\"2.0.4\", \"rating\":\"6\" } ]" );
 
 
@@ -141,6 +141,20 @@ public class ManagerHelper
             }
         }
         return rating;
+    }
+
+    protected String findVersion( Set<PluginInfo> availablePlugins, String pluginName )
+    {
+        String version = null;
+        for ( PluginInfo plugin : availablePlugins )
+        {
+            if ( pluginName.equals( plugin.getPluginName() ) )
+            {
+                version = plugin.getVersion();
+            }
+
+        }
+        return version;
     }
 
 

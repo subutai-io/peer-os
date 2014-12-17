@@ -3,6 +3,7 @@ package org.safehaus.subutai.wol.impl.manager.handler;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.wol.api.PluginInfo;
@@ -72,7 +73,7 @@ public class PluginOperationHandler implements Runnable
         {
             trackerOperation.addLogFailed( String.format( "%s, Removing operation is failed...", e.getMessage() ) );
         }
-        trackerOperation.addLogDone( "Plugin removed successfully." );
+        trackerOperation.addLogDone( "Plugin is removed successfully." );
     }
 
 
@@ -88,12 +89,28 @@ public class PluginOperationHandler implements Runnable
         {
             trackerOperation.addLogFailed( String.format( "%s, Installing operation is failed...", e.getMessage() ) );
         }
-        trackerOperation.addLogDone( "Plugin installed successfully." );
+        trackerOperation.addLogDone( "Plugin is installed successfully." );
     }
 
 
     private void upgradePlugin()
     {
+        String result = null;
+        trackerOperation.addLog( "Upgrading plugin.." );
+        RequestBuilder command = manager.getCommands().makeUpgradeCommand( pluginName );
+        try
+        {
+            result = managerHelper.execute( command );
+            /*if( result.equals( "fail" ))
+            {
+                throw new PluginManagerException( "Operation is failed" );
+            }*/
+        }
+        catch ( PluginManagerException e )
+        {
+            trackerOperation.addLogFailed( String.format( "%s, Upgrade operation is failed...", e.getMessage() ) );
+        }
+        trackerOperation.addLogDone( "Plugin is upgraded successfully." );
     }
 
 

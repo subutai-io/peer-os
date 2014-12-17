@@ -18,6 +18,7 @@ import org.safehaus.subutai.wol.api.PluginManager;
 
 import com.google.common.collect.Sets;
 import com.vaadin.server.ExternalResource;
+import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
@@ -91,6 +92,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
 
         getListInstalledPluginsButton( controlsContent );
         getListAvailablePluginsButton( controlsContent );
+        getMarketPlaceButton( controlsContent );
 
 
         contentRoot.addComponent( controlsContent, 0, 0 );
@@ -119,6 +121,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         } );
 
         controlsContent.addComponent( listPluginsBtn );
+        //contentRoot.addComponent( pluginsTable, 0, 1, 0, 9 );
     }
 
     private void getListAvailablePluginsButton( HorizontalLayout controlsContent )
@@ -136,6 +139,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
         }  );
 
         controlsContent.addComponent( listAvailablePluginsBtn );
+        //contentRoot.addComponent( pluginsTable, 0, 1, 0, 9 );
     }
 
     private void getMarketPlaceButton( final HorizontalLayout controlsContent)
@@ -157,23 +161,30 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
 
     private void marketPlaceButtonClickListener( HorizontalLayout controlsContent )
     {
+        contentRoot.removeComponent( pluginsTable );
         URL url = null;
         try
         {
-            url = new URL("http://dev.vaadin.com/");
+            url = new URL("http://www.google.com/");
         }
         catch ( MalformedURLException e )
         {
             e.printStackTrace();
         }
-        Embedded browser = new Embedded("", new ExternalResource(url));
-        controlsContent.addComponent(browser);
+        //Embedded browser = new Embedded("", new ExternalResource(url));
+        BrowserFrame sample = new BrowserFrame("vaadin.com", new ExternalResource(
+                "https://vaadin.com/home"));
+        sample.setWidth( "600px" );
+        sample.setHeight( "400px" );
+        sample.setSizeUndefined();
+        controlsContent.addComponent( sample );
     }
 
 
     private void listInstalledPluginsClickHandler()
     {
         pluginsTable.removeAllItems();
+        contentRoot.addComponent( pluginsTable );
         boolean isUpgradeAvailable = false;
 
         for ( PluginInfo p : pluginManager.getInstalledPlugins() )
@@ -203,6 +214,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
             Object itemId = itemIds.get( count-1 );
 
             addClickListenerToRemoveButton( removeButton, p.getPluginName(), itemId );
+            addClickListenetToUpgradeButton( upgradeButton, p.getPluginName());
         }
     }
 
@@ -210,6 +222,7 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
     private void listAvailablePluginsClickHandler()
     {
         pluginsTable.removeAllItems();
+        contentRoot.addComponent( pluginsTable );
 
         for( PluginInfo p : pluginManager.getAvailablePlugins() )
         {
@@ -270,6 +283,45 @@ public class PluginManagerComponent extends CustomComponent implements Disposabl
             }
         } );
     }
+
+
+    private void addClickListenetToUpgradeButton( final Button upgradeButton, final String pluginName )
+    {
+        upgradeButton.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                ConfirmationDialog alert = new ConfirmationDialog(
+                        String.format( "Do you want to upgrade the %s plugin?", pluginName ), "Yes",
+                        "No" );
+                alert.getOk().addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( Button.ClickEvent clickEvent )
+                    {
+
+                        UUID trackID = pluginManager.upgradePlugin( pluginName );
+
+                        ProgressWindow window =
+                                new ProgressWindow( executorService, tracker, trackID, pluginManager.getProductKey());
+                        window.getWindow().addCloseListener( new Window.CloseListener()
+                        {
+                            @Override
+                            public void windowClose( Window.CloseEvent closeEvent )
+                            {
+                                upgradeButton.setVisible( false );
+                            }
+                        } );
+                        contentRoot.getUI().addWindow( window.getWindow() );
+                    }
+                } );
+
+                contentRoot.getUI().addWindow( alert.getAlert() );
+            }
+        } );
+    }
+
 
 
     private void addClickListenerToRemoveButton( Button removeButton, final String pluginName, final Object itemId )

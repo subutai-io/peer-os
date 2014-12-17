@@ -17,7 +17,7 @@ public class Commands
 
     public static String PURGE_COMMAND = "apt-get --force-yes --assume-yes purge ";
 
-    public static String UPGRADE_COMMAND = "apt-get --force-yes --assume-yes upgrade";
+    public static String UPGRADE_COMMAND = "apt-get --force-yes --assume-yes upgrade ";
 
     public static String CHECK_COMMAND = "dpkg -l | grep '^ii' | grep " + PACKAGE_POSTFIX_WITHOUT_DASH;
 

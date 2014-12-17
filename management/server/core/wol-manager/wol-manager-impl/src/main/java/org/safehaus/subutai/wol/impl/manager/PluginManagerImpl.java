@@ -79,9 +79,11 @@ public class PluginManagerImpl implements PluginManager
 
 
     @Override
-    public void upgradePlugin( final String packageName )
+    public UUID upgradePlugin( final String pluginName )
     {
-
+        PluginOperationHandler handler = new PluginOperationHandler( this, managerHelper, pluginName, OperationType.UPGRADE );
+        executor.execute( handler );
+        return handler.getTrackerId();
     }
 
 
@@ -163,7 +165,15 @@ public class PluginManagerImpl implements PluginManager
     @Override
     public boolean isUpgradeAvailable( final String pluginName )
     {
-        return true;
+        boolean upgrade = false;
+        String currentVersion = managerHelper.findVersion( getInstalledPlugins(), pluginName );
+        String newVersion = managerHelper.findVersion( getAvailablePlugins(), pluginName );
+
+        if( !currentVersion.equals( newVersion ) )
+        {
+            upgrade = true;
+        }
+        return upgrade;
     }
 
 
