@@ -42,7 +42,7 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
     private int routerPort = 27018;
     private int dataNodePort = 27017;
 
-    private Set<MongoConfigNode> configServers = new HashSet<>();
+    private Set<MongoConfigNodeImpl> configServers = new HashSet<>();
     private Set<MongoRouterNode> routerServers = new HashSet<>();
     private Set<MongoDataNode> dataNodes = new HashSet<>();
     private UUID environmentId;
@@ -222,6 +222,7 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
 
     public Set<MongoConfigNode> getConfigServers()
     {
+        Set<MongoConfigNode> result = new HashSet<>();
         return configServers;
     }
 

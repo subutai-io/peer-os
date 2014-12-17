@@ -181,7 +181,7 @@ public class ProgressWindow
         indicator.setVisible( false );
         ok.setEnabled( true );
 
-        Notification.show( to.getDescription(), to.getLog(), Notification.Type.WARNING_MESSAGE );
+        Notification.show( to.getState() + " " + to.getDescription(), to.getLog(), Notification.Type.WARNING_MESSAGE );
     }
 
 

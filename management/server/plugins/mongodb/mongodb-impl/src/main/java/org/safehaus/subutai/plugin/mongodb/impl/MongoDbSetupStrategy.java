@@ -237,7 +237,8 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
 
         po.addLog( "Saving cluster information to database..." );
 
-        mongoManager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        mongoManager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(),
+                mongoManager.getGSON().toJson( config ) );
         po.addLog( "Cluster information saved to database" );
 
 

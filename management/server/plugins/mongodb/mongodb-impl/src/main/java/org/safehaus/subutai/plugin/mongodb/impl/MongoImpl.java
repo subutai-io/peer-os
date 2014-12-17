@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 
@@ -67,6 +68,7 @@ public class MongoImpl implements Mongo
     private PluginDAO pluginDAO;
     private DataSource dataSource;
     private PeerManager peerManager;
+    private Gson GSON = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping().create();
 
 
     public MongoImpl( DataSource dataSource )
@@ -147,6 +149,7 @@ public class MongoImpl implements Mongo
             gsonBuilder.registerTypeAdapter( MongoRouterNode.class, new GsonInterfaceAdapter<MongoRouterNode>() )
                        .create();
 
+            GSON = gsonBuilder.setPrettyPrinting().disableHtmlEscaping().create();
             this.pluginDAO = new PluginDAO( dataSource, gsonBuilder );
         }
         catch ( SQLException e )
@@ -162,6 +165,12 @@ public class MongoImpl implements Mongo
     public void destroy()
     {
         executor.shutdown();
+    }
+
+
+    public Gson getGSON()
+    {
+        return GSON;
     }
 
 
@@ -193,8 +202,15 @@ public class MongoImpl implements Mongo
 
     public List<MongoClusterConfig> getClusters()
     {
-        List<MongoClusterConfigImpl> r =
-                pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, MongoClusterConfigImpl.class );
+        List<String> clusterDataList = pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY );
+
+        List<MongoClusterConfigImpl> r = new ArrayList<>();
+        //                pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, MongoClusterConfigImpl.class );
+        for ( final String clusterData : clusterDataList )
+        {
+            MongoClusterConfigImpl config = GSON.fromJson( clusterData, MongoClusterConfigImpl.class );
+            r.add( config );
+        }
 
         List<MongoClusterConfig> result = new ArrayList<>();
         result.addAll( r );
@@ -207,7 +223,9 @@ public class MongoImpl implements Mongo
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
 
-        return pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, clusterName, MongoClusterConfigImpl.class );
+        String jsonString = pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, clusterName );
+        return GSON.fromJson( jsonString, MongoClusterConfigImpl.class );
+        //        return pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, clusterName, MongoClusterConfigImpl.class );
     }
 
 
