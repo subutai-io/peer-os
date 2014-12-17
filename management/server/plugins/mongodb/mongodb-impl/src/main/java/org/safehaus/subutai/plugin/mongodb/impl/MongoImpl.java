@@ -21,7 +21,6 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.util.GsonInterfaceAdapter;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -30,9 +29,6 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
-import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
-import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
-import org.safehaus.subutai.plugin.mongodb.api.MongoRouterNode;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 import org.safehaus.subutai.plugin.mongodb.impl.handler.AddNodeOperationHandler;
@@ -142,15 +138,33 @@ public class MongoImpl implements Mongo
         try
         {
 
-            GsonBuilder gsonBuilder = new GsonBuilder();
-            gsonBuilder.registerTypeAdapter( MongoDataNode.class, new GsonInterfaceAdapter<MongoDataNode>() ).create();
-            gsonBuilder.registerTypeAdapter( MongoConfigNode.class, new GsonInterfaceAdapter<MongoConfigNode>() )
-                       .create();
-            gsonBuilder.registerTypeAdapter( MongoRouterNode.class, new GsonInterfaceAdapter<MongoRouterNode>() )
-                       .create();
+            //            GsonBuilder gsonBuilder = new GsonBuilder();
+            ////            gsonBuilder.registerTypeAdapter( MongoDataNode.class, new
+            // GsonInterfaceAdapter<MongoDataNode>() ).create();
+            ////            gsonBuilder.registerTypeAdapter( MongoConfigNode.class, new
+            // GsonInterfaceAdapter<MongoConfigNode>() )
+            ////                       .create();
+            ////            gsonBuilder.registerTypeAdapter( MongoRouterNode.class, new
+            // GsonInterfaceAdapter<MongoRouterNode>() )
+            ////                       .create();
+            //            gsonBuilder.setExclusionStrategies( new ExclusionStrategy()
+            //            {
+            //                @Override
+            //                public boolean shouldSkipField( final FieldAttributes f )
+            //                {
+            //                    return false;
+            //                }
+            //
+            //
+            //                @Override
+            //                public boolean shouldSkipClass( final Class<?> clazz )
+            //                {
+            //                    return clazz.isInterface();
+            //                }
+            //            } );
 
-            GSON = gsonBuilder.setPrettyPrinting().disableHtmlEscaping().create();
-            this.pluginDAO = new PluginDAO( dataSource, gsonBuilder );
+            //            GSON = gsonBuilder.serializeNulls().setPrettyPrinting().disableHtmlEscaping().create();
+            this.pluginDAO = new PluginDAO( dataSource );
         }
         catch ( SQLException e )
         {
@@ -208,7 +222,8 @@ public class MongoImpl implements Mongo
         //                pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, MongoClusterConfigImpl.class );
         for ( final String clusterData : clusterDataList )
         {
-            MongoClusterConfigImpl config = GSON.fromJson( clusterData, MongoClusterConfigImpl.class );
+            MongoClusterConfigImpl config =
+                    GSON.fromJson( clusterData, MongoClusterConfigImpl.class ).init( environmentManager );
             r.add( config );
         }
 
@@ -224,7 +239,12 @@ public class MongoImpl implements Mongo
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
 
         String jsonString = pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, clusterName );
-        return GSON.fromJson( jsonString, MongoClusterConfigImpl.class );
+        MongoClusterConfigImpl clusterConfig = GSON.fromJson( jsonString, MongoClusterConfigImpl.class );
+        if ( clusterConfig != null )
+        {
+            return clusterConfig.init( environmentManager );
+        }
+        return clusterConfig;
         //        return pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, clusterName, MongoClusterConfigImpl.class );
     }
 
