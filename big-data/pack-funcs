@@ -16,15 +16,17 @@ initializeVariables() {
   echo "mode: $mode"
   productName=$1
   mode=$2
-  if [ "$mode" == "default" ]; then 
+  if [ "$mode" == "plugin" ]; then 
+    BASE=/var/lib/jenkins/jobs/master.plugin.$productName
+    SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin"
+    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-plugin"
+
+  else
     productNameUppercase="$(tr '[:lower:]' '[:upper:]' <<< ${productName:0:1})${productName:1}"
     BASE=/var/lib/jenkins/jobs/master.bigdata.$productName/$productNameUppercase
     SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
     TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
-  else
-    BASE=/var/lib/jenkins/jobs/master.plugin.$productName
-    SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin"
-    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-plugin"
+
   fi
 
   pushd $BASE
@@ -33,10 +35,10 @@ initializeVariables() {
   fi
   fileName=`ls | grep subutai | awk '{print $1}' | head -1`
   if [[ $fileName == "" ]]; then
-    if [ "$mode" == "default"]; then 
-      fileName="subutai-$productName"
-    else
+    if [ "$mode" == "plugin" ]; then 
       fileName="subutai-$productName-plugin"
+    else
+      fileName="subutai-$productName"
     fi
     mkdir -p $fileName
   fi
@@ -71,12 +73,14 @@ checkPackageVersion() {
 
 generateDebianPackagePlugins() {
   makeDirectory=$BASE/$fileName
+  ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
   pushd $makeDirectory
   if [ -d target ]; then
     rm -rf target/
   fi
   make
   cp target/*".deb" $TARGET/
+  cp target/*".deb" $ISOPATH/
   popd
 }
 
@@ -188,20 +192,17 @@ generateRepoPackage() {
   #Basic path definitions
   productName=$1  
 
+  SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
+  TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
+  PACK="/var/lib/jenkins/Automation/Automation_ISO/mgmt-repo/template-repo-package/"
+  ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
+
   #it's template package operation
   if [[ $productName == *"template"* ]]; then
     BASE=/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName
-    SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
-    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
-    PACK="/var/lib/jenkins/Automation/Automation_ISO/mgmt-repo/template-repo-package/"
-    ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
   else
     productNameUppercase="$(tr '[:lower:]' '[:upper:]' <<< ${productName:0:1})${productName:1}"
     BASE=/var/lib/jenkins/jobs/master.bigdata.$productName/$productNameUppercase
-    SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
-    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
-    PACK="/var/lib/jenkins/Automation/Automation_ISO/mgmt-repo/template-repo-package/"
-    ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
   fi
 
   pushd $BASE
@@ -243,19 +244,42 @@ generateRepoPackage() {
      echo "Pure package name is empty. Aborting..."
      exit 1
   fi
+  
+  #starting to genereate template repo package
+  generateTemplateRepo
+  echo "Repo wrapper package Successfully created."
 
+  popd
+}
+
+#generete Template repo package structure
+generateTemplateRepo() {
+  pushd $BASE
+  local arch="amd64"
   templateName="temp"
 
   #check temp folder does exist or not
   if [ -d "$templateName" ]; then
     rm -rf "$BASE/$templateName"
   fi
-  cp -a $PACK $BASE/$templateName
 
-  sed -i "s/template/subutai-repo-$purePackageName/g" $BASE/$templateName/DEBIAN/control
+  #creating main folders  
+  mkdir -p $BASE/$templateName/DEBIAN
+  mkdir -p $BASE/$templateName/repo/ksks/amd64/trusty
+
+  #generating and filling control file 
+  touch $BASE/$templateName/DEBIAN/control
+  chmod 755 $BASE/$templateName/DEBIAN/control
+  echo "Package: subutai-repo-$purePackageName" >> $BASE/$templateName/DEBIAN/control
+  echo "Version: $productVersion" >> $BASE/$templateName/DEBIAN/control
+  echo "Architecture: $arch" >> $BASE/$templateName/DEBIAN/control
+  echo "Maintainer: <subut.ai>" >> $BASE/$templateName/DEBIAN/control
+  echo "Priority: optional" >> $BASE/$templateName/DEBIAN/control
+  echo "Description: This is subutai repo $purePackageName wrapper package" >> $BASE/$templateName/DEBIAN/control
+
   cp $currentPackage $BASE/$templateName/repo/ksks/amd64/trusty/
   mv $BASE/$templateName/ $BASE/subutai-repo-$shortCurrentPackage
-  
+
   CURRENTPACK=$BASE/subutai-repo-$shortCurrentPackage
   echo "CURRENTPACK: $CURRENTPACK"
 
@@ -263,9 +287,6 @@ generateRepoPackage() {
   mv $BASE/subutai-repo-"$shortCurrentPackage".deb $ISOPATH
   rm -rf $BASE/subutai-repo-$shortCurrentPackage
   rm -rf $BASE/$templateName
-
-  echo "Repo wrapper package Successfully created."
-
   popd
 }
 
