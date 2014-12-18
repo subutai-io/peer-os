@@ -117,6 +117,7 @@ function lxc_assert {
       unlock_container_read $lxc
       show_usage "$usage"
     else
+      
       msg_info "    - check passed: container \"$lxc\" exists."
     fi
   else
@@ -257,6 +258,23 @@ function lxc_clone {
     msg_info "    - parent \"$parent\" is a template"
   fi
 
+  if [[ $parent_home =~ "/var/lib/lxc/" ]]; then
+    ls $HOME/.local/tmpdir/$parent/rootfs > /dev/null 2>&1
+    if [ $? != 0 ]; then
+      local tmp_path="$HOME/.local/tmpdir/"
+      local tmp_parent="$tmp_path$parent"
+      mkdir -p $HOME/.local/tmpdir/$parent
+      sudo btrfs send /lxc-data/$parent-home > $tmp_parent-home.delta
+      sudo btrfs send /lxc-data/$parent-var > $tmp_parent-var.delta
+      sudo btrfs send /lxc/$parent-opt > $tmp_parent-opt.delta
+      sudo btrfs send /var/lib/lxc/$parent/rootfs > $tmp_parent-rootfs.delta
+      sudo btrfs receive $tmp_path$parent -f $tmp_parent-rootfs.delta
+      sudo btrfs receive $tmp_path -f $tmp_parent-opt.delta
+      sudo btrfs receive $tmp_path -f $tmp_parent-var.delta
+      sudo btrfs receive $tmp_path -f $tmp_parent-home.delta
+      rm $tmp_parent-*.delta
+    fi
+  fi
   # (2) setup skeleton of new cloned child container
   btrfs subvolume create $child_home
   
@@ -267,7 +285,7 @@ function lxc_clone {
      -e "s/lxc\.utsname.*/lxc\.utsname = $child/"                  \
      -e "s/subutai\.parent.*/subutai\.parent = $parent/"           \
      -e "/lxc\.mount\.entry/d" \
-     -e "/subutai\.git\.branch/ a\lxc\.mount\.entry = $HOME\/\.local\/lxc\/p1-opt opt none bind,rw 0 0" \
+     -e "/subutai\.git\.branch/ a\lxc\.mount\.entry = $HOME\/\.local\/lxc\/$child-opt opt none bind,rw 0 0" \
      -e "/subutai\.git\.branch/ a\lxc\.mount\.entry = $HOME\/\.local\/lxc\-data\/$child-var var none bind,rw 0 0" \
      -e "/subutai\.git\.branch/ a\lxc\.mount\.entry = $HOME\/\.local\/lxc\-data\/$child-home home none bind,rw 0 0" \
      -e "s|\/var\/lib\/lxc\/$parent\/|${HOME}\/\.local\/share\/lxc\/$child\/|g"\

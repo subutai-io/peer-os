@@ -28,11 +28,11 @@ function fs_take_snapshot_from_parent {
   local child_ds="$2"
   lxc-info -n $parent > /dev/null 2>&1
   if [ $? == 0 ]; then
-    #sudo btrfs subvolume snapshot $HOME/.local/share/lxc/$parent/rootfs $HOME/.local/share/lxc/$child_ds > /dev/null 2>&1
-    sudo cp -R  $HOME/.local/share/lxc/$parent/rootfs/ $HOME/.local/share/lxc/$child_ds
+    sudo btrfs subvolume snapshot $HOME/.local/tmpdir/$parent/rootfs $HOME/.local/share/lxc/$child_ds > /dev/null 2>&1
+    #sudo cp -R  $HOME/.local/share/lxc/$parent/rootfs/ $HOME/.local/share/lxc/$child_ds
   else
-    #sudo btrfs subvolume snapshot /var/lib/lxc/$parent/rootfs $HOME/.local/share/lxc/$child_ds > /dev/null 2>&1
-    sudo cp -R  /var/lib/lxc/$parent/rootfs $HOME/.local/share/lxc/$child_ds
+    sudo btrfs subvolume snapshot  $HOME/.local/tmpdir/$parent/rootfs $HOME/.local/share/lxc/$child_ds > /dev/null 2>&1
+    #sudo cp -R  /var/lib/lxc/$parent/rootfs $HOME/.local/share/lxc/$child_ds
   fi
 }
 function fs_clone {
@@ -41,9 +41,11 @@ function fs_clone {
   local parent_name=`echo $parent_snap | awk -F "-" '{print $1}'`
   local parent_dir=`fs_find_parent_dir $parent_name`
   if [[ "$1" =~ "var" ]] || [[ "$1" =~ "home" ]]; then
-    sudo cp -R $parent_dir/lxc-data/$parent_snap $HOME/.local/lxc-data/$child_ds > /dev/null 2>&1
+    sudo btrfs subvolume snapshot $HOME/.local/tmpdir/$parent_snap $HOME/.local/lxc-data/$child_ds > /dev/null 2>&1
+    #sudo cp -R $parent_dir/lxc-data/$parent_snap $HOME/.local/lxc-data/$child_ds > /dev/null 2>&1
   elif [[ "$1" =~ "opt" ]]; then
-    sudo cp -R $parent_dir/lxc/$parent_snap $HOME/.local/lxc/$child_ds > /dev/null 2>&1
+    sudo btrfs subvolume snapshot $HOME/.local/tmpdir/$parent_snap $HOME/.local/lxc/$child_ds > /dev/null 2>&1
+    #sudo cp -R $parent_dir/lxc/$parent_snap $HOME/.local/lxc/$child_ds > /dev/null 2>&1
   else
     rm -rf /$HOME/.local/share/lxc/$child_ds/rootfs
     fs_take_snapshot_from_parent $parent_snap $child_ds
