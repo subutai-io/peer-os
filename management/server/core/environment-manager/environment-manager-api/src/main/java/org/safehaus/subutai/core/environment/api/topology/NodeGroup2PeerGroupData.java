@@ -10,7 +10,6 @@ import org.safehaus.subutai.common.protocol.NodeGroup;
 
 public class NodeGroup2PeerGroupData extends TopologyData
 {
-    final UUID blueprintId;
     final UUID peerGroupId;
     final Map<NodeGroup, UUID> nodeGroupToPeer = new HashMap<>();
 
@@ -19,12 +18,6 @@ public class NodeGroup2PeerGroupData extends TopologyData
     {
         this.blueprintId = blueprintId;
         this.peerGroupId = peerGroupId;
-    }
-
-
-    public UUID getBlueprintId()
-    {
-        return blueprintId;
     }
 
 
