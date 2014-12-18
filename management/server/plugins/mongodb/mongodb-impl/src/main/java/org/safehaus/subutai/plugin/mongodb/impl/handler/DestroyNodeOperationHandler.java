@@ -52,7 +52,6 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
             return;
         }
 
-        //        Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         MongoNode node = config.findNode( lxcHostname );
         if ( node == null )
         {
@@ -115,69 +114,6 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
                 po.addLog( "Unregistering this node from replica set..." );
                 MongoDataNode primaryDataNode = config.findPrimaryNode();
                 primaryDataNode.unRegisterSecondaryNode( dataNode );
-
-
-                //            config.getDataNodes().remove( agent );
-                //            config.setNumberOfDataNodes( config.getNumberOfDataNodes() - 1 );
-                //            //unregister from primary
-                //            po.addLog( "Unregistering this node from replica set..." );
-                //            Command findPrimaryNodeCommand =
-                //                    manager.getCommands().getFindPrimaryNodeCommand( agent, config.getDataNodePort
-                // () );
-                //            manager.getCommandRunner().runCommand( findPrimaryNodeCommand );
-                //
-                //            if ( findPrimaryNodeCommand.hasCompleted() && !findPrimaryNodeCommand.getResults()
-                // .isEmpty() )
-                //            {
-                //                Pattern p = Pattern.compile( "primary\" : \"(.*)\"" );
-                //                Matcher m = p.matcher( findPrimaryNodeCommand.getResults().get( agent.getUuid() )
-                // .getStdOut() );
-                //                Agent primaryNodeAgent = null;
-                //                if ( m.find() )
-                //                {
-                //                    String primaryNodeHost = m.group( 1 );
-                //                    if ( !Strings.isNullOrEmpty( primaryNodeHost ) )
-                //                    {
-                //                        String hostname = primaryNodeHost.split( ":" )[0].replace( "." + config
-                // .getDomainName(), "" );
-                //                        primaryNodeAgent = manager.getAgentManager().getAgentByHostname( hostname );
-                //                    }
-                //                }
-                //                if ( primaryNodeAgent != null )
-                //                {
-                //                    if ( primaryNodeAgent != agent )
-                //                    {
-                //                        Command unregisterSecondaryNodeFromPrimaryCommand = manager.getCommands()
-                //
-                // .getUnregisterSecondaryNodeFromPrimaryCommand(
-                //
-                // primaryNodeAgent,
-                //                                                                                           config
-                // .getDataNodePort(),
-                //                                                                                           agent,
-                //                                                                                           config
-                // .getDomainName() );
-                //
-                //                        manager.getCommandRunner().runCommand(
-                // unregisterSecondaryNodeFromPrimaryCommand );
-                //                        if ( !unregisterSecondaryNodeFromPrimaryCommand.hasCompleted() )
-                //                        {
-                //                            po.addLog( "Could not unregister this node from replica set, skipping..
-                // ." );
-                //                        }
-                //                    }
-                //                }
-                //                else
-                //                {
-                //                    po.addLog( "Could not determine primary node for unregistering from replica set,
-                // skipping..." );
-                //                }
-                //            }
-                //            else
-                //            {
-                //                po.addLog( "Could not determine primary node for unregistering from replica set,
-                // skipping..." );
-                //            }
             }
             else if ( nodeType == NodeType.ROUTER_NODE )
             {
@@ -200,7 +136,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
 
         //update db
         po.addLog( "Updating cluster information in database..." );
-        manager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        String json = manager.getGSON().toJson( config.prepare() );
+        manager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), json );
         po.addLogDone( "Cluster information updated in database" );
     }
 }

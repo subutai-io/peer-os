@@ -16,7 +16,11 @@
   </jaxrs:server>
   <bean id="hadoopRestServiceImpl" class="org.safehaus.subutai.plugin.hadoop.rest.RestServiceImpl">
     <property name="hadoopManager" ref="hadoopManager" />
+    <property name="environmentManager" ref="environmentManager" />
   </bean>
   <reference id="hadoopManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
+  <reference id="environmentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
+
 </blueprint>

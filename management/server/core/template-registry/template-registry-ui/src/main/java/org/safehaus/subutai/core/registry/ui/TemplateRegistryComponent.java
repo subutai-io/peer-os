@@ -221,7 +221,7 @@ public class TemplateRegistryComponent extends CustomComponent
         verticalLayout.setSizeFull();
 
         changedFilesTable = new Table( "Changed Files." );
-        changedFilesTable.setWidth( "21%" );
+        changedFilesTable.setWidth( "50%" );
         changedFilesTable.setImmediate( true );
 
         templateInfoTable = new Table( "Template Info" );

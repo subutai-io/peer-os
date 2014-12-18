@@ -167,7 +167,12 @@ public class HadoopImpl implements Hadoop
     @Override
     public UUID uninstallCluster( final String clustername )
     {
-        return null;
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clustername ), "Cluster name is null or empty" );
+        HadoopClusterConfig hadoopClusterConfig = getCluster( clustername );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.UNINSTALL, null );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 

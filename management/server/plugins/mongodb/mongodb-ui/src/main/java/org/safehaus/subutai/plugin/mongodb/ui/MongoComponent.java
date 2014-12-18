@@ -35,10 +35,24 @@ public class MongoComponent extends CustomComponent
 
         TabSheet mongoSheet = new TabSheet();
         mongoSheet.setSizeFull();
-        Manager manager = new Manager( executorService, serviceLocator );
+        final Manager manager = new Manager( executorService, serviceLocator );
         Wizard wizard = new Wizard( executorService, serviceLocator );
         mongoSheet.addTab( wizard.getContent(), "Install" );
         mongoSheet.addTab( manager.getContent(), "Manage" );
+        mongoSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+            {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if ( caption.equals( "Manage" ) )
+                {
+                    manager.refreshClustersInfo();
+                    manager.checkAllNodes();
+                }
+            }
+        } );
         verticalLayout.addComponent( mongoSheet );
 
         setCompositionRoot( verticalLayout );

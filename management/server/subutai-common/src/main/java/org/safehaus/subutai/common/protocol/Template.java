@@ -335,6 +335,12 @@ public class Template
     }
 
 
+    public String getFileName()
+    {
+        return String.format( "%s-subutai-template_%s_%s.deb", templateName, templateVersion, lxcArch ).toLowerCase();
+    }
+
+
     public String getParentTemplateName()
     {
         return parentTemplateName;

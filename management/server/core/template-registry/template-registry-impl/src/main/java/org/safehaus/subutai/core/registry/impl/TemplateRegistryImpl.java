@@ -679,8 +679,8 @@ public class TemplateRegistryImpl implements TemplateRegistry
     {
         try
         {
-            //            Template template = TestUtilsDuplicate.getParentTemplate();
-            //            templateService.saveTemplate( template );
+            //                        Template template = TestUtilsDuplicate.getParentTemplate();
+            //                        templateService.saveTemplate( template );
 
             LOG.warn( "Printing saved templates..." );
             List<Template> templates = templateService.getAllTemplates();

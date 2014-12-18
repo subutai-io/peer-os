@@ -47,6 +47,8 @@ import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
+import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.security.api.SecurityManager;
 import org.safehaus.subutai.core.security.api.SecurityManagerException;
@@ -55,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
@@ -467,6 +470,66 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentManagerException( e.getMessage() );
         }
+    }
+
+
+    public void createLocalContainer( final Environment environment, final String templateName,
+                                      final String nodeGroupName, ResourceHost resourceHost )
+            throws EnvironmentBuildException
+    {
+        Preconditions.checkNotNull( environment );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
+        Preconditions.checkNotNull( resourceHost );
+
+
+        //obtain free name
+        String containerName = peerManager.getLocalPeer().getFreeHostName( templateName );
+
+        //clone container
+        try
+        {
+            resourceHost.cloneContainer( templateName, containerName );
+        }
+        catch ( ResourceHostException e )
+        {
+            throw new EnvironmentBuildException( e.getMessage() );
+        }
+
+        //wait container
+        int timeout = 180;
+        long start = System.currentTimeMillis();
+        ContainerHost containerHost = null;
+        while ( start + timeout * 1000 > System.currentTimeMillis() && containerHost == null )
+        {
+            try
+            {
+                Thread.sleep( 100 );
+            }
+            catch ( InterruptedException ignore )
+            {
+
+            }
+
+            containerHost = resourceHost.getContainerHostByName( containerName );
+        }
+
+        //container connection timed out
+        if ( containerHost == null )
+        {
+            throw new EnvironmentBuildException( "Container has not connected within wait interval" );
+        }
+
+        //construct host entity
+        HostInfoModel hostInfoModel = new HostInfoModel( containerHost );
+        EnvironmentContainerImpl environmentContainer =
+                new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), nodeGroupName, hostInfoModel );
+
+        //add container to environment
+        environment.addContainer( environmentContainer );
+
+        //save environment
+        saveEnvironment( environment );
     }
 
 

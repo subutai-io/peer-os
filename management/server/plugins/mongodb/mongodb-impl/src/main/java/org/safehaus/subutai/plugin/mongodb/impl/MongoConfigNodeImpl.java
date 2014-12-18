@@ -25,7 +25,7 @@ public class MongoConfigNodeImpl extends MongoNodeImpl implements MongoConfigNod
         try
         {
             CommandDef commandDef = Commands.getStartConfigServerCommand( port );
-            CommandResult commandResult = containerHost.execute( commandDef.build( true ) );
+            CommandResult commandResult = execute( commandDef.build( true ).withTimeout( 10 ) );
 
             if ( !commandResult.getStdOut().contains( "child process started successfully, parent exiting" ) )
             {
