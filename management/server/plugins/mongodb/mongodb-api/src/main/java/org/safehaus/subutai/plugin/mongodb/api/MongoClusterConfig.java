@@ -82,4 +82,6 @@ public interface MongoClusterConfig extends ConfigBase
     MongoNode findNode( String lxcHostname );
 
     void setEnvironmentId( UUID id );
+
+    Object prepare();
 }

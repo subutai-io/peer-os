@@ -242,7 +242,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
         Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping()
                                      .excludeFieldsWithoutExposeAnnotation().create();
 
-        String jsonConfig = gson.toJson( config );
+        String jsonConfig = gson.toJson( config.prepare() );
         mongoManager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), jsonConfig );
         po.addLog( "Cluster information saved to database" );
 

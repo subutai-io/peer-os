@@ -6,7 +6,6 @@
 package org.safehaus.subutai.plugin.mongodb.impl;
 
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -21,7 +20,6 @@ import org.safehaus.subutai.plugin.mongodb.api.MongoException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoRouterNode;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
-import org.safehaus.subutai.plugin.mongodb.impl.custom.datatypes.CustomNodeSet;
 
 import com.google.gson.annotations.Expose;
 
@@ -70,137 +68,11 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
     @Expose
     private Set<MongoDataNodeImpl> dataNodesImpl = new HashSet<>();
 
-    private transient Set<MongoConfigNode> configServers = new CustomNodeSet<MongoConfigNode>()
-    {
-        @Override
-        protected boolean addNode( final MongoConfigNode node )
-        {
-            return configServersImpl.add( ( MongoConfigNodeImpl ) node );
-        }
+    private transient Set<MongoConfigNode> configServers = new HashSet<>();
 
+    private transient Set<MongoRouterNode> routerServers = new HashSet<>();
 
-        @Override
-        protected boolean removeNode( final Object node )
-        {
-            return configServersImpl.remove( node );
-        }
-
-
-        @Override
-        protected boolean addAllNode( final Collection<? extends MongoConfigNode> c )
-        {
-            return configServersImpl.addAll( ( Collection<? extends MongoConfigNodeImpl> ) c );
-        }
-
-
-        @Override
-        protected void clearNode()
-        {
-            configServersImpl.clear();
-        }
-
-
-        @Override
-        protected boolean removeAllNode( final Collection<?> c )
-        {
-            return configServersImpl.removeAll( c );
-        }
-
-
-        @Override
-        protected boolean retainAllNode( final Collection<?> c )
-        {
-            return configServersImpl.retainAll( c );
-        }
-    };
-
-    private transient Set<MongoRouterNode> routerServers = new CustomNodeSet<MongoRouterNode>()
-    {
-        @Override
-        protected boolean addNode( final MongoRouterNode node )
-        {
-            return routerServersImpl.add( ( MongoRouterNodeImpl ) node );
-        }
-
-
-        @Override
-        protected boolean removeNode( final Object node )
-        {
-            return routerServersImpl.remove( node );
-        }
-
-
-        @Override
-        protected boolean addAllNode( final Collection<? extends MongoRouterNode> c )
-        {
-            return routerServersImpl.addAll( ( Collection<? extends MongoRouterNodeImpl> ) c );
-        }
-
-
-        @Override
-        protected void clearNode()
-        {
-            routerServersImpl.clear();
-        }
-
-
-        @Override
-        protected boolean removeAllNode( final Collection<?> c )
-        {
-            return routerServersImpl.removeAll( c );
-        }
-
-
-        @Override
-        protected boolean retainAllNode( final Collection<?> c )
-        {
-            return routerServersImpl.retainAll( c );
-        }
-    };
-
-    private transient Set<MongoDataNode> dataNodes = new CustomNodeSet<MongoDataNode>()
-    {
-        @Override
-        protected boolean addNode( final MongoDataNode node )
-        {
-            return dataNodesImpl.add( ( MongoDataNodeImpl ) node );
-        }
-
-
-        @Override
-        protected boolean removeNode( final Object node )
-        {
-            return dataNodesImpl.remove( node );
-        }
-
-
-        @Override
-        protected boolean addAllNode( final Collection<? extends MongoDataNode> c )
-        {
-            return dataNodesImpl.addAll( ( Collection<? extends MongoDataNodeImpl> ) c );
-        }
-
-
-        @Override
-        protected void clearNode()
-        {
-            dataNodesImpl.clear();
-        }
-
-
-        @Override
-        protected boolean removeAllNode( final Collection<?> c )
-        {
-            return dataNodesImpl.removeAll( c );
-        }
-
-
-        @Override
-        protected boolean retainAllNode( final Collection<?> c )
-        {
-            return dataNodesImpl.retainAll( c );
-        }
-    };
+    private transient Set<MongoDataNode> dataNodes = new HashSet<>();
 
     @Expose
     private UUID environmentId;
@@ -539,5 +411,24 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
                 + numberOfRouters + ", numberOfDataNodes=" + numberOfDataNodes + ", cfgSrvPort=" + cfgSrvPort
                 + ", routerPort=" + routerPort + ", dataNodePort=" + dataNodePort + ", configServers=" + configServers
                 + ", routerServers=" + routerServers + ", dataNodes=" + dataNodes + '}';
+    }
+
+
+    @Override
+    public Object prepare()
+    {
+        for ( final MongoConfigNode configServer : configServers )
+        {
+            this.configServersImpl.add( ( MongoConfigNodeImpl ) configServer );
+        }
+        for ( final MongoRouterNode routerServer : routerServers )
+        {
+            this.routerServersImpl.add( ( MongoRouterNodeImpl ) routerServer );
+        }
+        for ( final MongoDataNode dataNode : dataNodes )
+        {
+            this.dataNodesImpl.add( ( MongoDataNodeImpl ) dataNode );
+        }
+        return this;
     }
 }
