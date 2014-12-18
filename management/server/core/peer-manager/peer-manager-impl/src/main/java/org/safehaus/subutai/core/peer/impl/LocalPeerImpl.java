@@ -87,6 +87,7 @@ import com.google.common.collect.Sets;
 public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
+    private static final String TEMPLATE_DOWNLOAD_DIR = "/downloaded-subutai-templates";
 
     private static final long HOST_INACTIVE_TIME = 5 * 1000 * 60; // 5 min
     private static final int MAX_LXC_NAME = 15;
@@ -341,12 +342,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
      *
      * @param sourcePeer - peer from which to import templates
      * @param templates - templates to import
+     * @param templateDownloadToken - template download token
+     * @param resourceHosts - resource hosts on which to import template
      */
-    protected void importTemplates( Peer sourcePeer, Set<Template> templates, String templateDownloadToken )
-            throws PeerException
+    protected void importTemplates( Peer sourcePeer, Set<Template> templates, String templateDownloadToken,
+                                    Set<ResourceHost> resourceHosts ) throws PeerException
     {
         Preconditions.checkNotNull( sourcePeer );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( templates ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateDownloadToken ) );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( resourceHosts ) );
 
         //import only remote templates, otherwise no-op
         if ( !sourcePeer.isLocal() )
@@ -355,13 +360,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             for ( Template template : templates )
             {
                 //import each template's ancestry lineage
-                importTemplateLineage( sourcePeer, template, templateDownloadToken );
+                importTemplateLineage( sourcePeer, template, templateDownloadToken, resourceHosts );
             }
         }
     }
 
 
     /**
+     * TODO make sure resource hosts can access management host via SSH without password
+     *
      * Imports a template's whole ancestry lineage including the template itself from remote peer without registering
      * with template registry.
      *
@@ -370,8 +377,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
      * @param sourcePeer - peer from which to import ancestry lineage
      * @param template - template whose ancestry lineage to import
      */
-    private void importTemplateLineage( Peer sourcePeer, Template template, String templateDownloadToken )
-            throws PeerException
+    private void importTemplateLineage( Peer sourcePeer, Template template, String templateDownloadToken,
+                                        Set<ResourceHost> resourceHosts ) throws PeerException
     {
         //construct template lineage
         List<Template> templateLineage = Lists.newArrayList();
@@ -388,25 +395,24 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         }
 
 
-        //import template lineage
+        //downloaded templates if needed
         for ( Template remoteTemplate : templateLineage )
         {
             try
             {
-                //check if template is already imported
-                CommandResult result =
-                        managementHost.execute( commands.getCheckTemplateCommand( remoteTemplate.getTemplateName() ) );
+                //check if template is already downloaded
+                CommandResult result = managementHost.execute(
+                        commands.getCheckTemplateDownloadedCommand( TEMPLATE_DOWNLOAD_DIR,
+                                remoteTemplate.getFileName() ) );
 
-                //template is not imported -> import it
-                if ( result.getExitCode() == 1 )
+                //template is not downloaded -> download it
+                if ( result.getExitCode() == 2 )
                 {
                     //download target template
+                    //TODO download template by full name, update registry download functionality
                     commandUtil.execute( commands.getDownloadTemplateCommand( sourcePeer.getPeerInfo().getIp(),
-                            sourcePeer.getPeerInfo().getPort(), remoteTemplate.getTemplateName(),
-                            templateDownloadToken ), managementHost );
-                    //import target template
-                    commandUtil.execute( commands.getImportTemplateCommand( remoteTemplate.getTemplateName() ),
-                            managementHost );
+                            sourcePeer.getPeerInfo().getPort(), remoteTemplate.getTemplateName(), templateDownloadToken,
+                            TEMPLATE_DOWNLOAD_DIR ), managementHost );
                 }
             }
             catch ( CommandException e )
@@ -414,6 +420,41 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 throw new PeerException( e );
             }
         }
+
+        //import templates on resource hosts
+        for ( ResourceHost resourceHost : resourceHosts )
+        {
+            for ( Template remoteTemplate : templateLineage )
+            {
+                try
+                {
+                    CommandResult result = resourceHost
+                            .execute( commands.getCheckTemplateImportedCommand( remoteTemplate.getTemplateName() ) );
+
+                    //template is not imported -> import it
+                    if ( result.getExitCode() == 1 )
+                    {
+                        //copy template from management host
+                        commandUtil.execute( commands.getCopyTemplateFromManagementHostCommand( TEMPLATE_DOWNLOAD_DIR,
+                                remoteTemplate.getFileName() ), resourceHost );
+
+                        //import template
+                        commandUtil.execute( commands.getImportTemplateCommand( remoteTemplate.getTemplateName() ),
+                                resourceHost );
+                    }
+                }
+                catch ( CommandException e )
+                {
+                    throw new PeerException( e );
+                }
+            }
+        }
+    }
+
+
+    private String getTempDirPath()
+    {
+        return System.getProperty( "java.io.tmpdir" );
     }
 
 
