@@ -30,18 +30,17 @@ public class TestUtilsDuplicate
 
     public static final String CHILD_CONFIG_FILE =
             "# Common configuration\n" + "lxc.include = /usr/share/lxc/config/ubuntu.common.conf\n" + "\n"
-                    + "# Container specific configuration\n" + "lxc.rootfs = /var/lib/lxc/cassandra/rootfs\n"
-                    + "lxc.mount = /var/lib/lxc/cassandra/fstab\n" + "lxc.utsname = zookeeper\n"
-                    + "lxc.arch = amd64\n" + "\n" + "# Network configuration\n" + "lxc.network.type = veth\n"
-                    + "lxc.network.flags = up\n" + "lxc.network.link = br0\n"
-                    + "lxc.network.hwaddr = 00:16:3e:82:6e:f0\n" + "subutai.config.path = /etc\n"
-                    + "lxc.hook.pre-start = /usr/bin/pre_start_hook\n" + "subutai.parent = master\n"
-                    + "subutai.git.branch = cassandra\n" + "SUBUTAI_VERSION = 2.3\n"
-                    + "lxc.mount.entry = /lxc/cassandra-opt opt none bind,rw 0 0\n"
-                    + "lxc.mount.entry = /lxc-data/cassandra-home home none bind,rw 0 0\n"
-                    + "lxc.mount.entry = /lxc-data/cassandra-var var none bind,rw 0 0\n"
+                    + "# Container specific configuration\n" + "lxc.rootfs = /var/lib/lxc/mongo/rootfs\n"
+                    + "lxc.mount = /var/lib/lxc/mongo/fstab\n" + "lxc.utsname = mongo\n" + "lxc.arch = amd64\n" + "\n"
+                    + "# Network configuration\n" + "lxc.network.type = veth\n" + "lxc.network.flags = up\n"
+                    + "lxc.network.link = br0\n" + "lxc.network.hwaddr = 00:16:3e:82:6e:f0\n"
+                    + "subutai.config.path = /etc\n" + "lxc.hook.pre-start = /usr/bin/pre_start_hook\n"
+                    + "subutai.parent = master\n" + "subutai.git.branch = mongo\n" + "SUBUTAI_VERSION = 2.3\n"
+                    + "lxc.mount.entry = /lxc/mongo-opt opt none bind,rw 0 0\n"
+                    + "lxc.mount.entry = /lxc-data/mongo-home home none bind,rw 0 0\n"
+                    + "lxc.mount.entry = /lxc-data/mongo-var var none bind,rw 0 0\n"
                     + "subutai.git.uuid = 8c3e8fea6bbc4817831ded7d9dc2d71c818bd1f4\n"
-                    + "subutai.template.package = /lxc-data/tmpdir/cassandra-subutai-template_2.1.0_amd64.deb";
+                    + "subutai.template.package = /lxc-data/tmpdir/mongo-subutai-template_2.1.0_amd64.deb";
 
     public static final String PACKAGES_MANIFEST =
             "ii  kmod                             15-0ubuntu6                   " +

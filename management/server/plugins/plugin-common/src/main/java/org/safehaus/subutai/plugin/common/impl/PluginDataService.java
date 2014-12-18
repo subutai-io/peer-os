@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
@@ -56,14 +55,44 @@ public class PluginDataService
 
     public void update( String source, String key, final Object info ) throws SQLException
     {
+        String infoJson = gson.toJson( info );
         EntityManager em = emf.createEntityManager();
         try
         {
             source = source.toUpperCase();
             key = key.toUpperCase();
             em.getTransaction().begin();
-            ClusterDataEntity entity = new ClusterDataEntity( source, key, gson.toJson( info ) );
+            ClusterDataEntity entity = new ClusterDataEntity( source, key, infoJson );
             em.merge( entity );
+            em.flush();
+            em.getTransaction().commit();
+        }
+        catch ( Exception e )
+        {
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
+            throw new SQLException( e );
+        }
+        finally
+        {
+            em.close();
+        }
+    }
+
+
+    public void update( String source, String key, final String info ) throws SQLException
+    {
+        EntityManager em = emf.createEntityManager();
+        try
+        {
+            source = source.toUpperCase();
+            key = key.toUpperCase();
+            em.getTransaction().begin();
+            ClusterDataEntity entity = new ClusterDataEntity( source, key, info );
+            em.merge( entity );
+            em.flush();
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -138,8 +167,73 @@ public class PluginDataService
             }
             em.getTransaction().commit();
         }
-        catch ( NoResultException e )
+        catch ( Exception e )
         {
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
+            throw new SQLException( e );
+        }
+        finally
+        {
+            em.close();
+        }
+        return result;
+    }
+
+
+    public List<String> getInfo( String source ) throws SQLException
+    {
+        EntityManager em = emf.createEntityManager();
+        List<String> result = new ArrayList<>();
+        try
+        {
+            source = source.toUpperCase();
+            em.getTransaction().begin();
+
+            result =
+                    em.createQuery( "select cd.info from ClusterDataEntity cd where cd.source = :source", String.class )
+                      .setParameter( "source", source ).getResultList();
+
+            em.getTransaction().commit();
+        }
+        catch ( Exception e )
+        {
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
+            throw new SQLException( e );
+        }
+        finally
+        {
+            em.close();
+        }
+        return result;
+    }
+
+
+    public String getInfo( String source, String key ) throws SQLException
+    {
+        EntityManager em = emf.createEntityManager();
+        String result = null;
+        try
+        {
+            source = source.toUpperCase();
+            key = key.toUpperCase();
+            em.getTransaction().begin();
+            TypedQuery<String> query = em.createQuery(
+                    "select cd.info from ClusterDataEntity cd where cd.source = :source and cd.id = :id",
+                    String.class );
+            query.setParameter( "source", source );
+            query.setParameter( "id", key );
+
+            List<String> infoList = query.getResultList();
+            if ( infoList.size() > 0 )
+            {
+                result = infoList.get( 0 );
+            }
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -167,7 +261,7 @@ public class PluginDataService
             key = key.toUpperCase();
             em.getTransaction().begin();
             Query query =
-                    em.createQuery( "DELETE FROM ClusterDataEntity cd WHERE cd.source = :source and cd.key = :key" );
+                    em.createQuery( "DELETE FROM ClusterDataEntity cd WHERE cd.source = :source and cd.id = :key" );
             query.setParameter( "source", source );
             query.setParameter( "id", key );
             query.executeUpdate();

@@ -14,6 +14,8 @@ import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.annotations.Expose;
+
 
 /**
  * Created by timur on 11/14/14.
@@ -22,8 +24,18 @@ public abstract class MongoNodeImpl implements MongoNode
 {
     static final Logger LOG = LoggerFactory.getLogger( MongoNodeImpl.class );
 
+    @Expose
+    String environmentId;
+
+    @Expose
+    String containerHostId;
+
     ContainerHost containerHost;
+
+    @Expose
     String domainName;
+
+    @Expose
     int port;
 
 
@@ -32,6 +44,8 @@ public abstract class MongoNodeImpl implements MongoNode
         this.containerHost = containerHost;
         this.domainName = domainName;
         this.port = port;
+        environmentId = containerHost.getEnvironmentId();
+        containerHostId = containerHost.getId().toString();
     }
 
 
@@ -123,5 +137,23 @@ public abstract class MongoNodeImpl implements MongoNode
     public ContainerHost getContainerHost()
     {
         return containerHost;
+    }
+
+
+    public String getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public String getContainerHostId()
+    {
+        return containerHostId;
+    }
+
+
+    public void setContainerHost( ContainerHost containerHost )
+    {
+        this.containerHost = containerHost;
     }
 }
