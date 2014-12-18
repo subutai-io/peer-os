@@ -409,7 +409,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 if ( result.getExitCode() == 2 )
                 {
                     //download target template
-                    //TODO download template by full name, update registry download functionality
                     commandUtil.execute( commands.getDownloadTemplateCommand( sourcePeer.getPeerInfo().getIp(),
                             sourcePeer.getPeerInfo().getPort(), remoteTemplate.getTemplateName(), templateDownloadToken,
                             TEMPLATE_DOWNLOAD_DIR ), managementHost );
