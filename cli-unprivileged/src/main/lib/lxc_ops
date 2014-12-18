@@ -258,17 +258,23 @@ function lxc_clone {
   fi
 
   # (2) setup skeleton of new cloned child container
-  mkdir -p $child_rootfs
+  btrfs subvolume create $child_home
+  
   local mac=`lxc_new_mac`
   #TODO sed failed
   sudo cat $parent_conf | grep -v subutai.template.package 		   \
       | sudo sed                                           		   \
      -e "s/lxc\.utsname.*/lxc\.utsname = $child/"                  \
      -e "s/subutai\.parent.*/subutai\.parent = $parent/"           \
+     -e "/lxc\.mount\.entry/d" \
+     -e "/subutai\.git\.branch/ a\lxc\.mount\.entry = $HOME\/\.local\/lxc\/p1-opt opt none bind,rw 0 0" \
+     -e "/subutai\.git\.branch/ a\lxc\.mount\.entry = $HOME\/\.local\/lxc\-data\/$child-var var none bind,rw 0 0" \
+     -e "/subutai\.git\.branch/ a\lxc\.mount\.entry = $HOME\/\.local\/lxc\-data\/$child-home home none bind,rw 0 0" \
      -e "s|\/var\/lib\/lxc\/$parent\/|${HOME}\/\.local\/share\/lxc\/$child\/|g"\
      -e "s/subutai\.git\.branch.*/subutai\.git\.branch = $child/"  \
      -e "s/lxc\.network\.hwaddr.*/lxc\.network\.hwaddr = $mac/"    \
      -e "s/$parent-/$child-/g" | grep -v subutai.git.uuid >> $child_conf
+  cat $HOME/.config/lxc/default.conf >> $child_conf
   sudo cp $parent_home/fstab $child_home
 
   # (3) fs clone snapshots for child datasets
@@ -277,7 +283,7 @@ function lxc_clone {
   lxc_clone_ds $parent $child opt lxc "$usage"
   lxc_clone_ds $parent $child var lxc-data "$usage"
   lxc_clone_ds $parent $child home lxc-data "$usage"
-  lxc_mapshifting $child
+  lxc_chown $child
 
   # (4) alter hostname from /etc/hosts and /etc/hostname
   
@@ -300,7 +306,7 @@ function lxc_clone {
   if [ ! -f $child_rootfs/etc/subutai/lxc-config ]; then
      touch $child_rootfs/etc/subutai/lxc-config
   else
-     sudo cp /dev/null $child_rootfs/etc/subutai/lxc-config
+     cp /dev/null $child_rootfs/etc/subutai/lxc-config
   fi
   
   echo "[Subutai-Agent]" >> $child_rootfs/etc/subutai/lxc-config
@@ -314,6 +320,17 @@ function lxc_clone {
     echo "" > $child_rootfs/etc/subutai-agent/uuid.txt
   fi
    lxc_mapshifting $child
+   sudo sed -i "/lxc.network/d" $child_conf
+}
+
+function lxc_chown {
+  local lxc_name="$1"
+  #change the ownership of the container and shift the rootfs to user id and group
+  sudo chown -R $USER:$USER $HOME/.local/share/lxc/$lxc_name
+  sudo chown -R $USER:$USER $HOME/.local/lxc/$lxc_name-opt
+  sudo chown -R $USER:$USER $HOME/.local/lxc-data/$lxc_name-var
+  sudo chown -R $USER:$USER $HOME/.local/lxc-data/$lxc_name-home
+
 }
 
 function lxc_mapshifting {
@@ -323,17 +340,17 @@ function lxc_mapshifting {
   sudo uidmapshift -u $HOME/.local/share/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
   sudo uidmapshift -g $HOME/.local/share/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
 
-  sudo chown -R $USER:$USER $HOME/lxc/$lxc_name-opt
-  sudo uidmapshift -u $HOME/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
-  sudo uidmapshift -g $HOME/lxc/$lxc_name 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  sudo chown -R $USER:$USER $HOME/.local/lxc/$lxc_name-opt
+  sudo uidmapshift -u $HOME/.local/lxc/$lxc_name-opt 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  sudo uidmapshift -g $HOME/.local/lxc/$lxc_name-opt 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
 
-  sudo chown -R $USER:$USER $HOME/lxc-data/$lxc_name-var
-  sudo uidmapshift -u $HOME/lxc-data/$lxc_name-var 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
-  sudo uidmapshift -g $HOME/lxc-data/$lxc_name-var 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  sudo chown -R $USER:$USER $HOME/.local/lxc-data/$lxc_name-var
+  sudo uidmapshift -u $HOME/.local/lxc-data/$lxc_name-var 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  sudo uidmapshift -g $HOME/.local/lxc-data/$lxc_name-var 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
 
-  sudo chown -R $USER:$USER $HOME/lxc-data/$lxc_name-home
-  sudo uidmapshift -u $HOME/lxc-data/$lxc_name-home 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
-  sudo uidmapshift -g $HOME/lxc-data/$lxc_name-home 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  sudo chown -R $USER:$USER $HOME/.local/lxc-data/$lxc_name-home
+  sudo uidmapshift -u $HOME/.local/lxc-data/$lxc_name-home 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
+  sudo uidmapshift -g $HOME/.local/lxc-data/$lxc_name-home 0 $(grep $USER /etc/subuid | cut -d : -f 2) $(grep $USER /etc/subuid | cut -d : -f 3) > /dev/null 2>&1
 
 
 }

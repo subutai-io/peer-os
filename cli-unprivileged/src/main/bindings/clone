@@ -79,7 +79,7 @@ function clone {
   #cloning operation is starting..
   lxc_clone $parent $child $environmentId "`usage`"
 
-  ovs_configure_lxc $child
+  #ovs_configure_lxc $child
   git_child_branch $child
   msg_ok "Successfully cloned $child container from $parent"
   unlock_container_write $child
