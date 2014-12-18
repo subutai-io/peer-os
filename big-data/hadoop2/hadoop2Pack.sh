@@ -3,6 +3,7 @@ set -e
 . /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/pack-funcs
 
 productName=hadoop2
+mode=bdproduct
 downloadFileAndMakeChanges() {
 	initializeVariables $1
 
@@ -48,7 +49,7 @@ downloadFileAndMakeChanges() {
 }
 
 # 1) Check if the version is changed or not. If not changed, dont create a new debian.
-checkPackageVersion $productName
+checkVersion $productName $mode
 # 2) Get the sources which are downloaded from version control system
 #    to local machine to relevant directories to generate the debian package
 getSourcesToRelevantDirectories $productName
