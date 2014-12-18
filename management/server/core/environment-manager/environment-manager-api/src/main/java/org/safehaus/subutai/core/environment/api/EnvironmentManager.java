@@ -19,6 +19,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.topology.TopologyData;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 
 /**
@@ -67,4 +68,8 @@ public interface EnvironmentManager
                               String nodeGroupName, final Peer peer ) throws EnvironmentManagerException;
 
     void removeContainer( UUID environmentId, UUID hostId ) throws EnvironmentManagerException;
+
+    public void createLocalContainer( final Environment environment, final String templateName,
+                                      final String nodeGroupName, ResourceHost resourceHost )
+            throws EnvironmentBuildException;
 }

@@ -546,6 +546,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     }
 
 
+    @Override
+    public String getFreeHostName( final String prefix )
+    {
+        return nextHostName( prefix, getContainerNames() );
+    }
+
+
     private String nextHostName( String templateName, Set<String> existingNames )
     {
         AtomicInteger i = sequences.putIfAbsent( templateName, new AtomicInteger() );
@@ -567,7 +574,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     }
 
 
-    private Set<String> getContainerNames() throws PeerException
+    private Set<String> getContainerNames()
     {
         Set<String> result = new HashSet<>();
         for ( ResourceHost resourceHost : getResourceHosts() )
