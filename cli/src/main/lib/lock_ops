@@ -111,7 +111,7 @@ function are_containers_writable {
   else
     src_container=$1
     dst_container=$2
-    wipe_outstanding_locks $1 $2
+    wipe_outstanding_locks $src_container $dst_container
     (ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$src_container\b" \
      || ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$dst_container\b" \
      || ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$dst_container\b" \
