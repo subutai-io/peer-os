@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
@@ -139,18 +140,6 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
     }
 
 
-    public String getDomainName()
-    {
-        return domainName;
-    }
-
-
-    public void setDomainName( String domainName )
-    {
-        this.domainName = domainName;
-    }
-
-
     @Override
     public int getNumberOfConfigServers()
     {
@@ -190,6 +179,43 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
     }
 
 
+    public int getDataNodePort()
+    {
+        return dataNodePort;
+    }
+
+
+    public void setDataNodePort( int dataNodePort )
+    {
+        this.dataNodePort = dataNodePort;
+    }
+
+
+
+    public int getRouterPort()
+    {
+        return routerPort;
+    }
+
+
+    public void setRouterPort( int routerPort )
+    {
+        this.routerPort = routerPort;
+    }
+
+
+    public String getDomainName()
+    {
+        return domainName;
+    }
+
+
+    public void setDomainName( String domainName )
+    {
+        this.domainName = domainName;
+    }
+
+
     public String getReplicaSetName()
     {
         return replicaSetName;
@@ -202,73 +228,15 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
     }
 
 
-    public String getClusterName()
+    public int getCfgSrvPort()
     {
-        return clusterName;
+        return cfgSrvPort;
     }
 
 
-    public void setClusterName( String clusterName )
+    public void setCfgSrvPort( int cfgSrvPort )
     {
-        this.clusterName = clusterName;
-    }
-
-
-    public UUID getEnvironmentId()
-    {
-        return environmentId;
-    }
-
-
-    public void setEnvironmentId( final UUID environmentId )
-    {
-        this.environmentId = environmentId;
-    }
-
-
-    @Override
-    public String getProductName()
-    {
-        return PRODUCT_NAME;
-    }
-
-
-    @Override
-    public String getProductKey()
-    {
-        return PRODUCT_KEY;
-    }
-
-
-    public NodeType getNodeType( MongoNode node )
-    {
-        NodeType nodeType = null;
-
-        if ( getRouterServers().contains( node ) )
-        {
-            nodeType = NodeType.ROUTER_NODE;
-        }
-        else if ( getConfigServers().contains( node ) )
-        {
-            nodeType = NodeType.CONFIG_NODE;
-        }
-        else if ( getDataNodes().contains( node ) )
-        {
-            nodeType = NodeType.DATA_NODE;
-        }
-
-        return nodeType;
-    }
-
-
-    public Set<MongoRouterNode> getRouterServers()
-    {
-        return routerServers;
-    }
-
-
-    public void setRouterServers( Set<MongoRouterNode> routerServers )
-    {
+        this.cfgSrvPort = cfgSrvPort;
         this.routerServers.clear();
         this.routerServers.addAll( routerServers );
     }
@@ -295,44 +263,19 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
 
     public void setDataNodes( Set<MongoDataNode> dataNodes )
     {
-        this.dataNodes.clear();
-        this.dataNodes.addAll( dataNodes );
+        this.dataNodes = dataNodes;
     }
 
 
-    public int getRouterPort()
+    public UUID getEnvironmentId()
     {
-        return routerPort;
+        return environmentId;
     }
 
 
-    public void setRouterPort( int routerPort )
+    public void setEnvironmentId( final UUID environmentId )
     {
-        this.routerPort = routerPort;
-    }
-
-
-    public int getCfgSrvPort()
-    {
-        return cfgSrvPort;
-    }
-
-
-    public void setCfgSrvPort( int cfgSrvPort )
-    {
-        this.cfgSrvPort = cfgSrvPort;
-    }
-
-
-    public int getDataNodePort()
-    {
-        return dataNodePort;
-    }
-
-
-    public void setDataNodePort( int dataNodePort )
-    {
-        this.dataNodePort = dataNodePort;
+        this.environmentId = environmentId;
     }
 
 
@@ -353,6 +296,56 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
                 setNumberOfConfigServers( getNumberOfConfigServers() + 1 );
                 break;
         }
+    }
+
+
+    public Set<MongoRouterNode> getRouterServers()
+    {
+        return routerServers;
+    }
+
+
+    public void setRouterServers( Set<MongoRouterNode> routerServers )
+    {
+        //        Set<MongoRouterNodeImpl> routers = new HashSet<>();
+        //        for ( MongoRouterNode node : routerServers )
+        //        {
+        //            routers.add( new MongoRouterNodeImpl( node ) );
+        //        }
+        this.routerServers = routerServers;
+    }
+
+
+    public NodeType getNodeType( MongoNode node )
+    {
+        NodeType nodeType = null;
+
+        if ( getRouterServers().contains( node ) )
+        {
+            nodeType = NodeType.ROUTER_NODE;
+        }
+        else if ( getConfigServers().contains( node ) )
+        {
+            nodeType = NodeType.CONFIG_NODE;
+        }
+        else if ( getDataNodes().contains( node ) )
+        {
+            nodeType = NodeType.DATA_NODE;
+        }
+
+        return nodeType;
+    }
+
+
+    public String getClusterName()
+    {
+        return clusterName;
+    }
+
+
+    public void setClusterName( String clusterName )
+    {
+        this.clusterName = clusterName;
     }
 
 
@@ -400,6 +393,36 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
         }
 
         return result;
+    }
+
+
+    @Override
+    public String getProductName()
+    {
+        return PRODUCT_NAME;
+    }
+
+
+    @Override
+    public String getProductKey()
+    {
+        return PRODUCT_KEY;
+    }
+
+
+    public int getNodePort( ContainerHost node )
+    {
+
+        if ( getRouterServers().contains( node ) )
+        {
+            return getRouterPort();
+        }
+        else if ( getConfigServers().contains( node ) )
+        {
+            return getCfgSrvPort();
+        }
+
+        return getDataNodePort();
     }
 
 

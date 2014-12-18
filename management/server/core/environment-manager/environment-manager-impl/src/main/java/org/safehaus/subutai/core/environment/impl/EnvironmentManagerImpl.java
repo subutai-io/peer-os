@@ -28,17 +28,10 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenc
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.topology.Blueprint2PeerData;
-import org.safehaus.subutai.core.environment.api.topology.Blueprint2PeerGroupData;
-import org.safehaus.subutai.core.environment.api.topology.Node2PeerData;
-import org.safehaus.subutai.core.environment.api.topology.NodeGroup2PeerData;
-import org.safehaus.subutai.core.environment.api.topology.NodeGroup2PeerGroupData;
 import org.safehaus.subutai.core.environment.api.topology.TopologyData;
-import org.safehaus.subutai.core.environment.impl.builder.Blueprint2PeerBuilder;
-import org.safehaus.subutai.core.environment.impl.builder.Blueprint2PeerGroupBuilder;
-import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuildProcessFactory;
+import org.safehaus.subutai.core.environment.impl.builder.BuildProcessFactory;
+import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuildProcessBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.Node2PeerBuilder;
-import org.safehaus.subutai.core.environment.impl.builder.NodeGroup2PeerBuilder;
-import org.safehaus.subutai.core.environment.impl.builder.NodeGroup2PeerGroupBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.ProcessBuilderException;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
@@ -385,7 +378,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
-        catch ( EnvironmentManagerException e )
+        catch ( EnvironmentBuildException e )
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
@@ -452,35 +445,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public UUID saveBuildProcess( final TopologyData topologyData ) throws EnvironmentManagerException
     {
-        EnvironmentBuildProcessFactory factory = null;
-        if ( topologyData instanceof Blueprint2PeerData )
-        {
-            factory = new Blueprint2PeerBuilder( this );
-        }
-        else if ( topologyData instanceof Blueprint2PeerGroupData )
-        {
-            factory = new Blueprint2PeerGroupBuilder( this );
-        }
-        else if ( topologyData instanceof Node2PeerData )
-        {
-            factory = new Node2PeerBuilder( this );
-        }
-        else if ( topologyData instanceof NodeGroup2PeerData )
-        {
-            factory = new NodeGroup2PeerBuilder( this );
-        }
-        else if ( topologyData instanceof NodeGroup2PeerGroupData )
-        {
-            factory = new NodeGroup2PeerGroupBuilder( this );
-        }
-        else
-        {
-            throw new EnvironmentManagerException( "Unsupported topology data: " + topologyData );
-        }
-
+        EnvironmentBuildProcessBuilder builder = BuildProcessFactory.newBuilder( topologyData, this );
         try
         {
-            EnvironmentBuildProcess process = factory.prepareBuildProcess( topologyData );
+            EnvironmentBuildProcess process = builder.prepareBuildProcess( topologyData );
             environmentDAO.saveInfo( PROCESS, process.getId().toString(), process );
             return process.getId();
         }
@@ -623,7 +591,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
-        catch ( EnvironmentManagerException e )
+        catch ( EnvironmentBuildException e )
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
@@ -634,7 +602,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public UUID addContainer( final UUID environmentId, final String template, PlacementStrategy strategy,
                               String nodeGroupName, final Peer peer ) throws EnvironmentManagerException
     {
-        EnvironmentBuildProcessFactory builder = new Node2PeerBuilder( this );
+        EnvironmentBuildProcessBuilder builder = new Node2PeerBuilder( this );
         try
         {
 

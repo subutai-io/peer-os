@@ -26,6 +26,7 @@ public class Wizard
     private HostRegistry hostRegistry;
 
 
+
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
 
@@ -33,6 +34,7 @@ public class Wizard
         this.executorService = executorService;
         this.hadoop = serviceLocator.getService( Hadoop.class );
         this.hostRegistry = serviceLocator.getService( HostRegistry.class );
+
 
         grid = new VerticalLayout();
         grid.setMargin( true );
@@ -56,6 +58,7 @@ public class Wizard
             case 2:
             {
                 component = new ConfigurationStep( this, hostRegistry );
+
                 break;
             }
             case 3:

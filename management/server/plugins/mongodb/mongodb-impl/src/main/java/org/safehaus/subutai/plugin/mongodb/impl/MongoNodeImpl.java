@@ -63,7 +63,7 @@ public abstract class MongoNodeImpl implements MongoNode
                 Commands.getCheckInstanceRunningCommand( containerHost.getHostname(), domainName, port );
         try
         {
-            CommandResult commandResult = containerHost.execute( commandDef.build() );
+            CommandResult commandResult = execute( commandDef.build().withTimeout( 10 ).daemon() );
             if ( commandResult.getStdOut().contains( "couldn't connect to server" ) )
             {
                 return false;
@@ -102,7 +102,7 @@ public abstract class MongoNodeImpl implements MongoNode
         CommandDef commandDef = Commands.getStopNodeCommand();
         try
         {
-            containerHost.execute( commandDef.build( true ) );
+            execute( commandDef.build( true ).withTimeout( 60 ) );
         }
         catch ( CommandException e )
         {

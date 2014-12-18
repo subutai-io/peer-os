@@ -152,7 +152,6 @@ public class Commands
         {
             configServersArg.setLength( configServersArg.length() - 1 );
         }
-
         return new CommandDef( "Start router(s)",
                 String.format( "mongos --configdb %s --port %s --fork --logpath %s/mongodb.log",
                         configServersArg.toString(), routerPort, Constants.LOG_DIR ),
@@ -266,11 +265,13 @@ public class Commands
     }
 
 
+
     public static CommandDef getFindPrimaryNodeCommandLine( int dataNodePort )
     {
         return new CommandDef( "Find primary node",
                 String.format( "/bin/echo 'db.isMaster()' | mongo --port %s", dataNodePort ), 30 );
     }
+
 
 
     public static CommandDef getCheckInstanceRunningCommand( String hostname, String domainName, int port )

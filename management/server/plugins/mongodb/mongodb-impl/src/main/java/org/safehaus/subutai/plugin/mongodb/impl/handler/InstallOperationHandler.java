@@ -49,7 +49,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl,
         {
             Environment env = manager.getEnvironmentManager()
                                      .buildEnvironment( manager.getDefaultEnvironmentBlueprint( config ) );
-            config.setEnvironmentId(env.getId());
+            config.setEnvironmentId( env.getId() );
             ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( env, config, po );
             clusterSetupStrategy.setup();
 
