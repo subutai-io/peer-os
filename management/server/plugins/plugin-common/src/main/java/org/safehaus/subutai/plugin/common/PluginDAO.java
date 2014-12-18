@@ -65,16 +65,15 @@ public class PluginDAO
         //        this.dataService = new PluginDataService( emfUtil.getEmf() );
     }
 
-
     public PluginDAO( final DataSource dataSource, final GsonBuilder gsonBuilder ) throws SQLException
     {
         Preconditions.checkNotNull( dataSource, "DataSource is null" );
         Preconditions.checkNotNull( dataSource, "GsonBuilder is null" );
-        this.dbUtil = new DbUtil( dataSource );
-        gson = gsonBuilder.setPrettyPrinting().disableHtmlEscaping().create();
-
+        //        this.dbUtil = new DbUtil( dataSource );
+        //        gson = gsonBuilder.setPrettyPrinting().disableHtmlEscaping().create();
+        this.dataService = new PluginDataService( emfUtil.getEmf(), gsonBuilder );
         //        this.dataService = new PluginDataService( emfUtil.getEmf(), gsonBuilder );
-        setupDb();
+        //        setupDb();
     }
 
 
@@ -88,6 +87,29 @@ public class PluginDAO
 
 
     public boolean saveInfo( String source, String key, Object info )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
+        Preconditions.checkNotNull( info, "Info is null" );
+
+
+        try
+        {
+            dataService.update( source, key, info );
+            //            dbUtil.update( "merge into cluster_data (source, id, info) values (? , ?, ?)", source, key,
+            //                    gson.toJson( info ) );
+
+            return true;
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        return false;
+    }
+
+
+    public boolean saveInfo( String source, String key, String info )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
@@ -164,6 +186,76 @@ public class PluginDAO
         try
         {
             return dataService.getInfo( source, key, clazz );
+            //            ResultSet rs = dbUtil.select( "select info from cluster_data where source = ? and id = ?",
+            // source, key );
+            //            if ( rs != null && rs.next() )
+            //            {
+            //                Clob infoClob = rs.getClob( "info" );
+            //                if ( infoClob != null && infoClob.length() > 0 )
+            //                {
+            //                    String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
+            //                    return gson.fromJson( info, clazz );
+            //                }
+            //            }
+        }
+        catch ( JsonSyntaxException | SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        return null;
+    }
+
+
+    /**
+     * Returns all POJOs from DB identified by source key
+     *
+     * @param source - source key
+     *
+     * @return - list of Json String
+     */
+    public List<String> getInfo( String source )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
+
+        List<String> list = new ArrayList<>();
+        try
+        {
+            list = dataService.getInfo( source );
+            //            ResultSet rs = dbUtil.select( "select info from cluster_data where source = ?", source );
+            //            while ( rs != null && rs.next() )
+            //            {
+            //                Clob infoClob = rs.getClob( "info" );
+            //                if ( infoClob != null && infoClob.length() > 0 )
+            //                {
+            //                    String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
+            //                    list.add( gson.fromJson( info, clazz ) );
+            //                }
+            //            }
+        }
+        catch ( JsonSyntaxException | SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        return list;
+    }
+
+
+    /**
+     * Returns POJO from DB
+     *
+     * @param source - source key
+     * @param key - pojo key
+     *
+     * @return - POJO
+     */
+    public String getInfo( String source, String key )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
+
+        try
+        {
+            return dataService.getInfo( source, key );
             //            ResultSet rs = dbUtil.select( "select info from cluster_data where source = ? and id = ?",
             // source, key );
             //            if ( rs != null && rs.next() )

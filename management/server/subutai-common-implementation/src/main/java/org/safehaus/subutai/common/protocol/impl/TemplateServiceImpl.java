@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 
 import org.safehaus.subutai.common.exception.DaoException;
@@ -128,7 +129,7 @@ public class TemplateServiceImpl implements TemplateService
      * @return {@code Template}
      */
     @Override
-    public Template getTemplateByName( String templateName, String lxcArch ) throws DaoException
+    public Template getTemplate( String templateName, String lxcArch ) throws DaoException
     {
         EntityManager entityManager;
         try
@@ -142,7 +143,46 @@ public class TemplateServiceImpl implements TemplateService
 
             return template;
         }
-        catch ( NoResultException e )
+        catch ( NoResultException | NonUniqueResultException e )
+        {
+            return null;
+        }
+        catch ( Exception ex )
+        {
+            throw new DaoException( ex );
+        }
+    }
+
+
+    /**
+     * Returns template by name
+     *
+     * @param templateName - template name
+     * @param lxcArch -- lxc arch of template
+     * @param md5sum -- lxc md5sum of template
+     * @param templateVersion -- lxc templateVersion of template
+     *
+     * @return {@code Template}
+     */
+    @Override
+    public Template getTemplate( String templateName, String lxcArch, String md5sum, String templateVersion )
+            throws DaoException
+    {
+        EntityManager entityManager;
+        try
+        {
+            Template template;
+            entityManager = entityManagerFactory.createEntityManager();
+            Query query = entityManager.createNamedQuery( Template.QUERY_GET_TEMPLATE_BY_NAME_ARCH_MD5_VERSION );
+            query.setParameter( "templateName", templateName );
+            query.setParameter( "lxcArch", lxcArch );
+            query.setParameter( "md5sum", md5sum );
+            query.setParameter( "templateVersion", templateVersion );
+            template = ( Template ) query.getSingleResult();
+
+            return template;
+        }
+        catch ( NoResultException | NonUniqueResultException e )
         {
             return null;
         }
@@ -188,7 +228,7 @@ public class TemplateServiceImpl implements TemplateService
     {
         try
         {
-            Template template = this.getTemplateByName( parentTemplateName, lxcArch );
+            Template template = this.getTemplate( parentTemplateName, lxcArch );
             if ( template != null )
             {
                 return template.getChildren();

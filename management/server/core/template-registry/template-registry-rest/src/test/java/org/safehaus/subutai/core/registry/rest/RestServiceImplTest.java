@@ -65,7 +65,7 @@ public class RestServiceImplTest
                     + "# Network configuration\n" + "lxc.network.type = veth\n" + "lxc.network.flags = up\n"
                     + "lxc.network.link = br0\n" + "lxc.network.hwaddr = 00:16:3e:5:5e:67\n"
                     + "subutai.config.path = /etc\n" + "lxc.hook.pre-start = /usr/bin/pre_start_hook\n"
-                    + "subutai.parent = master\n" + "subutai.git.branch = hadoop\n"
+                    + "subutai.parent = master\n" + "subutai.git.branch = hadoop\n" + "SUBUTAI_VERSION = 2.3\n"
                     + "lxc.mount.entry = /lxc/hadoop-opt opt none bind,rw 0 0\n"
                     + "lxc.mount.entry = /lxc-data/hadoop-home home none bind,rw 0 0\n"
                     + "lxc.mount.entry = /lxc-data/hadoop-var var none bind,rw 0 0\n"
@@ -91,9 +91,11 @@ public class RestServiceImplTest
         String subutaiParent = properties.getProperty( "subutai.parent" );
         String subutaiGitBranch = properties.getProperty( "subutai.git.branch" );
         String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
+        //TODO need to find out how to extract version from configFile
+        String templateVersion = "2.1.0";
         template =
                 new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch, subutaiGitUuid,
-                        packagesFile, md5sum );
+                        packagesFile, md5sum, templateVersion );
         return template;
     }
 

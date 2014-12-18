@@ -16,6 +16,10 @@ public class CpuQuotaInfo extends QuotaInfo
 
     public CpuQuotaInfo( String cpuIndexes )
     {
+        if ( cpuIndexes.equals( "none" ) )
+        {
+            return;
+        }
         cpuIndexes = cpuIndexes.replace( "\n", "" );
         String[] ranges = cpuIndexes.split( "," );
         for ( String range : ranges )

@@ -155,7 +155,7 @@ public class ConfigurationStep extends VerticalLayout
                 {
                     show( "Please provide number of nodes and seeds !" );
                 }
-                else if ( ( int ) nodesCountCombo.getValue() <= ( int ) seedsCountCombo.getValue() )
+                else if ( ( int ) nodesCountCombo.getValue() < ( int ) seedsCountCombo.getValue() )
                 {
                     show( "Number of seeds should be smaller than total number nodes in the cluster !" );
                 }

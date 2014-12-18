@@ -141,7 +141,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
         {
             po.addLog( "Updating cluster information in database..." );
 
-            manager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            String json = manager.getGSON().toJson( config );
+            manager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), json );
             po.addLogDone( "Cluster information updated in database" );
         }
         else

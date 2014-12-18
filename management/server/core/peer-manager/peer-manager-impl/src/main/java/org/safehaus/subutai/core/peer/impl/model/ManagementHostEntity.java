@@ -11,6 +11,7 @@ import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
@@ -28,6 +29,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 {
     @Column
     String name = "Subutai Management Host";
+    @Transient
+    private Commands commands;
 
 
     private ManagementHostEntity()
@@ -52,14 +55,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
     public void init()
     {
-        //        try
-        //        {
-        //            createFlows();
-        //        }
-        //        catch ( CommandException e )
-        //        {
-        //            throw new SubutaiInitException( "Could not create network flows." );
-        //        }
+        this.commands = new Commands();
     }
 
 
@@ -92,11 +88,9 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
     public void addAptSource( final String hostname, final String ip ) throws PeerException
     {
-        RequestBuilder rb = new RequestBuilder( Commands.getAddAptSourceCommand( hostname, ip ) );
-        rb.withCwd( "/etc/apt-cacher/" );
         try
         {
-            CommandResult commandResult = execute( rb );
+            CommandResult commandResult = execute( commands.getAddAptSourceCommand( hostname, ip ) );
             if ( !commandResult.hasCompleted() )
             {
                 throw new CommandException( "Command execution failed." );
@@ -111,11 +105,9 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
     public void removeAptSource( final String host, final String ip ) throws PeerException
     {
-        RequestBuilder rb = new RequestBuilder( Commands.getRemoveAptSourceCommand( host, ip ) );
-        rb.withCwd( "/etc/apt-cacher/" );
         try
         {
-            CommandResult commandResult = execute( rb );
+            CommandResult commandResult = execute( commands.getRemoveAptSourceCommand( ip ) );
             if ( !commandResult.hasCompleted() )
             {
                 throw new CommandException( "Command execution failed." );
