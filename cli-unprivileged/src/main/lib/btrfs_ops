@@ -161,7 +161,7 @@ function fs_rls_holds_delete_snaps {
 #demote template
 function fs_demote_template {
   local temp="$1"  
-  local lxc_path="/var/lib/lxc/$temp"
+  local lxc_path="$HOME/.local/share/lxc/$temp"
 
   cat $lxc_path/config | \
     grep -v "lxc.hook.pre-start" | \
@@ -170,10 +170,10 @@ function fs_demote_template {
   rm $lxc_path/config
   mv $lxc_path/config.new $lxc_path/config
 
-  sudo btrfs property set -ts /var/lib/lxc/$temp/rootfs/ ro false
-  sudo btrfs property set -ts /lxc/$temp-opt ro false
-  sudo btrfs property set -ts /lxc-data/$temp-var ro false
-  sudo btrfs property set -ts /lxc-data/$temp-home ro false
+  sudo btrfs property set -ts $HOME/.local/share/lxc/$temp/rootfs/ ro false
+  sudo btrfs property set -ts $HOME/.local/lxc/$temp-opt ro false
+  sudo btrfs property set -ts $HOME/.local/lxc-data/$temp-var ro false
+  sudo btrfs property set -ts $HOME/.local/lxc-data/$temp-home ro false
 
 }
 
