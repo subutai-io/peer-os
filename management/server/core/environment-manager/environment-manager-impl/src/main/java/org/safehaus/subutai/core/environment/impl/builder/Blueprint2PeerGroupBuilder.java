@@ -20,11 +20,10 @@ import org.safehaus.subutai.core.peer.api.PeerGroup;
 import com.google.common.collect.Lists;
 
 
-/**
- * Created by bahadyr on 11/6/14.
- */
 public class Blueprint2PeerGroupBuilder extends EnvironmentBuildProcessFactory
 {
+
+    private final Random random = new Random();
 
     public Blueprint2PeerGroupBuilder( final EnvironmentManagerImpl environmentManager )
     {
@@ -75,8 +74,6 @@ public class Blueprint2PeerGroupBuilder extends EnvironmentBuildProcessFactory
      */
     private int randomInt( int max )
     {
-        Random random = new Random();
-        int rand = random.nextInt( max + 1 );
-        return rand;
+        return random.nextInt( max );
     }
 }
