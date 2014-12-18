@@ -371,7 +371,8 @@ public class MonitorImplTest
 
         when( containerHost.getPeer() ).thenReturn( remotePeer );
         ContainerHostMetricResponse response = mock( ContainerHostMetricResponse.class );
-        when( remotePeer.sendRequest( anyObject(), anyString(), anyInt(), eq( ContainerHostMetricResponse.class ) ) )
+        when( remotePeer
+                .sendRequest( anyObject(), anyString(), anyInt(), eq( ContainerHostMetricResponse.class ), anyInt() ) )
                 .thenReturn( response );
         ContainerHostMetricImpl metric = JsonUtil.fromJson( METRIC_JSON, ContainerHostMetricImpl.class );
         when( response.getMetrics() ).thenReturn( Sets.newHashSet( metric ) );
@@ -385,7 +386,8 @@ public class MonitorImplTest
 
         PeerException exception = mock( PeerException.class );
         doThrow( exception ).when( remotePeer )
-                            .sendRequest( anyObject(), anyString(), anyInt(), eq( ContainerHostMetricResponse.class ) );
+                            .sendRequest( anyObject(), anyString(), anyInt(), eq( ContainerHostMetricResponse.class ),
+                                    anyInt() );
 
 
         monitor.getContainerHostsMetrics( environment );

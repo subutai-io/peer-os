@@ -21,9 +21,10 @@ public interface RestService
 {
 
     @GET
-    @Path( "templates/{templateName}/download" )
+    @Path( "templates/{templateName}/download/{token}" )
     @Produces( { MediaType.APPLICATION_OCTET_STREAM } )
-    public Response downloadTemplate( @PathParam( "templateName" ) String templateName );
+    public Response downloadTemplate( @PathParam( "templateName" ) String templateName,
+                                      @PathParam( "token" ) String templateDownloadToken );
 
     @GET
     @Path( "templates/{templateName}" )

@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Criteria;
-import org.safehaus.subutai.common.protocol.Template;
-
 
 /**
  * Local peer interface
@@ -80,6 +77,9 @@ public interface LocalPeer extends Peer
             throws PeerException;
 
     public List<HostTask> getTasks();
+
+    public String getFreeHostName( String prefix );
+
 
     //    Agent waitForAgent( String containerName, int timeout );
 

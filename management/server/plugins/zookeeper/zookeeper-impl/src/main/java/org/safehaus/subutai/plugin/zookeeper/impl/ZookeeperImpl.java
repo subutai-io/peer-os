@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.api.ClusterOperationType;
@@ -47,6 +48,7 @@ public class ZookeeperImpl implements Zookeeper
     private Hadoop hadoopManager;
     private Commands commands;
     private ExecutorService executor;
+    private PeerManager peerManager;
     private static final Logger LOG = LoggerFactory.getLogger( ZookeeperImpl.class.getName() );
 
     private PluginDAO pluginDAO;
@@ -110,6 +112,18 @@ public class ZookeeperImpl implements Zookeeper
     public void setEnvironmentManager( final EnvironmentManager environmentManager )
     {
         this.environmentManager = environmentManager;
+    }
+
+
+    public PeerManager getPeerManager()
+    {
+        return peerManager;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
     }
 
 
