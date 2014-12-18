@@ -30,7 +30,11 @@ public class ManagerHelper
 
     private static final String INFO_JSON = String.format(
             "[{\"type\":\"plugin\", \"pluginName\":\"lucene\", \"version\":\"2.0.5\", \"rating\":\"5\" }, " +
-                    "{\"type\":\"plugin\", \"pluginName\":\"hipi\", \"version\":\"2.0.4\", \"rating\":\"6\" } ]" );
+                    "{\"type\":\"plugin\", \"pluginName\":\"hipi\", \"version\":\"2.0.4\", \"rating\":\"6\" }," +
+                    " {\"type\":\"plugin\", \"pluginName\":\"hadoop\", \"version\":\"2.1.4\", \"rating\":\"6\" }," +
+                    "{\"type\":\"plugin\", \"pluginName\":\"presto\", \"version\":\"2.1.1\", \"rating\":\"8\" }," +
+                    "{\"type\":\"plugin\", \"pluginName\":\"spark\", \"version\":\"2.0.4\", \"rating\":\"1\" }," +
+                    "{\"type\":\"plugin\", \"pluginName\":\"shark\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" );
 
 
     public ManagerHelper( PeerManager peerManager )
