@@ -37,7 +37,7 @@ public class Blueprint2PeerGroupWizard extends Window
         this.module = module;
         this.blueprint = blueprint;
 
-        generatePeerGroupsLayout();
+        setContent( generatePeerGroupsLayout() );
     }
 
 
