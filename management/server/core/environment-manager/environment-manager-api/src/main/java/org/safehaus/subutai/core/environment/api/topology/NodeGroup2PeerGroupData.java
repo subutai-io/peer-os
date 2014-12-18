@@ -1,20 +1,21 @@
 package org.safehaus.subutai.core.environment.api.topology;
 
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.NodeGroup;
 
-/**
- * Created by bahadyr on 11/6/14.
- */
+
 public class NodeGroup2PeerGroupData extends TopologyData
 {
-
     final UUID blueprintId;
     final UUID peerGroupId;
+    final Map<NodeGroup, UUID> nodeGroupToPeer = new HashMap<>();
 
 
-    public NodeGroup2PeerGroupData( final UUID blueprintId, final UUID peerGroupId )
+    public NodeGroup2PeerGroupData( UUID blueprintId, UUID peerGroupId )
     {
         this.blueprintId = blueprintId;
         this.peerGroupId = peerGroupId;
@@ -31,4 +32,18 @@ public class NodeGroup2PeerGroupData extends TopologyData
     {
         return peerGroupId;
     }
+
+
+    public Map<NodeGroup, UUID> getNodeGroupToPeer()
+    {
+        return nodeGroupToPeer;
+    }
+
+
+    public void setNodeGroupToPeer( Map<NodeGroup, UUID> nodeGroupToPeer )
+    {
+        this.nodeGroupToPeer.clear();
+        this.nodeGroupToPeer.putAll( nodeGroupToPeer );
+    }
 }
+
