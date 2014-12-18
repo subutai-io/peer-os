@@ -79,6 +79,12 @@ public class MongoImpl implements Mongo
     }
 
 
+    public void setCommands( final Commands commands )
+    {
+        this.commands = commands;
+    }
+
+
     public PluginDAO getPluginDAO()
     {
         return pluginDAO;
@@ -103,6 +109,12 @@ public class MongoImpl implements Mongo
     }
 
 
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
+    }
+
+
     public Tracker getTracker()
     {
         return tracker;
@@ -115,21 +127,9 @@ public class MongoImpl implements Mongo
     }
 
 
-    public void setEnvironmentManager( final EnvironmentManager environmentManager )
-    {
-        this.environmentManager = environmentManager;
-    }
-
-
     public void setExecutor( final ExecutorService executor )
     {
         this.executor = executor;
-    }
-
-
-    public void setCommands( final Commands commands )
-    {
-        this.commands = commands;
     }
 
 

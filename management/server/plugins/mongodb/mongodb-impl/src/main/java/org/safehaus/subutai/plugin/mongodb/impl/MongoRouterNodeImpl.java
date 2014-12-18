@@ -36,18 +36,6 @@ public class MongoRouterNodeImpl extends MongoNodeImpl implements MongoRouterNod
 
 
     @Override
-    public void setConfigServers( Set<MongoConfigNode> configServers )
-    {
-        this.configServers.clear();
-        for ( final MongoConfigNode configServer : configServers )
-        {
-            this.configServers.add( ( MongoConfigNodeImpl ) configServer );
-        }
-        //        this.configServers.addAll( configServers );
-    }
-
-
-    @Override
     public void start() throws MongoException
     {
         Preconditions.checkNotNull( configServers, "Config servers is null" );
@@ -87,6 +75,17 @@ public class MongoRouterNodeImpl extends MongoNodeImpl implements MongoRouterNod
         {
             LOG.error( e.toString(), e );
             throw new MongoException( "Could not register data nodes." );
+        }
+    }
+
+
+    @Override
+    public void setConfigServers( Set<MongoConfigNode> configServers )
+    {
+        this.configServers.clear();
+        for ( final MongoConfigNode configServer : configServers )
+        {
+            this.configServers.add( ( MongoConfigNodeImpl ) configServer );
         }
     }
 }

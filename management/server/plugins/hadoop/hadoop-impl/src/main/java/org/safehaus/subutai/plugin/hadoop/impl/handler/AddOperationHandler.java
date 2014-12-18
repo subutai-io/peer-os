@@ -15,7 +15,7 @@ public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl, Ha
     public AddOperationHandler( HadoopImpl manager, String clusterName, int nodeCount )
     {
         //    public AddOperationHandler( HadoopImpl manager, String clusterName ) {
-        super( manager, clusterName );
+        super( manager, manager.getCluster( clusterName ) );
         this.nodeCount = nodeCount;
         trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Adding %d node to cluster %s", nodeCount, clusterName ) );

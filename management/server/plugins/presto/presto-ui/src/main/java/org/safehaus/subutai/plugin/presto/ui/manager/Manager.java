@@ -459,6 +459,43 @@ public class Manager
     }
 
 
+    public void addClickListenerToSetCoordinatorButton( final ContainerHost host, Button setCoordinatorBtn )
+    {
+        setCoordinatorBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                ConfirmationDialog alert = new ConfirmationDialog(
+                        String.format( "Do you want to set %s as coordinator node?", host.getHostname() ), "Yes",
+                        "No" );
+                alert.getOk().addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( Button.ClickEvent clickEvent )
+                    {
+                        UUID trackID = presto.uninstallCluster( config.getClusterName() );
+
+                        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                PrestoClusterConfig.PRODUCT_KEY );
+
+                        window.getWindow().addCloseListener( new Window.CloseListener()
+                        {
+                            @Override
+                            public void windowClose( Window.CloseEvent closeEvent )
+                            {
+                                refreshClustersInfo();
+                            }
+                        } );
+                        contentRoot.getUI().addWindow( window.getWindow() );
+                    }
+                } );
+                contentRoot.getUI().addWindow( alert.getAlert() );
+            }
+        } );
+    }
+
+
     public void addClickListenerToDestroyButton( final ContainerHost node, Button destroyBtn )
     {
         destroyBtn.addClickListener( new Button.ClickListener()

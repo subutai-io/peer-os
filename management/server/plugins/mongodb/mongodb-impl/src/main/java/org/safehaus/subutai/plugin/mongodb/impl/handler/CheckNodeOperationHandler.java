@@ -63,47 +63,5 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<MongoImp
             nodeState = NodeState.STOPPED;
         }
         po.addLogDone( String.format( "Node on %s is %s", lxcHostname, nodeState ) );
-
-        //        Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        //        if ( node == null )
-        //        {
-        //            po.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
-        //            return;
-        //        }
-        //        if ( !config.getAllNodes().contains( node ) )
-        //        {
-        //            po.addLogFailed(
-        //                    String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname,
-        // clusterName ) );
-        //            return;
-        //        }
-        //        po.addLog( "Checking node..." );
-        //                Command checkNodeCommand = manager.getCommands().
-        //                        getCheckInstanceRunningCommand( node, config.getDomainName(), config.getNodePort(
-        // node ) );
-        //        manager.getCommandRunner().runCommand( checkNodeCommand );
-        //
-        //        if ( checkNodeCommand.hasCompleted() )
-        //        {
-        //            AgentResult agentResult = checkNodeCommand.getResults().get( node.getUuid() );
-        //            if ( agentResult != null )
-        //            {
-        //                if ( agentResult.getStdOut().contains( "couldn't connect to server" ) )
-        //                {
-        //                    po.addLogDone( String.format( "Node on %s is %s", lxcHostname, NodeState.STOPPED ) );
-        //                }
-        //                else if ( agentResult.getStdOut().contains( "connecting to" ) )
-        //                {
-        //                    po.addLogDone( String.format( "Node on %s is %s", lxcHostname, NodeState.RUNNING ) );
-        //                }
-        //                else
-        //                {
-        //                    po.addLogFailed( String.format( "Node on %s is not found", lxcHostname ) );
-        //                }
-        //                return;
-        //            }
-        //        }
-        //        po.addLogFailed( String.format( "Error checking status of node %s : %s", node.getHostname(),
-        //                checkNodeCommand.getAllErrors() ) );
     }
 }

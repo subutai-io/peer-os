@@ -58,29 +58,5 @@ public class UninstallOperationHandler extends AbstractOperationHandler<MongoImp
 
         manager.getPluginDAO().deleteInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName() );
         po.addLogDone( "Cluster destroyed." );
-
-
-        //        MongoClusterConfig config = manager.getCluster( clusterName );
-        //        if ( config == null )
-        //        {
-        //            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
-        //            return;
-        //        }
-        //
-        //        po.addLog( "Destroying lxc containers" );
-        //        try
-        //        {
-        //            manager.getContainerManager().clonesDestroy( config.getAllNodes() );
-        //            po.addLog( "Lxc containers successfully destroyed" );
-        //        }
-        //        catch ( LxcDestroyException ex )
-        //        {
-        //            po.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
-        //        }
-        //
-        //        po.addLog( "Deleting cluster information from database.." );
-        //
-        //        manager.getPluginDAO().deleteInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName() );
-        //        po.addLogDone( "Cluster info deleted from database" );
     }
 }
