@@ -1,6 +1,7 @@
 package org.safehaus.subutai.plugin.hadoop.impl.handler;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -15,6 +16,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Ignore
 public class AddOperationHandlerTest
 {
     AddOperationHandler addOperationHandler;

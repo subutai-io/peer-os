@@ -8,32 +8,18 @@ import java.util.UUID;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
-
-/**
- * Created by bahadyr on 5/6/14.
- */
 
 public class RestServiceImpl implements RestService
 {
 
     private static final String OPERATION_ID = "OPERATION_ID";
     private Hadoop hadoopManager;
-
-
-    public Hadoop getHadoopManager()
-    {
-        return hadoopManager;
-    }
-
-
-    public void setHadoopManager( Hadoop hadoopManager )
-    {
-        this.hadoopManager = hadoopManager;
-    }
-
+    private EnvironmentManager environmentManager;
 
     @Override
     public Response listClusters()
@@ -173,5 +159,28 @@ public class RestServiceImpl implements RestService
         String operationId =
                 JsonUtil.toJson( OPERATION_ID, hadoopManager.statusTaskTracker( hadoopClusterConfig, hostname ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
+    }
+
+    public Hadoop getHadoopManager()
+    {
+        return hadoopManager;
+    }
+
+
+    public void setHadoopManager( Hadoop hadoopManager )
+    {
+        this.hadoopManager = hadoopManager;
+    }
+
+
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
     }
 }

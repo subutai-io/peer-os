@@ -59,42 +59,5 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<MongoImpl
         {
             po.addLogFailed( String.format( "Failed to stop node %s, %s", lxcHostname, e ) );
         }
-
-
-        //        MongoClusterConfig config = manager.getCluster( clusterName );
-        //        if ( config == null )
-        //        {
-        //            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
-        //            return;
-        //        }
-        //
-        //        Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        //        if ( node == null )
-        //        {
-        //            po.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
-        //            return;
-        //        }
-        //        if ( !config.getAllNodes().contains( node ) )
-        //        {
-        //            po.addLogFailed(
-        //                    String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname,
-        // clusterName ) );
-        //            return;
-        //        }
-        //
-        //        po.addLog( "Stopping node..." );
-        //        Command stopNodeCommand = manager.getCommands().getStopNodeCommand( Sets.newHashSet( node ) );
-        //        manager.getCommandRunner().runCommand( stopNodeCommand );
-        //
-        //        if ( stopNodeCommand.hasSucceeded() )
-        //        {
-        //            po.addLogDone( String.format( "Node on %s stopped", lxcHostname ) );
-        //        }
-        //        else
-        //        {
-        //            po.addLogFailed(
-        //                    String.format( "Failed to stop node %s, %s", lxcHostname, stopNodeCommand.getAllErrors
-        // () ) );
-        //        }
     }
 }

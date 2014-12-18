@@ -5,7 +5,7 @@ function list_usage {
   echo -----------------------------------------------------------------------
   echo Usage: List containers and/or temlates.
   echo
-  echo "        "subutai \[-qh\] list \[-tcpa\] \[name_list\]
+  echo "        "subutai \[-qh\] list \[-tc\[-f\]pa\] \[name_list\]
   echo
   echo -----------------------------------------------------------------------
 }
@@ -139,7 +139,6 @@ function list_containers {
   local lxc_list=`lxc-ls`
   local mode="$2"
   local containers="$1"
-  local lxc_list_fancy=`lxc-ls -f`
   if [ -z "$containers" ]; then
     for container in $lxc_list; do
       if [ -z "`echo $templates | grep $container`" ]; then
@@ -152,12 +151,19 @@ function list_containers {
   if [ "false" == "$subutai_quiet" -a -z "$mode" ]; then
     echo -e "CONTAINER"
     echo -e "---------"
+  elif [ "false" == "$subutai_quiet" -a "fancy"  == "$mode" ]; then
+    echo -e "NAME\tSTATE\tIPV4\tIPV6\tAUTOSTART"
+    echo -e "---------------------------------------------"
   elif [ "false" == "$subutai_quiet" -a "ancestors" == "$mode" ]; then
     echo -e "CONTAINER\tANCESTORS"
     echo -e "---------\t---------"
   elif [ "false" == "$subutai_quiet" -a "parents" == "$mode" ]; then
     echo -e "CONTAINER\tPARENTS"
     echo -e "---------\t-------"
+  fi
+
+  if [ "fancy"  == "$mode" ]; then
+    local lxc_list_fancy=`lxc-ls -f`
   fi
 
   for container in $containers; do
@@ -167,6 +173,8 @@ function list_containers {
     fi
 
     if [ -z "$mode" ]; then
+      echo $container
+    elif [ "fancy"  == "$mode" ]; then
       echo "$lxc_list_fancy" | grep -w "$container"
     elif [ "ancestors" == "$mode" ]; then 
       echo -e "$container\t\t`get_ancestor_list $container`"
@@ -188,9 +196,10 @@ function list {
   registered="false"
   parents="false"
   ancestors="false"
+  fancy="false"
 
   shift_amount=0;
-  while getopts ":tcrpa" opt; do
+  while getopts ":tcrpaf" opt; do
     case $opt in
       t)
         templates="true"
@@ -215,15 +224,22 @@ function list {
         ;;
       p)
         parents="true"
-        if [ "true" == "$ancestors" ]; then
-          msg_error "Cannot use the -p and -a options together." >&2
+        if [[ "true" == "$fancy" || "true" == "$ancestors" ]]; then
+          msg_error "Cannot use the -f, -p and -a options together." >&2
           exit 1
         fi
         ;;
       a)
         ancestors="true"
-        if [ "true" == "$parents" ]; then
-          msg_error "Cannot use the -p and -a options together." >&2
+        if [[ "true" == "$parents" || "true" == "$fancy" ]]; then
+          msg_error "Cannot use the -f, -p and -a options together." >&2
+          exit 1
+        fi
+        ;;
+      f)
+        fancy="true"
+        if [[ "true" == "$parents" || "true" == "$ancestors" ]]; then
+          msg_error "Cannot use the -f, -p and -a options together." >&2
           exit 1
         fi
         ;;
@@ -250,6 +266,7 @@ function list {
     echo -e "registered\t= $registered"
     echo -e "containers\t= $containers"
     echo -e "ancestors\t= $ancestors"
+    echo -e "fancy\t= $fancy"
     echo
   fi
 
@@ -270,8 +287,10 @@ function list {
       list_templates "$operands" "ancestors"
     fi
   elif [ "true" == "$containers" ]; then
-    if [ "false" == "$parents" -a "false" == "$ancestors" ]; then
+    if [ "false" == "$parents" -a "false" == "$ancestors" -a "false"  == "$fancy" ]; then
       list_containers "$operands" 
+    elif [ "true" == "$fancy" ]; then
+      list_containers "$operands" "fancy"
     elif [ "true" == "$parents" ]; then
       list_containers "$operands" "parents"
     elif [ "true" == "$ancestors" ]; then

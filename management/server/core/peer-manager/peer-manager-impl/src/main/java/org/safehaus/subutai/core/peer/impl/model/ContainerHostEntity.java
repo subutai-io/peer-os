@@ -1,16 +1,22 @@
 package org.safehaus.subutai.core.peer.impl.model;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -23,6 +29,9 @@ import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 /**
@@ -52,12 +61,22 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     private String nodeGroupName = "UNKNOWN";
 
     private QuotaManager quotaManager;
-    //    @Column( name = "parent_host_name", nullable = false )
-    //    protected String parentHostname;
+
+    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
+    private Set<String> tags = new HashSet<>();
+    @Transient
+    private DataService dataService;
 
 
     private ContainerHostEntity()
     {
+    }
+
+
+    @Override
+    public void setDataService( final DataService dataService )
+    {
+        this.dataService = dataService;
     }
 
 
@@ -134,6 +153,31 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public String getTemplateName()
     {
         return templateName;
+    }
+
+
+    @Override
+    public void addTag( final String tag )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+        this.tags.add( tag );
+        this.dataService.update( this );
+    }
+
+
+    @Override
+    public void removeTag( final String tag )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+        this.tags.remove( tag );
+        this.dataService.update( this );
+    }
+
+
+    @Override
+    public Set<String> getTags()
+    {
+        return this.tags;
     }
 
 

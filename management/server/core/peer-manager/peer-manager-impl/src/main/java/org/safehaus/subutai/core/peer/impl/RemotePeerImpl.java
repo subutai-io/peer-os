@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -24,7 +23,6 @@ import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.HostInfoModel;
-import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -36,7 +34,6 @@ import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandResultImpl;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequest;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerResponse;
-import org.safehaus.subutai.core.peer.impl.model.ContainerHostEntity;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequest;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
@@ -137,15 +134,11 @@ public class RemotePeerImpl implements RemotePeer
                                                        final int quantity, final String strategyId,
                                                        final List<Criteria> criteria ) throws PeerException
     {
-        //        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000, peerInfo.getIp(),
-        // "8181" );
-        //        return remotePeerRestClient.scheduleCloneContainers( creatorPeerId, templates, quantity,
-        // strategyId, criteria );
 
         CreateContainerResponse response =
                 sendRequest( new CreateContainerRequest( creatorPeerId, templates, quantity, strategyId, criteria ),
                         RecipientType.CONTAINER_CREATE_REQUEST.name(), Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT,
-                        CreateContainerResponse.class );
+                        CreateContainerResponse.class, Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT );
 
         if ( response != null )
         {
@@ -155,17 +148,6 @@ public class RemotePeerImpl implements RemotePeer
         {
             throw new PeerException( "Command timed out" );
         }
-    }
-
-
-    private Set<ContainerHost> getContainerHostImpl( final Set<HostKey> hostKeys )
-    {
-        Set<ContainerHost> result = new HashSet<>();
-        for ( HostKey hostKey : hostKeys )
-        {
-            result.add( new ContainerHostEntity( hostKey ) );
-        }
-        return result;
     }
 
 
@@ -307,16 +289,17 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public <T, V> V sendRequest( final T request, String recipient, final int timeout, Class<V> responseType )
-            throws PeerException
+    public <T, V> V sendRequest( final T request, String recipient, final int requestTimeout, Class<V> responseType,
+                                 int responseTimeout ) throws PeerException
     {
         Preconditions.checkNotNull( responseType, "Invalid response type" );
 
         //send request
-        MessageRequest messageRequest = sendRequestInternal( request, recipient, timeout );
+        MessageRequest messageRequest = sendRequestInternal( request, recipient, requestTimeout );
 
         //wait for response here
-        MessageResponse messageResponse = messageResponseListener.waitResponse( messageRequest.getId(), timeout );
+        MessageResponse messageResponse =
+                messageResponseListener.waitResponse( messageRequest.getId(), requestTimeout, responseTimeout );
 
         if ( messageResponse != null )
         {
@@ -335,9 +318,10 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public <T> void sendRequest( final T request, final String recipient, final int timeout ) throws PeerException
+    public <T> void sendRequest( final T request, final String recipient, final int requestTimeout )
+            throws PeerException
     {
-        sendRequestInternal( request, recipient, timeout );
+        sendRequestInternal( request, recipient, requestTimeout );
     }
 
 
@@ -348,20 +332,19 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    private <T> MessageRequest sendRequestInternal( final T request, final String recipient, final int timeout )
+    private <T> MessageRequest sendRequestInternal( final T request, final String recipient, final int requestTimeout )
             throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
-        Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
+        Preconditions.checkArgument( requestTimeout > 0, "Timeout must be greater than 0" );
 
         MessageRequest messageRequest = new MessageRequest( new Payload( request, localPeer.getId() ), recipient );
         Message message = messenger.createMessage( messageRequest );
 
         try
         {
-            messenger.sendMessage( this, message, RecipientType.PEER_REQUEST_LISTENER.name(),
-                    Timeouts.PEER_MESSAGE_TIMEOUT );
+            messenger.sendMessage( this, message, RecipientType.PEER_REQUEST_LISTENER.name(), requestTimeout );
         }
         catch ( MessageException e )
         {

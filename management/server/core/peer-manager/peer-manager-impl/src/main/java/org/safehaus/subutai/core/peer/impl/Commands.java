@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.nio.file.Paths;
+
 import org.safehaus.subutai.common.command.RequestBuilder;
 
 import com.google.common.collect.Lists;
@@ -28,11 +30,20 @@ public class Commands
     }
 
 
-    public RequestBuilder getDownloadTemplateCommand( String peerIp, int peerPort, String templateName )
+    public RequestBuilder getDownloadTemplateCommand( String peerIp, int peerPort, String templateName,
+                                                      String templateDownloadToken, String downloadDir )
     {
         return new RequestBuilder( "curl" ).withCmdArgs( Lists.newArrayList( "-O", "-J", "-L",
-                String.format( "http://%s:%d/cxf/registry/templates/%s/download ", peerIp, peerPort, templateName ) ) )
-                                           .withCwd( "/lxc-data/tmpdir" ).withTimeout( 24 * 60 * 60 );
+                String.format( "http://%s:%d/cxf/registry/templates/%s/download/%s", peerIp, peerPort, templateName,
+                        templateDownloadToken ) ) ).withCwd( downloadDir ).withTimeout( 24 * 60 * 60 );
+    }
+
+
+    public RequestBuilder getCopyTemplateFromManagementHostCommand( String downloadDir, String templateFileName )
+    {
+        return new RequestBuilder(
+                String.format( "scp root@gw.intra.lan:%s", Paths.get( downloadDir, templateFileName ) ) )
+                .withTimeout( 180 );
     }
 
 
@@ -43,8 +54,15 @@ public class Commands
     }
 
 
-    public RequestBuilder getCheckTemplateCommand( String templateName )
+    public RequestBuilder getCheckTemplateImportedCommand( String templateName )
     {
         return new RequestBuilder( "subutai" ).withCmdArgs( Lists.newArrayList( "list", "-t", templateName ) );
+    }
+
+
+    public RequestBuilder getCheckTemplateDownloadedCommand( String downloadDir, String templateFileName )
+    {
+        return new RequestBuilder(
+                String.format( "mkdir -p %s ; ls %s", downloadDir, Paths.get( downloadDir, templateFileName ) ) );
     }
 }

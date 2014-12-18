@@ -95,6 +95,19 @@ generateDebianCliPackage() {
   popd
 }
 
+generateDebianPackagePlugins() {
+  makeDirectory=$BASE/$fileName
+  ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
+  pushd $makeDirectory
+  if [ -d target ]; then
+    rm -rf target/
+  fi
+  make
+  cp target/*".deb" $TARGET/
+  cp target/*".deb" $ISOPATH/
+  popd
+}
+
 
 generateDebianPackage() {
   updatePackageContent $1
@@ -213,6 +226,11 @@ generateRepoPackage() {
   TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
   ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
 
+  SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
+  TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
+  PACK="/var/lib/jenkins/Automation/Automation_ISO/mgmt-repo/template-repo-package/"
+  ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
+
   #it's template package operation
   if [[ $productName == *"template"* ]]; then
     BASE=/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName
@@ -276,6 +294,7 @@ generateRepoPackage() {
 
   popd
 }
+
 
 #generate Template repo package structure
 generateTemplateRepo() {

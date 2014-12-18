@@ -424,7 +424,7 @@ public class Manager
             for ( PigConfig pigClusterInfo : clustersInfo )
             {
                 clusterCombo.addItem( pigClusterInfo );
-                clusterCombo.setItemCaption( pigClusterInfo, pigClusterInfo.getClusterName() );
+                clusterCombo.setItemCaption( pigClusterInfo, pigClusterInfo.getClusterName() + "(" + pigClusterInfo.getHadoopClusterName() + ")" );
             }
             if ( clusterInfo != null )
             {

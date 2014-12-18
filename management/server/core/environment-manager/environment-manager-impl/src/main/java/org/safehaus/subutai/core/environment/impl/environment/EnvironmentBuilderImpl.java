@@ -59,7 +59,8 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
                 throw new BuildException( "No templates assigned" );
             }
             ContainerCreatorThread creatorThread =
-                    new ContainerCreatorThread( this, environment.getId(), message, manager.getPeerManager() );
+                    new ContainerCreatorThread( this, environment.getId(), message, manager.getPeerManager(),
+                            manager.getEnvironmentContainerDataService() );
             creatorThread.addObserver( this );
             containersAmount = containersAmount + message.getNumberOfNodes();
             LOG.info( String.format( "-----------> Scheduled: %s %d %s", key, message.getNumberOfNodes(),

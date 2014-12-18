@@ -399,9 +399,7 @@ public class Manager
             for ( NutchConfig nutchClusterInfo : clustersInfo )
             {
                 clusterCombo.addItem( nutchClusterInfo );
-                clusterCombo.setItemCaption( nutchClusterInfo,
-                        String.format( "%s (%s)", nutchClusterInfo.getClusterName(),
-                                nutchClusterInfo.getHadoopClusterName() ) );
+                clusterCombo.setItemCaption( nutchClusterInfo, nutchClusterInfo.getClusterName() + "(" + nutchClusterInfo.getHadoopClusterName() + ")" );
             }
             if ( clusterInfo != null )
             {
