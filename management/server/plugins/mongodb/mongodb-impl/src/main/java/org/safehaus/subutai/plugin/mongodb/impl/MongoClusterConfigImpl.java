@@ -6,6 +6,7 @@
 package org.safehaus.subutai.plugin.mongodb.impl;
 
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
@@ -20,6 +22,9 @@ import org.safehaus.subutai.plugin.mongodb.api.MongoException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoRouterNode;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
+import org.safehaus.subutai.plugin.mongodb.impl.custom.datatypes.CustomNodeSet;
+
+import com.google.gson.annotations.Expose;
 
 //import org.safehaus.subutai.common.protocol.Agent;
 
@@ -29,24 +34,225 @@ import org.safehaus.subutai.plugin.mongodb.api.NodeType;
  */
 public class MongoClusterConfigImpl implements MongoClusterConfig
 {
-
+    @Expose
     public static final String PRODUCT_KEY = "MongoDB";
+
+    @Expose
     public static final String PRODUCT_NAME = "mongo";
+
+    @Expose
     private String templateName = PRODUCT_NAME;
+
+    @Expose
     private String clusterName = "";
+    @Expose
     private String replicaSetName = "repl";
+    @Expose
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
+    @Expose
     private int numberOfConfigServers = 3;
+    @Expose
     private int numberOfRouters = 2;
+    @Expose
     private int numberOfDataNodes = 3;
+    @Expose
     private int cfgSrvPort = 27019;
+    @Expose
     private int routerPort = 27018;
+    @Expose
     private int dataNodePort = 27017;
 
-    private Set<MongoConfigNode> configServers = new HashSet<>();
-    private Set<MongoRouterNode> routerServers = new HashSet<>();
-    private Set<MongoDataNode> dataNodes = new HashSet<>();
+    @Expose
+    private Set<MongoConfigNodeImpl> configServersImpl = new HashSet<>();
+
+    @Expose
+    private Set<MongoRouterNodeImpl> routerServersImpl = new HashSet<>();
+
+    @Expose
+    private Set<MongoDataNodeImpl> dataNodesImpl = new HashSet<>();
+
+    private transient Set<MongoConfigNode> configServers = new CustomNodeSet<MongoConfigNode>()
+    {
+        @Override
+        protected boolean addNode( final MongoConfigNode node )
+        {
+            return configServersImpl.add( ( MongoConfigNodeImpl ) node );
+        }
+
+
+        @Override
+        protected boolean removeNode( final Object node )
+        {
+            return configServersImpl.remove( node );
+        }
+
+
+        @Override
+        protected boolean addAllNode( final Collection<? extends MongoConfigNode> c )
+        {
+            return configServersImpl.addAll( ( Collection<? extends MongoConfigNodeImpl> ) c );
+        }
+
+
+        @Override
+        protected void clearNode()
+        {
+            configServersImpl.clear();
+        }
+
+
+        @Override
+        protected boolean removeAllNode( final Collection<?> c )
+        {
+            return configServersImpl.removeAll( c );
+        }
+
+
+        @Override
+        protected boolean retainAllNode( final Collection<?> c )
+        {
+            return configServersImpl.retainAll( c );
+        }
+    };
+
+    private transient Set<MongoRouterNode> routerServers = new CustomNodeSet<MongoRouterNode>()
+    {
+        @Override
+        protected boolean addNode( final MongoRouterNode node )
+        {
+            return routerServersImpl.add( ( MongoRouterNodeImpl ) node );
+        }
+
+
+        @Override
+        protected boolean removeNode( final Object node )
+        {
+            return routerServersImpl.remove( node );
+        }
+
+
+        @Override
+        protected boolean addAllNode( final Collection<? extends MongoRouterNode> c )
+        {
+            return routerServersImpl.addAll( ( Collection<? extends MongoRouterNodeImpl> ) c );
+        }
+
+
+        @Override
+        protected void clearNode()
+        {
+            routerServersImpl.clear();
+        }
+
+
+        @Override
+        protected boolean removeAllNode( final Collection<?> c )
+        {
+            return routerServersImpl.removeAll( c );
+        }
+
+
+        @Override
+        protected boolean retainAllNode( final Collection<?> c )
+        {
+            return routerServersImpl.retainAll( c );
+        }
+    };
+
+    private transient Set<MongoDataNode> dataNodes = new CustomNodeSet<MongoDataNode>()
+    {
+        @Override
+        protected boolean addNode( final MongoDataNode node )
+        {
+            return dataNodesImpl.add( ( MongoDataNodeImpl ) node );
+        }
+
+
+        @Override
+        protected boolean removeNode( final Object node )
+        {
+            return dataNodesImpl.remove( node );
+        }
+
+
+        @Override
+        protected boolean addAllNode( final Collection<? extends MongoDataNode> c )
+        {
+            return dataNodesImpl.addAll( ( Collection<? extends MongoDataNodeImpl> ) c );
+        }
+
+
+        @Override
+        protected void clearNode()
+        {
+            dataNodesImpl.clear();
+        }
+
+
+        @Override
+        protected boolean removeAllNode( final Collection<?> c )
+        {
+            return dataNodesImpl.removeAll( c );
+        }
+
+
+        @Override
+        protected boolean retainAllNode( final Collection<?> c )
+        {
+            return dataNodesImpl.retainAll( c );
+        }
+    };
+
+    @Expose
     private UUID environmentId;
+
+
+    public MongoClusterConfigImpl init( final EnvironmentManager environmentManager )
+    {
+        for ( final MongoConfigNodeImpl mongoConfigNode : configServersImpl )
+        {
+            mongoConfigNode.setContainerHost( environmentManager.getEnvironment( mongoConfigNode.getEnvironmentId() )
+                                                                .getContainerHostById( UUID.fromString(
+                                                                        mongoConfigNode.getContainerHostId() ) ) );
+
+            this.configServers.add( mongoConfigNode );
+        }
+        for ( final MongoRouterNodeImpl mongoRouterNode : routerServersImpl )
+        {
+            mongoRouterNode.setContainerHost( environmentManager.getEnvironment( mongoRouterNode.getEnvironmentId() )
+                                                                .getContainerHostById( UUID.fromString(
+                                                                        mongoRouterNode.getContainerHostId() ) ) );
+            this.routerServers.add( mongoRouterNode );
+        }
+        for ( final MongoDataNodeImpl mongoDataNode : dataNodesImpl )
+        {
+            mongoDataNode.setContainerHost( environmentManager.getEnvironment( mongoDataNode.getEnvironmentId() )
+                                                              .getContainerHostById( UUID.fromString(
+                                                                      mongoDataNode.getContainerHostId() ) ) );
+            this.dataNodes.add( mongoDataNode );
+        }
+        return this;
+    }
+
+
+    public Set<MongoNode> getAllNodes()
+    {
+        Set<MongoNode> nodes = new HashSet<>();
+        if ( configServers != null )
+        {
+            nodes.addAll( configServers );
+        }
+        if ( dataNodes != null )
+        {
+            nodes.addAll( dataNodes );
+        }
+        if ( routerServers != null )
+        {
+            nodes.addAll( routerServers );
+        }
+
+        return nodes;
+    }
 
 
     @Override
@@ -113,6 +319,7 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
     }
 
 
+
     public int getRouterPort()
     {
         return routerPort;
@@ -158,6 +365,8 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
     public void setCfgSrvPort( int cfgSrvPort )
     {
         this.cfgSrvPort = cfgSrvPort;
+        this.routerServers.clear();
+        this.routerServers.addAll( routerServers );
     }
 
 
@@ -169,27 +378,8 @@ public class MongoClusterConfigImpl implements MongoClusterConfig
 
     public void setConfigServers( Set<MongoConfigNode> configServers )
     {
-        this.configServers = configServers;
-    }
-
-
-    public Set<MongoNode> getAllNodes()
-    {
-        Set<MongoNode> nodes = new HashSet<>();
-        if ( configServers != null )
-        {
-            nodes.addAll( configServers );
-        }
-        if ( dataNodes != null )
-        {
-            nodes.addAll( dataNodes );
-        }
-        if ( routerServers != null )
-        {
-            nodes.addAll( routerServers );
-        }
-
-        return nodes;
+        this.configServers.clear();
+        this.configServers.addAll( configServers );
     }
 
 

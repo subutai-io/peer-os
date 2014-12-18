@@ -27,6 +27,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 
 /**
@@ -232,9 +234,12 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
 
         po.addLog( "Saving cluster information to database..." );
 
-        mongoManager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-        po.addLog( "Cluster information saved to database" );
+        Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping()
+                                     .excludeFieldsWithoutExposeAnnotation().create();
 
+        String jsonConfig = gson.toJson( config );
+        mongoManager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), jsonConfig );
+        po.addLog( "Cluster information saved to database" );
 
         return config;
     }
@@ -296,6 +301,6 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
         }
 
         config.setEnvironmentId( environment.getId() );
-        po.addLogDone( String.format( "Cluster %s configured successfully.", config.getClusterName() ) );
+        po.addLog( String.format( "Cluster %s configured successfully.", config.getClusterName() ) );
     }
 }
