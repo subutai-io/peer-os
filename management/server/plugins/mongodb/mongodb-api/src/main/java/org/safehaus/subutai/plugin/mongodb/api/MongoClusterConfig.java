@@ -67,8 +67,6 @@ public interface MongoClusterConfig extends ConfigBase
 
     UUID getEnvironmentId();
 
-    void setEnvironmentId( UUID id );
-
     void addNode( MongoNode mongoNode, NodeType nodeType );
 
     Set<MongoRouterNode> getRouterServers();
@@ -82,4 +80,9 @@ public interface MongoClusterConfig extends ConfigBase
     MongoDataNode findPrimaryNode() throws MongoException;
 
     MongoNode findNode( String lxcHostname );
+
+
+    void setEnvironmentId( UUID id );
+
+    Object prepare();
 }

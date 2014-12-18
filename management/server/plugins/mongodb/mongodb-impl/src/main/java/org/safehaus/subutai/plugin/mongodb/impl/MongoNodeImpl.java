@@ -63,7 +63,7 @@ public abstract class MongoNodeImpl implements MongoNode
                 Commands.getCheckInstanceRunningCommand( containerHost.getHostname(), domainName, port );
         try
         {
-            CommandResult commandResult = execute( commandDef.build().withTimeout( 10 ) );
+            CommandResult commandResult = execute( commandDef.build().withTimeout( 10 ).daemon() );
             if ( commandResult.getStdOut().contains( "couldn't connect to server" ) )
             {
                 return false;

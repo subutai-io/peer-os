@@ -494,28 +494,27 @@ public class Manager
                     PROGRESS_ICON.setVisible( true );
                     disableButtons( startBtn, stopBtn, destroyBtn, checkBtn );
                     executorService.execute(
-                            new CheckTask( mongo, tracker, mongoClusterConfig.getClusterName(), node.getHostname(),
-                                    new CompleteEvent()
+                        new CheckTask( mongo, tracker, mongoClusterConfig.getClusterName(), node.getHostname(),
+                            new CompleteEvent()
+                            {
+                                public void onComplete( NodeState state )
+                                {
+                                    synchronized ( PROGRESS_ICON )
                                     {
-                                        public void onComplete( NodeState state )
+                                        if ( state == NodeState.RUNNING )
                                         {
-                                            synchronized ( PROGRESS_ICON )
-                                            {
-
-                                                if ( state == NodeState.RUNNING )
-                                                {
-                                                    stopBtn.setEnabled( true );
-                                                }
-                                                else if ( state == NodeState.STOPPED )
-                                                {
-                                                    startBtn.setEnabled( true );
-                                                }
-                                                resultHolder.setValue( state.name() );
-                                                enableButtons( destroyBtn, checkBtn );
-                                                PROGRESS_ICON.setVisible( false );
-                                            }
+                                            stopBtn.setEnabled( true );
                                         }
-                                    } ) );
+                                        else if ( state == NodeState.STOPPED )
+                                        {
+                                            startBtn.setEnabled( true );
+                                        }
+                                        resultHolder.setValue( state.name() );
+                                        enableButtons( destroyBtn, checkBtn );
+                                        PROGRESS_ICON.setVisible( false );
+                                    }
+                                }
+                            } ) );
                 }
             } );
 
@@ -527,18 +526,18 @@ public class Manager
                     PROGRESS_ICON.setVisible( true );
                     disableButtons( startBtn, stopBtn, destroyBtn, checkBtn );
                     executorService.execute(
-                            new StartTask( mongo, tracker, nodeType, mongoClusterConfig.getClusterName(),
-                                    node.getHostname(), new CompleteEvent()
+                        new StartTask( mongo, tracker, nodeType, mongoClusterConfig.getClusterName(),
+                                node.getHostname(), new CompleteEvent()
+                        {
+                            public void onComplete( NodeState state )
                             {
-                                public void onComplete( NodeState state )
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    synchronized ( PROGRESS_ICON )
-                                    {
-                                        enableButtons( checkBtn, startBtn, stopBtn, destroyBtn );
-                                        checkBtn.click();
-                                    }
+                                    enableButtons( checkBtn, startBtn, stopBtn, destroyBtn );
+                                    checkBtn.click();
                                 }
-                            } ) );
+                            }
+                        } ) );
                 }
             } );
 
@@ -550,18 +549,18 @@ public class Manager
                     PROGRESS_ICON.setVisible( true );
                     disableButtons( startBtn, stopBtn, destroyBtn, checkBtn );
                     executorService.execute(
-                            new StopTask( mongo, tracker, mongoClusterConfig.getClusterName(), node.getHostname(),
-                                    new CompleteEvent()
+                        new StopTask( mongo, tracker, mongoClusterConfig.getClusterName(), node.getHostname(),
+                                new CompleteEvent()
+                                {
+                                    public void onComplete( NodeState state )
                                     {
-                                        public void onComplete( NodeState state )
+                                        synchronized ( PROGRESS_ICON )
                                         {
-                                            synchronized ( PROGRESS_ICON )
-                                            {
-                                                enableButtons( checkBtn, startBtn, stopBtn, destroyBtn );
-                                                checkBtn.click();
-                                            }
+                                            enableButtons( checkBtn, startBtn, stopBtn, destroyBtn );
+                                            checkBtn.click();
                                         }
-                                    } ) );
+                                    }
+                                } ) );
                 }
             } );
 

@@ -136,7 +136,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
 
         //update db
         po.addLog( "Updating cluster information in database..." );
-        String json = manager.getGSON().toJson( config );
+        String json = manager.getGSON().toJson( config.prepare() );
         manager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), json );
         po.addLogDone( "Cluster information updated in database" );
     }
