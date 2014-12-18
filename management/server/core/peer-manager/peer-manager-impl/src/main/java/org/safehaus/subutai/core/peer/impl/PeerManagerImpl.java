@@ -230,7 +230,7 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void deletePeerGroup( final PeerGroup group )
     {
-        peerDAO.deleteInfo( PEER_GROUP, group.getUUID().toString() );
+        peerDAO.deleteInfo( PEER_GROUP, group.getId().toString() );
     }
 
 
