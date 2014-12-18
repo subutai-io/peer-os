@@ -1,14 +1,12 @@
 package org.safehaus.subutai.core.environment.impl.builder;
 
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.topology.NodeGroup2PeerGroupData;
@@ -18,7 +16,7 @@ import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
 
 
-public class NodeGroup2PeerGroupBuilder extends EnvironmentBuildProcessFactory
+public class NodeGroup2PeerGroupBuilder extends EnvironmentBuildProcessBuilder
 {
 
     public NodeGroup2PeerGroupBuilder( final EnvironmentManagerImpl environmentManager )
@@ -48,7 +46,6 @@ public class NodeGroup2PeerGroupBuilder extends EnvironmentBuildProcessFactory
             throw new ProcessBuilderException( e.getMessage() );
         }
 
-        UUID localPeerId = environmentManager.getPeerManager().getLocalPeer().getId();
         EnvironmentBuildProcess process = new EnvironmentBuildProcess( data.getBlueprintId() );
         for ( Map.Entry<NodeGroup, UUID> e : data.getNodeGroupToPeer().entrySet() )
         {
@@ -70,14 +67,7 @@ public class NodeGroup2PeerGroupBuilder extends EnvironmentBuildProcessFactory
                 throw new ProcessBuilderException( "Peer not found: id=" + peerId );
             }
 
-            CloneContainersMessage ccm = new CloneContainersMessage();
-            ccm.setTargetPeerId( peerId );
-            ccm.setNodeGroupName( ng.getName() );
-            ccm.setNumberOfNodes( ng.getNumberOfNodes() );
-            ccm.setStrategy( ng.getPlacementStrategy() );
-
-            List<Template> templates = fetchRequiredTemplates( localPeerId, ng.getTemplateName() );
-            ccm.setTemplates( templates );
+            CloneContainersMessage ccm = makeContainerCloneMessage( ng, peerId );
 
             String key = peer.getId() + ng.getName();
             process.putCloneContainerMessage( key, ccm );

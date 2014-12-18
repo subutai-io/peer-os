@@ -9,7 +9,6 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.topology.Blueprint2PeerGroupData;
@@ -20,10 +19,11 @@ import org.safehaus.subutai.core.peer.api.PeerGroup;
 import com.google.common.collect.Lists;
 
 
-public class Blueprint2PeerGroupBuilder extends EnvironmentBuildProcessFactory
+public class Blueprint2PeerGroupBuilder extends EnvironmentBuildProcessBuilder
 {
 
     private final Random random = new Random();
+
 
     public Blueprint2PeerGroupBuilder( final EnvironmentManagerImpl environmentManager )
     {
@@ -48,15 +48,7 @@ public class Blueprint2PeerGroupBuilder extends EnvironmentBuildProcessFactory
             {
                 UUID peerId = uuidList.get( randomInt( uuidList.size() ) );
                 String key = peerId.toString() + "-" + nodeGroup.getTemplateName();
-                CloneContainersMessage ccm = new CloneContainersMessage();
-                ccm.setTargetPeerId( peerId );
-                ccm.setNodeGroupName( nodeGroup.getName() );
-                ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
-                ccm.setStrategy( nodeGroup.getPlacementStrategy() );
-                List<Template> templates =
-                        fetchRequiredTemplates( environmentManager.getPeerManager().getLocalPeer().getId(),
-                                nodeGroup.getTemplateName() );
-                ccm.setTemplates( templates );
+                CloneContainersMessage ccm = makeContainerCloneMessage( nodeGroup, peerId );
                 process.putCloneContainerMessage( key, ccm );
             }
 
@@ -77,3 +69,4 @@ public class Blueprint2PeerGroupBuilder extends EnvironmentBuildProcessFactory
         return random.nextInt( max );
     }
 }
+
