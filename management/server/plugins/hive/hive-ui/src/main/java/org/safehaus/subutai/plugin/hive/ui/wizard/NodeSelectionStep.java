@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -15,6 +18,7 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.api.SetupType;
+import org.safehaus.subutai.server.ui.api.PortalModuleService;
 
 import com.vaadin.data.Property;
 import com.vaadin.ui.Button;
@@ -104,7 +108,10 @@ public class NodeSelectionStep extends Panel
         content.addComponent( nameTxt );
         if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP )
         {
-            addOverHadoopComponents( content, wizard.getConfig() );
+            if ( !addOverHadoopComponents( content, wizard.getConfig() ) )
+            {
+                wizard.back();
+            }
         }
         else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP )
         {
@@ -116,7 +123,7 @@ public class NodeSelectionStep extends Panel
     }
 
 
-    private void addOverHadoopComponents( ComponentContainer parent, final HiveConfig config )
+    private boolean addOverHadoopComponents( ComponentContainer parent, final HiveConfig config )
     {
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
         hadoopClusters.setId( "HiveHadoopClusterCb" );
@@ -165,6 +172,31 @@ public class NodeSelectionStep extends Panel
                 hadoopClusters.setItemCaption( hci, hci.getClusterName() );
             }
         }
+        else
+        {
+            PortalModuleService portalModuleService = null;
+            // get bundle instance via the OSGi Framework Util class
+            BundleContext ctx = FrameworkUtil.getBundle( PortalModuleService.class ).getBundleContext();
+            if ( ctx != null )
+            {
+                ServiceReference serviceReference = ctx.getServiceReference( PortalModuleService.class.getName() );
+                if ( serviceReference != null )
+                {
+                    portalModuleService = PortalModuleService.class.cast( ctx.getService( serviceReference ) );
+                    //                    return PortalModuleService.class.cast( ctx.getService( serviceReference ) );
+                }
+            }
+            if ( portalModuleService != null )
+            {
+                portalModuleService.loadDependentModule( HadoopClusterConfig.PRODUCT_KEY );
+            }
+            return false;
+            //            MainUI mainUI = MainUI.getInstance();
+            //            ModulesView modulesView = mainUI.getModulesView();
+            //            HashMap<String, AbstractLayout> moduleViews = modulesView.getModuleViews();
+            //            ModuleView moduleView = ( ModuleView ) moduleViews.get( HadoopClusterConfig.PRODUCT_KEY );
+            //            moduleView.addModuleTab();
+        }
 
         String hn = config.getHadoopClusterName();
         if ( hn != null && !hn.isEmpty() )
@@ -178,6 +210,7 @@ public class NodeSelectionStep extends Panel
 
         parent.addComponent( hadoopClusters );
         parent.addComponent( cmbServerNode );
+        return true;
     }
 
 
