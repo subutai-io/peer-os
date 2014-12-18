@@ -70,8 +70,9 @@ function unlock_container_read {
 function are_containers_readable {
   if [[ -z "$2" ]]
   then
-    wipe_outstanding_read_locks
-    (ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$1\b") > /dev/null 2>&1
+    src_container=$1
+    wipe_outstanding_locks $src_container
+    (ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$src_container\b") > /dev/null 2>&1
     if [ $? == 0 ]
     then
       echo "true"
@@ -79,9 +80,11 @@ function are_containers_readable {
       echo "false"
     fi
   else
-    wipe_outstanding_read_locks
-    (ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$1\b" \
-     || ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$2\b") \
+    src_container=$1
+    dst_container=$2
+    wipe_outstanding_locks $src_container $dst_container
+    (ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$src_container\b" \
+     || ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$dst_container\b") \
       > /dev/null 2>&1
     if [ $? == 0 ]
     then
@@ -95,9 +98,10 @@ function are_containers_readable {
 function are_containers_writable {
   if [[ -z "$2" ]]
   then
-    wipe_outstanding_locks
-    (ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$1\b" \
-     || ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$1\b") > /dev/null 2>&1
+    src_container=$1
+    wipe_outstanding_locks $src_container
+    (ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$src_container\b" \
+     || ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$src_container\b") > /dev/null 2>&1
     if [ $? == 0 ]
     then
       echo "true"
@@ -105,11 +109,13 @@ function are_containers_writable {
       echo "false"
     fi
   else
-    wipe_outstanding_locks
-    (ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$1\b" \
-     || ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$2\b" \
-     || ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$1\b" \
-     || ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$2\b") \
+    src_container=$1
+    dst_container=$2
+    wipe_outstanding_locks $1 $2
+    (ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$src_container\b" \
+     || ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$dst_container\b" \
+     || ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$dst_container\b" \
+     || ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$dst_container\b") \
       > /dev/null 2>&1
     if [ $? == 0 ]
     then
@@ -121,19 +127,34 @@ function are_containers_writable {
 }
 
 function wipe_outstanding_locks {
-  wipe_outstanding_read_locks
-  wipe_outstanding_write_locks
+  if [[ -z "$2" ]]
+  then
+    src_container=$1
+    wipe_outstanding_read_locks $src_container
+    wipe_outstanding_write_locks $src_container
+  else
+    src_container=$1
+    dst_container=$2
+    wipe_outstanding_read_locks $src_container $dst_container
+    wipe_outstanding_write_locks $src_container $dst_container
+  fi
 }
 
 function wipe_outstanding_read_locks {
-  for lockfile in $SUBUTAI_LOCK_PATH/read/*;
+  if [[ -z "$2" ]]
+  then
+    target_container=$1-
+  else
+    target_container=$1-$2
+  fi
+  for lockfile in $SUBUTAI_LOCK_PATH/read/$target_container;
   do
-    if [ ! -f $lockfile ]
+    if [ ! -e $lockfile ]
     then
       continue
     fi
-    PROCESS_ID=`cat $lockfile`
-    if [ "`ps -p $PROCESS_ID -o comm=`" == "" ]
+    process_id=`cat $lockfile`
+    if [ "`ps -p $process_id -o comm=`" == "" ]
     then
       rm $lockfile
     fi
@@ -141,14 +162,20 @@ function wipe_outstanding_read_locks {
 }
 
 function wipe_outstanding_write_locks {
-  for lockfile in $SUBUTAI_LOCK_PATH/write/*;
+  if [[ -z "$2" ]]
+  then
+    target_container=$1-
+  else
+    target_container=$1-$2
+  fi
+  for lockfile in $SUBUTAI_LOCK_PATH/write/$target_container;
   do
-    if [ ! -f $lockfile ]
+    if [ ! -e $lockfile ]
     then
       continue
     fi
-    PROCESS_ID=`cat $lockfile`
-    if [ "`ps -p $PROCESS_ID -o comm=`" == "" ]
+    process_id=`cat $lockfile`
+    if [ "`ps -p $process_id -o comm=`" == "" ]
     then
       rm $lockfile
     fi
