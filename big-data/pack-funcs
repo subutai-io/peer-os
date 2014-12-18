@@ -66,9 +66,33 @@ getSourcesToRelevantDirectories() {
   popd
 }
 
-#check version of given bigdata product 
-checkPackageVersion() {
-  checkVersion $productName "bdproduct"
+
+generateDebianPackagePlugins() {
+  makeDirectory=$BASE/$fileName
+  ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
+  pushd $makeDirectory
+  if [ -d target ]; then
+    rm -rf target/
+  fi
+  make
+  cp target/*".deb" $TARGET/
+  cp target/*".deb" $ISOPATH/
+  popd
+}
+
+#generate debian package using make
+generateDebianCliPackage() {
+  
+  productName=$1
+  BASE="/var/lib/jenkins/jobs/master.subutai-$productName/Subutai-$productName"
+  TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
+  SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/$productName" 
+  
+  pushd $SOURCE
+  make package
+  cp subutai-$productName-debian-build/*.deb $BASE/
+  cp subutai-$productName-debian-build/*.deb $TARGET/
+  popd
 }
 
 generateDebianPackagePlugins() {
@@ -190,7 +214,17 @@ generateRepoPackage() {
   fi
   
   #Basic path definitions
-  productName=$1  
+  productName=$1
+  productVersion=$2
+	
+	#assign version_new
+  if [ ! -z $productVersion ]; then
+  	version_new=$productVersion 
+	fi
+
+  SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
+  TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
+  ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
 
   SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
   TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
@@ -200,6 +234,8 @@ generateRepoPackage() {
   #it's template package operation
   if [[ $productName == *"template"* ]]; then
     BASE=/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName
+  elif [[ $productName == *"cli"* ]]; then
+    BASE=/var/lib/jenkins/jobs/master.subutai-$productName/Subutai-$productName
   else
     productNameUppercase="$(tr '[:lower:]' '[:upper:]' <<< ${productName:0:1})${productName:1}"
     BASE=/var/lib/jenkins/jobs/master.bigdata.$productName/$productNameUppercase
@@ -208,32 +244,39 @@ generateRepoPackage() {
   pushd $BASE
 
   #get latest package from ISOPATH to remove it
-  removedPackage=`ls -lt $ISOPATH | grep "subutai-repo-$productName" | awk '{ print $9 }' | grep .deb | head -1`
+  removedPackage=`ls -lt $ISOPATH | grep "subutai-repo-"$productName"_" | awk '{ print $9 }' | grep .deb | head -1`
   echo "removedPackageName: $removedPackage" 
   if [ "$removedPackage" != "" ]; then
     rm $ISOPATH/$removedPackage
+  fi
+
+  #if it is cli-management there will be extra remove operation for non repo wrapper package
+  if [ "$productName" = "cli-management" ]; then
+     #remove cli-management package from pool/extras
+     removedPackage=`ls -lt $ISOPATH | grep "subutai-$productName" | awk '{ print $9 }' | grep .deb | head -1`
+     echo "removedPackageName: $removedPackage" 
+     if [ ! -z "$removedPackage" ]; then
+        rm $ISOPATH/$removedPackage
+     fi
+     #copy debian package to pool/extras
+     cp $BASE/subutai-cli-management*.deb $ISOPATH/
   fi
 
   #get package full name, for example:subutai-hadoop_1.0.12_all.deb
   currentPackage=`ls -lt $TARGET | awk '{ print $9 }' | grep .deb | head -1` 
   echo "CurrentPackageName: $currentPackage"
 
-  #delete repo package: subutai-repo-hadoop_1.0.12_all.deb
-  if [ -f "$ISOPATH/subutai-repo-$currentPackage" ]; then
-      rm $ISOPATH/subutai-repo-$currentPackage 
-  fi
-  
-  if [[ "$currentPackage" == *"template"* ]]; then
-     productVersion=$2
-     shortCurrentPackage="$productName""_""$productVersion""_amd64"
-     purePackageName=$productName
-     echo "shortCurrentPackage: $shortCurrentPackage"
+	if [[ "$currentPackage" == *"template"* ]]; then
+    shortCurrentPackage="$productName""_""$productVersion""_amd64"
+    purePackageName=$productName
+    echo "shortCurrentPackage: $shortCurrentPackage"
   
   elif [[ "$currentPackage" == *"subutai"* ]]; then
      shortCurrentPackage=`echo "$currentPackage" | awk '{print substr($1,9); }'  | awk '{print substr($0, 0, length($0)-4)}'`
      echo "shortCurrentPackage: $shortCurrentPackage"
      purePackageName=`echo $shortCurrentPackage | awk -F "." '{print $1}' | awk '{print substr($0, 0, length($0)-2)}'`
      echo "purePackageName: $purePackageName"
+
   else
      echo "pure packagename cannot be resolved."
      exit 1
@@ -252,7 +295,8 @@ generateRepoPackage() {
   popd
 }
 
-#generete Template repo package structure
+
+#generate Template repo package structure
 generateTemplateRepo() {
   pushd $BASE
   local arch="amd64"
@@ -271,7 +315,7 @@ generateTemplateRepo() {
   touch $BASE/$templateName/DEBIAN/control
   chmod 755 $BASE/$templateName/DEBIAN/control
   echo "Package: subutai-repo-$purePackageName" >> $BASE/$templateName/DEBIAN/control
-  echo "Version: $productVersion" >> $BASE/$templateName/DEBIAN/control
+  echo "Version: $version_new" >> $BASE/$templateName/DEBIAN/control
   echo "Architecture: $arch" >> $BASE/$templateName/DEBIAN/control
   echo "Maintainer: <subut.ai>" >> $BASE/$templateName/DEBIAN/control
   echo "Priority: optional" >> $BASE/$templateName/DEBIAN/control
@@ -311,15 +355,11 @@ getTemplateVersion() {
   target_template_version=$version_new
 }
 
-#check subutai tempalte version status
-checkTemplatePackageVersion() {
-  checkVersion $productName "template"
-}
-
 
 #check version of package based on type
 checkVersion() {
-  mode=$2
+  local productName=$1
+  local mode=$2
   echo "MODE: $mode"
   if [ "$mode" = "template" ]; then
 
@@ -363,6 +403,16 @@ checkVersion() {
     lineNumberVersion=$(sed -n '/Version:/=' $CONTROL)
     lineVersion=$(sed $lineNumberVersion!d $CONTROL)
     version_new=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
+    echo "Version= $version_new"
+ 
+  elif [ "$mode" = "cli" ]; then
+
+    CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/$productName/debian/changelog"
+    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
+
+    version_new=`cat $CONTROL | grep subutai-$productName | awk -F" " '{print $2}'`
+    version_new=`echo ${version_new//[()]/}`
+    echo "Version= $version_new"
 
   fi
 
