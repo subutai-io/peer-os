@@ -120,19 +120,19 @@ function export {
   # ----------------------------------------------------------------------------
   
   # insert subutai.template.package info inside containers config file
-  conf="/var/lib/lxc/$container/config"
+  conf="$HOME/.local/share/lxc/$container/config"
   propline="`cat $conf | grep subutai.template.package`"
 
   if [ -z "$propline" ]; then
-    echo "subutai.template.package = $debian_dir.deb" >> /var/lib/lxc/$container/config
+    echo "subutai.template.package = $debian_dir.deb" >> $HOME/.local/share/lxc/$container/config
     debian_file=$debian_dir".deb"
   else
     debian_file=`echo $propline | awk '{print $3}'`
   fi
 
-  cp /var/lib/lxc/$container/config $debian_root
-  cp /var/lib/lxc/$container/fstab  $debian_root
-  cp /var/lib/lxc/$container/packages  $debian_root
+  cp $HOME/.local/share/lxc/$container/config $debian_root
+  cp $HOME/.local/share/lxc/$container/fstab  $debian_root
+  cp $HOME/.local/share/lxc/$container/packages  $debian_root
 
   pkg=`deb_pkg $container`
   check_status "debian package $pkg generated" "$?"
