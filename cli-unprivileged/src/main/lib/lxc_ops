@@ -482,30 +482,38 @@ function lxc_rename {
   fi
 
   # (2) setup skeleton of destination container
-  mkdir -p "$dst_rootfs"
-  sudo cat "$src_conf" | sudo sed                                           \
-     -e "s/lxc\.utsname.*/lxc\.utsname = $dst/"                   \
-     -e "s/\/lxc\/$src\//\/$HOME\/lxc\/$dst\//g"     \
-     -e "s/subutai\.git\.branch.*/subutai\.git\.branch = $dst/"   \
-     -e "s/$src-/$dst-/g" | grep -v subutai.git.uuid >> "$dst_conf"
-  sudo cp "$src_home/fstab" "$dst_home"
+  btrfs subvolume create $dst_home 1>/dev/null
+
+  sudo cat $src_conf | sudo sed                                    \
+     -e "s/lxc\.utsname.*/lxc\.utsname = $dst/"                  \
+     -e "/lxc\.mount\.entry/d" \
+     -e "/subutai\.git\.branch/ a\lxc\.mount\.entry = $HOME\/\.local\/lxc\/$dst-opt opt none bind,rw 0 0" \
+     -e "/subutai\.git\.branch/ a\lxc\.mount\.entry = $HOME\/\.local\/lxc\-data\/$dst-var var none bind,rw 0 0" \
+     -e "/subutai\.git\.branch/ a\lxc\.mount\.entry = $HOME\/\.local\/lxc\-data\/$dst-home home none bind,rw 0 0" \
+     -e "s|\/lxc\/$src\/|\/lxc\/$dst\/|g"\
+     -e "s/subutai\.git\.branch.*/subutai\.git\.branch = $dst/"  \
+     -e "s/$parent-/$child-/g" | grep -v subutai.git.uuid >> $dst_conf
+  cp $src_home/fstab $dst_home
   
   lxc_stop "$src"
   
   # umount all the partitions
-  umount "$HOME/lxc-data/$src-home"
-  umount "$HOME/lxc-data/$src-var"
-  umount "$HOME/lxc/$src-opt"
-  umount "$HOME/.local/share/lxc/$src/rootfs"
+  umount "$HOME/.local/lxc-data/$src-home" > /dev/null 2>&1
+  umount "$HOME/.local/lxc-data/$src-var" > /dev/null 2>&1
+  umount "$HOME/.local/lxc/$src-opt" > /dev/null 2>&1
+  umount "$HOME/.local/share/lxc/$src/rootfs" > /dev/null 2>&1
   
   # rename datasets and set mount point for rootfs
+  lxc_chown $src
   fs_rename_datasets_set_mount_point $src $dst $dst_rootfs
+  lxc_chown $dst
   # change the hostname
   echo "$dst" > "$dst_rootfs/etc/hostname"
   str_replace_in_file "$src" "$dst" "$dst_rootfs/etc/hosts"
-
+  lxc_chown $dst
+  lxc_mapshifting $dst
   # cleanup the old source, start up the new container, and adjust git
-  rm -rf "$HOME/.local/share/lxc/$src"
+  sudo btrfs subvolume delete $HOME/.local/share/lxc/$src/ 1>/dev/null
   lxc_wait_net "$dst"
   git_rename_branch "$src" "$dst"
   lxc_stop "$dst"

@@ -77,7 +77,7 @@ function rename {
   fi
 
   # check to make sure container is NOT registered as a template
-  if [ "`is_registered $lxc`" == "true" ]; then
+  if [ "`is_registered $src`" == "true" ]; then
     msg_error "A template with name \"$src\" is registered. Aborting ..."
     unlock_container_read $src
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
