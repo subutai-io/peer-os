@@ -111,7 +111,7 @@ public class Template
 
     //indicates whether this template is in use on any of FAIs connected to Subutai
     @Expose
-    @ElementCollection( targetClass = String.class )
+    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> faisUsingThisTemplate = new HashSet<>();
 
     //indicates where template is generated
@@ -223,6 +223,10 @@ public class Template
 
     public void setInUseOnFAI( final String faiHostname, final boolean inUseOnFAI )
     {
+        if ( faisUsingThisTemplate == null )
+        {
+            faisUsingThisTemplate = new HashSet<>();
+        }
         if ( inUseOnFAI )
         {
             faisUsingThisTemplate.add( faiHostname );
@@ -246,10 +250,6 @@ public class Template
         {
             this.children = new ArrayList<>();
         }
-        //        for ( Template child : children )
-        //        {
-        //            child.setParentTemplate( this );
-        //        }
         this.children.addAll( children );
     }
 
@@ -388,38 +388,6 @@ public class Template
     }
 
 
-    //    @Override
-    //    public boolean equals( final Object o )
-    //    {
-    //        if ( this == o )
-    //        {
-    //            return true;
-    //        }
-    //        if ( !( o instanceof Template ) )
-    //        {
-    //            return false;
-    //        }
-    //
-    //        final Template that = ( Template ) o;
-    //
-    //        return pk.getLxcArch().equals( that.pk.getLxcArch() ) && pk.getMd5sum().equals( that.pk.getMd5sum() )
-    // && pk.getTemplateName()
-    //                .equals( that.pk.getTemplateName() ) && pk.getTemplateVersion().equals( that.pk
-    // .getTemplateVersion() );
-    //    }
-    //
-    //
-    //    @Override
-    //    public int hashCode()
-    //    {
-    //        int result = templateName.hashCode();
-    //        result = 31 * result + lxcArch.hashCode();
-    //        result = 31 * result + templateVersion.hashCode();
-    //        result = 31 * result + md5sum.hashCode();
-    //        return result;
-    //    }
-
-
     @Override
     public boolean equals( final Object o )
     {
@@ -443,37 +411,6 @@ public class Template
     {
         return pk.hashCode();
     }
-
-    //    @Override
-    //    public int hashCode()
-    //    {
-    //        int result = templateName.hashCode();
-    //        result = 31 * result + lxcArch.hashCode();
-    //        //        int result = pk.getTemplateName().hashCode();
-    //        //        result = 31 * result + pk.getLxcArch().hashCode();
-    //        return result;
-    //    }
-    //
-    //
-    //    @Override
-    //    public boolean equals( final Object o )
-    //    {
-    //        if ( this == o )
-    //        {
-    //            return true;
-    //        }
-    //        if ( o == null || getClass() != o.getClass() )
-    //        {
-    //            return false;
-    //        }
-    //
-    //        final Template template = ( Template ) o;
-    //
-    //        return lxcArch.equals( template.getLxcArch() ) && templateName.equals( template.getTemplateName() );
-    //        //        return pk.getLxcArch().equals( template.getLxcArch() ) && pk.getTemplateName()
-    //        //                                                                    .equals( template.getTemplateName
-    // () );
-    //    }
 
 
     @Override
