@@ -1,10 +1,22 @@
 package org.safehaus.subutai.plugin.cassandra.ui.Environment;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
@@ -100,29 +112,20 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         List<Environment> environmentList = environmentWizard.getEnvironmentManager().getEnvironments();
-        final ComboBox envCombo = new ComboBox( "Choose environment" );
-        BeanItemContainer<Environment> eBean = new BeanItemContainer<>( Environment.class );
-        eBean.addAll( environmentList );
-        envCombo.setContainerDataSource( eBean );
-        envCombo.setNullSelectionAllowed( false );
-        envCombo.setTextInputAllowed( false );
-        envCombo.setItemCaptionPropertyId( "name" );
-
-        envCombo.addValueChangeListener( new Property.ValueChangeListener()
+        List<Environment> envList = new ArrayList<>();
+        for ( Environment anEnvironmentList : environmentList )
         {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event )
+            boolean exists = isTemplateExists( anEnvironmentList.getContainerHosts(), "cassandra" );
+            if ( exists )
             {
-                Environment e = ( Environment ) event.getProperty().getValue();
-                environmentWizard.getConfig().setEnvironmentId( e.getId() );
+                envList.add( anEnvironmentList );
             }
-        } );
+        }
 
-        final ComboBox seedsCountCombo =
-                new ComboBox( "Choose number of seeds", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
-        seedsCountCombo.setImmediate( true );
+        final ComboBox seedsCountCombo = new ComboBox( "Choose number of seeds" );
         seedsCountCombo.setImmediate( true );
         seedsCountCombo.setNullSelectionAllowed( false );
+        seedsCountCombo.setTextInputAllowed( false );
         seedsCountCombo.setValue( environmentWizard.getConfig() );
 
         seedsCountCombo.addValueChangeListener( new Property.ValueChangeListener()
@@ -133,6 +136,29 @@ public class ConfigurationStep extends VerticalLayout
                 environmentWizard.getConfig().setNumberOfSeeds( ( Integer ) event.getProperty().getValue() );
             }
         } );
+
+
+        final ComboBox envCombo = new ComboBox( "Choose environment" );
+        BeanItemContainer<Environment> eBean = new BeanItemContainer<>( Environment.class );
+        eBean.addAll( envList );
+        envCombo.setContainerDataSource( eBean );
+        envCombo.setNullSelectionAllowed( false );
+        envCombo.setTextInputAllowed( false );
+        envCombo.setItemCaptionPropertyId( "name" );
+        envCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                Environment e = ( Environment ) event.getProperty().getValue();
+                environmentWizard.getConfig().setEnvironmentId( e.getId() );
+                seedsCountCombo.removeAllItems();
+                for ( int i=0; i < e.getContainerHosts().size(); i++ ){
+                    seedsCountCombo.addItem( (i+1)+ "" );
+                }
+            }
+        } );
+
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
@@ -197,6 +223,25 @@ public class ConfigurationStep extends VerticalLayout
         addComponent( layout );
     }
 
+
+    private boolean isTemplateExists( Set<ContainerHost> containerHosts, String templateName ){
+        for ( ContainerHost host: containerHosts ){
+            if ( host.getTemplateName().equals( templateName ) ){
+                return true;
+            }
+        }
+        return  false;
+    }
+
+    private int getNumberOfContainers( Environment environment, String productTemplateName ){
+        int count = 0;
+        for ( ContainerHost host : environment.getContainerHosts() ){
+            if ( host.getTemplateName().equals( productTemplateName ) ){
+                count++;
+            }
+        }
+        return count;
+    }
 
     private void show( String notification )
     {
