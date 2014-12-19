@@ -4,6 +4,7 @@ package org.safehaus.subutai.plugin.mongodb.impl;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoException;
 import org.safehaus.subutai.plugin.mongodb.impl.common.CommandDef;
@@ -20,7 +21,7 @@ public class MongoConfigNodeImpl extends MongoNodeImpl implements MongoConfigNod
 
 
     @Override
-    public void start() throws MongoException
+    public void start( MongoClusterConfig config ) throws MongoException
     {
         try
         {
