@@ -66,19 +66,14 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
             case CONFIG_NODE:
                 return new PlacementStrategy( "BEST_SERVER", Sets.newHashSet( new Criteria( "MORE_RAM", true ) ) );
 
-            //return PlacementStrategy.MORE_RAM;
             case ROUTER_NODE:
                 return new PlacementStrategy( "BEST_SERVER", Sets.newHashSet( new Criteria( "MORE_CPU", true ) ) );
 
-            //                return PlacementStrategy.MORE_CPU;
             case DATA_NODE:
                 return new PlacementStrategy( "BEST_SERVER", Sets.newHashSet( new Criteria( "MORE_HDD", true ) ) );
 
-            //                return PlacementStrategy.MORE_HDD;
             default:
                 return new PlacementStrategy( "ROUND_ROBIN" );
-
-            //                return PlacementStrategy.ROUND_ROBIN;
         }
     }
 
@@ -242,10 +237,9 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
         Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping()
                                      .excludeFieldsWithoutExposeAnnotation().create();
 
-        String jsonConfig = gson.toJson( config );
+        String jsonConfig = gson.toJson( config.prepare() );
         mongoManager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), jsonConfig );
         po.addLog( "Cluster information saved to database" );
-
 
         return config;
     }
@@ -266,14 +260,14 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
             for ( MongoConfigNode configNode : config.getConfigServers() )
             {
                 po.addLog( "Starting config node: " + configNode.getHostname() );
-                configNode.start();
+                configNode.start( config );
             }
 
             for ( MongoRouterNode routerNode : config.getRouterServers() )
             {
                 po.addLog( "Starting router node: " + routerNode.getHostname() );
                 routerNode.setConfigServers( config.getConfigServers() );
-                routerNode.start();
+                routerNode.start( config );
             }
 
             for ( MongoDataNode dataNode : config.getDataNodes() )
@@ -286,7 +280,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
             for ( MongoDataNode dataNode : config.getDataNodes() )
             {
                 po.addLog( "Starting data node: " + dataNode.getHostname() );
-                dataNode.start();
+                dataNode.start( config );
                 if ( primaryDataNode == null )
                 {
                     primaryDataNode = dataNode;
@@ -305,79 +299,8 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
             e.printStackTrace();
             throw new ClusterConfigurationException( e );
         }
-        po.addLogDone( String.format( "Cluster %s configured successfully.", config.getClusterName() ) );
 
-        //                List<Command> installationCommands = mongoManager.getCommands().getInstallationCommands(
-        // config );
-        //
-        //        for ( Command command : installationCommands )
-        //        {
-        //            po.addLog( String.format( "Running command: %s", command.getDescription() ) );
-        //            final AtomicBoolean commandOK = new AtomicBoolean();
-        //
-        //            if ( command.getData() == CommandType.START_CONFIG_SERVERS || command.getData() == CommandType
-        // .START_ROUTERS
-        //                    || command.getData() == CommandType.START_DATA_NODES )
-        //            {
-        //                mongoManager.getCommandRunner().runCommand( command, new CommandCallback()
-        //                {
-        //
-        //                    @Override
-        //                    public void onResponse( Response response, AgentResult agentResult, Command command )
-        //                    {
-        //
-        //                        int count = 0;
-        //                        for ( AgentResult result : command.getResults().values() )
-        //                        {
-        //                            if ( result.getStdOut().contains( "child process started successfully,
-        // parent exiting" ) )
-        //                            {
-        //                                count++;
-        //                            }
-        //                        }
-        //                        if ( command.getData() == CommandType.START_CONFIG_SERVERS )
-        //                        {
-        //                            if ( count == config.getConfigServers().size() )
-        //                            {
-        //                                commandOK.set( true );
-        //                            }
-        //                        }
-        //                        else if ( command.getData() == CommandType.START_ROUTERS )
-        //                        {
-        //                            if ( count == config.getRouterServers().size() )
-        //                            {
-        //                                commandOK.set( true );
-        //                            }
-        //                        }
-        //                        else if ( command.getData() == CommandType.START_DATA_NODES )
-        //                        {
-        //                            if ( count == config.getDataNodes().size() )
-        //                            {
-        //                                commandOK.set( true );
-        //                            }
-        //                        }
-        //                        if ( commandOK.get() )
-        //                        {
-        //                            stop();
-        //                        }
-        //                    }
-        //                } );
-        //            }
-        //            else
-        //            {
-        //                mongoManager.getCommandRunner().runCommand( command );
-        //            }
-        //
-        //            if ( command.hasSucceeded() || commandOK.get() )
-        //            {
-        //                po.addLog( String.format( "Command %s succeeded", command.getDescription() ) );
-        //            }
-        //            else
-        //            {
-        //                throw new ClusterConfigurationException(
-        //                        String.format( "Command %s failed: %s", command.getDescription(),
-        // command.getAllErrors() ) );
-        //            }
-        //        }
+        config.setEnvironmentId( environment.getId() );
+        po.addLog( String.format( "Cluster %s configured successfully.", config.getClusterName() ) );
     }
 }

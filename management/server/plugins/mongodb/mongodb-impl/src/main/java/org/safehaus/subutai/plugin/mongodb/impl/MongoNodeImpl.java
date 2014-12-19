@@ -7,6 +7,8 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
 import org.safehaus.subutai.plugin.mongodb.impl.common.CommandDef;
@@ -63,7 +65,7 @@ public abstract class MongoNodeImpl implements MongoNode
                 Commands.getCheckInstanceRunningCommand( containerHost.getHostname(), domainName, port );
         try
         {
-            CommandResult commandResult = containerHost.execute( commandDef.build() );
+            CommandResult commandResult = execute( commandDef.build(true).withTimeout( 10 ) );
             if ( commandResult.getStdOut().contains( "couldn't connect to server" ) )
             {
                 return false;
@@ -92,8 +94,14 @@ public abstract class MongoNodeImpl implements MongoNode
     }
 
 
+    /**
+     * We need this config parameter to be able start router nodes successfully.
+     *
+     * @param config
+     * @throws MongoException
+     */
     @Override
-    public abstract void start() throws MongoException;
+    public abstract void start( MongoClusterConfig config ) throws MongoException;
 
 
     @Override
@@ -102,7 +110,7 @@ public abstract class MongoNodeImpl implements MongoNode
         CommandDef commandDef = Commands.getStopNodeCommand();
         try
         {
-            containerHost.execute( commandDef.build( true ) );
+            execute( commandDef.build( true ).withTimeout( 60 ) );
         }
         catch ( CommandException e )
         {

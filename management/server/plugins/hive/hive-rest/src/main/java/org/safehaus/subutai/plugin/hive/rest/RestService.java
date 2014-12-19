@@ -16,6 +16,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
@@ -24,17 +27,10 @@ import org.safehaus.subutai.plugin.hive.api.SetupType;
 
 public class RestService
 {
-
     private static final String OPERATION_ID = "OPERATION_ID";
-
     private Hive hiveManager;
-
-
-    public void setHiveManager( Hive hiveManager )
-    {
-        this.hiveManager = hiveManager;
-    }
-
+    private EnvironmentManager environmentManager;
+    private Hadoop hadoop;
 
     @GET
     @Path( "clusters" )
@@ -79,16 +75,18 @@ public class RestService
         config.setClusterName( clusterName );
         config.setHadoopClusterName( hadoopClusterName );
 
-        // TODO fix here please do not use agentManager, try to pass number of nodes to create instead of specific
-        // containers
-        //        Agent serverAgent = agentManager.getAgentByHostname( server );
-        //        config.setServer( serverAgent.getUuid() );
-        //
-        //        for ( String client : clients.split( "," ) )
-        //        {
-        //            Agent agent = agentManager.getAgentByHostname( client );
-        //            config.getClients().add( agent.getUuid() );
-        //        }
+        ContainerHost serverAgent = environmentManager.getEnvironmentByUUID( hadoop.getCluster( hadoopClusterName )
+                .getEnvironmentId() ).getContainerHostByHostname( server );
+        // TODO fix here
+        config.setServer( serverAgent.getId() );
+
+        for ( String client : clients.split( "," ) )
+        {
+            ContainerHost agent = environmentManager.getEnvironmentByUUID( hadoop.getCluster( hadoopClusterName )
+                                                                               .getEnvironmentId() ).getContainerHostByHostname( client );
+            // TODO fix here agent uuid
+            config.getClients().add( agent.getId() );
+        }
 
         UUID uuid = hiveManager.installCluster( config );
 
@@ -174,4 +172,22 @@ public class RestService
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
+
+    public void setHiveManager( Hive hiveManager )
+    {
+        this.hiveManager = hiveManager;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
+    }
+
+
+    public void setHadoop( final Hadoop hadoop )
+    {
+        this.hadoop = hadoop;
+    }
+
 }

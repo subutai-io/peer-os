@@ -79,7 +79,6 @@ public class CheckTask implements Runnable
                 break;
             }
         }
-
         completeEvent.onComplete( state );
     }
 }
