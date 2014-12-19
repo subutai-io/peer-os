@@ -28,10 +28,10 @@ function fs_take_snapshot_from_parent {
   local child_ds="$2"
   lxc-info -n $parent > /dev/null 2>&1
   if [ $? == 0 ]; then
-    sudo btrfs subvolume snapshot $HOME/.local/tmpdir/$parent/rootfs $HOME/.local/share/lxc/$child_ds > /dev/null 2>&1
+    sudo btrfs subvolume snapshot $HOME/.local/share/lxc/$parent/rootfs $HOME/.local/share/lxc/$child_ds > /dev/null 2>&1
     #sudo cp -R  $HOME/.local/share/lxc/$parent/rootfs/ $HOME/.local/share/lxc/$child_ds
   else
-    sudo btrfs subvolume snapshot  $HOME/.local/tmpdir/$parent/rootfs $HOME/.local/share/lxc/$child_ds > /dev/null 2>&1
+    sudo btrfs subvolume snapshot $HOME/.local/tmpdir/$parent/rootfs $HOME/.local/share/lxc/$child_ds > /dev/null 2>&1
     #sudo cp -R  /var/lib/lxc/$parent/rootfs $HOME/.local/share/lxc/$child_ds
   fi
 }
@@ -40,11 +40,25 @@ function fs_clone {
   local child_ds=`echo "$2" | awk -F"/" '{print $2}'`
   local parent_name=`echo $parent_snap | awk -F "-" '{print $1}'`
   local parent_dir=`fs_find_parent_dir $parent_name`
+  local lxc_path=`lxc_find_parent_dir $parent_name`
+  local prefix=""
+
+  if [[ $lxc_path =~ "/var/lib/lxc" ]]; then
+     prefix="$HOME/.local/tmpdir"
+  else
+     prefix="$HOME/.local/"
+     if [[ "$1" =~ "var" ]] || [[ "$1" =~ "home" ]]; then
+       prefix="$prefix/lxc-data"
+     elif [[ "$1" =~ "opt" ]]; then
+       prefix="$prefix/lxc"
+     fi
+  fi
+
   if [[ "$1" =~ "var" ]] || [[ "$1" =~ "home" ]]; then
-    sudo btrfs subvolume snapshot $HOME/.local/tmpdir/$parent_snap $HOME/.local/lxc-data/$child_ds > /dev/null 2>&1
+    sudo btrfs subvolume snapshot $prefix/$parent_snap $HOME/.local/lxc-data/$child_ds > /dev/null 2>&1
     #sudo cp -R $parent_dir/lxc-data/$parent_snap $HOME/.local/lxc-data/$child_ds > /dev/null 2>&1
   elif [[ "$1" =~ "opt" ]]; then
-    sudo btrfs subvolume snapshot $HOME/.local/tmpdir/$parent_snap $HOME/.local/lxc/$child_ds > /dev/null 2>&1
+    sudo btrfs subvolume snapshot $prefix/$parent_snap $HOME/.local/lxc/$child_ds > /dev/null 2>&1
     #sudo cp -R $parent_dir/lxc/$parent_snap $HOME/.local/lxc/$child_ds > /dev/null 2>&1
   else
     rm -rf /$HOME/.local/share/lxc/$child_ds/rootfs
@@ -227,19 +241,28 @@ function fs_get_children {
 function fs_assert_snap {
   local snap=`echo "$1" | awk -F"/" '{print $2}' | awk -F"@" '{print $1}'`
   local usage="$2"
- 
+  local lxc_name=`echo $snap | awk -F"-" '{print $1}'`
+  local lxc_path=`lxc_find_parent_dir $lxc_name`
+  local prefix=""
+  
+  if [[ $lxc_path =~ "/var/lib/lxc" ]]; then
+     prefix=""
+  else
+     prefix="$HOME/.local"
+  fi
+
   if [[ "$1" =~ "home" ]] || [[ "$1" =~ "var" ]]; then
-    if [ -z "`sudo btrfs property get -ts /lxc-data/$snap/ | grep true`" ]; then
+    if [ -z "`sudo btrfs property get -ts $prefix/lxc-data/$snap/ | grep true`" ]; then
         msg_error "Snapshot \"$snap\" does NOT exist!"
         show_usage "$usage"
     fi
   elif  [[ "$1" =~ "opt" ]]; then
-    if [ -z "`sudo btrfs property get -ts /lxc/$snap/ | grep true`" ]; then
+    if [ -z "`sudo btrfs property get -ts $prefix/lxc/$snap/ | grep true`" ]; then
       msg_error "Snapshot \"$snap\" does NOT exist!"
       show_usage "$usage"
     fi
   else
-    if [ -z "`sudo btrfs property get -ts /var/lib/lxc/$snap/rootfs | grep true`" ]; then
+    if [ -z "`sudo btrfs property get -ts $prefix/lxc/$snap/rootfs | grep true`" ]; then
       msg_error "Snapshot \"$snap\" does NOT exist!"
       show_usage "$usage"
     fi

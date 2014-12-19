@@ -289,6 +289,7 @@ function lxc_clone {
      -e "/subutai\.git\.branch/ a\lxc\.mount\.entry = $HOME\/\.local\/lxc\-data\/$child-var var none bind,rw 0 0" \
      -e "/subutai\.git\.branch/ a\lxc\.mount\.entry = $HOME\/\.local\/lxc\-data\/$child-home home none bind,rw 0 0" \
      -e "s|\/var\/lib\/lxc\/$parent\/|${HOME}\/\.local\/share\/lxc\/$child\/|g"\
+     -e "s|\/share\/lxc\/$parent\/|\/share\/lxc\/$child\/|g" \
      -e "s/subutai\.git\.branch.*/subutai\.git\.branch = $child/"  \
      -e "s/lxc\.network\.hwaddr.*/lxc\.network\.hwaddr = $mac/"    \
      -e "s/$parent-/$child-/g" | grep -v subutai.git.uuid >> $child_conf

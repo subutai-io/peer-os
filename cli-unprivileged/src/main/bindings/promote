@@ -173,6 +173,7 @@ function promote {
   for debpkg in "`lxc-attach -n $lxc_template -- dpkg -l`"; do
     echo "$debpkg" >> $lxc_home/packages
   done
+  sudo sed -i "/lxc.id_map/d" $lxc_home/config
 
   # ---------------------------------------------------------------------------
   # (3) git operations
