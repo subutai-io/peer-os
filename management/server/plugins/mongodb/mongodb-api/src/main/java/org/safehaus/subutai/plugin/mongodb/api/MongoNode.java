@@ -19,7 +19,7 @@ public interface MongoNode
 
     int getPort();
 
-    void start() throws MongoException;
+    void start( MongoClusterConfig config ) throws MongoException;
 
     void stop() throws MongoException;
 

@@ -19,7 +19,7 @@ initializeVariables() {
   if [ "$mode" == "plugin" ]; then 
     BASE=/var/lib/jenkins/jobs/master.plugin.$productName
     SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin"
-    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-plugin"
+    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-subutai-plugin"
 
   else
     productNameUppercase="$(tr '[:lower:]' '[:upper:]' <<< ${productName:0:1})${productName:1}"
@@ -216,11 +216,12 @@ generateRepoPackage() {
   #Basic path definitions
   productName=$1
   productVersion=$2
+  archType=amd64
 	
 	#assign version_new
   if [ ! -z $productVersion ]; then
   	version_new=$productVersion 
-	fi
+  fi
 
   SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
   TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
@@ -232,7 +233,7 @@ generateRepoPackage() {
   ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
 
   #it's template package operation
-  if [[ $productName == *"template"* ]]; then
+  if [[ $productName == *"template"* ]] || [[ $productName == *"plugin"*  ]]; then
     BASE=/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName
   elif [[ $productName == *"cli"* ]]; then
     BASE=/var/lib/jenkins/jobs/master.subutai-$productName/Subutai-$productName
@@ -266,11 +267,15 @@ generateRepoPackage() {
   currentPackage=`ls -lt $TARGET | awk '{ print $9 }' | grep .deb | head -1` 
   echo "CurrentPackageName: $currentPackage"
 
-	if [[ "$currentPackage" == *"template"* ]]; then
-    shortCurrentPackage="$productName""_""$productVersion""_amd64"
+  if [[ "$currentPackage" == *"template"* ]]; then
+    shortCurrentPackage="$productName""_""$productVersion""_$archType"
     purePackageName=$productName
     echo "shortCurrentPackage: $shortCurrentPackage"
-  
+  elif [[ "$currentPackage" == *"plugin"* ]]; then
+    shortCurrentPackage="$productName""_""$version_new""_$archType"
+    purePackageName=$productName
+    echo "shortCurrentPackage: $shortCurrentPackage"
+
   elif [[ "$currentPackage" == *"subutai"* ]]; then
      shortCurrentPackage=`echo "$currentPackage" | awk '{print substr($1,9); }'  | awk '{print substr($0, 0, length($0)-4)}'`
      echo "shortCurrentPackage: $shortCurrentPackage"
@@ -299,7 +304,6 @@ generateRepoPackage() {
 #generate Template repo package structure
 generateTemplateRepo() {
   pushd $BASE
-  local arch="amd64"
   templateName="temp"
 
   #check temp folder does exist or not
@@ -316,7 +320,7 @@ generateTemplateRepo() {
   chmod 755 $BASE/$templateName/DEBIAN/control
   echo "Package: subutai-repo-$purePackageName" >> $BASE/$templateName/DEBIAN/control
   echo "Version: $version_new" >> $BASE/$templateName/DEBIAN/control
-  echo "Architecture: $arch" >> $BASE/$templateName/DEBIAN/control
+  echo "Architecture: $archType" >> $BASE/$templateName/DEBIAN/control
   echo "Maintainer: <subut.ai>" >> $BASE/$templateName/DEBIAN/control
   echo "Priority: optional" >> $BASE/$templateName/DEBIAN/control
   echo "Description: This is subutai repo $purePackageName wrapper package" >> $BASE/$templateName/DEBIAN/control
@@ -380,7 +384,7 @@ checkVersion() {
   elif [ "$mode" = "plugin" ]; then
 
     CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin/debian/changelog"
-    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-plugin"
+    TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-subutai-plugin"
 
     version_new=`cat $CONTROL | grep "$productName-subutai-plugin" | awk -F" " '{print $2}'`
     version_new=`echo ${version_new//[()]/}`
