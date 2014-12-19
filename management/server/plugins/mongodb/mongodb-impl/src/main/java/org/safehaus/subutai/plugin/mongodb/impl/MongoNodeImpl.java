@@ -7,6 +7,8 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoNode;
 import org.safehaus.subutai.plugin.mongodb.impl.common.CommandDef;
@@ -92,8 +94,14 @@ public abstract class MongoNodeImpl implements MongoNode
     }
 
 
+    /**
+     * We need this config parameter to be able start router nodes successfully.
+     *
+     * @param config
+     * @throws MongoException
+     */
     @Override
-    public abstract void start() throws MongoException;
+    public abstract void start( MongoClusterConfig config ) throws MongoException;
 
 
     @Override
