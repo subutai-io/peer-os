@@ -98,10 +98,10 @@ function fs_addmount {
 #snaphost ll holds on clone's rootfs
 function fs_snap_hold_readonly {
   local lxc_template="$1"
-  sudo btrfs property set -ts /var/lib/lxc/$lxc_template/rootfs/ ro true
-  sudo btrfs property set -ts /lxc/$lxc_template-opt ro true
-  sudo btrfs property set -ts /lxc-data/$lxc_template-var ro true
-  sudo btrfs property set -ts /lxc-data/$lxc_template-home ro true
+  sudo btrfs property set -ts $HOME/.local/share/lxc/$lxc_template/rootfs/ ro true
+  sudo btrfs property set -ts $HOME/.local/lxc/$lxc_template-opt ro true
+  sudo btrfs property set -ts $HOME/.local/lxc-data/$lxc_template-var ro true
+  sudo btrfs property set -ts $HOME/.local/lxc-data/$lxc_template-home ro true
 }
 
 function fs_recv {
@@ -294,9 +294,16 @@ function fs_assert_ds {
 
 # checks if the container (arg $1) is a template, echo "true"/"false"
 function fs_is_template {
-  local fs_dir="$1"
-  if [ -z "`sudo btrfs property get -ts $fs_dir | grep true`" ]; then
-    echo false
+  local path1="$HOME/.local/share/lxc"
+  local path2="$HOME/.local/tmpdir"
+  local fs_dir="$path1/$1/rootfs"
+  if [ -z "`(sudo btrfs property get -ts $fs_dir | grep true) 2>/dev/null`" ]; then
+    local  fs_dir1="$path2/$1/rootfs"
+    if [ -z "`(sudo btrfs property get -ts $fs_dir1 | grep true) 2>/dev/null`" ]; then
+      echo false
+    else
+      echo true
+    fi
   else
     echo true
   fi
@@ -314,7 +321,7 @@ function fs_get_parent {
     return
   fi
 
-  local snap=$(sudo btrfs subvolume list -u /var/lib/lxc | grep `sudo btrfs subvolume list -q /var/lib/lxc | grep $c/ | awk -F" " '{print $9}'` | awk -F" " '{print $11}' | awk -F"/" '{print $1}')
+  local snap=$(sudo btrfs subvolume list -u $HOME/.local/share/lxc | grep `sudo btrfs subvolume list -q $HOME/.local/ | grep $c/ | awk -F" " '{print $9}'` | awk -F" " '{print $11}' | awk -F"/rootfs" '{print $1}' | awk -F"/" '{print $NF}')
   echo `fs_ctnr_from_ds $snap`
 }
 

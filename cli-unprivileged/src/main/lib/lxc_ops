@@ -250,7 +250,7 @@ function lxc_clone {
   lxc_assert_no $child "`usage`"
   lxc_assert $parent "`usage`"
 
-  if [ "`fs_is_template $parent_home/rootfs`" == "false" ]; then
+  if [ "`fs_is_template $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is not a template"
     unlock_container_read $child
     exit 1
