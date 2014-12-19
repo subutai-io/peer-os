@@ -133,7 +133,8 @@ public class ConfigurationStep extends VerticalLayout
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                environmentWizard.getConfig().setNumberOfSeeds( ( Integer ) event.getProperty().getValue() );
+                environmentWizard.getConfig().setNumberOfSeeds( Integer.parseInt(
+                        ( String ) event.getProperty().getValue() ) );
             }
         } );
 
@@ -179,8 +180,8 @@ public class ConfigurationStep extends VerticalLayout
                 {
                     show( "Please provide number of nodes and seeds !" );
                 }
-                else if ( ( ( Environment ) envCombo.getValue() ).getContainerHosts().size() <= ( int ) seedsCountCombo
-                        .getValue() )
+                else if ( ( ( Environment ) envCombo.getValue() ).getContainerHosts().size() <= Integer.parseInt(
+                        ( String ) seedsCountCombo.getValue() ))
                 {
                     show( "Number of seeds should be smaller than total number nodes in the cluster !" );
                 }
