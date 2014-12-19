@@ -15,7 +15,10 @@ import org.safehaus.subutai.core.environment.api.topology.NodeGroup2PeerGroupDat
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -26,15 +29,19 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-/**
- * Created by bahadyr on 9/10/14.
- */
 public class NodeGroup2PeerGroupWizard extends Window
 {
+    public static final String PROPERTY_NODE_GROUP = "Node Group";
+    public static final String PROPERTY_PEER = "Put";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger( NodeGroup2PeerGroupWizard.class );
 
     private int step = 0;
     private EnvironmentManagerPortalModule module;
     private EnvironmentBlueprint blueprint;
+
+    private Table ngTopgTable;
+    final ComboBox peerGroupsCombo = new ComboBox();
 
 
     public NodeGroup2PeerGroupWizard( final String caption, EnvironmentManagerPortalModule module,
@@ -47,13 +54,15 @@ public class NodeGroup2PeerGroupWizard extends Window
         setVisible( false );
         setWidth( "800px" );
         setHeight( "500px" );
+
         this.module = module;
         this.blueprint = blueprint;
+
         next();
     }
 
 
-    public void next()
+    private void next()
     {
         step++;
         putForm();
@@ -65,56 +74,44 @@ public class NodeGroup2PeerGroupWizard extends Window
         switch ( step )
         {
             case 1:
-            {
                 setContent( generatePeerGroupsLayout() );
                 break;
-            }
             case 2:
-            {
                 setContent( generateNodeGroupLayout() );
                 break;
-            }
             default:
-            {
                 close();
                 break;
-            }
         }
     }
 
 
-    private Table ngTopgTable;
-    private Map<Object, NodeGroup> nodeGroupMap;
-
-
     private Component generateNodeGroupLayout()
     {
-
         VerticalLayout vl = new VerticalLayout();
         vl.setMargin( true );
 
         ngTopgTable = new Table();
-        ngTopgTable.addContainerProperty( "Node Group", String.class, null );
-        ngTopgTable.addContainerProperty( "Put", ComboBox.class, null );
+        ngTopgTable.addContainerProperty( PROPERTY_NODE_GROUP, String.class, null );
+        ngTopgTable.addContainerProperty( PROPERTY_PEER, ComboBox.class, null );
         ngTopgTable.setPageLength( 10 );
         ngTopgTable.setSelectable( false );
         ngTopgTable.setEnabled( true );
         ngTopgTable.setImmediate( true );
         ngTopgTable.setSizeFull();
-        nodeGroupMap = new HashMap<>();
         for ( NodeGroup ng : blueprint.getNodeGroups() )
         {
-            ComboBox comboBox = new ComboBox();
             BeanItemContainer<PeerInfo> bic = new BeanItemContainer<>( PeerInfo.class );
             bic.addAll( selectedPeers() );
+            ComboBox comboBox = new ComboBox();
             comboBox.setContainerDataSource( bic );
             comboBox.setNullSelectionAllowed( false );
             comboBox.setTextInputAllowed( false );
             comboBox.setItemCaptionPropertyId( "name" );
-            Object itemId = ngTopgTable.addItem( new Object[] {
-                    ng.getName(), comboBox
+            ngTopgTable.addItem( new Object[]
+            {
+                ng.getName(), comboBox
             }, null );
-            nodeGroupMap.put( itemId, ng );
         }
 
         Button nextButton = new Button( "Save build task" );
@@ -123,10 +120,12 @@ public class NodeGroup2PeerGroupWizard extends Window
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                PeerGroup peerGroup = getSelectedPeerGroup();
-                if ( peerGroup != null )
+                Map<NodeGroup, UUID> matches = getMatches();
+                if ( matches != null && matches.size() == blueprint.getNodeGroups().size() )
                 {
-                    NodeGroup2PeerGroupData data = new NodeGroup2PeerGroupData( blueprint.getId(), peerGroup.getId() );
+                    PeerGroup pg = getSelectedPeerGroup();
+                    NodeGroup2PeerGroupData data = new NodeGroup2PeerGroupData( blueprint.getId(), pg.getId() );
+                    data.setNodeGroupToPeer( matches );
                     try
                     {
                         module.getEnvironmentManager().saveBuildProcess( data );
@@ -135,11 +134,15 @@ public class NodeGroup2PeerGroupWizard extends Window
                     {
                         Notification.show( e.getMessage() );
                     }
+                    catch ( Exception ex )
+                    {
+                        LOGGER.error( "Failed to save", ex );
+                    }
                     next();
                 }
                 else
                 {
-                    Notification.show( "Please select peer group", Notification.Type.HUMANIZED_MESSAGE );
+                    Notification.show( "Invalid match of node groups", Notification.Type.HUMANIZED_MESSAGE );
                 }
             }
         } );
@@ -155,12 +158,14 @@ public class NodeGroup2PeerGroupWizard extends Window
     {
         Set<PeerInfo> peerSet = new HashSet<>();
         PeerGroup peerGroup = getSelectedPeerGroup();
-        for ( UUID uuid : peerGroup.getPeerIds() )
+        if ( peerGroup != null )
         {
-            PeerInfo peer = module.getPeerManager().getPeerInfo( uuid );
-            peerSet.add( peer );
+            for ( UUID uuid : peerGroup.getPeerIds() )
+            {
+                PeerInfo peer = module.getPeerManager().getPeerInfo( uuid );
+                peerSet.add( peer );
+            }
         }
-
         return peerSet;
     }
 
@@ -175,15 +180,6 @@ public class NodeGroup2PeerGroupWizard extends Window
     {
         this.module = module;
     }
-
-
-    public void back()
-    {
-        step--;
-    }
-
-
-    final ComboBox peerGroupsCombo = new ComboBox();
 
 
     private VerticalLayout generatePeerGroupsLayout()
@@ -207,7 +203,14 @@ public class NodeGroup2PeerGroupWizard extends Window
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                next();
+                if ( getSelectedPeerGroup() != null )
+                {
+                    next();
+                }
+                else
+                {
+                    Notification.show( "Select peer group" );
+                }
             }
         } );
 
@@ -220,6 +223,46 @@ public class NodeGroup2PeerGroupWizard extends Window
 
     private PeerGroup getSelectedPeerGroup()
     {
-        return ( PeerGroup ) peerGroupsCombo.getValue();
+        Object selected = peerGroupsCombo.getValue();
+        return selected instanceof PeerGroup ? ( PeerGroup ) selected : null;
+    }
+
+
+    private Map<NodeGroup, UUID> getMatches()
+    {
+        Map<NodeGroup, UUID> result = new HashMap<>();
+        for ( Object itemId : ngTopgTable.getItemIds() )
+        {
+            Item item = ngTopgTable.getItem( itemId );
+            String ngName = item.getItemProperty( PROPERTY_NODE_GROUP ).getValue().toString();
+            NodeGroup ng = getNodeGroupByName( ngName );
+            if ( ng != null )
+            {
+                Object cmb = item.getItemProperty( PROPERTY_PEER ).getValue();
+                if ( cmb instanceof ComboBox )
+                {
+                    Object selected = ( ( ComboBox ) cmb ).getValue();
+                    if ( selected instanceof PeerInfo )
+                    {
+                        result.put( ng, ( ( PeerInfo ) selected ).getId() );
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+
+    private NodeGroup getNodeGroupByName( String name )
+    {
+        for ( NodeGroup ng : blueprint.getNodeGroups() )
+        {
+            if ( ng.getName().equals( name ) )
+            {
+                return ng;
+            }
+        }
+        return null;
     }
 }
+

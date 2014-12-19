@@ -812,7 +812,7 @@ public class Manager
             for ( PrestoClusterConfig c : clustersInfo )
             {
                 clusterCombo.addItem( c );
-                clusterCombo.setItemCaption( c, c.getClusterName() );
+                clusterCombo.setItemCaption( c, c.getClusterName() + "(" + c.getHadoopClusterName() + ")" );
             }
             if ( clusterInfo != null )
             {

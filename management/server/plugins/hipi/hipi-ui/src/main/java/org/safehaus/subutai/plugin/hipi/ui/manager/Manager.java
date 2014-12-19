@@ -390,9 +390,7 @@ public class Manager
             for ( HipiConfig hipiClusterInfo : clustersInfo )
             {
                 clusterCombo.addItem( hipiClusterInfo );
-                clusterCombo.setItemCaption( hipiClusterInfo,
-                        String.format( "%s (%s)", hipiClusterInfo.getClusterName(),
-                                hipiClusterInfo.getHadoopClusterName() ) );
+                clusterCombo.setItemCaption( hipiClusterInfo, hipiClusterInfo.getClusterName() + "(" + hipiClusterInfo.getHadoopClusterName() + ")" );
             }
             if ( clusterInfo != null )
             {

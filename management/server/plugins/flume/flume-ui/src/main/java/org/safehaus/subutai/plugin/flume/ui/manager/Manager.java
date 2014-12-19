@@ -538,7 +538,7 @@ public class Manager
             for ( FlumeConfig ci : clustersInfo )
             {
                 clusterCombo.addItem( ci );
-                clusterCombo.setItemCaption( ci, ci.getClusterName() );
+                clusterCombo.setItemCaption( ci, ci.getClusterName() + "(" + ci.getHadoopClusterName() + ")" );
             }
             if ( clusterInfo != null )
             {

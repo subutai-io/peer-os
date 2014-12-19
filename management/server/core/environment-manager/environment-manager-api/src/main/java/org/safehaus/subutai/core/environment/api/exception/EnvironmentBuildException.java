@@ -1,9 +1,6 @@
 package org.safehaus.subutai.core.environment.api.exception;
 
 
-/**
- * Created by bahadyr on 6/24/14.
- */
 public class EnvironmentBuildException extends EnvironmentManagerException
 {
 
@@ -19,6 +16,7 @@ public class EnvironmentBuildException extends EnvironmentManagerException
     }
 
 
+    @Override
     public String getMessage()
     {
         return message;
@@ -28,8 +26,9 @@ public class EnvironmentBuildException extends EnvironmentManagerException
     @Override
     public String toString()
     {
-        return "EnvironmentBuildException{" +
-                "message='" + message + '\'' +
-                '}';
+        return "EnvironmentBuildException{"
+                + "message='" + message + '\''
+                + '}';
     }
 }
+

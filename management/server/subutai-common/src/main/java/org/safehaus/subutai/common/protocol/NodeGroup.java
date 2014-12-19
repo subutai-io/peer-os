@@ -1,7 +1,7 @@
 package org.safehaus.subutai.common.protocol;
 
 
-import javax.persistence.Entity;
+import java.util.Objects;
 
 import org.safehaus.subutai.common.settings.Common;
 
@@ -9,7 +9,6 @@ import org.safehaus.subutai.common.settings.Common;
 /**
  * Node Group class
  */
-
 public class NodeGroup
 {
 
@@ -109,14 +108,37 @@ public class NodeGroup
     @Override
     public String toString()
     {
-        return "NodeGroup{" +
-                "name='" + name + '\'' +
-                ", numberOfNodes=" + numberOfNodes +
-                ", templateName='" + templateName + '\'' +
-                ", placementStrategy=" + placementStrategy +
-                ", linkHosts=" + linkHosts +
-                ", exchangeSshKeys=" + exchangeSshKeys +
-                ", domainName='" + domainName + '\'' +
-                '}';
+        return "NodeGroup{"
+                + "name='" + name + '\''
+                + ", numberOfNodes=" + numberOfNodes
+                + ", templateName='" + templateName + '\''
+                + ", placementStrategy=" + placementStrategy
+                + ", linkHosts=" + linkHosts
+                + ", exchangeSshKeys=" + exchangeSshKeys
+                + ", domainName='" + domainName + '\''
+                + '}';
     }
+
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 5;
+        hash = 41 * hash + Objects.hashCode( this.name );
+        return hash;
+    }
+
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( obj instanceof NodeGroup )
+        {
+            NodeGroup other = ( NodeGroup ) obj;
+            return Objects.equals( this.name, other.name );
+        }
+        return false;
+    }
+
 }
+
