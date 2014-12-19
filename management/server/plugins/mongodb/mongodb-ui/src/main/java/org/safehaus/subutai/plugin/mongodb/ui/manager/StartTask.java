@@ -56,6 +56,7 @@ public class StartTask implements Runnable
         }
         else if ( nodeType == NodeType.ROUTER_NODE )
         {
+
             waitTimeout = Timeouts.START_ROUTER_TIMEOUT_SEC;
 
             //            Set<MongoConfigNode> list = mongo.getCluster( clusterName ).getConfigServers();

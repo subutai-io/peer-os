@@ -21,7 +21,7 @@ import com.google.gson.annotations.Expose;
 public class MongoRouterNodeImpl extends MongoNodeImpl implements MongoRouterNode
 {
     @Expose
-    Set<MongoConfigNodeImpl> configServers = new HashSet<>();
+    Set<MongoConfigNode> configServers;
 
     @Expose
     int cfgSrvPort;
@@ -39,8 +39,7 @@ public class MongoRouterNodeImpl extends MongoNodeImpl implements MongoRouterNod
     public void start() throws MongoException
     {
         Preconditions.checkNotNull( configServers, "Config servers is null" );
-        CommandDef commandDef = Commands.getStartRouterCommandLine( port, cfgSrvPort, domainName,
-                new HashSet<MongoConfigNode>( configServers ) );
+        CommandDef commandDef = Commands.getStartRouterCommandLine( port, cfgSrvPort, domainName, configServers);
         try
         {
             CommandResult commandResult = containerHost.execute( commandDef.build( true ) );
@@ -82,10 +81,6 @@ public class MongoRouterNodeImpl extends MongoNodeImpl implements MongoRouterNod
     @Override
     public void setConfigServers( Set<MongoConfigNode> configServers )
     {
-        this.configServers.clear();
-        for ( final MongoConfigNode configServer : configServers )
-        {
-            this.configServers.add( ( MongoConfigNodeImpl ) configServer );
-        }
+        this.configServers = configServers;
     }
 }

@@ -47,6 +47,7 @@ public class StartAllTask implements Runnable
         {
             try
             {
+                routerNode.setConfigServers( mongoClusterConfig.getConfigServers() );
                 routerNode.start();
             }
             catch ( MongoException e )
