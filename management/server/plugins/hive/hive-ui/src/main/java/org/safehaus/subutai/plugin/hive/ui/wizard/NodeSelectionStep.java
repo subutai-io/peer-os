@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -40,6 +40,7 @@ public class NodeSelectionStep extends Panel
     private final Hadoop hadoop;
     private int controlWidth = 350;
     private EnvironmentManager environmentManager;
+    private GridLayout content;
 
 
     public NodeSelectionStep( final Hive hive, final Hadoop hadoop, final EnvironmentManager environmentManager,
@@ -52,7 +53,7 @@ public class NodeSelectionStep extends Panel
 
         setSizeFull();
 
-        GridLayout content = new GridLayout( 1, 2 );
+        content = new GridLayout( 1, 2 );
         content.setSizeFull();
         content.setSpacing( true );
         content.setMargin( true );
@@ -108,7 +109,7 @@ public class NodeSelectionStep extends Panel
         content.addComponent( nameTxt );
         if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP )
         {
-            if ( !addOverHadoopComponents( content, wizard.getConfig() ) )
+            if ( !addOverHadoopComponents( content, wizard.getConfig(), wizard.getServiceLocator() ) )
             {
                 wizard.back();
             }
@@ -123,7 +124,8 @@ public class NodeSelectionStep extends Panel
     }
 
 
-    private boolean addOverHadoopComponents( ComponentContainer parent, final HiveConfig config )
+    private boolean addOverHadoopComponents( ComponentContainer parent, final HiveConfig config,
+                                             final ServiceLocator serviceLocator )
     {
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
         hadoopClusters.setId( "HiveHadoopClusterCb" );
@@ -174,28 +176,31 @@ public class NodeSelectionStep extends Panel
         }
         else
         {
+            //            ConfirmationDialog alert =
+            //                    new ConfirmationDialog( String.format( "Do you want to proceed with Hadoop
+            // installation" ), "Yes",
+            //                            "No" );
+            //            alert.getOk().addClickListener( new Button.ClickListener()
+            //            {
+            //                @Override
+            //                public void buttonClick( Button.ClickEvent clickEvent )
+            //                {
             PortalModuleService portalModuleService = null;
-            // get bundle instance via the OSGi Framework Util class
-            BundleContext ctx = FrameworkUtil.getBundle( PortalModuleService.class ).getBundleContext();
-            if ( ctx != null )
+            try
             {
-                ServiceReference serviceReference = ctx.getServiceReference( PortalModuleService.class.getName() );
-                if ( serviceReference != null )
-                {
-                    portalModuleService = PortalModuleService.class.cast( ctx.getService( serviceReference ) );
-                    //                    return PortalModuleService.class.cast( ctx.getService( serviceReference ) );
-                }
+                portalModuleService = serviceLocator.getService( PortalModuleService.class );
+            }
+            catch ( NamingException ignore )
+            {
             }
             if ( portalModuleService != null )
             {
                 portalModuleService.loadDependentModule( HadoopClusterConfig.PRODUCT_KEY );
             }
+            //                }
+            //            } );
+            //            content.getUI().addWindow( alert.getAlert() );
             return false;
-            //            MainUI mainUI = MainUI.getInstance();
-            //            ModulesView modulesView = mainUI.getModulesView();
-            //            HashMap<String, AbstractLayout> moduleViews = modulesView.getModuleViews();
-            //            ModuleView moduleView = ( ModuleView ) moduleViews.get( HadoopClusterConfig.PRODUCT_KEY );
-            //            moduleView.addModuleTab();
         }
 
         String hn = config.getHadoopClusterName();

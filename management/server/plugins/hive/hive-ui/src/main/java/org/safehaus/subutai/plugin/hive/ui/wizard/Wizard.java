@@ -29,6 +29,7 @@ public class Wizard
     private int step = 1;
     private HiveConfig config = new HiveConfig();
     private HadoopClusterConfig hadoopConfig;
+    private ServiceLocator serviceLocator;
 
 
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -39,6 +40,7 @@ public class Wizard
         this.tracker = serviceLocator.getService( Tracker.class );
         this.hive = serviceLocator.getService( Hive.class );
         this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.serviceLocator = serviceLocator;
 
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
@@ -126,5 +128,11 @@ public class Wizard
     public void setHadoopConfig( final HadoopClusterConfig hadoopConfig )
     {
         this.hadoopConfig = hadoopConfig;
+    }
+
+
+    public ServiceLocator getServiceLocator()
+    {
+        return serviceLocator;
     }
 }
