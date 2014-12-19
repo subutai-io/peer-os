@@ -136,19 +136,19 @@ lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
 lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
 version=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
 packageName="subutai-management_"$version"_amd64"
-echo "packageName:$packageName"
+echo "fileName:$fileName packageName:$packageName"
 mv $fileName $packageName
 dpkg-deb -z8 -Zgzip --build $packageName/
 
 #copying subutai-management.deb file to our pool
-cp $packageName".deb" /var/lib/jenkins/Automation/Bigdata/management/
+cp $packageName".deb" /var/lib/jenkins/Automation/Automation_ISO/Packages/management/
 
 #editing package properties 
 chown jenkins:jenkins *.deb
 chmod -R 644 *.deb
 
 #get package latest package from ISOPATH to remove it
-removedPackage=`ls -lt $ISOPATH | grep "subutai-management" | awk '{ print $9 }' | grep .deb | head -1`
+removedPackage=`ls -lt $ISOPATH | grep "subutai-management_" | awk '{ print $9 }' | grep .deb | head -1`
 echo "removedPackageName: $removedPackage" 
 if [ "$removedPackage" != "" ]; then
 	rm $ISOPATH/$removedPackage
