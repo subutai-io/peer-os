@@ -14,6 +14,7 @@
   <name>Subutai Wol Manager UI</name>
   <description>Subutai Wol Manager UI</description>
 
+
   <dependencies>
     <dependency>
       <groupId>org.osgi</groupId>
