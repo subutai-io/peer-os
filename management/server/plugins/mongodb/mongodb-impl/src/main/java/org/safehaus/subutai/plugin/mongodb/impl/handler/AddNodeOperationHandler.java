@@ -174,7 +174,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
             po.addLog( String.format( "Stopping node..." ) );
             newDataNode.stop();
             po.addLog( String.format( "Starting node..." ) );
-            newDataNode.start();
+            newDataNode.start( config );
 
             po.addLog( String.format( "Data node started successfully" ) );
 
@@ -215,7 +215,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
 
             po.addLog( String.format( "Starting router: %s", newRouter.getHostname() ) );
             newRouter.setConfigServers( config.getConfigServers() );
-            newRouter.start();
+            newRouter.start( config );
             return true;
         }
         catch ( SubutaiException e )
