@@ -32,14 +32,7 @@ public class HiveComponent extends CustomComponent
         TabSheet sheet = new TabSheet();
         sheet.setSizeFull();
         manager = new Manager( executorService, serviceLocator );
-        wizard = new Wizard( executorService, serviceLocator )
-        {
-            @Override
-            public void requestHadoopPlugin()
-            {
-
-            }
-        };
+        wizard = new Wizard( executorService, serviceLocator );
         sheet.addTab( wizard.getContent(), "Install" );
         sheet.getTab( 0 ).setId( "HiveInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );
