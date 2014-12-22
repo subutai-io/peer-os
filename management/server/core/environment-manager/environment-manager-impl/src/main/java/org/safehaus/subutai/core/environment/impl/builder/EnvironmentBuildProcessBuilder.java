@@ -5,22 +5,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.topology.TopologyData;
 import org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl;
 
 
-/**
- * Created by bahadyr on 10/21/14.
- */
-public abstract class EnvironmentBuildProcessFactory
+public abstract class EnvironmentBuildProcessBuilder
 {
 
     EnvironmentManagerImpl environmentManager;
 
 
-    public EnvironmentBuildProcessFactory( final EnvironmentManagerImpl environmentManager )
+    public EnvironmentBuildProcessBuilder( final EnvironmentManagerImpl environmentManager )
     {
         this.environmentManager = environmentManager;
     }
@@ -59,4 +58,24 @@ public abstract class EnvironmentBuildProcessFactory
 
         return requiredTemplates;
     }
+
+
+    protected CloneContainersMessage makeContainerCloneMessage( NodeGroup nodeGroup, UUID peerId ) throws ProcessBuilderException
+    {
+        UUID localPeerId = environmentManager.getPeerManager().getLocalPeer().getId();
+        List<Template> templates = fetchRequiredTemplates( localPeerId, nodeGroup.getTemplateName() );
+        if ( templates.isEmpty() )
+        {
+            throw new ProcessBuilderException( "No templates provided" );
+        }
+
+        CloneContainersMessage ccm = new CloneContainersMessage();
+        ccm.setTargetPeerId( peerId );
+        ccm.setNodeGroupName( nodeGroup.getName() );
+        ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
+        ccm.setStrategy( nodeGroup.getPlacementStrategy() );
+        ccm.setTemplates( templates );
+        return ccm;
+    }
 }
+

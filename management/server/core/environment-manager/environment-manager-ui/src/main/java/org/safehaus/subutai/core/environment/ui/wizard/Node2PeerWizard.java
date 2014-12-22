@@ -24,9 +24,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-/**
- * Created by bahadyr on 9/10/14.
- */
 public class Node2PeerWizard extends Window
 {
 
@@ -54,7 +51,7 @@ public class Node2PeerWizard extends Window
     }
 
 
-    public void next()
+    private void next()
     {
         step++;
         putForm();
@@ -66,20 +63,14 @@ public class Node2PeerWizard extends Window
         switch ( step )
         {
             case 1:
-            {
                 setContent( genPeersLayout() );
                 break;
-            }
             case 2:
-            {
                 setContent( genNodesToPeersLayout() );
                 break;
-            }
             default:
-            {
                 setContent( genPeersLayout() );
                 break;
-            }
         }
     }
 
@@ -93,12 +84,6 @@ public class Node2PeerWizard extends Window
     public void setManagerUI( final EnvironmentManagerPortalModule managerUI )
     {
         this.managerUI = managerUI;
-    }
-
-
-    public void back()
-    {
-        step--;
     }
 
 
@@ -123,8 +108,9 @@ public class Node2PeerWizard extends Window
             for ( Peer peer : peers )
             {
                 CheckBox checkBox = new CheckBox();
-                peersTable.addItem( new Object[] {
-                        peer.getName(), checkBox
+                peersTable.addItem( new Object[]
+                {
+                    peer.getName(), checkBox
                 }, peer );
             }
         }
@@ -177,8 +163,9 @@ public class Node2PeerWizard extends Window
                 peersBox.setNullSelectionAllowed( false );
                 peersBox.setTextInputAllowed( false );
                 peersBox.setItemCaptionPropertyId( "name" );
-                Integer itemId = ( Integer ) containerToPeerTable.addItem( new Object[] {
-                        ng.getTemplateName(), peersBox
+                Integer itemId = ( Integer ) containerToPeerTable.addItem( new Object[]
+                {
+                    ng.getTemplateName(), peersBox
                 }, null );
                 nodeGroupMap.put( itemId, ng );
             }
@@ -192,8 +179,7 @@ public class Node2PeerWizard extends Window
                 Map<Integer, Peer> topology = topologySelection();
                 if ( !topology.isEmpty() || containerToPeerTable.getItemIds().size() != topology.size() )
                 {
-                    Map<Integer, NodeGroup> map = getNodeGroupMap();
-                    Node2PeerData data = new Node2PeerData( blueprint.getId(), topology, map );
+                    Node2PeerData data = new Node2PeerData( blueprint.getId(), topology, nodeGroupMap );
                     try
                     {
                         UUID processId = managerUI.getEnvironmentManager().saveBuildProcess( data );
@@ -223,9 +209,9 @@ public class Node2PeerWizard extends Window
     private List<Peer> selectedPeers()
     {
         List<Peer> peers = new ArrayList<>();
-        for ( Object itemId : getPeersTable().getItemIds() )
+        for ( Object itemId : peersTable.getItemIds() )
         {
-            CheckBox selection = ( CheckBox ) getPeersTable().getItem( itemId ).getItemProperty( "Select" ).getValue();
+            CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Select" ).getValue();
             if ( selection.getValue() )
             {
                 peers.add( ( Peer ) itemId );
@@ -235,41 +221,18 @@ public class Node2PeerWizard extends Window
     }
 
 
-    public Table getPeersTable()
-    {
-        return peersTable;
-    }
-
-
-    public Table getContainerToPeerTable()
-    {
-        return containerToPeerTable;
-    }
-
-
-    public Map<Integer, NodeGroup> getNodeGroupMap()
-    {
-        return nodeGroupMap;
-    }
-
-
-    public void setNodeGroupMap( final Map<Integer, NodeGroup> nodeGroupMap )
-    {
-        this.nodeGroupMap = nodeGroupMap;
-    }
-
-
     public Map<Integer, Peer> topologySelection()
     {
         Map<Integer, Peer> topology = new HashMap<>();
-        for ( Object itemId : getContainerToPeerTable().getItemIds() )
+        for ( Object itemId : containerToPeerTable.getItemIds() )
         {
             Integer objectIndex = ( Integer ) itemId;
-            ComboBox selection =
-                    ( ComboBox ) getContainerToPeerTable().getItem( objectIndex ).getItemProperty( "Put" ).getValue();
+            ComboBox selection
+                    = ( ComboBox ) containerToPeerTable.getItem( objectIndex ).getItemProperty( "Put" ).getValue();
             Peer peer = ( Peer ) selection.getValue();
             topology.put( objectIndex, peer );
         }
         return topology;
     }
 }
+

@@ -34,13 +34,16 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopNodeOperationTask;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.QuestionDialog;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
+import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.event.Action;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 
@@ -62,41 +65,36 @@ public class ManagerListener
 
     protected ItemClickEvent.ItemClickListener getTableClickListener( final Table table )
     {
-        //        return new ItemClickEvent.ItemClickListener()
-        //        {
-        //            @Override
-        //            public void itemClick( ItemClickEvent event )
-        //            {
-        //                if ( event.isDoubleClick() )
-        //                {
-        //                    String lxcHostname =
-        //                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" )
-        // .getValue();
-        //                    Environ
-        //
-        //                    host lxcAgent = hadoopManager.getAgentManager().getAgentByHostname( lxcHostname );
-        //                    if ( lxcAgent != null )
-        //                    {
-        //                        TerminalWindow terminal =
-        //                                new TerminalWindow( Sets.newHashSet( lxcAgent ),
-        // hadoopManager.getExecutorService(),
-        //                                        hadoopManager.getCommandRunner(), hadoopManager.getAgentManager() );
-        //                        hadoopManager.getContentRoot().getUI().addWindow( terminal.getWindow() );
-        //                    }
-        //                    else
-        //                    {
-        //                        hadoopManager.show( "host of " + lxcHostname + " is not connected" );
-        //                    }
-        //                }
-        //            }
-        //        };
-        return null;
+        return new ItemClickEvent.ItemClickListener()
+        {
+            @Override
+            public void itemClick( ItemClickEvent event )
+            {
+                if ( event.isDoubleClick() )
+                {
+                    String containerId =
+                            ( String ) table.getItem( event.getItemId() ).getItemProperty( Manager.HOST_COLUMN_CAPTION ).getValue();
+                    ContainerHost containerHost = hadoopManager.getEnvironmentManager().getEnvironmentByUUID(
+                            hadoopManager.getHadoopCluster().getEnvironmentId())
+                                                               .getContainerHostByHostname( containerId );
+
+                    if ( containerHost != null )
+                    {
+                        TerminalWindow terminal = new TerminalWindow( containerHost );
+                        hadoopManager.getContentRoot().getUI().addWindow( terminal.getWindow() );
+                    }
+                    else
+                    {
+                        Notification.show( "Agent is not connected" );
+                    }
+                }
+            }
+        };
     }
 
 
     protected Button.ClickListener addNodeButtonListener()
     {
-
         return new Button.ClickListener()
         {
             @Override
