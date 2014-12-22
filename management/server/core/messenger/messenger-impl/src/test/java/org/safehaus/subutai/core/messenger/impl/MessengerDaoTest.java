@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.messenger.impl;
 
 
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -83,7 +82,7 @@ public class MessengerDaoTest
     public void testGetEnvelopes() throws Exception
     {
         when( messageDataService.getTargetPeers() ).thenReturn( Lists.newArrayList( TARGET_PEER_ID.toString() ) );
-        when( messageDataService.getSelectMessages( eq( TARGET_PEER_ID.toString() ), anyInt(), anyInt() ) )
+        when( messageDataService.getMessages( eq( TARGET_PEER_ID.toString() ), anyInt(), anyInt() ) )
                 .thenReturn( Lists.newArrayList( messageEntity ) );
 
         Set<Envelope> envelopeSet = messengerDao.getEnvelopes();

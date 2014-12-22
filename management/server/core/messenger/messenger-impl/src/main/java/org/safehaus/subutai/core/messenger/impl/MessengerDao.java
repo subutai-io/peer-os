@@ -50,7 +50,7 @@ public class MessengerDao
         for ( final String targetPeer : targetPeers )
         {
             List<MessageEntity> messages =
-                    messageDataService.getSelectMessages( targetPeer, WIDENING_INTERVAL_SEC, MESSAGE_LIMIT_PER_PEER );
+                    messageDataService.getMessages( targetPeer, WIDENING_INTERVAL_SEC, MESSAGE_LIMIT_PER_PEER );
 
             Set<Envelope> envelopes = new HashSet<>();
             envelopes.addAll( buildEnvelopes( messages ) );
