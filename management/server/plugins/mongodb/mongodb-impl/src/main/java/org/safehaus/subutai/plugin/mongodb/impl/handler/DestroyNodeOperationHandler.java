@@ -96,7 +96,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
                     for ( MongoRouterNode routerNode : config.getRouterServers() )
                     {
                         routerNode.stop();
-                        routerNode.start();
+                        routerNode.start( config );
                     }
                 }
                 catch ( MongoException me )

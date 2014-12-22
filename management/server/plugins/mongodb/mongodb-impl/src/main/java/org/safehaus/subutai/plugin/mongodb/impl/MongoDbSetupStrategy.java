@@ -260,14 +260,14 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
             for ( MongoConfigNode configNode : config.getConfigServers() )
             {
                 po.addLog( "Starting config node: " + configNode.getHostname() );
-                configNode.start();
+                configNode.start( config );
             }
 
             for ( MongoRouterNode routerNode : config.getRouterServers() )
             {
                 po.addLog( "Starting router node: " + routerNode.getHostname() );
                 routerNode.setConfigServers( config.getConfigServers() );
-                routerNode.start();
+                routerNode.start( config );
             }
 
             for ( MongoDataNode dataNode : config.getDataNodes() )
@@ -280,7 +280,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
             for ( MongoDataNode dataNode : config.getDataNodes() )
             {
                 po.addLog( "Starting data node: " + dataNode.getHostname() );
-                dataNode.start();
+                dataNode.start( config );
                 if ( primaryDataNode == null )
                 {
                     primaryDataNode = dataNode;
