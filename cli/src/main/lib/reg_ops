@@ -216,7 +216,6 @@ function build_rest_url {
 
 function get_template_version {
   local template=$1
-  #TODO get the actual version of this template
-  local version=$SUBUTAI_VERSION
+  local version=$(get_exported_package_version $template)
   echo $version
 }
