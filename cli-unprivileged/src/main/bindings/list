@@ -276,6 +276,7 @@ function list {
     elif [ "true" == "$ancestors" ]; then
       list_templates "$operands" "ancestors"
     fi
+    msg_info "* - located under '/var/lib/lxc'"
   elif [ "true" == "$containers" ]; then
     if [ "false" == "$parents" -a "false" == "$ancestors" ]; then
       list_containers "$operands" 
@@ -291,7 +292,6 @@ function list {
       list_registered_templates
     fi
   fi
-
 }
 
 

@@ -395,7 +395,7 @@ function fs_list_templates {
   do
     if [ ! -z "`sudo btrfs property get -ts /var/lib/lxc/$item/rootfs | grep true`" ]
     then
-       echo $item
+       echo *$item
     fi
   done
 
