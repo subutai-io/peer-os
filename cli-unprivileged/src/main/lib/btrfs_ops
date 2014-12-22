@@ -244,7 +244,6 @@ function fs_assert_snap {
   local lxc_name=`echo $snap | awk -F"-" '{print $1}'`
   local lxc_path=`lxc_find_parent_dir $lxc_name`
   local prefix=""
-  
   if [[ $lxc_path =~ "/var/lib/lxc" ]]; then
      prefix=""
   else
@@ -387,11 +386,19 @@ function fs_part_from_ds {
 function fs_list_templates {
   for item in `lxc-ls`
   do
+    if [ ! -z "`sudo btrfs property get -ts $HOME/.local/share/lxc/$item/rootfs | grep true`" ]
+    then
+       echo $item
+    fi
+  done
+  for item in `ls /var/lib/lxc/ | grep -v -`
+  do
     if [ ! -z "`sudo btrfs property get -ts /var/lib/lxc/$item/rootfs | grep true`" ]
     then
        echo $item
     fi
   done
+
 }
 #TODO
 function fs_copy_ds {

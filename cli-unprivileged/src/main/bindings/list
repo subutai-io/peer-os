@@ -39,6 +39,13 @@ function get_ancestor_list {
 function list_contemp {
   if [ -z "$1" ]; then
     local contemps=`lxc-ls`
+    for item in `ls /var/lib/lxc/ | grep -v -`
+  do
+    if [ ! -z "`sudo btrfs property get -ts /var/lib/lxc/$item/rootfs | grep true`" ]
+    then
+       contemps=$contemps" "$item
+    fi
+  done
   else
     local contemps="$1"
   fi
