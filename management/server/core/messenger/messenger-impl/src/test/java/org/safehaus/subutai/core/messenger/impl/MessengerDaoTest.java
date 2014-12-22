@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.junit.Before;
@@ -58,38 +59,12 @@ public class MessengerDaoTest
     SQLException exception;
     @Mock
     ResultSet envelopesRs;
+    @Mock
+    EntityManagerFactory entityManagerFactory;
 
     MessageImpl message;
     Envelope envelope;
-    MessengerDaoExt messengerDao;
-
-
-    static class MessengerDaoExt extends MessengerDao
-    {
-        public MessengerDaoExt( final DataSource dataSource ) throws DaoException
-        {
-            super( dataSource );
-        }
-
-
-        public void setDbUtil( DbUtil dbUtil )
-        {
-            this.dbUtil = dbUtil;
-        }
-
-
-        @Override
-        public void setupDb()
-        {
-            //deactivate by overriding
-        }
-
-
-        public void testSetupDb() throws DaoException
-        {
-            super.setupDb();
-        }
-    }
+    MessengerDao messengerDao;
 
 
     private void throwDbException() throws SQLException
@@ -102,8 +77,7 @@ public class MessengerDaoTest
     @Before
     public void setUp() throws Exception
     {
-        messengerDao = new MessengerDaoExt( dataSource );
-        messengerDao.setDbUtil( dbUtil );
+        messengerDao = new MessengerDao( entityManagerFactory );
         message = new MessageImpl( SOURCE_PEER_ID, PAYLOAD );
         envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE );
         envelope.setCreateDate( CREATE_DATE );
@@ -120,25 +94,7 @@ public class MessengerDaoTest
     @Test( expected = NullPointerException.class )
     public void testConstructor() throws Exception
     {
-        new MessengerDaoExt( null );
-    }
-
-
-    @Test
-    public void testSetupDb() throws Exception
-    {
-        messengerDao.testSetupDb();
-
-        verify( dbUtil ).update( anyString(), anyVararg() );
-    }
-
-
-    @Test( expected = DaoException.class )
-    public void testSetupDbWithException() throws Exception
-    {
-        throwDbException();
-
-        messengerDao.testSetupDb();
+        new MessengerDao( null );
     }
 
 
@@ -225,19 +181,6 @@ public class MessengerDaoTest
 
         verify( dbUtil, times( 2 ) ).update( anyString(), anyVararg() );
 
-        throwDbException();
-
-        try
-        {
-            messengerDao.saveEnvelope( envelope );
-            verify( exception ).printStackTrace( any( PrintStream.class ) );
-
-            fail( "Expected DaoException" );
-        }
-        catch ( DaoException e )
-        {
-
-        }
     }
 
 
@@ -252,18 +195,6 @@ public class MessengerDaoTest
         assertEquals( envelope.getTargetPeerId(), envelope1.getTargetPeerId() );
         assertEquals( envelope.getCreateDate(), envelope1.getCreateDate() );
 
-        throwDbException();
 
-        try
-        {
-            messengerDao.getEnvelope( message.getId() );
-            verify( exception ).printStackTrace( any( PrintStream.class ) );
-
-            fail( "Expected DaoException" );
-        }
-        catch ( DaoException e )
-        {
-
-        }
     }
 }

@@ -202,15 +202,9 @@ public class MessageDataService implements DataService<String, MessageEntity>
             long ts = System.currentTimeMillis();
             Query query = em.createQuery( "select e from MessageEntity e where e.targetPeerId = :targetPeerId"
                     + " and e.isSent =false and e.createDate + e.attempts * 1000 * :intval < :ts1"
-                    + " and :ts1 - e.createDate <= e.timeToLive * 1000" + " order by e.createDate asc" )
+                    + " and :ts1 - e.createDate <= e.timeToLive * 1000 order by e.createDate asc" )
                             .setMaxResults( messageLimitPerPeer ).setParameter( "targetPeerId", targetPeer )
-                            .setParameter( "intval", wideningIntervalSec ).setParameter( "ts1", ts );/* and e
-                            .createDate + e.attempts"
-                            + " * :intvl * 1000 < :ts1 and e.isSent =false and :ts2 - e.createDate <= e.timeToLive *
-                            1000 order by e.createDate asc" )
-                            .setParameter( "targetPeerId", targetPeer ).setParameter( "intvl", wideningIntervalSec )
-                            .setParameter( "ts1", ts ).setParameter( "ts2", ts ).setMaxResults( messageLimitPerPeer );
-                            */
+                            .setParameter( "intval", wideningIntervalSec ).setParameter( "ts1", ts );
             result = query.getResultList();
             em.getTransaction().commit();
         }
@@ -233,8 +227,6 @@ public class MessageDataService implements DataService<String, MessageEntity>
 
     public void purgeMessages()
     {
-
-        List<MessageEntity> result = new ArrayList<>();
         EntityManager em = emf.createEntityManager();
         try
         {

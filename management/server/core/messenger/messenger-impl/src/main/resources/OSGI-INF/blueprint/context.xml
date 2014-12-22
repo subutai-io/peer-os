@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:~/messenger" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
-  </bean>
-
   <reference id="entityManagerFactory" interface="javax.persistence.EntityManagerFactory"
              filter="(osgi.unit.name=messengerUnit)" />
 
@@ -16,9 +10,8 @@
   <bean id="messenger" class="org.safehaus.subutai.core.messenger.impl.MessengerImpl" scope="singleton"
         init-method="init"
         destroy-method="destroy">
-    <argument ref="dataSource" />
     <argument ref="peerManager" />
-    <property name="entityManagerFactory" ref="entityManagerFactory" />
+    <argument ref="entityManagerFactory" />
   </bean>
 
   <service ref="messenger" interface="org.safehaus.subutai.core.messenger.api.Messenger" />
