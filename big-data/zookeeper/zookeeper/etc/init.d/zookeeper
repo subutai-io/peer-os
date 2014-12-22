@@ -1,36 +1,58 @@
 #!/bin/bash
-# Starts and stops Zookeeper.
+
+NAME=zookeeper_server
+PIDFILE=/var/zookeeper/$NAME.pid
+DESC="Zookeeper Server"
+CMD_PATT="zookeeper"
+. /lib/lsb/init-functions
+
+
+is_running()
+{
+    if [ -f $PIDFILE ]; then
+        pid=`cat $PIDFILE`
+        grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 0
+        return 1
+    fi
+    return 3
+}
+
+
 if [ "x$ZOOKEEPER_HOME" = "x" ];
 then
-	ZOOKEEPER_HOME=/opt/zookeeper-3.4.5
+  ZOOKEEPER_HOME=/opt/zookeeper-3.4.5
 fi
 
 case "$1" in
 start)
-	start-stop-daemon --start --exec $ZOOKEEPER_HOME/bin/zookeeper.sh start
-;;
+  start-stop-daemon --start --exec $ZOOKEEPER_HOME/bin/zookeeper.sh start
+  ;;
 
 stop)
-	start-stop-daemon --start --exec $ZOOKEEPER_HOME/bin/zookeeper.sh stop
-;;
+  start-stop-daemon --start --exec $ZOOKEEPER_HOME/bin/zookeeper.sh stop
+  ;;
 
 restart)
-        $0 stop
-        $0 start
-;;
+  $0 stop
+  $0 start
+  ;;
 
 status)
-        line=$(ps aux | grep [Q]uorumPeerMain)
-        if [ -n "$line" ]; then
-                echo "Zookeeper is Running"
-                exit 0
-        else
-                echo "Zookeeper is NOT Running"
-                exit 1
-        fi
-;;
+  is_running
+  stat=$?
+  case "$stat" in
+    0)
+      PID=`cat $PIDFILE`
+      log_success_msg "$DESC is running(PID:$PID)" ;;
+    1)
+      log_failure_msg "could not access pidfile for $DESC" ;;
+    *)
+      log_success_msg "$DESC is not running" ;;
+  esac
+  exit "$stat"
+  ;;
 
 *)
-        echo "Usage: $0 {start|stop|restart|status}"
-        exit 1
+  echo "Usage: $0 {start|stop|restart|status}"
+  exit 1
 esac
