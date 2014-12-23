@@ -6,6 +6,7 @@
 package org.safehaus.subutai.plugin.cassandra.ui.manager;
 
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -56,7 +57,8 @@ public class Manager
     protected static final String START_BUTTON_CAPTION = "Start";
     protected static final String STOP_ALL_BUTTON_CAPTION = "Stop All";
     protected static final String STOP_BUTTON_CAPTION = "Stop";
-    protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Environment";
+    protected static final String REMOVE_CLUSTER = "Remove Cluster";
     protected static final String DESTROY_NODE_BUTTON_CAPTION = "Destroy";
     protected static final String HOST_COLUMN_CAPTION = "Host";
     protected static final String IP_COLUMN_CAPTION = "IP List";
@@ -65,7 +67,7 @@ public class Manager
     protected static final String ADD_NODE_BUTTON_CAPTION = "Add Node";
     protected static final String BUTTON_STYLE_NAME = "default";
     private static final String MESSAGE = "No cluster is installed !";
-    final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn, addNodeBtn;
+    final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn, addNodeBtn, removeCluster;
     private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final ExecutorService executorService;
     private final Tracker tracker;
@@ -161,9 +163,19 @@ public class Manager
         /** Destroy Cluster button */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
         destroyClusterBtn.setId( "CassDestroyClusterBtn" );
+        destroyClusterBtn.setDescription( "Destroy environment with containers" );
         addClickListenerToDestroyClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
+
+
+        /** Remove Cluster button */
+        removeCluster = new Button( REMOVE_CLUSTER );
+        removeCluster.setId( "CassRemoveClusterBtn" );
+        removeCluster.setDescription( "Removes cluster info from DB" );
+        addClickListenerToRemoveClusterButton();
+        controlsContent.addComponent( removeCluster );
+        controlsContent.setComponentAlignment( removeCluster, Alignment.MIDDLE_CENTER );
 
 
         /** Add Node button */
@@ -175,7 +187,7 @@ public class Manager
 
 
 
-        addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn, addNodeBtn );
+        addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn, addNodeBtn, removeCluster );
 
         PROGRESS_ICON.setVisible( false );
         PROGRESS_ICON.setId( "indicator" );
@@ -217,6 +229,48 @@ public class Manager
                         }
                     } );
 
+                    contentRoot.getUI().addWindow( alert.getAlert() );
+                }
+                else
+                {
+                    show( "Please, select cluster" );
+                }
+            }
+        } );
+    }
+
+
+    private void addClickListenerToRemoveClusterButton()
+    {
+        removeCluster.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config != null )
+                {
+                    ConfirmationDialog alert = new ConfirmationDialog(
+                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
+                            "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
+                        @Override
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
+                            UUID track =  cassandra.removeCluster( config.getClusterName() );
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, track,
+                                    CassandraClusterConfig.PRODUCT_KEY );
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
+                                @Override
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
+                                    refreshClustersInfo();
+                                }
+                            } );
+                            contentRoot.getUI().addWindow( window.getWindow() );
+                        }
+                    } );
                     contentRoot.getUI().addWindow( alert.getAlert() );
                 }
                 else
@@ -789,9 +843,13 @@ public class Manager
         if ( config != null )
         {
             Environment environment = environmentManager.getEnvironmentByUUID( config.getEnvironmentId() );
+            Set<ContainerHost> containerHosts = new HashSet<>();
+            for ( UUID uuid : config.getNodes() ){
+                containerHosts.add( environment.getContainerHostById( uuid ) );
+            }
             if ( environment != null )
             {
-                populateTable( nodesTable, environment.getContainerHosts() );
+                populateTable( nodesTable, containerHosts );
             }
             else
             {

@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -10,6 +11,7 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+import org.safehaus.subutai.plugin.cassandra.impl.ClusterConfiguration;
 
 
 public class ConfigureEnvironmentClusterHandler extends AbstractOperationHandler<CassandraImpl, CassandraClusterConfig>
@@ -45,10 +47,19 @@ public class ConfigureEnvironmentClusterHandler extends AbstractOperationHandler
         {
             Environment env = manager.getEnvironmentManager().getEnvironmentByUUID( config.getEnvironmentId() );
 
-            ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( env, config, po );
-            clusterSetupStrategy.setup();
+            try
+            {
+                new ClusterConfiguration( trackerOperation, manager ).configureCluster( config, env );
+            }
+            catch ( ClusterConfigurationException e )
+            {
+                throw new ClusterSetupException( e.getMessage() );
+            }
 
-            po.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
+////            ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( env, config, po );
+////            clusterSetupStrategy.setup();
+//
+//            po.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
         catch ( ClusterSetupException e )
         {

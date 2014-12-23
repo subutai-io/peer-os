@@ -1,6 +1,7 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
 
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.command.CommandException;
@@ -44,24 +45,22 @@ public class ClusterConfiguration
 
 
         StringBuilder sb = new StringBuilder();
-        int seedCount = 0;
-        for ( ContainerHost containerHost : environment.getContainerHosts() )
+        for ( UUID uuid : config.getSeedNodes() )
         {
-            seedCount++;
+            ContainerHost containerHost = environment.getContainerHostById( uuid );
             sb.append( containerHost.getIpByMask( Common.IP_MASK ) ).append( "," );
-            if ( seedCount == config.getNumberOfSeeds() )
-            {
-                break;
-            }
         }
-        sb.replace( sb.toString().length() - 1, sb.toString().length(), "" );
+        if ( ! sb.toString().isEmpty() ){
+            sb.replace( sb.toString().length() - 1, sb.toString().length(), "" );
+        }
         String seedsParam = "seeds " + sb.toString();
 
 
-        for ( ContainerHost containerHost : environment.getContainerHosts() )
+        for ( UUID uuid : config.getNodes() )
         {
             try
             {
+                ContainerHost containerHost = environment.getContainerHostById( uuid );
                 po.addLog( "Configuring node: " + containerHost.getHostname() );
 
                 // Setting permission
