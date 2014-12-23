@@ -61,13 +61,13 @@ public class Manager
     private final EnvironmentManager environmentManager;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Manager( final ExecutorService executorService, Lucene lucene, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager) throws NamingException
     {
         this.executorService = executorService;
-        this.lucene = serviceLocator.getService( Lucene.class );
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.lucene = lucene;
+        this.tracker = tracker;
+        this.hadoop = hadoop;
+        this.environmentManager = environmentManager;
 
 
         contentRoot = new GridLayout();

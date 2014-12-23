@@ -5,7 +5,9 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.plugin.elasticsearch.ui.manager.Manager;
 import org.safehaus.subutai.plugin.elasticsearch.ui.wizard.Wizard;
 
@@ -20,7 +22,7 @@ public class ElasticsearchComponent extends CustomComponent
     private final Manager manager;
 
 
-    public ElasticsearchComponent( ExecutorService executorService, ServiceLocator serviceLocator )
+    public ElasticsearchComponent( ExecutorService executorService, Elasticsearch elasticsearch, Tracker tracker, EnvironmentManager environmentManager )
             throws NamingException
     {
         setSizeFull();
@@ -32,8 +34,8 @@ public class ElasticsearchComponent extends CustomComponent
         setCompositionRoot( verticalLayout );
         TabSheet sheet = new TabSheet();
         sheet.setSizeFull();
-        manager = new Manager( executorService, serviceLocator );
-        wizard = new Wizard( executorService, serviceLocator );
+        manager = new Manager( executorService, elasticsearch, tracker, environmentManager );
+        wizard = new Wizard( executorService, elasticsearch, tracker );
         sheet.addTab( wizard.getContent(), "Install" );
         sheet.getTab( 0 ).setId( "ElasticSearchInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );

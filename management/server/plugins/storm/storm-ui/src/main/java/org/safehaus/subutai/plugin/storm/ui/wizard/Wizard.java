@@ -32,14 +32,14 @@ public class Wizard
 
 
 
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Wizard( ExecutorService executorService, Storm storm, Zookeeper zookeeper,  Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
 
         this.executorService = executorService;
-        this.storm = serviceLocator.getService( Storm.class );
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.zookeeper = serviceLocator.getService( Zookeeper.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.storm = storm;
+        this.zookeeper = zookeeper;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
 
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );

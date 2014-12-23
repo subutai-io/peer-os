@@ -5,9 +5,13 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.safehaus.subutai.plugin.hive.ui.manager.Manager;
 import org.safehaus.subutai.plugin.hive.ui.wizard.Wizard;
+import org.safehaus.subutai.server.ui.api.PortalModuleService;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
@@ -21,7 +25,8 @@ public class HiveComponent extends CustomComponent
     private final Manager manager;
 
 
-    public HiveComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public HiveComponent( ExecutorService executorService, Hive hive, Hadoop hadoop, Tracker tracker,
+                          EnvironmentManager environmentManager, PortalModuleService portalModuleService ) throws NamingException
     {
         setSizeFull();
 
@@ -31,10 +36,9 @@ public class HiveComponent extends CustomComponent
 
         TabSheet sheet = new TabSheet();
         sheet.setSizeFull();
-        manager = new Manager( executorService, serviceLocator );
-        wizard = new Wizard( executorService, serviceLocator )
+        manager = new Manager( executorService, hive, hadoop, tracker, environmentManager );
+        wizard = new Wizard( executorService, hive, hadoop, tracker, environmentManager, portalModuleService )
         {
-            @Override
             public void requestHadoopPlugin()
             {
 

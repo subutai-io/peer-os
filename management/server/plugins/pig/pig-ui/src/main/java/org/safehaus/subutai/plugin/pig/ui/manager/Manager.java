@@ -58,16 +58,16 @@ public class Manager
     private final EnvironmentManager environmentManager;
 
 
-    public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Manager( ExecutorService executorService, Pig pig, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
         Preconditions.checkNotNull( executorService, "Executor is null" );
-        Preconditions.checkNotNull( serviceLocator, "Service Locator is null" );
 
-        this.tracker = serviceLocator.getService( Tracker.class );
         this.executorService = executorService;
-        this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
-        this.pig = serviceLocator.getService( Pig.class );
+        this.pig = pig;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
+
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );

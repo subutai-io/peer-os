@@ -29,13 +29,13 @@ public class Wizard
     private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
 
 
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Wizard( ExecutorService executorService, Hipi hipi, Hadoop hadoop, Tracker tracker ) throws NamingException
     {
 
         this.executorService = executorService;
-        this.hipi = serviceLocator.getService( Hipi.class );
-        this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.tracker = serviceLocator.getService( Tracker.class );
+        this.hipi = hipi;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
 
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );

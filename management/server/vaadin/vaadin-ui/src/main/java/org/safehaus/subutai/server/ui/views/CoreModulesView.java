@@ -35,6 +35,7 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
     private CssLayout modulesLayout;
     private HashMap<String, PortalModule> modules = new HashMap<>();
     private HashMap<String, AbstractLayout> moduleViews = new HashMap<>();
+    private static PortalModuleService portalModuleService = null;
 
 
     public CoreModulesView()
@@ -100,18 +101,21 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
 
     public static PortalModuleService getPortalModuleService()
     {
-        // get bundle instance via the OSGi Framework Util class
-        BundleContext ctx = FrameworkUtil.getBundle( PortalModuleService.class ).getBundleContext();
-        if ( ctx != null )
+        if ( portalModuleService == null )
         {
-            ServiceReference serviceReference = ctx.getServiceReference( PortalModuleService.class.getName() );
-            if ( serviceReference != null )
+            // get bundle instance via the OSGi Framework Util class
+            BundleContext ctx = FrameworkUtil.getBundle( PortalModuleService.class ).getBundleContext();
+            if ( ctx != null )
             {
-                return PortalModuleService.class.cast( ctx.getService( serviceReference ) );
+                ServiceReference serviceReference = ctx.getServiceReference( PortalModuleService.class.getName() );
+                if ( serviceReference != null )
+                {
+                    portalModuleService = PortalModuleService.class.cast( ctx.getService( serviceReference ) );
+                    //                    return PortalModuleService.class.cast( ctx.getService( serviceReference ) );
+                }
             }
         }
-
-        return null;
+        return portalModuleService;
     }
 
 
@@ -166,6 +170,18 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
     }
 
 
+    @Override
+    public void loadDependentModule( final String moduleId )
+    {
+        ModuleView moduleView = ( ModuleView ) getModuleViews().get( moduleId );
+        if ( moduleView == null )
+        {
+            return;
+        }
+        moduleView.addModuleTab();
+    }
+
+
     private void removeModule( PortalModule module )
     {
         ModuleView moduleView = ( ModuleView ) moduleViews.get( module.getId() );
@@ -173,5 +189,11 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
         {
             modulesLayout.removeComponent( moduleView );
         }
+    }
+
+
+    public HashMap<String, AbstractLayout> getModuleViews()
+    {
+        return moduleViews;
     }
 }

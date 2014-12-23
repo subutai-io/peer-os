@@ -10,15 +10,17 @@ import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.safehaus.subutai.common.datatypes.TemplateVersion;
+import org.safehaus.subutai.common.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -29,17 +31,18 @@ import com.google.gson.annotations.Expose;
  * Template represents template entry in registry
  */
 @Entity( name = "Template" )
-@IdClass( TemplatePK.class )
+//@IdClass( TemplatePK.class )
 //@Table(name = "Template")
 @NamedQueries( value = {
         @NamedQuery( name = "Template.getAll", query = "SELECT t FROM Template t" ),
         @NamedQuery( name = "Template.getTemplateByNameArch",
-                query = "SELECT t FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = " + ":lxcArch" ),
+                query = "SELECT t FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = "
+                        + ":lxcArch" ),
         @NamedQuery( name = "Template.getTemplateByNameArchMd5Version",
-                query = "SELECT t FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = "
-                        + ":lxcArch AND t.templateVersion = :templateVersion AND t.md5sum = :md5sum" ),
+                query = "SELECT t FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = "
+                        + ":lxcArch AND t.pk.templateVersion = :templateVersion AND t.pk.md5sum = :md5sum" ),
         @NamedQuery( name = "Template.removeTemplateByNameArch",
-                query = "DELETE FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = :lxcArch" )
+                query = "DELETE FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = :lxcArch" )
 } )
 @XmlRootElement( name = "" )
 public class Template
@@ -53,28 +56,9 @@ public class Template
     public static final String QUERY_GET_TEMPLATE_BY_NAME_ARCH_MD5_VERSION = "Template.getTemplateByNameArchMd5Version";
     public static final String QUERY_REMOVE_TEMPLATE_BY_NAME_ARCH = "Template.removeTemplateByNameArch";
 
-    //    @EmbeddedId
-    //    TemplatePK pk;
-
-    @Id
     @Expose
-    private String templateName;
-
-
-    @Id
-    @Expose
-    private String lxcArch;
-
-
-    //template's md5sum hash
-    @Id
-    @Expose
-    private String md5sum;
-
-
-    @Id
-    @Expose
-    private String templateVersion;
+    @EmbeddedId
+    TemplatePK pk;
 
 
     //name of parent template
@@ -127,7 +111,7 @@ public class Template
 
     //indicates whether this template is in use on any of FAIs connected to Subutai
     @Expose
-    @ElementCollection( targetClass = String.class )
+    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> faisUsingThisTemplate = new HashSet<>();
 
     //indicates where template is generated
@@ -159,8 +143,9 @@ public class Template
         Preconditions.checkArgument( !Strings.isNullOrEmpty( packagesManifest ), "Missing packages manifest" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( md5sum ), "Missing md5sum" );
 
-        this.templateName = lxcUtsname;
-        this.lxcArch = lxcArch;
+        this.pk = new TemplatePK( lxcUtsname, lxcArch, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), md5sum );
+        //        this.templateName = lxcUtsname;
+        //        this.lxcArch = lxcArch;
         //        this.pk = new TemplatePK( lxcUtsname, lxcArch );
         this.lxcUtsname = lxcUtsname;
         this.subutaiConfigPath = subutaiConfigPath;
@@ -169,10 +154,10 @@ public class Template
         this.subutaiGitUuid = subutaiGitUuid;
         this.packagesManifest = packagesManifest;
         this.parentTemplateName = subutaiParent;
-        this.md5sum = md5sum;
+        //        this.md5sum = md5sum;
 
         //        if ( pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
-        if ( this.templateName.equalsIgnoreCase( parentTemplateName ) )
+        if ( this.pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
         {
             parentTemplateName = null;
         }
@@ -181,7 +166,7 @@ public class Template
 
     public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
                      final String subutaiParent, final String subutaiGitBranch, final String subutaiGitUuid,
-                     final String packagesManifest, final String md5sum, final String templateVersion )
+                     final String packagesManifest, final String md5sum, final TemplateVersion templateVersion )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcUtsname ), "Missing lxc.utsname parameter" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "Missing lxc.arch parameter" );
@@ -193,10 +178,11 @@ public class Template
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiGitUuid ), "Missing subutai.git.uuid parameter" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( packagesManifest ), "Missing packages manifest" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( md5sum ), "Missing md5sum" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateVersion ), "Missing templateVersion" );
+        Preconditions.checkNotNull( templateVersion, "Missing templateVersion" );
 
-        this.templateName = lxcUtsname;
-        this.lxcArch = lxcArch;
+        this.pk = new TemplatePK( lxcUtsname, lxcArch, templateVersion, md5sum );
+        //        this.templateName = lxcUtsname;
+        //        this.lxcArch = lxcArch;
         //        this.pk = new TemplatePK( lxcUtsname, lxcArch );
         this.lxcUtsname = lxcUtsname;
         this.subutaiConfigPath = subutaiConfigPath;
@@ -204,16 +190,28 @@ public class Template
         this.subutaiGitBranch = subutaiGitBranch;
         this.subutaiGitUuid = subutaiGitUuid;
         this.parentTemplateName = subutaiParent;
-        this.md5sum = md5sum;
-        this.templateVersion = templateVersion;
+        //        this.md5sum = md5sum;
+        //        this.templateVersion = templateVersion;
         this.packagesManifest = packagesManifest;
 
 
         //        if ( pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
-        if ( this.templateName.equalsIgnoreCase( parentTemplateName ) )
+        if ( this.pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
         {
             parentTemplateName = null;
         }
+    }
+
+
+    public TemplatePK getPk()
+    {
+        return pk;
+    }
+
+
+    public void setPk( final TemplatePK pk )
+    {
+        this.pk = pk;
     }
 
 
@@ -225,6 +223,10 @@ public class Template
 
     public void setInUseOnFAI( final String faiHostname, final boolean inUseOnFAI )
     {
+        if ( faisUsingThisTemplate == null )
+        {
+            faisUsingThisTemplate = new HashSet<>();
+        }
         if ( inUseOnFAI )
         {
             faisUsingThisTemplate.add( faiHostname );
@@ -248,10 +250,6 @@ public class Template
         {
             this.children = new ArrayList<>();
         }
-        //        for ( Template child : children )
-        //        {
-        //            child.setParentTemplate( this );
-        //        }
         this.children.addAll( children );
     }
 
@@ -271,7 +269,7 @@ public class Template
 
     public String getMd5sum()
     {
-        return md5sum;
+        return pk.getMd5sum();
     }
 
 
@@ -289,7 +287,7 @@ public class Template
 
     public String getLxcArch()
     {
-        return lxcArch;
+        return this.pk.getLxcArch();
     }
 
 
@@ -331,13 +329,14 @@ public class Template
 
     public String getTemplateName()
     {
-        return templateName;
+        return this.pk.getTemplateName();
     }
 
 
     public String getFileName()
     {
-        return String.format( "%s-subutai-template_%s_%s.deb", templateName, templateVersion, lxcArch ).toLowerCase();
+        return String.format( "%s-subutai-template_%s_%s.deb", pk.getTemplateName(), pk.getTemplateVersion(),
+                pk.getLxcArch() ).toLowerCase();
     }
 
 
@@ -347,9 +346,9 @@ public class Template
     }
 
 
-    public String getTemplateVersion()
+    public TemplateVersion getTemplateVersion()
     {
-        return templateVersion;
+        return pk.getTemplateVersion();
     }
 
 
@@ -379,8 +378,10 @@ public class Template
 
     public Template getRemoteClone( UUID peerId )
     {
-        Template result = new Template( this.lxcArch, this.lxcUtsname, this.subutaiConfigPath, this.subutaiParent,
-                this.subutaiGitBranch, this.subutaiGitUuid, this.packagesManifest, this.md5sum, this.templateVersion );
+        Template result =
+                new Template( this.pk.getLxcArch(), this.lxcUtsname, this.subutaiConfigPath, this.subutaiParent,
+                        this.subutaiGitBranch, this.subutaiGitUuid, this.packagesManifest, this.pk.getMd5sum(),
+                        this.pk.getTemplateVersion() );
         result.setRemote( true );
         result.setPeerId( peerId );
         return result;
@@ -399,62 +400,26 @@ public class Template
             return false;
         }
 
-        final Template that = ( Template ) o;
+        final Template template = ( Template ) o;
 
-        return lxcArch.equals( that.lxcArch ) && md5sum.equals( that.md5sum ) && templateName
-                .equals( that.templateName ) && templateVersion.equals( that.templateVersion );
+        return pk.equals( template.pk );
     }
 
 
     @Override
     public int hashCode()
     {
-        int result = templateName.hashCode();
-        result = 31 * result + lxcArch.hashCode();
-        result = 31 * result + templateVersion.hashCode();
-        result = 31 * result + md5sum.hashCode();
-        return result;
+        return pk.hashCode();
     }
-
-    //    @Override
-    //    public int hashCode()
-    //    {
-    //        int result = templateName.hashCode();
-    //        result = 31 * result + lxcArch.hashCode();
-    //        //        int result = pk.getTemplateName().hashCode();
-    //        //        result = 31 * result + pk.getLxcArch().hashCode();
-    //        return result;
-    //    }
-    //
-    //
-    //    @Override
-    //    public boolean equals( final Object o )
-    //    {
-    //        if ( this == o )
-    //        {
-    //            return true;
-    //        }
-    //        if ( o == null || getClass() != o.getClass() )
-    //        {
-    //            return false;
-    //        }
-    //
-    //        final Template template = ( Template ) o;
-    //
-    //        return lxcArch.equals( template.getLxcArch() ) && templateName.equals( template.getTemplateName() );
-    //        //        return pk.getLxcArch().equals( template.getLxcArch() ) && pk.getTemplateName()
-    //        //                                                                    .equals( template.getTemplateName
-    // () );
-    //    }
 
 
     @Override
     public String toString()
     {
         return "Template{" +
-                "templateName='" + templateName + '\'' +
+                "templateName='" + pk.getTemplateName() + '\'' +
                 ", parentTemplateName='" + parentTemplateName + '\'' +
-                ", lxcArch='" + lxcArch + '\'' +
+                ", lxcArch='" + pk.getLxcArch() + '\'' +
                 ", lxcUtsname='" + lxcUtsname + '\'' +
                 ", subutaiConfigPath='" + subutaiConfigPath + '\'' +
                 ", subutaiParent='" + subutaiParent + '\'' +
@@ -462,8 +427,8 @@ public class Template
                 ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
                 ", children=" + children +
                 ", products=" + products +
-                ", md5sum='" + md5sum + '\'' +
-                ", templateVersion='" + templateVersion + '\'' +
+                ", md5sum='" + pk.getMd5sum() + '\'' +
+                ", templateVersion='" + pk.getTemplateVersion() + '\'' +
                 ", faisUsingThisTemplate=" + faisUsingThisTemplate +
                 ", peerId=" + peerId +
                 ", remote=" + remote +

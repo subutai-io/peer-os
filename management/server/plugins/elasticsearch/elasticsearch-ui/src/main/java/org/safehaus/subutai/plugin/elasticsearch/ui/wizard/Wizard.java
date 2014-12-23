@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
@@ -28,13 +27,12 @@ public class Wizard
     private ElasticsearchClusterConfiguration config = new ElasticsearchClusterConfiguration();
 
 
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Wizard( ExecutorService executorService, Elasticsearch elasticsearch, Tracker tracker ) throws NamingException
     {
 
-        this.elasticsearch = serviceLocator.getService( Elasticsearch.class );
+        this.elasticsearch = elasticsearch;
         this.executorService = executorService;
-        this.tracker = serviceLocator.getService( Tracker.class );
-
+        this.tracker = tracker;
         verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
         grid = new GridLayout( 1, 1 );

@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoException;
 import org.safehaus.subutai.plugin.mongodb.impl.common.CommandDef;
@@ -25,7 +26,7 @@ public class MongoDataNodeImpl extends MongoNodeImpl implements MongoDataNode
 
 
     @Override
-    public void start() throws MongoException
+    public void start( MongoClusterConfig config ) throws MongoException
     {
         try
         {

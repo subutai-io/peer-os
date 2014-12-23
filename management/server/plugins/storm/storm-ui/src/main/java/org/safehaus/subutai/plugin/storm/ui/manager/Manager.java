@@ -20,6 +20,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.storm.api.Storm;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
 import org.safehaus.subutai.plugin.storm.api.StormNodeOperationTask;
@@ -60,13 +61,13 @@ public class Manager
     private final EnvironmentManager environmentManager;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Manager( final ExecutorService executorService, final Storm storm, Zookeeper zookeeper, final Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
         this.executorService = executorService;
-        this.storm = serviceLocator.getService( Storm.class );
-        this.zookeeper = serviceLocator.getService( Zookeeper.class );
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.storm = storm;
+        this.zookeeper = zookeeper;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
 
 
         contentRoot = new GridLayout();

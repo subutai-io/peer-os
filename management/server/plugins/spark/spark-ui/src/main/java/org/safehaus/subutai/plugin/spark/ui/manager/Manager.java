@@ -80,15 +80,14 @@ public class Manager
     private Environment environment;
 
 
-    public Manager( final ExecutorService executor, final ServiceLocator serviceLocator ) throws NamingException
+    public Manager( final ExecutorService executor, final Spark spark, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
         Preconditions.checkNotNull( executor, "Executor is null" );
-        Preconditions.checkNotNull( serviceLocator, "Service Locator is null" );
 
-        this.spark = serviceLocator.getService( Spark.class );
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.spark = spark;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
 
         this.executor = executor;
         contentRoot = new GridLayout();

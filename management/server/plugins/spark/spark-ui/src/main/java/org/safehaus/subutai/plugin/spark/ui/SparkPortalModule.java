@@ -10,6 +10,10 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -21,13 +25,20 @@ public class SparkPortalModule implements PortalModule
 
     public static final String MODULE_IMAGE = "spark.png";
     protected static final Logger LOG = Logger.getLogger( SparkPortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
+    private final Spark spark;
+    private final Tracker tracker;
+    private final Hadoop hadoop;
+
+    private final EnvironmentManager environmentManager;
 
 
-    public SparkPortalModule()
+    public SparkPortalModule( Spark spark, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager )
     {
-        this.serviceLocator = new ServiceLocator();
+        this.spark = spark;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
     }
 
 
@@ -69,7 +80,7 @@ public class SparkPortalModule implements PortalModule
     {
         try
         {
-            return new SparkComponent( executor, serviceLocator );
+            return new SparkComponent( executor, spark, hadoop, tracker, environmentManager );
         }
         catch ( NamingException e )
         {

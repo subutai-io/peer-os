@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -26,7 +25,6 @@ public class Wizard
 {
 
     private final GridLayout grid;
-    private final ServiceLocator serviceLocator;
     private final ExecutorService executor;
     private final Tracker tracker;
     private final Hadoop hadoop;
@@ -37,15 +35,13 @@ public class Wizard
     private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
 
 
-    public Wizard( ExecutorService executor, ServiceLocator serviceLocator ) throws NamingException
+    public Wizard( ExecutorService executor, HBase hbase, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
-        this.serviceLocator = serviceLocator;
         this.executor = executor;
-
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.hbase = serviceLocator.getService( HBase.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.hbase = hbase;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
 
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );

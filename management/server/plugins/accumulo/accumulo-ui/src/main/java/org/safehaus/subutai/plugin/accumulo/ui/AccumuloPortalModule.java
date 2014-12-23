@@ -12,10 +12,16 @@ import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import javax.naming.NamingException;
+import javax.sound.midi.Track;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -25,13 +31,22 @@ public class AccumuloPortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "accumulo.png";
     protected static final Logger LOG = Logger.getLogger( AccumuloPortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
+    private Accumulo accumulo;
+    private Hadoop hadoop;
+    private Zookeeper zookeeper;
+    private Tracker tracker;
+    private EnvironmentManager environmentManager;
 
 
-    public AccumuloPortalModule()
+    public AccumuloPortalModule(Accumulo accumulo, Tracker tracker, Hadoop hadoop, Zookeeper zookeeper, EnvironmentManager environmentManager)
     {
-        this.serviceLocator = new ServiceLocator();
+        this.accumulo = accumulo;
+        this.tracker = tracker;
+        this.hadoop = hadoop;
+        this.zookeeper = zookeeper;
+        this.environmentManager = environmentManager;
+
     }
 
 
@@ -71,7 +86,7 @@ public class AccumuloPortalModule implements PortalModule
     {
         try
         {
-            return new AccumuloComponent( executor, serviceLocator );
+            return new AccumuloComponent( executor, accumulo, hadoop, zookeeper, tracker, environmentManager );
         }
         catch ( NamingException e )
         {

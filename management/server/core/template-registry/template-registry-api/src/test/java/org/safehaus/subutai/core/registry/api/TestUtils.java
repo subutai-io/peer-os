@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Properties;
 
+import org.safehaus.subutai.common.datatypes.TemplateVersion;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.settings.Common;
 
 
 /**
@@ -59,11 +61,9 @@ public class TestUtils
         String subutaiParent = properties.getProperty( "subutai.parent" );
         String subutaiGitBranch = properties.getProperty( "subutai.git.branch" );
         String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
-        //TODO need to find out how to extract version from configFile
-        String templateVersion = "2.1.0";
 
         return new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch, subutaiGitUuid,
-                packagesFile, md5sum, templateVersion );
+                packagesFile, md5sum, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ) );
     }
 
 

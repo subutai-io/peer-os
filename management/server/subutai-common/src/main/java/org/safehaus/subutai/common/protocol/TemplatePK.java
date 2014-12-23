@@ -3,20 +3,57 @@ package org.safehaus.subutai.common.protocol;
 
 import java.io.Serializable;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Table;
+
+import org.safehaus.subutai.common.datatypes.TemplateVersion;
+
+import com.google.gson.annotations.Expose;
+
 
 /**
  * Created by talas on 11/5/14.
- */ //@Embeddable
+ */
+@Embeddable
+@Table( name = "template_pk" )
+@Access( AccessType.FIELD )
 public class TemplatePK implements Serializable
 {
-    //        @Column(name = "templateName")
+    @Column( name = "template_name" )
+    @Expose
     private String templateName;
     //        @Column(name = "lxcArch")
+    @Expose
+    @Column( name = "lxc_arch" )
     private String lxcArch;
 
+
+    @Expose
+    @Column( name = "template_version" )
     private String templateVersion;
 
+
+    @Expose
+    @Column( name = "md5_sum" )
     private String md5sum;
+
+
+    public TemplatePK()
+    {
+    }
+
+
+    public TemplatePK( final String templateName, final String lxcArch, final TemplateVersion templateVersion,
+                       final String md5sum )
+    {
+        this.templateName = templateName;
+        this.lxcArch = lxcArch;
+        this.templateVersion = templateVersion.toString();
+        this.md5sum = md5sum;
+    }
 
 
     public String getTemplateName()
@@ -43,15 +80,15 @@ public class TemplatePK implements Serializable
     }
 
 
-    public String getTemplateVersion()
+    public TemplateVersion getTemplateVersion()
     {
-        return templateVersion;
+        return new TemplateVersion( templateVersion );
     }
 
 
-    public void setTemplateVersion( final String templateVersion )
+    public void setTemplateVersion( final TemplateVersion templateVersion )
     {
-        this.templateVersion = templateVersion;
+        this.templateVersion = templateVersion.toString();
     }
 
 
