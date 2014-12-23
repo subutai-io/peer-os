@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 
@@ -18,11 +20,16 @@ import javax.persistence.Table;
 @Table( name = "tracker_operation" )
 @Access( AccessType.FIELD )
 @IdClass( TrackerOperationPK.class )
+@NamedQueries( {
+        @NamedQuery( name = "getTrackerOperation", query = "SELECT to FROM TrackerOperationEntity to WHERE to.source "
+                + "= :source AND to.operationTrackId = :operationTrackId" )
+} )
 public class TrackerOperationEntity
 {
     //source varchar(100), " +
     //    "id uuid, ts timestamp, "
     //            + "info clob, PRIMARY KEY (source, id))
+    public static final String QUERY_GET_OPERATION = "getTrackerOperation";
 
     @Id
     @Column( name = "source_id" )
@@ -51,5 +58,32 @@ public class TrackerOperationEntity
     public String getInfo()
     {
         return info;
+    }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof TrackerOperationEntity ) )
+        {
+            return false;
+        }
+
+        final TrackerOperationEntity entity = ( TrackerOperationEntity ) o;
+
+        return operationTrackId.equals( entity.operationTrackId ) && source.equals( entity.source );
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        int result = source.hashCode();
+        result = 31 * result + operationTrackId.hashCode();
+        return result;
     }
 }

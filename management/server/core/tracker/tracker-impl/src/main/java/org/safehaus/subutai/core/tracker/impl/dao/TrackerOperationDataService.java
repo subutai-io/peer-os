@@ -79,12 +79,17 @@ public class TrackerOperationDataService
         {
             em.getTransaction().begin();
 
-            TypedQuery<TrackerOperationEntity> query = em.createQuery(
-                    "SELECT to FROM TrackerOperationEntity to WHERE to.source = :source AND to.operationTrackId = "
-                            + ":operationTrackId", TrackerOperationEntity.class );
+            TypedQuery<TrackerOperationEntity> query =
+                    em.createNamedQuery( TrackerOperationEntity.QUERY_GET_OPERATION, TrackerOperationEntity.class );
             query.setParameter( "source", source );
             query.setParameter( "operationTrackId", operationTrackId.toString() );
-            result = query.getSingleResult();
+
+            List<TrackerOperationEntity> operations = query.getResultList();
+
+            if ( operations != null && operations.size() > 0 )
+            {
+                result = operations.get( 0 );
+            }
 
             em.getTransaction().commit();
         }
