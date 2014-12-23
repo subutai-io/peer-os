@@ -28,6 +28,7 @@ public class MessageImpl implements Message
         this.sourcePeerId = message.getSourcePeerId();
         payloadString = message.getPayload();
         id = message.getId();
+        sender = message.getSender();
     }
 
 

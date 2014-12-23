@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doThrow;
 
 
 /**
@@ -156,4 +157,6 @@ public class MessageImplTest
         message.setSender( SENDER );
         assertThat( message.toString(), containsString( SENDER ) );
     }
+
+
 }
