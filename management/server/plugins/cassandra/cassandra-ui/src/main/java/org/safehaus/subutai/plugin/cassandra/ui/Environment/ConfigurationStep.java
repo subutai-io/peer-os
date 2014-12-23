@@ -23,6 +23,7 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -36,7 +37,7 @@ public class ConfigurationStep extends VerticalLayout
 
     public ConfigurationStep( final EnvironmentWizard environmentWizard )
     {
-
+        removeAllComponents();
         setSizeFull();
 
         GridLayout content = new GridLayout( 1, 3 );
@@ -111,7 +112,7 @@ public class ConfigurationStep extends VerticalLayout
             }
         } );
 
-        List<Environment> environmentList = environmentWizard.getEnvironmentManager().getEnvironments();
+        final List<Environment> environmentList = environmentWizard.getEnvironmentManager().getEnvironments();
         List<Environment> envList = new ArrayList<>();
         for ( Environment anEnvironmentList : environmentList )
         {
@@ -157,6 +158,7 @@ public class ConfigurationStep extends VerticalLayout
                 for ( int i=0; i < e.getContainerHosts().size(); i++ ){
                     seedsCountCombo.addItem( (i+1)+ "" );
                 }
+                environmentWizard.getConfig().setNumberOfNodes( e.getContainerHosts().size() );
             }
         } );
 
@@ -234,15 +236,6 @@ public class ConfigurationStep extends VerticalLayout
         return  false;
     }
 
-    private int getNumberOfContainers( Environment environment, String productTemplateName ){
-        int count = 0;
-        for ( ContainerHost host : environment.getContainerHosts() ){
-            if ( host.getTemplateName().equals( productTemplateName ) ){
-                count++;
-            }
-        }
-        return count;
-    }
 
     private void show( String notification )
     {

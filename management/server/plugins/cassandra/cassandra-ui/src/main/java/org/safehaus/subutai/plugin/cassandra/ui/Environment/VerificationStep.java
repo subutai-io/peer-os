@@ -43,6 +43,7 @@ public class VerificationStep extends VerticalLayout
         cfgView.addStringCfg( "Saved caches directory", environmentWizard.getConfig().getSavedCachesDirectory() );
         cfgView.addStringCfg( "Commit log directory", environmentWizard.getConfig().getCommitLogDirectory() );
         cfgView.addStringCfg( "Number of seeds", environmentWizard.getConfig().getNumberOfSeeds() + "" );
+        cfgView.addStringCfg( "Number of nodes", environmentWizard.getConfig().getNumberOfNodes() + "" );
         cfgView.addStringCfg( "Environment UUID", environmentWizard.getConfig().getEnvironmentId() + "" );
 
         Button install = new Button( "Install" );
