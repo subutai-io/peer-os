@@ -7,84 +7,21 @@ then
 fi
 case "$1" in
 start)
-        start-stop-daemon --start --exec $HADOOP_HOME/bin/start-all.sh
+  start-stop-daemon --start --exec $HADOOP_HOME/bin/start-all.sh
 ;;
-
 stop)
-        start-stop-daemon --start --exec $HADOOP_HOME/bin/stop-all.sh
+  start-stop-daemon --start --exec $HADOOP_HOME/bin/stop-all.sh
 ;;
-
 restart)
-        $0 stop
-        $0 start
+  $0 stop
+  $0 start
 ;;
-
 status)
-	line1=$(ps aux | grep [N]ameNode)
-	line3=$(ps aux | grep [J]obTracker)
-        line2=$(ps aux | grep -c [N]ameNode)
-        line4=$(ps aux | grep [D]ataNode)
-	line5=$(ps aux | grep [T]askTracker)
-	substring="SecondaryNameNode"
-        
-        #Check if the output is empty or not
-        if [ -n "$line1" ]; then
-                #Check if the output contains specific substring
-                if [[ $line1 =~ .*$substring.* ]]; then
-                        echo "SecondaryNameNode is Running";
-                        #Check if output is not less than 2
-                        if [[ "$line2" -lt 2 ]];
-                        then
-                                echo "NameNode is NOT Running"
-                                #exit 1
-                        else
-                                echo "NameNode is Running"
-                                #exit 0
-                        fi
-                else
-                        echo "NameNode is Running (SecondaryNameNode is NOT Running on this machine)"
-                        #exit 0
-                fi
-                #echo "NameNode is Running"
-                #exit 0
-         else
-                echo "NameNode is NOT Running"
-                echo "SecondaryNameNode is NOT Running"
-		#exit 1
-        fi
-
-
-
-
-
-	if [ -n "$line3" ]; then
-		echo "JobTracker is Running"
-                #exit 0
-        else
-        	echo "JobTracker is NOT Running"
-                #exit 1
-        fi
-
-	if [ -n "$line4" ]; then
-                echo "DataNode is Running"
-                #exit 0
-        else
-                echo "DataNode is NOT Running"
-                #exit 1
-        fi
-
-	if [ -n "$line5" ]; then
-                echo "TaskTracker is Running"
-                #exit 0
-        else
-                echo "TaskTracker is NOT Running"
-                #exit 1
-        fi
-
+  service hadoop-dfs status
+  service hadoop-mapred status
 ;;
-
 *)
-        echo "Usage: $0 {start|stop|restart|status}"
-        exit 1
+  echo "Usage: $0 {start|stop|restart|status}"
+  exit 1
 esac
 
