@@ -1,6 +1,7 @@
 package org.safehaus.subutai.common.protocol.impl;
 
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -56,6 +57,15 @@ public class TemplateServiceImpl implements TemplateService
             savedTemplate = entityManager.merge( template );
             entityManager.flush();
             entityManager.getTransaction().commit();
+
+            if ( template.getParentTemplateName() != null && !template.getParentTemplateName()
+                                                                      .equals( template.getTemplateName() ) )
+            {
+                Template parent = getTemplate( template.getParentTemplateName(), template.getTemplateVersion(),
+                        template.getLxcArch() );
+                parent.addChildren( Arrays.asList( template ) );
+                saveTemplate( parent );
+            }
         }
         catch ( Exception ex )
         {
