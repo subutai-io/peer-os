@@ -154,9 +154,9 @@ function fs_remove_mount {
   parent_ds="$pool/$parent-$partition"
 
   if [[ "$pool"  == "lxc" ]]; then
-    sudo btrfs subvolume delete /lxc/$child-$partition > /dev/null 2>&1
+    sudo btrfs subvolume delete $HOME/.local/lxc/$child-$partition > /dev/null 2>&1
   else
-    sudo btrfs subvolume delete /lxc-data/$child-$partition > /dev/null 2>&1
+    sudo btrfs subvolume delete $HOME/.local/lxc-data/$child-$partition > /dev/null 2>&1
   fi
 
   # Need to destroy mount
