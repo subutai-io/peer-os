@@ -60,7 +60,7 @@ public class VerificationStep extends VerticalLayout
         cfgView.addStringCfg( "Seed nodes", seeds.substring( 0, ( seeds.length() -1 ) ) + "" );
         cfgView.addStringCfg( "Environment UUID", environmentWizard.getConfig().getEnvironmentId() + "" );
 
-        Button install = new Button( "Install" );
+        Button install = new Button( "Configure" );
         install.addStyleName( "default" );
         install.addClickListener( new Button.ClickListener()
         {
