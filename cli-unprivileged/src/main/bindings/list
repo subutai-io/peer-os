@@ -86,7 +86,7 @@ function list_templates {
   local mode="$2"
 
   if [ "false" == "$subutai_quiet" -a -z "$mode" ]; then
-    echo -e "TEMPLATE"
+    echo -e "TEMPLATE (* - located under '/var/lib/lxc')"
     echo -e "--------"
   elif [ "false" == "$subutai_quiet" -a "ancestors" == "$mode" ]; then
     echo -e "TEMPLATE\tANCESTORS"
@@ -276,7 +276,6 @@ function list {
     elif [ "true" == "$ancestors" ]; then
       list_templates "$operands" "ancestors"
     fi
-    msg_info "* - located under '/var/lib/lxc'"
   elif [ "true" == "$containers" ]; then
     if [ "false" == "$parents" -a "false" == "$ancestors" ]; then
       list_containers "$operands" 
