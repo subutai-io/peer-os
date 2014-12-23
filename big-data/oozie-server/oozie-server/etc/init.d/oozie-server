@@ -4,85 +4,87 @@
 . /etc/profile
 . /lib/lsb/init-functions
 
-if [ "x$OOZIE_SERVER_HOME" = "x" ];
-then
-	OOZIE_SERVER_HOME="/opt/oozie-3.3.2"
+
+if [ "x$OOZIE_SERVER_HOME" = "x" ];then
+  OOZIE_SERVER_HOME="/opt/oozie-3.3.2"
 fi
 DESC="Oozie Server"
 NAME=oozie-server
 PIDFILE="$OOZIE_SERVER_HOME/oozie-server/temp/oozie.pid"
 CMD_PATT="oozie.+"
 
+
 is_running()
 {
-        if [ -f $PIDFILE ]; then
-        pid=`cat $PIDFILE`
-        grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 0
-        return 1
-    fi
-    return 3
+  if [ -f $PIDFILE ]; then
+    pid=`cat $PIDFILE`
+    grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 0
+    return 1
+  fi
+  return 3
 }
+
+
 case "$1" in
 start)
-        is_running
-        stat=$?
-        case "$stat" in
-                0) echo $DESC "is already running..." ;;
-                1) echo "Could not access pidfile for $DESC" ;;
-                *)
-                echo "Starting "$DESC" ... "
-                [ -e `dirname "$PIDFILE"` ] || \
-                        install -d -m755 `dirname $PIDFILE`
-                DAEMON="$OOZIE_SERVER_HOME/bin/oozied.sh"
-                ARGS=" start"
-                start-stop-daemon --start --pidfile "$PIDFILE" --exec "${DAEMON}" -- ${ARGS}
-        ;;
-        esac
+  is_running
+  stat=$?
+  case "$stat" in
+    0) echo $DESC "is already running..." ;;
+    1) echo "Could not access pidfile for $DESC" ;;
+    *)
+      echo "Starting "$DESC" ... "
+      [ -e `dirname "$PIDFILE"` ] || \
+        install -d -m755 `dirname $PIDFILE`
+      DAEMON="$OOZIE_SERVER_HOME/bin/oozied.sh"
+      ARGS=" start"
+      start-stop-daemon --start --pidfile "$PIDFILE" --exec "${DAEMON}" -- ${ARGS}
+      ;;
+  esac
 ;;
-
 stop)
-        is_running
-        stat=$?
-        case "$stat" in
-        0)
-                echo "Stopping" $DESC
-                echo "PID: " $PIDFILE
-                start-stop-daemon -K -p "$PIDFILE" -R TERM/30/KILL/5 >/dev/null
-                rm -f "$PIDFILE";;
-        1) echo "Could not access pidfile for $DESC" ;;
-        *) echo $DESC" is not running..." ;;
-        esac
+  is_running
+  stat=$?
+  case "$stat" in
+    0)
+      echo "Stopping" $DESC
+      echo "PID: " $PIDFILE
+      start-stop-daemon -K -p "$PIDFILE" -R TERM/30/KILL/5 >/dev/null
+      rm -f "$PIDFILE";;
+    1) echo "Could not access pidfile for $DESC" ;;
+    *) echo $DESC" is not running..." ;;
+  esac
 ;;
-
 restart)
-        $0 stop
-        is_running
-        stat=$?
-        while [ $stat = 0 ];
-        do
-                is_running
-                stat=$?
-                sleep 1
-        done
-        $0 start
+  $0 stop
+  is_running
+  stat=$?
+  while [ $stat = 0 ];
+  do
+    is_running
+    stat=$?
+    sleep 1
+  done
+  $0 start
 ;;
-
 status)
-        is_running
-        stat=$?
-        case "$stat" in
-                0) log_success_msg "$DESC is running" ;;
-                1) log_failure_msg "could not access pidfile for $DESC" ;;
-                *) log_success_msg "$DESC is not running" ;;
-        esac
-        exit "$stat"
+  is_running
+  stat=$?
+  case "$stat" in
+    0)
+      PID=`cat $PIDFILE`
+      log_success_msg "$DESC is running(PID:$PID)" ;;
+    1) log_failure_msg "could not access pidfile for $DESC" ;;
+    *) log_success_msg "$DESC is not running" ;;
+  esac
+  exit "$stat"
 ;;
 kill)
-        start-stop-daemon -K -p "$PIDFILE" -R TERM/30/KILL/5 >/dev/null
-        rm -f "$PIDFILE"
-        echo $DESC "is killed..."
+  start-stop-daemon -K -p "$PIDFILE" -R TERM/30/KILL/5 >/dev/null
+  rm -f "$PIDFILE"
+  echo $DESC "is killed..."
 ;;
 *)
-        echo "Usage: $0 {start|stop|restart|status|kill}"
-        exit 1
+  echo "Usage: $0 {start|stop|restart|status|kill}"
+  exit 1
 esac
