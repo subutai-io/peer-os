@@ -79,12 +79,17 @@ public class MainUI extends UI
 
     private String username = "administrator";
 
+    private CoreModulesView coreModulesView;
+    private ModulesView modulesView;
+
     private HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
     private HashMap<String, View> routes = new HashMap<String, View>()
     {
         {
-            put( "/core", new CoreModulesView() );
-            put( "/modules", new ModulesView() );
+            coreModulesView = new CoreModulesView();
+            modulesView = new ModulesView();
+            put( "/core", coreModulesView );
+            put( "/modules", modulesView );
         }
     };
 
@@ -410,5 +415,17 @@ public class MainUI extends UI
                 ( ( DragAndDropWrapper ) next ).iterator().next().removeStyleName( "selected" );
             }
         }
+    }
+
+
+    public CoreModulesView getCoreModulesView()
+    {
+        return coreModulesView;
+    }
+
+
+    public ModulesView getModulesView()
+    {
+        return modulesView;
     }
 }

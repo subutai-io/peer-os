@@ -29,7 +29,7 @@ import com.vaadin.ui.Component;
 public class MongoPortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "mongodb.png";
-    protectedic final Logger LOG = Logger.getLogger( MongoPortalModule.class.getName() );
+    protected final Logger LOG = Logger.getLogger( MongoPortalModule.class.getName() );
     private ExecutorService executor;
     private final Tracker tracker;
     private final Mongo mongo;

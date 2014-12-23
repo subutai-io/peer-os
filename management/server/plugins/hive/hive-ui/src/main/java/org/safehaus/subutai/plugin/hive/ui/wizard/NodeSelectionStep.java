@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.naming.NamingException;
+
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -15,6 +17,7 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.api.SetupType;
+import org.safehaus.subutai.server.ui.api.PortalModuleService;
 
 import com.vaadin.data.Property;
 import com.vaadin.ui.Button;
@@ -36,19 +39,22 @@ public class NodeSelectionStep extends Panel
     private final Hadoop hadoop;
     private int controlWidth = 350;
     private EnvironmentManager environmentManager;
+    private GridLayout content;
+    private PortalModuleService portalModuleService;
 
 
     public NodeSelectionStep( final Hive hive, final Hadoop hadoop, final EnvironmentManager environmentManager,
-                              final Wizard wizard )
+                              final Wizard wizard, final PortalModuleService portalModuleService )
     {
 
         this.hive = hive;
         this.hadoop = hadoop;
         this.environmentManager = environmentManager;
+        this.portalModuleService = portalModuleService;
 
         setSizeFull();
 
-        GridLayout content = new GridLayout( 1, 2 );
+        content = new GridLayout( 1, 2 );
         content.setSizeFull();
         content.setSpacing( true );
         content.setMargin( true );
@@ -104,7 +110,10 @@ public class NodeSelectionStep extends Panel
         content.addComponent( nameTxt );
         if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP )
         {
-            addOverHadoopComponents( content, wizard.getConfig() );
+            if ( !addOverHadoopComponents( content, wizard.getConfig() ) )
+            {
+                wizard.back();
+            }
         }
         else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP )
         {
@@ -116,7 +125,7 @@ public class NodeSelectionStep extends Panel
     }
 
 
-    private void addOverHadoopComponents( ComponentContainer parent, final HiveConfig config )
+    private boolean addOverHadoopComponents( ComponentContainer parent, final HiveConfig config )
     {
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
         hadoopClusters.setId( "HiveHadoopClusterCb" );
@@ -136,7 +145,7 @@ public class NodeSelectionStep extends Panel
                 {
                     HadoopClusterConfig hc = ( HadoopClusterConfig ) event.getProperty().getValue();
                     config.setHadoopClusterName( hc.getClusterName() );
-                    config.setHadoopNodes( new HashSet<>( hc.getAllNodes() ) );
+                    config.setHadoopNodes( new HashSet<UUID>( hc.getAllNodes() ) );
 
                     ContainerHost selected = null;
                     if ( config.getServer() != null )
@@ -151,7 +160,7 @@ public class NodeSelectionStep extends Panel
                     }
                     fillServerNodeComboBox( config, cmbServerNode, hc, selected );
                     filterNodes( cmbServerNode, hc );
-                    // TODO if all nodes are filtered, than notify user
+                    // TODO if all nodes are filtered, then notify user
                 }
             }
         } );
@@ -164,6 +173,27 @@ public class NodeSelectionStep extends Panel
                 hadoopClusters.addItem( hci );
                 hadoopClusters.setItemCaption( hci, hci.getClusterName() );
             }
+        }
+        else
+        {
+            //            ConfirmationDialog alert =
+            //                    new ConfirmationDialog( String.format( "Do you want to proceed with Hadoop
+            // installation" ), "Yes",
+            //                            "No" );
+            //            alert.getOk().addClickListener( new Button.ClickListener()
+            //            {
+            //                @Override
+            //                public void buttonClick( Button.ClickEvent clickEvent )
+            //                {
+
+            if ( portalModuleService != null )
+            {
+                portalModuleService.loadDependentModule( HadoopClusterConfig.PRODUCT_KEY );
+            }
+            //                }
+            //            } );
+            //            content.getUI().addWindow( alert.getAlert() );
+            return false;
         }
 
         String hn = config.getHadoopClusterName();
@@ -178,6 +208,7 @@ public class NodeSelectionStep extends Panel
 
         parent.addComponent( hadoopClusters );
         parent.addComponent( cmbServerNode );
+        return true;
     }
 
 
@@ -250,7 +281,7 @@ public class NodeSelectionStep extends Panel
     private void filterNodes( final ComboBox serverNode, final HadoopClusterConfig hadoopClusterConfig )
     {
         Collection<UUID> items = ( Collection<UUID> ) serverNode.getItemIds();
-        final Set<UUID> set = new HashSet<>( items );
+        final Set<UUID> set = new HashSet<UUID>( items );
         for ( final UUID uuid : set )
         {
             new Thread( new Runnable()

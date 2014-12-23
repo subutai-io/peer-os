@@ -15,6 +15,7 @@ import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
+import org.safehaus.subutai.server.ui.api.PortalModuleService;
 
 import com.vaadin.ui.Component;
 
@@ -29,14 +30,17 @@ public class HivePortalModule implements PortalModule
     private final EnvironmentManager environmentManager;
     private final Tracker tracker;
     private Hadoop hadoop;
+    private PortalModuleService portalModuleService;
 
 
-    public HivePortalModule( Hive hive, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager)
+    public HivePortalModule( Hive hive, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager,
+                             PortalModuleService portalModuleService)
     {
         this.hive = hive;
         this.hadoop = hadoop;
         this.tracker = tracker;
         this.environmentManager = environmentManager;
+        this.portalModuleService = portalModuleService;
 
     }
 
@@ -80,7 +84,7 @@ public class HivePortalModule implements PortalModule
     {
         try
         {
-            return new HiveComponent( executor, hive, hadoop, tracker, environmentManager );
+            return new HiveComponent( executor, hive, hadoop, tracker, environmentManager, portalModuleService );
         }
         catch ( NamingException e )
         {

@@ -5,19 +5,19 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
+import org.safehaus.subutai.server.ui.api.PortalModuleService;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 
 
-public abstract class Wizard
+public class Wizard
 {
 
     private final GridLayout grid;
@@ -29,9 +29,11 @@ public abstract class Wizard
     private int step = 1;
     private HiveConfig config = new HiveConfig();
     private HadoopClusterConfig hadoopConfig;
+    private PortalModuleService portalModuleService;
 
 
-    public Wizard( ExecutorService executorService, Hive hive, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
+    public Wizard( ExecutorService executorService, Hive hive, Hadoop hadoop, Tracker tracker, EnvironmentManager
+            environmentManager, PortalModuleService portalModuleService ) throws NamingException
     {
 
         this.executorService = executorService;
@@ -39,6 +41,7 @@ public abstract class Wizard
         this.hadoop = hadoop;
         this.tracker = tracker;
         this.environmentManager = environmentManager;
+        this.portalModuleService = portalModuleService;
 
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
@@ -61,7 +64,7 @@ public abstract class Wizard
             }
             case 2:
             {
-                component = new NodeSelectionStep( hive, hadoop, environmentManager, this );
+                component = new NodeSelectionStep( hive, hadoop, environmentManager, this, portalModuleService );
                 break;
             }
             case 3:
@@ -111,9 +114,6 @@ public abstract class Wizard
     }
 
 
-    public abstract void requestHadoopPlugin();
-
-
     public HiveConfig getConfig()
     {
         return config;
@@ -130,4 +130,5 @@ public abstract class Wizard
     {
         this.hadoopConfig = hadoopConfig;
     }
+
 }
