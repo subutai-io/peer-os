@@ -66,8 +66,8 @@ status)
   stat=$?
   case "$stat" in
     0)
-      PID=`cat $PIDFILE`
-      log_success_msg "$DESC is running(PID:$PID)" ;;
+      pid=`cat $PIDFILE`
+      log_success_msg "$DESC is running(pid:$pid)" ;;
     1) log_failure_msg "could not access pidfile for $DESC" ;;
     *) log_success_msg "$DESC is not running" ;;
   esac
