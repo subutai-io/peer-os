@@ -141,7 +141,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
         {
             po.addLog( "Updating cluster information in database..." );
 
-            manager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            String json = manager.getGSON().toJson( config.prepare() );
+            manager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), json );
             po.addLogDone( "Cluster information updated in database" );
         }
         else
@@ -173,7 +174,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
             po.addLog( String.format( "Stopping node..." ) );
             newDataNode.stop();
             po.addLog( String.format( "Starting node..." ) );
-            newDataNode.start();
+            newDataNode.start( config );
 
             po.addLog( String.format( "Data node started successfully" ) );
 
@@ -193,112 +194,6 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
             po.addLog( String.format( "Error: %s", e.toString() ) );
         }
         return false;
-
-        //        List<Command> commands = manager.getCommands().getAddDataNodeCommands( config, agent );
-        //
-        //        boolean additionOK = true;
-        //        Command findPrimaryNodeCommand = null;
-        //
-        //        for ( Command command : commands )
-        //        {
-        //            po.addLog( String.format( "Running command: %s", command.getDescription() ) );
-        //            final AtomicBoolean commandOK = new AtomicBoolean();
-        //
-        //            if ( command.getData() == CommandType.FIND_PRIMARY_NODE )
-        //            {
-        //                findPrimaryNodeCommand = command;
-        //            }
-        //
-        //            if ( command.getData() == CommandType.START_DATA_NODES )
-        //            {
-        //                manager.getCommandRunner().runCommand( command, new CommandCallback()
-        //                {
-        //
-        //                    @Override
-        //                    public void onResponse( Response response, AgentResult agentResult, Command command )
-        //                    {
-        //                        if ( agentResult.getStdOut().contains( "child process started successfully,
-        // parent exiting" ) )
-        //                        {
-        //                            commandOK.set( true );
-        //                            stop();
-        //                        }
-        //                    }
-        //                } );
-        //            }
-        //            else
-        //            {
-        //                manager.getCommandRunner().runCommand( command );
-        //            }
-        //
-        //            if ( command.hasSucceeded() || commandOK.get() )
-        //            {
-        //                po.addLog( String.format( "Command %s succeeded", command.getDescription() ) );
-        //            }
-        //            else
-        //            {
-        //                po.addLog( String.format( "Command %s failed: %s", command.getDescription(),
-        // command.getAllErrors() ) );
-        //                additionOK = false;
-        //                break;
-        //            }
-        //        }
-
-        //        //parse result of findPrimaryNodeCommand
-        //        if ( additionOK )
-        //        {
-        //            if ( findPrimaryNodeCommand != null && !findPrimaryNodeCommand.getResults().isEmpty() )
-        //            {
-        //                ContainerHost primaryNodeAgent = null;
-        //                Pattern p = Pattern.compile( "primary\" : \"(.*)\"" );
-        //                AgentResult result = findPrimaryNodeCommand.getResults().entrySet().iterator().next()
-        // .getValue();
-        //                Matcher m = p.matcher( result.getStdOut() );
-        //                if ( m.find() )
-        //                {
-        //                    String primaryNodeHost = m.group( 1 );
-        //                    if ( !Strings.isNullOrEmpty( primaryNodeHost ) )
-        //                    {
-        //                        String hostname = primaryNodeHost.split( ":" )[0].replace( "." + config
-        // .getDomainName(), "" );
-        //                        primaryNodeAgent = findNodeInCluster( hostname );
-        //                    }
-        //                }
-        //
-        //                if ( primaryNodeAgent != null )
-        //                {
-        //                    CommandDef registerSecondaryNodeCommandDef = manager.getCommands()
-        //
-        // .getRegisterSecondaryNodeWithPrimaryCommand(
-        //                                                                                agent.getHostname(),
-        //                                                                                config.getDataNodePort(),
-        //                                                                                config.getDomainName() );
-        //                    try
-        //                    {
-        //                        primaryNodeAgent.execute( new RequestBuilder( registerSecondaryNodeCommandDef
-        // .getCommand() ) );
-        //                        po.addLog( String.format( "Command %s succeeded",
-        //                                registerSecondaryNodeCommandDef.getDescription() ) );
-        //                        return true;
-        //                    }
-        //                    catch ( CommandException e )
-        //                    {
-        //                        po.addLog( String.format( "Command %s failed: %s",
-        //                                registerSecondaryNodeCommandDef.getDescription(), e.toString() ) );
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    po.addLog( "Could not find primary node" );
-        //                }
-        //            }
-        //            else
-        //            {
-        //                po.addLog( "Could not find primary node" );
-        //            }
-        //        }
-        //
-        //        return false;
     }
 
 
@@ -320,21 +215,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
 
             po.addLog( String.format( "Starting router: %s", newRouter.getHostname() ) );
             newRouter.setConfigServers( config.getConfigServers() );
-            newRouter.start();
+            newRouter.start( config );
             return true;
-            //            CommandDef commandDef = manager.getCommands()
-            //                                           .getStartRouterCommand( config.getRouterPort(),
-            // config.getCfgSrvPort(),
-            //                                                   config.getDomainName(), config.getConfigServers() );
-
-            //            CommandResult commandResult = newRouter
-            //                    .execute( new RequestBuilder( commandDef.getCommand() ).withTimeout( commandDef
-            // .getTimeout() ) );
-            //            if ( commandResult.getStdOut().contains( "child process started successfully,
-            // parent exiting" ) )
-            //            {
-            //                return true;
-            //            }
         }
         catch ( SubutaiException e )
         {
@@ -344,54 +226,4 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl,
 
         return false;
     }
-
-
-    //    private boolean addRouterOld( TrackerOperation po, final MongoClusterConfig config, Agent agent )
-    //    {
-    //        List<Command> commands = manager.getCommands().getAddRouterCommandsOld( config, agent );
-    //
-    //        boolean additionOK = true;
-    //
-    //        for ( Command command : commands )
-    //        {
-    //            po.addLog( String.format( "Running command: %s", command.getDescription() ) );
-    //            final AtomicBoolean commandOK = new AtomicBoolean();
-    //
-    //            if ( command.getData() == CommandType.START_ROUTERS )
-    //            {
-    //                manager.getCommandRunner().runCommand( command, new CommandCallback()
-    //                {
-    //
-    //                    @Override
-    //                    public void onResponse( Response response, AgentResult agentResult, Command command )
-    //                    {
-    //                        if ( agentResult.getStdOut().contains( "child process started successfully,
-    // parent exiting" ) )
-    //                        {
-    //                            commandOK.set( true );
-    //                            stop();
-    //                        }
-    //                    }
-    //                } );
-    //            }
-    //            else
-    //            {
-    //                manager.getCommandRunner().runCommand( command );
-    //            }
-    //
-    //            if ( command.hasSucceeded() || commandOK.get() )
-    //            {
-    //                po.addLog( String.format( "Command %s succeeded", command.getDescription() ) );
-    //            }
-    //            else
-    //            {
-    //                po.addLog( String.format( "Command %s failed: %s", command.getDescription(),
-    // command.getAllErrors() ) );
-    //                additionOK = false;
-    //                break;
-    //            }
-    //        }
-    //
-    //        return additionOK;
-    //    }
 }

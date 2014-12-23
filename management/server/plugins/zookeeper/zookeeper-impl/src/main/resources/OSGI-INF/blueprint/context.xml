@@ -13,12 +13,15 @@
              interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
   <reference id="environmentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
+  <reference id="peerManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
   <bean id="impl" scope="singleton" class="org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl"
         init-method="init" destroy-method="destroy">
     <property name="tracker" ref="tracker" />
     <property name="environmentManager" ref="environmentManager" />
     <property name="hadoopManager" ref="hadoopManager" />
+    <property name="peerManager" ref="peerManager" />
     <argument ref="dataSource" />
   </bean>
 

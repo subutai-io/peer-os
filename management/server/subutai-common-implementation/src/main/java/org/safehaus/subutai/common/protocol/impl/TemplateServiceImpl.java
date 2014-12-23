@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 
 import org.safehaus.subutai.common.exception.DaoException;
@@ -142,7 +143,7 @@ public class TemplateServiceImpl implements TemplateService
 
             return template;
         }
-        catch ( NoResultException e )
+        catch ( NoResultException | NonUniqueResultException e )
         {
             return null;
         }
@@ -181,7 +182,7 @@ public class TemplateServiceImpl implements TemplateService
 
             return template;
         }
-        catch ( NoResultException e )
+        catch ( NoResultException | NonUniqueResultException e )
         {
             return null;
         }

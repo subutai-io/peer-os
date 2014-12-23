@@ -1,13 +1,11 @@
 package org.safehaus.subutai.core.environment.impl.builder;
 
 
-import java.util.List;
 import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.topology.Blueprint2PeerData;
@@ -15,10 +13,7 @@ import org.safehaus.subutai.core.environment.api.topology.TopologyData;
 import org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl;
 
 
-/**
- * Created by bahadyr on 11/6/14.
- */
-public class Blueprint2PeerBuilder extends EnvironmentBuildProcessFactory
+public class Blueprint2PeerBuilder extends EnvironmentBuildProcessBuilder
 {
     public Blueprint2PeerBuilder( final EnvironmentManagerImpl environmentManager )
     {
@@ -37,24 +32,11 @@ public class Blueprint2PeerBuilder extends EnvironmentBuildProcessFactory
             EnvironmentBlueprint blueprint = environmentManager.getEnvironmentBlueprint( data.getBlueprintId() );
             Set<NodeGroup> groupSet = blueprint.getNodeGroups();
 
-            int i=0;
+            int i = 0;
             for ( NodeGroup nodeGroup : groupSet )
             {
-                String key = data.getPeerId().toString() + "-" + nodeGroup.getTemplateName()+"-"+(i++);
-                CloneContainersMessage ccm = new CloneContainersMessage();
-                ccm.setTargetPeerId( data.getPeerId() );
-                ccm.setNodeGroupName( nodeGroup.getName() );
-                ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
-                ccm.setStrategy( nodeGroup.getPlacementStrategy() );
-                List<Template> templates =
-                        fetchRequiredTemplates( environmentManager.getPeerManager().getLocalPeer().getId(),
-                                nodeGroup.getTemplateName() );
-                if ( templates.isEmpty() )
-                {
-                    throw new ProcessBuilderException( "No templates provided" );
-                }
-
-                ccm.setTemplates( templates );
+                String key = data.getPeerId().toString() + "-" + nodeGroup.getTemplateName() + "-" + ( i++ );
+                CloneContainersMessage ccm = makeContainerCloneMessage( nodeGroup, data.getPeerId() );
                 process.putCloneContainerMessage( key, ccm );
             }
 
@@ -66,3 +48,4 @@ public class Blueprint2PeerBuilder extends EnvironmentBuildProcessFactory
         }
     }
 }
+

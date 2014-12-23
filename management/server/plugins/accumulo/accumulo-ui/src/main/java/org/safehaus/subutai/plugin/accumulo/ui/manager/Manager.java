@@ -869,10 +869,10 @@ public class Manager
         clusterCombo.removeAllItems();
         if ( mongoClusterInfos != null && !mongoClusterInfos.isEmpty() )
         {
-            for ( AccumuloClusterConfig mongoClusterInfo : mongoClusterInfos )
+            for ( AccumuloClusterConfig accumuloCluster : mongoClusterInfos )
             {
-                clusterCombo.addItem( mongoClusterInfo );
-                clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
+                clusterCombo.addItem( accumuloCluster );
+                clusterCombo.setItemCaption( accumuloCluster, accumuloCluster.getClusterName() + "(" + accumuloCluster.getHadoopClusterName() + ")" );
             }
             if ( clusterInfo != null )
             {

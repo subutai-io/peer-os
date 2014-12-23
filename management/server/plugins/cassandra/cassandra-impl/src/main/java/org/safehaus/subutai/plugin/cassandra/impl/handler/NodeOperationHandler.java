@@ -6,6 +6,7 @@ import java.util.Iterator;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
@@ -14,6 +15,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+import org.safehaus.subutai.plugin.cassandra.impl.ClusterConfiguration;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 import org.safehaus.subutai.plugin.common.api.NodeOperationType;
 
@@ -109,8 +111,20 @@ public class NodeOperationHandler extends AbstractOperationHandler<CassandraImpl
             environmentManager.removeContainer( config.getEnvironmentId(), host.getId() );
             config.getNodes().remove( host.getId() );
             manager.getPluginDAO().saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            // configure cluster again
+            ClusterConfiguration configurator = new ClusterConfiguration( trackerOperation, manager);
+            try
+            {
+                configurator.configureCluster( config, environmentManager.getEnvironmentByUUID( config
+                        .getEnvironmentId() ) );
+            }
+            catch ( ClusterConfigurationException e )
+            {
+                e.printStackTrace();
+            }
             trackerOperation.addLog( String.format( "Cluster information is updated" ) );
             trackerOperation.addLogDone( String.format( "Container %s is removed from cluster", host.getHostname() ) );
+
         }
         catch ( EnvironmentManagerException e )
         {

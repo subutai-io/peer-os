@@ -1,29 +1,22 @@
 package org.safehaus.subutai.core.environment.impl.builder;
 
 
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.Map;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.topology.NodeGroup2PeerGroupData;
 import org.safehaus.subutai.core.environment.api.topology.TopologyData;
 import org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
 
-import com.google.common.collect.Lists;
 
-
-/**
- * Created by bahadyr on 11/6/14.
- */
-public class NodeGroup2PeerGroupBuilder extends EnvironmentBuildProcessFactory
+public class NodeGroup2PeerGroupBuilder extends EnvironmentBuildProcessBuilder
 {
 
     public NodeGroup2PeerGroupBuilder( final EnvironmentManagerImpl environmentManager )
@@ -35,48 +28,52 @@ public class NodeGroup2PeerGroupBuilder extends EnvironmentBuildProcessFactory
     @Override
     public EnvironmentBuildProcess prepareBuildProcess( final TopologyData topologyData ) throws ProcessBuilderException
     {
+        if ( !( topologyData instanceof NodeGroup2PeerGroupData ) )
+        {
+            throw new ProcessBuilderException( "Invalid topology data type" );
+        }
+
         NodeGroup2PeerGroupData data = ( NodeGroup2PeerGroupData ) topologyData;
-        EnvironmentBuildProcess process = new EnvironmentBuildProcess( data.getBlueprintId() );
+        PeerGroup peerGroup = environmentManager.getPeerManager().getPeerGroup( data.getPeerGroupId() );
+
+        EnvironmentBlueprint blueprint;
         try
         {
-            EnvironmentBlueprint blueprint = environmentManager.getEnvironmentBlueprint( data.getBlueprintId() );
-            PeerGroup peerGroup = environmentManager.getPeerManager().getPeerGroup( data.getPeerGroupId() );
-
-            List<UUID> uuidList = Lists.newArrayList( peerGroup.getPeerIds().iterator() );
-
-            Set<NodeGroup> groupSet = blueprint.getNodeGroups();
-            for ( NodeGroup nodeGroup : groupSet )
-            {
-                UUID peerId = uuidList.get( randomInt( uuidList.size() ) );
-                String key = peerId.toString() + "-" + nodeGroup.getTemplateName();
-                CloneContainersMessage ccm = new CloneContainersMessage();
-                ccm.setTargetPeerId( peerId );
-                ccm.setNodeGroupName( nodeGroup.getName() );
-                ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
-                ccm.setStrategy( nodeGroup.getPlacementStrategy() );
-                List<Template> templates =
-                        fetchRequiredTemplates( environmentManager.getPeerManager().getLocalPeer().getId(),
-                                nodeGroup.getTemplateName() );
-                ccm.setTemplates( templates );
-                process.putCloneContainerMessage( key, ccm );
-            }
-
-            return process;
+            blueprint = environmentManager.getEnvironmentBlueprint( data.getBlueprintId() );
         }
         catch ( EnvironmentManagerException e )
         {
             throw new ProcessBuilderException( e.getMessage() );
         }
+
+        EnvironmentBuildProcess process = new EnvironmentBuildProcess( data.getBlueprintId() );
+        for ( Map.Entry<NodeGroup, UUID> e : data.getNodeGroupToPeer().entrySet() )
+        {
+            NodeGroup ng = e.getKey();
+            UUID peerId = e.getValue();
+            if ( !blueprint.getNodeGroups().contains( ng ) )
+            {
+                throw new ProcessBuilderException( "Node group not found in blueprint" );
+            }
+            if ( !peerGroup.getPeerIds().contains( peerId ) )
+            {
+                String m = String.format( "Peer id=%s does not belong to peer group %s", peerId, peerGroup.getName() );
+                throw new ProcessBuilderException( m );
+            }
+
+            Peer peer = environmentManager.getPeerManager().getPeer( peerId );
+            if ( peer == null )
+            {
+                throw new ProcessBuilderException( "Peer not found: id=" + peerId );
+            }
+
+            CloneContainersMessage ccm = makeContainerCloneMessage( ng, peerId );
+
+            String key = peer.getId() + ng.getName();
+            process.putCloneContainerMessage( key, ccm );
+        }
+        return process;
     }
 
-
-    /**
-     * TODO: should be replaced with placement strategy
-     */
-    private int randomInt( int max )
-    {
-        Random random = new Random();
-        int rand = random.nextInt( max + 1 );
-        return rand;
-    }
 }
+

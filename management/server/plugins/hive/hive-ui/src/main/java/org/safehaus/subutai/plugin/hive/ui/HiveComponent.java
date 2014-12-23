@@ -35,7 +35,14 @@ public class HiveComponent extends CustomComponent
         TabSheet sheet = new TabSheet();
         sheet.setSizeFull();
         manager = new Manager( executorService, hive, hadoop, tracker, environmentManager );
-        wizard = new Wizard( executorService, hive, hadoop, tracker, environmentManager );
+        wizard = new Wizard( executorService, hive, hadoop, tracker, environmentManager )
+        {
+            @Override
+            public void requestHadoopPlugin()
+            {
+
+            }
+        };
         sheet.addTab( wizard.getContent(), "Install" );
         sheet.getTab( 0 ).setId( "HiveInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );

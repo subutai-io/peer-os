@@ -1,11 +1,13 @@
 package org.safehaus.subutai.plugin.mongodb.impl;
 
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.MongoConfigNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoDataNode;
 import org.safehaus.subutai.plugin.mongodb.api.MongoException;
@@ -14,11 +16,15 @@ import org.safehaus.subutai.plugin.mongodb.impl.common.CommandDef;
 import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 
 import com.google.common.base.Preconditions;
+import com.google.gson.annotations.Expose;
 
 
 public class MongoRouterNodeImpl extends MongoNodeImpl implements MongoRouterNode
 {
+    @Expose
     Set<MongoConfigNode> configServers;
+
+    @Expose
     int cfgSrvPort;
 
 
@@ -31,17 +37,11 @@ public class MongoRouterNodeImpl extends MongoNodeImpl implements MongoRouterNod
 
 
     @Override
-    public void setConfigServers( Set<MongoConfigNode> configServers )
-    {
-        this.configServers = configServers;
-    }
-
-
-    @Override
-    public void start() throws MongoException
+    public void start( MongoClusterConfig config ) throws MongoException
     {
         Preconditions.checkNotNull( configServers, "Config servers is null" );
-        CommandDef commandDef = Commands.getStartRouterCommandLine( port, cfgSrvPort, domainName, configServers );
+        CommandDef commandDef = Commands.getStartRouterCommandLine( port, cfgSrvPort, domainName,
+                config.getConfigServers() );
         try
         {
             CommandResult commandResult = containerHost.execute( commandDef.build( true ) );
@@ -77,5 +77,12 @@ public class MongoRouterNodeImpl extends MongoNodeImpl implements MongoRouterNod
             LOG.error( e.toString(), e );
             throw new MongoException( "Could not register data nodes." );
         }
+    }
+
+
+    @Override
+    public void setConfigServers( Set<MongoConfigNode> configServers )
+    {
+        this.configServers = configServers;
     }
 }

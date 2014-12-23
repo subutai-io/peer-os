@@ -395,9 +395,7 @@ public class Manager
             for ( LuceneConfig luceneClusterInfo : clustersInfo )
             {
                 clusterCombo.addItem( luceneClusterInfo );
-                clusterCombo.setItemCaption( luceneClusterInfo,
-                        String.format( "%s (%s)", luceneClusterInfo.getClusterName(),
-                                luceneClusterInfo.getHadoopClusterName() ) );
+                clusterCombo.setItemCaption( luceneClusterInfo, luceneClusterInfo.getClusterName() + "(" + luceneClusterInfo.getHadoopClusterName() + ")" );
             }
             if ( clusterInfo != null )
             {

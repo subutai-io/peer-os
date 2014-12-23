@@ -25,61 +25,64 @@ public interface MongoClusterConfig extends ConfigBase
 
     int getNumberOfConfigServers();
 
+    void setNumberOfConfigServers( int i );
+
     int getNumberOfRouters();
+
+    void setNumberOfRouters( int i );
 
     int getNumberOfDataNodes();
 
+    void setNumberOfDataNodes( int value );
+
     int getDataNodePort();
+
+    void setDataNodePort( int i );
 
     int getRouterPort();
 
+    void setRouterPort( int i );
+
     String getDomainName();
+
+    void setDomainName( String value );
 
     String getReplicaSetName();
 
+    void setReplicaSetName( String value );
+
     int getCfgSrvPort();
 
-    void setConfigServers( Set<MongoConfigNode> configServers );
-
-    void setRouterServers( Set<MongoRouterNode> routers );
-
-    void setDataNodes( Set<MongoDataNode> dataNodes );
+    void setCfgSrvPort( int i );
 
     Set<MongoConfigNode> getConfigServers();
+
+    void setConfigServers( Set<MongoConfigNode> configServers );
 
     Set<MongoNode> getAllNodes();
 
     Set<MongoDataNode> getDataNodes();
 
+    void setDataNodes( Set<MongoDataNode> dataNodes );
+
     UUID getEnvironmentId();
 
     void addNode( MongoNode mongoNode, NodeType nodeType );
 
-    void setNumberOfRouters( int i );
-
     Set<MongoRouterNode> getRouterServers();
+
+    void setRouterServers( Set<MongoRouterNode> routers );
 
     NodeType getNodeType( MongoNode node );
 
-    void setNumberOfConfigServers( int i );
-
-    void setCfgSrvPort( int i );
-
-    void setRouterPort( int i );
-
-    void setDataNodePort( int i );
-
-    void setDomainName( String value );
-
     void setClusterName( String clasterName );
-
-    void setNumberOfDataNodes( int value );
-
-    void setReplicaSetName( String value );
 
     MongoDataNode findPrimaryNode() throws MongoException;
 
     MongoNode findNode( String lxcHostname );
 
+
     void setEnvironmentId( UUID id );
+
+    Object prepare();
 }

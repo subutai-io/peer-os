@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.ui.manager.Manager;
@@ -27,7 +28,7 @@ import com.vaadin.ui.VerticalLayout;
 public class MongoComponent extends CustomComponent
 {
 
-    public MongoComponent( ExecutorService executorService, Mongo mongo, Tracker tracker ) throws NamingException
+    public MongoComponent( ExecutorService executorService, Mongo mongo, EnvironmentManager environmentManager, Tracker tracker ) throws NamingException
     {
         setSizeFull();
 
@@ -37,10 +38,24 @@ public class MongoComponent extends CustomComponent
 
         TabSheet mongoSheet = new TabSheet();
         mongoSheet.setSizeFull();
-        Manager manager = new Manager( executorService, mongo, tracker );
+        final Manager manager = new Manager( executorService, mongo, environmentManager, tracker );
         Wizard wizard = new Wizard( executorService, mongo, tracker );
         mongoSheet.addTab( wizard.getContent(), "Install" );
         mongoSheet.addTab( manager.getContent(), "Manage" );
+        mongoSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+            {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if ( caption.equals( "Manage" ) )
+                {
+                    manager.refreshClustersInfo();
+                    manager.checkAllNodes();
+                }
+            }
+        } );
         verticalLayout.addComponent( mongoSheet );
 
         setCompositionRoot( verticalLayout );

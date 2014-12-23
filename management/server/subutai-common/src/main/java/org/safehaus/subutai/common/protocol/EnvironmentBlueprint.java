@@ -19,30 +19,30 @@ public class EnvironmentBlueprint
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private boolean linkHosts;
     private boolean exchangeSshKeys;
-    //    private UUID id;
+    private UUID id;
 
 
     public EnvironmentBlueprint()
     {
-        //        this.id = UUIDUtil.generateTimeBasedUUID();
+        this.id = UUID.randomUUID();
         this.nodeGroups = new HashSet<>();
     }
 
 
     public UUID getId()
     {
-        return UUID.nameUUIDFromBytes( name.getBytes() );
+        return id;
     }
 
 
     public EnvironmentBlueprint( final String name, final String domainName, final boolean linkHosts,
                                  final boolean exchangeSshKeys )
     {
+        this();
         this.name = name;
         this.domainName = domainName;
         this.linkHosts = linkHosts;
         this.exchangeSshKeys = exchangeSshKeys;
-        this.nodeGroups = new HashSet<>();
     }
 
 

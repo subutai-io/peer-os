@@ -646,10 +646,10 @@ public class Manager
             return;
         }
 
-        for ( HiveConfig esConfig : clusters )
+        for ( HiveConfig hiveConfig : clusters )
         {
-            clusterCombo.addItem( esConfig );
-            clusterCombo.setItemCaption( esConfig, esConfig.getClusterName() );
+            clusterCombo.addItem( hiveConfig );
+            clusterCombo.setItemCaption( hiveConfig, hiveConfig.getClusterName() + "(" + hiveConfig.getHadoopClusterName() + ")" );
         }
 
         if ( clusterInfo != null )

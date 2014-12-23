@@ -396,10 +396,10 @@ public class Manager
         clusterCombo.removeAllItems();
         if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
-            for ( SharkClusterConfig mongoClusterInfo : clustersInfo )
+            for ( SharkClusterConfig sharkClusterConfig : clustersInfo )
             {
-                clusterCombo.addItem( mongoClusterInfo );
-                clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
+                clusterCombo.addItem( sharkClusterConfig );
+                clusterCombo.setItemCaption( sharkClusterConfig, sharkClusterConfig.getClusterName() + "(" + sharkClusterConfig.getSparkClusterName() + ")" );
             }
             if ( clusterInfo != null )
             {

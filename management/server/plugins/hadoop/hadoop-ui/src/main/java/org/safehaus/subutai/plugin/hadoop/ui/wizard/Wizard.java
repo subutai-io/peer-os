@@ -33,6 +33,7 @@ public class Wizard
         this.hadoop = hadoop;
         this.hostRegistry = hostRegistry;
 
+
         grid = new VerticalLayout();
         grid.setMargin( true );
         grid.setSizeFull();
@@ -55,6 +56,7 @@ public class Wizard
             case 2:
             {
                 component = new ConfigurationStep( this, hostRegistry );
+
                 break;
             }
             case 3:

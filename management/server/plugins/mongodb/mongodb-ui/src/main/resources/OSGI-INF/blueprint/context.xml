@@ -4,12 +4,14 @@
     xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="mongo" availability="mandatory" interface="org.safehaus.subutai.plugin.mongodb.api.Mongo" />
+  <reference id="environmentManager" availability="mandatory" interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
   <reference id="tracker" availability="mandatory" interface="org.safehaus.subutai.core.tracker.api.Tracker" />
 
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.mongodb.ui.MongoPortalModule"
         init-method="init" destroy-method="destroy">
     <argument ref="mongo" />
+    <argument ref="environmentManager" />
     <argument ref="tracker" />
   </bean>
 

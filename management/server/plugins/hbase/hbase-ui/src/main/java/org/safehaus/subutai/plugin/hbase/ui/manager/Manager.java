@@ -489,7 +489,7 @@ public class Manager
             for ( HBaseConfig info : clusters )
             {
                 clusterCombo.addItem( info );
-                clusterCombo.setItemCaption( info, info.getClusterName() );
+                clusterCombo.setItemCaption( info, info.getClusterName() + "(" + info.getHadoopClusterName() + ")" );
             }
             if ( clusterInfo != null )
             {

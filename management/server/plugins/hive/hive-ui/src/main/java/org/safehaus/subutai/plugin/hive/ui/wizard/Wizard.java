@@ -17,7 +17,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 
 
-public class Wizard
+public abstract class Wizard
 {
 
     private final GridLayout grid;
@@ -109,6 +109,9 @@ public class Wizard
         hadoopConfig = new HadoopClusterConfig();
         putForm();
     }
+
+
+    public abstract void requestHadoopPlugin();
 
 
     public HiveConfig getConfig()

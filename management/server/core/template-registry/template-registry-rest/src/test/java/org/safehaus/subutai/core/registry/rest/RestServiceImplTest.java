@@ -91,7 +91,8 @@ public class RestServiceImplTest
         String subutaiParent = properties.getProperty( "subutai.parent" );
         String subutaiGitBranch = properties.getProperty( "subutai.git.branch" );
         String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
-        String templateVersion = properties.getProperty( "SUBUTAI_VERSION" );
+        //TODO need to find out how to extract version from configFile
+        String templateVersion = "2.1.0";
         template =
                 new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch, subutaiGitUuid,
                         packagesFile, md5sum, templateVersion );

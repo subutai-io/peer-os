@@ -47,8 +47,6 @@ public class StartTask implements Runnable
     public void run()
     {
 
-        UUID trackID = mongo.startNode( clusterName, lxcHostname );
-
         long start = System.currentTimeMillis();
         NodeState state = NodeState.UNKNOWN;
         int waitTimeout = Timeouts.START_DATE_NODE_TIMEOUT_SEC;
@@ -60,6 +58,8 @@ public class StartTask implements Runnable
         {
             waitTimeout = Timeouts.START_ROUTER_TIMEOUT_SEC;
         }
+
+        UUID trackID = mongo.startNode( clusterName, lxcHostname );
 
         while ( !Thread.interrupted() )
         {

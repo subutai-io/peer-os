@@ -488,7 +488,7 @@ public class Manager
             for ( SparkClusterConfig ci : clustersInfo )
             {
                 clusterCombo.addItem( ci );
-                clusterCombo.setItemCaption( ci, ci.getClusterName() );
+                clusterCombo.setItemCaption( ci, ci.getClusterName() + "(" + ci.getHadoopClusterName() + ")" );
             }
             if ( clusterInfo != null )
             {

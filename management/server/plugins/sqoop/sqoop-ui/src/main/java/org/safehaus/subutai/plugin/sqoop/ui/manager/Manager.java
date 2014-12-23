@@ -382,10 +382,10 @@ public class Manager
             return;
         }
 
-        for ( SqoopConfig esConfig : clusters )
+        for ( SqoopConfig sqoopConfig : clusters )
         {
-            clusterCombo.addItem( esConfig );
-            clusterCombo.setItemCaption( esConfig, esConfig.getClusterName() );
+            clusterCombo.addItem( sqoopConfig );
+            clusterCombo.setItemCaption( sqoopConfig, sqoopConfig.getClusterName() + "(" + sqoopConfig.getHadoopClusterName() + ")" );
         }
 
         if ( clusterInfo != null )
