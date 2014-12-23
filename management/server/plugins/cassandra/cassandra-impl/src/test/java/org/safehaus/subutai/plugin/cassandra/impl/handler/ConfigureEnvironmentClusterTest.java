@@ -14,6 +14,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+import org.safehaus.subutai.plugin.cassandra.impl.dao.PluginDAO;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -23,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -82,9 +84,12 @@ public class ConfigureEnvironmentClusterTest
     {
         // mock run method
         when(cassandraImpl.getEnvironmentManager()).thenReturn(environmentManager);
-        when(environmentManager.getEnvironmentByUUID(any(UUID.class))).thenReturn(environment);
-        when(cassandraImpl.getClusterSetupStrategy(environment,cassandraClusterConfig,trackerOperation)).thenReturn(clusterSetupStrategy);
-
+        when(environmentManager.getEnvironmentByUUID( any( UUID.class ) )).thenReturn(environment);
+        when( cassandraImpl
+                .getClusterSetupStrategy( environment, cassandraClusterConfig, trackerOperation ) ).thenReturn(
+                clusterSetupStrategy );
+        when( environment.getId() ).thenReturn( UUID.randomUUID() );
+        when( cassandraImpl.getPluginDAO() ).thenReturn( mock( PluginDAO.class ) );
         configureEnvironmentClusterHandler.run();
 
         // asserts

@@ -120,6 +120,11 @@ public class EnvironmentWizard
     }
 
 
+    public void clearConfig(){
+        config = new CassandraClusterConfig();
+    }
+
+
     public void init()
     {
         step = 1;

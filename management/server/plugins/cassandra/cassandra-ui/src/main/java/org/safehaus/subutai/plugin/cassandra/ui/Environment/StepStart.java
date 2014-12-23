@@ -46,6 +46,7 @@ public class StepStart extends VerticalLayout
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
+                environmentWizard.init();
                 environmentWizard.next();
             }
         } );

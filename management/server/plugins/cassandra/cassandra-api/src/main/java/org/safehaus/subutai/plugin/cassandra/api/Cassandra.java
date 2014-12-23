@@ -29,6 +29,8 @@ public interface Cassandra extends ApiBase<CassandraClusterConfig>
 
     UUID destroyNode( String clusterName, String hostname );
 
+    UUID removeCluster( String clusterName );
+
     UUID checkNode( String clusterName, String hostname );
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, CassandraClusterConfig config,
