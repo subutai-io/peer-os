@@ -203,7 +203,7 @@ function fs_get_children_list {
     snap="lxc/$parent@template"
   fi
   local count=0
-  for ds in $(sudo btrfs subvolume list -q $HOME/.local/share/lxc | grep `sudo btrfs subvolume list -u $HOME/.local/share/lxc | grep $parent | awk '{print $9}'` | awk '{print $11}' | awk -F "/" '{print $1}')
+  for ds in $(sudo btrfs subvolume list -q $HOME/.local/share/lxc | grep "`sudo btrfs subvolume list -u $HOME/.local/share/lxc | grep $parent/ | awk '{print $9}'`" | awk '{print $11}' | awk -F "/" '{print $(NF-1)}')
   do
     children_list[$count]=`fs_ctnr_from_ds $ds`
     count=`expr $count + 1`
@@ -228,7 +228,7 @@ function fs_get_children {
   fi
 
   local count=0
-  for ds in $(sudo btrfs subvolume list -q $HOME/.local/share/lxc | grep `sudo btrfs subvolume list -u $HOME/.local/share/lxc | grep $parent | awk '{print $9}'` | awk '{print $11}' | awk -F "/" '{print $1}')
+  for ds in $(sudo btrfs subvolume list -q $HOME/.local/share/lxc | grep "`sudo btrfs subvolume list -u $HOME/.local/share/lxc | grep $parent/ | awk '{print $9}'`" | awk '{print $11}' | awk -F "/" '{print $(NF-1)}')
   do
      msg_info "        -> \"`fs_ctnr_from_ds $ds`\" is a child of $parent"
      count=`expr $count + 1`
