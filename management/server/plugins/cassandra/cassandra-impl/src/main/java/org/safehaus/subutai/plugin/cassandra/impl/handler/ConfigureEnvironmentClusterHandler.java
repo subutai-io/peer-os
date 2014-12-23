@@ -55,11 +55,6 @@ public class ConfigureEnvironmentClusterHandler extends AbstractOperationHandler
             {
                 throw new ClusterSetupException( e.getMessage() );
             }
-
-////            ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( env, config, po );
-////            clusterSetupStrategy.setup();
-//
-//            po.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
         catch ( ClusterSetupException e )
         {
