@@ -4,6 +4,7 @@ package org.safehaus.subutai.plugin.cassandra.ui.Environment;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +22,7 @@ import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
@@ -29,6 +31,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 
 
@@ -123,22 +126,16 @@ public class ConfigurationStep extends VerticalLayout
             }
         }
 
-        final ComboBox seedsCountCombo = new ComboBox( "Choose number of seeds" );
-        seedsCountCombo.setImmediate( true );
-        seedsCountCombo.setNullSelectionAllowed( false );
-        seedsCountCombo.setTextInputAllowed( false );
-        seedsCountCombo.setValue( environmentWizard.getConfig() );
+        // all nodes
+        final TwinColSelect allNodesSelect =
+                getTwinSelect( "Nodes to be configured", "hostname", "Available Nodes", "Selected Nodes", 4 );
+        allNodesSelect.setId( "AllNodes" );
+        allNodesSelect.setValue( null );
 
-        seedsCountCombo.addValueChangeListener( new Property.ValueChangeListener()
-        {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                environmentWizard.getConfig().setNumberOfSeeds( Integer.parseInt(
-                        ( String ) event.getProperty().getValue() ) );
-            }
-        } );
-
+        // seeds
+        final TwinColSelect seedsSelect =
+                getTwinSelect( "Seeds", "hostname", "Available Nodes", "Selected Nodes", 4 );
+        seedsSelect.setId( "Seeds" );
 
         final ComboBox envCombo = new ComboBox( "Choose environment" );
         BeanItemContainer<Environment> eBean = new BeanItemContainer<>( Environment.class );
@@ -154,14 +151,49 @@ public class ConfigurationStep extends VerticalLayout
             {
                 Environment e = ( Environment ) event.getProperty().getValue();
                 environmentWizard.getConfig().setEnvironmentId( e.getId() );
-                seedsCountCombo.removeAllItems();
-                for ( int i=0; i < e.getContainerHosts().size(); i++ ){
-                    seedsCountCombo.addItem( (i+1)+ "" );
-                }
-                environmentWizard.getConfig().setNumberOfNodes( e.getContainerHosts().size() );
+                allNodesSelect.setContainerDataSource(
+                        new BeanItemContainer<>( ContainerHost.class, e.getContainerHosts() ) );
             }
         } );
 
+
+        //add value change handler
+        allNodesSelect.addValueChangeListener( new Property.ValueChangeListener()
+        {
+
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                if ( event.getProperty().getValue() != null )
+                {
+                    Set<UUID> nodes = new HashSet<UUID>();
+                    Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
+                    seedsSelect.setContainerDataSource( new BeanItemContainer<>( ContainerHost.class, nodeList  ) );
+                    for ( ContainerHost host : nodeList )
+                    {
+                        nodes.add( host.getId() );
+                    }
+                    environmentWizard.getConfig().setNodes( nodes );
+                }
+            }
+        } );
+
+        //add value change handler
+        seedsSelect.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                if ( event.getProperty().getValue() != null )
+                {
+                    Set<UUID> nodes = new HashSet<UUID>();
+                    Set<ContainerHost> nodeList = ( Set<ContainerHost> ) event.getProperty().getValue();
+                    for ( ContainerHost host : nodeList )
+                    {
+                        nodes.add( host.getId() );
+                    }
+                    environmentWizard.getConfig().setSeedNodes( nodes );
+                }
+            }
+        } );
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
@@ -178,14 +210,13 @@ public class ConfigurationStep extends VerticalLayout
                 {
                     show( "Please provide domain name !" );
                 }
-                else if ( envCombo.getValue() == null || seedsCountCombo.getValue() == null )
+                else if ( environmentWizard.getConfig().getNodes().size() <= 0 )
                 {
-                    show( "Please provide number of nodes and seeds !" );
+                    show( "Please select nodes to be configured !" );
                 }
-                else if ( ( ( Environment ) envCombo.getValue() ).getContainerHosts().size() <= Integer.parseInt(
-                        ( String ) seedsCountCombo.getValue() ))
+                else if ( environmentWizard.getConfig().getSeedNodes().size() <= 0 )
                 {
-                    show( "Number of seeds should be smaller than total number nodes in the cluster !" );
+                    show( "Please select seeds nodes !" );
                 }
                 else
                 {
@@ -220,7 +251,8 @@ public class ConfigurationStep extends VerticalLayout
         content.addComponent( commitLogDirectoryTxtFld );
         content.addComponent( savedCachesDirectoryTxtFld );
         content.addComponent( envCombo );
-        content.addComponent( seedsCountCombo );
+        content.addComponent( allNodesSelect );
+        content.addComponent( seedsSelect );
         content.addComponent( buttons );
 
         addComponent( layout );
@@ -236,6 +268,21 @@ public class ConfigurationStep extends VerticalLayout
         return  false;
     }
 
+
+    public static TwinColSelect getTwinSelect( String title, String captionProperty, String leftTitle,
+                                               String rightTitle, int rows )
+    {
+        TwinColSelect twinColSelect = new TwinColSelect( title );
+        twinColSelect.setItemCaptionPropertyId( captionProperty );
+        twinColSelect.setRows( rows );
+        twinColSelect.setMultiSelect( true );
+        twinColSelect.setImmediate( true );
+        twinColSelect.setLeftColumnCaption( leftTitle );
+        twinColSelect.setRightColumnCaption( rightTitle );
+        twinColSelect.setWidth( 100, Sizeable.Unit.PERCENTAGE );
+        twinColSelect.setRequired( true );
+        return twinColSelect;
+    }
 
     private void show( String notification )
     {
