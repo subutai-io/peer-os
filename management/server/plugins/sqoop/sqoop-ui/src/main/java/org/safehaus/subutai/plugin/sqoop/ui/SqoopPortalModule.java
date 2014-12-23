@@ -9,7 +9,10 @@ import java.util.logging.Logger;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -20,13 +23,19 @@ public class SqoopPortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "sqoop.png";
     protected static final Logger LOG = Logger.getLogger( SqoopPortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
+    private final Sqoop sqoop;
+    private final Tracker tracker;
+    private final EnvironmentManager environmentManager;;
+    private Hadoop hadoop;
 
 
-    public SqoopPortalModule()
+    public SqoopPortalModule( Sqoop sqoop, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager )
     {
-        this.serviceLocator = new ServiceLocator();
+        this.sqoop = sqoop;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
     }
 
 
@@ -68,7 +77,7 @@ public class SqoopPortalModule implements PortalModule
     {
         try
         {
-            return new SqoopComponent( executor, serviceLocator );
+            return new SqoopComponent( executor, sqoop, hadoop, tracker, environmentManager );
         }
         catch ( NamingException e )
         {

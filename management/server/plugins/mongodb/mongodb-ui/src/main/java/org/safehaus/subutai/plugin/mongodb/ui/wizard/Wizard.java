@@ -33,11 +33,11 @@ public class Wizard
     private MongoClusterConfig mongoClusterConfig;// = new MongoClusterConfigImpl();
 
 
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Wizard( ExecutorService executorService, Mongo mongo, Tracker tracker ) throws NamingException
     {
         this.executorService = executorService;
-        this.mongo = serviceLocator.getService( Mongo.class );
-        this.tracker = serviceLocator.getService( Tracker.class );
+        this.mongo = mongo;
+        this.tracker = tracker;
         this.mongoClusterConfig = mongo.newMongoClusterConfigInstance();
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );

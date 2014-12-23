@@ -8,7 +8,10 @@ import java.util.concurrent.Executors;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.slf4j.Logger;
@@ -21,13 +24,19 @@ public class ZookeeperPortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "zookeeper.png";
     protected static final Logger LOG = LoggerFactory.getLogger( ZookeeperPortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
+    private final Hadoop hadoop;
+    private final Zookeeper zookeeper;
+    private final EnvironmentManager environmentManager;
+    private final Tracker tracker;
 
 
-    public ZookeeperPortalModule()
+    public ZookeeperPortalModule( Zookeeper zookeeper, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager)
     {
-        this.serviceLocator = new ServiceLocator();
+        this.zookeeper = zookeeper;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
     }
 
 
@@ -67,7 +76,7 @@ public class ZookeeperPortalModule implements PortalModule
     {
         try
         {
-            return new ZookeeperComponent( executor, serviceLocator );
+            return new ZookeeperComponent( executor, zookeeper, hadoop, tracker, environmentManager );
         }
         catch ( NamingException e )
         {

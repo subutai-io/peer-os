@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="manager" availability="mandatory"
+  <reference id="storm" availability="mandatory"
              interface="org.safehaus.subutai.plugin.storm.api.Storm" />
-  <reference id="tracker" availability="mandatory"
-             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
   <reference id="zookeeper" availability="mandatory"
              interface="org.safehaus.subutai.plugin.zookeeper.api.Zookeeper" />
+  <reference id="tracker" availability="mandatory"
+             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+  <reference id="environmentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
+
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.storm.ui.StormPortalModule"
         init-method="init" destroy-method="destroy">
+    <argument ref="storm" />
+    <argument ref="zookeeper" />
+    <argument ref="tracker" />
+    <argument ref="environmentManager" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />

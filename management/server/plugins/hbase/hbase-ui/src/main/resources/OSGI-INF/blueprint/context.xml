@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <!--<reference id="hbaseManager" availability="mandatory"
-             interface="org.safehaus.subutai.plugin.hbase.api.HBase" />
-  <reference id="tracker" availability="mandatory"
-             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
-  <reference id="hadoopManager" availability="mandatory"
-             interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />-->
+  <reference id="hBase" availability="mandatory" interface="org.safehaus.subutai.plugin.hbase.api.HBase" />
+  <reference id="hadoop" availability="mandatory" interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
+  <reference id="tracker" availability="mandatory" interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+  <reference id="environmentManager" availability="mandatory" interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.hbase.ui.HBasePortalModule"
         init-method="init" destroy-method="destroy">
+    <argument ref="hBase" />
+    <argument ref="hadoop" />
+    <argument ref="tracker" />
+    <argument ref="environmentManager" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />

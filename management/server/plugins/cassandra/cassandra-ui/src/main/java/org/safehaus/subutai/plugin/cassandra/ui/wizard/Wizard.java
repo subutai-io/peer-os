@@ -28,12 +28,12 @@ public class Wizard
     private CassandraClusterConfig config = new CassandraClusterConfig();
 
 
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Wizard( ExecutorService executorService, Cassandra cassandra, Tracker tracker ) throws NamingException
     {
 
-        this.cassandra = serviceLocator.getService( Cassandra.class );
+        this.cassandra = cassandra;
         this.executorService = executorService;
-        this.tracker = serviceLocator.getService( Tracker.class );
+        this.tracker = tracker;
 
         verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();

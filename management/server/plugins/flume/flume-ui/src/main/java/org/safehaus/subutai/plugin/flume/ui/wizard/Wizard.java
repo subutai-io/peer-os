@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.flume.api.Flume;
@@ -31,14 +30,14 @@ public class Wizard
     private HadoopClusterConfig hadoopConfig;
 
 
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Wizard( ExecutorService executorService, Flume flume, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
 
-        this.hadoop = serviceLocator.getService( Hadoop.class );
         this.executorService = executorService;
-        this.flume = serviceLocator.getService( Flume.class );
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.flume = flume;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
 
 
         grid = new GridLayout( 1, 20 );

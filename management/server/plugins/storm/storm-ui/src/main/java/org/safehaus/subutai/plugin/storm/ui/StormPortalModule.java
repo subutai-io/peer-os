@@ -9,8 +9,11 @@ import java.util.logging.Logger;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.storm.api.Storm;
 import org.safehaus.subutai.plugin.storm.api.StormClusterConfiguration;
+import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -20,13 +23,19 @@ public class StormPortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "storm.png";
     protected static final Logger LOG = Logger.getLogger( StormPortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
+    private final Storm storm;
+    private final Tracker tracker;
+    private Zookeeper zookeeper;
+    private final EnvironmentManager environmentManager;
 
 
-    public StormPortalModule()
+    public StormPortalModule( Storm storm, Zookeeper zookeeper,  Tracker tracker, EnvironmentManager environmentManager)
     {
-        serviceLocator = new ServiceLocator();
+        this.storm = storm;
+        this.zookeeper = zookeeper;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
     }
 
 
@@ -69,7 +78,7 @@ public class StormPortalModule implements PortalModule
     {
         try
         {
-            return new StormComponent( executor, serviceLocator );
+            return new StormComponent( executor, storm, zookeeper, tracker, environmentManager );
         }
         catch ( NamingException e )
         {

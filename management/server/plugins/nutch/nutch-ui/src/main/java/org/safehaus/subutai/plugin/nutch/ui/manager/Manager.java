@@ -15,7 +15,6 @@ import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -65,13 +64,13 @@ public class Manager
     private final EnvironmentManager environmentManager;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Manager( final ExecutorService executorService, Nutch nutch, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
         this.executorService = executorService;
-        this.nutch = serviceLocator.getService( Nutch.class );
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.nutch = nutch;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
 
 
         contentRoot = new GridLayout();
