@@ -9,12 +9,12 @@ CMD_PATT="zookeeper"
 
 is_running()
 {
-    if [ -f $PIDFILE ]; then
-        pid=`cat $PIDFILE`
-        grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 0
-        return 1
-    fi
-    return 3
+  if [ -f $PIDFILE ]; then
+    pid=`cat $PIDFILE`
+    grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 0
+    return 1
+  fi
+  return 3
 }
 
 
@@ -26,24 +26,21 @@ fi
 case "$1" in
 start)
   start-stop-daemon --start --exec $ZOOKEEPER_HOME/bin/zookeeper.sh start
-  ;;
-
+;;
 stop)
   start-stop-daemon --start --exec $ZOOKEEPER_HOME/bin/zookeeper.sh stop
-  ;;
-
+;;
 restart)
   $0 stop
   $0 start
-  ;;
-
+;;
 status)
   is_running
   stat=$?
   case "$stat" in
     0)
-      PID=`cat $PIDFILE`
-      log_success_msg "$DESC is running(PID:$PID)" ;;
+      pid=`cat $PIDFILE`
+      log_success_msg "$DESC is running(pid:$pid)" ;;
     1)
       log_failure_msg "could not access pidfile for $DESC" ;;
     *)
