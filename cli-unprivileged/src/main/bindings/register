@@ -120,10 +120,11 @@ function register {
   fi
 
   debian_root="$SUBUTAI_TMPDIR/$container"
-  pkg="`cat /var/lib/lxc/$container/config | \
+  pkg="`cat $HOME/.local/share/lxc/$container/config | \
      grep subutai.template.package | awk '{print $3}'`"
+  config_dir="$HOME/.local/share/lxc/$container"
   
-  send_n_register $pkg $SUBUTAI_TMPDIR/$container 
+  send_n_register $pkg $config_dir 
  
   if [ "`is_registered $container`" == "true" ]; then
     notify_template_import $container

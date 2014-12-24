@@ -10,7 +10,7 @@ export SUBUTAI_VERSION=1.0.1
 export SUBUTAI_SITE_GIT=git@gw:subutai.git
 
 # A large area where some debian package builds occur
-export SUBUTAI_TMPDIR=/$HOME/lxc-data/tmpdir
+export SUBUTAI_TMPDIR=$HOME/.local/lxc-data/tmpdir
 
 # Default set of packages to install on all containers
 export SUBUTAI_PACKAGES=git
@@ -67,6 +67,6 @@ export SUBUTAI_REST_PORT=8181
 export SUBUTAI_REST_PATH=cxf
 # Below are paths to specific actions, do not inclue leading and trailing
 # slashes in paths
-export SUBUTAI_REST_REGISTER_PATH=template
+export SUBUTAI_REST_REGISTER_PATH=registry/templates/import
 export SUBUTAI_REST_GET_TEMPLATE_PATH=registry/templates
 export SUBUTAI_REST_LIST_TEMPLATES=$SUBUTAI_REST_GET_TEMPLATE_PATH/plain-list
