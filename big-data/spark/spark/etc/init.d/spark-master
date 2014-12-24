@@ -3,7 +3,7 @@
 
 sparkVer="spark-1.0.0"
 if [ -d "/var/run/spark" ]; then
-	pidMaster=`ls -alt /var/run/spark/ | grep spark-.*.Master-.*.pid | head -1 | awk -F " " '{print $9}'`
+  pidMaster=`ls -alt /var/run/spark/ | grep spark-.*.Master-.*.pid | head -1 | awk -F " " '{print $9}'`
 fi
 
 pidFile=/var/run/spark/$pidMaster
@@ -18,71 +18,70 @@ export SPARK_PID_DIR=$PIDDIR
 CMD_PATT="spark"
 is_master_running()
 {
-    if [ -f $pidFile ] && [ "x$pidFile" != "x" ]; then
-        pid=`cat $pidFile`
-        grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 1 
-        return 0
-    fi
-    return 2
+  if [ -f $pidFile ] && [ "x$pidFile" != "x" ]; then
+    pid=`cat $pidFile`
+    grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 1 
+    return 0
+  fi
+  return 2
 }
 
 case "$1" in
-start)
-	$sbin/start-master.sh ;;
-stop)
-	is_master_running
-	stat=$?
- 	case "$stat" in
-            0)
-                 echo "Spark Master is NOT running." ;;
-            1)
-	        pidW=`cat $pidFile`
-                echo "Stopping Spark Master with pid $pidW."
-                start-stop-daemon -K -p "$pidFile" -R TERM/30/KILL/5 >/dev/null;;
-	    2)
-		echo "Pid file does not exists in \"/var/run/spark/\" directory." ;;
-            *)
-                echo "Something went wrong" ;;
-        esac ;;
-restart)
-        $0 stop
-        $0 start ;;
-status)
-        is_master_running 
-        stat=$?
-	case "$stat" in 
-        	0)
-	           echo "Spark Master is NOT running." ;;
-		1)
-                   masterPid=`cat $pidFile`
-                   echo "Spark Master is running with pid $masterPid." ;;
-		2) 
-		   echo "Pid file does not exists in \"/var/run/spark/\" directory." ;; 
-		*)
-	           echo "Something went wrong." ;;
-	esac ;;
-kill)
-	is_master_running
-	stat=$?
-	case "$stat" in
-		0)
-		  echo "No Spark Master to kill." 
-                  echo "Removing pidfile : $pidFile." 
-                  rm $pidFile ;;
-
-		1)
-        	  pidW=`cat $pidFile`
-                  echo "Stopping Spark Master with pid $pidW."
-                  start-stop-daemon -K -p "$pidFile" -R TERM/30/KILL/5 >/dev/null
-	          echo "Removing pidfile : $pidFile." 
-		  rm $pidFile ;;
-		2)
-		  echo "Pid file does not exists in \"/var/run/spark/\" directory." ;;
-		*)
-		  echo "Pid file does not exists in \"/var/run/spark/\" directory." ;; 
-	esac ;;
-*)
-        echo "Usage: $0 {start|stop|restart|status|kill}"
-        exit 1
+  start)
+    $sbin/start-master.sh ;;
+  stop)
+    is_master_running
+    stat=$?
+    case "$stat" in
+      0)
+        echo "Spark Master is NOT running." ;;
+      1)
+        pidW=`cat $pidFile`
+        echo "Stopping Spark Master with pid $pidW."
+        start-stop-daemon -K -p "$pidFile" -R TERM/30/KILL/5 >/dev/null;;
+      2)
+        echo "Pid file does not exists in \"/var/run/spark/\" directory." ;;
+      *)
+        echo "Something went wrong" ;;
+    esac ;;
+  restart)
+    $0 stop
+    $0 start ;;
+    status)
+    is_master_running 
+    stat=$?
+    case "$stat" in 
+      0)
+        echo "Spark Master is NOT running." ;;
+      1)
+        masterPid=`cat $pidFile`
+        echo "Spark Master is running (pid:$masterPid)." ;;
+      2) 
+        echo "Pid file does not exists in \"/var/run/spark/\" directory." ;; 
+      *)
+        echo "Something went wrong." ;;
+      esac ;;
+  kill)
+    is_master_running
+    stat=$?
+    case "$stat" in
+      0)
+        echo "No Spark Master to kill." 
+        echo "Removing pidfile : $pidFile." 
+        rm $pidFile ;;
+      1)
+        pidW=`cat $pidFile`
+        echo "Stopping Spark Master with pid $pidW."
+        start-stop-daemon -K -p "$pidFile" -R TERM/30/KILL/5 >/dev/null
+        echo "Removing pidfile : $pidFile." 
+        rm $pidFile ;;
+      2)
+        echo "Pid file does not exists in \"/var/run/spark/\" directory." ;;
+      *)
+        echo "Pid file does not exists in \"/var/run/spark/\" directory." ;; 
+    esac 
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status|kill}"
+    exit 1
 esac
-
