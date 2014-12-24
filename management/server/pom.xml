@@ -19,8 +19,7 @@
     <module>subutai-common-implementation</module>
     <module>subutai-common-datasource</module>
     <module>vaadin</module>
-    <module>plugins</module>
-
+    <!--<module>plugins</module>-->
     <module>subutai-features</module>
     <module>server-karaf</module>
   </modules>
