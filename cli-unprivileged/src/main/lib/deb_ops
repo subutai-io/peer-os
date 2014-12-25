@@ -78,7 +78,7 @@ function deb_pkg {
   # ----------------------------------------------------------------------------
   # (4) insert subutai.template.package info inside containers config file
   # ----------------------------------------------------------------------------
-  conf="/var/lib/lxc/$lxc/config"
+  conf="$HOME/.local/share/lxc/$lxc/config"
   propline="`cat $conf | grep subutai.template.package`"
 
   if [ -z "$propline" ]; then

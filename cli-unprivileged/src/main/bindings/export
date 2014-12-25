@@ -124,7 +124,7 @@ function export {
   propline="`cat $conf | grep subutai.template.package`"
 
   if [ -z "$propline" ]; then
-    echo "subutai.template.package = $debian_dir.deb" >> $HOME/.local/share/lxc/$container/config
+    echo "subutai.template.package = $debian_dir.deb" | sudo tee $HOME/.local/share/lxc/$container/config > /dev/null
     debian_file=$debian_dir".deb"
   else
     debian_file=`echo $propline | awk '{print $3}'`
