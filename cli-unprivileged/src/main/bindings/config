@@ -113,16 +113,17 @@ function config_del {
     msg_info "    - check passed: \"$path\" is a normal directory and exists."
   fi
 
+  lxc_chown $lxc
   # check that the path is present in the lxc config
   local found="false"
-  local lxc_root="/var/lib/lxc/$lxc"
+  local lxc_root="$HOME/.local/share/lxc/$lxc"
   local lxc_conf="$lxc_root/config"
   for entry in `cat $lxc_conf | grep subutai.config.path | awk '{print $3}'`; do
     # test if the path is equal to the entry
     if [ "$path" == "$entry" ]; then
       found="true"
       msg_info "    - check passed: \"$path\" component used for configs."
-      cat $lxc_conf | grep -v "$path" >> $lxc_conf.new
+      cat $lxc_conf | grep -v "$path" | tee -a $lxc_conf.new
       rm $lxc_conf
       mv $lxc_conf.new $lxc_conf
     fi
@@ -151,22 +152,20 @@ function config_del {
     # if the parent ignore file exist and our comp is NOT listed in it add it 
     if [ -f "$ignore" ]; then
       if [ -z "`cat $ignore | grep $comp`" ]; then
-        echo "$comp" >> "$ignore"
+        echo "$comp" | tee -a "$ignore"
         continue
       fi
     fi
   done
-
-#  git -C $lxc_root/rootfs add $first_comp $lxc_root/rootfs/.gitignore
-
-  
+  lxc_mapshifting $lxc
+#  git -C $lxc_root/rootfs add $first_comp $lxc_root/rootfs/.gitignore 
 }
 
 
 function config_add {
   local lxc="$1"
   local path="$2"
-  local lxc_root="/var/lib/lxc/$lxc"
+  local lxc_root="$HOME/.local/share/lxc/$lxc"
   local lxc_conf="$lxc_root/config"
 
 
@@ -190,7 +189,8 @@ function config_add {
     fi
   done
 
-  echo "subutai.config.path = $path" >> "$lxc_root/config"
+  lxc_chown $lxc
+  echo "subutai.config.path = $path" | tee -a "$lxc_root/config"
 
   # the current directory we are in
   local current="$lxc_root/rootfs"
@@ -210,7 +210,7 @@ function config_add {
     # if the parent ignore file exist and our comp is listed in it remove it
     if [ -f "$ignore" ]; then
       if [ -n "`cat $ignore | grep $comp`" ]; then
-        cat $ignore | grep -v $comp >> "$ignore.new"
+        cat $ignore | grep -v $comp | tee -a "$ignore.new"
         rm $ignore
         mv $ignore.new $ignore
         parent_mod="true"
@@ -227,7 +227,7 @@ function config_add {
     else
       for item in `ls $parent`; do
         if [ ! "$item" == "$comp" ]; then
-          echo "$item" >> $ignore 
+          echo "$item" | sudo tee -a $ignore        
         fi
         parent_mod="false"
       done 
@@ -235,7 +235,7 @@ function config_add {
   done
 
   git -C $lxc_root/rootfs add $first_comp $lxc_root/rootfs/.gitignore
-  
+  lxc_mapshifting $lxc 
 }
 
 
