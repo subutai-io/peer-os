@@ -1,9 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 # Starts and stops spark.
 
 sparkVer="spark-1.0.0"
 if [ -d "/var/run/spark/" ]; then
-  pidWorker=`ls -alt /var/run/spark/ | grep spark-.*.Worker-.*.pid | head -1 | awk -F " " '{print $9}'`
+	pidWorker=`ls -alt /var/run/spark/ | grep spark-.*.Worker-.*.pid | head -1 | awk -F " " '{print $9}'`
 fi
 
 pidFile=/var/run/spark/$pidWorker
@@ -18,72 +18,71 @@ CMD_PATT="spark"
 export SPARK_PID_DIR=$PIDDIR
 
 CMD_PATT="spark"
-is_slave_running()
-{
+check_process(){
+  if [ $# == 1 ]; then
+    role=$1
+  elif [ $# == 2 ]; then
+    pid_file=$1
+    role=$2
+  fi
   if [ -f $pidFile ] && [ "x$pidFile" != "x" ]; then
     pid=`cat $pidFile`
-    grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 1 
+    if grep -Eq "$CMD_PATT" "/proc/$pid/cmdline"; then
+      log_success_msg "Spark $role is running (pid:$pid)"
+      return 0
+    else
+      log_failure_msg "could not access pidfile"
+      return 1
+    fi
+  else
+    log_success_msg "Spark $role is NOT running"
     return 0
   fi
-  return 2
 }
+
+
+kill_service(){
+  pid_file=$1
+  is_running $pid_file
+  stat=$?
+  if [ "$stat" == "1" ]; then
+    start-stop-daemon -K -p "$pid_dir/$pid_file" -R TERM/30/KILL/5 >/dev/null
+  fi
+  if [ -f $pid_dir/$pid_file ];then
+    rm $pid_dir/$pid_file
+  fi
+}
+
+
+is_running(){
+  pid_file_name=$1
+  if [ -f $pid_dir/$pid_file_name ] && [ "x$pid_file_name" != "x" ]; then
+    pid=`cat $pid_dir/$pid_file_name`
+    if grep -Eq "$CMD_PATT" "/proc/$pid/cmdline"; then
+      return 1;
+    fi
+  fi
+  return 0
+}
+
 
 case "$1" in
   start)
     $sbin/start-slave.sh 1 spark://$SPARK_MASTER_IP:7077
     ;;
   stop)
-    is_slave_running
-    stat=$?
-    case "$stat" in
-      0)
-        echo "Spark Worker is NOT running." ;;
-      1)
-        pidW=`cat $pidFile`
-        echo "Stopping Spark Worker with pid $pidW."
-        start-stop-daemon -K -p "$pidFile" -R TERM/30/KILL/5 >/dev/null;;
-      2)
-        echo "Pid file does not exists in \"/var/run/spark/\" directory." ;;
-      *)
-        echo "Something went wrong." ;;
-    esac ;;
+    kill_service $pidWorker
+    ;;
   restart)
     $0 stop
-    $0 start ;;
+    $0 start 
+    ;;
   status)
-    is_slave_running 
-    stat=$?
-    case "$stat" in 
-      0)
-        echo "Spark Worker is NOT running." ;;
-      1)
-        slavePid=`cat $pidFile`
-        echo "Spark Worker is running (pid:$slavePid)." ;;
-      2)
-        echo "Pid file does not exists in \"/var/run/spark/\" directory.";;
-      *)
-        echo "Something went wrong." ;;
-    esac ;;
+    check_process $pidWorker "Worker"
+    ;;	
   kill)
-    is_slave_running
-    stat=$?
-    case "$stat" in
-      0)
-        echo "No Spark Worker to kill." 
-        echo "Removing pidfile : $pidFile." 
-        rm $pidFile ;;
-
-      1)
-        pidW=`cat $pidFile`
-        echo "Stopping Spark Worker with pid $pidW."
-        start-stop-daemon -K -p "$pidFile" -R TERM/30/KILL/5 >/dev/null
-        echo "Removing pidfile : $pidFile." 
-        rm $pidFile ;;
-      2)
-        echo "Pid file does not exists in \"/var/run/spark/\" directory." ;;
-      *)
-        echo "Something went wrong." ;; 
-    esac ;;
+    kill_process $pidWorker
+    ;;
   *)
     echo "Usage: $0 {start|stop|restart|status|kill}"
     exit 1

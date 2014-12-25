@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 # Starts and stops spark.
 
 sparkVer="spark-1.0.0"
 if [ -d "/var/run/spark" ]; then
-  Master=`ls -alt /var/run/spark/ | grep spark-.*.Master-.*.pid | head -1 | awk -F " " '{print $9}'`
-  Worker=`ls -alt /var/run/spark/ | grep spark-.*.Worker-.*.pid | head -1 | awk -F " " '{print $9}'`
+  Master=`ls -alt /var/run/spark/ | grep spark-.*.Master-.*.pid | head -1 | awk '{print $9}'`
+  Worker=`ls -alt /var/run/spark/ | grep spark-.*.Worker-.*.pid | head -1 | awk '{print $9}'`
 fi
 pidMaster=/var/run/spark/$Master
 pidWorker=/var/run/spark/$Worker
@@ -17,36 +17,53 @@ CMD_PATT="spark"
 
 export SPARK_PID_DIR=$PIDDIR
 
-is_slave_running()
-{
-  if [ -f $pidWorker ] && [ "x$pidWorker" != "x" ]; then
-    pidM=`cat $pidWorker`
-    grep -Eq "$CMD_PATT" "/proc/$pidM/cmdline" 2>/dev/null && return 1 
+check_process(){
+  if [ $# == 1 ]; then
+    role=$1
+  elif [ $# == 2 ]; then
+    pid_file=$1
+    role=$2
+  fi
+  if [ -f $pid_file ] && [ "x$pid_file" != "x" ]; then
+    pid=`cat $pid_file`
+    if grep -Eq "$CMD_PATT" "/proc/$pid/cmdline"; then
+      log_success_msg "Spark $role is running (pid:$pid)"
+      return 0
+    else
+      log_failure_msg "could not access pidfile"
+      return 1
+    fi
+  else
+    log_success_msg "$role is NOT running"
     return 0
   fi
-  return 2 
 }
 
-is_master_running()
-{
-  if [ -f $pidMaster ] && [ "x$pidMaster" != "x" ]; then
-    pidW=`cat $pidMaster`
-    grep -Eq "$CMD_PATT" "/proc/$pidW/cmdline" 2>/dev/null && return 1 
-    return 0
+
+kill_service(){
+  pid_file=$1
+  is_running $pid_file
+  stat=$?
+  if [ "$stat" == "1" ]; then
+    start-stop-daemon -K -p "$pid_dir/$pid_file" -R TERM/30/KILL/5 >/dev/null
   fi
-  return 2
+  if [ -f $pid_dir/$pid_file ];then
+    rm $pid_dir/$pid_file
+  fi
 }
 
-calculate()
-{
-  is_master_running
-  first=$?
-  is_slave_running
-  second=$?
-  a=$((first * 2))
-  b=$((second * 1))
-  return "$((a + b))"
+
+is_running(){
+  pid_file_name=$1
+  if [ -f $pid_dir/$pid_file_name ] && [ "x$pid_file_name" != "x" ]; then
+    pid=`cat $pid_dir/$pid_file_name`
+    if grep -Eq "$CMD_PATT" "/proc/$pid/cmdline"; then
+      return 1;
+    fi
+  fi
+  return 0
 }
+
 
 case "$1" in
   start)
@@ -60,128 +77,14 @@ case "$1" in
     $0 stop
     $0 start ;;
   status)
-    calculate
-    stat=$?
-    case "$stat" in
-      0)
-        echo "Spark Master is NOT running."
-        echo "Spark Worker is NOT running." ;;
-      1)
-        pidW=`cat $pidWorker`
-        echo "Spark Master is NOT running."
-        echo "Spark Worker is running (pid:$pidW)." ;;
-      2)
-        if [ -f "$pidWorker" ];then
-          pidM=`cat $pidMaster`
-          echo "Spark Master is running (pid:$pidM)."
-          echo "Spark Worker is NOT running."
-        else
-          echo "Spark Master is NOT running."
-          echo "Spark Worker pid file does not exists."
-        fi ;;
-      3)
-        pidM=`cat $pidMaster`
-        pidW=`cat $pidWorker`
-        echo "Spark Master is running (pid:$pidM)."
-        echo "Spark Worker is running (pid:$pidW)." ;;
-      4)
-        if [ -f "$pidMaster" ];then
-          pidM=`cat $pidMaster`
-          echo "Spark Master is running (pid:$pidM)."
-          echo "Spark Worker pid file does not exists."
-        else
-          echo "Spark Master pid file does not exists."
-          echo "Spark Worker is NOT running."
-        fi ;;
-      5)
-        pidW=`cat $pidWorker`
-        echo "Spark Master pid file does not exists."
-        echo "Spark Worker is running (pid:$pidW).";;
-      6)
-        echo "Spark Master pid file does not exists."
-        echo "Spark Worker pid file does not exists.";;
-      *)
-        echo "Something went wrong."
-    esac
-    ;;    
+    check_process $pidMaster "Master"
+    check_process $pidWorker "Worker"
+    ;;		
   kill)
-    calculate
-    stat=$?
-    case "$stat" in
-      0)
-        echo "No Spark Master to kill."
-        echo "Removing pidfile : $pidMaster." 
-        rm $pidMaster 
-        echo "No Spark Worker to kill." 
-        echo "Removing pidfile : $pidWorker." 
-        rm $pidWorker ;;
-      1)
-        echo "No Spark Master to kill."
-        echo "Removing pidfile : $pidMaster." 
-        rm $pidMaster 
-        pidW=`cat $pidWorker`
-        echo "Stopping Spark Worker with pid $pidW."
-        start-stop-daemon -K -p "$pidWorker" -R TERM/30/KILL/5 >/dev/null
-        echo "Removing pidfile : $pidWorker." 
-        rm $pidWorker ;;
-      2)
-        if [ -f "$pidWorker" ];then
-          pidM=`cat $pidMaster`
-          echo "Stopping Spark Master with pid $pidM."
-          start-stop-daemon -K -p "$pidMaster" -R TERM/30/KILL/5 >/dev/null
-          echo "Removing pidfile : $pidMaster."
-          rm $pidMaster
-          echo "Removing pidfile : $pidWorker."
-          rm $pidWorker
-        else
-          echo "Removing pidfile : $pidMaster." 
-          rm $pidMaster
-          echo "Spark Worker pid file does not exists." 
-        fi ;;
-      3)
-        pidM=`cat $pidMaster`
-        echo "Stopping Spark Master with pid $pidM."
-        start-stop-daemon -K -p "$pidMaster" -R TERM/30/KILL/5 >/dev/null
-        echo "Removing pidfile : $pidMaster."
-        rm $pidMaster
-
-        pidW=`cat $pidWorker`
-        echo "Stopping Spark Worker with pid $pidW."
-        start-stop-daemon -K -p "$pidWorker" -R TERM/30/KILL/5 >/dev/null
-        echo "Removing pidfile : $pidWorker." 
-        rm $pidWorker
-        ;;
-      4)
-        if [ -f "$pidMaster" ];then
-          pidM=`cat $pidMaster`
-          echo "Stopping Spark Master with pid $pidM."
-          start-stop-daemon -K -p "$pidMaster" -R TERM/30/KILL/5 >/dev/null
-          echo "Removing pidfile : $pidMaster."
-          rm $pidMaster
-          echo "Spark Worker pid file does not exists."
-        else
-          echo "Spark Master pid file does not exists."
-          pidW=`cat $pidWorker`
-          echo "Removing pidfile : $pidWorker." 
-          rm $pidWorker
-        fi ;;
-      5)
-        echo "Spark Master pid file does not exists."
-        pidW=`cat $pidWorker`
-        echo "Stopping Spark Worker with pid $pidW."
-        start-stop-daemon -K -p "$pidWorker" -R TERM/30/KILL/5 >/dev/null
-        echo "Removing pidfile : $pidWorker." 
-        rm $pidWorker ;; 
-      6)
-        echo "Spark Master pid file does not exists."
-        echo "Spark Worker pid file does not exists." ;;
-            
-      *)
-        echo "Something went wrong."
-    esac
-     ;;
+    kill_service $pidMaster
+    kill_service $pidWorker 	 
+    ;;
   *)
     echo "Usage: $0 {start|stop|restart|status|kill}"
     exit 1 ;;
 esac
-
