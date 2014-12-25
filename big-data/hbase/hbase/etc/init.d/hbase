@@ -25,48 +25,25 @@ if [ ! -f "$pid_dir/*-master.pid" ]; then
 fi
 
 CMD_PATT="hbase"
-is_master_running()
-{
-  if [ -f $pid_dir/$pidMaster ] && [ "x$pidMaster" != "x" ]; then
-    pid=`cat $pid_dir/$pidMaster`
-    if grep -Eq "$CMD_PATT" "/proc/$pid/cmdline"; then
-      log_success_msg "HMaster is running (pid:$pid)"
-    else
-      log_failure_msg "could not access pidfile"
-    fi
-  else
-    log_success_msg "HMaster is NOT running"
+
+check_process(){
+  if [ $# == 1 ]; then
+    role=$1
+  elif [ $# == 2 ]; then
+    pid_file=$1
+    role=$2
   fi
-}
-
-is_zookeeper_running()
-{
-  if [ -f $pid_dir/$pidZookeeper ] && [ "x$pidZookeeper" != "x" ]; then
-    pid=`cat $pid_dir/$pidZookeeper`
+  if [ -f $pid_dir/$pid_file ] && [ "x$pid_file" != "x" ]; then
+    pid=`cat $pid_dir/$pid_file`
     if grep -Eq "$CMD_PATT" "/proc/$pid/cmdline"; then
-      log_success_msg "HQuorumPeer is running (pid:$pid)"
-    else
-      log_failure_msg "could not access pidfile"
-    fi
-  else
-    log_success_msg "HQuorumPeer is NOT running"
-  fi
-}
-
-
-is_region_running()
-{
-  if [ -f $pid_dir/$pidRegion ] && [ "x$pidRegion" != "x" ]; then
-    pid=`cat $pid_dir/$pidRegion`
-    if grep -Eq "$CMD_PATT" "/proc/$pid/cmdline"; then
-      log_success_msg "HRegionServer is running (pid:$pid)"
+      log_success_msg "$role is running (pid:$pid)"
       return 0
     else
       log_failure_msg "could not access pidfile"
       return 1
     fi
   else
-    log_success_msg "HRegionServer is NOT running"
+    log_success_msg "$role is NOT running"
     return 0
   fi
 }
@@ -114,9 +91,9 @@ case "$1" in
   ;;
 
   status)
-    is_master_running
-    is_zookeeper_running 
-    is_region_running
+    check_process $pidMaster "HMaster"
+    check_process $pidZookeeper "HQuorumPeer"
+    check_process $pidRegion "HRegionServer"
     ;;
   kill)
     kill_service $pidMaster
