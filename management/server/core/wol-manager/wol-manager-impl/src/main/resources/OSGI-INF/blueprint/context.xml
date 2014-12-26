@@ -1,30 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-<reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
-<bean id="wolManager" scope="singleton" class="org.safehaus.subutai.wol.impl.WolImpl">
+  <bean id="wolManager" scope="singleton" class="org.safehaus.subutai.wol.impl.WolImpl">
     <argument ref="peerManager" />
-</bean>
-
-<service ref="wolManager" interface="org.safehaus.subutai.wol.api.WolManager" />
-
-  <!--Plugin Manager Services-->
-  <!--<reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />-->
-
-  <reference id="tracker" availability="mandatory"
-             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
-
-  <bean id="pluginManager" class="org.safehaus.subutai.wol.impl.manager.PluginManagerImpl" activation="eager">
-    <argument ref="peerManager" />
-    <property name="tracker" ref="tracker" />
   </bean>
 
-  <service ref="pluginManager" interface="org.safehaus.subutai.wol.api.PluginManager" />
-
-  <!--<bean id="pluginInfo" class="org.safehaus.subutai.wol.impl.manager.PluginInfoImpl" activation="eager">-->
-  <!--</bean>-->
-
-  <!--<service ref="pluginInfo" interface="org.safehaus.subutai.wol.api.PluginInfo" />-->
+  <service ref="wolManager" interface="org.safehaus.subutai.wol.api.WolManager" />
 
 </blueprint>
