@@ -12,9 +12,8 @@ import org.safehaus.subutai.common.quota.QuotaType;
 public interface QuotaManager
 {
     /**
-     * Set Quota for container specified with parameters passed parameter as value to change, it is enum and specific
-     * value specified in enum key and newValue can be in any format for setting new value. host is a host with
-     * collection of container we intend to modify
+     * Set Quota for container specified with parameters passed containerName - the target container to set quota on,
+     * QuotaInfo - about quota information containing quota key and value in preformatted string values
      */
     public void setQuota( String containerName, QuotaInfo quota ) throws QuotaException;
 

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <!--Plugin Manager UI-->
+
+  <reference id="tracker" availability="mandatory"
+             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+
+  <bean id="module2" scope="singleton" class="org.safehaus.subutai.core.backup.ui.PluginManagerPortalModule"
+        init-method="init" destroy-method="destroy">
+    <property name="tracker" ref="tracker" />
+  </bean>
+
+  <service ref="module2" interface="org.safehaus.subutai.core.backup.ui.PortalModule" />
+
+</blueprint>

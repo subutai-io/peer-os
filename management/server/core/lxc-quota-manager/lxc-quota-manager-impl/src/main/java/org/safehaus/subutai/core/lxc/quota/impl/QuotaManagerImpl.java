@@ -115,10 +115,15 @@ public class QuotaManagerImpl implements QuotaManager
             {
                 return new PeerQuotaInfo( new HddQuotaInfo( "rootfs", commandResult.getStdOut() ) );
             }
-            else
+            else if ( quotaType == QuotaType.QUOTA_HDD_VAR )
             {
                 //defaul QuotaType.QUOTA_HDD_VAR
                 return new PeerQuotaInfo( new HddQuotaInfo( "var", commandResult.getStdOut() ) );
+            }
+            else
+            {
+                LOGGER.error( "Error in getQuota. Unsupported quota type." );
+                throw new QuotaException( "Specify correct quota type: " + cmd );
             }
         }
         catch ( CommandException | HostNotFoundException e )

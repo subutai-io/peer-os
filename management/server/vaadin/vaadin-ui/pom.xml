@@ -31,101 +31,6 @@
   <name>Subutai Vaadin OSGi UI</name>
   <description>Subutai Vaadin OSGi UI</description>
 
-  <build>
-    <finalName>vaadin-ui</finalName>
-    <plugins>
-      <!--<plugin>-->
-      <!--<groupId>org.apache.maven.plugins</groupId>-->
-      <!--<artifactId>maven-jar-plugin</artifactId>-->
-      <!--<configuration>-->
-      <!--&lt;!&ndash;<finalName>${artifactId}-${project.version}</finalName>&ndash;&gt;-->
-      <!--<archive>-->
-      <!--<manifest>-->
-      <!--<addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
-      <!--</manifest>-->
-      <!--<manifestEntries>-->
-      <!--<Implementation-Build>${parent.version}</Implementation-Build>-->
-      <!--</manifestEntries>-->
-      <!--</archive>-->
-      <!--</configuration>-->
-      <!--<executions>-->
-      <!--<execution>-->
-      <!--<id>make-a-jar</id>-->
-      <!--<phase>compile</phase>-->
-      <!--<goals>-->
-      <!--<goal>jar</goal>-->
-      <!--</goals>-->
-      <!--</execution>-->
-      <!--</executions>-->
-      <!--</plugin>-->
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <supportedProjectTypes>
-            <supportedProjectType>war</supportedProjectType>
-          </supportedProjectTypes>
-          <instructions>
-            <Bundle-SymbolicName>${project.groupId}.server.ui</Bundle-SymbolicName>
-            <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
-
-            <!-- Add Embed lib -->
-            <Embed-Directory>WEB-INF/lib</Embed-Directory>
-            <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-            <Import-Package>*;resolution:=optional</Import-Package>
-            <Export-Package>
-              com.vaadin.ui.*;
-              com.vaadin.data.*;
-              com.vaadin.server.*;
-              com.vaadin.event.*;
-              com.vaadin.client.*;
-              com.vaadin.shared.*;
-              com.google.gwt.*;
-              org.json.*;
-              {local-packages};version=${project.version};-noimport:=true
-            </Export-Package>
-
-            <!-- Package format version - do not change -->
-            <Vaadin-Package-Version>${project.version}</Vaadin-Package-Version>
-
-            <!-- Comma-separated list of widgetsets in the package -->
-            <Vaadin-Widgetsets>org.safehaus.subutai.server.ui.widgetset.PortalWidgetset</Vaadin-Widgetsets>
-
-            <!-- OSGi war spec config -->
-            <Web-ContextPath>subutai</Web-ContextPath>
-          </instructions>
-        </configuration>
-        <executions>
-          <execution>
-            <id>bundle-manifest</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>manifest</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <configuration>
-          <attachClasses>true</attachClasses>
-          <webResources>
-            <resource>
-              <filtering>true</filtering>
-              <directory>src/main/webapp</directory>
-              <includes>
-                <include>**/web.xml</include>
-              </includes>
-            </resource>
-          </webResources>
-          <archive>
-            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
-          </archive>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
   <profiles>
     <profile>
       <!-- Updates Vaadin widgetset definitions based on project dependencies Remove widgetset directory to trigger recompile: rm -Rf src/main/webapp/VAADIN/widgetsets/ -->
@@ -224,4 +129,101 @@
       <version>${org.apache.shiro.version}</version>
     </dependency>
   </dependencies>
+
+  <build>
+    <finalName>vaadin-ui</finalName>
+    <plugins>
+      <!--<plugin>-->
+      <!--<groupId>org.apache.maven.plugins</groupId>-->
+      <!--<artifactId>maven-jar-plugin</artifactId>-->
+      <!--<configuration>-->
+      <!--&lt;!&ndash;<finalName>${artifactId}-${project.version}</finalName>&ndash;&gt;-->
+      <!--<archive>-->
+      <!--<manifest>-->
+      <!--<addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
+      <!--</manifest>-->
+      <!--<manifestEntries>-->
+      <!--<Implementation-Build>${parent.version}</Implementation-Build>-->
+      <!--</manifestEntries>-->
+      <!--</archive>-->
+      <!--</configuration>-->
+      <!--<executions>-->
+      <!--<execution>-->
+      <!--<id>make-a-jar</id>-->
+      <!--<phase>compile</phase>-->
+      <!--<goals>-->
+      <!--<goal>jar</goal>-->
+      <!--</goals>-->
+      <!--</execution>-->
+      <!--</executions>-->
+      <!--</plugin>-->
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <supportedProjectTypes>
+            <supportedProjectType>war</supportedProjectType>
+          </supportedProjectTypes>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.server.ui</Bundle-SymbolicName>
+            <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
+
+            <!-- Add Embed lib -->
+            <Embed-Directory>WEB-INF/lib</Embed-Directory>
+            <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+            <Import-Package>*;resolution:=optional</Import-Package>
+            <Export-Package>
+              com.vaadin.ui.*;
+              com.vaadin.data.*;
+              com.vaadin.server.*;
+              com.vaadin.event.*;
+              com.vaadin.client.*;
+              com.vaadin.shared.*;
+              com.google.gwt.*;
+              org.json.*;
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
+
+            <!-- Package format version - do not change -->
+            <Vaadin-Package-Version>${project.version}</Vaadin-Package-Version>
+
+            <!-- Comma-separated list of widgetsets in the package -->
+            <Vaadin-Widgetsets>org.safehaus.subutai.server.ui.widgetset.PortalWidgetset</Vaadin-Widgetsets>
+
+            <!-- OSGi war spec config -->
+            <Web-ContextPath>subutai</Web-ContextPath>
+          </instructions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <attachClasses>true</attachClasses>
+          <webResources>
+            <resource>
+              <filtering>true</filtering>
+              <directory>src/main/webapp</directory>
+              <includes>
+                <include>**/web.xml</include>
+              </includes>
+            </resource>
+          </webResources>
+          <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

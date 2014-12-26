@@ -8,7 +8,6 @@
     </non-jta-data-source>
     <class>org.safehaus.subutai.common.protocol.Template</class>
     <class>org.safehaus.subutai.common.protocol.TemplatePK</class>
-    <class>org.safehaus.subutai.common.datatypes.TemplateVersion</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />
