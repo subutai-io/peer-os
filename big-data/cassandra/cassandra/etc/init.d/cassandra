@@ -206,7 +206,7 @@ case "$1" in
     is_running
     stat=$?
     case "$stat" in
-      0) log_success_msg "$DESC is running" ;;
+      0) log_success_msg "$DESC is running (pid:`cat $PIDFILE`)" ;;
       1) log_failure_msg "could not access pidfile for $DESC" ;;
       *) log_success_msg "$DESC is not running" ;;
     esac
