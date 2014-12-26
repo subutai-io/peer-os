@@ -1,42 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
   <parent>
+    <artifactId>plugin-manager</artifactId>
     <groupId>org.safehaus.subutai</groupId>
-    <artifactId>wol-manager-parent</artifactId>
     <version>2.0.0</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>wol-manager-ui</artifactId>
+  <artifactId>plugin-manager-api</artifactId>
+  <name>Subutai Plugin Manager Api</name>
+  <description>Subutai Plugin Manager Api</description>
+
   <packaging>bundle</packaging>
-  <name>Subutai Wol Manager UI</name>
-  <description>Subutai Wol Manager UI</description>
-
 
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>wol-manager-api</artifactId>
+      <artifactId>subutai-common</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>vaadin-api</artifactId>
-      <version>${project.version}</version>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>vaadin-custom</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-common</artifactId>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -51,7 +52,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.wol.ui</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.pluginmanager.api</Bundle-SymbolicName>
           </instructions>
         </configuration>
       </plugin>

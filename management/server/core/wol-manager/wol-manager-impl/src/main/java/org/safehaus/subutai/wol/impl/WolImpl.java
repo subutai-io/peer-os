@@ -1,7 +1,8 @@
 package org.safehaus.subutai.wol.impl;
 
 
-import com.google.common.base.Preconditions;
+import java.util.ArrayList;
+
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
@@ -12,7 +13,7 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.wol.api.WolManager;
 import org.safehaus.subutai.wol.api.WolManagerException;
 
-import java.util.ArrayList;
+import com.google.common.base.Preconditions;
 
 
 public class WolImpl implements WolManager
