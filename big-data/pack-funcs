@@ -70,13 +70,14 @@ getSourcesToRelevantDirectories() {
 generateDebianPackagePlugins() {
   makeDirectory=$BASE/$fileName
   ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
+  productName=$1
   pushd $makeDirectory
   if [ -d target ]; then
     rm -rf target/
   fi
-  make
-  cp target/*".deb" $TARGET/
-  cp target/*".deb" $ISOPATH/
+  mvn clean install
+  cp $productName-kar/target/*".deb" $TARGET/
+  cp $productName-kar/target/*".deb" $ISOPATH/
   popd
 }
 
@@ -94,20 +95,6 @@ generateDebianCliPackage() {
   cp subutai-$productName-debian-build/*.deb $TARGET/
   popd
 }
-
-generateDebianPackagePlugins() {
-  makeDirectory=$BASE/$fileName
-  ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
-  pushd $makeDirectory
-  if [ -d target ]; then
-    rm -rf target/
-  fi
-  make
-  cp target/*".deb" $TARGET/
-  cp target/*".deb" $ISOPATH/
-  popd
-}
-
 
 generateDebianPackage() {
   updatePackageContent $1
@@ -383,11 +370,12 @@ checkVersion() {
         
   elif [ "$mode" = "plugin" ]; then
 
-    CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin/debian/changelog"
+    CONTROL="/var/lib/jenkins/jobs/master.get_branch_repo_all_plugins/workspace/$productName-plugin/pom.xml"
     TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-subutai-plugin"
 
-    version_new=`cat $CONTROL | grep "$productName-subutai-plugin" | awk -F" " '{print $2}'`
-    version_new=`echo ${version_new//[()]/}`
+    version_new=`mvn org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.version |grep -Ev '(^\[|Download\w+:)'`
+    #`cat $CONTROL | grep "$productName-subutai-plugin" | awk -F" " '{print $2}'`
+    #version_new=`echo ${version_new//[()]/}`
     echo "Version= $version_new"
 
   elif [ "$mode" = "n2n" ]; then
