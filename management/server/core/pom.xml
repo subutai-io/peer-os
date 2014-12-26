@@ -38,6 +38,7 @@
     <module>key-manager</module>
     <module>plugin-common</module>
     <module>backup-manager</module>
+    <module>plugin-manager</module>
   </modules>
 
 </project>
