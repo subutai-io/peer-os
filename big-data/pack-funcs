@@ -374,8 +374,6 @@ checkVersion() {
     TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName-subutai-plugin"
 
     version_new=`mvn org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.version |grep -Ev '(^\[|Download\w+:)'`
-    #`cat $CONTROL | grep "$productName-subutai-plugin" | awk -F" " '{print $2}'`
-    #version_new=`echo ${version_new//[()]/}`
     echo "Version= $version_new"
 
   elif [ "$mode" = "n2n" ]; then
