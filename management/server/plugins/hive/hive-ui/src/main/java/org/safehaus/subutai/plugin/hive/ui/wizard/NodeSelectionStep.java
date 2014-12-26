@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -41,15 +40,17 @@ public class NodeSelectionStep extends Panel
     private int controlWidth = 350;
     private EnvironmentManager environmentManager;
     private GridLayout content;
+    private PortalModuleService portalModuleService;
 
 
     public NodeSelectionStep( final Hive hive, final Hadoop hadoop, final EnvironmentManager environmentManager,
-                              final Wizard wizard )
+                              final Wizard wizard, final PortalModuleService portalModuleService )
     {
 
         this.hive = hive;
         this.hadoop = hadoop;
         this.environmentManager = environmentManager;
+        this.portalModuleService = portalModuleService;
 
         setSizeFull();
 
@@ -109,7 +110,7 @@ public class NodeSelectionStep extends Panel
         content.addComponent( nameTxt );
         if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP )
         {
-            if ( !addOverHadoopComponents( content, wizard.getConfig(), wizard.getServiceLocator() ) )
+            if ( !addOverHadoopComponents( content, wizard.getConfig() ) )
             {
                 wizard.back();
             }
@@ -124,8 +125,7 @@ public class NodeSelectionStep extends Panel
     }
 
 
-    private boolean addOverHadoopComponents( ComponentContainer parent, final HiveConfig config,
-                                             final ServiceLocator serviceLocator )
+    private boolean addOverHadoopComponents( ComponentContainer parent, final HiveConfig config )
     {
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
         hadoopClusters.setId( "HiveHadoopClusterCb" );
@@ -145,7 +145,7 @@ public class NodeSelectionStep extends Panel
                 {
                     HadoopClusterConfig hc = ( HadoopClusterConfig ) event.getProperty().getValue();
                     config.setHadoopClusterName( hc.getClusterName() );
-                    config.setHadoopNodes( new HashSet<>( hc.getAllNodes() ) );
+                    config.setHadoopNodes( new HashSet<UUID>( hc.getAllNodes() ) );
 
                     ContainerHost selected = null;
                     if ( config.getServer() != null )
@@ -160,7 +160,7 @@ public class NodeSelectionStep extends Panel
                     }
                     fillServerNodeComboBox( config, cmbServerNode, hc, selected );
                     filterNodes( cmbServerNode, hc );
-                    // TODO if all nodes are filtered, than notify user
+                    // TODO if all nodes are filtered, then notify user
                 }
             }
         } );
@@ -185,14 +185,7 @@ public class NodeSelectionStep extends Panel
             //                @Override
             //                public void buttonClick( Button.ClickEvent clickEvent )
             //                {
-            PortalModuleService portalModuleService = null;
-            try
-            {
-                portalModuleService = serviceLocator.getService( PortalModuleService.class );
-            }
-            catch ( NamingException ignore )
-            {
-            }
+
             if ( portalModuleService != null )
             {
                 portalModuleService.loadDependentModule( HadoopClusterConfig.PRODUCT_KEY );
@@ -288,7 +281,7 @@ public class NodeSelectionStep extends Panel
     private void filterNodes( final ComboBox serverNode, final HadoopClusterConfig hadoopClusterConfig )
     {
         Collection<UUID> items = ( Collection<UUID> ) serverNode.getItemIds();
-        final Set<UUID> set = new HashSet<>( items );
+        final Set<UUID> set = new HashSet<UUID>( items );
         for ( final UUID uuid : set )
         {
             new Thread( new Runnable()

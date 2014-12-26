@@ -12,6 +12,7 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
@@ -40,14 +41,14 @@ public class Wizard
     private ZookeeperClusterConfig zookeeperClusterConfig = new ZookeeperClusterConfig();
 
 
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Wizard( ExecutorService executorService, Accumulo accumulo, Hadoop hadoop, Zookeeper zookeeper, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
         this.executorService = executorService;
-        this.accumulo = serviceLocator.getService( Accumulo.class );
-        this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.zookeeper = serviceLocator.getService( Zookeeper.class );
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.accumulo = accumulo;
+        this.hadoop = hadoop;
+        this.zookeeper = zookeeper;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
 
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );

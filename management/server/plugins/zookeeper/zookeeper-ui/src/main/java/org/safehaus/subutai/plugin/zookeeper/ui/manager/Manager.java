@@ -79,14 +79,14 @@ public class Manager
     private ZookeeperClusterConfig config;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Manager( final ExecutorService executorService, final Zookeeper zookeeper, final Hadoop hadoop, final Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
 
-        this.hadoop = serviceLocator.getService( Hadoop.class );
         this.executorService = executorService;
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.zookeeper = serviceLocator.getService( Zookeeper.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.zookeeper = zookeeper;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );

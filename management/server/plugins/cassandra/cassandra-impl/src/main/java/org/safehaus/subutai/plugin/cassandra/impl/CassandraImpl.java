@@ -130,6 +130,15 @@ public class CassandraImpl implements Cassandra
     }
 
 
+    public UUID removeCluster( final String clusterName )
+    {
+        CassandraClusterConfig config = getCluster( clusterName );
+        AbstractOperationHandler operationHandler = new ClusterOperationHandler( this, config, ClusterOperationType.REMOVE );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
     @Override
     public List<CassandraClusterConfig> getClusters()
     {

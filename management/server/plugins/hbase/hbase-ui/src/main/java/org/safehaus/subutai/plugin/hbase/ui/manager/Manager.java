@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -82,14 +81,13 @@ public class Manager
     private Table nodesTable = null;
 
 
-    public Manager( final ExecutorService executor, final ServiceLocator serviceLocator ) throws NamingException
+    public Manager( final ExecutorService executor, final HBase hbase,final Hadoop hadoop, final Tracker tracker ) throws NamingException
     {
         Preconditions.checkNotNull( executor, "Executor is null" );
-        Preconditions.checkNotNull( serviceLocator, "Service Locator is null" );
 
-        this.hbase = serviceLocator.getService( HBase.class );
-        this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.tracker = serviceLocator.getService( Tracker.class );
+        this.hbase = hbase;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
         this.executor = executor;
 
         contentRoot = new GridLayout();

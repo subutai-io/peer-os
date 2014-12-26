@@ -5,65 +5,66 @@ if [ "x$HADOOP_HOME" = "x" ];
 then
   HADOOP_HOME=/opt/hadoop-1.2.1
 fi
+
 case "$1" in
 start)
-        start-stop-daemon --start --exec $HADOOP_HOME/bin/start-dfs.sh
+  start-stop-daemon --start --exec $HADOOP_HOME/bin/start-dfs.sh
 ;;
-
 stop)
-        start-stop-daemon --start --exec $HADOOP_HOME/bin/stop-dfs.sh
+  start-stop-daemon --start --exec $HADOOP_HOME/bin/stop-dfs.sh
 ;;
-
 restart)
-        $0 stop
-        $0 start
+  $0 stop
+  $0 start
 ;;
-
 status)
+  hadoop_environment_file="/etc/hadoop/hadoop-env.sh"
+  if [ -f $hadoop_environment_file  ]; then
+    . $hadoop_environment_file
+  fi
 
-	line1=$(ps aux | grep [N]ameNode)
-	line2=$(ps aux | grep -c [N]ameNode)
-	line3=$(ps aux | grep [D]ataNode)
-	substring="SecondaryNameNode"
-	
-	#if pidof -o %PPID DataNode > /dev/null; then
-	#Check if the output is empty or not
-	if [ -n "$line1" ]; then
-		#Check if the output contains specific substring
-		if [[ $line1 =~ .*$substring.* ]]; then
-  			echo "SecondaryNameNode is Running";
-			#Check if output is not less than 2
-			if [[ "$line2" -lt 2 ]];
-			then
-				echo "NameNode is NOT Running"
-				#exit 1
-			else
-				echo "NameNode is Running"
-				#exit 0
-			fi
-		else
-			echo "NameNode is Running!(SecondaryNameNode is not running on this machine)"
-			#exit 0
-		fi
-		#echo "NameNode is Running"
-		#exit 0
-	else
-              	echo "NameNode is NOT Running"
-        	echo "SecondaryNameNode is NOT Running"
-	       	#exit 1
-	fi
-	
-	if [ -n "$line3" ]; then
-		echo "DataNode is Running"
-		#exit 0
-	else
-		echo "DataNode is NOT Running"
-		#exit 1
-	fi
+  if [ -z $HADOOP_PID_DIR ]; then
+    HADOOP_PID_DIR="/tmp"
+  fi
 
+  namenode_file="hadoop-*-namenode.pid"
+  secondary_namenode_file="hadoop-*-secondarynamenode.pid"
+  datanode_file="hadoop-*-datanode.pid"
+
+  if ls $HADOOP_PID_DIR/$namenode_file 1> /dev/null 2>&1; then
+    pid=`cat $HADOOP_PID_DIR/$namenode_file`
+    if ps -p $pid > /dev/null;then
+      echo "NameNode is running (pid:$pid)"
+    else
+      echo "NameNode is not running"
+    fi
+  else
+    echo "NameNode is not running"
+  fi
+
+  if ls $HADOOP_PID_DIR/$secondary_namenode_file 1> /dev/null 2>&1; then
+    pid=`cat $HADOOP_PID_DIR/$secondary_namenode_file`
+    if ps -p $pid > /dev/null;then
+      echo "SecondaryNameNode is running (pid:$pid)"
+    else
+      echo "SecondaryNameNode is not running"
+    fi
+  else
+    echo "SecondaryNameNode is not running"
+  fi
+
+  if ls $HADOOP_PID_DIR/$datanode_file 1> /dev/null 2>&1; then
+    pid=`cat $HADOOP_PID_DIR/$datanode_file`
+    if ps -p $pid > /dev/null;then
+      echo "DataNode is running (pid:$pid)"
+    else
+      echo "DataNode is not running"
+    fi
+  else
+    echo "DataNode is not running"
+  fi
 ;;
-
 *)
-        echo "Usage: $0 {start|stop|restart|status}"
-        exit 1
+  echo "Usage: $0 {start|stop|restart|status}"
+  exit 1
 esac

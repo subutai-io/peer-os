@@ -11,6 +11,10 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.ui.manager.Manager;
 import org.safehaus.subutai.plugin.hbase.ui.wizard.Wizard;
 
@@ -22,7 +26,7 @@ import com.vaadin.ui.VerticalLayout;
 public class HBaseComponent extends CustomComponent
 {
 
-    public HBaseComponent( ExecutorService executor, ServiceLocator serviceLocator ) throws NamingException
+    public HBaseComponent( ExecutorService executor, HBase hBase, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
         setSizeFull();
 
@@ -32,8 +36,8 @@ public class HBaseComponent extends CustomComponent
 
         TabSheet sheet = new TabSheet();
         sheet.setSizeFull();
-        final Manager manager = new Manager( executor, serviceLocator );
-        Wizard wizard = new Wizard( executor, serviceLocator );
+        final Manager manager = new Manager( executor, hBase, hadoop, tracker );
+        Wizard wizard = new Wizard( executor, hBase, hadoop, tracker, environmentManager );
         sheet.addTab( wizard.getContent(), "Install" );
         sheet.getTab( 0 ).setId( "HbaseInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );

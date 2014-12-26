@@ -11,8 +11,13 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.ui.manager.Manager;
 import org.safehaus.subutai.plugin.accumulo.ui.wizard.Wizard;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
@@ -22,7 +27,7 @@ import com.vaadin.ui.VerticalLayout;
 public class AccumuloComponent extends CustomComponent
 {
 
-    public AccumuloComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public AccumuloComponent( ExecutorService executorService, Accumulo accumulo, Hadoop hadoop, Zookeeper zookeeper, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
 
         setSizeFull();
@@ -34,8 +39,8 @@ public class AccumuloComponent extends CustomComponent
         TabSheet sheet = new TabSheet();
         sheet.setSizeFull();
 
-        final Manager manager = new Manager( executorService, serviceLocator );
-        Wizard wizard = new Wizard( executorService, serviceLocator );
+        final Manager manager = new Manager( executorService, accumulo, hadoop, tracker, environmentManager );
+        Wizard wizard = new Wizard( executorService, accumulo, hadoop, zookeeper, tracker, environmentManager );
         sheet.addTab( wizard.getContent(), "Install" );
         sheet.getTab( 0 ).setId( "AccumuloInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );

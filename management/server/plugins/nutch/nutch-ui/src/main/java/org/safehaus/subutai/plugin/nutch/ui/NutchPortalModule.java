@@ -14,7 +14,10 @@ import java.util.logging.Logger;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.nutch.api.Nutch;
 import org.safehaus.subutai.plugin.nutch.api.NutchConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -25,13 +28,20 @@ public class NutchPortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "nutch.png";
     protected static final Logger LOG = Logger.getLogger( NutchPortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
+    private final Nutch nutch;
+    private final Tracker tracker;
+    private final Hadoop hadoop;
+    private final EnvironmentManager environmentManager;
 
 
-    public NutchPortalModule()
+    public NutchPortalModule( Nutch nutch, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager )
     {
-        this.serviceLocator = new ServiceLocator();
+        this.nutch = nutch;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
+
     }
 
 
@@ -72,7 +82,7 @@ public class NutchPortalModule implements PortalModule
     {
         try
         {
-            return new NutchComponent( executor, serviceLocator );
+            return new NutchComponent( executor, nutch, hadoop, tracker, environmentManager );
         }
         catch ( NamingException e )
         {

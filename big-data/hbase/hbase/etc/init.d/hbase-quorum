@@ -4,71 +4,85 @@ hbase=hbase-0.98.3
 hbaseConf="/etc/hbase/"
 
 . /etc/hbase/hbase-env.sh
+. /lib/lsb/init-functions
 
-if [ ! -f "/tmp/*-zookeeper.pid" ]; then
-        pidZookeeper=`ls -alt /tmp | grep hbase-.*-zookeeper.pid | head -1 | awk -F " " '{print $9}'`
-	echo $pidZookeeper
+if [ "x" != "x$HBASE_PID_DIR" ]; then
+  pid_dir=$HBASE_PID_DIR
+else
+  pid_dir="/tmp"
 fi
 
-is_zookeeper_running()
-{
-    if [ -f /tmp/$pidZookeeper ] && [ "x$pidZookeeper" != "x" ]; then
-        pid=`cat /tmp/$pidZookeeper`
-        grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 1
-        return 0
+
+if [ ! -f "$pid_dir/*-zookeeper.pid" ]; then
+  pidZookeeper=`ls -alt $pid_dir | grep hbase-.*-zookeeper.pid | head -1 | awk '{print $9}'`
+fi
+
+is_running(){
+  pid_file_name=$1
+  if [ -f $pid_dir/$pid_file_name ] && [ "x$pid_file_name" != "x" ]; then
+    pid=`cat $pid_dir/$pid_file_name`
+    if grep -Eq "$CMD_PATT" "/proc/$pid/cmdline"; then
+      return 1;
     fi
-    return 2 
+  fi
+  return 0
+}
+
+check_process(){
+  if [ $# == 1 ]; then
+    role=$1
+  elif [ $# == 2 ]; then
+    pid_file=$1
+    role=$2
+  fi
+  if [ -f $pid_dir/$pid_file ] && [ "x$pid_file" != "x" ]; then
+    pid=`cat $pid_dir/$pid_file`
+    if grep -Eq "$CMD_PATT" "/proc/$pid/cmdline"; then
+      log_success_msg "$role is running (pid:$pid)"
+      return 0
+    else
+      log_failure_msg "could not access pidfile"
+      return 1
+    fi
+  else
+    log_success_msg "$role is NOT running"
+    return 0
+  fi
+}
+
+kill_service(){
+  pid_file=$1
+  is_running $pid_file
+  stat=$?
+  if [ "$stat" == "1" ]; then
+    start-stop-daemon -K -p "$pid_dir/$pid_file" -R TERM/30/KILL/5 >/dev/null
+  fi
+  if [ -f $pid_dir/$pid_file ];then
+    rm $pid_dir/$pid_file
+  fi
 }
 
 case "$1" in
-start)
-	/opt/$hbase/bin/hbase-daemons.sh start zookeeper
-;;
-
-stop)
-	/opt/$hbase/bin/hbase-daemons.sh stop zookeeper
-	#pid=`cat /tmp/$pidZookeeper`
-	#echo "Stopping HQuorumPeer with pid $pid"
-	#start-stop-daemon -K -p "$pidZookeeper" -R TERM/30/KILL/5 >/dev/null 
-;;
-
-restart)
-        $0 stop
-        $0 start
-;;
-
-status)
-        is_zookeeper_running 
-        stat=$?
-        case "$stat" in 
-        0)
-		echo "HQuorumPeer is NOT running"  ;;
-	1)
-		echo "HQuorumPeer is running"  ;;
-	2)
-		echo "HQuorumPeer is NOT running and pid file does not exists" ;;
-	*)
-		echo "Could not find pid of HQuorumPeer!!!"
-		
-	esac
-;;
-calc)
-	calculate
-;;
-kill)
-	is_zookeeper_running
-   	stat=$?
-	if [ "$stat" == "1" ]; then
-		start-stop-daemon -K -p "/tmp/$pidZookeeper" -R TERM/30/KILL/5 >/dev/null
-	fi
-	start-stop-daemon -K -p "/tmp/$pidZookeeper" -R TERM/30/KILL/5 >/dev/null
-	if [ -f /tmp/$pidZookeeper ];then
-		rm /tmp/$pidZookeeper
-	fi	
-	echo "HQuorumPeer pid file is deleted."
-;;
-*)
-        echo "Usage: $0 {start|stop|restart|status|kill}"
-        exit 1
+  start)
+    /opt/$hbase/bin/hbase-daemons.sh start zookeeper
+    ;;
+  stop)
+    /opt/$hbase/bin/hbase-daemons.sh stop zookeeper
+    #pid=`cat /tmp/$pidZookeeper`
+    #echo "Stopping HQuorumPeer with pid $pid"
+    #start-stop-daemon -K -p "$pidZookeeper" -R TERM/30/KILL/5 >/dev/null 
+    ;;
+  restart)
+    $0 stop
+    $0 start
+    ;;
+  status)
+    check_process $pidZookeeper "HQuorumPeer"
+    ;;
+  kill)
+    kill_service $pidZookeeper
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status|kill}"
+    exit 1
 esac
-

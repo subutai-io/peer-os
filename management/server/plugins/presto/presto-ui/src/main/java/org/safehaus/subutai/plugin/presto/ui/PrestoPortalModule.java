@@ -9,7 +9,10 @@ import java.util.logging.Logger;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.presto.api.Presto;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -20,13 +23,19 @@ public class PrestoPortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "presto.png";
     protected static final Logger LOG = Logger.getLogger( PrestoPortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
+    private final Presto presto;
+    private final Hadoop hadoop;
+    private final Tracker tracker;
+    private final EnvironmentManager environmentManager;
 
 
-    public PrestoPortalModule()
+    public PrestoPortalModule( Presto presto, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager)
     {
-        this.serviceLocator = new ServiceLocator();
+        this.presto = presto;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
     }
 
 
@@ -69,7 +78,7 @@ public class PrestoPortalModule implements PortalModule
 
         try
         {
-            return new PrestoComponent( executor, serviceLocator );
+            return new PrestoComponent( executor, presto, hadoop, tracker, environmentManager );
         }
         catch ( NamingException e )
         {

@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <reference id="wolManager" availability="mandatory"
-               interface="org.safehaus.subutai.wol.api.WolManager"/>
+  <reference id="wolManager" availability="mandatory"
+             interface="org.safehaus.subutai.wol.api.WolManager" />
 
-    <bean id="module" scope="singleton" class="org.safehaus.subutai.wol.ui.WolUI"
-          init-method="init" destroy-method="destroy">
-        <property name="wolManager" ref="wolManager" />
-    </bean>
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.wol.ui.WolUI"
+        init-method="init" destroy-method="destroy">
+    <property name="wolManager" ref="wolManager" />
+  </bean>
 
-    <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule">
-        <service-properties>
+  <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule">
+    <service-properties>
 
-        </service-properties>
-    </service>
+    </service-properties>
+  </service>
 
-    <!--Plugin Manager UI-->
+  <!--Plugin Manager UI-->
 
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
 
-    <reference id="pluginManager" availability="mandatory"
-               interface="org.safehaus.subutai.wol.api.PluginManager" />
+  <reference id="pluginManager" availability="mandatory"
+             interface="org.safehaus.subutai.wol.api.PluginManager" />
 
-    <bean id="module2" scope="singleton" class="org.safehaus.subutai.wol.ui.PluginManagerPortalModule"
-          init-method="init" destroy-method="destroy">
-        <property name="pluginManager" ref="pluginManager" />
-        <property name="tracker" ref="tracker" />
-    </bean>
+  <bean id="module2" scope="singleton" class="org.safehaus.subutai.wol.ui.PluginManagerPortalModule"
+        init-method="init" destroy-method="destroy">
+    <property name="pluginManager" ref="pluginManager" />
+    <property name="tracker" ref="tracker" />
+  </bean>
 
-    <service ref="module2" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
+  <service ref="module2" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
 
 </blueprint>

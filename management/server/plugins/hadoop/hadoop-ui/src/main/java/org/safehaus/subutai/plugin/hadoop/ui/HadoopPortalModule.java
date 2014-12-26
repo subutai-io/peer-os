@@ -9,7 +9,10 @@ import java.util.logging.Logger;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -23,13 +26,20 @@ public class HadoopPortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "hadoop.png";
     protected static final Logger LOG = Logger.getLogger( HadoopPortalModule.class.getName() );
-    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
+    private Tracker tracker;
+    private Hadoop hadoop;
+    private EnvironmentManager environmentManager;
+    private HostRegistry hostRegistry;
 
 
-    public HadoopPortalModule()
+    public HadoopPortalModule(Tracker tracker, Hadoop hadoop, EnvironmentManager environmentManager, HostRegistry hostRegistry )
     {
-        this.serviceLocator = new ServiceLocator();
+        this.tracker = tracker;
+        this.hadoop = hadoop;
+        this.environmentManager = environmentManager;
+        this.hostRegistry = hostRegistry;
+
     }
 
 
@@ -71,7 +81,7 @@ public class HadoopPortalModule implements PortalModule
     {
         try
         {
-            return new HadoopComponent( executor, serviceLocator );
+            return new HadoopComponent( executor, tracker, hadoop, environmentManager, hostRegistry );
         }
         catch ( NamingException e )
         {

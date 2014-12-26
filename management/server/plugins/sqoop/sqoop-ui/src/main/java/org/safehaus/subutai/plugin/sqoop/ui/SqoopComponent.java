@@ -6,6 +6,10 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 import org.safehaus.subutai.plugin.sqoop.ui.manager.ExportPanel;
 import org.safehaus.subutai.plugin.sqoop.ui.manager.ImportExportBase;
 import org.safehaus.subutai.plugin.sqoop.ui.manager.ImportPanel;
@@ -26,10 +30,10 @@ public class SqoopComponent extends CustomComponent
     private final TabSheet sheet;
 
 
-    public SqoopComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public SqoopComponent( ExecutorService executorService, Sqoop sqoop, Hadoop hadoop, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
-        manager = new Manager( executorService, serviceLocator, this );
-        wizard = new Wizard( executorService, serviceLocator );
+        manager = new Manager( executorService, sqoop, hadoop, tracker, environmentManager, this );
+        wizard = new Wizard( executorService, sqoop, hadoop, tracker, environmentManager );
 
         setSizeFull();
         VerticalLayout verticalLayout = new VerticalLayout();

@@ -7,6 +7,7 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
@@ -30,13 +31,13 @@ public class EnvironmentWizard
     private CassandraClusterConfig config = new CassandraClusterConfig();
 
 
-    public EnvironmentWizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public EnvironmentWizard( ExecutorService executorService, Cassandra cassandra, Tracker tracker, EnvironmentManager environmentManager ) throws NamingException
     {
 
         this.executorService = executorService;
-        this.cassandra = serviceLocator.getService( Cassandra.class );
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.cassandra = cassandra;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
 
         verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
@@ -116,6 +117,11 @@ public class EnvironmentWizard
     public CassandraClusterConfig getConfig()
     {
         return config;
+    }
+
+
+    public void clearConfig(){
+        config = new CassandraClusterConfig();
     }
 
 

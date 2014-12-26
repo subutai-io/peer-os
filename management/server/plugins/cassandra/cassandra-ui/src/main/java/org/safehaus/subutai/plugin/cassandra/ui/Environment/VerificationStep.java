@@ -4,6 +4,7 @@ package org.safehaus.subutai.plugin.cassandra.ui.Environment;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
@@ -42,10 +43,24 @@ public class VerificationStep extends VerticalLayout
         cfgView.addStringCfg( "Data directory", environmentWizard.getConfig().getDataDirectory() );
         cfgView.addStringCfg( "Saved caches directory", environmentWizard.getConfig().getSavedCachesDirectory() );
         cfgView.addStringCfg( "Commit log directory", environmentWizard.getConfig().getCommitLogDirectory() );
-        cfgView.addStringCfg( "Number of seeds", environmentWizard.getConfig().getNumberOfSeeds() + "" );
+
+        String selectedNodes = "";
+        final Environment environment = environmentWizard.getEnvironmentManager().getEnvironmentByUUID(
+                environmentWizard.getConfig().getEnvironmentId() );
+        for ( UUID uuid : environmentWizard.getConfig().getNodes() ){
+            selectedNodes += environment.getContainerHostById( uuid ).getHostname() + ",";
+        }
+
+        String seeds = "";
+        for ( UUID uuid : environmentWizard.getConfig().getSeedNodes() ){
+            seeds += environment.getContainerHostById( uuid ).getHostname() + ",";
+        }
+
+        cfgView.addStringCfg( "Nodes to be configured", selectedNodes.substring( 0, ( selectedNodes.length() - 1 ) ) );
+        cfgView.addStringCfg( "Seed nodes", seeds.substring( 0, ( seeds.length() -1 ) ) + "" );
         cfgView.addStringCfg( "Environment UUID", environmentWizard.getConfig().getEnvironmentId() + "" );
 
-        Button install = new Button( "Install" );
+        Button install = new Button( "Configure" );
         install.addStyleName( "default" );
         install.addClickListener( new Button.ClickListener()
         {
@@ -74,6 +89,7 @@ public class VerificationStep extends VerticalLayout
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
+                environmentWizard.clearConfig();
                 environmentWizard.back();
             }
         } );

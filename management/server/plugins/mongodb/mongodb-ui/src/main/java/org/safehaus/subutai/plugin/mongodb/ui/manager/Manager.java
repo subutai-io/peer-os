@@ -84,13 +84,13 @@ public class Manager
     private MongoClusterConfig mongoClusterConfig;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public Manager( final ExecutorService executorService, final Mongo mongo, final EnvironmentManager environmentManager, final Tracker tracker ) throws NamingException
     {
 
         this.executorService = executorService;
-        this.tracker = serviceLocator.getService( Tracker.class );
-        this.mongo = serviceLocator.getService( Mongo.class );
-        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
+        this.mongo = mongo;
+        this.tracker = tracker;
+        this.environmentManager = environmentManager;
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
