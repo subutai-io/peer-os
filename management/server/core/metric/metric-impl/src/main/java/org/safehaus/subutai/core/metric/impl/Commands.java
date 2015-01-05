@@ -29,4 +29,10 @@ public class Commands
                 monitoringSettings.getRamAlertThreshold(), monitoringSettings.getCpuAlertThreshold(),
                 monitoringSettings.getDiskAlertThreshold(), hostname ) );
     }
+
+
+    public RequestBuilder getProcessResourceUsageCommand( String hostname, int pid )
+    {
+        return new RequestBuilder( String.format( "subutai monitor -i %s %s", pid, hostname ) );
+    }
 }
