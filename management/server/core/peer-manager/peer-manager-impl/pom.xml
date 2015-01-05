@@ -43,6 +43,10 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>metric-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>host-registry-api</artifactId>
     </dependency>
     <dependency>
@@ -111,7 +115,7 @@
             <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
             <Bundle-SymbolicName>${project.groupId}.core.peer.impl</Bundle-SymbolicName>
             <Export-Package>
-                {local-packages};version=${project.version};-noimport:=true
+              {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
           </instructions>
         </configuration>

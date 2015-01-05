@@ -9,6 +9,7 @@ import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
@@ -304,6 +305,28 @@ public class RemotePeerRestClient
         else
         {
             throw new PeerException( "Could not get quota", response.getEntity().toString() );
+        }
+    }
+
+
+    public ProcessResourceUsage getProcessResourceUsage( ContainerHost host, int processPid ) throws PeerException
+    {
+        String path = "peer/container/resource/usage";
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "hostId", host.getId().toString() )
+                      .query( "processPid", processPid ).get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<ProcessResourceUsage>()
+            {}.getType() );
+        }
+        else
+        {
+            throw new PeerException( "Could not get process resource usage", response.getEntity().toString() );
         }
     }
 }
