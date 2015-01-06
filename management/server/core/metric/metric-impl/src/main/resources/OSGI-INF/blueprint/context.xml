@@ -2,12 +2,12 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="peerManager" availability="optional"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
   <reference id="emf" interface="javax.persistence.EntityManagerFactory"
              filter="(osgi.unit.name=metricUnit)" />
 
   <bean id="monitor" class="org.safehaus.subutai.core.metric.impl.MonitorImpl"
-        scope="singleton" activation="eager" destroy-method="destroy">
+        scope="singleton" destroy-method="destroy">
     <argument ref="peerManager" />
     <argument ref="emf" />
   </bean>
