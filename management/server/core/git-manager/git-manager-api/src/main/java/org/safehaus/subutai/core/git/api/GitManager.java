@@ -54,6 +54,19 @@ public interface GitManager
     public String diffFile( String repositoryRoot, String branchName1, String branchName2, String filePath )
             throws GitException;
 
+
+    /**
+     * Returns diff in file between specified branches
+     *
+     * @param repositoryRoot - path to repo
+     * @param branchName - branch name
+     * @param filePath - relative (to repo root) file path
+     *
+     * @return - differences in file {@code String}
+     */
+    public String showFile( String repositoryRoot, String branchName, String filePath ) throws GitException;
+
+
     /**
      * Initializes empty git repo in the specified directory
      *

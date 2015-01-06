@@ -148,7 +148,31 @@ public class GitManagerImpl implements GitManager
         Preconditions.checkArgument( !Strings.isNullOrEmpty( filePath ), "File path is null or empty" );
 
         CommandResult result = execute(
-                new RequestBuilder( String.format( "git diff %s %s %s", branchName1, branchName2, filePath ) )
+                new RequestBuilder( String.format( "git diff %s %s -- %s", branchName1, branchName2, filePath ) )
+                        .withCwd( repositoryRoot ), false );
+
+        return result.getStdOut();
+    }
+
+
+    /**
+     * Returns diff in file between specified branches
+     *
+     * @param repositoryRoot - path to repo
+     * @param branchName - branch name
+     * @param filePath - relative (to repo root) file path
+     *
+     * @return - differences in file {@code String}
+     */
+    @Override
+    public String showFile( final String repositoryRoot, final String branchName, final String filePath )
+            throws GitException
+    {
+        validateRepoUrl( repositoryRoot );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name 1 is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( filePath ), "File path is null or empty" );
+
+        CommandResult result = execute( new RequestBuilder( String.format( "git show %s:%s", branchName, filePath ) )
                         .withCwd( repositoryRoot ), false );
 
         return result.getStdOut();

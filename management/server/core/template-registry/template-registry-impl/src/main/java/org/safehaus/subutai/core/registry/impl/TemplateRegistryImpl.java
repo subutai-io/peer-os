@@ -36,6 +36,8 @@ import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -126,11 +128,21 @@ public class TemplateRegistryImpl implements TemplateRegistry
             String subutaiParent = properties.getProperty( "subutai.parent" );
             String subutaiGitBranch = properties.getProperty( "subutai.git.branch" );
             String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
+            String subutaiTemplateVersion = properties.getProperty( "subutai.template.package" );
+            if ( subutaiTemplateVersion == null || "".equals( subutaiTemplateVersion ) )
+            {
+                subutaiTemplateVersion = Common.DEFAULT_TEMPLATE_VERSION;
+            }
+            else
+            {
+                String[] parsedVersion = subutaiTemplateVersion.split( "_" );
+                subutaiTemplateVersion = parsedVersion[1];
+            }
 
             LOG.warn( configFile );
 
             Template template = new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch,
-                    subutaiGitUuid, packagesFile, md5sum, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ) );
+                    subutaiGitUuid, packagesFile, md5sum, new TemplateVersion( subutaiTemplateVersion ) );
 
             //check if template with such name already exists
             if ( getTemplate( template.getTemplateName() ) != null )
@@ -877,5 +889,43 @@ public class TemplateRegistryImpl implements TemplateRegistry
         Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token" );
 
         return templateDownloadTokens.get( token ) != null;
+    }
+
+
+    @Override
+    public Pair<String, String> getChangedFileVersions( String branchA, String branchB, GitChangedFile file )
+    {
+        try
+        {
+            final String aBranchVersion = gitManager.showFile( REPO_ROOT_PATH, branchA, file.getGitFilePath() );
+            final String bBranchVersion = gitManager.showFile( REPO_ROOT_PATH, branchB, file.getGitFilePath() );
+            return new Pair<String, String>()
+            {
+                @Override
+                public String getLeft()
+                {
+                    return aBranchVersion;
+                }
+
+
+                @Override
+                public String getRight()
+                {
+                    return bBranchVersion;
+                }
+
+
+                @Override
+                public String setValue( final String value )
+                {
+                    throw new UnsupportedOperationException( "Cannot set value for object." );
+                }
+            };
+        }
+        catch ( GitException e )
+        {
+            LOG.error( "Error getting git file branch version.", e );
+            return null;
+        }
     }
 }
