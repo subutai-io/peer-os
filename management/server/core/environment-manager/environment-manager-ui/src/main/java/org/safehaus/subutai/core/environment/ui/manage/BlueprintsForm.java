@@ -46,8 +46,10 @@ public class BlueprintsForm
         contentRoot.setSpacing( true );
         contentRoot.setMargin( true );
         environmentsTable = createTable( "Blueprints", 300 );
+        environmentsTable.setId( "environmentsTable" );
 
         environmentsButton = new Button( VIEW );
+        environmentsButton.setId( "environmentsButton" );
         environmentsButton.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -91,6 +93,7 @@ public class BlueprintsForm
             {
 
                 final Button view = new Button( VIEW );
+                view.setId( blueprint.getName() + "-view" );
                 view.addClickListener( new Button.ClickListener()
                 {
                     @Override
@@ -103,6 +106,7 @@ public class BlueprintsForm
                 } );
 
                 final Button N2P_BTN = new Button( N2P );
+                N2P_BTN.setId( blueprint.getName() + "-N2P" );
                 N2P_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
@@ -115,6 +119,7 @@ public class BlueprintsForm
                 } );
 
                 final Button B2PG_BTN = new Button( B2PG );
+                B2PG_BTN.setId( blueprint.getName() + "-B2PG" );
                 B2PG_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
@@ -128,6 +133,7 @@ public class BlueprintsForm
                 } );
 
                 final Button NG2PG_BTN = new Button( NG2PG );
+                NG2PG_BTN.setId( blueprint.getName() + "-NG2PG_BTN" );
                 NG2PG_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
@@ -141,6 +147,7 @@ public class BlueprintsForm
                 } );
 
                 final Button NG2P_BTN = new Button( NG2P );
+                NG2P_BTN.setId( blueprint.getName() + "-NG2P_BTN" );
                 NG2P_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
@@ -153,6 +160,7 @@ public class BlueprintsForm
                 } );
 
                 final Button delete = new Button( DELETE );
+                delete.setId( blueprint.getName() + "-delete" );
                 delete.addClickListener( new Button.ClickListener()
                 {
                     @Override

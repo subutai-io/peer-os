@@ -93,6 +93,7 @@ public class Node2PeerWizard extends Window
         vl.setMargin( true );
 
         peersTable = new Table();
+        peersTable.setId( "peersTable" );
         peersTable.addContainerProperty( "Name", String.class, null );
         peersTable.addContainerProperty( "Select", CheckBox.class, null );
         peersTable.setPageLength( 10 );
@@ -108,6 +109,7 @@ public class Node2PeerWizard extends Window
             for ( Peer peer : peers )
             {
                 CheckBox checkBox = new CheckBox();
+                checkBox.setId( peer.getName() + "-check" );
                 peersTable.addItem( new Object[]
                 {
                     peer.getName(), checkBox
@@ -115,6 +117,7 @@ public class Node2PeerWizard extends Window
             }
         }
         Button nextButton = new Button( "Next" );
+        nextButton.setId( "nextButton" );
         nextButton.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -144,6 +147,7 @@ public class Node2PeerWizard extends Window
         vl.setMargin( true );
 
         containerToPeerTable = new Table();
+        containerToPeerTable.setId( "containerToPeerTable" );
         containerToPeerTable.addContainerProperty( "Container", String.class, null );
         containerToPeerTable.addContainerProperty( "Put", ComboBox.class, null );
         containerToPeerTable.setPageLength( 10 );
@@ -157,6 +161,7 @@ public class Node2PeerWizard extends Window
             for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
             {
                 ComboBox peersBox = new ComboBox();
+                peersBox.setId( "peersCb" );
                 BeanItemContainer<Peer> bic = new BeanItemContainer<>( Peer.class );
                 bic.addAll( selectedPeers() );
                 peersBox.setContainerDataSource( bic );
@@ -171,6 +176,7 @@ public class Node2PeerWizard extends Window
             }
         }
         Button nextButton = new Button( "Save build task" );
+        nextButton.setId( "saveButton" );
         nextButton.addClickListener( new Button.ClickListener()
         {
             @Override
