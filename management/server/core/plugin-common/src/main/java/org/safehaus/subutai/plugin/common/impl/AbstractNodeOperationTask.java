@@ -3,9 +3,9 @@ package org.safehaus.subutai.plugin.common.impl;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.protocol.CompleteEvent;
-import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.plugin.common.api.NodeState;
+import org.safehaus.subutai.plugin.common.api.CompleteEvent;
+import org.safehaus.subutai.plugin.common.api.ConfigBase;
 import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.peer.api.ContainerHost;

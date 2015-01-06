@@ -1,4 +1,4 @@
-package org.safehaus.subutai.common.protocol;
+package org.safehaus.subutai.plugin.common.api;
 
 
 import java.util.UUID;

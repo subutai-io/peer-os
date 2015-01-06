@@ -1,7 +1,4 @@
-package org.safehaus.subutai.common.protocol;
-
-
-import org.safehaus.subutai.common.exception.ClusterSetupException;
+package org.safehaus.subutai.plugin.common.api;
 
 
 /**

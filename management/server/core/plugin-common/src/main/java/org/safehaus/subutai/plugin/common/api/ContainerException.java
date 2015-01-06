@@ -1,4 +1,7 @@
-package org.safehaus.subutai.common.exception;
+package org.safehaus.subutai.plugin.common.api;
+
+
+import org.safehaus.subutai.common.exception.SubutaiException;
 
 
 /**
