@@ -176,18 +176,19 @@ function fs_rls_holds_delete_snaps {
 function fs_demote_template {
   local temp="$1"  
   local lxc_path="$HOME/.local/share/lxc/$temp"
-
+  sudo btrfs property set -ts $HOME/.local/share/lxc/$temp/rootfs/ ro false
+  sudo btrfs property set -ts $HOME/.local/lxc/$temp-opt ro false
+  sudo btrfs property set -ts $HOME/.local/lxc-data/$temp-var ro false
+  sudo btrfs property set -ts $HOME/.local/lxc-data/$temp-home ro false
+  lxc_chown $temp
+  cat $HOME/.config/lxc/default.conf >> $lxc_path/config
   cat $lxc_path/config | \
     grep -v "lxc.hook.pre-start" | \
     grep -v "subutai.template.package" | \
     grep -v "subutai.git.uuid" >> $lxc_path/config.new
   rm $lxc_path/config
   mv $lxc_path/config.new $lxc_path/config
-
-  sudo btrfs property set -ts $HOME/.local/share/lxc/$temp/rootfs/ ro false
-  sudo btrfs property set -ts $HOME/.local/lxc/$temp-opt ro false
-  sudo btrfs property set -ts $HOME/.local/lxc-data/$temp-var ro false
-  sudo btrfs property set -ts $HOME/.local/lxc-data/$temp-home ro false
+  lxc_mapshifting $temp
 
 }
 
@@ -274,16 +275,16 @@ function fs_assert_snap {
 function fs_assert_nods {
   local ds="$1"
   local usage="$2"
-  if [[ "$from_ds" =~ "var" ]] || [[ "$from_ds" =~ "home" ]]; then
-    if [ -n "`sudo btrfs subvolume list /lxc-data | grep $ds`" ]; then
+  if [[ "$ds" =~ "var" ]] || [[ "$ds" =~ "home" ]]; then
+    if [ -n "`sudo btrfs subvolume list $HOME/.local/lxc-data | grep $ds`" ]; then
       msg_info "BTRFS dataset \"$ds\" does NOT exist!"
     fi
-  elif [[ "$from_ds" =~ "opt" ]];then
-    if [ -n "`sudo btrfs subvolume list /lxc | grep $ds`" ]; then
+  elif [[ "$ds" =~ "opt" ]];then
+    if [ -n "`sudo btrfs subvolume list $HOME/.local/lxc | grep $ds`" ]; then
       msg_info "BTRFS dataset \"$ds\" does NOT exist!"
      fi
   else
-    if [ -n "`sudo btrfs subvolume list /var/lib/lxc/ | grep $ds`" ]; then
+    if [ -n "`sudo btrfs subvolume list $HOME/.local/share/lxc/ | grep $ds`" ]; then
       msg_info "BTRFS dataset \"$ds\" does NOT exist!"
     fi
   fi
@@ -295,12 +296,12 @@ function fs_assert_nods {
 function fs_assert_ds {
   local ds="$1"
   local usage="$2"
-  if [[ "$from_ds" =~ "var" ]] || [[ "$from_ds" =~ "home" ]]; then
+  if [[ "$ds" =~ "var" ]] || [[ "$ds" =~ "home" ]]; then
     if [ -z "`sudo btrfs subvolume list /lxc-data | grep $ds`" ]; then
       msg_error "BTRFS dataset \"$ds\" does NOT exist!"
       show_usage "$usage"
     fi
-  elif [[ "$from_ds" =~ "opt" ]];then
+  elif [[ "$ds" =~ "opt" ]];then
     if [ -z "`sudo btrfs subvolume list /lxc | grep $ds`" ]; then
       msg_error "BTRFS dataset \"$ds\" does NOT exist!"
       show_usage "$usage"
