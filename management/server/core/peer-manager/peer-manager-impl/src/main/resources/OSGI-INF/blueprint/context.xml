@@ -26,7 +26,7 @@
 
   <reference id="quotaManager" availability="mandatory"
              interface="org.safehaus.subutai.core.lxc.quota.api.QuotaManager" />
-  <reference id="monitor" availability="mandatory"
+  <reference id="monitor" availability="optional"
              interface="org.safehaus.subutai.core.metric.api.Monitor" />
 
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
