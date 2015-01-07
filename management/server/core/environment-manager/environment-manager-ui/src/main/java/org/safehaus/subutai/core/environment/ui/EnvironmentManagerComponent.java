@@ -45,9 +45,13 @@ public class EnvironmentManagerComponent extends CustomComponent implements Disp
         environmentBuildForm = new EnvironmentsBuildProcessForm( managerUI );
         environmentForm = new EnvironmentsForm( managerUI );
         sheet.addTab( blueprintManager.getContentRoot(), "Blueprint load" );
+        sheet.getTab( 0 ).setId( "BlueprintLoad" );
         sheet.addTab( blueprintsForm.getContentRoot(), "Blueprints" );
+        sheet.getTab( 1 ).setId( "Blueprints" );
         sheet.addTab( environmentBuildForm.getContentRoot(), "Build process" );
+        sheet.getTab( 2 ).setId( "BuildProcess" );
         sheet.addTab( environmentForm.getContentRoot(), "Environments" );
+        sheet.getTab( 3 ).setId( "Environments" );
         verticalLayout.addComponent( sheet );
 
 
