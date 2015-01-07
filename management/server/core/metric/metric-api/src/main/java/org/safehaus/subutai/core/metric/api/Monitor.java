@@ -3,6 +3,8 @@ package org.safehaus.subutai.core.metric.api;
 
 import java.util.Set;
 
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.core.metric.api.Metric;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
@@ -66,6 +68,9 @@ public interface Monitor
 
     public void activateMonitoring( ContainerHost containerHost, MonitoringSettings monitoringSettings )
             throws MonitorException;
+
+
+    public ProcessResourceUsage getProcessResourceUsage( ContainerHost containerHost, int processPid ) throws MonitorException;
 
     /**
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under

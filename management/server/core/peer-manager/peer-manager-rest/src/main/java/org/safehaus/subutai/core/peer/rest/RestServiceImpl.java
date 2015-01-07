@@ -13,6 +13,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
@@ -186,6 +187,23 @@ public class RestServiceImpl implements RestService
             return Response.ok( GSON.toJson( quotaInfo ) ).build();
         }
         catch ( JsonParseException | PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getProcessResourceUsage( final String hostId, final int processPid )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            ProcessResourceUsage processResourceUsage =
+                    localPeer.getProcessResourceUsage( localPeer.getContainerHostById( hostId ), processPid );
+            return Response.ok( GSON.toJson( processResourceUsage ) ).build();
+        }
+        catch ( PeerException e )
         {
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }

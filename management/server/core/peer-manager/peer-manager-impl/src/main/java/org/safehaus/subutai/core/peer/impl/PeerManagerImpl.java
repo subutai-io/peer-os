@@ -13,6 +13,7 @@ import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
+import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -49,6 +50,7 @@ public class PeerManagerImpl implements PeerManager
     private static final String PEER_GROUP = "PEER_GROUP";
     private PeerDAO peerDAO;
     private QuotaManager quotaManager;
+    private Monitor monitor;
     private TemplateRegistry templateRegistry;
     private DataSource dataSource;
     private CommandExecutor commandExecutor;
@@ -115,7 +117,7 @@ public class PeerManagerImpl implements PeerManager
             peerInfo = result.get( 0 );
         }
         localPeer = new LocalPeerImpl( this, templateRegistry, peerDAO, quotaManager, strategyManager, requestListeners,
-                                       commandExecutor, hostRegistry );
+                commandExecutor, hostRegistry, monitor );
         localPeer.init();
 
         //add command request listener
@@ -162,6 +164,12 @@ public class PeerManagerImpl implements PeerManager
     public void setQuotaManager( final QuotaManager quotaManager )
     {
         this.quotaManager = quotaManager;
+    }
+
+
+    public void setMonitor( final Monitor monitor )
+    {
+        this.monitor = monitor;
     }
 
 

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.common.enums;
+package org.safehaus.subutai.plugin.common.api;
 
 
 /**
