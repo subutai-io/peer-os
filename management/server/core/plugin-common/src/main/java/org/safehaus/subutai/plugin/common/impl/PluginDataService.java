@@ -261,7 +261,7 @@ public class PluginDataService
             key = key.toUpperCase();
             em.getTransaction().begin();
             Query query =
-                    em.createQuery( "DELETE FROM ClusterDataEntity cd WHERE cd.source = :source and cd.id = :key" );
+                    em.createQuery( "DELETE FROM ClusterDataEntity cd WHERE cd.source = :source and cd.id = :id" );
             query.setParameter( "source", source );
             query.setParameter( "id", key );
             query.executeUpdate();
