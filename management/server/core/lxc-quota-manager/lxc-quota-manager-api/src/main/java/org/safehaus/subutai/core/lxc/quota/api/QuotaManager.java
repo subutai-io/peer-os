@@ -22,4 +22,6 @@ public interface QuotaManager
      * Get specified quota of container
      */
     public PeerQuotaInfo getQuota( String containerName, QuotaType quotaType ) throws QuotaException;
+
+    //TODO add simplifed quota management functions and expose them in Peer
 }
