@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.messenger.api.Message;
@@ -41,34 +40,41 @@ public class MessengerImpl implements Messenger, MessageProcessor
     private final PeerManager peerManager;
     protected MessengerDao messengerDao;
     protected MessageSender messageSender;
+    private   EntityManager entityManager;
 
 
-    public MessengerImpl( final PeerManager peerManager, final EntityManagerFactory entityManagerFactory )
+
+    public MessengerImpl( final PeerManager peerManager)
             throws MessengerException
     {
         Preconditions.checkNotNull( peerManager );
-        Preconditions.checkNotNull( entityManagerFactory );
+        Preconditions.checkNotNull( entityManager );
 
         this.peerManager = peerManager;
-        EntityManager entityManager = null;
+
         try
         {
-            entityManager = entityManagerFactory.createEntityManager();
-            this.messengerDao = new MessengerDao( entityManagerFactory );
+            this.messengerDao  = new MessengerDao( entityManager );
             this.messageSender = new MessageSender( peerManager, messengerDao, this );
         }
         catch ( Exception e )
         {
-            LOG.error( "Error on creating entity manager.", e );
             throw new MessengerException( e );
         }
         finally
         {
-            if ( entityManager != null )
-            {
-                entityManager.close();
-            }
         }
+    }
+
+    public EntityManager getEntityManager()
+    {
+        return entityManager;
+    }
+
+
+    public void setEntityManager( final EntityManager entityManager )
+    {
+        this.entityManager = entityManager;
     }
 
 

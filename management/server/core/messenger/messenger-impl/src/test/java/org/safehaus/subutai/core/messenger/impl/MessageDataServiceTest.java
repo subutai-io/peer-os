@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.messenger.impl;
 import java.io.PrintStream;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
@@ -15,7 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.messenger.impl.dao.MessageDataService;
-import org.safehaus.subutai.core.messenger.impl.model.MessageEntity;
+import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
@@ -31,8 +30,6 @@ import static org.mockito.Mockito.when;
 public class MessageDataServiceTest
 {
     private static final String ID = "id";
-    @Mock
-    EntityManagerFactory entityManagerFactory;
     @Mock
     EntityManager entityManager;
     @Mock
@@ -52,14 +49,11 @@ public class MessageDataServiceTest
     @Before
     public void setUp() throws Exception
     {
-        when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
-        when( entityManager.getTransaction() ).thenReturn( transaction );
-        when( transaction.isActive() ).thenReturn( true );
         when( entityManager.createQuery( anyString() ) ).thenReturn( query );
         when( entityManager.createQuery( anyString(), eq( String.class ) ) ).thenReturn( typedQuery );
         when( entityManager.createQuery( anyString(), eq( MessageEntity.class ) ) ).thenReturn( typedQuery );
 
-        messageDataService = new MessageDataService( entityManagerFactory );
+        messageDataService = new MessageDataService( entityManager );
 
         reset( exception );
     }

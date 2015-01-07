@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 
 import org.junit.After;
@@ -31,7 +31,7 @@ public class TemplateServiceImplTest
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateServiceImplTest.class.getName() );
 
     //    private EntityManager em;
-    private EntityManagerFactory emf;
+    private EntityManager em;
     //    private EntityTransaction tx;
 
     private TemplateServiceImpl templateServiceImpl;
@@ -40,9 +40,8 @@ public class TemplateServiceImplTest
     @Before
     public void setUp() throws Exception
     {
-        emf = Persistence.createEntityManagerFactory( "default" );
         templateServiceImpl = new TemplateServiceImpl();
-        templateServiceImpl.setEntityManagerFactory( emf );
+        templateServiceImpl.setEntityManager( em );
     }
 
 
@@ -50,7 +49,7 @@ public class TemplateServiceImplTest
     public void tearDown() throws Exception
     {
         //        em.close();
-        emf.close();
+        em.close();
     }
 
 

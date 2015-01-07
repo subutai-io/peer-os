@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityManager;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.messenger.impl.dao.MessageDataService;
-import org.safehaus.subutai.core.messenger.impl.model.MessageEntity;
+import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
 
 import com.google.common.collect.Lists;
 
@@ -39,7 +39,7 @@ public class MessengerDaoTest
 
 
     @Mock
-    EntityManagerFactory entityManagerFactory;
+    EntityManager entityManager;
     @Mock
     MessageDataService messageDataService;
     @Mock
@@ -54,7 +54,7 @@ public class MessengerDaoTest
     @Before
     public void setUp() throws Exception
     {
-        messengerDao = new MessengerDao( entityManagerFactory );
+        messengerDao = new MessengerDao( entityManager );
         messengerDao.messageDataService = messageDataService;
         message = new MessageImpl( SOURCE_PEER_ID, PAYLOAD );
         envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE );

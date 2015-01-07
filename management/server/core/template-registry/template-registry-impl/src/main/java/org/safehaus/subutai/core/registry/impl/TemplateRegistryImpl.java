@@ -840,6 +840,14 @@ public class TemplateRegistryImpl implements TemplateRegistry
     {
         try
         {
+            try
+            {
+                templateService.saveTemplate( TestUtils2.getParentTemplate() );
+            }
+            catch ( IOException e )
+            {
+                e.printStackTrace();
+            }
             LOG.warn( "Printing saved templates..." );
             List<Template> templates = templateService.getAllTemplates();
             for ( Template template1 : templates )

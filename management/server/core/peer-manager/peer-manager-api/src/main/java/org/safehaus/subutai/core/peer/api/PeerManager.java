@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.peer.api;
 import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityManager;
 
 
 public interface PeerManager
@@ -46,5 +46,5 @@ public interface PeerManager
 
     public void removeRequestListener( RequestListener listener );
 
-    EntityManagerFactory getEntityManagerFactory();
+    EntityManager getEntityManager();
 }

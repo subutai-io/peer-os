@@ -57,6 +57,12 @@
 
     <!-- apache shiro -->
     <org.apache.shiro.version>1.2.3</org.apache.shiro.version>
+
+    <!-- Database  -->
+    <h2database.version>1.4.184</h2database.version>
+    <openjpa.version>2.3.0</openjpa.version>
+
+
   </properties>
 
   <dependencyManagement>
@@ -758,7 +764,18 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- db-manager -->
+      <!-- Database -->
+      <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>${h2database.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.openjpa</groupId>
+        <artifactId>openjpa-all</artifactId>
+        <version>${openjpa.version}</version>
+      </dependency>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <dependency>
         <groupId>com.codahale.metrics</groupId>
         <artifactId>metrics-core</artifactId>

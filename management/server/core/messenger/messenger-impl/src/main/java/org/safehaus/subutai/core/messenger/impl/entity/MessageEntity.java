@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.messenger.impl.model;
+package org.safehaus.subutai.core.messenger.impl.entity;
 
 
 import java.io.Serializable;

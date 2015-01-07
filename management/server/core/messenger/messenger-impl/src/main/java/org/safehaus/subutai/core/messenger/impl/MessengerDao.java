@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityManager;
 
 import org.safehaus.subutai.core.messenger.impl.dao.MessageDataService;
-import org.safehaus.subutai.core.messenger.impl.model.MessageEntity;
+import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -26,11 +26,11 @@ public class MessengerDao
     protected MessageDataService messageDataService;
 
 
-    public MessengerDao( EntityManagerFactory entityManagerFactory )
+    public MessengerDao( EntityManager entityManager )
     {
-        Preconditions.checkNotNull( entityManagerFactory, "EntityManagerFactory is null" );
+        Preconditions.checkNotNull( entityManager, "EntityManager is null" );
 
-        this.messageDataService = new MessageDataService( entityManagerFactory );
+        this.messageDataService = new MessageDataService( entityManager );
     }
 
 

@@ -6,12 +6,11 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
-import org.safehaus.subutai.core.messenger.impl.model.MessageEntity;
+import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,14 +21,14 @@ import com.google.common.collect.Lists;
 public class MessageDataService implements DataService<String, MessageEntity>
 {
     private static final Logger LOG = LoggerFactory.getLogger( MessageDataService.class );
-    EntityManagerFactory emf;
+    EntityManager em;
 
 
-    public MessageDataService( EntityManagerFactory entityManagerFactory )
+    public MessageDataService( EntityManager entityManager )
     {
-        Preconditions.checkNotNull( entityManagerFactory );
+        Preconditions.checkNotNull( entityManager );
 
-        this.emf = entityManagerFactory;
+        this.em = entityManager;
     }
 
 
@@ -37,24 +36,16 @@ public class MessageDataService implements DataService<String, MessageEntity>
     public MessageEntity find( final String id )
     {
         MessageEntity result = null;
-        EntityManager em = emf.createEntityManager();
+
         try
         {
-            em.getTransaction().begin();
             result = em.find( MessageEntity.class, id );
-            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
-            LOG.error( e.toString(), e );
-            if ( em.getTransaction().isActive() )
-            {
-                em.getTransaction().rollback();
-            }
         }
         finally
         {
-            em.close();
         }
         return result;
     }
@@ -64,24 +55,16 @@ public class MessageDataService implements DataService<String, MessageEntity>
     public Collection<MessageEntity> getAll()
     {
         Collection<MessageEntity> result = Lists.newArrayList();
-        EntityManager em = emf.createEntityManager();
         try
         {
-            em.getTransaction().begin();
             result = em.createQuery( "select h from MessageEntity h", MessageEntity.class ).getResultList();
-            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
-            if ( em.getTransaction().isActive() )
-            {
-                em.getTransaction().rollback();
-            }
         }
         finally
         {
-            em.close();
         }
         return result;
     }
@@ -90,25 +73,17 @@ public class MessageDataService implements DataService<String, MessageEntity>
     @Override
     public void persist( final MessageEntity item )
     {
-        EntityManager em = emf.createEntityManager();
         try
         {
-            em.getTransaction().begin();
             em.persist( item );
             em.flush();
-            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
-            if ( em.getTransaction().isActive() )
-            {
-                em.getTransaction().rollback();
-            }
         }
         finally
         {
-            em.close();
         }
     }
 
@@ -116,25 +91,18 @@ public class MessageDataService implements DataService<String, MessageEntity>
     @Override
     public void remove( final String id )
     {
-        EntityManager em = emf.createEntityManager();
         try
         {
-            em.getTransaction().begin();
             MessageEntity item = em.find( MessageEntity.class, id );
             em.remove( item );
-            em.getTransaction().commit();
+            em.flush();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
-            if ( em.getTransaction().isActive() )
-            {
-                em.getTransaction().rollback();
-            }
         }
         finally
         {
-            em.close();
         }
     }
 
@@ -142,24 +110,17 @@ public class MessageDataService implements DataService<String, MessageEntity>
     @Override
     public void update( final MessageEntity item )
     {
-        EntityManager em = emf.createEntityManager();
         try
         {
-            em.getTransaction().begin();
             em.merge( item );
-            em.getTransaction().commit();
+            em.flush();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
-            if ( em.getTransaction().isActive() )
-            {
-                em.getTransaction().rollback();
-            }
         }
         finally
         {
-            em.close();
         }
     }
 
@@ -167,26 +128,18 @@ public class MessageDataService implements DataService<String, MessageEntity>
     public List<String> getTargetPeers()
     {
         List<String> result = new ArrayList<>();
-        EntityManager em = emf.createEntityManager();
         try
         {
-            em.getTransaction().begin();
             TypedQuery<String> query =
                     em.createQuery( "select distinct e.targetPeerId from MessageEntity e", String.class );
             result = query.getResultList();
-            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
-            if ( em.getTransaction().isActive() )
-            {
-                em.getTransaction().rollback();
-            }
         }
         finally
         {
-            em.close();
         }
 
         return result;
@@ -198,10 +151,8 @@ public class MessageDataService implements DataService<String, MessageEntity>
     {
 
         List<MessageEntity> result = new ArrayList<>();
-        EntityManager em = emf.createEntityManager();
         try
         {
-            em.getTransaction().begin();
             long ts = System.currentTimeMillis();
             TypedQuery<MessageEntity> query = em.createQuery(
                     "select e from MessageEntity e where e.targetPeerId = :targetPeerId"
@@ -212,19 +163,13 @@ public class MessageDataService implements DataService<String, MessageEntity>
                                                 .setParameter( "intval", wideningIntervalSec )
                                                 .setParameter( "ts1", ts );
             result = query.getResultList();
-            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
-            if ( em.getTransaction().isActive() )
-            {
-                em.getTransaction().rollback();
-            }
         }
         finally
         {
-            em.close();
         }
 
         return result;
@@ -233,84 +178,61 @@ public class MessageDataService implements DataService<String, MessageEntity>
 
     public void purgeMessages()
     {
-        EntityManager em = emf.createEntityManager();
         try
         {
-            em.getTransaction().begin();
             long ts = System.currentTimeMillis();
             Query query = em.createQuery( "delete from MessageEntity e where e.createDate + 3600 * 1000 * 24 < :ts1" )
                             .setParameter( "ts1", ts );
 
             query.executeUpdate();
-            em.getTransaction().commit();
+            em.flush();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
-            if ( em.getTransaction().isActive() )
-            {
-                em.getTransaction().rollback();
-            }
         }
         finally
         {
-            em.close();
         }
     }
 
 
     public void markAsSent( String messageId )
     {
-
-        EntityManager em = emf.createEntityManager();
         try
         {
-            em.getTransaction().begin();
             Query query = em.createQuery( "update MessageEntity e set e.isSent = true where e.id = :id" )
                             .setParameter( "id", messageId );
 
             query.executeUpdate();
-            em.getTransaction().commit();
+            em.flush();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
-            if ( em.getTransaction().isActive() )
-            {
-                em.getTransaction().rollback();
-            }
         }
         finally
         {
-            em.close();
         }
     }
 
 
     public void incrementDeliveryAttempts( final String messageId )
     {
-
-        EntityManager em = emf.createEntityManager();
         try
         {
-            em.getTransaction().begin();
             Query query = em.createQuery( "update MessageEntity e set e.attempts = e.attempts + 1  where e.id = :id" )
                             .setParameter( "id", messageId );
 
             query.executeUpdate();
-            em.getTransaction().commit();
+            em.flush();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
-            if ( em.getTransaction().isActive() )
-            {
-                em.getTransaction().rollback();
-            }
         }
         finally
         {
-            em.close();
         }
     }
 }

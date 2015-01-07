@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
@@ -59,7 +59,7 @@ public class PeerManagerImpl implements PeerManager
     private CommandResponseListener commandResponseListener;
     private Set<RequestListener> requestListeners = Sets.newHashSet();
     private MessageResponseListener messageResponseListener;
-    private EntityManagerFactory entityManagerFactory;
+    private EntityManager entityManager;
     private HostRegistry hostRegistry;
 
 
@@ -71,9 +71,9 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    public void setEntityManagerFactory( EntityManagerFactory entityManagerFactory )
+    public void setEntityManager( EntityManager entityManager )
     {
-        this.entityManagerFactory = entityManagerFactory;
+        this.entityManager = entityManager;
     }
 
 
@@ -84,9 +84,9 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public EntityManagerFactory getEntityManagerFactory()
+    public EntityManager getEntityManager()
     {
-        return entityManagerFactory;
+        return entityManager;
     }
 
 

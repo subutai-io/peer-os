@@ -63,9 +63,9 @@ import org.safehaus.subutai.core.peer.impl.dao.ContainerHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.ManagementHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.dao.ResourceHostDataService;
-import org.safehaus.subutai.core.peer.impl.model.ContainerHostEntity;
-import org.safehaus.subutai.core.peer.impl.model.ManagementHostEntity;
-import org.safehaus.subutai.core.peer.impl.model.ResourceHostEntity;
+import org.safehaus.subutai.core.peer.impl.entity.ContainerHostEntity;
+import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
+import org.safehaus.subutai.core.peer.impl.entity.ResourceHostEntity;
 import org.safehaus.subutai.core.peer.impl.task.CloneTaskImpl;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -132,7 +132,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     @Override
     public void init()
     {
-        managementHostDataService = new ManagementHostDataService( peerManager.getEntityManagerFactory() );
+        managementHostDataService = new ManagementHostDataService( peerManager.getEntityManager() );
         Collection allManagementHostEntity = managementHostDataService.getAll();
         if ( allManagementHostEntity != null && allManagementHostEntity.size() > 0 )
         {
@@ -142,11 +142,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             managementHost.init();
         }
 
-        resourceHostDataService = new ResourceHostDataService( peerManager.getEntityManagerFactory() );
+        resourceHostDataService = new ResourceHostDataService( peerManager.getEntityManager() );
         resourceHosts = Sets.newHashSet();
         resourceHosts.addAll( resourceHostDataService.getAll() );
 
-        containerHostDataService = new ContainerHostDataService( peerManager.getEntityManagerFactory() );
+        containerHostDataService = new ContainerHostDataService( peerManager.getEntityManager() );
 
         for ( ResourceHost resourceHost : resourceHosts )
         {

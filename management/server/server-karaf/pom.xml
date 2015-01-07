@@ -147,6 +147,7 @@
             <feature>http</feature>
             <feature>jndi</feature>
             <feature>transaction</feature>
+            <feature>jdbc</feature>
           </bootFeatures>
         </configuration>
         <executions>
