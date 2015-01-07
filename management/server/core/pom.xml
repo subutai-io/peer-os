@@ -36,7 +36,6 @@
     <module>command-executor</module>
     <module>wol-manager</module>
     <module>key-manager</module>
-    <module>plugin-common</module>
     <module>plugin-manager</module>
   </modules>
 
