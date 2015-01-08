@@ -123,14 +123,12 @@ function fs_recv {
   local deltas="$2"
   local lxc_rootfs="$3"
   rm -rf /var/lib/lxc/$template/rootfs
-  sudo btrfs receive /var/lib/lxc/$template < $deltas/rootfs.delta
-  sudo btrfs receive /lxc/ < $deltas/opt.delta
-  sudo btrfs receive /lxc-data/ < $deltas/var.delta
-  sudo btrfs receive /lxc-data/ < $deltas/home.delta
-  sudo btrfs property set -ts /var/lib/lxc/$template/rootfs/ ro true
-  sudo btrfs property set -ts /lxc/$template-opt ro true
-  sudo btrfs property set -ts /lxc-data/$template-var ro true
-  sudo btrfs property set -ts /lxc-data/$template-home ro true
+  rm -rf $HOME/.local/share/lxc/$template/rootfs
+  sudo btrfs receive $HOME/.local/share/lxc/$template < $deltas/rootfs.delta
+  sudo btrfs receive $HOME/.local/lxc < $deltas/opt.delta
+  sudo btrfs property set -ts $HOME/.local/lxc/$template-opt ro true
+  sudo btrfs property set -ts $HOME/.local/lxc-data/$template-var ro true
+  sudo btrfs property set -ts $HOME/.local/lxc-data/$template-home ro true
 }
 
 #generate delta images of all filesystems
