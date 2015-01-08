@@ -46,5 +46,5 @@ public interface PeerManager
 
     public void removeRequestListener( RequestListener listener );
 
-    EntityManager getEntityManager();
+    EntityManager getEntityManagerFactory();
 }

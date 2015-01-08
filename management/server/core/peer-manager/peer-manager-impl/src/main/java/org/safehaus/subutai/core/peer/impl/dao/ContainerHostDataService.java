@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.peer.impl.dao;
 import java.util.Collection;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.core.peer.impl.entity.ContainerHostEntity;
@@ -16,18 +17,18 @@ import com.google.common.collect.Lists;
 public class ContainerHostDataService implements DataService<String, ContainerHostEntity>
 {
     private static final Logger LOG = LoggerFactory.getLogger( ContainerHostDataService.class );
-    EntityManager em;
+    EntityManagerFactory emf;
 
 
-    public ContainerHostDataService( EntityManager entityManager )
+    public ContainerHostDataService( EntityManagerFactory entityManagerFactory )
     {
-        this.em = entityManager;
+        this.emf = entityManagerFactory;
     }
 
 
-    public void setEntityManager( final EntityManager em )
+    public void setEntityManagerFactory( final EntityManagerFactory emf )
     {
-        this.em = em;
+        this.emf = emf;
     }
 
 
@@ -35,16 +36,24 @@ public class ContainerHostDataService implements DataService<String, ContainerHo
     public ContainerHostEntity find( final String id )
     {
         ContainerHostEntity result = null;
+        EntityManager em = emf.createEntityManager();
         try
         {
+            em.getTransaction().begin();
             result = em.find( ContainerHostEntity.class, id );
+            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
         }
         finally
         {
+            em.close();
         }
         return result;
     }
@@ -54,16 +63,24 @@ public class ContainerHostDataService implements DataService<String, ContainerHo
     public Collection<ContainerHostEntity> getAll()
     {
         Collection<ContainerHostEntity> result = Lists.newArrayList();
+        EntityManager em = emf.createEntityManager();
         try
         {
+            em.getTransaction().begin();
             result = em.createQuery( "select h from ContainerHostEntity h", ContainerHostEntity.class ).getResultList();
+            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
         }
         finally
         {
+            em.close();
         }
         return result;
     }
@@ -72,17 +89,25 @@ public class ContainerHostDataService implements DataService<String, ContainerHo
     @Override
     public void persist( final ContainerHostEntity item )
     {
+        EntityManager em = emf.createEntityManager();
         try
         {
+            em.getTransaction().begin();
             em.persist( item );
             em.flush();
+            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
         }
         finally
         {
+            em.close();
         }
     }
 
@@ -90,18 +115,25 @@ public class ContainerHostDataService implements DataService<String, ContainerHo
     @Override
     public void remove( final String id )
     {
+        EntityManager em = emf.createEntityManager();
         try
         {
+            em.getTransaction().begin();
             ContainerHostEntity entity = em.find( ContainerHostEntity.class, id );
             em.remove( entity );
-            em.flush();
+            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
         }
         finally
         {
+            em.close();
         }
     }
 
@@ -109,17 +141,24 @@ public class ContainerHostDataService implements DataService<String, ContainerHo
     @Override
     public void update( final ContainerHostEntity item )
     {
+        EntityManager em = emf.createEntityManager();
         try
         {
+            em.getTransaction().begin();
             em.merge( item );
-            em.flush();
+            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
         }
         finally
         {
+            em.close();
         }
     }
 }

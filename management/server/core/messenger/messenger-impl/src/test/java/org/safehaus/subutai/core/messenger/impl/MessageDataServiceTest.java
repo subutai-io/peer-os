@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.messenger.impl;
 import java.io.PrintStream;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
@@ -33,8 +32,6 @@ public class MessageDataServiceTest
     @Mock
     EntityManager entityManager;
     @Mock
-    EntityTransaction transaction;
-    @Mock
     TypedQuery typedQuery;
     @Mock
     Query query;
@@ -61,7 +58,7 @@ public class MessageDataServiceTest
 
     private void throwException()
     {
-        doThrow( exception ).when( transaction ).begin();
+        //doThrow( exception ).when( transaction ).begin();
     }
 
 

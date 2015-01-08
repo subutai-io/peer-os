@@ -6,13 +6,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
+import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -24,6 +25,7 @@ import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandRequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequestListener;
+import org.safehaus.subutai.core.peer.impl.dao.DaoManager;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequestListener;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
@@ -49,6 +51,7 @@ public class PeerManagerImpl implements PeerManager
     private static final String PEER_GROUP = "PEER_GROUP";
     private PeerDAO peerDAO;
     private QuotaManager quotaManager;
+    private Monitor monitor;
     private TemplateRegistry templateRegistry;
     private DataSource dataSource;
     private CommandExecutor commandExecutor;
@@ -59,8 +62,8 @@ public class PeerManagerImpl implements PeerManager
     private CommandResponseListener commandResponseListener;
     private Set<RequestListener> requestListeners = Sets.newHashSet();
     private MessageResponseListener messageResponseListener;
-    private EntityManager entityManager;
     private HostRegistry hostRegistry;
+    private DaoManager daoManager;
 
 
     public PeerManagerImpl( final DataSource dataSource, final Messenger messenger )
@@ -71,10 +74,6 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    public void setEntityManager( EntityManager entityManager )
-    {
-        this.entityManager = entityManager;
-    }
 
 
     public void setHostRegistry( final HostRegistry hostRegistry )
@@ -83,10 +82,22 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @Override
-    public EntityManager getEntityManager()
+    public DaoManager getDaoManager()
     {
-        return entityManager;
+        return daoManager;
+    }
+
+
+    public void setDaoManager( final DaoManager daoManager )
+    {
+        this.daoManager = daoManager;
+    }
+
+
+    @Override
+    public EntityManagerFactory getEntityManagerFactory()
+    {
+        return  daoManager.getEntityManagerFactory();
     }
 
 
@@ -115,7 +126,7 @@ public class PeerManagerImpl implements PeerManager
             peerInfo = result.get( 0 );
         }
         localPeer = new LocalPeerImpl( this, templateRegistry, peerDAO, quotaManager, strategyManager, requestListeners,
-                                       commandExecutor, hostRegistry );
+                commandExecutor, hostRegistry, monitor );
         localPeer.init();
 
         //add command request listener
@@ -162,6 +173,12 @@ public class PeerManagerImpl implements PeerManager
     public void setQuotaManager( final QuotaManager quotaManager )
     {
         this.quotaManager = quotaManager;
+    }
+
+
+    public void setMonitor( final Monitor monitor )
+    {
+        this.monitor = monitor;
     }
 
 

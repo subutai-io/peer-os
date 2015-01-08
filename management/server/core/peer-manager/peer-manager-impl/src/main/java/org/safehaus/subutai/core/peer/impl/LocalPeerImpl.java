@@ -22,6 +22,7 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
@@ -37,6 +38,8 @@ import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
+import org.safehaus.subutai.core.metric.api.Monitor;
+import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.peer.api.CloneParam;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -99,6 +102,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     private CommandExecutor commandExecutor;
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
+    private Monitor monitor;
     private ConcurrentMap<String, AtomicInteger> sequences;
     private ManagementHostDataService managementHostDataService;
     private ResourceHostDataService resourceHostDataService;
@@ -113,7 +117,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     public LocalPeerImpl( PeerManager peerManager, TemplateRegistry templateRegistry, PeerDAO peerDao,
                           QuotaManager quotaManager, StrategyManager strategyManager,
                           Set<RequestListener> requestListeners, CommandExecutor commandExecutor,
-                          HostRegistry hostRegistry )
+                          HostRegistry hostRegistry, Monitor monitor )
 
     {
         this.strategyManager = strategyManager;
@@ -121,6 +125,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
         this.templateRegistry = templateRegistry;
         this.peerDAO = peerDao;
         this.quotaManager = quotaManager;
+        this.monitor = monitor;
         this.requestListeners = requestListeners;
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
@@ -132,7 +137,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     @Override
     public void init()
     {
-        managementHostDataService = new ManagementHostDataService( peerManager.getEntityManager() );
+        managementHostDataService = new ManagementHostDataService( peerManager.getEntityManagerFactory() );
         Collection allManagementHostEntity = managementHostDataService.getAll();
         if ( allManagementHostEntity != null && allManagementHostEntity.size() > 0 )
         {
@@ -142,11 +147,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             managementHost.init();
         }
 
-        resourceHostDataService = new ResourceHostDataService( peerManager.getEntityManager() );
+        resourceHostDataService = new ResourceHostDataService( peerManager.getEntityManagerFactory() );
         resourceHosts = Sets.newHashSet();
         resourceHosts.addAll( resourceHostDataService.getAll() );
 
-        containerHostDataService = new ContainerHostDataService( peerManager.getEntityManager() );
+        containerHostDataService = new ContainerHostDataService( peerManager.getEntityManagerFactory() );
 
         for ( ResourceHost resourceHost : resourceHosts )
         {
@@ -910,6 +915,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             quotaManager.setQuota( c.getHostname(), quota );
         }
         catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost host, final int processPid )
+            throws PeerException
+    {
+        try
+        {
+            Host c = bindHost( host.getHostId() );
+            return monitor.getProcessResourceUsage( ( ContainerHost ) c, processPid );
+        }
+        catch ( MonitorException e )
         {
             throw new PeerException( e );
         }

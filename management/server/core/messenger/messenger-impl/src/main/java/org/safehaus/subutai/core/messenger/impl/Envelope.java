@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 import org.safehaus.subutai.core.messenger.api.Message;
-import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
+import org.safehaus.subutai.core.messenger.impl.model.MessageEntity;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

@@ -77,7 +77,7 @@ public class MessengerImplTest
         when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
         when( dataSource.getConnection() ).thenReturn( connection );
 
-        messenger = new MessengerImpl( peerManager );
+        messenger = new MessengerImpl(  );
         messenger.messageSender = messageSender;
         messenger.notificationExecutor = notificationExecutor;
         messenger.messengerDao = messengerDao;
@@ -89,14 +89,14 @@ public class MessengerImplTest
     @Test( expected = NullPointerException.class )
     public void testConstructor() throws Exception
     {
-        new MessengerImpl( null);
+        new MessengerImpl( );
     }
 
 
     @Test( expected = NullPointerException.class )
     public void testConstructor2() throws Exception
     {
-        new MessengerImpl( peerManager );
+        new MessengerImpl( );
     }
 
 
@@ -105,7 +105,7 @@ public class MessengerImplTest
     {
         //doThrow( new RuntimeException() ).when( entityManagerFactory ).createEntityManager();
 
-        new MessengerImpl( peerManager );
+        new MessengerImpl(  );
     }
 
 

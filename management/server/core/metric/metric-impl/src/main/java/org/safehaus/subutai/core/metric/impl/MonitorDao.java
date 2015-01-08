@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.exception.DaoException;
@@ -37,9 +37,9 @@ public class MonitorDao
     }
 
 
-    public MonitorDao( EntityManagerFactory emf ) throws DaoException
+    public MonitorDao( EntityManager em ) throws DaoException
     {
-        this.dataService = new SubscriberDataService( emf );
+        this.dataService = new SubscriberDataService( em );
     }
 
 
@@ -65,17 +65,7 @@ public class MonitorDao
         Preconditions.checkNotNull( environmentId, INVALID_ENV_ID );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), "Invalid subscriber id" );
 
-        //        try
-        //        {
         dataService.update( environmentId.toString(), subscriberId );
-        //            dbUtil.update( "merge into monitor_subscriptions(environmentId, subscriberId) values(?,?)",
-        // environmentId,
-        //                    subscriberId );
-        //        }
-        //        catch ( SQLException e )
-        //        {
-        //            throw new DaoException( e );
-        //        }
     }
 
 
@@ -85,16 +75,8 @@ public class MonitorDao
         Preconditions.checkNotNull( environmentId, INVALID_ENV_ID );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), "Invalid subscriber id" );
 
-        //        try
-        //        {
         dataService.remove( environmentId.toString(), subscriberId );
-        //            dbUtil.update( "delete from monitor_subscriptions where environmentId = ? and subscriberId = ?",
-        //                    environmentId, subscriberId );
-        //        }
-        //        catch ( SQLException e )
-        //        {
-        //            throw new DaoException( e );
-        //        }
+
     }
 
 
@@ -103,23 +85,7 @@ public class MonitorDao
         Preconditions.checkNotNull( environmentId, INVALID_ENV_ID );
         Set<String> subscribersIds;
         subscribersIds = dataService.getEnvironmentSubscriberIds( environmentId.toString() );
-        //        try
-        //        {
-        //            ResultSet rs = dbUtil.select( "select subscriberId from monitor_subscriptions where
-        // environmentId = ?",
-        //                    environmentId );
-        //            if ( rs != null )
-        //            {
-        //                while ( rs.next() )
-        //                {
-        //                    subscribersIds.add( rs.getString( "subscriberId" ) );
-        //                }
-        //            }
-        //        }
-        //        catch ( SQLException e )
-        //        {
-        //            throw new DaoException( e );
-        //        }
+
         return subscribersIds;
     }
 }

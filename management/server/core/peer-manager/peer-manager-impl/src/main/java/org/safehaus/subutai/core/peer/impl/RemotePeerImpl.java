@@ -11,6 +11,7 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
@@ -196,6 +197,15 @@ public class RemotePeerImpl implements RemotePeer
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
         remotePeerRestClient.setQuota( host, quotaInfo );
+    }
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost containerHost, final int processPid )
+            throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.getProcessResourceUsage( containerHost, processPid );
     }
 
 

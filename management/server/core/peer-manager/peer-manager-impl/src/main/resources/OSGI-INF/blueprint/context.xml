@@ -16,6 +16,12 @@
     <property name="password" value="" />
   </bean>
   <!-- ***************************************************************** -->
+  <bean id="daoManager" init-method="init" destroy-method="destroy" scope="singleton"
+        class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
+    <jpa:unit unitname="peerManagerPUnit" property="entityManagerFactory" />
+    <tx:transaction method="*" value="Required"/>
+  </bean>
+  <!-- ***************************************************************** -->
 
   <service ref="peerManager" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
@@ -35,14 +41,12 @@
 
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
-
-    <jpa:context unitname="peerManagerPUnit" property="entityManager" />
-    <tx:transaction method="*" value="Required"/>
     <property name="templateRegistry" ref="templateRegistry" />
     <property name="hostRegistry"     ref="hostRegistry" />
     <property name="strategyManager"  ref="strategyManager" />
     <property name="quotaManager"     ref="quotaManager" />
     <property name="commandExecutor"  ref="commandExecutor" />
+    <property name="daoManager"       ref="daoManager" />
     <argument ref="dataSource" />
     <argument ref="messenger" />
   </bean>

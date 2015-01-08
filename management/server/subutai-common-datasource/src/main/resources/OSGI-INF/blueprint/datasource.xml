@@ -8,7 +8,6 @@
 
   <bean id="envManagerJDBC" class="org.h2.jdbcx.JdbcDataSource">
     <property name="URL" value="jdbc:h2:/var/lib/subutai/db/environmentDb" />
-                                jdbc:h2:/var/lib/subutai/db/commonDb
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>

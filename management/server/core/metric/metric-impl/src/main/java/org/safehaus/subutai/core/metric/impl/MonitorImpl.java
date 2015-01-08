@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.command.CommandException;
@@ -55,7 +55,7 @@ public class MonitorImpl implements Monitor
             Collections.newSetFromMap( new ConcurrentHashMap<AlertListener, Boolean>() );
     private final Commands commands = new Commands();
     private final PeerManager peerManager;
-
+    private   EntityManager entityManager;
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
 
@@ -79,28 +79,16 @@ public class MonitorImpl implements Monitor
         }
     }
 
-
-    public MonitorImpl( final DataSource dataSource, PeerManager peerManager, EntityManagerFactory emf )
-            throws MonitorException
+    public EntityManager getEntityManager()
     {
-        Preconditions.checkNotNull( dataSource, "Data source is null" );
-        Preconditions.checkNotNull( peerManager, "Peer manager is null" );
-        Preconditions.checkNotNull( emf, "EntityManagerFactory is null." );
-        try
-        {
-            this.monitorDao = new MonitorDao( emf );
-            this.peerManager = peerManager;
-            peerManager.addRequestListener( new RemoteAlertListener( this ) );
-            peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
-            peerManager.addRequestListener( new MonitoringActivationListener( this, peerManager ) );
-        }
-        catch ( DaoException e )
-        {
-            throw new MonitorException( e );
-        }
+        return entityManager;
     }
 
 
+    public void setEntityManager( final EntityManager entityManager )
+    {
+        this.entityManager = entityManager;
+    }
     @Override
     public Set<ContainerHostMetric> getContainerHostsMetrics( final Environment environment ) throws MonitorException
     {

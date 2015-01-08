@@ -4,8 +4,8 @@ package org.safehaus.subutai.core.metric.impl.dao;
 import java.util.HashSet;
 import java.util.Set;
 
+
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
@@ -23,67 +23,49 @@ import com.google.common.base.Preconditions;
  */
 public class SubscriberDataService
 {
-    private EntityManagerFactory emf;
+    private EntityManager em;
     private Logger LOGGER = LoggerFactory.getLogger( SubscriberDataService.class );
 
 
-    public SubscriberDataService( final EntityManagerFactory emf ) throws DaoException
+    public SubscriberDataService( final EntityManager em ) throws DaoException
     {
-        Preconditions.checkNotNull( emf, "EntityManagerFactory cannot be null." );
-        this.emf = emf;
-        try
-        {
-            this.emf.createEntityManager().close();
-        }
-        catch ( PersistenceException e )
-        {
-            LOGGER.error( "Couldn't initialize EntityManager in SubscriberDataService." );
-            throw new DaoException( e );
-        }
+        Preconditions.checkNotNull( em, "EntityManager cannot be null." );
+        this.em = em;
+       
     }
 
 
-    public void setEmf( final EntityManagerFactory emf )
+    public void setEmf( final EntityManager em )
     {
-        Preconditions.checkNotNull( emf, "EntityManagerFactory cannot be null." );
-        this.emf = emf;
+        Preconditions.checkNotNull( em, "EntityManager cannot be null." );
+        this.em = em;
     }
 
 
     public void update( final String environmentId, final String subscriberId ) throws DaoException
     {
-        EntityManager em = emf.createEntityManager();
         try
         {
-            em.getTransaction().begin();
 
             Subscriber subscriber = new Subscriber( environmentId, subscriberId );
             em.merge( subscriber );
-
-            em.getTransaction().commit();
+            em.flush();
         }
         catch ( PersistenceException e )
         {
             LOGGER.error( "Instance is not an entity or command invoked on a container-managed entity manager." );
-            if ( em.getTransaction().isActive() )
-            {
-                em.getTransaction().rollback();
-            }
             throw new DaoException( e );
         }
         finally
         {
-            em.close();
         }
     }
 
 
     public void remove( final String environmentId, final String subscriberId ) throws DaoException
     {
-        EntityManager em = emf.createEntityManager();
         try
         {
-            em.getTransaction().begin();
 
             Query query = em.createQuery(
                     "DELETE FROM Subscriber s WHERE s.environmentId = :environmentId AND s.subscriberId = "
@@ -92,7 +74,7 @@ public class SubscriberDataService
             query.setParameter( "subscriberId", subscriberId );
             query.executeUpdate();
 
-            em.getTransaction().commit();
+            em.flush();
         }
         catch ( PersistenceException e )
         {
@@ -101,7 +83,6 @@ public class SubscriberDataService
         }
         finally
         {
-            em.close();
         }
     }
 
@@ -109,18 +90,15 @@ public class SubscriberDataService
     public Set<String> getEnvironmentSubscriberIds( final String environmentId ) throws DaoException
     {
         Set<String> result = new HashSet<>();
-        EntityManager em = emf.createEntityManager();
         try
         {
-            em.getTransaction().begin();
-
             TypedQuery<String> query =
                     em.createQuery( "select s.subscriberId from Subscriber s where s.environmentId = :environmentId",
                             String.class );
             query.setParameter( "environmentId", environmentId );
             result.addAll( query.getResultList() );
 
-            em.getTransaction().commit();
+            em.flush();
         }
         catch ( PersistenceException e )
         {
@@ -129,7 +107,6 @@ public class SubscriberDataService
         }
         finally
         {
-            em.close();
         }
         return result;
     }
