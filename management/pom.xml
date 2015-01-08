@@ -46,7 +46,7 @@
     <com.google.guava.version>16.0.1</com.google.guava.version>
     <!-- REST -->
     <restlet-version>2.2.2</restlet-version>
-    <org.apache.cxf.version>3.0.1</org.apache.cxf.version>
+    <org.apache.cxf.version>2.7.12</org.apache.cxf.version>
     <!-- TEST -->
     <org.mockito.version>1.9.5</org.mockito.version>
     <com.jayway.awaitility.version>1.5.0</com.jayway.awaitility.version>
@@ -54,6 +54,9 @@
     <org.osgi.version>4.3.1</org.osgi.version>
 
     <vaadin-version>7.3.3</vaadin-version>
+
+    <!-- apache shiro -->
+    <org.apache.shiro.version>1.2.3</org.apache.shiro.version>
   </properties>
 
   <dependencyManagement>
@@ -98,7 +101,6 @@
         <artifactId>key-manager-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
-
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- environment-manager -->
@@ -177,6 +179,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>lxc-quota-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>lxc-quota-manager-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -686,6 +693,11 @@
         <groupId>org.apache.servicemix.specs</groupId>
         <artifactId>org.apache.servicemix.specs.activation-api-1.1</artifactId>
         <version>2.4.0</version>
+      </dependency>
+      <dependency>
+          <groupId>commons-validator</groupId>
+          <artifactId>commons-validator</artifactId>
+          <version>1.4.0</version>
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

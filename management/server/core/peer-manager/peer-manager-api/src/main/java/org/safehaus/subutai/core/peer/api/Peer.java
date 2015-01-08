@@ -11,8 +11,10 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 
 
 /**
@@ -31,9 +33,6 @@ public interface Peer
 
     public Set<ContainerHost> getContainerHostsByEnvironmentId( UUID environmentId ) throws PeerException;
 
-    public Set<ContainerHost> createContainers( UUID creatorPeerId, UUID environmentId, List<Template> templates,
-                                                int quantity, String strategyId, List<Criteria> criteria,
-                                                String nodeGroupName ) throws PeerException;
 
     Set<HostInfoModel> scheduleCloneContainers( UUID creatorPeerId, List<Template> templates, int quantity,
                                                 String strategyId, List<Criteria> criteria ) throws PeerException;
@@ -58,17 +57,18 @@ public interface Peer
 
     public boolean isLocal();
 
-    public String getQuota( ContainerHost host, QuotaEnum quota ) throws PeerException;
+    public PeerQuotaInfo getQuota( ContainerHost host, QuotaType quotaType ) throws PeerException;
 
-    public void setQuota( ContainerHost host, QuotaEnum quota, String value ) throws PeerException;
+    public void setQuota( ContainerHost host, QuotaInfo quotaInfo ) throws PeerException;
 
     public Template getTemplate( String templateName ) throws PeerException;
 
     public boolean isOnline() throws PeerException;
 
-    public <T, V> V sendRequest( T request, String recipient, int timeout, Class<V> responseType ) throws PeerException;
+    public <T, V> V sendRequest( T request, String recipient, int requestTimeout, Class<V> responseType,
+                                 int responseTimeout ) throws PeerException;
 
-    public <T> void sendRequest( T request, String recipient, int timeout ) throws PeerException;
+    public <T> void sendRequest( T request, String recipient, int requestTimeout ) throws PeerException;
 
     public ContainerHostState getContainerHostState( String containerId ) throws PeerException;
 }

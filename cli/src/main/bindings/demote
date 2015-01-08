@@ -61,7 +61,7 @@ function demote {
     unlock_container_read $temp
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
-  elif [ "true" == `is_registered $temp` -a "x$SUBUTAI_OFFLINE_MODE" != "xtrue" ]; then
+  elif [ "true" == "`is_registered $temp`" ]; then
     msg_error "Cannot demote registered template \"$temp\""
     unlock_container_read $temp
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi

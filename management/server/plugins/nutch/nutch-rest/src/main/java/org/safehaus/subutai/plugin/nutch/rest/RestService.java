@@ -27,8 +27,6 @@ public class RestService
     private static final String OPERATION_ID = "OPERATION_ID";
 
     private Nutch nutchManager;
-
-
     public void setNutchManager( Nutch nutchManager )
     {
         this.nutchManager = nutchManager;

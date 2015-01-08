@@ -28,18 +28,12 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenc
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.topology.Blueprint2PeerData;
-import org.safehaus.subutai.core.environment.api.topology.Blueprint2PeerGroupData;
-import org.safehaus.subutai.core.environment.api.topology.Node2PeerData;
-import org.safehaus.subutai.core.environment.api.topology.NodeGroup2PeerData;
-import org.safehaus.subutai.core.environment.api.topology.NodeGroup2PeerGroupData;
 import org.safehaus.subutai.core.environment.api.topology.TopologyData;
-import org.safehaus.subutai.core.environment.impl.builder.Blueprint2PeerBuilder;
-import org.safehaus.subutai.core.environment.impl.builder.Blueprint2PeerGroupBuilder;
-import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuildProcessFactory;
+import org.safehaus.subutai.core.environment.impl.builder.BuildProcessFactory;
+import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuildProcessBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.Node2PeerBuilder;
-import org.safehaus.subutai.core.environment.impl.builder.NodeGroup2PeerBuilder;
-import org.safehaus.subutai.core.environment.impl.builder.NodeGroup2PeerGroupBuilder;
 import org.safehaus.subutai.core.environment.impl.builder.ProcessBuilderException;
+import org.safehaus.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDataService;
 import org.safehaus.subutai.core.environment.impl.environment.BuildException;
@@ -53,6 +47,8 @@ import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
+import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.security.api.SecurityManager;
 import org.safehaus.subutai.core.security.api.SecurityManagerException;
@@ -61,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
@@ -86,6 +83,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private DataSource dataSource;
     private EntityManagerFactory entityManagerFactory;
     private EnvironmentDataService environmentDataService;
+    private EnvironmentContainerDataService environmentContainerDataService;
 
 
     public EnvironmentManagerImpl( final DataSource dataSource ) throws SQLException
@@ -153,8 +151,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             LOG.error( e.getMessage(), e );
         }
-        entityManagerFactory.createEntityManager();
+        entityManagerFactory.createEntityManager().close();
         environmentDataService = new EnvironmentDataService( entityManagerFactory );
+        environmentContainerDataService = new EnvironmentContainerDataService( entityManagerFactory );
     }
 
 
@@ -214,6 +213,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             for ( ContainerHost containerHost : environment.getContainerHosts() )
             {
                 containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
+                containerHost.setDataService( environmentContainerDataService );
             }
         }
         return result;
@@ -227,6 +227,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         for ( ContainerHost containerHost : result.getContainerHosts() )
         {
             containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
+            containerHost.setDataService( environmentContainerDataService );
         }
         return result;
         //        return environmentDAO.getInfo( ENVIRONMENT, uuid, Environment.class );
@@ -315,7 +316,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void saveEnvironment( final Environment environment ) throws EnvironmentManagerException
+    public void saveEnvironment( final Environment environment )
     {
 
         if ( environmentDataService.find( environment.getId().toString() ) == null )
@@ -377,7 +378,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
-        catch ( EnvironmentManagerException e )
+        catch ( EnvironmentBuildException e )
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
@@ -434,6 +435,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         for ( ContainerHost containerHost : result.getContainerHosts() )
         {
             containerHost.setPeer( getPeerManager().getPeer( containerHost.getPeerId() ) );
+            containerHost.setDataService( environmentContainerDataService );
         }
         return result;
         //        return environmentDAO.getInfo( ENVIRONMENT, environmentId.toString(), Environment.class );
@@ -443,31 +445,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public UUID saveBuildProcess( final TopologyData topologyData ) throws EnvironmentManagerException
     {
-        EnvironmentBuildProcessFactory factory = null;
-        if ( topologyData instanceof Blueprint2PeerData )
-        {
-            factory = new Blueprint2PeerBuilder( this );
-        }
-        else if ( topologyData instanceof Blueprint2PeerGroupData )
-        {
-            factory = new Blueprint2PeerGroupBuilder( this );
-        }
-        else if ( topologyData instanceof Node2PeerData )
-        {
-            factory = new Node2PeerBuilder( this );
-        }
-        else if ( topologyData instanceof NodeGroup2PeerData )
-        {
-            factory = new NodeGroup2PeerBuilder( this );
-        }
-        else if ( topologyData instanceof NodeGroup2PeerGroupData )
-        {
-            factory = new NodeGroup2PeerGroupBuilder( this );
-        }
-
+        EnvironmentBuildProcessBuilder builder = BuildProcessFactory.newBuilder( topologyData, this );
         try
         {
-            EnvironmentBuildProcess process = factory.prepareBuildProcess( topologyData );
+            EnvironmentBuildProcess process = builder.prepareBuildProcess( topologyData );
             environmentDAO.saveInfo( PROCESS, process.getId().toString(), process );
             return process.getId();
         }
@@ -489,6 +470,66 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentManagerException( e.getMessage() );
         }
+    }
+
+
+    public void createLocalContainer( final Environment environment, final String templateName,
+                                      final String nodeGroupName, ResourceHost resourceHost )
+            throws EnvironmentBuildException
+    {
+        Preconditions.checkNotNull( environment );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
+        Preconditions.checkNotNull( resourceHost );
+
+
+        //obtain free name
+        String containerName = peerManager.getLocalPeer().getFreeHostName( templateName );
+
+        //clone container
+        try
+        {
+            resourceHost.cloneContainer( templateName, containerName );
+        }
+        catch ( ResourceHostException e )
+        {
+            throw new EnvironmentBuildException( e.getMessage() );
+        }
+
+        //wait container
+        int timeout = 180;
+        long start = System.currentTimeMillis();
+        ContainerHost containerHost = null;
+        while ( start + timeout * 1000 > System.currentTimeMillis() && containerHost == null )
+        {
+            try
+            {
+                Thread.sleep( 100 );
+            }
+            catch ( InterruptedException ignore )
+            {
+
+            }
+
+            containerHost = resourceHost.getContainerHostByName( containerName );
+        }
+
+        //container connection timed out
+        if ( containerHost == null )
+        {
+            throw new EnvironmentBuildException( "Container has not connected within wait interval" );
+        }
+
+        //construct host entity
+        HostInfoModel hostInfoModel = new HostInfoModel( containerHost );
+        EnvironmentContainerImpl environmentContainer =
+                new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), nodeGroupName, hostInfoModel );
+
+        //add container to environment
+        environment.addContainer( environmentContainer );
+
+        //save environment
+        saveEnvironment( environment );
     }
 
 
@@ -550,7 +591,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
-        catch ( EnvironmentManagerException e )
+        catch ( EnvironmentBuildException e )
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
@@ -558,10 +599,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public UUID addContainers( final UUID environmentId, final String template, PlacementStrategy strategy,
-                               String nodeGroupName, final Peer peer ) throws EnvironmentManagerException
+    public UUID addContainer( final UUID environmentId, final String template, PlacementStrategy strategy,
+                              String nodeGroupName, final Peer peer ) throws EnvironmentManagerException
     {
-        EnvironmentBuildProcessFactory builder = new Node2PeerBuilder( this );
+        EnvironmentBuildProcessBuilder builder = new Node2PeerBuilder( this );
         try
         {
 
@@ -615,6 +656,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public PeerManager getPeerManager()
     {
         return peerManager;
+    }
+
+
+    public EnvironmentDataService getEnvironmentDataService()
+    {
+        return environmentDataService;
+    }
+
+
+    public EnvironmentContainerDataService getEnvironmentContainerDataService()
+    {
+        return environmentContainerDataService;
     }
 
 

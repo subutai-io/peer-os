@@ -37,11 +37,33 @@ function quota {
       "cpu.cpus")
         lxc_get_cpus $container
       ;;
-      "hdd.quota")
-        fs_get_quota $container
+      "hdd.quota.home")
+        fs_get_quota $container "home"
+      ;;
+      "hdd.quota.var")
+        fs_get_quota $container "var"
+      ;;
+      "hdd.quota.opt")
+        fs_get_quota $container "opt"
+      ;;
+      "hdd.quota.rootfs")
+        fs_get_quota $container "rootfs"
+      ;;
+      "json")
+        local memory_value=$(lxc_get_memory $container)
+        local memory_value=$( [ -z $memory_value ] &&  echo "none" || echo $memory_value )
+
+        local cpu_value=$(lxc_get_cpus $container)
+        local cpu_value=$( [ -z $cpu_value ] && echo "none" || printf "\"$cpu_value\"" )
+
+        local hdd_home_value=$(fs_get_quota $container "home")
+        local hdd_var_value=$(fs_get_quota $container "var")
+        local hdd_opt_value=$(fs_get_quota $container "opt")
+        local hdd_rootfs_value=$(fs_get_quota $container "rootfs")
+        printf "{memory.quota=$memory_value,cpu.cpus=$cpu_value,hdd.quota.home=$hdd_home_value, hdd.quota.var=$hdd_var_value, hdd.quota.opt=$hdd_opt_value, hdd.quota.rootfs=$hdd_rootfs_value}"
       ;;
       *)
-	msg_error "$resource_parameter is not a supported parameter! Aborting.."
+        msg_error "$resource_parameter is not a supported parameter! Aborting.."
         exit 1
     esac
   else
@@ -52,15 +74,24 @@ function quota {
       "cpu.cpus" )
         lxc_set_cpus $container $parameter_value
       ;;
-      "hdd.quota")
-        local directory=$4
-        fs_set_quota $container $directory $parameter_value
+      "hdd.quota.home")
+        fs_set_quota $container "home" $parameter_value
+      ;;
+      "hdd.quota.var")
+        fs_set_quota $container "var" $parameter_value
+      ;;
+      "hdd.quota.opt")
+        fs_set_quota $container "opt" $parameter_value
+      ;;
+      "hdd.quota.rootfs")
+        fs_set_quota $container "rootfs" $parameter_value
       ;;
       *)
         msg_error "$resource_parameter is not a supported parameter! Aborting.."
         exit 1
     esac
   fi
+
 }
 
 

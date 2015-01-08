@@ -5,9 +5,14 @@
              interface="org.safehaus.subutai.common.protocol.api.TemplateService"
              availability="mandatory" />
 
+  <reference id="gitManager"
+             interface="org.safehaus.subutai.core.git.api.GitManager"
+             availability="optional" />
+
   <bean id="templateRegistry" scope="singleton" activation="eager"
-        class="org.safehaus.subutai.core.registry.impl.TemplateRegistryImpl" init-method="init">
-  <property name="templateService" ref="templateService" />
+        class="org.safehaus.subutai.core.registry.impl.TemplateRegistryImpl" init-method="init" destroy-method="dispose">
+    <property name="templateService" ref="templateService" />
+    <property name="gitManager" ref="gitManager" />
   </bean>
 
   <service ref="templateRegistry"

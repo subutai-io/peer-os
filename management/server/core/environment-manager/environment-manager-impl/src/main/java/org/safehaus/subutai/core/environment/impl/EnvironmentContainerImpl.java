@@ -13,6 +13,7 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
@@ -28,13 +29,16 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.protocol.api.DataService;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
 import org.safehaus.subutai.core.hostregistry.api.Interface;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.HostEvent;
@@ -42,6 +46,9 @@ import org.safehaus.subutai.core.peer.api.HostEventListener;
 import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 /**
@@ -67,6 +74,10 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     private String templateName;
     @Column( name = "template_arch" )
     private String templateArch;
+
+    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
+    private Set<String> tags = new HashSet<>();
+
     @ManyToOne( targetEntity = EnvironmentImpl.class )
     @JoinColumn( name = "environment_id" )
     private Environment environment;
@@ -77,6 +88,8 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
     @Transient
     private Peer peer;
+    @Transient
+    private DataService dataService;
 
     @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = HostInterface
             .class, orphanRemoval = true )
@@ -103,6 +116,13 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
             hostInterface.setHost( this );
             this.interfaces.add( hostInterface );
         }
+    }
+
+
+    @Override
+    public void setDataService( final DataService dataService )
+    {
+        this.dataService = dataService;
     }
 
 
@@ -176,15 +196,13 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     }
 
 
-    @Override
-    public String getQuota( final QuotaEnum memoryLimitInBytes ) throws PeerException
+    public PeerQuotaInfo getQuota( QuotaType quotaType ) throws PeerException
     {
         throw new UnsupportedOperationException( "Unsupported operation." );
     }
 
 
-    @Override
-    public void setQuota( final QuotaEnum memoryLimitInBytes, final String memoryLimit ) throws PeerException
+    public void setQuota( QuotaInfo quota ) throws PeerException
     {
         throw new UnsupportedOperationException( "Unsupported operation." );
     }
@@ -229,6 +247,31 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public String getTemplateName()
     {
         return this.templateName;
+    }
+
+
+    @Override
+    public void addTag( final String tag )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+        this.tags.add( tag );
+        dataService.update( this );
+    }
+
+
+    @Override
+    public void removeTag( final String tag )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+        this.tags.remove( tag );
+        dataService.update( this );
+    }
+
+
+    @Override
+    public Set<String> getTags()
+    {
+        return this.tags;
     }
 
 

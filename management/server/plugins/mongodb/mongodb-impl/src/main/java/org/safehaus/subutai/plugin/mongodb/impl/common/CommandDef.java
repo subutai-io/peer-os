@@ -1,14 +1,9 @@
 package org.safehaus.subutai.plugin.mongodb.impl.common;
 
 
-import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.core.peer.api.Host;
 
 
-/**
- * Created by timur on 11/7/14.
- */
 public class CommandDef
 {
     private String command;
@@ -24,12 +19,6 @@ public class CommandDef
     }
 
 
-    public RequestBuilder build()
-    {
-        return new RequestBuilder( command ).withTimeout( timeout );
-    }
-
-
     public RequestBuilder build( boolean daemon )
     {
         if ( daemon )
@@ -40,6 +29,12 @@ public class CommandDef
         {
             return build();
         }
+    }
+
+
+    public RequestBuilder build()
+    {
+        return new RequestBuilder( command ).withTimeout( timeout );
     }
 
 
@@ -61,7 +56,7 @@ public class CommandDef
     }
 
 
-//    public void execute( Host host ) throws CommandException
+    //    public void execute( Host host ) throws CommandException
     //    {
     //        host.execute( build() );
     //    }

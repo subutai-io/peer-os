@@ -1,25 +1,37 @@
 package org.safehaus.subutai.core.peer.impl.model;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.protocol.api.DataService;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.HostInfo;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 /**
@@ -47,12 +59,24 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     private volatile ContainerHostState state = ContainerHostState.STOPPED;
     @Column( name = "node_group_name", nullable = false )
     private String nodeGroupName = "UNKNOWN";
-    //    @Column( name = "parent_host_name", nullable = false )
-    //    protected String parentHostname;
+
+    private QuotaManager quotaManager;
+
+    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
+    private Set<String> tags = new HashSet<>();
+    @Transient
+    private DataService dataService;
 
 
     private ContainerHostEntity()
     {
+    }
+
+
+    @Override
+    public void setDataService( final DataService dataService )
+    {
+        this.dataService = dataService;
     }
 
 
@@ -132,6 +156,31 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    @Override
+    public void addTag( final String tag )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+        this.tags.add( tag );
+        this.dataService.update( this );
+    }
+
+
+    @Override
+    public void removeTag( final String tag )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+        this.tags.remove( tag );
+        this.dataService.update( this );
+    }
+
+
+    @Override
+    public Set<String> getTags()
+    {
+        return this.tags;
+    }
+
+
     public void setTemplateName( final String templateName )
     {
         this.templateName = templateName;
@@ -170,17 +219,17 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public String getQuota( final QuotaEnum quota ) throws PeerException
+    public void setQuota( QuotaInfo quota ) throws PeerException
     {
         Peer peer = getPeer();
-        return peer.getQuota( this, quota );
+        peer.setQuota( this, quota );
     }
 
 
-    public void setQuota( final QuotaEnum quota, final String value ) throws PeerException
+    public PeerQuotaInfo getQuota( final QuotaType quotaType ) throws PeerException
     {
         Peer peer = getPeer();
-        peer.setQuota( this, quota, value );
+        return peer.getQuota( this, quotaType );
     }
 
 

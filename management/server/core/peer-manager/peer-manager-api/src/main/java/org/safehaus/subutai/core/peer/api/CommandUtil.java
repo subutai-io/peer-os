@@ -46,13 +46,11 @@ public class CommandUtil
         Preconditions.checkNotNull( requestBuilder );
         Preconditions.checkNotNull( host );
 
-        CommandResult result;
-
-        result = host.execute( requestBuilder );
+        CommandResult result = host.execute( requestBuilder );
 
         if ( !result.hasSucceeded() )
         {
-            throw new CommandException( String.format( "Error on container %s: %s", host.getHostname(),
+            throw new CommandException( String.format( "Error executing command on host %s: %s", host.getHostname(),
                     result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
         }
         return result;
@@ -207,7 +205,7 @@ public class CommandUtil
     }
 
 
-    public static boolean isStdOutContains( CommandResult commandResult, String text )
+    public static boolean stdOutContains( CommandResult commandResult, String text )
     {
         Preconditions.checkNotNull( commandResult, "CommandResult is null" );
         Preconditions.checkNotNull( text, "Text is null" );

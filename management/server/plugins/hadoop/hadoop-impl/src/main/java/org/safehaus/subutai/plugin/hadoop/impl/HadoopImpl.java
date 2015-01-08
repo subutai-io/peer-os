@@ -1,20 +1,11 @@
 package org.safehaus.subutai.plugin.hadoop.impl;
 
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.sql.DataSource;
-
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.protocol.*;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -34,9 +25,12 @@ import org.safehaus.subutai.plugin.hadoop.impl.handler.RemoveNodeOperationHandle
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
+import javax.sql.DataSource;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class HadoopImpl implements Hadoop
@@ -69,6 +63,10 @@ public class HadoopImpl implements Hadoop
         executor = Executors.newCachedThreadPool();
     }
 
+    public void setPluginDAO(final PluginDAO pluginDAO)
+    {
+        this.pluginDAO = pluginDAO;
+    }
 
     public void destroy()
     {
@@ -169,7 +167,12 @@ public class HadoopImpl implements Hadoop
     @Override
     public UUID uninstallCluster( final String clustername )
     {
-        return null;
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clustername ), "Cluster name is null or empty" );
+        HadoopClusterConfig hadoopClusterConfig = getCluster( clustername );
+        AbstractOperationHandler operationHandler =
+                new ClusterOperationHandler( this, hadoopClusterConfig, ClusterOperationType.UNINSTALL, null );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 

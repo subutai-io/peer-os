@@ -20,6 +20,8 @@ import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecu
 import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutor;
 import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutorImpl;
 import org.safehaus.subutai.core.environment.ui.text.EnvAnswer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -45,6 +47,9 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private static final String STATUS = "Status";
     private static final String ACTION = "Action";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger( EnvironmentsBuildProcessForm.class );
+
     private Map<UUID, ExecutorService> executorServiceMap = new HashMap<>();
     private VerticalLayout contentRoot;
     private Table environmentsTable;
@@ -126,13 +131,11 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
         } );
 
         Button processButton = null;
-        Button destroyButton = null;
         Embedded icon = null;
 
         switch ( process.getProcessStatusEnum() )
         {
             case NEW_PROCESS:
-            {
                 processButton = new Button( "Build" );
                 icon = new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) );
                 processButton.addClickListener( new Button.ClickListener()
@@ -145,9 +148,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 } );
 
                 break;
-            }
             case IN_PROGRESS:
-            {
                 processButton = new Button( "Terminate" );
                 icon = new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) );
                 processButton.addClickListener( new Button.ClickListener()
@@ -159,28 +160,18 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     }
                 } );
                 break;
-            }
             case FAILED:
                 icon = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
                 break;
             case TERMINATED:
-            {
                 icon = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
                 break;
-            }
             case SUCCESSFUL:
-            {
                 icon = new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) );
                 break;
-            }
-
-            default:
-            {
-                break;
-            }
         }
 
-        destroyButton = new Button( "Destroy" );
+        Button destroyButton = new Button( "Destroy" );
         destroyButton.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -192,11 +183,18 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
         } );
         try
         {
-            EnvironmentBlueprint blueprint =
-                    module.getEnvironmentManager().getEnvironmentBlueprint( process.getBlueprintId() );
-            environmentsTable.addItem( new Object[] {
-                    blueprint.getName(), icon, viewButton, processButton, destroyButton
-            }, process.getId() );
+            EnvironmentBlueprint bp = module.getEnvironmentManager().getEnvironmentBlueprint( process.getBlueprintId() );
+            if ( bp != null )
+            {
+                environmentsTable.addItem( new Object[]
+                {
+                    bp.getName(), icon, viewButton, processButton, destroyButton
+                }, process.getId() );
+            }
+            else
+            {
+                LOGGER.error( "Blueorint not found id=" + process.getBlueprintId() );
+            }
         }
         catch ( EnvironmentManagerException e )
         {

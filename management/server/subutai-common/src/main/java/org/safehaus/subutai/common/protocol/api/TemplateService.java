@@ -21,5 +21,9 @@ public interface TemplateService
     public List<Template> getChildTemplates( String parentTemplateName, String lxcArch ) throws DaoException;
 
 
-    public Template getTemplateByName( String templateName, String lxcArch ) throws DaoException;
+    public Template getTemplate( String templateName, String lxcArch ) throws DaoException;
+
+
+    public Template getTemplate( String templateName, String lxcArch, String md5sum, String version )
+            throws DaoException;
 }

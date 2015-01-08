@@ -15,7 +15,7 @@ public interface Messenger
     /**
      * Creates message with specified payload
      *
-     * @param payload - object to send
+     * @param payload - object to send. Object must not be of interface type and must not contain any interface types
      *
      * @return - message
      */

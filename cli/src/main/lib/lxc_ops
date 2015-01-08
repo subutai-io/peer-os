@@ -20,7 +20,7 @@ function lxc_stop {
   local lxc="$1"
   lxc_assert_name "$lxc"
   
-  if [ "State:          RUNNING" == "`lxc-info -n $lxc | grep State`" ]; then
+  if [ "State:          RUNNING" == "`lxc-info -n $lxc | grep State | head -1`" ]; then
     lxc-stop -n $lxc
   fi
 }
@@ -413,10 +413,10 @@ function lxc_rename {
   lxc_stop "$src"
   
   # umount all the partitions
-  umount "/lxc-data/$src-home"
-  umount "/lxc-data/$src-var"
-  umount "/lxc/$src-opt"
-  umount "/var/lib/lxc/$src/rootfs"
+  umount "/lxc-data/$src-home" > /dev/null 2>&1
+  umount "/lxc-data/$src-var" > /dev/null 2>&1
+  umount "/lxc/$src-opt" > /dev/null 2>&1
+  umount "/var/lib/lxc/$src/rootfs" > /dev/null 2>&1
   
   # rename datasets and set mount point for rootfs
   fs_rename_datasets_set_mount_point $src $dst $dst_rootfs
@@ -498,36 +498,35 @@ function lxc_install_agent {
   fi
 }
 
-
 function lxc_get_memory {
-  container=$1
-  resource_parameter="memory.limit_in_bytes"
+  local container=$1
+  local resource_parameter="memory.limit_in_bytes"
 
   lxc_quota_modification $container $resource_parameter
 }
 
 
 function lxc_set_memory {
-  container=$1
-  resource_parameter="memory.limit_in_bytes"
-  parameter_value=$2
+  local container=$1
+  local resource_parameter="memory.limit_in_bytes"
+  local parameter_value=$2
 
   lxc_quota_modification $container $resource_parameter $parameter_value
 }
 
 
 function lxc_get_cpus {
-  container=$1
-  resource_parameter="cpuset.cpus"
+  local container=$1
+  local resource_parameter="cpuset.cpus"
 
   lxc_quota_modification $container $resource_parameter
 }
 
 
 function lxc_set_cpus {
-  container=$1
-  resource_parameter="cpuset.cpus"
-  parameter_value=$2
+  local container=$1
+  local resource_parameter="cpuset.cpus"
+  local parameter_value=$2
 
   lxc_quota_modification $container $resource_parameter $parameter_value
 }

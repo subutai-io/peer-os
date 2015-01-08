@@ -33,6 +33,7 @@ function fs_set_mountpoint {
   zfs set mountpoint=$child_rootfs lxc/$child
 }
 
+
 function fs_addmount {
   local name=$1
   local mount=$2
@@ -72,6 +73,7 @@ function fs_addmount {
   return
 }
 
+
 #snaphost ll holds on clone's rootfs
 function fs_snap_hold_readonly {
   local lxc_template="$1"
@@ -92,6 +94,7 @@ function fs_snap_hold_readonly {
   zfs set readonly=on lxc-data/$lxc_template-home
 }
 
+
 function fs_recv {
   local template="$1"
   local deltas="$2"
@@ -103,6 +106,7 @@ function fs_recv {
   zfs recv lxc-data/$template-home < $deltas/home.delta
 }
 
+
 #generate delta images of all filesystems
 function fs_send {
   local parent="$1"
@@ -113,6 +117,7 @@ function fs_send {
   zfs send -I "lxc-data/$parent-var@template" "lxc-data/$container-var@template" > "$deltas/var.delta"
   zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template" > "$deltas/home.delta"
 }
+
 
 function fs_remove_mount {
   child="$1"
@@ -152,6 +157,7 @@ function fs_rls_holds_delete_snaps {
     msg_info "    - \"$snap\" snapshot destroyed"
   done
 }
+
 
 #demote template
 function fs_demote_template {
@@ -348,6 +354,7 @@ function fs_list_templates {
   done
 }
 
+
 function fs_copy_ds {
   local from_ds="$1"
 
@@ -389,6 +396,7 @@ function fs_copy_ds {
   zfs destroy "$from_snap"
   zfs destroy "$to_ds@$now"
 }
+
 
 function fs_get_quota {
   local container=$1
@@ -521,6 +529,7 @@ function fs_get_physical_used_disk {
   local pool=$1
   zfs get -p used $pool | grep "$pool" | awk '{ print $3 }'
 }
+
 
 function fs_quota_operations {
   local container=$1

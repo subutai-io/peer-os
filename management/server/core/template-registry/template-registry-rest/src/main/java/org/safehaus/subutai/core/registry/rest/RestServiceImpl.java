@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.registry.rest;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -12,8 +13,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.ws.rs.core.Response;
 
@@ -71,6 +70,50 @@ public class RestServiceImpl implements RestService
         this.repositoryManager = repositoryManager;
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
+    }
+
+
+    @Override
+    public Response downloadTemplate( final String templateName, final String templateDownloadToken )
+    {
+        try
+        {
+            //check template download token
+            if ( !templateRegistry.checkTemplateDownloadToken( templateDownloadToken ) )
+            {
+                return Response.status( Response.Status.FORBIDDEN ).entity( "Invalid template download token" ).build();
+            }
+
+            String packageName = String.format( "%s-subutai-template", templateName );
+            String fullPackageName = repositoryManager.getFullPackageName( packageName );
+            String fullPackagePath =
+                    String.format( "%s%s%s", Common.APT_REPO_PATH, Common.APT_REPO_AMD64_PACKAGES_SUBPATH,
+                            fullPackageName );
+
+            File packageFile = new File( fullPackagePath );
+
+            if ( packageFile.exists() )
+            {
+                if ( packageFile.isFile() )
+                {
+                    return Response.ok( packageFile ).header( "Content-Disposition",
+                            String.format( "attachment; filename=%s", fullPackageName ) ).build();
+                }
+                else
+                {
+                    return Response.status( Response.Status.BAD_REQUEST ).entity( "File is directory" ).build();
+                }
+            }
+            else
+            {
+                return Response.status( Response.Status.NOT_FOUND ).build();
+            }
+        }
+        catch ( RepositoryException e )
+        {
+            LOG.error( "Error in downloadTemplate", e );
+            return Response.serverError().entity( e ).build();
+        }
     }
 
 
@@ -254,19 +297,9 @@ public class RestServiceImpl implements RestService
             try
             {
                 String packageName = String.format( "%s-subutai-template", templateName );
-                String packageInfo = repositoryManager.getPackageInfo( packageName );
-                Pattern p = Pattern.compile( "Filename:.+/(.+deb)" );
-                Matcher m = p.matcher( packageInfo );
-                if ( m.find() )
-                {
-                    String fullPackageName = m.group( 1 );
-                    repositoryManager.removePackageByName( fullPackageName );
-                    return Response.ok().build();
-                }
-                else
-                {
-                    return Response.serverError().header( EXCEPTION_HEADER, "Could not get full package name" ).build();
-                }
+                String fullPackageName = repositoryManager.getFullPackageName( packageName );
+                repositoryManager.removePackageByName( fullPackageName );
+                return Response.ok().build();
             }
             catch ( RepositoryException e )
             {

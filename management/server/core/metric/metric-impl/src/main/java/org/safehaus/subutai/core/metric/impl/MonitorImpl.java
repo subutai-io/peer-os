@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.command.CommandException;
@@ -79,6 +80,27 @@ public class MonitorImpl implements Monitor
     }
 
 
+    public MonitorImpl( final DataSource dataSource, PeerManager peerManager, EntityManagerFactory emf )
+            throws MonitorException
+    {
+        Preconditions.checkNotNull( dataSource, "Data source is null" );
+        Preconditions.checkNotNull( peerManager, "Peer manager is null" );
+        Preconditions.checkNotNull( emf, "EntityManagerFactory is null." );
+        try
+        {
+            this.monitorDao = new MonitorDao( emf );
+            this.peerManager = peerManager;
+            peerManager.addRequestListener( new RemoteAlertListener( this ) );
+            peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
+            peerManager.addRequestListener( new MonitoringActivationListener( this, peerManager ) );
+        }
+        catch ( DaoException e )
+        {
+            throw new MonitorException( e );
+        }
+    }
+
+
     @Override
     public Set<ContainerHostMetric> getContainerHostsMetrics( final Environment environment ) throws MonitorException
     {
@@ -135,7 +157,8 @@ public class MonitorImpl implements Monitor
             //send request and obtain metrics
             ContainerHostMetricResponse response =
                     peer.sendRequest( request, RecipientType.METRIC_REQUEST_RECIPIENT.name(),
-                            Constants.METRIC_REQUEST_TIMEOUT, ContainerHostMetricResponse.class );
+                            Constants.METRIC_REQUEST_TIMEOUT, ContainerHostMetricResponse.class,
+                            Constants.METRIC_REQUEST_TIMEOUT );
 
             //if response contains metrics, add them to result
             if ( response != null && !CollectionUtil.isCollectionEmpty( response.getMetrics() ) )

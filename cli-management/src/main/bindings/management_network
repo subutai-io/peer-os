@@ -380,6 +380,7 @@ function management_network {
       net_check_N2N_IpAddress $supernodeIpAddress $localPeerIpAddress
       net_check_portNumber $supernodePort
       net_check_keyType $keyType
+      net_create_tap_device $interfaceName $localPeerIpAddress 
       
       if [ $keyType = "string" ]; then 
          edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -k $keyFile -r -a $localPeerIpAddress

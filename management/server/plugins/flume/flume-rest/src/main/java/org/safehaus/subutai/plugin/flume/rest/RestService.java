@@ -30,7 +30,6 @@ public class RestService
 
     private Flume flumeManager;
 
-
     public void setFlumeManager( Flume flumeManager )
     {
         this.flumeManager = flumeManager;

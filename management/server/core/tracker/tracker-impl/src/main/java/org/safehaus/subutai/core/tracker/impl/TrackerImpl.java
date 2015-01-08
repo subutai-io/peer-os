@@ -6,7 +6,6 @@
 package org.safehaus.subutai.core.tracker.impl;
 
 
-import java.io.StringReader;
 import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,13 +14,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.sql.DataSource;
+import javax.persistence.EntityManagerFactory;
 
-import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.OperationState;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.core.tracker.impl.dao.TrackerOperationDataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,20 +44,33 @@ public class TrackerImpl implements Tracker
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = LoggerFactory.getLogger( TrackerImpl.class.getName() );
     private static final String SOURCE_IS_EMPTY_MSG = "Source is null or empty";
+    private TrackerOperationDataService dataService;
 
     /**
      * reference to dataSource
      */
     protected DbUtil dbUtil;
+    private EntityManagerFactory emf;
 
 
-    public TrackerImpl( final DataSource dataSource ) throws SQLException
+    public void setEmf( final EntityManagerFactory emf )
     {
-        Preconditions.checkNotNull( dataSource, "Data source is null" );
-        this.dbUtil = new DbUtil( dataSource );
-
-        setupDb();
+        this.emf = emf;
     }
+
+    //    public TrackerImpl( final DataSource dataSource ) throws SQLException
+    //    {
+    //        Preconditions.checkNotNull( dataSource, "Data source is null" );
+    //        this.dbUtil = new DbUtil( dataSource );
+    //
+    //        setupDb();
+    //    }
+    //
+    //    public TrackerImpl (EntityManagerFactory emf)
+    //    {
+    //        Preconditions.checkNotNull( emf, "EntityManagerEntity is null." );
+    //        dataService = new TrackerOperationDataService( emf );
+    //    }
 
 
     protected void setupDb() throws SQLException
@@ -85,18 +98,20 @@ public class TrackerImpl implements Tracker
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
         Preconditions.checkNotNull( operationTrackId, "Operation track id is null" );
 
-        try
-        {
-            ResultSet rs = dbUtil.select( "select info from tracker_operation where source = ? and id = ?",
-                    source.toLowerCase(), operationTrackId );
+        return dataService.getTrackerOperation( source, operationTrackId );
 
-            return createTrackerOperation( rs );
-        }
-        catch ( SQLException | RuntimeException e )
-        {
-            LOG.error( "Error in getTrackerOperation", e );
-        }
-        return null;
+        //        try
+        //        {
+        //            ResultSet rs = dbUtil.select( "select info from tracker_operation where source = ? and id = ?",
+        //                    source.toLowerCase(), operationTrackId );
+        //
+        //            return createTrackerOperation( rs );
+        //        }
+        //        catch ( SQLException | RuntimeException e )
+        //        {
+        //            LOG.error( "Error in getTrackerOperation", e );
+        //        }
+        //        return null;
     }
 
 
@@ -131,8 +146,9 @@ public class TrackerImpl implements Tracker
 
         try
         {
-            dbUtil.update( "merge into tracker_operation(source,id,ts,info) values(?,?,?,?)", source.toLowerCase(),
-                    po.getId(), po.createDate(), new StringReader( GSON.toJson( po ) ) );
+            dataService.saveTrackerOperation( source, po );
+            //            dbUtil.update( "merge into tracker_operation(source,id,ts,info) values(?,?,?,?)", source.toLowerCase(),
+            //                    po.getId(), po.createDate(), new StringReader( GSON.toJson( po ) ) );
             return true;
         }
         catch ( SQLException e )
@@ -184,17 +200,20 @@ public class TrackerImpl implements Tracker
         Preconditions.checkNotNull( toDate, "To Date is null" );
 
         List<TrackerOperationView> list = new ArrayList<>();
+
         try
         {
-            ResultSet rs = dbUtil.select( "select info from tracker_operation where source = ? and ts between ? and ?"
-                    + " order by ts desc limit ?", source.toLowerCase(), fromDate, toDate, limit );
-
-            TrackerOperationViewImpl productOperationViewImpl = createTrackerOperation( rs );
-            while ( productOperationViewImpl != null )
-            {
-                list.add( productOperationViewImpl );
-                productOperationViewImpl = createTrackerOperation( rs );
-            }
+            list = dataService.getTrackerOperations( source, fromDate, toDate, limit );
+            //            ResultSet rs = dbUtil.select( "select info from tracker_operation where source = ? and ts
+            // between ? and ?"
+            //                    + " order by ts desc limit ?", source.toLowerCase(), fromDate, toDate, limit );
+            //
+            //            TrackerOperationViewImpl productOperationViewImpl = createTrackerOperation( rs );
+            //            while ( productOperationViewImpl != null )
+            //            {
+            //                list.add( productOperationViewImpl );
+            //                productOperationViewImpl = createTrackerOperation( rs );
+            //            }
         }
         catch ( SQLException | JsonSyntaxException ex )
         {
@@ -214,16 +233,17 @@ public class TrackerImpl implements Tracker
         List<String> sources = new ArrayList<>();
         try
         {
-            ResultSet rs = dbUtil.select( "select distinct source from tracker_operation" );
+            sources = dataService.getTrackerOperationSources();
+            //            ResultSet rs = dbUtil.select( "select distinct source from tracker_operation" );
 
-            while ( rs != null && rs.next() )
-            {
-                String source = rs.getString( "source" );
-                if ( !Strings.isNullOrEmpty( source ) )
-                {
-                    sources.add( source.toLowerCase() );
-                }
-            }
+            //            while ( rs != null && rs.next() )
+            //            {
+            //                String source = rs.getString( "source" );
+            //                if ( !Strings.isNullOrEmpty( source ) )
+            //                {
+            //                    sources.add( source.toLowerCase() );
+            //                }
+            //            }
         }
         catch ( SQLException e )
         {
@@ -279,5 +299,11 @@ public class TrackerImpl implements Tracker
                 return;
             }
         }
+    }
+
+
+    public void init()
+    {
+        dataService = new TrackerOperationDataService( emf );
     }
 }

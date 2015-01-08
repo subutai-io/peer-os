@@ -10,21 +10,13 @@ import java.io.Serializable;
 public class TemplatePK implements Serializable
 {
     //        @Column(name = "templateName")
-    String templateName;
+    private String templateName;
     //        @Column(name = "lxcArch")
-    String lxcArch;
+    private String lxcArch;
 
+    private String templateVersion;
 
-    public TemplatePK()
-    {
-    }
-
-
-    public TemplatePK( String templateName, String lxcArch )
-    {
-        this.templateName = templateName;
-        this.lxcArch = lxcArch;
-    }
+    private String md5sum;
 
 
     public String getTemplateName()
@@ -51,6 +43,30 @@ public class TemplatePK implements Serializable
     }
 
 
+    public String getTemplateVersion()
+    {
+        return templateVersion;
+    }
+
+
+    public void setTemplateVersion( final String templateVersion )
+    {
+        this.templateVersion = templateVersion;
+    }
+
+
+    public String getMd5sum()
+    {
+        return md5sum;
+    }
+
+
+    public void setMd5sum( final String md5sum )
+    {
+        this.md5sum = md5sum;
+    }
+
+
     @Override
     public boolean equals( final Object o )
     {
@@ -65,7 +81,8 @@ public class TemplatePK implements Serializable
 
         final TemplatePK that = ( TemplatePK ) o;
 
-        return lxcArch.equals( that.lxcArch ) && templateName.equals( that.templateName );
+        return lxcArch.equals( that.lxcArch ) && md5sum.equals( that.md5sum ) && templateName
+                .equals( that.templateName ) && templateVersion.equals( that.templateVersion );
     }
 
 
@@ -74,6 +91,8 @@ public class TemplatePK implements Serializable
     {
         int result = templateName.hashCode();
         result = 31 * result + lxcArch.hashCode();
+        result = 31 * result + templateVersion.hashCode();
+        result = 31 * result + md5sum.hashCode();
         return result;
     }
 }

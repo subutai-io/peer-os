@@ -351,13 +351,13 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             CommandResult commandResult = run( Command.DESTROY, containerHost.getHostname() );
 
-            if ( commandResult.hasSucceeded() && CommandUtil.isStdOutContains( commandResult,
+            if ( commandResult.hasSucceeded() && CommandUtil.stdOutContains( commandResult,
                     String.format( CONTAINER_DESTROYED, containerHost.getHostname() ) ) )
             {
                 return;
             }
 
-            if ( !commandResult.hasSucceeded() && CommandUtil.isStdOutContains( commandResult,
+            if ( !commandResult.hasSucceeded() && CommandUtil.stdOutContains( commandResult,
                     String.format( CONTAINER_DOES_NOT_EXISTS, containerHost.getHostname() ) ) )
             {
                 return;
@@ -545,6 +545,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             return;
         }
         // trying add repository
+        /* TODO
+           download each template except master in ancestry lineage if not installed already
+           install it using dpkg -i
+           then proceed
+          */
         updateRepository( p );
         importTemplate( p );
         if ( !isTemplateExist( p ) )

@@ -50,7 +50,7 @@ public class TerminalForm extends CustomComponent implements Disposable
         environmentTree = new EnvironmentTree( environmentManager );
         horizontalSplit.setFirstComponent( environmentTree );
 
-        GridLayout grid = new GridLayout( 20, 10 );
+        GridLayout grid = new GridLayout( 20, 11 );
         grid.setSizeFull();
         grid.setMargin( true );
         grid.setSpacing( true );
@@ -93,6 +93,27 @@ public class TerminalForm extends CustomComponent implements Disposable
         controls.addComponent( indicator );
 
         grid.addComponent( controls, 0, 9, 19, 9 );
+
+        HorizontalLayout filterControls = new HorizontalLayout();
+        filterControls.setSpacing( true );
+        Label filterLbl = new Label( "Tag" );
+        final TextField filterTxt = new TextField();
+        Button filterBtn = new Button( "Filter" );
+        filterControls.addComponent( filterLbl );
+        filterControls.addComponent( filterTxt );
+        filterControls.addComponent( filterBtn );
+
+        filterBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                environmentTree.filterContainerHostsByTag( filterTxt.getValue() );
+            }
+        } );
+
+
+        grid.addComponent( filterControls, 0, 10, 19, 10 );
 
         horizontalSplit.setSecondComponent( grid );
         setCompositionRoot( horizontalSplit );
