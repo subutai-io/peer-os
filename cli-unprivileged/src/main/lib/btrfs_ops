@@ -136,10 +136,19 @@ function fs_send {
   local parent="$1"
   local container="$2"
   local deltas="$3"
-  (sudo btrfs send -p "/var/lib/lxc/$parent/rootfs" "/var/lib/lxc/$container/rootfs" > "$deltas/rootfs.delta") > /dev/null 2>&1
-  (sudo btrfs send -p "/lxc/$parent-opt" "/lxc/$container-opt" > "$deltas/opt.delta") > /dev/null 2>&1
-  (sudo btrfs send -p "/lxc-data/$parent-var" "/lxc-data/$container-var" > "$deltas/var.delta") > /dev/null 2>&1
-  (sudo btrfs send -p "/lxc-data/$parent-home" "/lxc-data/$container-home" > "$deltas/home.delta") > /dev/null 2>&1
+  if [ $parent == "master" ]
+  then
+  (sudo btrfs send -p "$HOME/.local/tmpdir/$parent/rootfs" "$HOME/.local/share/lxc/$container/rootfs" > "$deltas/rootfs.delta") > /dev/null 2>&1
+  (sudo btrfs send -p "$HOME/.local/tmpdir/$parent-opt" "$HOME/.local/lxc/$container-opt" > "$deltas/opt.delta") > /dev/null 2>&1
+  (sudo btrfs send -p "$HOME/.local/tmpdir/$parent-var" "$HOME/.local/lxc-data/$container-var" > "$deltas/var.delta") > /dev/null 2>&1
+  (sudo btrfs send -p "$HOME/.local/tmpdir/$parent-home" "$HOME/.local/lxc-data/$container-home" > "$deltas/home.delta") > /dev/null 2>&1
+  else
+    (sudo btrfs send -p "$HOME/.local/share/lxc/$parent/rootfs" "$HOME/.local/share/lxc/$container/rootfs" > "$deltas/rootfs.delta") > /dev/null 2>&1
+    (sudo btrfs send -p "$HOME/.local/lxc/$parent-opt" "$HOME/.local/lxc/$container-opt" > "$deltas/opt.delta") > /dev/null 2>&1
+    (sudo btrfs send -p "$HOME/.local/lxc/$parent-var" "$HOME/.local/lxc-data/$container-var" > "$deltas/var.delta") > /dev/null 2>&1
+    (sudo btrfs send -p "$HOME/.local/lxc/$parent-home" "$HOME/.local/lxc-data/$container-home" > "$deltas/home.delta") > /dev/null 2>&1
+  fi
+
 }
 
 function fs_remove_mount {

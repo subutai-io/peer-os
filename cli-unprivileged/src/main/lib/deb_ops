@@ -184,12 +184,6 @@ function create_postinst_script {
   if [ $lxc != "master" ]; then
     echo "  subutai import $lxc" >> $postinst_file
   else
-    echo "  subutai master_import"  >> $postinst_file
-  fi
-  echo "fi" >> $postinst_file
-  echo "if [ -d \"\$SUBUTAI_TMPDIR/$lxc\" ]; then" >> $postinst_file
-  echo "  rm -r \$SUBUTAI_TMPDIR/$lxc" >> $postinst_file
-  echo "fi" >> $postinst_file
   chmod 755 $postinst_file
 }
 
