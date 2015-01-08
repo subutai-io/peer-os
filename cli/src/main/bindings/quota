@@ -9,7 +9,7 @@ function quota_usage {
   echo "           "quota_parameters:
   echo "                             "memory.quota
   echo "                             "cpu.cpus
-  echo "                             "hdd.quota
+  echo "                             "hdd.quota.\[home\|opt\|var\|rootfs\]
   echo -----------------------------------------------------------------------
 }
 
