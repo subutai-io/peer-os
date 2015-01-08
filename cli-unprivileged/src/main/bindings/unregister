@@ -44,7 +44,9 @@ function unregister {
     exit 1
   fi
 
-  lxc_assert_no $template
+  #TODO
+  #this check should be considered again. It checks container exist or not. Gives error all the time
+  #lxc_assert_no $template
   fs_assert_nods lxc/$template
 
   if [ "`are_containers_readable $template`" == "true" ]
@@ -102,7 +104,9 @@ function unregister {
   # (2) Unregister the template
   # ----------------------------------------------------------------------------
   
-  git_delete_branch $template
+  #TODO 
+  #git remove operatioons will not used until PGP Keu authentication impelemented for users  
+  #git_delete_branch $template
   delete_n_unregister $template 
 
   unlock_container_write $template

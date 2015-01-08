@@ -167,7 +167,7 @@ function send_n_register {
 
 function delete_n_unregister {
   template=$1
-  local url="`build_rest_url $SUBUTAI_REST_REGISTER_PATH`/$template"
+  local url="`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template"
 
   if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
     msg_info "${FUNCNAME[0]} called in TEST/OFFLINE mode"
