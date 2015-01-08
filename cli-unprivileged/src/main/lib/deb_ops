@@ -168,7 +168,7 @@ function create_postinst_script {
   local postinst_file=$debian_dir/DEBIAN/postinst
   echo "#!/bin/bash"  >> $postinst_file
   echo ""  >> $postinst_file
-  echo "subutai_lib_base=/usr/share/subutai-cli/subutai/unprivileged/lib/" >> $postinst_file
+  echo "subutai_lib_base=/usr/share/subutai-cli/subutai/unprivileged/lib" >> $postinst_file
   echo "subutai_conf_base=/etc/subutai" >> $postinst_file
   echo "subutai_binding_base=/etc/subutai/bindings" >> $postinst_file
   echo ". \$subutai_lib_base/funcs" >> $postinst_file
@@ -184,9 +184,14 @@ function create_postinst_script {
   if [ $lxc != "master" ]; then
     echo "  subutai import $lxc" >> $postinst_file
   else
+    echo "  subutai master_import"  >> $postinst_file
+  fi
+  echo "fi" >> $postinst_file
+  echo "if [ -d \"\$SUBUTAI_TMPDIR/$lxc\" ]; then" >> $postinst_file
+  echo "  rm -r \$SUBUTAI_TMPDIR/$lxc" >> $postinst_file
+  echo "fi" >> $postinst_file
   chmod 755 $postinst_file
 }
-
 
 # -----------------------------------------------------------------------------
 # Creates postinst script of debian package
