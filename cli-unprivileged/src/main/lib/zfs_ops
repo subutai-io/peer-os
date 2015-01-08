@@ -266,7 +266,7 @@ function fs_assert_nods {
   local ds="$1"
   local usage="$2"
 
-  if [ -n "`sudo sudo zfs list -o name -H | grep $ds`" ]; then
+  if [ -n "`sudo zfs list -o name -H | grep $ds`" ]; then
     msg_error "ZFS dataset \"$ds\" already exists!"
     show_usage "$usage"
   fi
