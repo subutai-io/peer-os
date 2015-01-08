@@ -122,7 +122,7 @@ function register {
   debian_root="$SUBUTAI_TMPDIR/$container"
   pkg="`cat $HOME/.local/share/lxc/$container/config | \
      grep subutai.template.package | awk '{print $3}'`"
-  config_dir="$HOME/.local/share/lxc/$container"
+  config_dir="$HOME/.local/lxc-data/tmpdir/$container"
   
   send_n_register $pkg $config_dir 
  
