@@ -190,11 +190,12 @@ function import {
   lxc_config=$lxc_home/config
   deltas=$debian_root/deltas
 
-  mkdir -p $lxc_rootfs
+  sudo btrfs subvolume create $lxc_home
+  #mkdir -p $lxc_rootfs
   msg_info "    - lxc_rootfs = $lxc_rootfs"
-  cp $config $lxc_home;
-  cp $debian_root/fstab $lxc_home;
-  cp $debian_root/packages $lxc_home;
+  sudo cp $config $lxc_home;
+  sudo cp $debian_root/fstab $lxc_home;
+  sudo cp $debian_root/packages $lxc_home;
 
   fs_recv $template $deltas $lxc_rootfs  
 
