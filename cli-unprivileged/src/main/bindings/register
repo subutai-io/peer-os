@@ -114,15 +114,17 @@ function register {
   # (2) Publish the template which has the debian package under $SUBUTAI_TMPDIR 
   # ----------------------------------------------------------------------------
   
+#TODO 
+#git push operatioons will not used until PGP Keu authentication impelemented for users 
   # push to the subutai site git repository if defined
-  if [ -n "$SUBUTAI_SITE_GIT" ]; then
-    git_remote_push $container
-  fi
+ # if [ -n "$SUBUTAI_SITE_GIT" ]; then
+ #   git_remote_push $container
+ # fi
 
   debian_root="$SUBUTAI_TMPDIR/$container"
   pkg="`cat $HOME/.local/share/lxc/$container/config | \
      grep subutai.template.package | awk '{print $3}'`"
-  config_dir="$HOME/.local/share/lxc/$container"
+  config_dir="$HOME/.local/lxc-data/tmpdir/$container"
   
   send_n_register $pkg $config_dir 
  

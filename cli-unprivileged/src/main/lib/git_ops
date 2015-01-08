@@ -74,7 +74,7 @@ function git_add_commit {
 function git_remote_push {
   local lxc="$1"
 
-  pushd /var/lib/lxc/$lxc/rootfs > /dev/null
+  pushd $HOME/.local/share/lxc/$lxc/rootfs > /dev/null
   git push -u $SUBUTAI_SITE_GIT $lxc > /dev/null 2>&1
   status=$?
   message="    - branch \"$lxc\" pushed to site git repository"
