@@ -45,11 +45,19 @@ function get_maximum_cpu_capacity_nanoseconds {
     return
   fi
 
-  local result=$(echo $cfs_quota/$cfs_period*$seconds_to_nanoseconds | bc)
+  local result=$(echo $cfs_quota*$seconds_to_nanoseconds/$cfs_period | bc)
   echo "$result"
+#  echo "asd"
   return
 }
 
+function get_physical_cpu_capacity_nanoseconds {
+  local cpu_core=$(nproc)
+  local seconds_to_nanoseconds="1000000000"
+  local result=$(echo $cpu_core*$seconds_to_nanoseconds | bc)
+  echo "$result"
+  return
+}
 
 function get_available_ram {
   local lxc=$1
@@ -776,6 +784,92 @@ function query_rrd {
   fi
 
   rrdtool fetch "$database_file" LAST -e $TIME -s e-"$start_time"sec
+}
+
+
+function query_pid {
+  local hostname=$1
+  local metric_type=$2
+  local pid=$3
+
+  lxc_assert "$hostname" > /dev/null
+  if [ "$metric_type" != "all"  ]; then
+    assert_metric "$metric_type"
+  fi
+  assert_number "$pid"
+
+  local print_result="{\"host\":\"$hostname\",\"pid\":\"$pid\""
+  if [ $metric_type == "ram" ]; then
+    local usage=$(get_ram_usage_in_bytes_by_pid $hostname $pid)
+    print_result="$print_result, \"usedRam\":\"$usage\""
+  elif [ $metric_type == "cpu" ]; then
+    local usage=$(get_cpu_usage_percentage_by_pid $hostname $pid)
+    print_result="$print_result, \"usedCpu\":\"$usage\""
+
+  elif [ "$metric_type" == "all" ]; then
+    local cpu_usage_percentage=$(get_cpu_usage_percentage_by_pid $hostname $pid)
+    local ram_usage_in_bytes=$(get_ram_usage_in_bytes_by_pid $hostname $pid)
+    print_result="$print_result, \"usedRam\":\"$ram_usage_in_bytes\""
+    print_result="$print_result, \"usedCpu\":\"$cpu_usage_percentage\""
+  else
+    msg_error "$metric_type cannot be calculated for individual processes! Aborting.."
+    exit 1
+  fi
+  print_result="$print_result}"
+  echo "$print_result"
+  return
+}
+
+
+function get_cpu_usage_percentage_by_pid {
+  local hostname=$1
+  local pid=$2
+
+  local usage_output=`lxc-attach -n "$hostname" -- ps -p $pid -o %cpu`
+  local line_count=$(echo -e "$usage_output" | wc -l)
+
+  if [ "$line_count" == "1" ]; then
+    echo "0"
+    return
+  fi
+
+  # since ps command is not cgroup aware, its percentage result does not
+  # consider the quotas defined for the lxc container.
+  # so we need to manipulate this result
+  local usage_in_percentage_without_quotas=$(echo -e "$usage_output" | tail -1 | tr -d ' ')
+  local cpu_quota=$(get_maximum_cpu_capacity_nanoseconds $hostname)
+  local physical_cpu_capacity=$(get_physical_cpu_capacity_nanoseconds)
+  local usage_in_percentage_with_quotas=$(echo "$usage_in_percentage_without_quotas*$cpu_quota*100/$physical_cpu_capacity" | bc)
+  echo "$usage_in_percentage_with_quotas"
+  return
+}
+
+
+function get_ram_usage_percentage_by_pid {
+  local hostname=$1
+  local pid=$2
+
+  local usage_output=`lxc-attach -n "$hostname" -- ps -p $pid -o %mem`
+  local line_count=$(echo -e "$usage_output" | wc -l)
+
+  if [ "$line_count" == "1" ]; then
+    echo "0"
+    return
+  fi
+
+  local usage=$(echo -e "$usage_output" | tail -1 | tr -d ' ')
+  echo "$usage"
+}
+
+
+function get_ram_usage_in_bytes_by_pid {
+  local hostname=$1
+  local pid=$2
+
+  local usage_in_percentage=$(get_ram_usage_percentage_by_pid $hostname $pid)
+  local ram_quota=$(get_total_ram $hostname)
+  local usage_in_byte=$(echo $ram_quota*$usage_in_percentage | bc)
+  echo $usage_in_byte
 }
 
 
