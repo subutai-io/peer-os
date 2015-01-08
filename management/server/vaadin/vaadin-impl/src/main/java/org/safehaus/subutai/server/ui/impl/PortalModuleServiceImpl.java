@@ -120,4 +120,14 @@ public class PortalModuleServiceImpl implements PortalModuleService
             listeners.remove( listener );
         }
     }
+
+
+    @Override
+    public void loadDependentModule( final String moduleId )
+    {
+        for ( final PortalModuleListener listener : listeners )
+        {
+            listener.loadDependentModule( moduleId );
+        }
+    }
 }

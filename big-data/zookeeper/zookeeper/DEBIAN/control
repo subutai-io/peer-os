@@ -4,5 +4,5 @@ Section: devel
 Installed-Size: 40000
 Maintainer: subutai
 Architecture: all
-Version: 1.0.2
+Version: 1.0.3
 Description: This is a zookeeper package of subutai distribution.

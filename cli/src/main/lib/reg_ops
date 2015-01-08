@@ -7,7 +7,8 @@
 function is_registered {
  
   local template=$1
-  local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template
+  local version=$(get_template_version $template)
+  local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template/$version
   if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
     return
   fi
@@ -25,7 +26,8 @@ function is_registered {
 
 function has_child_templates_registered {
   local template=$1
-  local url=`build_rest_url "registry/templates/$template/children"`
+  local version=$(get_template_version $template)
+  local url=`build_rest_url "registry/templates/$template/$version/children"`
 
   if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
     echo false
@@ -63,8 +65,9 @@ function set_template_in_use {
 
   local template=$1
   local in_use=$2
+  local version=$(get_template_version $template)
   local hostname=`hostname`
-  local url=`build_rest_url "registry/templates/$template/fai/$hostname/is-used/$in_use"`
+  local url=`build_rest_url "registry/templates/$template/$version/fai/$hostname/is-used/$in_use"`
 
   response=$(curl --write-out %{http_code} -s --output /dev/null -XPUT $url)
   message="    - send $in_use for usage of template $template on host $hostname"
@@ -78,7 +81,8 @@ function set_template_in_use {
 
 function is_template_in_use {
   template=$1
-  local url=`build_rest_url "registry/templates/$template/is-used-on-fai"`
+  local version=$(get_template_version $template)
+  local url=`build_rest_url "registry/templates/$template/$version/is-used-on-fai"`
 
   if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
     echo false
@@ -102,7 +106,8 @@ function is_template_in_use {
 # of registered template package with local template package
 function are_md5sums_equal {
   local template=$1
-  local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template
+  local version=$(get_template_version $template)
+  local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template/$version
 
   if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
     echo true
@@ -170,8 +175,9 @@ function send_n_register {
 
 
 function delete_n_unregister {
-  template=$1
-  local url="`build_rest_url $SUBUTAI_REST_REGISTER_PATH`/$template"
+  local template=$1
+  local version=$SUBUTAI_VERSION
+  local url="`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template/$version/remove"
 
   if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
     msg_info "${FUNCNAME[0]} called in TEST/OFFLINE mode"
@@ -207,3 +213,9 @@ function build_rest_url {
   echo $url
 }
 
+
+function get_template_version {
+  local template=$1
+  local version=$(get_exported_package_version $template)
+  echo $version
+}
