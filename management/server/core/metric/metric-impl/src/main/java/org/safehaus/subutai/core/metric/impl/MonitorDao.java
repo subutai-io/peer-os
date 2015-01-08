@@ -26,6 +26,7 @@ public class MonitorDao
     private SubscriberDataService dataService;
 
 
+<<<<<<< HEAD
 
     public MonitorDao( final DataSource dataSource ) throws DaoException
     {
@@ -38,34 +39,27 @@ public class MonitorDao
 
 
     public MonitorDao( EntityManager em ) throws DaoException
+=======
+    public MonitorDao( EntityManagerFactory emf ) throws DaoException
+>>>>>>> master
     {
         this.dataService = new SubscriberDataService( em );
     }
 
 
-    protected void setupDb() throws DaoException
-    {
-        String sql = "create table if not exists monitor_subscriptions(environmentId uuid, subscriberId varchar(100), "
-                + " PRIMARY KEY (environmentId, subscriberId));";
-
-        try
-        {
-            dbUtil.update( sql );
-        }
-        catch ( SQLException e )
-        {
-            throw new DaoException( e );
-        }
-    }
-
-
-    public void addSubscription( UUID environmentId, String subscriberId ) throws DaoException
+   public void addSubscription( UUID environmentId, String subscriberId ) throws DaoException
     {
 
         Preconditions.checkNotNull( environmentId, INVALID_ENV_ID );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), "Invalid subscriber id" );
 
+<<<<<<< HEAD
         dataService.update( environmentId.toString(), subscriberId );
+=======
+
+        dataService.update( environmentId.toString(), subscriberId );
+
+>>>>>>> master
     }
 
 
@@ -75,6 +69,10 @@ public class MonitorDao
         Preconditions.checkNotNull( environmentId, INVALID_ENV_ID );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), "Invalid subscriber id" );
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
         dataService.remove( environmentId.toString(), subscriberId );
 
     }

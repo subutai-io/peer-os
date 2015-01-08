@@ -341,6 +341,7 @@ public class MainUI extends UI
         {
             Button b =
                     new NativeButton( view.substring( 0, 1 ).toUpperCase() + view.substring( 1 ).replace( '-', ' ' ) );
+            b.setId( view.substring( 0, 1 ).toUpperCase() + view.substring( 1 ).replace( '-', ' ' ) );
             b.addStyleName( "icon-" + view );
             b.addClickListener( new Button.ClickListener()
             {

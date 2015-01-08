@@ -9,6 +9,7 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
@@ -44,6 +45,9 @@ public interface Peer
     public void destroyContainer( ContainerHost containerHost ) throws PeerException;
 
     public boolean isConnected( Host host );
+
+    public ProcessResourceUsage getProcessResourceUsage( ContainerHost containerHost, int processPid )
+            throws PeerException;
 
     public CommandResult execute( RequestBuilder requestBuilder, Host host ) throws CommandException;
 

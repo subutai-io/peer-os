@@ -16,13 +16,12 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.util.DbUtil;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyVararg;
@@ -52,28 +51,10 @@ public class MonitorDaoTest
     static class MonitorDaoExt extends MonitorDao
     {
 
-        public MonitorDaoExt( final DataSource dataSource ) throws DaoException
-        {
-            super( dataSource );
-        }
-
 
         public MonitorDaoExt( final EntityManager em ) throws DaoException
         {
             super( em );
-        }
-
-
-        @Override
-        protected void setupDb() throws DaoException
-        {
-            //no-op
-        }
-
-
-        public void testSetupDB() throws DaoException
-        {
-            super.setupDb();
         }
 
 
@@ -117,13 +98,6 @@ public class MonitorDaoTest
     }
 
 
-    @Test( expected = NullPointerException.class )
-    public void testConstructorShouldFailOnNullDataSource() throws Exception
-    {
-        new MonitorDao( ( DataSource ) null );
-    }
-
-
     @Test
     public void testAddSubscription() throws Exception
     {
@@ -143,13 +117,12 @@ public class MonitorDaoTest
 
 
     @Test
-    @Ignore
     public void testRemoveSubscription() throws Exception
     {
 
         monitorDao.removeSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
 
-        verify( dbUtil ).update( anyString(), anyVararg() );
+        assertFalse( monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID ).contains( SUBSCRIBER_ID ) );
     }
 
 
@@ -182,31 +155,5 @@ public class MonitorDaoTest
         throwDbException();
 
         monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID );
-    }
-
-
-    @Test
-    public void testSetupDb() throws Exception
-    {
-        monitorDao.testSetupDB();
-
-        ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass( String.class );
-
-
-        verify( dbUtil ).update( sqlCaptor.capture() );
-
-        assertEquals( "create table if not exists monitor_subscriptions(environmentId uuid, subscriberId varchar(100), "
-                + " PRIMARY KEY (environmentId, subscriberId));", sqlCaptor.getValue() );
-    }
-
-
-    @Test( expected = DaoException.class )
-    @Ignore
-    public void testSetupDbException() throws Exception
-    {
-
-        throwDbException();
-
-        monitorDao.testSetupDB();
     }
 }

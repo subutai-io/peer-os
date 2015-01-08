@@ -68,6 +68,7 @@ public class EnvironmentsForm
         environmentsTable = createTable( ENVIRONMENTS, 300 );
 
         environmentsButton = new Button( VIEW );
+        environmentsButton.setId( "environmentsButton" );
 
         environmentsButton.addClickListener( new Button.ClickListener()
         {

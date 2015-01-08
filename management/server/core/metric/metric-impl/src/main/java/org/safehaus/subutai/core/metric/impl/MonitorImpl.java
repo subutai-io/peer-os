@@ -10,12 +10,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+<<<<<<< HEAD
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
+=======
+import javax.persistence.EntityManagerFactory;
+>>>>>>> master
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.exception.DaoException;
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -26,6 +31,7 @@ import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -60,14 +66,22 @@ public class MonitorImpl implements Monitor
     protected MonitorDao monitorDao;
 
 
-    public MonitorImpl( final DataSource dataSource, PeerManager peerManager ) throws MonitorException
+    public MonitorImpl( PeerManager peerManager, EntityManagerFactory emf ) throws MonitorException
     {
+<<<<<<< HEAD
         Preconditions.checkNotNull( dataSource, "Data source is null" );
         Preconditions.checkNotNull( peerManager, "Peer manager is null" );
 
         try
         {
             this.monitorDao = new MonitorDao( dataSource );
+=======
+        Preconditions.checkNotNull( peerManager, "Peer manager is null" );
+        Preconditions.checkNotNull( emf, "EntityManagerFactory is null." );
+        try
+        {
+            this.monitorDao = new MonitorDao( emf );
+>>>>>>> master
             this.peerManager = peerManager;
             peerManager.addRequestListener( new RemoteAlertListener( this ) );
             peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
@@ -77,11 +91,14 @@ public class MonitorImpl implements Monitor
         {
             throw new MonitorException( e );
         }
+<<<<<<< HEAD
     }
 
     public EntityManager getEntityManager()
     {
         return entityManager;
+=======
+>>>>>>> master
     }
 
 
@@ -424,6 +441,36 @@ public class MonitorImpl implements Monitor
             {
                 LOG.error( "Error in activateMonitoringAtLocalContainers", e );
             }
+        }
+    }
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost containerHost, final int processPid )
+            throws MonitorException
+    {
+        Preconditions.checkNotNull( containerHost );
+        Preconditions.checkArgument( processPid > 0 );
+        try
+        {
+            ResourceHost resourceHost =
+                    peerManager.getLocalPeer().getResourceHostByContainerName( containerHost.getHostname() );
+            CommandResult commandResult = resourceHost
+                    .execute( commands.getProcessResourceUsageCommand( containerHost.getHostname(), processPid ) );
+            if ( !commandResult.hasSucceeded() )
+            {
+                throw new MonitorException(
+                        String.format( "Error getting process resource usage of pid=%d on %s: %s %s", processPid,
+                                containerHost.getHostname(), commandResult.getStatus(), commandResult.getStdErr() ) );
+            }
+            //TODO actualize output of the command
+            return JsonUtil.fromJson( commandResult.getStdOut(), ProcessResourceUsage.class );
+        }
+        catch ( CommandException | HostNotFoundException | JsonSyntaxException e )
+        {
+            LOG.error( String.format( "Could not obtain process resource usage for container %s, pid %d",
+                    containerHost.getHostname(), processPid ), e );
+            throw new MonitorException( e );
         }
     }
 
