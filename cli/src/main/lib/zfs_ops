@@ -400,16 +400,33 @@ function fs_copy_ds {
 
 function fs_get_quota {
   local container=$1
+  local directory=$2
 
-  local lxc_home=$(fs_quota_operations "lxc-data/$container-home")
-  local lxc_var=$(fs_quota_operations "lxc-data/$container-var")
-  local lxc_opt=$(fs_quota_operations "lxc/$container-opt")
-  local lxc_rootfs=$(fs_quota_operations "lxc/$container")
-
-  printf "Container home:\t%s\n" $lxc_home
-  printf "Container opt:\t%s\n" $lxc_opt
-  printf "Container var:\t%s\n" $lxc_var
-  printf "Container rootfs:\t%s\n" $lxc_rootfs
+  case $directory in
+    "home" )
+      container="lxc-data/$container-home";
+      ;;
+    "var")
+      container="lxc-data/$container-var";
+      ;;
+    "opt")
+      container="lxc/$container-opt";
+      ;;
+    "rootfs")
+      container="lxc/$container";
+      ;;
+    \?)
+      local lxc_home=$(fs_quota_operations "lxc-data/$container-home")
+      local lxc_var=$(fs_quota_operations "lxc-data/$container-var")
+      local lxc_opt=$(fs_quota_operations "lxc/$container-opt")
+      local lxc_rootfs=$(fs_quota_operations "lxc/$container")
+      # printf "home:\t%s\n" $lxc_home
+      # printf "opt:\t%s\n" $lxc_opt
+      # printf "var:\t%s\n" $lxc_var
+      # printf "rootfs:\t%s\n" $lxc_rootfs
+      ;;
+  esac
+  fs_quota_operations $container
 }
 
 

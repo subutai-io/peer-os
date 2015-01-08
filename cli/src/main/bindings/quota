@@ -22,7 +22,7 @@ function quota {
   local container=$1
   local resource_parameter=$2
   local parameter_value=$3
-  lxc_assert "$container" "`quota_usage`"
+  lxc_assert "$container" "`quota_usage`" > /dev/null
 
   if [[ -z $resource_parameter ]]; then
     msg_error "Resource parameter not provided. Aborting..."
