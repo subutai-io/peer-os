@@ -12,7 +12,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -23,6 +22,7 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
@@ -40,6 +40,7 @@ import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import static junit.framework.Assert.assertEquals;
@@ -83,7 +84,7 @@ public class MonitorImplTest
     @Mock
     MonitorDao monitorDao;
     @Mock
-    ContainerHostMetric containerHostMetric;
+    ContainerHostMetricImpl containerHostMetric;
     @Mock
     AlertListener alertListener;
     Set<AlertListener> alertListeners;
@@ -105,12 +106,16 @@ public class MonitorImplTest
     @Mock
     MonitoringSettings monitoringSettings;
 
+    @Mock
+    EnvironmentManager environmentManager;
+
 
     static class MonitorImplExt extends MonitorImpl
     {
-        public MonitorImplExt( final PeerManager peerManager, EntityManagerFactory emf ) throws MonitorException
+        public MonitorImplExt( final PeerManager peerManager, EntityManagerFactory emf,
+                               EnvironmentManager environmentManager ) throws MonitorException
         {
-            super( peerManager, emf );
+            super( peerManager, emf, environmentManager );
         }
 
 
@@ -131,11 +136,12 @@ public class MonitorImplTest
         PreparedStatement preparedStatement = mock( PreparedStatement.class );
         when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
         when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
-        monitor = new MonitorImplExt( peerManager, entityManagerFactory );
+        monitor = new MonitorImplExt( peerManager, entityManagerFactory, environmentManager );
         monitor.setMonitorDao( monitorDao );
 
-        containerHostMetric = mock( ContainerHostMetric.class );
+        containerHostMetric = mock( ContainerHostMetricImpl.class );
         when( containerHostMetric.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
+        when( containerHostMetric.getHost() ).thenReturn( HOST );
         when( alertListener.getSubscriberId() ).thenReturn( SUBSCRIBER_ID );
         alertListeners = Sets.newHashSet( alertListener );
         monitor.setMetricListeners( alertListeners );
@@ -148,8 +154,11 @@ public class MonitorImplTest
         when( remotePeer.isLocal() ).thenReturn( false );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         when( environment.getContainerHosts() ).thenReturn( Sets.newHashSet( containerHost ) );
+        when( environment.getContainerHostByHostname(HOST) ).thenReturn( containerHost  );
         when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID.toString() );
+        when( containerHost.getHostname() ).thenReturn( HOST );
         when( localPeer.getResourceHosts() ).thenReturn( Sets.newHashSet( resourceHost ) );
+        when( environmentManager.getEnvironments() ).thenReturn( Lists.newArrayList(environment) );
     }
 
 
@@ -204,7 +213,7 @@ public class MonitorImplTest
 
         monitor.notifyOnAlert( containerHostMetric );
 
-        verify( containerHostMetric ).getEnvironmentId();
+        verify( containerHostMetric ).getHost();
     }
 
 
@@ -385,7 +394,7 @@ public class MonitorImplTest
     }
 
 
-//    @Ignore
+    //    @Ignore
     @Test( expected = MonitorException.class )
     public void testGetContainerHostMetricsWithException() throws Exception
     {
@@ -588,7 +597,7 @@ public class MonitorImplTest
     }
 
 
-//    @Ignore
+    //    @Ignore
     @Test( expected = MonitorException.class )
     public void testActivateMonitoring() throws Exception
     {
