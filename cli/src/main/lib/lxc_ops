@@ -26,6 +26,19 @@ function lxc_stop {
 }
 
 
+function lxc_assert_running {
+  local lxc="$1"
+  lxc_assert_name "$lxc"
+
+  local output=$(lxc-info -n $lxc | grep "RUNNING")
+
+  if [ -z "$output" ]; then
+    msg_error "$lxc is not running! Aborting.."
+    exit 1
+  fi
+}
+
+
 # waits until the networking comes up on a container (arg $1)
 # if container is off starts it up and waits
 # sleeps for maximum of (arg $2) seconds: defaults to 10 seconds
@@ -418,6 +431,25 @@ function lxc_rename {
   lxc_stop "$dst"
 }
 
+
+function lxc_get_pid {
+  local lxc=$1
+  echo $(lxc-info -n $lxc 2>/dev/null | grep "PID" | cut -d':' -f2 | tr -d ' ')
+}
+
+
+function lxc_get_uptime_in_seconds {
+  local lxc=$1
+  local pid=$(lxc_get_pid $lxc)
+  if [ "`is_number $pid`" != "true" ]; then
+    echo "0"
+    return
+  fi
+
+  local elapsed_time_in_second=$(ps -p $pid -o etimes= | tr -d ' ')
+  echo $elapsed_time_in_second
+}
+
 function lxc_remove_agent {
   container=$1
   agent_package="subutai-agent"
@@ -473,6 +505,7 @@ function lxc_get_memory {
   lxc_quota_modification $container $resource_parameter
 }
 
+
 function lxc_set_memory {
   local container=$1
   local resource_parameter="memory.limit_in_bytes"
@@ -481,12 +514,14 @@ function lxc_set_memory {
   lxc_quota_modification $container $resource_parameter $parameter_value
 }
 
+
 function lxc_get_cpus {
   local container=$1
   local resource_parameter="cpuset.cpus"
 
   lxc_quota_modification $container $resource_parameter
 }
+
 
 function lxc_set_cpus {
   local container=$1
@@ -496,10 +531,66 @@ function lxc_set_cpus {
   lxc_quota_modification $container $resource_parameter $parameter_value
 }
 
-function lxc_quota_modification {
+
+function lxc_get_cfs_quota {
   local container=$1
-  local resource_parameter=$2
-  local parameter_value=$3
+  local resource_parameter="cpu.cfs_quota_us"
+
+  lxc_quota_modification $container $resource_parameter
+}
+
+
+function lxc_set_cfs_quota {
+  local container=$1
+  local resource_parameter="cpu.cfs_quota_us"
+  local parameter_value=$2
+
+  lxc_quota_modification $container $resource_parameter $parameter_value
+}
+
+
+function lxc_get_cfs_period {
+  local container=$1
+  local resource_parameter="cpu.cfs_period_us"
+
+  lxc_quota_modification $container $resource_parameter
+}
+
+
+function lxc_set_cfs_period {
+  local container=$1
+  local resource_parameter="cpu.cfs_period_us"
+  local parameter_value=$2
+
+  lxc_quota_modification $container $resource_parameter $parameter_value
+}
+
+
+function lxc_get_cpu_core_count {
+  local container=$1
+  local cpu_set=$(lxc_get_cpus $container)
+  local cpu_core_count="0"
+  # Parse cpu_set to determine how many core is available to container
+  IFS=',' read -ra available_cpus <<< "$cpu_set"
+  for cpu_list in "${available_cpus[@]}"; do
+    # check if cpus are defined in a range
+    if [[ $cpu_list == *"-"* ]]; then
+      local range_start=$(echo $cpu_list | cut -d'-' -f1)
+      local range_end=$(echo $cpu_list | cut -d'-' -f2)
+      cpu_core_count=$(($cpu_core_count + $range_end - $range_start + 1))
+    else
+      cpu_core_count=$(($cpu_core_count + 1))
+    fi
+  done
+  echo "$cpu_core_count"
+  return
+}
+
+
+function lxc_quota_modification {
+  container=$1
+  resource_parameter=$2
+  parameter_value=$3
 
   if [ -z "$parameter_value" ]; then
     lxc-cgroup -n $container $resource_parameter

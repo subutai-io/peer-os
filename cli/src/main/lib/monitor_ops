@@ -4,24 +4,84 @@
 # Set of functions for monitoring functionality
 # ==========================================================================
 
-metric_list=("ram" "cpu")
+metric_list=("ram" "cpu" "diskVar" "diskOpt" "diskHome" "diskRootfs")
+dataset_list=("var" "opt" "home" "rootfs")
+pool_list=("lxc" "lxc-data")
 parameter_list=("metricCollectionIntervalInMin" "maxSampleCount" "metricCountToAverageToAlert" "intervalBetweenAlertsInMin" "ramAlertThreshold" "cpuAlertThreshold" "diskAlertThreshold")
+
 
 function get_total_ram {
   local lxc="$1"
   lxc_assert $lxc > /dev/null
 
   local physical_total_ram=$(get_physical_total_ram)
-  #TODO check if there is a limit set for lxc
+  local ram_quota=$(lxc_get_memory $lxc)
+  assert_number "$ram_quota" > /dev/null
+
+  if (( $(bc <<< "$ram_quota <= $physical_total_ram") == 1 )); then
+    echo "$ram_quota"
+    return
+  fi
   echo "$physical_total_ram"
+  return
 }
 
+
+# Returns maximum cpu time can be used within
+# one second in terms of nanoseconds
+function get_maximum_cpu_capacity_nanoseconds {
+  local lxc="$1"
+  lxc_assert $lxc > /dev/null
+
+  local cfs_quota=$(lxc_get_cfs_quota $lxc)
+  local cfs_period=$(lxc_get_cfs_period $lxc)
+  local seconds_to_nanoseconds="1000000000"
+
+  # Check if there is no quota set for lxc
+  if [ "$cfs_quota" == -1 ]; then
+    local cpu_core_quota=$(lxc_get_cpu_core_count $lxc)
+    local result=$(echo $cpu_core_quota*$seconds_to_nanoseconds | bc)
+    echo "$result"
+    return
+  fi
+
+  local result=$(echo $cfs_quota*$seconds_to_nanoseconds/$cfs_period | bc)
+  echo "$result"
+#  echo "asd"
+  return
+}
+
+function get_physical_cpu_capacity_nanoseconds {
+  local cpu_core=$(nproc)
+  local seconds_to_nanoseconds="1000000000"
+  local result=$(echo $cpu_core*$seconds_to_nanoseconds | bc)
+  echo "$result"
+  return
+}
 
 function get_available_ram {
   local lxc=$1
   lxc_assert $lxc > /dev/null
-  # TODO return available ram for container if there is a limit set
-  get_physical_available_ram
+  local ram_quota=$(lxc_get_memory $lxc)
+  local total_available_ram=$(get_physical_available_ram)
+  local physical_total_ram=$(get_physical_total_ram)
+
+  # return available ram for container if there is a limit set
+  if (( $(bc <<< "$ram_quota < $physical_total_ram") == 1 )); then
+    local used_ram=$(get_used_ram $lxc)
+    local available_ram=$(($ram_quota - $used_ram))
+    # TODO does this manipulation necessary?
+    # check if available ram is greater than physical resource host's available ram
+#    if [[ "$available_ram" -gt "$total_available_ram" ]]; then
+#      echo $total_available_ram
+#      return
+#    fi
+    echo $available_ram
+    return
+  fi
+  # else return total available ram
+  echo $total_available_ram
+  return
 }
 
 
@@ -34,10 +94,167 @@ function get_used_ram {
 
   if [ $status == 0 ]; then
     echo $used_ram
+    return
   fi
+  echo 0
+  return
 }
 
 
+function get_average_used_ram {
+  local lxc=$1
+  local sampleCountToAverage=$2
+  local metric_type="ram"
+  get_metric_average $lxc $sampleCountToAverage $metric_type
+}
+
+
+function get_average_used_disk_by_metric_type {
+  local lxc=$1
+  local metric_type=$2
+  local sampleCountToAverage=$3
+  get_metric_average $lxc $sampleCountToAverage $metric_type
+}
+
+
+function get_average_cpu_usage_between_samples {
+  local lxc=$1
+  local sampleCountToAverage=$2
+  local metric_type="cpu"
+  local update_sequence=$(get_update_sequence $lxc $metric_type)
+  local lxc_uptime_in_seconds=$(lxc_get_uptime_in_seconds $lxc)
+
+  lxc_assert $lxc > /dev/null
+  local numberExpression='^[0-9]+$'
+
+  if [ -z "$sampleCountToAverage" ]; then
+    msg_error "No value provided for sampleCountToAverage! Aborting.."
+    exit 1
+  fi
+
+  # Check if the value is a number
+  if ! [[ $sampleCountToAverage =~ $numberExpression ]] ; then
+    msg_error "$sampleCountToAverage is not a number! Aborting.."
+    exit 1
+  fi
+
+  assert_metric $metric_type > /dev/null
+
+  local lxc_max_cpu_sample_count=$(echo $lxc_uptime_in_seconds/$update_sequence + 1 | bc)
+#  msg_debug "lxc_max_cpu_sample_count: $lxc_max_cpu_sample_count"
+  # Check if lxc is restarted within the interval of the samples
+  if (( $(bc <<< "$lxc_max_cpu_sample_count < $sampleCountToAverage") == 1 )); then
+    sampleCountToAverage=$lxc_max_cpu_sample_count
+  fi
+#  msg_debug "sampleCountToAverage: $sampleCountToAverage"
+  local interval_time_in_seconds=$(echo $(($sampleCountToAverage+1))*$update_sequence | bc)
+  local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $lxc $metric_type)"
+  local cpu_values=$(rrdtool fetch "$database_file" LAST -e $(date +%s) -s e-"$interval_time_in_seconds"sec | grep "e+")
+
+  local line_count=$(echo -e "$cpu_values" | wc -l)
+#  msg_debug "line_count: $line_count"
+
+  # without at least one sample, average cannot be calculated
+  if [ $line_count -lt 2 ]; then
+    local first_value=$(echo -e "$cpu_values" | sed -n 1p | cut -d':' -f2 | tr -d ' ' | sed -e 's/[eE]+*/*10^/')
+    if [ "`is_number $first_value`" == "true" ]; then
+      echo "$first_value"
+      return
+    fi
+    echo "0"
+    return
+  fi
+
+  local first_value=$(echo -e "$cpu_values" | sed -n 1p | cut -d':' -f2 | tr -d ' ' | sed -e 's/[eE]+*/*10^/')
+  local first_timestamp=$(echo -e "$cpu_values" | sed -n 1p | cut -d':' -f1 | tr -d ' ')
+  local last_value=$(echo -e "$cpu_values" | sed -e '$!d' | cut -d':' -f2 | tr -d ' ' | sed -e 's/[eE]+*/*10^/')
+  local last_timestamp=$(echo -e "$cpu_values" | sed -e '$!d' | cut -d':' -f1 | tr -d ' ')
+
+  local cpu_usage=$(echo $last_value - $first_value | bc)
+  local time_elapsed=$(echo $last_timestamp - $first_timestamp | bc)
+  # Remove insignificant bits
+  cpu_usage=$(echo $cpu_usage | cut -d'.' -f1)
+
+  if [ -z "$cpu_usage" ]; then
+    echo "0"
+    return
+  fi
+
+  # In case the first sample is greater than the last sample for cpu usage,
+  # it means the container is restarted and calculate the average
+  # via the next sample which would be the first sample of the restarted container
+  if (( $(bc <<< "$last_value <= $first_value") == 1 )); then
+    get_average_cpu_usage_between_samples $lxc $(echo $sampleCountToAverage -1 | bc)
+    return
+  fi
+
+#  msg_debug "first_value: $first_value"
+#  msg_debug "first_timestamp: $first_timestamp"
+#  msg_debug "last_value:  $last_value"
+#  msg_debug "last_timestamp: $last_timestamp"
+#  msg_debug "line_count:  $line_count"
+#  msg_debug "sampleCount: $sampleCountToAverage"
+#  msg_debug "time_elapsed: $time_elapsed"
+  echo $(($cpu_usage / $time_elapsed))
+  return
+}
+
+
+function get_metric_average {
+  local lxc=$1
+  local sampleCountToAverage=$2
+  local metric_type=$3
+
+  lxc_assert $lxc > /dev/null
+  local numberExpression='^[0-9]+$'
+
+  if [ -z "$sampleCountToAverage" ]; then
+    msg_error "No value provided for sampleCountToAverage! Aborting.."
+    exit 1
+  fi
+
+  # Check if the value is a number
+  if ! [[ $sampleCountToAverage =~ $numberExpression ]] ; then
+    msg_error "$sampleCountToAverage is not a number! Aborting.."
+    exit 1
+  fi
+
+  if [ $sampleCountToAverage -lt 1 ]; then
+    msg_error "Sample count to be averaged cannot be less than \"1\". Aborting!"
+    exit 1
+  fi
+  assert_metric $metric_type > /dev/null
+
+  local maxSampleCount=$(get_max_sample_count)
+  if [ $sampleCountToAverage -gt $maxSampleCount ]; then
+    msg_error "Sample count cannot be greater than maximum sample count! Aborting.."
+    exit 1
+  fi
+
+  local last_N_values=$(query_rrd $lxc "$metric_type" | tail -$sampleCountToAverage | grep "e+")
+  if [ -z "$last_N_values" ]; then
+    msg_error "No data found for $metric_type metric_type for $lxc! Aborting.."
+    exit 1
+  fi
+
+  local sum=$(echo "0" | bc)
+  local line_count=$(echo "$last_N_values" | wc -l)
+  while read -r line; do
+    value=$(echo $line | cut -d':' -f2 | tr -d ' ' | sed -e 's/[eE][+][0]/*10^/')
+    sum=$(echo $sum+$value | bc)
+  done <<< "$last_N_values"
+  # Remove insignificant bits
+  sum=$(echo $sum | cut -d'.' -f1)
+  if [ -z "$sum" ]; then
+    echo "0"
+    return
+  fi
+  echo $(($sum / $line_count))
+  return
+}
+
+
+# reports the total CPU time (in nanoseconds) consumed by all tasks in this cgroup
 function get_used_cpu {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -54,6 +271,7 @@ function get_used_cpu {
 function get_physical_total_ram {
   local total_ram_kb=$(grep MemTotal /proc/meminfo | awk '{print $2}')
   echo "$(($total_ram_kb * 1024))"
+  return
 }
 
 
@@ -61,6 +279,7 @@ function get_physical_available_ram {
   local total_ram=$(get_physical_total_ram)
   local used_ram=$(get_physical_used_ram)
   echo "$(($total_ram - $used_ram))"
+  return
 }
 
 
@@ -74,6 +293,7 @@ function get_physical_used_ram {
 }
 
 
+# reports the total CPU time (in nanoseconds) consumed by all tasks in this cgroup
 function get_physical_used_cpu {
   local used_cpu=$(cat /sys/fs/cgroup/cpuacct/cpuacct.usage)
   local status=$?
@@ -84,39 +304,255 @@ function get_physical_used_cpu {
 }
 
 
-function get_available_disk {
+function get_available_disk_by_dataset {
+  local lxc=$1
+  local dataset=$2
+  lxc_assert $lxc > /dev/null
+  assert_dataset $dataset
+  echo $(fs_get_available_disk "$lxc" "$dataset")
+}
+
+
+function get_available_diskVar {
   local lxc=$1
   lxc_assert $lxc > /dev/null
-  echo "100000"
+  echo $(get_available_disk_by_dataset "$lxc" "var")
 }
 
 
-function get_used_disk {
+function get_available_diskOpt {
   local lxc=$1
   lxc_assert $lxc > /dev/null
-  echo "50000"
+  echo $(get_available_disk_by_dataset "$lxc" "opt")
 }
 
 
-function get_total_disk {
+function get_available_diskHome {
   local lxc=$1
   lxc_assert $lxc > /dev/null
-  echo "150000"
+  echo $(get_available_disk_by_dataset "$lxc" "home")
 }
 
 
-function get_physical_available_disk {
-  echo "400000"
+function get_available_diskRootfs {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_available_disk_by_dataset "$lxc" "rootfs")
 }
 
 
-function get_physical_used_disk {
-  echo "150000"
+function get_used_disk_by_dataset {
+  local lxc=$1
+  local dataset=$2
+  lxc_assert $lxc > /dev/null
+  assert_dataset $dataset
+  echo $(fs_get_used_disk "$lxc" "$dataset")
 }
 
 
-function get_physical_total_disk {
-  echo "550000"
+function get_used_diskVar {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_used_disk_by_dataset "$lxc" "var")
+}
+
+
+function get_used_diskOpt {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_used_disk_by_dataset "$lxc" "opt")
+}
+
+
+function get_used_diskHome {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_used_disk_by_dataset "$lxc" "home")
+}
+
+
+function get_used_diskRootfs {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_used_disk_by_dataset "$lxc" "rootfs")
+}
+
+
+function get_total_disk_by_dataset {
+  local lxc=$1
+  local dataset=$2
+  assert_dataset $dataset
+
+  local disk_quota=$(fs_get_quota_exact_values $lxc | grep "$dataset" | cut -d':' -f2 | tr -d '\040\011\015')
+  local metric_type=$(get_disk_metric_type_by_dataset $dataset)
+  local physical_total_disk_dataset=$(get_physical_total_"$metric_type")
+  local numberExpression='^[0-9]+$'
+
+  # Return physical total disk if the disk quota is empty
+  if [ -z "$disk_quota" ]; then
+    echo "$physical_total_disk_dataset"
+    return
+  fi
+  # Return physical total disk if the disk quota is not a number
+  if ! [[ $disk_quota =~ $numberExpression ]] ; then
+    echo "$physical_total_disk_dataset"
+    return
+  fi
+
+  assert_number "$disk_quota"  > /dev/null
+
+  # Return quota value set for disk if it is less than or equal to
+  # physical total disk and if quota is not 0 meaning no limit defined
+  if (( $(bc <<< "$disk_quota <= $physical_total_disk_dataset") == 1 )) && (("$disk_quota" > "0")); then
+    echo "$disk_quota"
+    return
+  fi
+  # Return physical total disk size if the quota set is greater than
+  # the physical total disk
+  echo "$physical_total_disk_dataset"
+  return
+}
+
+
+function get_total_diskVar {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_total_disk_by_dataset "$lxc" "var")
+}
+
+
+function get_total_diskOpt {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_total_disk_by_dataset "$lxc" "opt")
+}
+
+
+function get_total_diskHome {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_total_disk_by_dataset "$lxc" "home")
+}
+
+
+function get_total_diskRootfs {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo $(get_total_disk_by_dataset "$lxc" "rootfs")
+}
+
+
+function get_var_dataset_pool {
+  echo "lxc-data"
+}
+
+
+function get_opt_dataset_pool {
+  echo "lxc"
+}
+
+
+function get_home_dataset_pool {
+  echo "lxc-data"
+}
+
+
+function get_rootfs_dataset_pool {
+  echo "lxc"
+}
+
+
+function get_physical_available_disk_by_pool_name {
+  local pool_name=$1
+  assert_pool $pool_name
+  echo $(fs_get_physical_available_disk "$pool_name")
+}
+
+
+function get_physical_available_diskVar {
+  local pool=$(get_var_dataset_pool)
+  get_physical_available_disk_by_pool_name $pool
+}
+
+
+function get_physical_available_diskOpt {
+  local pool=$(get_opt_dataset_pool)
+  get_physical_available_disk_by_pool_name $pool
+}
+
+
+function get_physical_available_diskHome {
+  local pool=$(get_home_dataset_pool)
+  get_physical_available_disk_by_pool_name $pool
+}
+
+
+function get_physical_available_diskRootfs {
+  local pool=$(get_rootfs_dataset_pool)
+  get_physical_available_disk_by_pool_name $pool
+}
+
+
+function get_physical_used_disk_by_pool_name {
+  local pool_name=$1
+  assert_pool $pool_name
+  echo $(fs_get_physical_used_disk "$pool_name")
+}
+
+
+function get_physical_used_diskVar {
+  local pool=$(get_var_dataset_pool)
+  get_physical_used_disk_by_pool_name $pool
+}
+
+
+function get_physical_used_diskOpt {
+  local pool=$(get_opt_dataset_pool)
+  get_physical_used_disk_by_pool_name $pool
+}
+
+
+function get_physical_used_diskHome {
+  local pool=$(get_home_dataset_pool)
+  get_physical_used_disk_by_pool_name $pool
+}
+
+
+function get_physical_used_diskRootfs {
+  local pool=$(get_rootfs_dataset_pool)
+  get_physical_used_disk_by_pool_name $pool
+}
+
+
+function get_physical_total_disk_by_pool_name {
+  local pool_name=$1
+  assert_pool $pool
+  echo $(fs_get_physical_total_disk $pool_name)
+  return
+}
+
+
+function get_physical_total_diskVar {
+  local pool=$(get_var_dataset_pool)
+  get_physical_total_disk_by_pool_name $pool
+}
+
+
+function get_physical_total_diskOpt {
+  local pool=$(get_opt_dataset_pool)
+  get_physical_total_disk_by_pool_name $pool
+}
+
+
+function get_physical_total_diskHome {
+  local pool=$(get_home_dataset_pool)
+  get_physical_total_disk_by_pool_name $pool
+}
+
+
+function get_physical_total_diskRootfs {
+  local pool=$(get_rootfs_dataset_pool)
+  get_physical_total_disk_by_pool_name $pool
 }
 
 
@@ -170,7 +606,7 @@ function create_rrd {
 
   # Initialize following variables that depend on configuration file
   # after get_monitor_configuration call
-  local update_sequence=$(get_update_sequence)
+  local update_sequence=$(get_update_sequence $hostname $metric_type)
   local maxSampleCount=$(get_max_sample_count)
 
   pushd $SUBUTAI_RRD_DIRECTORY > /dev/null
@@ -206,11 +642,25 @@ function update_rrd {
   local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
   local tag=$(get_metric_tag $metric_type)
   local dataset_name=$(get_dataset_name $metric_type)
-  local update_sequence=$(get_update_sequence)
-  local metric_value=$(subutai monitor $hostname | awk -F"$tag" '{print $2}' | awk -F"," '{print $1}' | awk -F"\"" '{print $3}')
-
-  msg_info "    - $metric_value is stored at `date +%s`"
+  local update_sequence=$(get_update_sequence $hostname $metric_type)
+  local function_name=$(get_resource_usage_function_name_by_metric_type $hostname $metric_type)
+  local metric_value=$($function_name $hostname)
+  local current_time=`date +%s`
+  message="$metric_value is stored at $current_time for $metric_type($hostname) metric"
+  msg_info "    - $message"
   rrdtool update  "$database_file" --template "$dataset_name" N:"$metric_value"
+}
+
+
+function get_resource_usage_function_name_by_metric_type {
+  local hostname=$1
+  local metric_type=$2
+  # Check if the hostname is the physical host or a container
+  if [ `hostname` != $hostname  ]; then
+    echo "get_used_$metric_type"
+  else
+    echo "get_physical_used_$metric_type"
+  fi
 }
 
 
@@ -232,8 +682,18 @@ function start_update_rrd {
   stop_update_rrd "$hostname" "$metric_type" > /dev/null
   #write out current crontab
   crontab -l > mycron
+  #echo path variable to cron file if not set(this is for sbin directory due to zfs)
+  local path_entry="PATH=\/bin:\/usr\/bin:\/sbin"
+  if ! grep -q "PATH=" mycron
+  then
+    sed -i "1s/^/$path_entry\n/" mycron
+  fi
   #echo new cron into cron file
-  echo "*/$(get_cron_interval_in_minutes) * * * * subutai monitor -u $metric_type $hostname" >> mycron
+  local update_entry=$(get_update_entry $hostname $metric_type)
+  echo "*/$(get_update_interval_in_minutes $hostname $metric_type) * * * * $update_entry" >> mycron
+  #echo new cron into cron file
+  local alert_entry=$(get_alert_entry $hostname $metric_type)
+  echo "*/$(get_alert_interval_in_minutes $hostname $metric_type) * * * * $alert_entry" >> mycron
   #install new cron file
   crontab mycron
   rm mycron
@@ -243,13 +703,9 @@ function start_update_rrd {
 function start_update_all_rrd {
   local hostname=$1
 
-  if [ `hostname` != $hostname ]; then
-    lxc_assert "$hostname"
-  fi
-
   for metric_type in "${metric_list[@]}"
   do
-    start_update_rrd $hostname $metric_type > /dev/null
+    start_update_rrd "$hostname" "$metric_type"
   done
 }
 
@@ -259,8 +715,21 @@ function stop_update_rrd {
   local metric_type=$2
 
   assert_metric "$metric_type"
+  local update_entry=$(get_update_entry $hostname $metric_type)
+  crontab -l | grep "$update_entry" > /dev/null
+  local status=$?
+  if [ $status == 0 ]; then
+    msg_info "    - stop update job of $metric_type metric for $hostname"
+    crontab -l | sed "/$update_entry/d" | crontab -
+  fi
 
-  crontab -l | sed "/subutai monitor -u $metric_type $hostname/d" | crontab -
+  local alert_entry=$(get_alert_entry $hostname $metric_type)
+  crontab -l | grep "$alert_entry" > /dev/null
+  local status=$?
+  if [ $status == 0 ]; then
+    msg_info "    - stop alert job of $metric_type metric for $hostname"
+    crontab -l | sed "/$alert_entry/d" | crontab -
+  fi
 }
 
 
@@ -278,6 +747,20 @@ function stop_update_all_rrd {
 }
 
 
+function get_update_entry {
+  local hostname=$1
+  local metric_type=$2
+  echo "subutai monitor -u $metric_type $hostname"
+}
+
+
+function get_alert_entry {
+  local hostname=$1
+  local metric_type=$2
+  echo "subutai monitor -a $metric_type $hostname"
+}
+
+
 function query_rrd {
   local hostname=$1
   local metric_type=$2
@@ -290,11 +773,103 @@ function query_rrd {
   local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
 
   local TIME=$(date +%s)
-  local update_sequence=$(get_update_sequence)
+  local update_sequence=$(get_update_sequence $hostname $metric_type)
   # Show last X entries
   local maxSampleCount=$(get_max_sample_count)
   local start_time=$(($update_sequence * $maxSampleCount))
+
+  if [ ! -f $database_file ]; then
+    msg_error "Database file of $metric_type rrd for $hostname does not exist. Aborting!"
+    exit 1
+  fi
+
   rrdtool fetch "$database_file" LAST -e $TIME -s e-"$start_time"sec
+}
+
+
+function query_pid {
+  local hostname=$1
+  local metric_type=$2
+  local pid=$3
+
+  lxc_assert "$hostname" > /dev/null
+  if [ "$metric_type" != "all"  ]; then
+    assert_metric "$metric_type"
+  fi
+  assert_number "$pid"
+
+  local print_result="{\"host\":\"$hostname\",\"pid\":\"$pid\""
+  if [ $metric_type == "ram" ]; then
+    local usage=$(get_ram_usage_in_bytes_by_pid $hostname $pid)
+    print_result="$print_result, \"usedRam\":\"$usage\""
+  elif [ $metric_type == "cpu" ]; then
+    local usage=$(get_cpu_usage_percentage_by_pid $hostname $pid)
+    print_result="$print_result, \"usedCpu\":\"$usage\""
+
+  elif [ "$metric_type" == "all" ]; then
+    local cpu_usage_percentage=$(get_cpu_usage_percentage_by_pid $hostname $pid)
+    local ram_usage_in_bytes=$(get_ram_usage_in_bytes_by_pid $hostname $pid)
+    print_result="$print_result, \"usedRam\":\"$ram_usage_in_bytes\""
+    print_result="$print_result, \"usedCpu\":\"$cpu_usage_percentage\""
+  else
+    msg_error "$metric_type cannot be calculated for individual processes! Aborting.."
+    exit 1
+  fi
+  print_result="$print_result}"
+  echo "$print_result"
+  return
+}
+
+
+function get_cpu_usage_percentage_by_pid {
+  local hostname=$1
+  local pid=$2
+
+  local usage_output=`lxc-attach -n "$hostname" -- ps -p $pid -o %cpu`
+  local line_count=$(echo -e "$usage_output" | wc -l)
+
+  if [ "$line_count" == "1" ]; then
+    echo "0"
+    return
+  fi
+
+  # since ps command is not cgroup aware, its percentage result does not
+  # consider the quotas defined for the lxc container.
+  # so we need to manipulate this result
+  local usage_in_percentage_without_quotas=$(echo -e "$usage_output" | tail -1 | tr -d ' ')
+  local cpu_quota=$(get_maximum_cpu_capacity_nanoseconds $hostname)
+  local physical_cpu_capacity=$(get_physical_cpu_capacity_nanoseconds)
+  local usage_in_percentage_with_quotas=$(echo "$usage_in_percentage_without_quotas*$cpu_quota*100/$physical_cpu_capacity" | bc)
+  echo "$usage_in_percentage_with_quotas"
+  return
+}
+
+
+function get_ram_usage_percentage_by_pid {
+  local hostname=$1
+  local pid=$2
+
+  local usage_output=`lxc-attach -n "$hostname" -- ps -p $pid -o %mem`
+  local line_count=$(echo -e "$usage_output" | wc -l)
+
+  if [ "$line_count" == "1" ]; then
+    echo "0"
+    return
+  fi
+
+  local usage=$(echo -e "$usage_output" | tail -1 | tr -d ' ')
+  echo "$usage"
+}
+
+
+function get_ram_usage_in_bytes_by_pid {
+  local hostname=$1
+  local pid=$2
+
+  local usage_in_percentage=$(get_ram_usage_percentage_by_pid $hostname $pid)
+  local ram_quota=$(get_total_ram $hostname)
+  local usage_in_byte=$(echo $ram_quota*$usage_in_percentage | bc)
+  echo $usage_in_byte
 }
 
 
@@ -326,30 +901,33 @@ function remove_rrd_file {
 
   local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
   stop_update_rrd $hostname $metric_type
-  rm -f $database_file > /dev/null 2>&1
-  msg_info "    - $metric_type rrd of $hostname is destroyed"
+  if [ -f $database_file ]; then
+    rm -f $database_file
+    msg_info "    - $metric_type rrd of $hostname is destroyed"
+  fi
 }
 
 
 function remove_monitor_configuration {
   local hostname=$1
   local metric_type=$2
-  if [ -z $hostname  ]; then
+  if [ -z "$hostname" ]; then
     msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
     exit 1
   fi
   assert_metric $metric_type
 
   local monitor_conf=$(get_monitor_configuration_file $hostname $metric_type)
-
-  rm -f $monitor_conf > /dev/null 2>&1
-  msg_info "    - $monitor_conf file is removed"
+  if [ -f $monitor_conf ]; then
+    rm -f $monitor_conf
+    msg_info "    - $monitor_conf file is removed"
+  fi
 }
 
 
 function assert_metric {
   local metric_type=$1
-  if [ -z $metric_type ]; then
+  if [ -z "$metric_type" ]; then
     msg_error "Metric type is empty. Aborting!"
     exit 1
   fi
@@ -357,6 +935,36 @@ function assert_metric {
   if [ $(contains "${metric_list[@]}" "$metric_type") != "y" ]; then
     msg_error "    - $metric_type is not supported metric type. Please provide one of the followings:"
     echo "      ${metric_list[@]}"
+    exit 1
+  fi
+}
+
+
+function assert_dataset {
+  local dataset=$1
+  if [ -z "$dataset" ]; then
+    msg_error "Dataset is empty. Aborting!"
+    exit 1
+  fi
+
+  if [ $(contains "${dataset_list[@]}" "$dataset") != "y" ]; then
+    msg_error "    - $dataset is not supported dataset. Please provide one of the followings:"
+    echo "      ${dataset_list[@]}"
+    exit 1
+  fi
+}
+
+
+function assert_pool {
+  local pool_name=$1
+  if [ -z "$pool_name" ]; then
+    msg_error "Pool name is empty. Aborting!"
+    exit 1
+  fi
+
+  if [ $(contains "${pool_list[@]}" "$pool_name") != "y" ]; then
+    msg_error "    - $pool_name is not supported dataset. Please provide one of the followings:"
+    echo "      ${pool_list[@]}"
     exit 1
   fi
 }
@@ -375,7 +983,7 @@ function assert_parameters {
 
 function assert_parameter {
   local parameter=$1
-  if [ -z $parameter ]; then
+  if [ -z "$parameter" ]; then
     msg_error "Parameter is empty. Aborting!"
     exit 1
   fi
@@ -420,8 +1028,20 @@ function get_database_file {
 }
 
 
-function get_cron_interval_in_minutes {
-  if [ -z $metricCollectionIntervalInMin ]; then
+function get_update_interval_in_minutes {
+  local hostname=$1
+  local metric_type=$2
+
+  if [ -z "$hostname" ]; then
+    msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+  assert_metric $metric_type > /dev/null
+
+  # Get configuration parameters
+  get_monitor_configuration "$hostname" "$metric_type"
+
+  if [ -z "$metricCollectionIntervalInMin" ]; then
     echo "1"
     return
   fi
@@ -430,14 +1050,45 @@ function get_cron_interval_in_minutes {
 }
 
 
+function get_alert_interval_in_minutes {
+  local hostname=$1
+  local metric_type=$2
+
+  if [ -z "$hostname" ]; then
+    msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+  assert_metric $metric_type > /dev/null
+
+  # Get configuration parameters
+  get_monitor_configuration "$hostname" "$metric_type"
+
+  if [ -z "$intervalBetweenAlertsInMin" ]; then
+    echo "10"
+    return
+  fi
+  echo $intervalBetweenAlertsInMin
+  return
+}
+
+
 function get_update_sequence {
-  local interval_in_minutes=$(get_cron_interval_in_minutes)
+  local hostname=$1
+  local metric_type=$2
+
+  if [ -z "$hostname" ]; then
+    msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+  assert_metric $metric_type > /dev/null
+
+  local interval_in_minutes=$(get_update_interval_in_minutes $hostname $metric_type)
   echo "$(($interval_in_minutes * 60))"
 }
 
 
 function get_max_sample_count {
-  if [ -z $maxSampleCount ]; then
+  if [ -z "$maxSampleCount" ]; then
     echo "1440"
     return
   fi
@@ -452,7 +1103,7 @@ function store_monitor_configuration {
   local parameters=$3
   local monitor_conf=$(get_monitor_configuration_file $hostname $metric_type)
 
-  if [[ -z $parameters ]]; then
+  if [[ -z "$parameters" ]]; then
     if [ -f $monitor_conf ]; then
       msg_info "    - using configuration file $monitor_conf"
     else
@@ -472,7 +1123,7 @@ function store_monitor_configuration {
     local value=$(echo $parameter | cut -d':' -f2)
     local numberExpression='^[0-9]+$'
 
-    if [ -z $value ]; then
+    if [ -z "$value" ]; then
       msg_error "No value provided for $parameter! Aborting.."
       exit 1
     fi
@@ -507,7 +1158,7 @@ function get_monitor_configuration {
   local hostname=$1
   local metric_type=$2
 
-  if [ -z $hostname  ]; then
+  if [ -z "$hostname" ]; then
     msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
     exit 1
   fi
@@ -525,7 +1176,7 @@ function get_monitor_configuration_file {
   local hostname=$1
   local metric_type=$2
 
-  if [ -z $hostname  ]; then
+  if [ -z "$hostname" ]; then
     msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
     exit 1
   fi
@@ -539,7 +1190,7 @@ function get_monitor_configuration_file {
 function get_monitor_configuration_dir {
   local hostname=$1
 
-  if [ -z $hostname  ]; then
+  if [ -z "$hostname" ]; then
     msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
     exit 1
   fi
@@ -553,7 +1204,7 @@ function assert_no_config {
   local hostname=$1
   local metric_type=$2
 
-  if [ -z $hostname  ]; then
+  if [ -z "$hostname" ]; then
     msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
     exit 1
   fi
@@ -567,4 +1218,274 @@ function assert_no_config {
 }
 
 
+function get_ram_threshold_percentage {
+  local hostname=$1
+  # Get configuration parameters
+  get_monitor_configuration "$hostname" "ram"
 
+  if [ -z "$ramAlertThreshold" ]; then
+    echo "80"
+    return
+  fi
+  echo $ramAlertThreshold
+  return
+}
+
+
+function get_cpu_threshold_percentage {
+  local hostname=$1
+  # Get configuration parameters
+  get_monitor_configuration "$hostname" "cpu"
+
+  if [ -z "$cpuAlertThreshold" ]; then
+    echo "80"
+    return
+  fi
+  echo $cpuAlertThreshold
+  return
+}
+
+
+function get_disk_threshold_percentage {
+  local hostname=$1
+  local dataset=$2
+  # Get configuration parameters
+  get_monitor_configuration "$hostname" "$dataset"
+
+  if [ -z "$diskAlertThreshold" ]; then
+    echo "80"
+    return
+  fi
+  echo $diskAlertThreshold
+  return
+}
+
+
+function get_metric_count_to_average_to_alert {
+  local hostname=$1
+  local metric_type=$2
+  # Get configuration parameters
+  get_monitor_configuration "$hostname" "$metric_type"
+
+  if [ -z "$metricCountToAverageToAlert" ]; then
+    echo "10"
+    return
+  fi
+  echo $metricCountToAverageToAlert
+  return
+}
+
+
+function get_ram_alert_threshold_bytes {
+  local lxc=$1
+  local ram_threshold_percentage=$(get_ram_threshold_percentage $lxc)
+  local ram_quota=$(get_total_ram $lxc)
+
+  local result=$(echo $ram_quota*$ram_threshold_percentage/100 | bc)
+  echo "$result"
+  return
+}
+
+
+function get_cpu_alert_threshold_nanoseconds {
+  local lxc=$1
+  local cpu_threshold_percentage=$(get_cpu_threshold_percentage $lxc)
+  local cpu_quota=$(get_maximum_cpu_capacity_nanoseconds $lxc)
+
+  local result=$(echo $cpu_quota*$cpu_threshold_percentage/100 | bc)
+  echo "$result"
+  return
+}
+
+
+function get_disk_alert_threshold_bytes {
+  local lxc=$1
+  local dataset=$2
+  local metric_type=$(get_disk_metric_type_by_dataset $dataset)
+  local disk_threshold_percentage=$(get_disk_threshold_percentage $lxc $metric_type)
+  local disk_quota=$(get_total_disk_by_dataset $lxc $dataset)
+
+  local result=$(echo $disk_quota*$disk_threshold_percentage/100 | bc)
+  echo "$result"
+  return
+}
+
+
+function get_disk_metric_type_by_dataset {
+  local dataset=$1
+  echo "disk$(tr '[:lower:]' '[:upper:]' <<< ${dataset:0:1})${dataset:1}"
+}
+
+
+function ram_alert {
+  local lxc=$1
+  local metric_type="ram"
+  local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $lxc $metric_type)"
+
+  lxc_assert $lxc
+  lxc_assert_running "$lxc"
+
+  if [ ! -f $database_file ]; then
+    msg_error "Database file of $metric_type rrd for $lxc does not exist. Aborting!"
+    exit 1
+  fi
+
+
+  local ram_alert_threshold_bytes=$(get_ram_alert_threshold_bytes $lxc)
+  local metricCountToAverageToAlert=$(get_metric_count_to_average_to_alert $lxc $metric_type)
+  local average_used_ram=$(get_average_used_ram $lxc $metricCountToAverageToAlert)
+
+  local last_N_values=$(query_rrd $lxc "$metric_type" | tail -$metricCountToAverageToAlert | grep "e+")
+  if [ -z "$last_N_values" ]; then
+    msg_error "No data found for $metric_type metric for $lxc! Aborting.."
+    exit 1
+  fi
+
+  assert_number "$average_used_ram"
+  assert_number "$ram_alert_threshold_bytes"
+
+  if (( $(bc <<< "$average_used_ram >= $ram_alert_threshold_bytes") == 1 )); then
+    msg_info "Ram alert threshold $ram_alert_threshold_bytes is exceeded with usage $average_used_ram($metricCountToAverageToAlert)!"
+    local url=`build_rest_url monitor/alert`
+    local current_metrics=$(subutai monitor $lxc)
+    curl --data "$current_metrics" "$url"
+  else
+    msg_info "Ram usage $average_used_ram($metricCountToAverageToAlert) is lower than threshold $ram_alert_threshold_bytes"
+  fi
+}
+
+
+function cpu_alert {
+  local lxc=$1
+  local metric_type="cpu"
+  local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $lxc $metric_type)"
+
+  lxc_assert "$lxc"
+  lxc_assert_running "$lxc"
+
+  if [ ! -f $database_file ]; then
+    msg_error "Database file of $metric_type rrd for $lxc does not exist. Aborting!"
+    exit 1
+  fi
+
+  local last_N_values=$(query_rrd $lxc "$metric_type" | tail -$metricCountToAverageToAlert | grep "e+")
+  if [ -z "$last_N_values" ]; then
+    msg_error "No data found for $metric_type metric_type for $lxc! Aborting.."
+    exit 1
+  fi
+
+  local cpu_alert_threshold_nanoseconds=$(get_cpu_alert_threshold_nanoseconds $lxc)
+  local metricCountToAverageToAlert=$(get_metric_count_to_average_to_alert $lxc $metric_type)
+  local average_cpu_usage_between_samples=$(get_average_cpu_usage_between_samples $lxc $metricCountToAverageToAlert)
+
+  assert_number "$average_cpu_usage_between_samples"
+  assert_number "$cpu_alert_threshold_nanoseconds"
+
+  if (( $(bc <<< "$cpu_alert_threshold_nanoseconds < $average_cpu_usage_between_samples") == 1 )); then
+    msg_info "Cpu alert threshold $cpu_alert_threshold_nanoseconds is exceeded with usage $average_cpu_usage_between_samples($metricCountToAverageToAlert)!"
+    local url=`build_rest_url monitor/alert`
+    local current_metrics=$(subutai monitor $lxc)
+    curl --data "$current_metrics" "$url"
+  else
+    msg_info "Cpu usage $average_cpu_usage_between_samples($metricCountToAverageToAlert) is lower than threshold $cpu_alert_threshold_nanoseconds"
+  fi
+}
+
+
+function disk_alert {
+  local lxc=$1
+  local dataset=$2
+  local metric_type=$(get_disk_metric_type_by_dataset $dataset)
+  local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $lxc $metric_type)"
+
+  lxc_assert $lxc
+  lxc_assert_running "$lxc"
+
+  if [ ! -f $database_file ]; then
+    msg_error "Database file of $metric_type rrd for $lxc does not exist. Aborting!"
+    exit 1
+  fi
+
+  local disk_alert_threshold_bytes=$(get_disk_alert_threshold_bytes $lxc $dataset)
+  local metricCountToAverageToAlert=$(get_metric_count_to_average_to_alert $lxc $metric_type)
+  local average_used_disk=$(get_average_used_disk_by_metric_type $lxc $metric_type $metricCountToAverageToAlert)
+
+  local last_N_values=$(query_rrd $lxc "$metric_type" | tail -$metricCountToAverageToAlert | grep "e+")
+  if [ -z "$last_N_values" ]; then
+    msg_error "No data found for $metric_type metric for $lxc! Aborting.."
+    exit 1
+  fi
+
+  assert_number "$average_used_disk"
+  assert_number "$disk_alert_threshold_bytes"
+
+  if (( $(bc <<< "$average_used_disk >= $disk_alert_threshold_bytes") == 1 )); then
+    msg_info "Disk alert threshold $disk_alert_threshold_bytes is exceeded with usage $average_used_disk($metricCountToAverageToAlert)!"
+    local url=`build_rest_url monitor/alert`
+    local current_metrics=$(subutai monitor $lxc)
+    curl --data "$current_metrics" "$url"
+  else
+    msg_info "Disk usage $average_used_disk($metricCountToAverageToAlert) is lower than threshold $disk_alert_threshold_bytes"
+  fi
+}
+
+
+function diskOpt_alert {
+  local lxc=$1
+  local dataset="opt"
+  disk_alert $lxc $dataset
+}
+
+
+function diskVar_alert {
+  local lxc=$1
+  local dataset="var"
+  disk_alert $lxc $dataset
+}
+
+
+function diskHome_alert {
+  local lxc=$1
+  local dataset="home"
+  disk_alert $lxc $dataset
+}
+
+
+function diskRootfs_alert {
+  local lxc=$1
+  local dataset="rootfs"
+  disk_alert $lxc $dataset
+}
+
+
+function assert_number {
+  local variable="$1"
+  local numberExpression='^[0-9]+$'
+  if [ -z "$variable" ]; then
+    msg_error "Variable asserted to be a number is empty! Aborting.."
+    exit 1
+  fi
+  # Check if the value is a number
+  if ! [[ $variable =~ $numberExpression ]] ; then
+    msg_error "$variable is not a number! Aborting.."
+    exit 1
+  fi
+}
+
+
+function is_number {
+  local variable="$1"
+  local numberExpression='^[0-9]+$'
+  if [ -z "$variable" ]; then
+    echo "false"
+    return
+  fi
+
+  if ! [[ $variable =~ $numberExpression ]] ; then
+    echo "false"
+    return
+  fi
+
+  echo "true"
+  return
+}
