@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.impl.model;
+package org.safehaus.subutai.core.peer.impl.entity;
 
 
 import java.util.HashSet;

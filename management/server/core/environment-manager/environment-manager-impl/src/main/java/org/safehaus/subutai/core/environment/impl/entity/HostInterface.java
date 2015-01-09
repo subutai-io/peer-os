@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.environment.impl;
+package org.safehaus.subutai.core.environment.impl.entity;
 
 
 import java.io.Serializable;
@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.safehaus.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.hostregistry.api.Interface;
 
 

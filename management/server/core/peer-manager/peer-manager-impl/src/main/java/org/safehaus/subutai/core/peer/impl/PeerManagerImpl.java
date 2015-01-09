@@ -25,6 +25,7 @@ import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandRequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequestListener;
+import org.safehaus.subutai.core.peer.impl.dao.DaoManager;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequestListener;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
@@ -61,8 +62,8 @@ public class PeerManagerImpl implements PeerManager
     private CommandResponseListener commandResponseListener;
     private Set<RequestListener> requestListeners = Sets.newHashSet();
     private MessageResponseListener messageResponseListener;
-    private EntityManagerFactory entityManagerFactory;
     private HostRegistry hostRegistry;
+    private DaoManager daoManager;
 
 
     public PeerManagerImpl( final DataSource dataSource, final Messenger messenger )
@@ -72,23 +73,28 @@ public class PeerManagerImpl implements PeerManager
         this.messenger = messenger;
     }
 
-
-    public void setEntityManagerFactory( EntityManagerFactory entityManagerFactory )
-    {
-        this.entityManagerFactory = entityManagerFactory;
-    }
-
-
     public void setHostRegistry( final HostRegistry hostRegistry )
     {
         this.hostRegistry = hostRegistry;
     }
 
 
+    public DaoManager getDaoManager()
+    {
+        return daoManager;
+    }
+
+
+    public void setDaoManager( final DaoManager daoManager )
+    {
+        this.daoManager = daoManager;
+    }
+
+
     @Override
     public EntityManagerFactory getEntityManagerFactory()
     {
-        return entityManagerFactory;
+        return  daoManager.getEntityManagerFactory();
     }
 
 

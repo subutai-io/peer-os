@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
@@ -36,6 +36,8 @@ import org.safehaus.subutai.core.environment.impl.builder.ProcessBuilderExceptio
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDataService;
+import org.safehaus.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
+import org.safehaus.subutai.core.environment.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.environment.impl.environment.BuildException;
 import org.safehaus.subutai.core.environment.impl.environment.DestroyException;
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentBuilder;
@@ -70,7 +72,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class.getName() );
-    //    private static final String ENVIRONMENT = "ENVIRONMENT";
     private static final String PROCESS = "PROCESS";
     private static final String BLUEPRINT = "BLUEPRINT";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -80,15 +81,23 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private TemplateRegistry templateRegistry;
     private SecurityManager securityManager;
     private Tracker tracker;
-    private DataSource dataSource;
-    private EntityManagerFactory entityManagerFactory;
+    private EntityManager entityManager;
     private EnvironmentDataService environmentDataService;
     private EnvironmentContainerDataService environmentContainerDataService;
+    private DataSource dataSource;
 
-
-    public EnvironmentManagerImpl( final DataSource dataSource ) throws SQLException
+    public EnvironmentManagerImpl( )
     {
-        Preconditions.checkNotNull( dataSource, "Data source is null" );
+
+    }
+    public DataSource getDataSource()
+    {
+        return dataSource;
+    }
+
+
+    public void setDataSource( final DataSource dataSource )
+    {
         this.dataSource = dataSource;
     }
 
@@ -105,15 +114,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public EntityManagerFactory getEntityManagerFactory()
+    public EntityManager getEntityManager()
     {
-        return entityManagerFactory;
+        return entityManager;
     }
 
 
-    public void setEntityManagerFactory( final EntityManagerFactory entityManagerFactory )
+    public void setEntityManager( EntityManager entityManager )
     {
-        this.entityManagerFactory = entityManagerFactory;
+        LOG.info( "**** Entity Manager Injected **********" );
+        this.entityManager = entityManager;
     }
 
 
@@ -143,6 +153,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public void init()
     {
+
+        LOG.info( "**** Init Entity Manager **********" + entityManager.getProperties().toString());
+
+        // **** Temporary *******************
         try
         {
             this.environmentDAO = new EnvironmentDAO( dataSource );
@@ -151,9 +165,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             LOG.error( e.getMessage(), e );
         }
-        entityManagerFactory.createEntityManager().close();
-        environmentDataService = new EnvironmentDataService( entityManagerFactory );
-        environmentContainerDataService = new EnvironmentContainerDataService( entityManagerFactory );
+        // ***********************************
+
+        environmentDataService = new EnvironmentDataService( entityManager );
+        environmentContainerDataService = new EnvironmentContainerDataService( entityManager );
     }
 
 
@@ -259,6 +274,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             EnvironmentBlueprint environmentBlueprint = GSON.fromJson( blueprint, EnvironmentBlueprint.class );
+            LOG.info( "******* saveBlueprint ************" );
             return environmentDAO.saveBlueprint( environmentBlueprint );
         }
         catch ( JsonParseException | EnvironmentPersistenceException e )

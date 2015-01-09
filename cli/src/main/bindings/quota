@@ -1,13 +1,15 @@
 #!/bin/bash
 
 
-
 function quota_usage {
   echo -----------------------------------------------------------------------
-  echo Usage: List containers and/or temlates.
+  echo Usage: Quota management of containers.
   echo
-  echo "        "subutai \[-qh\] quota \[name_list\] \[quota_type\] \[quota_value\]
-  echo
+  echo "        "subutai \[-qh\] quota container quota_parameter \[quota_value\] \[additional_parameters\]
+  echo "           "quota_parameters:
+  echo "                             "memory.quota
+  echo "                             "cpu.cpus
+  echo "                             "hdd.quota.\[home\|opt\|var\|rootfs\]
   echo -----------------------------------------------------------------------
 }
 
@@ -20,36 +22,32 @@ function quota {
   local container=$1
   local resource_parameter=$2
   local parameter_value=$3
-
-  if [[ -z $container ]]; then
-    echo "Dancing with container with no name. Aborting...";
-    exit 1;
-  fi
+  lxc_assert "$container" "`quota_usage`" > /dev/null
 
   if [[ -z $resource_parameter ]]; then
-    echo "Resource parameter not provided. Aborting..."
+    msg_error "Resource parameter not provided. Aborting..."
     exit 1;
   fi
 
   if [ -z $parameter_value ]; then
     case $resource_parameter in
-      "memory.quota" ) 
-        lxc_get_memory $container 
+      "memory.quota" )
+        lxc_get_memory $container
       ;;
       "cpu.cpus")
         lxc_get_cpus $container
       ;;
       "hdd.quota.home")
-        zfs_get_quota $container "home"
+        fs_get_quota $container "home"
       ;;
       "hdd.quota.var")
-        zfs_get_quota $container "var"
+        fs_get_quota $container "var"
       ;;
       "hdd.quota.opt")
-        zfs_get_quota $container "opt"
+        fs_get_quota $container "opt"
       ;;
       "hdd.quota.rootfs")
-        zfs_get_quota $container "rootfs"
+        fs_get_quota $container "rootfs"
       ;;
       "json")
         local memory_value=$(lxc_get_memory $container)
@@ -58,12 +56,15 @@ function quota {
         local cpu_value=$(lxc_get_cpus $container)
         local cpu_value=$( [ -z $cpu_value ] && echo "none" || printf "\"$cpu_value\"" )
 
-        local hdd_home_value=$(zfs_get_quota $container "home")
-        local hdd_var_value=$(zfs_get_quota $container "var")
-        local hdd_opt_value=$(zfs_get_quota $container "opt")
-        local hdd_rootfs_value=$(zfs_get_quota $container "rootfs")
+        local hdd_home_value=$(fs_get_quota $container "home")
+        local hdd_var_value=$(fs_get_quota $container "var")
+        local hdd_opt_value=$(fs_get_quota $container "opt")
+        local hdd_rootfs_value=$(fs_get_quota $container "rootfs")
         printf "{memory.quota=$memory_value,cpu.cpus=$cpu_value,hdd.quota.home=$hdd_home_value, hdd.quota.var=$hdd_var_value, hdd.quota.opt=$hdd_opt_value, hdd.quota.rootfs=$hdd_rootfs_value}"
       ;;
+      *)
+        msg_error "$resource_parameter is not a supported parameter! Aborting.."
+        exit 1
     esac
   else
     case $resource_parameter in
@@ -74,17 +75,20 @@ function quota {
         lxc_set_cpus $container $parameter_value
       ;;
       "hdd.quota.home")
-        zfs_set_quota $container "home" $parameter_value
+        fs_set_quota $container "home" $parameter_value
       ;;
       "hdd.quota.var")
-        zfs_set_quota $container "var" $parameter_value
+        fs_set_quota $container "var" $parameter_value
       ;;
       "hdd.quota.opt")
-        zfs_set_quota $container "opt" $parameter_value
+        fs_set_quota $container "opt" $parameter_value
       ;;
       "hdd.quota.rootfs")
-        zfs_set_quota $container "rootfs" $parameter_value
+        fs_set_quota $container "rootfs" $parameter_value
       ;;
+      *)
+        msg_error "$resource_parameter is not a supported parameter! Aborting.."
+        exit 1
     esac
   fi
 
@@ -92,6 +96,5 @@ function quota {
 
 
 function quota_description {
-
   echo sets and gets container quotas;
 }

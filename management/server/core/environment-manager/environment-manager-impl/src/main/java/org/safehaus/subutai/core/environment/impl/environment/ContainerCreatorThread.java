@@ -9,7 +9,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.DataService;
-import org.safehaus.subutai.core.environment.impl.EnvironmentContainerImpl;
+import org.safehaus.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;

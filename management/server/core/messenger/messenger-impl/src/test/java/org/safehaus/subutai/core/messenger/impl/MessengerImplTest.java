@@ -8,7 +8,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.junit.Before;
@@ -65,8 +64,6 @@ public class MessengerImplTest
     @Mock
     MessageImpl message;
     @Mock
-    EntityManagerFactory entityManagerFactory;
-    @Mock
     EntityManager entityManager;
 
     MessengerImpl messenger;
@@ -79,9 +76,8 @@ public class MessengerImplTest
         PreparedStatement preparedStatement = mock( PreparedStatement.class );
         when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
         when( dataSource.getConnection() ).thenReturn( connection );
-        when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
 
-        messenger = new MessengerImpl( peerManager, entityManagerFactory );
+        messenger = new MessengerImpl(  );
         messenger.messageSender = messageSender;
         messenger.notificationExecutor = notificationExecutor;
         messenger.messengerDao = messengerDao;
@@ -93,23 +89,23 @@ public class MessengerImplTest
     @Test( expected = NullPointerException.class )
     public void testConstructor() throws Exception
     {
-        new MessengerImpl( null, entityManagerFactory );
+        new MessengerImpl( );
     }
 
 
     @Test( expected = NullPointerException.class )
     public void testConstructor2() throws Exception
     {
-        new MessengerImpl( peerManager, null );
+        new MessengerImpl( );
     }
 
 
     @Test( expected = MessengerException.class )
     public void testConstructorWithException() throws Exception
     {
-        doThrow( new RuntimeException() ).when( entityManagerFactory ).createEntityManager();
+        //doThrow( new RuntimeException() ).when( entityManagerFactory ).createEntityManager();
 
-        new MessengerImpl( peerManager, entityManagerFactory );
+        new MessengerImpl(  );
     }
 
 
