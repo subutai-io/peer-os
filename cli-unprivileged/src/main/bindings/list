@@ -41,7 +41,7 @@ function list_contemp {
     local contemps=`lxc-ls`
     for item in `ls /var/lib/lxc/ | grep -v -`
   do
-    if [ $(fs_is_read_only $item) == 0 ]
+    if [ "`fs_is_read_only $item`" == "0" ]
     then
        contemps=$contemps" "$item
     fi

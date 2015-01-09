@@ -34,9 +34,9 @@ function fs_volume_delete {
 function fs_is_read_only {
   local item="$1"
   if [ -z "`sudo btrfs property get -ts /var/lib/lxc/$item/rootfs | grep true`" ]; then
-    return 1
+    echo 1
   else
-    return 0
+    echo 0
   fi
 }
 
