@@ -169,8 +169,8 @@ function create_postinst_script {
   echo "#!/bin/bash"  >> $postinst_file
   echo ""  >> $postinst_file
   echo "subutai_lib_base=/usr/share/subutai-cli/subutai/unprivileged/lib" >> $postinst_file
-  echo "subutai_conf_base=/etc/subutai" >> $postinst_file
-  echo "subutai_binding_base=/etc/subutai/bindings" >> $postinst_file
+  echo "subutai_conf_base=/etc/subutai/unprivileged" >> $postinst_file
+  echo "subutai_binding_base=/etc/subutai/unprivileged/bindings" >> $postinst_file
   echo ". \$subutai_lib_base/funcs" >> $postinst_file
   echo "export APT_GET_INVOCATION=true" >> $postinst_file
   
