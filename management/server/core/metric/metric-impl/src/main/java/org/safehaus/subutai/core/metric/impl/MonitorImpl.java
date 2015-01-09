@@ -472,6 +472,9 @@ public class MonitorImpl implements Monitor
                     peerManager.getLocalPeer().getContainerHostByName( containerHostMetric.getHost() );
             if ( containerHost != null )
             {
+                //set host id for future reference
+                containerHostMetric.setHostId( containerHost.getId() );
+
                 //find container's creator peer
                 Peer creatorPeer = peerManager.getPeer( UUID.fromString( containerHost.getCreatorPeerId() ) );
 
@@ -511,7 +514,7 @@ public class MonitorImpl implements Monitor
             ContainerHost containerHost = null;
             for ( Environment environment : environments )
             {
-                containerHost = environment.getContainerHostByHostname( metric.getHost() );
+                containerHost = environment.getContainerHostById( metric.getHostId() );
                 if ( containerHost != null )
                 {
                     break;
@@ -521,8 +524,8 @@ public class MonitorImpl implements Monitor
             if ( containerHost == null )
             {
                 throw new MonitorException(
-                        String.format( "Could not find alert container %s within existing environments",
-                                metric.getHost() ) );
+                        String.format( "Could not find alert container within existing environments by id %s",
+                                metric.getHostId() ) );
             }
 
             metric.setEnvironmentId( UUID.fromString( containerHost.getEnvironmentId() ) );

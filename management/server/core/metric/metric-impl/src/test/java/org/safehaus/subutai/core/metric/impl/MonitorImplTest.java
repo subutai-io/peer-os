@@ -70,6 +70,7 @@ public class MonitorImplTest
     private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
     private static final UUID LOCAL_PEER_ID = UUID.randomUUID();
     private static final UUID REMOTE_PEER_ID = UUID.randomUUID();
+    private static final UUID HOST_ID = UUID.randomUUID();
     private static final String HOST = "test";
     private static final double METRIC_VALUE = 123;
     private static final String METRIC_JSON = " {\"host\":\"test\", \"totalRam\":\"123\"," +
@@ -141,7 +142,7 @@ public class MonitorImplTest
 
         containerHostMetric = mock( ContainerHostMetricImpl.class );
         when( containerHostMetric.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
-        when( containerHostMetric.getHost() ).thenReturn( HOST );
+        when( containerHostMetric.getHostId() ).thenReturn( HOST_ID );
         when( alertListener.getSubscriberId() ).thenReturn( SUBSCRIBER_ID );
         alertListeners = Sets.newHashSet( alertListener );
         monitor.setMetricListeners( alertListeners );
@@ -154,11 +155,11 @@ public class MonitorImplTest
         when( remotePeer.isLocal() ).thenReturn( false );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         when( environment.getContainerHosts() ).thenReturn( Sets.newHashSet( containerHost ) );
-        when( environment.getContainerHostByHostname(HOST) ).thenReturn( containerHost  );
+        when( environment.getContainerHostById( HOST_ID ) ).thenReturn( containerHost );
         when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID.toString() );
-        when( containerHost.getHostname() ).thenReturn( HOST );
+        when( containerHost.getId() ).thenReturn( HOST_ID );
         when( localPeer.getResourceHosts() ).thenReturn( Sets.newHashSet( resourceHost ) );
-        when( environmentManager.getEnvironments() ).thenReturn( Lists.newArrayList(environment) );
+        when( environmentManager.getEnvironments() ).thenReturn( Lists.newArrayList( environment ) );
     }
 
 
@@ -213,7 +214,7 @@ public class MonitorImplTest
 
         monitor.notifyOnAlert( containerHostMetric );
 
-        verify( containerHostMetric ).getHost();
+        verify( containerHostMetric ).getHostId();
     }
 
 

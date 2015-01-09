@@ -20,4 +20,13 @@ public class ContainerHostMetricImpl extends ContainerHostMetric
 
         this.environmentId = environmentId;
     }
+
+
+    protected void setHostId( final UUID hostId )
+    {
+
+        Preconditions.checkNotNull( host, "Invalid host id" );
+
+        this.hostId = hostId;
+    }
 }
