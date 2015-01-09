@@ -5,6 +5,31 @@
 # --------------------------------------------------------------------------
 
 
+function fs_send_recv_clone {
+  local parent="$1"
+  local tmp_path="$HOME/.local/tmpdir/"
+  local tmp_parent="$tmp_path$parent"
+  mkdir -p $HOME/.local/tmpdir/$parent
+  sudo btrfs send /lxc-data/$parent-home > $tmp_parent-home.delta
+  sudo btrfs send /lxc-data/$parent-var > $tmp_parent-var.delta
+  sudo btrfs send /lxc/$parent-opt > $tmp_parent-opt.delta
+  sudo btrfs send /var/lib/lxc/$parent/rootfs > $tmp_parent-rootfs.delta
+  sudo btrfs receive $tmp_path$parent -f $tmp_parent-rootfs.delta
+  sudo btrfs receive $tmp_path -f $tmp_parent-opt.delta
+  sudo btrfs receive $tmp_path -f $tmp_parent-var.delta
+  sudo btrfs receive $tmp_path -f $tmp_parent-home.delta
+  rm $tmp_parent-*.delta
+}
+
+function fs_volume_create {
+  local dst_home="$1"
+  btrfs subvolume create $dst_home 1>/dev/null
+}
+
+function fs_volume_delete {
+  local src="$1"  
+  sudo btrfs subvolume delete $HOME/.local/share/lxc/$src/ 1>/dev/null
+}
 # rename datasets and set mount point for rootfs
 function fs_rename_datasets_set_mount_point {
   local src="$1"

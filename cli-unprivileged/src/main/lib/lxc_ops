@@ -261,22 +261,11 @@ function lxc_clone {
   if [[ $parent_home =~ "/var/lib/lxc/" ]]; then
     ls $HOME/.local/tmpdir/$parent/rootfs > /dev/null 2>&1
     if [ $? != 0 ]; then
-      local tmp_path="$HOME/.local/tmpdir/"
-      local tmp_parent="$tmp_path$parent"
-      mkdir -p $HOME/.local/tmpdir/$parent
-      sudo btrfs send /lxc-data/$parent-home > $tmp_parent-home.delta
-      sudo btrfs send /lxc-data/$parent-var > $tmp_parent-var.delta
-      sudo btrfs send /lxc/$parent-opt > $tmp_parent-opt.delta
-      sudo btrfs send /var/lib/lxc/$parent/rootfs > $tmp_parent-rootfs.delta
-      sudo btrfs receive $tmp_path$parent -f $tmp_parent-rootfs.delta
-      sudo btrfs receive $tmp_path -f $tmp_parent-opt.delta
-      sudo btrfs receive $tmp_path -f $tmp_parent-var.delta
-      sudo btrfs receive $tmp_path -f $tmp_parent-home.delta
-      rm $tmp_parent-*.delta
+       fs_send_recv_clone $parent
     fi
   fi
   # (2) setup skeleton of new cloned child container
-  btrfs subvolume create $child_home
+  fs_volume_create $child_home
   
   local mac=`lxc_new_mac`
   #TODO sed failed
@@ -483,8 +472,7 @@ function lxc_rename {
   fi
 
   # (2) setup skeleton of destination container
-  btrfs subvolume create $dst_home 1>/dev/null
-
+  fs_volume_create $dst_home
   sudo cat $src_conf | sudo sed                                    \
      -e "s/lxc\.utsname.*/lxc\.utsname = $dst/"                  \
      -e "/lxc\.mount\.entry/d" \
@@ -514,7 +502,7 @@ function lxc_rename {
   lxc_chown $dst
   lxc_mapshifting $dst
   # cleanup the old source, start up the new container, and adjust git
-  sudo btrfs subvolume delete $HOME/.local/share/lxc/$src/ 1>/dev/null
+  fs_volume_delete $src
   lxc_wait_net "$dst"
   git_rename_branch "$src" "$dst"
   lxc_stop "$dst"
