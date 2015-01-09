@@ -7,6 +7,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.network.api.ContainerInfo;
 import org.safehaus.subutai.core.network.api.N2NConnection;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
@@ -19,7 +20,6 @@ import com.google.gson.JsonSyntaxException;
 
 public class NetworkRestServiceImpl implements NetworkRestService
 {
-    public static final String TUNNEL_TYPE = "vxlan";
 
     private static final Logger LOG = LoggerFactory.getLogger( NetworkRestServiceImpl.class.getName() );
 
@@ -80,6 +80,22 @@ public class NetworkRestServiceImpl implements NetworkRestService
 
 
     @Override
+    public Response removeN2NConnection( String interfaceName, String communityName )
+    {
+        try
+        {
+            networkManager.removeN2NConnection( interfaceName, communityName );
+            return Response.ok().build();
+        }
+        catch ( NetworkManagerException ex )
+        {
+            LOG.error( "Failed to remove N2N connection", ex );
+            return Response.serverError().entity( ex.getMessage() ).build();
+        }
+    }
+
+
+    @Override
     public Response listTunnels()
     {
         try
@@ -96,12 +112,12 @@ public class NetworkRestServiceImpl implements NetworkRestService
 
 
     @Override
-    public Response setupTunnel( String tunnel )
+    public Response setupTunnel( String tunnel, String type )
     {
         try
         {
             Tunnel t = JsonUtil.fromJson( tunnel, TunnelImpl.class );
-            networkManager.setupTunnel( t.getTunnelName(), t.getTunnelIp(), TUNNEL_TYPE );
+            networkManager.setupTunnel( t.getTunnelName(), t.getTunnelIp(), type );
             return Response.ok().build();
         }
         catch ( NetworkManagerException ex )
@@ -118,6 +134,38 @@ public class NetworkRestServiceImpl implements NetworkRestService
 
 
     @Override
+    public Response removeTunnel( String tunnelName )
+    {
+        try
+        {
+            networkManager.removeTunnel( tunnelName );
+            return Response.ok().build();
+        }
+        catch ( NetworkManagerException ex )
+        {
+            LOG.error( "Failed to remove tunnel", ex );
+            return Response.serverError().entity( ex.getMessage() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getContainerInfo( String containerName )
+    {
+        try
+        {
+            ContainerInfo ci = networkManager.getContainerIp( containerName );
+            return Response.ok( JsonUtil.to( ci ) ).build();
+        }
+        catch ( NetworkManagerException ex )
+        {
+            LOG.error( "Failed to get container IP", ex );
+            return Response.serverError().entity( ex.getMessage() ).build();
+        }
+    }
+
+
+    @Override
     public Response setContainerIp( String containerName, String ip, int netMask, int vLanId )
     {
         try
@@ -128,6 +176,22 @@ public class NetworkRestServiceImpl implements NetworkRestService
         catch ( NetworkManagerException ex )
         {
             LOG.error( "Failed to set container IP", ex );
+            return Response.serverError().entity( ex.getMessage() ).build();
+        }
+    }
+
+
+    @Override
+    public Response removeContainerIp( String containerName )
+    {
+        try
+        {
+            networkManager.removeContainerIp( containerName );
+            return Response.ok().build();
+        }
+        catch ( NetworkManagerException ex )
+        {
+            LOG.error( "Failed to remove container IP", ex );
             return Response.serverError().entity( ex.getMessage() ).build();
         }
     }

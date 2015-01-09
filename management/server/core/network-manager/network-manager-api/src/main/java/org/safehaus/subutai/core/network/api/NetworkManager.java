@@ -83,5 +83,8 @@ public interface NetworkManager
      * Removes VNI-VLAN mapping on management host
      */
     public void removeVniVLanMapping( String tunnelName, int vni, int vLanId ) throws NetworkManagerException;
+
+
+    public NetworkManager getRemoteManager( String host, int port );
 }
 

@@ -30,6 +30,12 @@ public interface NetworkRestService
     Response setupN2NConnection( @FormParam( "n2n" ) String n2n, @FormParam( "keyFile" ) String keyFilePath );
 
 
+    @DELETE
+    @Path( "n2n/{interfaceName}/{communityName}" )
+    Response removeN2NConnection( @PathParam( "interfaceName" ) String interfaceName,
+                                  @PathParam( "communityName" ) String communityName );
+
+
     @GET
     @Path( "tunnel" )
     Response listTunnels();
@@ -37,7 +43,17 @@ public interface NetworkRestService
 
     @POST
     @Path( "tunnel" )
-    Response setupTunnel( @FormParam( "tunnel" ) String tunnel );
+    Response setupTunnel( @FormParam( "tunnel" ) String tunnel, @FormParam( "type" ) String type );
+
+
+    @DELETE
+    @Path( "tunnel/{tunnelName}" )
+    Response removeTunnel( @PathParam( "tunnelName" ) String tunnelName );
+
+
+    @GET
+    @Path( "containers/{name}/ip" )
+    Response getContainerInfo( @PathParam( "name" ) String containerName );
 
 
     @POST
@@ -46,14 +62,19 @@ public interface NetworkRestService
                              @FormParam( "netMask" ) int netMask, @FormParam( "vLanId" ) int vLanId );
 
 
+    @DELETE
+    @Path( "containers/{name}/ip" )
+    Response removeContainerIp( @PathParam( "name" ) String containerName );
+
+
     @POST
     @Path( "gateway" )
     Response setupGateway( @FormParam( "gatewayIp" ) String gatewayIp, @FormParam( "vLanId" ) int vLanId );
 
 
     @DELETE
-    @Path( "gateway" )
-    Response removeGateway( @FormParam( "vLanId" ) int vLanId );
+    @Path( "gateway/{vLanId}" )
+    Response removeGateway( @PathParam( "vLanId" ) int vLanId );
 
 
     @POST
