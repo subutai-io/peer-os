@@ -44,9 +44,7 @@ function unregister {
     exit 1
   fi
 
-  #TODO
-  #this check should be considered again. It checks container exist or not. Gives error all the time
-  #lxc_assert_no $template
+  lxc_assert_no $template
   fs_assert_nods lxc/$template
 
   if [ "`are_containers_readable $template`" == "true" ]
