@@ -5,6 +5,46 @@
 # --------------------------------------------------------------------------
 
 
+function fs_send_recv_clone {
+  local parent="$1"
+  local tmp_path="$HOME/.local/tmpdir/"
+  local tmp_parent="$tmp_path$parent"
+  mkdir -p $HOME/.local/tmpdir/$parent
+  sudo zfs send /lxc-data/$parent-home > $tmp_parent-home.delta
+  sudo zfs send /lxc-data/$parent-var > $tmp_parent-var.delta
+  sudo zfs send /lxc/$parent-opt > $tmp_parent-opt.delta
+  sudo zfs send /var/lib/lxc/$parent/rootfs > $tmp_parent-rootfs.delta
+  sudo zfs recv $tmp_path$parent < $tmp_parent-rootfs.delta
+  sudo zfs recv $tmp_path < $tmp_parent-opt.delta
+  sudo zfs recv $tmp_path < $tmp_parent-var.delta
+  sudo zfs recv $tmp_path < $tmp_parent-home.delta
+  rm $tmp_parent-*.delta
+}
+
+function fs_volume_create_sudo {
+  local dst_home="$1"
+  sudo zfs create $dst_home 1>/dev/null
+}
+function fs_volume_create {
+  local dst_home="$1"
+  zfs create $dst_home 1>/dev/null
+}
+
+function fs_volume_delete {
+  local src="$1"
+  sudo btrfs subvolume delete $HOME/.local/share/lxc/$src/ 1>/dev/null
+}
+
+function fs_is_read_only {
+  local item="$1"
+  if [ -z "`sudo btrfs property get -ts /var/lib/lxc/$item/rootfs | grep true`" ]; then
+    echo 1
+  else
+    echo 0
+  fi
+}
+
+
 # rename datasets and set mount point for rootfs
 function fs_rename_datasets_set_mount_point {
   local src="$1"
