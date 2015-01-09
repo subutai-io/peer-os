@@ -51,7 +51,7 @@ public class EnvironmentManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-        manager = new EnvironmentManagerImpl( dataSource );
+        manager = new EnvironmentManagerImpl(  );
         manager.setEnvironmentDAO( environmentDao );
     }
 

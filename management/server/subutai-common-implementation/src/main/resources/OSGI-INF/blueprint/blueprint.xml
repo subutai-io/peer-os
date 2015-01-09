@@ -1,19 +1,16 @@
 <blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd"
+           xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
+           xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.0.0"
     >
 
-  <!--###########################-->
-  <!--Template EntityManagerFactory-->
-  <reference id="emfTemplate" interface="javax.persistence.EntityManagerFactory" filter="(osgi.unit.name=commonUnit)" />
-
   <!--TemplateService-->
-  <bean id="templateServiceImpl"
-        class="org.safehaus.subutai.common.protocol.impl.TemplateServiceImpl">
-    <property ref="emfTemplate" name="entityManagerFactory" />
+  <bean id="templateServiceImpl" class="org.safehaus.subutai.common.protocol.impl.TemplateServiceImpl">
+    <jpa:context unitname="commonServicePUnit" property="entityManager" />
+    <tx:transaction method="*" value="Required"/>
   </bean>
 
-  <service ref="templateServiceImpl"
-           interface="org.safehaus.subutai.common.protocol.api.TemplateService" />
+  <service ref="templateServiceImpl"  interface="org.safehaus.subutai.common.protocol.api.TemplateService" />
 
 </blueprint>
