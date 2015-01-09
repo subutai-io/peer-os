@@ -13,7 +13,7 @@ public class Commands
 
     public RequestBuilder getCreateSSHCommand()
     {
-        return new RequestBuilder( "rm -Rf /root/.ssh && " +
+        return new RequestBuilder( "rm -rf /root/.ssh && " +
                 "mkdir -p /root/.ssh && " +
                 "chmod 700 /root/.ssh && " +
                 "ssh-keygen -t dsa -P '' -f /root/.ssh/id_dsa" );
