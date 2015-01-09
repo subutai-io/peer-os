@@ -1231,5 +1231,92 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
             host.updateHostInfo( resourceHostInfo );
         }
     }
+
+
+    // ********** Quota functions *****************
+
+
+    @Override
+    public int getRamQuota( final UUID containerId ) throws PeerException
+    {
+        try
+        {
+            return quotaManager.getRamQuota( containerId );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public void setRamQuota( final UUID containerId, final int ramInMb ) throws PeerException
+    {
+        try
+        {
+            quotaManager.setRamQuota( containerId, ramInMb );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public int getCpuQuota( final UUID containerId ) throws PeerException
+    {
+        try
+        {
+            return quotaManager.getCpuQuota( containerId );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public void setCpuQuota( final UUID containerId, final int cpuPercent ) throws PeerException
+    {
+        try
+        {
+            quotaManager.setCpuQuota( containerId, cpuPercent );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public Set<Integer> getCpuSet( final UUID containerId ) throws PeerException
+    {
+        try
+        {
+            return quotaManager.getCpuSet( containerId );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public void setCpuSet( final UUID containerId, final Set<Integer> cpuSet ) throws PeerException
+    {
+        try
+        {
+            quotaManager.setCpuSet( containerId, cpuSet );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
 }
 
