@@ -7,8 +7,7 @@
 
   <!--TemplateService-->
   <bean id="templateServiceImpl" class="org.safehaus.subutai.common.protocol.impl.TemplateServiceImpl">
-    <jpa:context unitname="commonServicePUnit" property="entityManager" />
-    <tx:transaction method="*" value="Required"/>
+    <jpa:unit unitname="commonServicePUnit" property="entityManagerFactory" />
   </bean>
 
   <service ref="templateServiceImpl"  interface="org.safehaus.subutai.common.protocol.api.TemplateService" />

@@ -47,17 +47,18 @@ public class MessengerImpl implements Messenger, MessageProcessor
             throws MessengerException
     {
     }
-    public MessengerImpl( final PeerManager peerManager, final EntityManagerFactory entityManagerFactory )
+    public MessengerImpl(PeerManager peerManager,EntityManagerFactory entityManagerFactory  )
             throws MessengerException
     {
-
+        this.peerManager = peerManager;
+        this.entityManagerFactory = entityManagerFactory;
     }
     public void init( ) throws MessengerException
     {
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( daoManager );
 
-         try
+        try
         {
             //entityManager = entityManagerFactory.createEntityManager();
             this.messengerDao  = new MessengerDao( daoManager.getEntityManagerFactory());
