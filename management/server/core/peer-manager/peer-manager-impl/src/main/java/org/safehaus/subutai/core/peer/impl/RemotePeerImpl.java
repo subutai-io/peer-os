@@ -363,4 +363,60 @@ public class RemotePeerImpl implements RemotePeer
 
         return messageRequest;
     }
+
+    // ********** Quota functions *****************
+
+
+    @Override
+    public int getRamQuota( final UUID containerId ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        return remotePeerRestClient.getRamQuota( containerId );
+    }
+
+
+    @Override
+    public void setRamQuota( final UUID containerId, final int ramInMb ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        remotePeerRestClient.setRamQuota( containerId, ramInMb );
+    }
+
+
+    @Override
+    public int getCpuQuota( final UUID containerId ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        return remotePeerRestClient.getCpuQuota( containerId );
+    }
+
+
+    @Override
+    public void setCpuQuota( final UUID containerId, final int cpuPercent ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        remotePeerRestClient.setCpuQuota( containerId, cpuPercent );
+    }
+
+
+    @Override
+    public Set<Integer> getCpuSet( final UUID containerId ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        return remotePeerRestClient.getCpuSet( containerId );
+    }
+
+
+    @Override
+    public void setCpuSet( final UUID containerId, final Set<Integer> cpuSet ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        remotePeerRestClient.setCpuSet( containerId, cpuSet );
+    }
 }
