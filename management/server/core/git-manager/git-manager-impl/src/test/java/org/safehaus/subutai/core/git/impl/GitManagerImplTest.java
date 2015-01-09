@@ -19,6 +19,7 @@ import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitFileStatus;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -216,7 +217,7 @@ public class GitManagerImplTest extends SystemOutRedirectTest
     }
 
 
-    @Test
+    @Test( expected = GitException.class )
     public void shouldCommitAndReturnCommitId() throws GitException
     {
         setOutput( COMMIT_OUTPUT );
@@ -224,10 +225,15 @@ public class GitManagerImplTest extends SystemOutRedirectTest
         String commitId = gitManager.commit( REPOSITORY_ROOT, filePaths, COMMIT_MESSAGE, false );
 
         assertEquals( COMMIT_ID, commitId );
+
+
+        setOutput( "" );
+
+        gitManager.commit( REPOSITORY_ROOT, filePaths, COMMIT_MESSAGE, false );
     }
 
 
-    @Test
+    @Test( expected = GitException.class )
     public void shouldCommitAllAndReturnCommitId() throws GitException
     {
         setOutput( COMMIT_OUTPUT );
@@ -235,10 +241,14 @@ public class GitManagerImplTest extends SystemOutRedirectTest
         String commitId = gitManager.commitAll( REPOSITORY_ROOT, COMMIT_MESSAGE );
 
         assertEquals( COMMIT_ID, commitId );
+
+        setOutput( "" );
+
+        gitManager.commitAll( REPOSITORY_ROOT, COMMIT_MESSAGE );
     }
 
 
-    @Test
+    @Test( expected = GitException.class )
     public void shouldSupplyProperRequestBuilder() throws GitException, CommandException
     {
         setOutput( COMMIT_OUTPUT );
@@ -247,6 +257,10 @@ public class GitManagerImplTest extends SystemOutRedirectTest
 
         verify( commandUtil ).execute( new RequestBuilder( String.format( "git commit -a -m \"%s\"", COMMIT_MESSAGE ) )
                 .withCwd( REPOSITORY_ROOT ), managementHost );
+
+        setOutput( "" );
+
+        gitManager.commitAll( REPOSITORY_ROOT, COMMIT_MESSAGE );
     }
 
 
@@ -487,7 +501,7 @@ public class GitManagerImplTest extends SystemOutRedirectTest
     @Test( expected = GitException.class )
     public void testGetManagementHost() throws Exception
     {
-        doThrow( new PeerException( "" ) ).when( localPeer ).getManagementHost();
+        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getManagementHost();
 
         gitManager.getManagementHost();
     }

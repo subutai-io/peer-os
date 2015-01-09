@@ -25,7 +25,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>command-runner-api</artifactId>
+      <artifactId>peer-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -36,6 +36,11 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20131018</version>
     </dependency>
   </dependencies>
 

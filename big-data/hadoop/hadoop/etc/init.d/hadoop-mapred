@@ -5,42 +5,54 @@ if [ "x$HADOOP_HOME" = "x" ];
 then
   HADOOP_HOME=/opt/hadoop-1.2.1
 fi
+
 case "$1" in
 start)
-        start-stop-daemon --start --exec $HADOOP_HOME/bin/start-mapred.sh
+  start-stop-daemon --start --exec $HADOOP_HOME/bin/start-mapred.sh
 ;;
-
 stop)
-        start-stop-daemon --start --exec $HADOOP_HOME/bin/stop-mapred.sh
+  start-stop-daemon --start --exec $HADOOP_HOME/bin/stop-mapred.sh
 ;;
-
 restart)
-        $0 stop
-        $0 start
+  $0 stop
+  $0 start
 ;;
-
 status)
-	line=$(ps aux | grep [J]obTracker)
-	line2=$(ps aux | grep [T]askTracker)
-	#if pidof -o %PPID DataNode > /dev/null; then
-	if [ -n "$line" ]; then
-		echo "JobTracker is Running"
-		#exit 0
-	else
-		echo "JobTracker is NOT Running"
-		#exit 1
-	fi
-	
-	if [ -n "$line2" ]; then
-                echo "TaskTracker is Running"
-                #exit 0
-        else
-                echo "TaskTracker is NOT Running"
-                #exit 1
-        fi
-;;
+  hadoop_environment_file="/etc/hadoop/hadoop-env.sh"
+  if [ -f $hadoop_environment_file  ]; then
+    . $hadoop_environment_file
+  fi
 
+  if [ -z $HADOOP_PID_DIR ]; then
+    HADOOP_PID_DIR="/tmp"
+  fi
+
+  jobtracker_file="hadoop-*-jobtracker.pid"
+  tasktracker_file="hadoop-*-tasktracker.pid"
+
+  if ls $HADOOP_PID_DIR/$jobtracker_file 1> /dev/null 2>&1; then
+    pid=`cat $HADOOP_PID_DIR/$jobtracker_file`
+    if ps -p $pid > /dev/null;then
+      echo "JobTracker is running (pid:$pid)"
+    else
+      echo "JobTracker is not running"
+    fi
+  else
+    echo "JobTracker is not running"
+  fi
+
+  if ls $HADOOP_PID_DIR/$tasktracker_file 1> /dev/null 2>&1; then
+   pid=`cat $HADOOP_PID_DIR/$tasktracker_file`
+    if ps -p $pid > /dev/null;then
+      echo "TaskTracker is running (pid:$pid)"
+    else
+      echo "TaskTracker is not running"
+    fi
+  else
+    echo "TaskTracker is not running"
+  fi
+;;
 *)
-	echo "Usage: $0 {start|stop|restart|status}"
-	exit 1
+  echo "Usage: $0 {start|stop|restart|status}"
+  exit 1
 esac

@@ -21,19 +21,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>agent-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>environment-manager-api</artifactId>
-    </dependency>
-    <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>monitoring-api</artifactId>-->
-    <!--</dependency>-->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>command-runner-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -84,9 +72,10 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
+            <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
             <Bundle-SymbolicName>${project.groupId}.core.environment.impl</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
+              {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
           </instructions>
         </configuration>

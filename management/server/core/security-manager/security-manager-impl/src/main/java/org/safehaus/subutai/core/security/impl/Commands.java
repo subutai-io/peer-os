@@ -5,13 +5,9 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
-/**
- * Commands for NetworkManager
- */
 public class Commands
 {
 
@@ -39,6 +35,15 @@ public class Commands
     }
 
 
+    public RequestBuilder getAppendSSHCommand( String key )
+    {
+        return new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
+                "chmod 700 /root/.ssh && " +
+                "echo '%s' >> /root/.ssh/authorized_keys && " +
+                "chmod 644 /root/.ssh/authorized_keys", key ) );
+    }
+
+
     public RequestBuilder getConfigSSHCommand()
     {
         return new RequestBuilder( "echo 'Host *' > /root/.ssh/config && " +
@@ -54,7 +59,7 @@ public class Commands
 
         for ( ContainerHost host : containerHosts )
         {
-            String ip = AgentUtil.getAgentIpByMask( host.getAgent(), Common.IP_MASK );
+            String ip = host.getIpByMask( Common.IP_MASK );
             String hostname = host.getHostname();
             cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
             appendHosts.append( "/bin/echo '" ).

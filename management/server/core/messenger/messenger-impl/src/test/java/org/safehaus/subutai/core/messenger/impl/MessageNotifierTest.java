@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.messenger.impl;
 
 
+import java.io.PrintStream;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,11 +10,9 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageListener;
-import org.slf4j.Logger;
 
 import static junit.framework.TestCase.fail;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -71,13 +71,11 @@ public class MessageNotifierTest
     @Test
     public void testRunWithException() throws Exception
     {
-        Logger logger = mock( Logger.class );
-        messageNotifier.LOG = logger;
-        Exception exception = new RuntimeException();
+        Exception exception = mock( RuntimeException.class );
         doThrow( exception ).when( listener ).onMessage( message );
 
         messageNotifier.run();
 
-        verify( logger ).error( anyString(), eq( exception ) );
+        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 }

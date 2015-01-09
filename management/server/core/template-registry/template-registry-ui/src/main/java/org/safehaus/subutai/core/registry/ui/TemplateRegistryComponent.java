@@ -12,11 +12,17 @@ import java.util.Map;
 import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.git.api.GitChangedFile;
+import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
@@ -51,11 +57,13 @@ public class TemplateRegistryComponent extends CustomComponent
 
     private GridLayout grid;
     private Table templateInfoTable;
+    private Table changedFilesTable;
     private TextArea packagesInstalled;
     private TextArea packagesChanged;
 
     private static final String TEMPLATE_PROPERTY = "Template Property";
     private static final String TEMPLATE_VALUE = "Value";
+    private static final Logger LOGGER = LoggerFactory.getLogger( TemplateRegistryComponent.class );
 
 
     private interface TemplateValue
@@ -119,7 +127,7 @@ public class TemplateRegistryComponent extends CustomComponent
     };
 
 
-    public TemplateRegistryComponent( TemplateRegistry registryManager )
+    public TemplateRegistryComponent( final TemplateRegistry registryManager )
     {
         setHeight( 100, Unit.PERCENTAGE );
 
@@ -177,6 +185,24 @@ public class TemplateRegistryComponent extends CustomComponent
                                 showSelectedTemplateInfo( template );
                             }
                         } );
+                        try
+                        {
+                            Container dataContainer = new BeanItemContainer<>( GitChangedFile.class );
+                            List<GitChangedFile> changedFiles = registryManager.getChangedFiles( template );
+                            for ( final GitChangedFile changedFile : changedFiles )
+                            {
+                                dataContainer.addItem( changedFile );
+                            }
+                            changedFilesTable.setContainerDataSource( dataContainer );
+                            //TODO instead of listing all changed files in TextArea list all of them in Table
+                            //where all files will be shown with appropriate columns and implement user
+                            //table row click listener, after that need to implement functionality to show diffs
+                            //of changed files by different colouring stuff
+                        }
+                        catch ( RegistryException e )
+                        {
+                            LOGGER.error( "Error getting changed files from repo.", e );
+                        }
                     }
                     else
                     {
@@ -194,6 +220,10 @@ public class TemplateRegistryComponent extends CustomComponent
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
+        changedFilesTable = new Table( "Changed Files." );
+        changedFilesTable.setWidth( "50%" );
+        changedFilesTable.setImmediate( true );
+
         templateInfoTable = new Table( "Template Info" );
         templateInfoTable.setWidth( "25%" );
         templateInfoTable.setImmediate( true );
@@ -206,6 +236,7 @@ public class TemplateRegistryComponent extends CustomComponent
         }
 
         verticalLayout.addComponent( templateInfoTable );
+        verticalLayout.addComponent( changedFilesTable );
 
         packagesInstalled = new TextArea( "Packages Installed" );
         packagesInstalled.setValue( "" );

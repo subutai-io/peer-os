@@ -3,6 +3,8 @@ package org.safehaus.subutai.core.repository.impl;
 
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
@@ -14,8 +16,6 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.repository.api.PackageInfo;
 import org.safehaus.subutai.core.repository.api.RepositoryException;
 import org.safehaus.subutai.core.repository.api.RepositoryManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -27,7 +27,6 @@ import com.google.common.collect.Sets;
  */
 public class RepositoryManagerImpl implements RepositoryManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( RepositoryManagerImpl.class.getName() );
     private static final String LINE_SEPARATOR = "\n";
     private static final String INVALID_PACKAGE_NAME = "Invalid package name";
 
@@ -120,13 +119,10 @@ public class RepositoryManagerImpl implements RepositoryManager
         {
             String line = lines.nextToken();
 
-            if ( line != null )
+            String[] packageFields = line.split( "\\s+-\\s+" );
+            if ( packageFields.length == 2 )
             {
-                String[] packageFields = line.split( "\\s+-\\s+" );
-                if ( packageFields.length == 2 )
-                {
-                    packages.add( new PackageInfo( packageFields[0], packageFields[1] ) );
-                }
+                packages.add( new PackageInfo( packageFields[0], packageFields[1] ) );
             }
         }
 
@@ -142,5 +138,24 @@ public class RepositoryManagerImpl implements RepositoryManager
         CommandResult result = executeCommand( commands.getPackageInfoCommand( packageName ) );
 
         return result.getStdOut();
+    }
+
+
+    @Override
+    public String getFullPackageName( final String shortPackageName ) throws RepositoryException
+    {
+        String packageInfo = getPackageInfo( shortPackageName );
+        Pattern p = Pattern.compile( "Filename:.+/(.+deb)" );
+        Matcher m = p.matcher( packageInfo );
+        if ( m.find() )
+        {
+            return m.group( 1 );
+        }
+        else
+        {
+            throw new RepositoryException(
+                    String.format( "Could not obtain full name by short name %s from:%n%s", shortPackageName,
+                            packageInfo ) );
+        }
     }
 }

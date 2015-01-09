@@ -18,6 +18,7 @@
     <module>host-registry-api</module>
     <module>host-registry-impl</module>
     <module>host-registry-cli</module>
+    <module>host-registry-rest</module>
   </modules>
 
 </project>

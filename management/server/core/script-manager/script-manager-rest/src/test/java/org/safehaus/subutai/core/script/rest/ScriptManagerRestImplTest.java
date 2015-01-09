@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class ScriptManagerRestImplTest
 {
-    private static final String SCRIPTS_PATH = ".";
+    private static final String SCRIPTS_PATH = "./";
     private static final String SCRIPT_NAME = "test.sh";
 
 

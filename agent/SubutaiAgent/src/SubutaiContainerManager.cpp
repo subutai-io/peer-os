@@ -31,10 +31,21 @@ SubutaiContainerManager::SubutaiContainerManager(string lxc_path, SubutaiLogger*
 {
     // Check for running containers in case we just started an app
     // after crash
-    vector<SubutaiContainer> tmp_container = findAllContainers();
-    getContainerStates(tmp_container);
+    try {
+    	/*remove the containerIdList to get rid of the previous list and create a clean one*/
+    	if( remove( "/etc/subutai-agent/containerIdList.txt" ) != 0 )
+    		_logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", "Cannot clean container id list."));
+    	else
+    		_logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Container id list is removed.."));
 
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Initializing"));
+    	_containers = findAllContainers();
+    } catch (SubutaiException e) {
+        _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));         
+    } catch (std::exception e) {
+        _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", e.what()));         
+    }
+
+    _logger->writeLog(6, _logger->setLogData("<SubutaiContainerManager>", "Initializing"));
 }
 /**
  * \details 	Default destructor of SubutaiContainerManager
@@ -50,12 +61,12 @@ SubutaiContainerManager::~SubutaiContainerManager()
 bool SubutaiContainerManager::isContainerRunning(string container_name) 
 {
     _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Check if container running"));
-    for (vector<SubutaiContainer>::iterator it = _runningContainers.begin(); it != _runningContainers.end(); it++) {
-        if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
+    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+        if ((*it).getContainerHostnameValue().compare(container_name) == 0 && (*it).getState() == "RUNNING") {
             return true;
         }
     }
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
+    _logger->writeLog(1, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
     return false;
 }
 
@@ -65,12 +76,12 @@ bool SubutaiContainerManager::isContainerRunning(string container_name)
 bool SubutaiContainerManager::isContainerStopped(string container_name)
 {
     _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Check if container stopped"));
-    for (vector<SubutaiContainer>::iterator it = _stoppedContainers.begin(); it != _stoppedContainers.end(); it++) {
-        if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
+    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+        if ((*it).getContainerHostnameValue().compare(container_name) == 0 && (*it).getState() == "STOPPED") {
             return true;
         }
     }
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
+    _logger->writeLog(1, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
     return false;
 }
 
@@ -80,15 +91,42 @@ bool SubutaiContainerManager::isContainerStopped(string container_name)
 bool SubutaiContainerManager::isContainerFrozen(string container_name)
 {
     _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Check if container frozen"));
-    for (vector<SubutaiContainer>::iterator it = _frozenContainers.begin(); it != _frozenContainers.end(); it++) {
-        if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
+    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+        if ((*it).getContainerHostnameValue().compare(container_name) == 0 && (*it).getState() == "FROZEN") {
             return true;
         }
     }
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
+    _logger->writeLog(1, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
     return false;
 }
 
+/**
+ * Delete related container info from containerIdList file when a container is destroyed.
+ */
+void SubutaiContainerManager::deleteContainerInfo(string hostname)
+{
+    string hostname_file, id;
+
+    string path = "/etc/subutai-agent/";
+    string uuidFile = path + "containerIdList.txt";
+
+    ifstream file(uuidFile.c_str());
+    ofstream temp("temp.txt"); // put id-hostname matchings which wont be deleted in temp
+
+
+    while(file >> hostname_file >> id)
+    {
+        if(strcmp(hostname_file.c_str(),hostname.c_str())){ // if the entry is different from hostname which will be deleted, put it in temp file.
+            temp << hostname_file << " " << id << endl;
+        }
+    }
+    file.clear(); // clear eof and fail bits
+    file.seekg(0, ios::beg);
+    file.close();
+    temp.close();
+    remove(uuidFile.c_str());
+    rename("temp.txt",uuidFile.c_str());
+}
 
 /*
  * \details find all containers - returns all defined containers -active stopped running
@@ -96,20 +134,26 @@ bool SubutaiContainerManager::isContainerFrozen(string container_name)
  */
 vector<SubutaiContainer> SubutaiContainerManager::findAllContainers()
 {
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Get all containers.."));
+    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Get all containers."));
     vector<SubutaiContainer> containers;
     char** names;
     lxc_container** cont;
-    int num = list_all_containers(_lxc_path.c_str(), &names, &cont);
-    for (int i = 0; i < num; i++) {
-        SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
-        c->setContainerHostname(names[i]);
-        _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", c->getContainerHostnameValue() + " added.."));
-        containers.push_back(*c);
+    int num;
+    try {
+        num = list_all_containers(_lxc_path.c_str(), &names, &cont);
+        for (int i = 0; i < num; i++) {
+            SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
+            c->setContainerHostname(names[i]);
+            _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", c->getContainerHostnameValue() + " added.."));
+            containers.push_back(*c);
+        }
+    } catch (SubutaiException e) {
+        _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));
+    } catch (std::exception e) {
+        _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", string(e.what())));
     }
     return containers;
 }
-
 
 /*
  * \details find container using hostname
@@ -118,23 +162,12 @@ vector<SubutaiContainer> SubutaiContainerManager::findAllContainers()
 SubutaiContainer* SubutaiContainerManager::findContainerByName(string container_name)
 {
     _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Get container by name: " + container_name));
-
-    for (vector<SubutaiContainer>::iterator it = _runningContainers.begin(); it != _runningContainers.end(); it++) {
+    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
         if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
             return &(*it);
         }
     }
-    for (vector<SubutaiContainer>::iterator it = _stoppedContainers.begin(); it != _stoppedContainers.end(); it++) {
-            if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
-                return &(*it);
-            }
-        }
-    for (vector<SubutaiContainer>::iterator it = _frozenContainers.begin(); it != _frozenContainers.end(); it++) {
-            if ((*it).getContainerHostnameValue().compare(container_name) == 0) {
-                return &(*it);
-            }
-        }
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
+    _logger->writeLog(1, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_name));
     return NULL;
 }
 
@@ -145,78 +178,14 @@ SubutaiContainer* SubutaiContainerManager::findContainerByName(string container_
 SubutaiContainer* SubutaiContainerManager::findContainerById(string container_id)
 {
     _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Get container by id: " + container_id));
-    for (ContainerIterator it = _runningContainers.begin(); it != _runningContainers.end(); it++) {
+    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
         if ((*it).getContainerIdValue() == container_id) {
             return &(*it);
         }
     }
-    for (ContainerIterator it = _stoppedContainers.begin(); it != _stoppedContainers.end(); it++) {
-            if ((*it).getContainerIdValue() == container_id) {
-                return &(*it);
-            }
-    }
-    for (ContainerIterator it = _frozenContainers.begin(); it != _frozenContainers.end(); it++) {
-            if ((*it).getContainerIdValue() == container_id) {
-                return &(*it);
-            }
-    }
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_id));
+    _logger->writeLog(1, _logger->setLogData("<SubutaiContainerManager>", "Container not found: " + container_id));
     return NULL;
 }
-
-
-/*
- * \details     get the states of all lxcs by using lxc-ls terminal command..
- * 				Frozen containers are returned by both --active and --frozen commands !
- *
- */
-void SubutaiContainerManager::getContainerStates(vector<SubutaiContainer> _allContainers)
-{
-    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Get container states.." ));
-    _frozenContainers.clear();
-    _runningContainers.clear();
-    _stoppedContainers.clear();
-
-    vector<string> running_containers = _helper.runAndSplit("lxc-ls --running", "r", "\n");
-    vector<string> stopped_containers = _helper.runAndSplit("lxc-ls --stopped", "r", "\n");
-    vector<string> frozen_containers  = _helper.runAndSplit("lxc-ls --frozen" , "r", "\n");
-
- 	for (vector<SubutaiContainer>::iterator it = _allContainers.begin(); it != _allContainers.end(); it++) {
- 		bool containerRegisteredToList = false;
-
-		for (vector<string>::iterator it_status = frozen_containers.begin(); it_status != frozen_containers.end(); it_status++) {
-			if((*it).getContainerHostnameValue() == (*it_status))
-			{
-			    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", (*it).getContainerHostnameValue() + "is added to frozen.."));
-				(*it).setContainerStatus(FROZEN);
-				_frozenContainers.push_back((*it));
-				containerRegisteredToList = true; break;
-			}
-		}
-		if(containerRegisteredToList) continue;
-		for (vector<string>::iterator it_status = running_containers.begin(); it_status != running_containers.end(); it_status++) {
-			if((*it).getContainerHostnameValue() == (*it_status))
-			{
-			    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", (*it).getContainerHostnameValue() + "is added to running.."));
-				(*it).setContainerStatus(RUNNING);
-				_runningContainers.push_back((*it));
-				containerRegisteredToList = true; break;
-			}
-		}
-		if(containerRegisteredToList) continue;
-		for (vector<string>::iterator it_status = stopped_containers.begin(); it_status != stopped_containers.end(); it_status++) {
-			if((*it).getContainerHostnameValue() == (*it_status))
-			{
-			    _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", (*it).getContainerHostnameValue() + "is added to stopped.."));
-				(*it).setContainerStatus(STOPPED);
-				_stoppedContainers.push_back((*it));
-				break;
-			}
-		}
-	}
-
-}
-
 
 /*
  * \details     Update active stopped and frozen lists
@@ -224,31 +193,66 @@ void SubutaiContainerManager::getContainerStates(vector<SubutaiContainer> _allCo
 void SubutaiContainerManager::updateContainerLists()
 {
     _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", "Update container list and their fields.."));
-	  vector<SubutaiContainer> tmp_container = findAllContainers();
-	  getContainerStates(tmp_container);
+    char** names;
+    lxc_container** cont;
+    int num, index = 0, size_of_containers = _containers.size();
+    try {
+        num = list_all_containers(_lxc_path.c_str(), &names, &cont);
+        bool destroy_container_check[size_of_containers];
+        /* hold destroy container check array to control which container is deleted. */
+        for (int i = 0; i < size_of_containers; i++) destroy_container_check[i] = false;
+        for (int i = 0; i < num; i++) {
+            // Check is there is any new conatiner appears
+            bool containerFound = false;
+            index = 0;
+            for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+                if ((*it).getContainerHostnameValue() == string(names[i])) {
+                    containerFound = true;
+                    destroy_container_check[index] = true;
+                    break;
+                }
+                index++;
+            }
+            if (!containerFound) {
+                SubutaiContainer* c = new SubutaiContainer(_logger, cont[i]);
+                c->setContainerHostname(names[i]);
+                _logger->writeLog(7, _logger->setLogData("<SubutaiContainerManager>", c->getContainerHostnameValue() + " added.."));
+                _containers.push_back(*c);
+            }
+        }
 
-	  for (vector<SubutaiContainer>::iterator it = _runningContainers.begin(); it != _runningContainers.end(); it++)
-	  {
-		  (*it).getContainerAllFields();
-	  }
-	  for (vector<SubutaiContainer>::iterator it = _stoppedContainers.begin(); it != _stoppedContainers.end(); it++)
-	  {
-		  (*it).getContainerAllFields();
-	  }
-	  for (vector<SubutaiContainer>::iterator it = _frozenContainers.begin(); it != _frozenContainers.end(); it++)
-	  {
-		  (*it).getContainerAllFields();
-	  }
-	  //free(&tmp_container);
+
+        for (int i = size_of_containers-1; i >= 0; i--) {
+        	/*if this container is destroyed, clean both containerIdList and containers array on containerManager*/
+        	if(!destroy_container_check[i])
+        	{
+        		deleteContainerInfo((_containers.at(i)).getContainerHostnameValue());
+        		_containers.erase (_containers.begin()+i);
+        	}
+        }
+    } catch (SubutaiException e) {
+        _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", e.displayText()));
+    } catch (std::exception e) {
+        _logger->writeLog(3, _logger->setLogData("<SubutaiContainerManager>", string(e.what())));
+    }
+    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+    	/*If new container is added, containerIdList is updated in getContainerId() method*/
+        (*it).getContainerAllFields();
+    }
 }
-
 
 /**
  * \details 	get running containers of resource host
  */
 vector<SubutaiContainer> SubutaiContainerManager::getRunningContainers()
 {
-	return _runningContainers;
+    vector<SubutaiContainer> cont;
+    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+        if ((*it).getState() == "RUNNING") {
+            cont.push_back((*it));
+        }
+    }
+    return cont;
 }
 
 /**
@@ -256,7 +260,13 @@ vector<SubutaiContainer> SubutaiContainerManager::getRunningContainers()
  */
 vector<SubutaiContainer> SubutaiContainerManager::getStoppedContainers()
 {
-	return _stoppedContainers;
+    vector<SubutaiContainer> cont;
+    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+        if ((*it).getState() == "STOPPED") {
+            cont.push_back((*it));
+        }
+    }
+    return cont;
 }
 
 /**
@@ -264,7 +274,13 @@ vector<SubutaiContainer> SubutaiContainerManager::getStoppedContainers()
  */
 vector<SubutaiContainer> SubutaiContainerManager::getFrozenContainers()
 {
-	return _frozenContainers;
+    vector<SubutaiContainer> cont;
+    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+        if ((*it).getState() == "FROZEN") {
+            cont.push_back((*it));
+        }
+    }
+    return cont;
 }
 
 /**
@@ -272,12 +288,7 @@ vector<SubutaiContainer> SubutaiContainerManager::getFrozenContainers()
  */
 vector<SubutaiContainer> SubutaiContainerManager::getAllContainers()
 {
-	vector<SubutaiContainer> concat;
-	concat.reserve(_runningContainers.size() + _stoppedContainers.size() + _frozenContainers.size()); // preallocate memory
-	concat.insert(concat.end(), _runningContainers.begin(), _runningContainers.end());
-	concat.insert(concat.end(), _stoppedContainers.begin(), _stoppedContainers.end());
-	concat.insert(concat.end(), _frozenContainers.begin(),  _frozenContainers.end());
-	return concat;
+    return _containers;
 }
 
 
@@ -286,13 +297,22 @@ vector<SubutaiContainer> SubutaiContainerManager::getAllContainers()
  */
 void SubutaiContainerManager::write()
 {
-	cout << "active: \n";
-	for (vector<SubutaiContainer>::iterator it = _runningContainers.begin(); it != _runningContainers.end(); it++)
-		(*it).write();
-	cout << "stopped: \n";
-	for (vector<SubutaiContainer>::iterator it = _stoppedContainers.begin(); it != _stoppedContainers.end(); it++)
-			(*it).write();
-	cout << "frozen: \n";
-	for (vector<SubutaiContainer>::iterator it = _frozenContainers.begin(); it != _frozenContainers.end(); it++)
-			(*it).write();
+    cout << "active: \n";
+    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+        if ((*it).getState() == "RUNNING") {
+            (*it).write();
+        }
+    }
+    cout << "stopped: \n";
+    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+        if ((*it).getState() == "STOPPED") {
+            (*it).write();
+        }
+    }
+    cout << "frozen: \n";
+    for (ContainerIterator it = _containers.begin(); it != _containers.end(); it++) {
+        if ((*it).getState() == "FROZEN") {
+            (*it).write();
+        }
+    }
 }

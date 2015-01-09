@@ -11,11 +11,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.communication.api.CommunicationManager;
+import org.safehaus.subutai.core.executor.api.CommandExecutor;
+import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
+import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
@@ -36,8 +36,6 @@ public class LocalPeerImplTest
     DataSource dataSource;
     @Mock
     Messenger messenger;
-    @Mock
-    AgentManager agentManager;
 
     @Mock
     TemplateRegistry templateRegistry;
@@ -46,16 +44,18 @@ public class LocalPeerImplTest
     PeerDAO peerDAO;
 
     @Mock
-    CommunicationManager communicationManager;
-
-    @Mock
-    CommandRunner commandRunner;
+    CommandExecutor commandExecutor;
 
     @Mock
     QuotaManager quotaManager;
 
     @Mock
     StrategyManager strategyManager;
+
+    @Mock
+    HostRegistry hostRegistry;
+    @Mock
+    Monitor monitor;
 
 
     @Before
@@ -70,9 +70,9 @@ public class LocalPeerImplTest
     public void testBindHostShouldFailOnNotExistenceHost() throws PeerException
     {
         LocalPeerImpl localPeer =
-                        new LocalPeerImpl( peerManager, agentManager, templateRegistry, peerDAO, communicationManager,
-                                commandRunner, quotaManager, strategyManager, null );
+                new LocalPeerImpl( peerManager, templateRegistry, peerDAO, quotaManager, strategyManager, null,
+                        commandExecutor, hostRegistry, monitor );
 
-                localPeer.bindHost( UUID.randomUUID() );
+        localPeer.bindHost( UUID.randomUUID().toString() );
     }
 }

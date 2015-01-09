@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.peer.api;
 
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -67,8 +68,26 @@ public class PeerGroup
     }
 
 
-    public UUID getUUID()
+    @Override
+    public int hashCode()
     {
-        return id;
+        int hash = 7;
+        hash = 37 * hash + Objects.hashCode( this.id );
+        return hash;
     }
+
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( obj instanceof PeerGroup )
+        {
+            PeerGroup other = ( PeerGroup ) obj;
+            return Objects.equals( this.id, other.id );
+        }
+        return false;
+    }
+
+
 }
+

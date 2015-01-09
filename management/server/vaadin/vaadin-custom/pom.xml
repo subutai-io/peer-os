@@ -29,7 +29,7 @@
       <artifactId>subutai-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>peer-manager-api</artifactId>
     </dependency>
     <dependency>
@@ -38,15 +38,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>agent-manager-api</artifactId>
+      <artifactId>host-registry-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>tracker-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>command-runner-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>

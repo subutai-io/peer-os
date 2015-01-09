@@ -14,11 +14,14 @@ import javax.ws.rs.core.Response;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.datatypes.TemplateVersion;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
+import org.safehaus.subutai.core.repository.api.RepositoryManager;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -46,6 +49,8 @@ public class RestServiceImplTest
 
 
     private TemplateRegistry templateRegistry;
+    private PeerManager peerManager;
+    private RepositoryManager repositoryManager;
     private RestServiceImpl restService;
     private Template template;
     private List<Template> templates;
@@ -61,7 +66,7 @@ public class RestServiceImplTest
                     + "# Network configuration\n" + "lxc.network.type = veth\n" + "lxc.network.flags = up\n"
                     + "lxc.network.link = br0\n" + "lxc.network.hwaddr = 00:16:3e:5:5e:67\n"
                     + "subutai.config.path = /etc\n" + "lxc.hook.pre-start = /usr/bin/pre_start_hook\n"
-                    + "subutai.parent = master\n" + "subutai.git.branch = hadoop\n"
+                    + "subutai.parent = master\n" + "subutai.git.branch = hadoop\n" + "SUBUTAI_VERSION = 2.3\n"
                     + "lxc.mount.entry = /lxc/hadoop-opt opt none bind,rw 0 0\n"
                     + "lxc.mount.entry = /lxc-data/hadoop-home home none bind,rw 0 0\n"
                     + "lxc.mount.entry = /lxc-data/hadoop-var var none bind,rw 0 0\n"
@@ -89,7 +94,7 @@ public class RestServiceImplTest
         String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
         template =
                 new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch, subutaiGitUuid,
-                        packagesFile, md5sum );
+                        packagesFile, md5sum, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ) );
         return template;
     }
 
@@ -100,15 +105,9 @@ public class RestServiceImplTest
         template = parseTemplate( CONFIG_FILE, "packagesFile", "md5sum" );
         templates = Lists.newArrayList( template );
         templateRegistry = mock( TemplateRegistry.class );
-        restService = new RestServiceImpl();
-        restService.setTemplateRegistry( templateRegistry );
-    }
-
-
-    @Test( expected = NullPointerException.class )
-    public void shouldThrowNullPointerExceptionForSettingNullValue()
-    {
-        restService.setTemplateRegistry( null );
+        peerManager = mock( PeerManager.class );
+        repositoryManager = mock( RepositoryManager.class );
+        restService = new RestServiceImpl( repositoryManager, templateRegistry, peerManager );
     }
 
 
@@ -124,7 +123,8 @@ public class RestServiceImplTest
     @Test
     public void shouldGetResponseWithTemplateAsJsonForGetTemplate()
     {
-        when( templateRegistry.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
+        when( templateRegistry.getTemplate( TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ) ) )
+                .thenReturn( template );
         Response response = restService.getTemplate( TEMPLATE_NAME );
         Template responseTemplate = GSON.fromJson( String.valueOf( response.getEntity() ), Template.class );
         assertEquals( template, responseTemplate );
@@ -157,7 +157,11 @@ public class RestServiceImplTest
     @Test
     public void shouldGetBadRequestOnUnregisterTemplate() throws RegistryException
     {
-        when( templateRegistry.unregisterTemplate( TEMPLATE_NAME ) ).thenThrow( new RuntimeException() );
+        when( templateRegistry
+                .unregisterTemplate( TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
+                        Common.DEFAULT_LXC_ARCH ) ).thenThrow( new RuntimeException() );
+        when( templateRegistry.getTemplate( TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ) ) )
+                .thenReturn( template );
         Response response = restService.unregisterTemplate( TEMPLATE_NAME );
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
     }
@@ -166,7 +170,12 @@ public class RestServiceImplTest
     @Test
     public void shouldGetOkOnUnregisterTemplate() throws RegistryException
     {
-        when( templateRegistry.unregisterTemplate( TEMPLATE_NAME ) ).thenReturn( true );
+        when( templateRegistry
+                .unregisterTemplate( TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
+                        Common.DEFAULT_LXC_ARCH ) ).thenReturn( true );
+        when( templateRegistry.getTemplate( TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ) ) )
+                .thenReturn( template );
+
         Response response = restService.unregisterTemplate( TEMPLATE_NAME );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
     }
@@ -175,8 +184,10 @@ public class RestServiceImplTest
     @Test
     public void shouldReturnTemplateOnGetTemplate()
     {
-        when( templateRegistry.getTemplate( TEMPLATE_NAME, Common.DEFAULT_LXC_ARCH ) ).thenReturn( template );
-        Response response = restService.getTemplate( TEMPLATE_NAME, Common.DEFAULT_LXC_ARCH );
+        when( templateRegistry.getTemplate( TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
+                Common.DEFAULT_LXC_ARCH ) ).thenReturn( template );
+        Response response =
+                restService.getTemplate( TEMPLATE_NAME, Common.DEFAULT_TEMPLATE_VERSION, Common.DEFAULT_LXC_ARCH );
         Template responseTemplate = GSON.fromJson( String.valueOf( response.getEntity() ), Template.class );
         assertEquals( template, responseTemplate );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -204,7 +215,8 @@ public class RestServiceImplTest
     @Test
     public void shouldReturnOkOnGetParentTemplate()
     {
-        when( templateRegistry.getParentTemplate( TEMPLATE_NAME ) ).thenReturn( template );
+        when( templateRegistry.getParentTemplate( TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
+                Common.DEFAULT_LXC_ARCH ) ).thenReturn( template );
         Response response = restService.getParentTemplate( TEMPLATE_NAME );
         Template responseTemplate = GSON.fromJson( String.valueOf( response.getEntity() ), Template.class );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -224,8 +236,10 @@ public class RestServiceImplTest
     @Test
     public void shouldReturnOkOnGetParentTemplateWithTwoParameters()
     {
-        when( templateRegistry.getParentTemplate( TEMPLATE_NAME, Common.DEFAULT_LXC_ARCH ) ).thenReturn( template );
-        Response response = restService.getParentTemplate( TEMPLATE_NAME, Common.DEFAULT_LXC_ARCH );
+        when( templateRegistry.getParentTemplate( TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
+                Common.DEFAULT_LXC_ARCH ) ).thenReturn( template );
+        Response response = restService
+                .getParentTemplate( TEMPLATE_NAME, Common.DEFAULT_TEMPLATE_VERSION, Common.DEFAULT_LXC_ARCH );
         Template responseTemplate = GSON.fromJson( String.valueOf( response.getEntity() ), Template.class );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
         assertEquals( template, responseTemplate );
@@ -235,7 +249,9 @@ public class RestServiceImplTest
     @Test
     public void shouldReturnListOfTemplatesOnGetParentTemplates()
     {
-        when( templateRegistry.getParentTemplates( TEMPLATE_NAME ) ).thenReturn( templates );
+        when( templateRegistry
+                .getParentTemplates( TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ) ) )
+                .thenReturn( templates );
         Response response = restService.getParentTemplates( TEMPLATE_NAME );
 
         Type templateType = new TypeToken<List<String>>()
@@ -251,8 +267,11 @@ public class RestServiceImplTest
     @Test
     public void shouldReturnListOfTemplatesOnGetParentTemplatesWithTwoParameters()
     {
-        when( templateRegistry.getParentTemplates( TEMPLATE_NAME, Common.DEFAULT_LXC_ARCH ) ).thenReturn( templates );
-        Response response = restService.getParentTemplates( TEMPLATE_NAME, Common.DEFAULT_LXC_ARCH );
+        when( templateRegistry
+                .getParentTemplates( TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
+                        Common.DEFAULT_LXC_ARCH ) ).thenReturn( templates );
+        Response response = restService
+                .getParentTemplates( TEMPLATE_NAME, Common.DEFAULT_TEMPLATE_VERSION, Common.DEFAULT_LXC_ARCH );
 
         Type templateType = new TypeToken<List<String>>()
         {
@@ -267,7 +286,9 @@ public class RestServiceImplTest
     @Test
     public void shouldReturnListOfTemplatesOnGetChildTemplates()
     {
-        when( templateRegistry.getChildTemplates( TEMPLATE_NAME ) ).thenReturn( templates );
+        when( templateRegistry
+                .getChildTemplates( TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ) ) )
+                .thenReturn( templates );
         Response response = restService.getChildTemplates( TEMPLATE_NAME );
 
         Type templateType = new TypeToken<List<String>>()
@@ -283,8 +304,10 @@ public class RestServiceImplTest
     @Test
     public void shouldReturnListOfTemplatesOnGetChildTemplatesArch()
     {
-        when( templateRegistry.getChildTemplates( TEMPLATE_NAME, ARCH ) ).thenReturn( templates );
-        Response response = restService.getChildTemplates( TEMPLATE_NAME, ARCH );
+        when( templateRegistry
+                .getChildTemplates( TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), ARCH ) )
+                .thenReturn( templates );
+        Response response = restService.getChildTemplates( TEMPLATE_NAME, Common.DEFAULT_TEMPLATE_VERSION, ARCH );
 
         Type templateType = new TypeToken<List<String>>()
         {
@@ -299,8 +322,11 @@ public class RestServiceImplTest
     @Test
     public void shouldReturnListOfTemplatesOnGetChildTemplatesWithTwoParameters()
     {
-        when( templateRegistry.getParentTemplates( TEMPLATE_NAME, Common.DEFAULT_LXC_ARCH ) ).thenReturn( templates );
-        Response response = restService.getParentTemplates( TEMPLATE_NAME, Common.DEFAULT_LXC_ARCH );
+        when( templateRegistry
+                .getParentTemplates( TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
+                        Common.DEFAULT_LXC_ARCH ) ).thenReturn( templates );
+        Response response = restService
+                .getParentTemplates( TEMPLATE_NAME, Common.DEFAULT_TEMPLATE_VERSION, Common.DEFAULT_LXC_ARCH );
 
         Type templateType = new TypeToken<List<String>>()
         {
@@ -338,8 +364,10 @@ public class RestServiceImplTest
     @Test
     public void testIsTemplateInUse() throws RegistryException
     {
-        when( templateRegistry.isTemplateInUse( TEMPLATE_NAME ) ).thenReturn( true );
-        Response response = restService.isTemplateInUse( TEMPLATE_NAME );
+        when( templateRegistry
+                .isTemplateInUse( TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ) ) )
+                .thenReturn( true );
+        Response response = restService.isTemplateInUse( TEMPLATE_NAME, Common.DEFAULT_TEMPLATE_VERSION );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
     }
@@ -348,8 +376,10 @@ public class RestServiceImplTest
     @Test
     public void testIsTemplateInUseException() throws RegistryException
     {
-        when( templateRegistry.isTemplateInUse( TEMPLATE_NAME ) ).thenThrow( new RegistryException( "" ) );
-        Response response = restService.isTemplateInUse( TEMPLATE_NAME );
+        when( templateRegistry
+                .isTemplateInUse( TEMPLATE_NAME, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ) ) )
+                .thenThrow( new RegistryException( "" ) );
+        Response response = restService.isTemplateInUse( TEMPLATE_NAME, Common.DEFAULT_TEMPLATE_VERSION );
 
         assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
     }
@@ -358,19 +388,24 @@ public class RestServiceImplTest
     @Test
     public void testSetTemplateInUse() throws RegistryException
     {
-        when( templateRegistry.updateTemplateUsage( TEMPLATE_NAME, TEMPLATE_NAME, true ) ).thenReturn( true );
-        Response response = restService.setTemplateInUse( TEMPLATE_NAME, TEMPLATE_NAME, "True" );
+        when( templateRegistry.updateTemplateUsage( TEMPLATE_NAME, TEMPLATE_NAME,
+                new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), true ) ).thenReturn( true );
+        Response response =
+                restService.setTemplateInUse( TEMPLATE_NAME, TEMPLATE_NAME, Common.DEFAULT_TEMPLATE_VERSION, "True" );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
-        verify( templateRegistry ).updateTemplateUsage( TEMPLATE_NAME, TEMPLATE_NAME, true );
+        verify( templateRegistry ).updateTemplateUsage( TEMPLATE_NAME, TEMPLATE_NAME,
+                new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), true );
     }
 
 
     @Test
     public void testSetTemplateInUseException() throws RegistryException
     {
-        when( templateRegistry.updateTemplateUsage( TEMPLATE_NAME, TEMPLATE_NAME, true ) )
+        when( templateRegistry.updateTemplateUsage( TEMPLATE_NAME, TEMPLATE_NAME,
+                new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), true ) )
                 .thenThrow( new RegistryException( "" ) );
-        Response response = restService.setTemplateInUse( TEMPLATE_NAME, TEMPLATE_NAME, "True" );
+        Response response =
+                restService.setTemplateInUse( TEMPLATE_NAME, TEMPLATE_NAME, Common.DEFAULT_TEMPLATE_VERSION, "True" );
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
     }
 

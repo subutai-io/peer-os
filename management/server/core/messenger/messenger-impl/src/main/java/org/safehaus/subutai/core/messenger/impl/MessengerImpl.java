@@ -8,9 +8,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.sql.DataSource;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
-import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.gson.JsonSyntaxException;
 
 
@@ -33,7 +34,7 @@ import com.google.gson.JsonSyntaxException;
  */
 public class MessengerImpl implements Messenger, MessageProcessor
 {
-    protected static Logger LOG = LoggerFactory.getLogger( MessengerImpl.class.getName() );
+    private static Logger LOG = LoggerFactory.getLogger( MessengerImpl.class.getName() );
     protected final Set<MessageListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MessageListener, Boolean>() );
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
@@ -42,19 +43,31 @@ public class MessengerImpl implements Messenger, MessageProcessor
     protected MessageSender messageSender;
 
 
-    public MessengerImpl( final DataSource dataSource, final PeerManager peerManager ) throws MessengerException
+    public MessengerImpl( final PeerManager peerManager, final EntityManagerFactory entityManagerFactory )
+            throws MessengerException
     {
-        Preconditions.checkNotNull( dataSource, "Data source is null" );
+        Preconditions.checkNotNull( peerManager );
+        Preconditions.checkNotNull( entityManagerFactory );
 
+        this.peerManager = peerManager;
+        EntityManager entityManager = null;
         try
         {
-            this.peerManager = peerManager;
-            this.messengerDao = new MessengerDao( dataSource );
+            entityManager = entityManagerFactory.createEntityManager();
+            this.messengerDao = new MessengerDao( entityManagerFactory );
             this.messageSender = new MessageSender( peerManager, messengerDao, this );
         }
-        catch ( DaoException e )
+        catch ( Exception e )
         {
+            LOG.error( "Error on creating entity manager.", e );
             throw new MessengerException( e );
+        }
+        finally
+        {
+            if ( entityManager != null )
+            {
+                entityManager.close();
+            }
         }
     }
 
@@ -75,6 +88,8 @@ public class MessengerImpl implements Messenger, MessageProcessor
     @Override
     public Message createMessage( final Object payload )
     {
+        Preconditions.checkNotNull( payload, "Invalid payload" );
+
         return new MessageImpl( peerManager.getLocalPeer().getId(), payload );
     }
 
@@ -83,13 +98,18 @@ public class MessengerImpl implements Messenger, MessageProcessor
     public void sendMessage( final Peer peer, final Message message, final String recipient, final int timeToLive )
             throws MessageException
     {
+        Preconditions.checkNotNull( peer, "Peer is null" );
+        Preconditions.checkNotNull( message, "Message is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
+        Preconditions.checkArgument( timeToLive > 0, "Invalid time-to-live" );
+
         try
         {
-            Envelope envelope = new Envelope( ( MessageImpl ) message, peer.getId(), recipient, timeToLive );
+            Envelope envelope = new Envelope( message, peer.getId(), recipient, timeToLive );
 
             messengerDao.saveEnvelope( envelope );
         }
-        catch ( DaoException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in sendMessage", e );
             throw new MessageException( e );
@@ -100,6 +120,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
     @Override
     public MessageStatus getMessageStatus( final UUID messageId ) throws MessageException
     {
+        Preconditions.checkNotNull( messageId, "Invalid message id" );
 
         try
         {
@@ -124,7 +145,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
 
             return MessageStatus.NOT_FOUND;
         }
-        catch ( DaoException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in getMessageStatus", e );
             throw new MessageException( e );
@@ -165,19 +186,17 @@ public class MessengerImpl implements Messenger, MessageProcessor
     @Override
     public void addMessageListener( final MessageListener listener )
     {
-        if ( listener != null )
-        {
-            listeners.add( listener );
-        }
+        Preconditions.checkNotNull( listener );
+
+        listeners.add( listener );
     }
 
 
     @Override
     public void removeMessageListener( final MessageListener listener )
     {
-        if ( listener != null )
-        {
-            listeners.remove( listener );
-        }
+        Preconditions.checkNotNull( listener );
+
+        listeners.remove( listener );
     }
 }

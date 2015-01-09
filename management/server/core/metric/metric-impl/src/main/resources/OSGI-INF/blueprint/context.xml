@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:~/monitor" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
-  </bean>
-
   <reference id="peerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <reference id="emf" interface="javax.persistence.EntityManagerFactory"
+             filter="(osgi.unit.name=metricUnit)" />
 
   <bean id="monitor" class="org.safehaus.subutai.core.metric.impl.MonitorImpl"
-        scope="singleton" activation="eager" destroy-method="destroy">
-    <argument ref="dataSource" />
+        scope="singleton" destroy-method="destroy">
     <argument ref="peerManager" />
+    <argument ref="emf" />
   </bean>
 
   <service ref="monitor" interface="org.safehaus.subutai.core.metric.api.Monitor" />

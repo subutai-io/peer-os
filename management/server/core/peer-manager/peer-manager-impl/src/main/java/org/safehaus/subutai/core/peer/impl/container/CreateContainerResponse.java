@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.peer.impl.container;
 
 import java.util.Set;
 
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.HostInfoModel;
 
 
 /**
@@ -11,18 +11,18 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
  */
 public class CreateContainerResponse
 {
-    private Set<ContainerHost> containerHosts;
+    private Set<HostInfoModel> hosts;
 
 
-    public CreateContainerResponse( final Set<ContainerHost> containerHosts )
+    public CreateContainerResponse( final Set<HostInfoModel> hosts )
     {
-        this.containerHosts = containerHosts;
+        this.hosts = hosts;
     }
 
 
-    public Set<ContainerHost> getContainerHosts()
+    public Set<HostInfoModel> getHosts()
     {
-        return containerHosts;
+        return hosts;
     }
 }
 

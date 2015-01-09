@@ -55,6 +55,7 @@ class SubutaiHelper
 		vector<string> splitResult(string, char*);
 		vector<string> runAndSplit(char*, char*, char* );
 		string toString(int);
+        string GenerateUUID();
 };
 
 #endif /* SUBUTAIHELPER_H_ */

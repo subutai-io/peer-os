@@ -120,7 +120,7 @@ function net_check_portNumber {
        msg_error "Port value \"$port\" is greater than maximum-65535 value.."
        show_usage "`management_network_usage`"
      else
-       echo "Port Number: OK"
+       msg_info "Port Number: OK"
      fi
   else
      msg_error "Port value \"$port\" is not valid.."
@@ -128,3 +128,49 @@ function net_check_portNumber {
   fi
 }
 
+function net_check_keyType {
+  local keyType="$1"
+
+  declare -a listArray=('string' 'file')
+  
+  #checking keyType is valid or not
+  local result="false"
+  for i in "${listArray[@]}"
+  do
+    if [  $i == $keyType ]; then
+        result="true"
+    fi
+  done
+ 
+  if [ "false" == "$result" ]; then
+    msg_error "keyType \"$keyType\" is not valid.."
+    show_usage "`management_network_usage`"
+  fi
+}
+
+function net_check_keyFile {
+  local keyFile="$1"
+
+  if [ ! -f  "$keyFile" ]; then
+    msg_error "keyFile \"$keyFile\" does not exist.."
+    show_usage "`management_network_usage`"
+  fi
+}
+
+function net_create_tap_device {
+  local interfaceName=$1
+  local localPeerIpAddress=$2
+ 
+  #get IP list Array via hostname function
+  deviceExist=`hostname -I`
+
+  #check tap device is created or not.
+  if [[ $deviceExist == *"$localPeerIpAddress"* ]]; then
+    #device exist, skip re-create tap device operation continue with edge command
+    msg_info "Device $interfaceName : exist with $localPeerIpAddress"
+  else
+    #create device with its name and ip address, call "tap_create"
+    msg_info "Device $interfaceName : does not exist creating tap device.."
+    tap_create -d $interfaceName -a $localPeerIpAddress &
+  fi
+}

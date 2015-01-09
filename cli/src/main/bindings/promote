@@ -120,8 +120,8 @@ function promote {
     lxc_assert_no "$templatename" "`promote_usage`"
   fi
   # check to make sure container is NOT registered as a template
-  if [ "`is_registered $templatename`" == "true" -a "x$SUBUTAI_OFFLINE_MODE" != "xtrue" ]; then
-    msg_error "A template with name \"$templatename\" is registered. Aborting ..."
+  if [ "`is_registered $lxc`" == "true" ]; then
+    msg_error "A template with name \"$lxc\" is registered. Aborting ..."
     unlock_container_read $lxc
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
@@ -181,7 +181,6 @@ function promote {
     fi
   fi
 
-  lxc_remove_agent $lxc_template
   lxc_home=/var/lib/lxc/$lxc_template
   for debpkg in "`lxc-attach -n $lxc_template -- dpkg -l`"; do
     echo "$debpkg" >> $lxc_home/packages
@@ -213,7 +212,7 @@ function promote {
   ovs-vsctl --if-exist del-port br-int "$ovs_port_name-2" > /dev/null 2>&1
   ovs_revert_configuration $lxc_template
   fs_snap_hold_readonly $lxc_template
-  destroy_monitor $lxc_template
+  destroy_all_monitor $lxc_template
   msg_ok "Successfully promoted $lxc_template"
   unlock_container_read $lxc
   if [ $? != 0 ]; then msg_error "Release read lock of $lxc"; exit 1; fi

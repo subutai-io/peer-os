@@ -4,6 +4,7 @@ set -e
 . /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/pack-funcs
 
 productName=hive
+mode=bdproduct
 downloadFileAndMakeChanges() {
 	initializeVariables $1
         optDirectory=$BASE/$fileName/opt
@@ -46,9 +47,13 @@ downloadFileAndMakeChanges() {
 	mv $optDirectory/$productName/examples/files/person\ age.txt $optDirectory/$productName/examples/files/person_age.txt	
 }
 
+# 1) Check if the version is changed or not. If not changed, dont create a new debian.
+checkVersion $productName $mode
 # 2) Get the sources which are downloaded from version control system to local machine to relevant directories to generate the debian package
 getSourcesToRelevantDirectories $productName
 # 3) Download hadoop tar file and make necessary changes
 downloadFileAndMakeChanges $productName
 # 4) Create the Debian package
 generateDebianPackage $productName
+# 5) Create the Wrapper Repo Debian Package
+generateRepoPackage $productName

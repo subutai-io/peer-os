@@ -34,6 +34,8 @@
 #include <cstdlib>
 #include <sstream>
 #include <list>
+#include <algorithm>
+#include <sys/utsname.h>
 #include "pugixml.hpp"
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -65,6 +67,7 @@ public:
 	string getAgentConnectionPortValue();
 	string getAgentConnectionOptionsValue();
 	string getAgentEnvironmentIdValue();
+    string getAgentArch();
 	vector<Interface> getAgentInterfaceValues();
 
 private:

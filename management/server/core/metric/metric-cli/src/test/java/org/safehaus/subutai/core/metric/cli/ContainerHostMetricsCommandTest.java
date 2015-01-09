@@ -44,7 +44,7 @@ public class ContainerHostMetricsCommandTest extends SystemOutRedirectTest
         Environment environment = mock( Environment.class );
         ContainerHostMetric metric = mock( ContainerHostMetric.class );
         when( metric.toString() ).thenReturn( METRIC_TO_STRING );
-        when( monitor.getContainerMetrics( environment ) ).thenReturn( Sets.newHashSet( metric ) );
+        when( monitor.getContainerHostsMetrics( environment ) ).thenReturn( Sets.newHashSet( metric ) );
         when( environmentManager.getEnvironmentByUUID( ENVIRONMENT_ID ) ).thenReturn( environment );
         containerHostMetricsCommand = new ContainerHostMetricsCommand( monitor, environmentManager );
         containerHostMetricsCommand.environmentIdString = ENVIRONMENT_ID.toString();

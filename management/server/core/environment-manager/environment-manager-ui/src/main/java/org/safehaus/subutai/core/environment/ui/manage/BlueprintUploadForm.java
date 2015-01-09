@@ -45,6 +45,7 @@ public class BlueprintUploadForm
         textArea = getTextArea();
 
         Button loadBlueprintButton = new Button( SAVE );
+        loadBlueprintButton.setId( "loadBlueprintButton" );
 
         loadBlueprintButton.addClickListener( new Button.ClickListener()
         {
@@ -56,6 +57,7 @@ public class BlueprintUploadForm
         } );
 
         Button putSampleBlueprint = new Button( "Get sample" );
+        putSampleBlueprint.setId( "putSampleBlueprint" );
         putSampleBlueprint.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -113,6 +115,7 @@ public class BlueprintUploadForm
     private TextArea getTextArea()
     {
         textArea = new TextArea( BLUEPRINT );
+        textArea.setId( "textArea" );
         textArea.setSizeFull();
         textArea.setRows( 20 );
         textArea.setImmediate( true );

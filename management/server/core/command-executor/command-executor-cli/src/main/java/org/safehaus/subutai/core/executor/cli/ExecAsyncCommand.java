@@ -10,6 +10,8 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.command.Response;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
@@ -21,6 +23,9 @@ import com.google.common.base.Preconditions;
 @Command( scope = "command", name = "exec-async", description = "Executes command asynchronously" )
 public class ExecAsyncCommand extends OsgiCommandSupport
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger( ExecAsyncCommand.class.getName() );
+
     private final CommandExecutor executor;
 
     @Argument( index = 0, name = "host id", required = true, multiValued = false, description = "id of host on which "
@@ -30,6 +35,8 @@ public class ExecAsyncCommand extends OsgiCommandSupport
     String command;
     @Argument( index = 2, name = "timeout", required = false, multiValued = false, description = "command timeout" )
     int timeout = 30;
+    @Argument( index = 3, name = "daemon", required = false, multiValued = false, description = "is daemon" )
+    boolean daemon = false;
 
 
     public ExecAsyncCommand( final CommandExecutor executor )
@@ -48,12 +55,13 @@ public class ExecAsyncCommand extends OsgiCommandSupport
         {
             UUID id = UUIDUtil.generateUUIDFromString( hostId );
 
-            executor.executeAsync( id, new RequestBuilder( command ).withTimeout( timeout ), new CommandCallback()
+            RequestBuilder requestBuilder = new RequestBuilder( command ).withTimeout( timeout );
+            executor.executeAsync( id, daemon ? requestBuilder.daemon() : requestBuilder, new CommandCallback()
             {
                 @Override
                 public void onResponse( final Response response, final CommandResult commandResult )
                 {
-                    System.out.println( response );
+                    LOG.info( response.toString() );
                 }
             } );
         }

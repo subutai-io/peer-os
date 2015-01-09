@@ -6,11 +6,12 @@ _subutai()
     cur=${COMP_WORDS[COMP_CWORD]}
     prev=${COMP_WORDS[COMP_CWORD-1]}
     template_list="`subutai -q list -t`"
-    container_list="`subutai -q list -c`"
-    global_switches="-h -q"
+    container_list="`subutai -q list -c | awk '{print $1}'`"
+    global_switches="-h(help) -q(quiet)"
     config_binding_switches="-a -d"
     list_binding_switches="-t -c -p -a"
     promote_binding_switches="-c -n"
+    export_binding_switches="-v(version)"
 
     case ${COMP_CWORD} in
         1)
@@ -34,7 +35,7 @@ _subutai()
                     COMPREPLY=( $(compgen -W "${config_binding_switches}" -- ${cur}))
                     ;;
                 network)
-                    networkArgs="-a -h -l -m -r"
+                    networkArgs="-s -l -r -h"
                     COMPREPLY=( $(compgen -W "${networkArgs}" -- ${cur}) )
                     return 0
                     ;;
@@ -59,7 +60,7 @@ _subutai()
                     COMPREPLY=( $(compgen -W "${config_binding_switches}" -- ${cur}))
                     ;;
                 network)
-                    networkArgs="-a -h -l -m -r"
+                    networkArgs="-s -l -r -h"
                     COMPREPLY=( $(compgen -W "${networkArgs}" -- ${cur}) )
                     return 0
                     ;;
@@ -67,10 +68,18 @@ _subutai()
                     COMPREPLY=()
                     ;;
 		*)
-		    if [[ $container_list == *"${prev}"* ]]; then
-			COMPREPLY=($(compgen -W "${promote_binding_switches}" ${cur}))
-		    fi 
-		    ;;
+                    case ${COMP_WORDS[COMP_CWORD-2]} in
+                        export)
+                           COMPREPLY=($(compgen -W "${export_binding_switches}" ${cur}))
+                           ;;
+                        promote)
+                           COMPREPLY=($(compgen -W "${promote_binding_switches}" ${cur}))
+                           ;;
+                        *)
+			   COMPREPLY=()
+                           ;;
+                    esac
+                    ;;
             esac
             ;;
         *)

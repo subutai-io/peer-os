@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.registry.rest;
 
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -12,99 +13,172 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+
 
 public interface RestService
 {
 
-    @GET
-    @Path("templates/{templateName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getTemplate( @PathParam("templateName") String templateName );
+    @POST
+    @Path( "templates" )
+    public Response registerTemplate( @FormParam( "config" ) String configFilePath,
+                                      @FormParam( "packages" ) String packagesFilePath,
+                                      @FormParam( "md5sum" ) String md5sum );
+
 
     @POST
-    @Path("templates")
-    public Response registerTemplate( @FormParam("config") String configFilePath,
-                                      @FormParam("packages") String packagesFilePath,
-                                      @FormParam("md5sum") String md5sum );
+    @Path( "templates/import" )
+    @Consumes( { MediaType.MULTIPART_FORM_DATA } )
+    public Response importTemplate( @Multipart( "file" ) Attachment in, @Multipart( "config_dir" ) String configDir );
 
-    @DELETE
-    @Path("templates/{templateName}")
-    public Response unregisterTemplate( @PathParam("templateName") String templateName );
 
     @GET
-    @Path("templates/{templateName}/arch/{lxcArch}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getTemplate( @PathParam("templateName") String templateName, @PathParam("lxcArch") String lxcArch );
-
-    @GET
-    @Path("templates/{childTemplateName}/parent")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getParentTemplate( @PathParam("childTemplateName") String childTemplateName );
-
-    @GET
-    @Path("templates/{childTemplateName}/arch/{lxcArch}/parent")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getParentTemplate( @PathParam("childTemplateName") String childTemplateName,
-                                       @PathParam("lxcArch") String lxcArch );
-
-    @GET
-    @Path("templates/{childTemplateName}/parents")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getParentTemplates( @PathParam("childTemplateName") String childTemplateName );
-
-    @GET
-    @Path("templates/{childTemplateName}/arch/{lxcArch}/parents")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getParentTemplates( @PathParam("childTemplateName") String childTemplateName,
-                                        @PathParam("lxcArch") String lxcArch );
-
-    @GET
-    @Path("templates/{parentTemplateName}/children")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getChildTemplates( @PathParam("parentTemplateName") String parentTemplateName );
-
-    @GET
-    @Path("templates/{parentTemplateName}/arch/{lxcArch}/children")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getChildTemplates( @PathParam("parentTemplateName") String parentTemplateName,
-                                       @PathParam("lxcArch") String lxcArch );
-
-    @GET
-    @Path("templates/tree")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Path( "templates/tree" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     public Response getTemplateTree();
 
-    @GET
-    @Path("templates/{templateName}/is-used-on-fai")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response isTemplateInUse( @PathParam("templateName") String templateName );
-
-    @PUT
-    @Path("templates/{templateName}/fai/{faiHostname}/is-used/{isInUse}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response setTemplateInUse( @PathParam("faiHostname") String faiHostname,
-                                      @PathParam("templateName") String templateName,
-                                      @PathParam("isInUse") String isInUse );
 
     @GET
-    @Path("templates")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Path( "templates" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     public Response listTemplates();
 
 
     @GET
-    @Path("templates/arch/{lxcArch}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response listTemplates( @PathParam("lxcArch") String lxcArch );
+    @Path( "templates/arch/{lxcArch}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response listTemplates( @PathParam( "lxcArch" ) String lxcArch );
 
 
     @GET
-    @Path("templates/plain-list")
-    @Produces({ MediaType.TEXT_PLAIN })
+    @Path( "templates/plain-list" )
+    @Produces( { MediaType.TEXT_PLAIN } )
     public Response listTemplatesPlain();
 
     @GET
-    @Path("templates/arch/{lxcArch}/plain-list")
-    @Produces({ MediaType.TEXT_PLAIN })
-    public Response listTemplatesPlain( @PathParam("lxcArch") String lxcArch );
+    @Path( "templates/arch/{lxcArch}/plain-list" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    public Response listTemplatesPlain( @PathParam( "lxcArch" ) String lxcArch );
+
+
+    @GET
+    @Path( "templates/{templateName}/{templateVersion}/download/{token}" )
+    @Produces( { MediaType.APPLICATION_OCTET_STREAM } )
+    public Response downloadTemplate( @PathParam( "templateName" ) String templateName,
+                                      @PathParam( "templateVersion" ) String templateVersion,
+                                      @PathParam( "token" ) String templateDownloadToken );
+
+
+    @GET
+    @Path( "templates/{templateName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getTemplate( @PathParam( "templateName" ) String templateName );
+
+
+    @GET
+    @Path( "templates/{templateName}/{templateVersion}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getTemplate( @PathParam( "templateName" ) String templateName,
+                                 @PathParam( "templateVersion" ) String templateVersion );
+
+
+    @DELETE
+    @Path( "templates/{templateName}" )
+    public Response unregisterTemplate( @PathParam( "templateName" ) String templateName );
+
+
+    @DELETE
+    @Path( "templates/{templateName}/{templateVersion}" )
+    public Response unregisterTemplate( @PathParam( "templateName" ) String templateName,
+                                        @PathParam( "templateVersion" ) String templateVersion );
+
+
+    @DELETE
+    @Path( "templates/{templateName}/{templateVersion}/remove" )
+    public Response removeTemplate( @PathParam( "templateName" ) String templateName,
+                                    @PathParam( "templateVersion" ) String templateVersion );
+
+    @GET
+    @Path( "templates/{templateName}/{templateVersion}/arch/{lxcArch}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getTemplate( @PathParam( "templateName" ) String templateName,
+                                 @PathParam( "templateVersion" ) String templateVersion,
+                                 @PathParam( "lxcArch" ) String lxcArch );
+
+
+    @GET
+    @Path( "templates/{childTemplateName}/parent" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getParentTemplate( @PathParam( "childTemplateName" ) String childTemplateName );
+
+
+    @GET
+    @Path( "templates/{childTemplateName}/{templateVersion}/parent" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getParentTemplate( @PathParam( "childTemplateName" ) String childTemplateName,
+                                       @PathParam( "templateVersion" ) String templateVersion );
+
+    @GET
+    @Path( "templates/{childTemplateName}/{templateVersion}/arch/{lxcArch}/parent" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getParentTemplate( @PathParam( "childTemplateName" ) String childTemplateName,
+                                       @PathParam( "templateVersion" ) String templateVersion,
+                                       @PathParam( "lxcArch" ) String lxcArch );
+
+
+    @GET
+    @Path( "templates/{childTemplateName}/parents" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getParentTemplates( @PathParam( "childTemplateName" ) String childTemplateName );
+
+
+    @GET
+    @Path( "templates/{childTemplateName}/{templateVersion}/parents" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getParentTemplates( @PathParam( "childTemplateName" ) String childTemplateName,
+                                        @PathParam( "templateVersion" ) String templateVersion );
+
+    @GET
+    @Path( "templates/{childTemplateName}/{templateVersion}/arch/{lxcArch}/parents" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getParentTemplates( @PathParam( "childTemplateName" ) String childTemplateName,
+                                        @PathParam( "templateVersion" ) String templateVersion,
+                                        @PathParam( "lxcArch" ) String lxcArch );
+
+
+    @GET
+    @Path( "templates/{parentTemplateName}/children" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getChildTemplates( @PathParam( "parentTemplateName" ) String parentTemplateName );
+
+
+    @GET
+    @Path( "templates/{parentTemplateName}/{templateVersion}/children" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getChildTemplates( @PathParam( "parentTemplateName" ) String parentTemplateName,
+                                       @PathParam( "templateVersion" ) String templateVersion );
+
+    @GET
+    @Path( "templates/{parentTemplateName}/{templateVersion}/arch/{lxcArch}/children" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getChildTemplates( @PathParam( "parentTemplateName" ) String parentTemplateName,
+                                       @PathParam( "templateVersion" ) String templateVersion,
+                                       @PathParam( "lxcArch" ) String lxcArch );
+
+
+    @GET
+    @Path( "templates/{templateName}/{templateVersion}/is-used-on-fai" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response isTemplateInUse( @PathParam( "templateName" ) String templateName,
+                                     @PathParam( "templateVersion" ) String templateVersion );
+
+
+    @PUT
+    @Path( "templates/{templateName}/{templateVersion}/fai/{faiHostname}/is-used/{isInUse}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response setTemplateInUse( @PathParam( "faiHostname" ) String faiHostname,
+                                      @PathParam( "templateName" ) String templateName,
+                                      @PathParam( "templateVersion" ) String templateVersion,
+                                      @PathParam( "isInUse" ) String isInUse );
 }

@@ -38,6 +38,22 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>2.3.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.openjpa</groupId>
+      <artifactId>openjpa-all</artifactId>
+      <version>2.3.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-jpa_2.0_spec</artifactId>
+      <version>1.1</version>
+    </dependency>
 
   </dependencies>
 
@@ -48,12 +64,45 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
+            <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
             <Bundle-SymbolicName>${project.groupId}.core.tracker.impl</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
           </instructions>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <configuration>
+              <target>
+                <!--<path id="enhance.path.ref">-->
+                <!--<fileset dir="${project.build.outputDirectory}">-->
+                <!--<include name="Agent.class" />-->
+                <!--</fileset>-->
+                <!--</path>-->
+                <!--<pathconvert property="enhance.files" refid="enhance.path.ref" pathsep=" " />-->
+                <java classname="org.apache.openjpa.enhance.PCEnhancer">
+                  <arg line="-p persistence.xml" />
+                  <!--<arg line="${enhance.files}" />-->
+                  <classpath>
+                    <path refid="maven.dependency.classpath" />
+                    <path refid="maven.compile.classpath" />
+                  </classpath>
+                </java>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

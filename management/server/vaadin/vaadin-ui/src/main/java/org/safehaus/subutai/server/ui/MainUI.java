@@ -28,7 +28,6 @@ import org.safehaus.subutai.server.ui.util.HelpManager;
 import org.safehaus.subutai.server.ui.util.HelpOverlay;
 import org.safehaus.subutai.server.ui.views.CoreModulesView;
 import org.safehaus.subutai.server.ui.views.ModulesView;
-import org.safehaus.subutai.server.ui.views.MonitorView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,13 +79,17 @@ public class MainUI extends UI
 
     private String username = "administrator";
 
+    private CoreModulesView coreModulesView;
+    private ModulesView modulesView;
+
     private HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
     private HashMap<String, View> routes = new HashMap<String, View>()
     {
         {
-            put( "/modules", new ModulesView() );
-            put( "/monitor", new MonitorView() );
-            put( "/core", new CoreModulesView() );
+            coreModulesView = new CoreModulesView();
+            modulesView = new ModulesView();
+            put( "/core", coreModulesView );
+            put( "/modules", modulesView );
         }
     };
 
@@ -334,10 +337,11 @@ public class MainUI extends UI
 
         menu.removeAllComponents();
 
-        for ( final String view : new String[] { "modules", "monitor", "core" } )
+        for ( final String view : new String[] { "core", "modules" } )
         {
             Button b =
                     new NativeButton( view.substring( 0, 1 ).toUpperCase() + view.substring( 1 ).replace( '-', ' ' ) );
+            b.setId( view.substring( 0, 1 ).toUpperCase() + view.substring( 1 ).replace( '-', ' ' ) );
             b.addStyleName( "icon-" + view );
             b.addClickListener( new Button.ClickListener()
             {
@@ -412,5 +416,17 @@ public class MainUI extends UI
                 ( ( DragAndDropWrapper ) next ).iterator().next().removeStyleName( "selected" );
             }
         }
+    }
+
+
+    public CoreModulesView getCoreModulesView()
+    {
+        return coreModulesView;
+    }
+
+
+    public ModulesView getModulesView()
+    {
+        return modulesView;
     }
 }

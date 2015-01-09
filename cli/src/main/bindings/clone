@@ -85,7 +85,6 @@ function clone {
 
   ovs_configure_lxc $child
   git_child_branch $child
-  lxc_install_agent $child
 
   if [ "x$postScriptsEnabled" == "xtrue" ]; then
     if [ "x$postScripts" == "xall" ]; then

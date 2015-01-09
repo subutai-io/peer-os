@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.executor.impl;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -276,11 +277,29 @@ public class CommandProcessorTest
             {
                 return null;
             }
+
+
+            @Override
+            public Set<String> getConfigPoints()
+            {
+                return null;
+            }
         };
-        when( commands.put( eq( COMMAND_ID ), any( CommandProcess.class ), anyInt(),
-                any( CommandProcessExpiryCallback.class ) ) ).thenReturn( true );
+
         when( resourceHostInfo.getId() ).thenReturn( HOST_ID );
         when( containerHostInfo.getStatus() ).thenReturn( ContainerHostState.RUNNING );
+        try
+        {
+            commandProcessor.execute( request, callback );
+            fail( "Expected CommandException" );
+        }
+        catch ( CommandException e )
+        {
+        }
+
+
+        when( commands.put( eq( COMMAND_ID ), any( CommandProcess.class ), anyInt(),
+                any( CommandProcessExpiryCallback.class ) ) ).thenReturn( true );
 
         commandProcessor.execute( request1, callback );
 
@@ -307,5 +326,7 @@ public class CommandProcessorTest
         catch ( CommandException e )
         {
         }
+
+
     }
 }

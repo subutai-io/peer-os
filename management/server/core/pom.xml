@@ -16,12 +16,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>agent-manager</module>
-    <module>apt-repository-manager</module>
-    <module>command-runner</module>
-    <module>communication-manager</module>
-    <module>monitoring</module>
-    <module>container-manager</module>
     <module>file-tracker</module>
     <module>environment-manager</module>
     <module>environment-terminal</module>
@@ -31,7 +25,6 @@
     <module>security-manager</module>
     <module>peer-manager</module>
     <module>strategy-manager</module>
-    <module>template-manager</module>
     <module>template-registry</module>
     <module>tracker</module>
     <module>metric</module>
@@ -41,6 +34,9 @@
     <module>broker</module>
     <module>host-registry</module>
     <module>command-executor</module>
+    <module>wol-manager</module>
+    <module>key-manager</module>
+    <module>plugin-manager</module>
   </modules>
 
 </project>

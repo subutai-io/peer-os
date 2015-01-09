@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 import org.safehaus.subutai.core.messenger.api.Message;
+import org.safehaus.subutai.core.messenger.impl.model.MessageEntity;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -23,7 +24,20 @@ public class Envelope
     private transient Timestamp createDate;
 
 
-    public Envelope( final MessageImpl message, UUID targetPeerId, String recipient, int timeToLive )
+    public Envelope( MessageEntity message )
+    {
+        Preconditions.checkNotNull( message, "Message is null" );
+
+        this.message = new MessageImpl( message );
+        this.targetPeerId = message.getTargetPeerId();
+        this.recipient = message.getRecipient();
+        this.timeToLive = message.getTimeToLive();
+        this.isSent = message.getIsSent();
+        this.createDate = new Timestamp( message.getCreateDate() );
+    }
+
+
+    public Envelope( final Message message, UUID targetPeerId, String recipient, int timeToLive )
     {
 
         Preconditions.checkNotNull( targetPeerId, "Target peer id is null" );
@@ -31,7 +45,7 @@ public class Envelope
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
         Preconditions.checkArgument( timeToLive > 0, "Invalid time-to-live" );
 
-        this.message = message;
+        this.message = new MessageImpl( message );
         this.targetPeerId = targetPeerId;
         this.recipient = recipient;
         this.timeToLive = timeToLive;
@@ -76,7 +90,7 @@ public class Envelope
 
     public Timestamp getCreateDate()
     {
-        return createDate;
+        return ( Timestamp ) createDate.clone();
     }
 
 

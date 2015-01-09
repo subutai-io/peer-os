@@ -20,8 +20,6 @@ import com.google.common.base.Preconditions;
 
 /**
  * Implementation of CommandExecutor
- *
- * TODO refactor RequestBuilder and its build method after migration to new agent
  */
 public class CommandExecutorImpl implements CommandExecutor
 {
@@ -56,7 +54,7 @@ public class CommandExecutorImpl implements CommandExecutor
         Preconditions.checkNotNull( requestBuilder, "Invalid request builder" );
         Preconditions.checkNotNull( requestBuilder, "Invalid callback" );
 
-        Request request = requestBuilder.build2( hostId );
+        Request request = requestBuilder.build( hostId );
 
         commandProcessor.execute( request, callback );
 
@@ -79,7 +77,7 @@ public class CommandExecutorImpl implements CommandExecutor
         Preconditions.checkNotNull( requestBuilder, "Invalid request builder" );
         Preconditions.checkNotNull( requestBuilder, "Invalid callback" );
 
-        commandProcessor.execute( requestBuilder.build2( hostId ), callback );
+        commandProcessor.execute( requestBuilder.build( hostId ), callback );
     }
 
 

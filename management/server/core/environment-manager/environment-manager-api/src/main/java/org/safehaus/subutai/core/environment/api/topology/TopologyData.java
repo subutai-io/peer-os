@@ -1,9 +1,26 @@
 package org.safehaus.subutai.core.environment.api.topology;
 
 
-/**
- * Created by bahadyr on 11/6/14.
- */
+import java.util.UUID;
+
+
 public abstract class TopologyData
 {
+
+    UUID blueprintId;
+
+
+    public UUID getBlueprintId()
+    {
+        return blueprintId;
+    }
+
+
+    public void setBlueprintId( UUID blueprintId )
+    {
+        this.blueprintId = blueprintId;
+    }
+
+
 }
+

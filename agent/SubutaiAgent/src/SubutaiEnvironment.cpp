@@ -30,8 +30,6 @@ SubutaiEnvironment::~SubutaiEnvironment()
     // TODO Auto-generated destructor stub
 }
 
-
-
 /**
  *  \details   KiskisAgent's settings.xml is read by this function.
  *  		   url: Broker address is fetched. (for instance: url = "localhost:8883))
@@ -157,6 +155,19 @@ bool SubutaiEnvironment::getAgentEnvironmentId()
     return false;
 }
 
+string SubutaiEnvironment::getAgentArch() {
+    utsname info;
+    if (uname(&info) != 0) {
+        environmentLogger->writeLog(3, environmentLogger->setLogData("<SubutaiAgent>", "Error: Failed to extract machine information"));
+        return "UNKNOWN";
+    } else {
+        std::string arch(info.machine);
+        std::transform(arch.begin(), arch.end(), arch.begin(), ::toupper);
+        environmentLogger->writeLog(7, environmentLogger->setLogData("<SubutaiAgent>", "Machine architecture:", arch));
+        return arch;
+    }
+}
+
 /**
  *  \details   Checking the machine is lxc or not
  */
@@ -244,6 +255,9 @@ bool SubutaiEnvironment::getAgentInterfaces()
 	    			{
 	    				found_ip = true;
 	    				ip = _helper.splitResult((*it_s), " ")[1];
+                        if (_helper.splitResult(ip, ":").size() > 1) {
+                            ip = _helper.splitResult(ip, ":")[1];
+                        }
 	    				found_i = false;
 	    			}
 	    			if(!strcmp((*it_s).c_str(), "inet")) found_i = true;

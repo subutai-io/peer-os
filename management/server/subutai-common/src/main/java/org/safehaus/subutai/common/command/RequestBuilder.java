@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.enums.OutputRedirection;
-import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.NumUtil;
@@ -27,12 +25,6 @@ import com.google.common.base.Strings;
  */
 public class RequestBuilder
 {
-
-    //SOURCE of command
-    private static final String SOURCE = "COMMAND-RUNNER";
-
-    //the same for all commands
-    private static final Integer REQUEST_SEQUENCE_NUMBER = 1;
 
     //the command to execute, e.g. ls
     private final String command;
@@ -52,12 +44,6 @@ public class RequestBuilder
     //command timeout interval
     private Integer timeout = 30;
 
-    //file path for std out redirection if any
-    private String stdOutPath;
-
-    //file path for std err redirection if any
-    private String stdErrPath;
-
     //user under which to run the command
     private String runAs = "root";
 
@@ -71,7 +57,7 @@ public class RequestBuilder
     private int pid;
 
     // Config points for inotify
-    private Set<String> confPoints;
+    private Set<String> configPoints;
 
     private int isDaemon = 0;
 
@@ -174,36 +160,6 @@ public class RequestBuilder
 
 
     /**
-     * Sets command std output redirection file path Only actual if {@code outputRedirection} is  CAPTURE or
-     * CAPTURE_AND_RETURN
-     *
-     * @param stdOutPath - path to file to redirect std output
-     */
-    public RequestBuilder withStdOutPath( String stdOutPath )
-    {
-
-        this.stdOutPath = stdOutPath;
-
-        return this;
-    }
-
-
-    /**
-     * Sets command err output redirection file path Only actual if {@code errRedirection} is  CAPTURE or
-     * CAPTURE_AND_RETURN
-     *
-     * @param stdErrPath - path to file to redirect err output
-     */
-    public RequestBuilder withErrPath( String stdErrPath )
-    {
-
-        this.stdErrPath = stdErrPath;
-
-        return this;
-    }
-
-
-    /**
      * Sets user under which to run command
      *
      * @param runAs - user
@@ -263,14 +219,13 @@ public class RequestBuilder
 
 
     /**
-     * Sets configuration points to track. This is actual for command with type INOTIFY_CREATE_REQUEST or
-     * INOTIFY_REMOVE_REQUEST
+     * Sets file paths to track via I_NOTIFY.
      */
-    public RequestBuilder withConfPoints( Set<String> confPoints )
+    public RequestBuilder withConfigPoints( Set<String> confPoints )
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( confPoints ), "Config points are empty" );
 
-        this.confPoints = confPoints;
+        this.configPoints = confPoints;
 
         return this;
     }
@@ -284,27 +239,10 @@ public class RequestBuilder
     }
 
 
-    /**
-     * Builds and returns Request object
-     *
-     * @param agentUUID - target agent UUID
-     * @param taskUUID - command UUID
-     */
-    public org.safehaus.subutai.common.protocol.Request build( UUID agentUUID, UUID taskUUID )
+    public Request build( UUID id )
     {
-
-        return new org.safehaus.subutai.common.protocol.Request( SOURCE, type, agentUUID, taskUUID,
-                REQUEST_SEQUENCE_NUMBER, cwd, command, outputRedirection, errRedirection, stdOutPath, stdErrPath, runAs,
-                cmdArgs, envVars, pid, timeout ).setConfPoints( confPoints );
-    }
-
-
-    public org.safehaus.subutai.common.command.Request build2( UUID id )
-    {
-        //TODO pass proper arguments after migration to new agent
-        return new RequestImpl( org.safehaus.subutai.common.command.RequestType.EXECUTE_REQUEST, id, cwd, command,
-                cmdArgs, envVars, org.safehaus.subutai.common.command.OutputRedirection.RETURN,
-                org.safehaus.subutai.common.command.OutputRedirection.RETURN, runAs, timeout, isDaemon );
+        return new RequestImpl( type, id, cwd, command, cmdArgs, envVars, outputRedirection, errRedirection, runAs,
+                timeout, isDaemon, configPoints );
     }
 
 
@@ -334,7 +272,7 @@ public class RequestBuilder
         {
             return false;
         }
-        if ( confPoints != null ? !confPoints.equals( that.confPoints ) : that.confPoints != null )
+        if ( configPoints != null ? !configPoints.equals( that.configPoints ) : that.configPoints != null )
         {
             return false;
         }
@@ -358,14 +296,7 @@ public class RequestBuilder
         {
             return false;
         }
-        if ( stdErrPath != null ? !stdErrPath.equals( that.stdErrPath ) : that.stdErrPath != null )
-        {
-            return false;
-        }
-        if ( stdOutPath != null ? !stdOutPath.equals( that.stdOutPath ) : that.stdOutPath != null )
-        {
-            return false;
-        }
+
         if ( timeout != null ? !timeout.equals( that.timeout ) : that.timeout != null )
         {
             return false;
@@ -388,18 +319,16 @@ public class RequestBuilder
         result = 31 * result + ( outputRedirection != null ? outputRedirection.hashCode() : 0 );
         result = 31 * result + ( errRedirection != null ? errRedirection.hashCode() : 0 );
         result = 31 * result + ( timeout != null ? timeout.hashCode() : 0 );
-        result = 31 * result + ( stdOutPath != null ? stdOutPath.hashCode() : 0 );
-        result = 31 * result + ( stdErrPath != null ? stdErrPath.hashCode() : 0 );
         result = 31 * result + ( runAs != null ? runAs.hashCode() : 0 );
         result = 31 * result + ( cmdArgs != null ? cmdArgs.hashCode() : 0 );
         result = 31 * result + ( envVars != null ? envVars.hashCode() : 0 );
         result = 31 * result + pid;
-        result = 31 * result + ( confPoints != null ? confPoints.hashCode() : 0 );
+        result = 31 * result + ( configPoints != null ? configPoints.hashCode() : 0 );
         return result;
     }
 
 
-    static class RequestImpl implements org.safehaus.subutai.common.command.Request
+    static class RequestImpl implements Request
     {
         private org.safehaus.subutai.common.command.RequestType type;
         private UUID id;
@@ -413,14 +342,13 @@ public class RequestBuilder
         private String runAs;
         private Integer timeout;
         private Integer isDaemon;
+        private Set<String> configPoints;
 
 
-        RequestImpl( final org.safehaus.subutai.common.command.RequestType type, final UUID id,
-                     final String workingDirectory, final String command, final List<String> args,
-                     final Map<String, String> environment,
-                     final org.safehaus.subutai.common.command.OutputRedirection stdOut,
-                     final org.safehaus.subutai.common.command.OutputRedirection stdErr, final String runAs,
-                     final Integer timeout, final Integer isDaemon )
+        RequestImpl( final RequestType type, final UUID id, final String workingDirectory, final String command,
+                     final List<String> args, final Map<String, String> environment, final OutputRedirection stdOut,
+                     final OutputRedirection stdErr, final String runAs, final Integer timeout, final Integer isDaemon,
+                     final Set<String> configPoints )
         {
             this.type = type;
             this.id = id;
@@ -434,6 +362,7 @@ public class RequestBuilder
             this.runAs = runAs;
             this.timeout = timeout;
             this.isDaemon = isDaemon;
+            this.configPoints = configPoints;
         }
 
 
@@ -487,14 +416,14 @@ public class RequestBuilder
 
 
         @Override
-        public org.safehaus.subutai.common.command.OutputRedirection getStdOut()
+        public OutputRedirection getStdOut()
         {
             return stdOut;
         }
 
 
         @Override
-        public org.safehaus.subutai.common.command.OutputRedirection getStdErr()
+        public OutputRedirection getStdErr()
         {
             return stdErr;
         }
@@ -518,6 +447,13 @@ public class RequestBuilder
         public Integer isDaemon()
         {
             return isDaemon;
+        }
+
+
+        @Override
+        public Set<String> getConfigPoints()
+        {
+            return configPoints;
         }
     }
 }

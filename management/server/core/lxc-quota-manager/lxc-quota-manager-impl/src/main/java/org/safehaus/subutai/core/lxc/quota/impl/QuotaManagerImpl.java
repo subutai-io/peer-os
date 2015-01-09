@@ -1,105 +1,130 @@
 package org.safehaus.subutai.core.lxc.quota.impl;
 
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
+import org.json.JSONObject;
 import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
+import org.safehaus.subutai.common.quota.CpuQuotaInfo;
+import org.safehaus.subutai.common.quota.HddQuotaInfo;
+import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
+import org.safehaus.subutai.core.peer.api.CommandUtil;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
+import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
 
-/**
- * Created by talas on 10/7/14.
- */
 public class QuotaManagerImpl implements QuotaManager
 {
 
-    private CommandRunner commandRunner;
     private static Logger LOGGER = LoggerFactory.getLogger( QuotaManagerImpl.class );
+    private PeerManager peerManager;
+    private CommandUtil commandUtil;
 
 
-    public QuotaManagerImpl( CommandRunner commandRunner )
+    public QuotaManagerImpl( PeerManager peerManager )
     {
-        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
-        this.commandRunner = commandRunner;
+        Preconditions.checkNotNull( peerManager );
+        this.peerManager = peerManager;
+        this.commandUtil = new CommandUtil();
     }
 
 
     @Override
-    public void setQuota( final String containerName, final QuotaEnum parameter, final String newValue,
-                          final Agent agent ) throws QuotaException
+    public void setQuota( String containerName, QuotaInfo quotaInfo ) throws QuotaException
     {
-        Preconditions.checkNotNull( containerName, "Target containerName is null." );
-        Preconditions.checkNotNull( parameter, "Parameter is null." );
-        Preconditions.checkNotNull( newValue, "New value to set is null." );
-        Preconditions.checkNotNull( agent, "Host is null." );
-
-        String precomputedString =
-                String.format( "lxc-cgroup -n %s %s %s", containerName, parameter.getKey(), newValue );
-        Command command =
-                commandRunner.createCommand( new RequestBuilder( precomputedString ), Sets.newHashSet( agent ) );
-        runCommand( command, false, agent, parameter, containerName );
-    }
+        Preconditions.checkNotNull( containerName, "ContainerName cannot be null" );
+        Preconditions.checkNotNull( quotaInfo, "QuotaInfo cannot be null." );
 
 
-    @Override
-    public String getQuota( final String containerName, final QuotaEnum parameter, final Agent agent )
-            throws QuotaException
-    {
-        Preconditions.checkNotNull( containerName, "Target containerName is null." );
-        Preconditions.checkNotNull( parameter, "Parameter is null." );
-        Preconditions.checkNotNull( agent, "Host is null." );
-
-        String precomputedString = String.format( "lxc-cgroup -n %s %s", containerName, parameter.getKey() );
-        Command command =
-                commandRunner.createCommand( new RequestBuilder( precomputedString ), Sets.newHashSet( agent ) );
-        return runCommand( command, true, agent, parameter, containerName );
-    }
-
-
-    private String runCommand( Command command, boolean givesOutput, Agent host, QuotaEnum parameter,
-                               String containerName ) throws QuotaException
-    {
+        String cmd = String.format( "subutai quota %s %s %s", containerName, quotaInfo.getQuotaKey(),
+                quotaInfo.getQuotaValue() );
         try
         {
-            command.execute();
-            if ( !command.hasSucceeded() )
-            {
-                if ( command.hasCompleted() )
-                {
-                    AgentResult agentResult = command.getResults().get( host.getUuid() );
-                    throw new QuotaException( String.format(
-                            "Error while performing [lxc-cgroup -n %1$s %2$s]: %3$s%n%4$s, exit code %5$s",
-                            containerName, parameter.getKey(), agentResult.getStdOut(), agentResult.getStdErr(),
-                            agentResult.getExitCode() ) );
-                }
-                else
-                {
-                    throw new QuotaException(
-                            String.format( "Error while performing [lxc-cgroup -n %1$s %2$s]: Command timed out",
-                                    containerName, parameter.getKey() ) );
-                }
-            }
-            else if ( givesOutput )
-            {
-                AgentResult agentResult = command.getResults().get( host.getUuid() );
-                LOGGER.info( agentResult.getStdOut() );
-                return agentResult.getStdOut();
-            }
+            ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerName( containerName );
+
+            commandUtil.execute( new RequestBuilder( cmd ), resourceHost );
         }
-        catch ( CommandException e )
+        catch ( CommandException | HostNotFoundException e )
         {
-            LOGGER.error( "Error executing lxc-cgroup command.", e.getMessage() );
+            LOGGER.error( "Error in setQuota", e );
+            throw new QuotaException( "Error setting quota value for command: " + cmd, e );
         }
-        return "";
+    }
+
+
+    @Override
+    public PeerQuotaInfo getQuota( String containerName, QuotaType quotaType ) throws QuotaException
+    {
+        Preconditions.checkNotNull( quotaType, "QuotaType cannot be null." );
+        Preconditions.checkNotNull( containerName, "ContainerName cannot be null." );
+
+        String cmd = String.format( "subutai quota %s %s", containerName, quotaType.getKey() );
+
+        try
+        {
+            ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerName( containerName );
+            CommandResult commandResult = commandUtil.execute( new RequestBuilder( cmd ), resourceHost );
+
+            if ( quotaType == QuotaType.QUOTA_ALL_JSON )
+            {
+                JSONObject jsonObject = new JSONObject( commandResult.getStdOut() );
+
+                CpuQuotaInfo cpuQuota = new CpuQuotaInfo( jsonObject.getString( QuotaType.QUOTA_CPU_CPUS.getKey() ) );
+                HddQuotaInfo hddHomeQuota =
+                        new HddQuotaInfo( "home", jsonObject.getString( QuotaType.QUOTA_HDD_HOME.getKey() ) );
+                HddQuotaInfo hddVarQuota =
+                        new HddQuotaInfo( "var", jsonObject.getString( QuotaType.QUOTA_HDD_VAR.getKey() ) );
+                HddQuotaInfo hddOptQuota =
+                        new HddQuotaInfo( "opt", jsonObject.getString( QuotaType.QUOTA_HDD_OPT.getKey() ) );
+                HddQuotaInfo hddRootfsQuota =
+                        new HddQuotaInfo( "rootfs", jsonObject.getString( QuotaType.QUOTA_HDD_ROOTFS.getKey() ) );
+                MemoryQuotaInfo memoryQuotaInfo =
+                        new MemoryQuotaInfo( jsonObject.getString( QuotaType.QUOTA_MEMORY_QUOTA.getKey() ) );
+
+                return new PeerQuotaInfo( cpuQuota, hddHomeQuota, hddVarQuota, hddOptQuota, hddRootfsQuota,
+                        memoryQuotaInfo );
+            }
+            else if ( quotaType == QuotaType.QUOTA_MEMORY_QUOTA )
+            {
+                return new PeerQuotaInfo( new MemoryQuotaInfo( commandResult.getStdOut() ) );
+            }
+            else if ( quotaType == QuotaType.QUOTA_CPU_CPUS )
+            {
+                CpuQuotaInfo cpuQuotaInfo = new CpuQuotaInfo( commandResult.getStdOut() );
+                return new PeerQuotaInfo( cpuQuotaInfo );
+            }
+            else if ( quotaType == QuotaType.QUOTA_HDD_HOME )
+            {
+                return new PeerQuotaInfo( new HddQuotaInfo( "home", commandResult.getStdOut() ) );
+            }
+            else if ( quotaType == QuotaType.QUOTA_HDD_OPT )
+            {
+                return new PeerQuotaInfo( new HddQuotaInfo( "opt", commandResult.getStdOut() ) );
+            }
+            else if ( quotaType == QuotaType.QUOTA_HDD_ROOTFS )
+            {
+                return new PeerQuotaInfo( new HddQuotaInfo( "rootfs", commandResult.getStdOut() ) );
+            }
+            else
+            {
+                //defaul QuotaType.QUOTA_HDD_VAR
+                return new PeerQuotaInfo( new HddQuotaInfo( "var", commandResult.getStdOut() ) );
+            }
+        }
+        catch ( CommandException | HostNotFoundException e )
+        {
+            LOGGER.error( "Error int getQuota.", e );
+            throw new QuotaException( "Error getting quota value for command: " + cmd, e );
+        }
     }
 }

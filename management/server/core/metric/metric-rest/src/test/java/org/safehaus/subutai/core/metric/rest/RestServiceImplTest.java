@@ -54,7 +54,7 @@ public class RestServiceImplTest
         environmentManager = mock( EnvironmentManager.class );
         resourceHostMetric = new ResourceHostMetricImpl();
         containerHostMetric = new ContainerHostMetricImpl();
-        when( monitor.getResourceHostMetrics() ).thenReturn( Sets.newHashSet( resourceHostMetric ) );
+        when( monitor.getResourceHostsMetrics() ).thenReturn( Sets.newHashSet( resourceHostMetric ) );
         restService = new RestServiceImpl( monitor, environmentManager );
     }
 
@@ -77,7 +77,7 @@ public class RestServiceImplTest
     public void testGetResourceHostMetrics() throws Exception
     {
 
-        Response response = restService.getResourceHostMetrics();
+        Response response = restService.getResourceHostsMetrics();
 
         Set<ResourceHostMetric> metrics = JsonUtil.fromJson( response.getEntity().toString(),
                 new TypeToken<Set<ResourceHostMetricImpl>>() {}.getType() );
@@ -89,9 +89,9 @@ public class RestServiceImplTest
     @Test
     public void testGetResourceHostMetricsException() throws Exception
     {
-        when( monitor.getResourceHostMetrics() ).thenThrow( new MonitorException( "" ) );
+        when( monitor.getResourceHostsMetrics() ).thenThrow( new MonitorException( "" ) );
 
-        Response response = restService.getResourceHostMetrics();
+        Response response = restService.getResourceHostsMetrics();
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
     }
@@ -101,9 +101,9 @@ public class RestServiceImplTest
     public void testAlertThresholdExcess() throws Exception
     {
         String alertMetric = JsonUtil.toJson( containerHostMetric );
-        Response response = restService.alertThresholdExcess( alertMetric );
+        Response response = restService.alert( alertMetric );
 
-        verify( monitor ).alertThresholdExcess( alertMetric );
+        verify( monitor ).alert( alertMetric );
 
         assertEquals( Response.Status.ACCEPTED.getStatusCode(), response.getStatus() );
     }
@@ -113,9 +113,9 @@ public class RestServiceImplTest
     public void testAlertThresholdExcessException() throws Exception
     {
         String alertMetric = JsonUtil.toJson( containerHostMetric );
-        doThrow( new MonitorException( "" ) ).when( monitor ).alertThresholdExcess( alertMetric );
+        doThrow( new MonitorException( "" ) ).when( monitor ).alert( alertMetric );
 
-        Response response = restService.alertThresholdExcess( alertMetric );
+        Response response = restService.alert( alertMetric );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
     }
@@ -127,9 +127,9 @@ public class RestServiceImplTest
         UUID environmentId = UUID.randomUUID();
         Environment environment = mock( Environment.class );
         when( environmentManager.getEnvironmentByUUID( environmentId ) ).thenReturn( environment );
-        when( monitor.getContainerMetrics( environment ) ).thenReturn( Sets.newHashSet( containerHostMetric ) );
+        when( monitor.getContainerHostsMetrics( environment ) ).thenReturn( Sets.newHashSet( containerHostMetric ) );
 
-        Response response = restService.getContainerHostMetrics( environmentId.toString() );
+        Response response = restService.getContainerHostsMetrics( environmentId.toString() );
         Set<ContainerHostMetric> metrics = JsonUtil.fromJson( response.getEntity().toString(),
                 new TypeToken<Set<ContainerHostMetricImpl>>() {}.getType() );
 
@@ -144,7 +144,7 @@ public class RestServiceImplTest
         UUID environmentId = UUID.randomUUID();
         when( environmentManager.getEnvironmentByUUID( environmentId ) ).thenReturn( null );
 
-        Response response = restService.getContainerHostMetrics( environmentId.toString() );
+        Response response = restService.getContainerHostsMetrics( environmentId.toString() );
 
         assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
     }
@@ -156,9 +156,9 @@ public class RestServiceImplTest
         UUID environmentId = UUID.randomUUID();
         Environment environment = mock( Environment.class );
         when( environmentManager.getEnvironmentByUUID( environmentId ) ).thenReturn( environment );
-        when( monitor.getContainerMetrics( environment ) ).thenThrow( new MonitorException( "" ) );
+        when( monitor.getContainerHostsMetrics( environment ) ).thenThrow( new MonitorException( "" ) );
 
-        Response response = restService.getContainerHostMetrics( environmentId.toString() );
+        Response response = restService.getContainerHostsMetrics( environmentId.toString() );
 
         assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
     }
@@ -167,7 +167,7 @@ public class RestServiceImplTest
     @Test
     public void testGetContainerHostMetricsWithIllegalEnvironmentId() throws Exception
     {
-        Response response = restService.getContainerHostMetrics( null );
+        Response response = restService.getContainerHostsMetrics( null );
 
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
     }

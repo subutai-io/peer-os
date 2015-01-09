@@ -3,7 +3,10 @@ package org.safehaus.subutai.core.metric.api;
 
 import java.util.Set;
 
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.core.metric.api.Metric;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
 /**
@@ -18,7 +21,7 @@ public interface Monitor
      *
      * @return set of metrics, one per each container within an environment
      */
-    public Set<ContainerHostMetric> getContainerMetrics( Environment environment ) throws MonitorException;
+    public Set<ContainerHostMetric> getContainerHostsMetrics( Environment environment ) throws MonitorException;
 
 
     /**
@@ -31,37 +34,68 @@ public interface Monitor
      *
      * @return set of metrics, one per each resource host within the local peer
      */
-    public Set<ResourceHostMetric> getResourceHostMetrics() throws MonitorException;
+    public Set<ResourceHostMetric> getResourceHostsMetrics() throws MonitorException;
 
 
     /**
-     * Enables {@code MetricListener} to be triggered if thresholds on some containers within the given environment are
-     * exceeded
+     * Enables {@code AlertListener} to be triggered if thresholds on some containers within the given environment are
+     * exceeded. Monitoring infrastructure is initialized with given monitoring settings. This call needs to be executed
+     * only once since subscription is stored in persistent storage
      *
-     * @param metricListener metricListener  to trigger
+     * @param alertListener alertListener  to trigger
      * @param environment environment to monitor
+     * @param monitoringSettings monitoring settings
      */
 
-    public void startMonitoring( MetricListener metricListener, Environment environment ) throws MonitorException;
+    public void startMonitoring( AlertListener alertListener, Environment environment,
+                                 MonitoringSettings monitoringSettings ) throws MonitorException;
 
     /**
-     * Disables {@code MetricListener} to be triggered for the given environment
+     * Disables {@code AlertListener} to be triggered for the given environment
      *
-     * @param metricListener metricListener  to trigger
+     * @param alertListener alertListener  to trigger
      * @param environment environment to monitor
      */
-    public void stopMonitoring( MetricListener metricListener, Environment environment ) throws MonitorException;
+    public void stopMonitoring( AlertListener alertListener, Environment environment ) throws MonitorException;
+
+
+    /**
+     * Activates monitoring on a given container
+     *
+     * @param containerHost container host to activate monitoring on
+     * @param monitoringSettings monitoring settings
+     */
+
+    public void activateMonitoring( ContainerHost containerHost, MonitoringSettings monitoringSettings )
+            throws MonitorException;
+
+
+    public ProcessResourceUsage getProcessResourceUsage( ContainerHost containerHost, int processPid ) throws MonitorException;
 
     /**
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
      * stress.
      *
      * @param alertMetric - body of alert in JSON
+     *
+     *
+     * TODO take this method to separate interface for by-REST only usage
      */
-    public void alertThresholdExcess( String alertMetric ) throws MonitorException;
+    public void alert( String alertMetric ) throws MonitorException;
 
+    /**
+     * Adds listener to be notified if threshold within environment is exceeded (after this call, interested parties
+     * need to execute startMonitoring call passing some environment under interest). Usually one calls this method in
+     * init method of client module
+     *
+     * @param listener - listener
+     */
+    public void addAlertListener( AlertListener listener );
 
-    public void addMetricListener( MetricListener listener );
-
-    public void removeMetricListener( MetricListener listener );
+    /**
+     * Removes listener
+     *
+     * @param listener - listener
+     */
+    public void removeAlertListener( AlertListener listener );
 }

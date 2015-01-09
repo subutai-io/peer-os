@@ -19,6 +19,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.topology.TopologyData;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 
 /**
@@ -45,7 +46,7 @@ public interface EnvironmentManager
 
     boolean deleteBlueprint( UUID blueprintId );
 
-    void saveEnvironment( final Environment environment ) throws EnvironmentManagerException;
+    void saveEnvironment( final Environment environment );
 
     boolean saveBuildProcess( EnvironmentBuildProcess buildProgress ) throws EnvironmentManagerException;
 
@@ -55,9 +56,7 @@ public interface EnvironmentManager
 
     void deleteBuildProcess( EnvironmentBuildProcess environmentBuildProcess );
 
-
     Environment getEnvironmentByUUID( UUID environmentId );
-
 
     UUID saveBuildProcess( TopologyData topologyData ) throws EnvironmentManagerException;
 
@@ -65,8 +64,12 @@ public interface EnvironmentManager
 
     void createAdditionalContainers( UUID id, String ngJson, Peer peer ) throws EnvironmentBuildException;
 
-    public UUID addContainers( final UUID environmentId, final String template, PlacementStrategy strategy,
-                               String nodeGroupName, final Peer peer ) throws EnvironmentManagerException;
+    public UUID addContainer( final UUID environmentId, final String template, PlacementStrategy strategy,
+                              String nodeGroupName, final Peer peer ) throws EnvironmentManagerException;
 
     void removeContainer( UUID environmentId, UUID hostId ) throws EnvironmentManagerException;
+
+    public void createLocalContainer( final Environment environment, final String templateName,
+                                      final String nodeGroupName, ResourceHost resourceHost )
+            throws EnvironmentBuildException;
 }

@@ -5,7 +5,7 @@ function export_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Exports a template as a debian pkg
   echo
-  echo "        "subutai export template
+  echo "        "subutai export template \[-v version\]
   echo
   echo -----------------------------------------------------------------------
 }
@@ -14,6 +14,7 @@ function export_usage {
 # Plan for exporting a template
 # -----------------------------------------------------------------------------
 # (1) perform sanity checks first
+#     - given version should be valid 
 #     - defer exports of master to the subutai-master-export script
 #     - template container MUST exist
 #     - container MUST be a template with the '@template' snapshot
@@ -29,7 +30,39 @@ function export {
      exit 1
   fi
 
+  OPTIND=0
   local container="$1"
+  lxc_assert "$container" "`usage`"
+
+  if [ "$container" == "master" ]; then
+    echo "Please use master_export command!"
+    unlock_container_write $container
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+    exit 1
+  fi
+
+  shift
+  while getopts ":v:" opt; do
+    case $opt in
+      v)
+        version="$OPTARG"
+        ;;
+      \?)
+        msg_error "Unrecognized option -$OPTARG"
+        exit 1
+        ;;
+      :)
+        msg_error "Option -$OPTARG requires an argument." >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  if [ -z $version ];then
+    version=$SUBUTAI_VERSION
+  fi
+  
+  assert_version_validity $version
    
   ps aux | grep "subutai export $container" | grep -v $$ \
          | grep -v "grep subutai" | grep -v "grep --color" > /dev/null 2>&1
@@ -61,11 +94,11 @@ function export {
     exit 1
   fi
 
-  local debian_package_name=`get_debian_package_name $container`
+  local debian_package_name=`get_debian_package_name $container $version` 
   local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
 
   if [ -f $debian_file ]; then
-    msg_error "It seems the debian file has already been generated"
+    msg_error "It seems the debian file has already been generated for this version: $version"
     msg_error "Destroy $SUBUTAI_TMPDIR/$container and the peer debian file first"
     unlock_container_write $container
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
@@ -120,21 +153,31 @@ function export {
   # ----------------------------------------------------------------------------
   
   # insert subutai.template.package info inside containers config file
-  conf="/var/lib/lxc/$container/config"
-  propline="`cat $conf | grep subutai.template.package`"
+  local conf="/var/lib/lxc/$container/config"
+  local propline="`cat $conf | grep subutai.template.package`"
 
   if [ -z "$propline" ]; then
     echo "subutai.template.package = $debian_dir.deb" >> /var/lib/lxc/$container/config
     debian_file=$debian_dir".deb"
   else
-    debian_file=`echo $propline | awk '{print $3}'`
+    escaped_debian_dir=$(echo $debian_dir | sed -e 's/\//\\\//g')
+    sed -i "s/subutai.template.package = *.*/subutai.template.package = $escaped_debian_dir.deb/g" $conf 
+    debian_file=$debian_dir".deb"
+  fi
+  local version_variable="subutai.template.version"
+  local version_propline="`cat $conf | grep $version_variable`"
+
+  if [ -z "$version_propline" ]; then
+    echo "$version_variable = $version" >> /var/lib/lxc/$container/config
+  else
+    sed -i "s/$version_variable = *.*/$version_variable = $version/g" $conf 
   fi
 
   cp /var/lib/lxc/$container/config $debian_root
   cp /var/lib/lxc/$container/fstab  $debian_root
   cp /var/lib/lxc/$container/packages  $debian_root
 
-  pkg=`deb_pkg $container`
+  pkg=`deb_pkg $container $version`
   check_status "debian package $pkg generated" "$?"
   
   # Remove debian directory after debian package generation

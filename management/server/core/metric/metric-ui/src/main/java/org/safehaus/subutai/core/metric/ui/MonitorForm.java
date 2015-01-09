@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.metric.ui;
 
 
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
 
@@ -13,6 +12,8 @@ import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.vaadin.data.util.BeanItemContainer;
@@ -28,14 +29,15 @@ import com.vaadin.ui.TextArea;
 
 public class MonitorForm extends CustomComponent
 {
+    private static final Logger LOG = LoggerFactory.getLogger( MonitorPortalModule.class.getName() );
 
     private Monitor monitor;
     private EnvironmentManager environmentManager;
-    private TextArea outputTxtArea;
+    protected TextArea outputTxtArea;
     private ComboBox environmentCombo;
 
 
-    public MonitorForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public MonitorForm( ServiceLocator serviceLocator ) throws NamingException
     {
 
         monitor = serviceLocator.getService( Monitor.class );
@@ -68,7 +70,7 @@ public class MonitorForm extends CustomComponent
     }
 
 
-    private Component getContainerHostsButton()
+    protected Component getContainerHostsButton()
     {
         Button button = new Button( "Get Container Hosts Metrics" );
 
@@ -87,18 +89,7 @@ public class MonitorForm extends CustomComponent
                 }
                 else
                 {
-                    try
-                    {
-                        Set<ContainerHostMetric> metrics = monitor.getContainerMetrics( environment );
-                        for ( ContainerHostMetric metric : metrics )
-                        {
-                            addOutput( metric.toString() );
-                        }
-                    }
-                    catch ( MonitorException e )
-                    {
-                        addOutput( e.getMessage() );
-                    }
+                    printContainerMetrics( environment );
                 }
             }
         } );
@@ -107,7 +98,45 @@ public class MonitorForm extends CustomComponent
     }
 
 
-    private Component getResourceHostsButton()
+    protected void printContainerMetrics( Environment environment )
+    {
+        try
+        {
+            Set<ContainerHostMetric> metrics = monitor.getContainerHostsMetrics( environment );
+            for ( ContainerHostMetric metric : metrics )
+            {
+                addOutput( metric.toString() );
+            }
+        }
+        catch ( MonitorException e )
+        {
+            LOG.error( "Error getting container metrics", e );
+
+            addOutput( e.getMessage() );
+        }
+    }
+
+
+    protected void printResourceHostMetrics()
+    {
+        try
+        {
+            Set<ResourceHostMetric> metrics = monitor.getResourceHostsMetrics();
+            for ( ResourceHostMetric metric : metrics )
+            {
+                addOutput( metric.toString() );
+            }
+        }
+        catch ( MonitorException e )
+        {
+            LOG.error( "Error getting resource host metrics", e );
+
+            addOutput( e.getMessage() );
+        }
+    }
+
+
+    protected Component getResourceHostsButton()
     {
         Button button = new Button( "Get Resource Hosts Metrics" );
 
@@ -118,18 +147,7 @@ public class MonitorForm extends CustomComponent
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                try
-                {
-                    Set<ResourceHostMetric> metrics = monitor.getResourceHostMetrics();
-                    for ( ResourceHostMetric metric : metrics )
-                    {
-                        addOutput( metric.toString() );
-                    }
-                }
-                catch ( MonitorException e )
-                {
-                    addOutput( e.getMessage() );
-                }
+                printResourceHostMetrics();
             }
         } );
 
@@ -137,7 +155,7 @@ public class MonitorForm extends CustomComponent
     }
 
 
-    private Component getOutputArea()
+    protected Component getOutputArea()
     {
         outputTxtArea = new TextArea( "Metrics" );
         outputTxtArea.setId( "outputTxtArea" );
@@ -149,7 +167,7 @@ public class MonitorForm extends CustomComponent
     }
 
 
-    private Component getEnvironmentComboBox()
+    protected Component getEnvironmentComboBox()
     {
 
         BeanItemContainer<Environment> environments = new BeanItemContainer<>( Environment.class );
@@ -163,12 +181,12 @@ public class MonitorForm extends CustomComponent
     }
 
 
-    private void addOutput( String output )
+    protected void addOutput( String output )
     {
 
         if ( !Strings.isNullOrEmpty( output ) )
         {
-            outputTxtArea.setValue( String.format( "%s\n%s", outputTxtArea.getValue(), output ) );
+            outputTxtArea.setValue( String.format( "%s%n%s", outputTxtArea.getValue(), output ) );
             outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
         }
     }

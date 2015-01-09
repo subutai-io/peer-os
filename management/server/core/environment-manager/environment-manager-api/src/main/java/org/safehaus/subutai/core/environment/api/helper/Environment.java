@@ -1,141 +1,53 @@
 package org.safehaus.subutai.core.environment.api.helper;
 
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
-import com.google.common.collect.Sets;
 
-public class Environment
+public interface Environment
 {
-
-    private UUID id;
-    private String name;
-    private Set<ContainerHost> containers;
-    private EnvironmentStatusEnum status;
-    private long creationTimestamp;
+    public long getCreationTimestamp();
 
 
-    public Environment( String name )
-    {
-        this.name = name;
-        this.id = UUIDUtil.generateTimeBasedUUID();
-        this.containers = new HashSet<>();
-        this.status = EnvironmentStatusEnum.EMPTY;
-        this.creationTimestamp = System.currentTimeMillis();
-    }
+    public EnvironmentStatusEnum getStatus();
 
 
-    public long getCreationTimestamp()
-    {
-        return creationTimestamp;
-    }
+    public void setStatus( final EnvironmentStatusEnum status );
 
 
-    public EnvironmentStatusEnum getStatus()
-    {
-        return status;
-    }
+    public void addContainer( ContainerHost container );
 
 
-    public void setStatus( final EnvironmentStatusEnum status )
-    {
-        this.status = status;
-    }
+    public Set<ContainerHost> getContainerHosts();
 
 
-    public void addContainer( ContainerHost container )
-    {
-        container.setEnvironmentId( id );
-        this.containers.add( container );
-    }
+    public String getName();
 
 
-    public Set<ContainerHost> getContainers()
-    {
-        return containers;
-    }
+    public UUID getId();
 
 
-    public void setContainers( final Set<ContainerHost> containers )
-    {
-        this.containers = containers;
-    }
+    public String getPublicKey();
 
 
-    public void destroyContainer( UUID containerId ) throws EnvironmentManagerException
-    {
-        //TODO Baha fill in the logic
-    }
+    public void setPublicKey( String key );
 
 
-    public String getName()
-    {
-        return name;
-    }
+    public ContainerHost getContainerHostById( UUID uuid );
 
 
-    public UUID getId()
-    {
-        return id;
-    }
+    public ContainerHost getContainerHostByHostname( String hostname );
 
 
-    public ContainerHost getContainerHostByUUID( UUID uuid ) {
-        Iterator<ContainerHost> iterator = containers.iterator();
-        while ( iterator.hasNext() ) {
-            ContainerHost containerHost = iterator.next();
-            if ( containerHost.getId().equals( uuid ) )
-                return containerHost;
-        }
-        return null;
-    }
+    public Set<ContainerHost> getContainerHostsByIds( Set<UUID> ids );
 
 
-    public ContainerHost getContainerHostByHostname( String hostname )
-    {
-        Iterator<ContainerHost> iterator = containers.iterator();
-        while ( iterator.hasNext() ) {
-            ContainerHost containerHost = iterator.next();
-            if ( containerHost.getHostname().equalsIgnoreCase( hostname ) )
-            {
-                return containerHost;
-            }
-        }
-        return null;
-    }
+    public void addContainers( final Set<ContainerHost> containerHosts );
 
 
-    public Set<ContainerHost> getHostsByIds( Set<UUID> ids )
-    {
-        Set<ContainerHost> hosts = Sets.newHashSet();
-        for ( UUID id : ids )
-        {
-            ContainerHost host = getContainerHostByUUID( id );
-            if ( host != null )
-            {
-                hosts.add( host );
-            }
-        }
-        return hosts;
-    }
-
-
-    public void addContainers( final Set<ContainerHost> containerHosts )
-    {
-        this.containers.addAll( containerHosts );
-    }
-
-
-    public void removeContainer( final ContainerHost containerHost )
-    {
-        this.containers.remove( containerHost );
-    }
+    public void removeContainer( final ContainerHost containerHost );
 }
+
