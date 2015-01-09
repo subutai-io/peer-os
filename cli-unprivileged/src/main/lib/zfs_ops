@@ -10,29 +10,50 @@ function fs_rename_datasets_set_mount_point {
   local src="$1"
   local dst="$2"
   local dst_rootfs="$3"
-  sudo zfs rename "lxc-data/$src-home" "lxc-data/$dst-home"
-  sudo zfs rename "lxc-data/$src-var"  "lxc-data/$dst-var"
-  sudo zfs rename "lxc/$src-opt" "lxc/$dst-opt"
-  sudo zfs rename "lxc/$src" "lxc/$dst"
-  sudo zfs set mountpoint="$dst_rootfs" "lxc/$dst"
+  sudo zfs rename "$HOME/.local/lxc-data/$src-home" "$HOME/.local/lxc-data/$dst-home"
+  sudo zfs rename "$HOME/.local/lxc-data/$src-var"  "$HOME/.local/lxc-data/$dst-var"
+  sudo zfs rename "$HOME/.local/lxc/$src-opt" "$HOME/.local/lxc/$dst-opt"
+  sudo zfs rename "$HOME/.local/share/lxc/$src" "$HOME/.local/share/lxc/$dst"
+  sudo zfs set mountpoint="$dst_rootfs" "$HOME/.local/lxc/$dst"
 
-  sudo zfs mount "lxc/$dst"
-  sudo zfs mount "lxc/$dst-opt"
-  sudo zfs mount "lxc-data/$dst-home"
-  sudo zfs mount "lxc-data/$dst-var"
+  sudo zfs mount "$HOME/.local/share/lxc/$dst"
+  sudo zfs mount "$HOME/.local/lxc/$dst-opt"
+  sudo zfs mount "$HOME/.local/lxc-data/$dst-home"
+  sudo zfs mount "$HOME/.local/lxc-data/$dst-var"
 }
-
+function fs_find_parent_dir {
+  local parent="$1"
+  lxc-info -n $parent > /dev/null 2>&1
+  if [ $? == 0 ]; then
+    echo "$HOME"
+  fi
+}
+#TODO
+function fs_take_snapshot_from_parent {
+  local parent="$1"
+  local child_ds="$2"
+  lxc-info -n $parent > /dev/null 2>&1
+  if [ $? == 0 ]; then
+    sudo btrfs subvolume snapshot $HOME/.local/share/lxc/$parent/rootfs $HOME/.local/share/lxc/$child_ds > /dev/null 2>&1
+    #sudo cp -R  $HOME/.local/share/lxc/$parent/rootfs/ $HOME/.local/share/lxc/$child_ds
+  else
+    sudo btrfs subvolume snapshot $HOME/.local/tmpdir/$parent/rootfs $HOME/.local/share/lxc/$child_ds > /dev/null 2>&1
+    #sudo cp -R  /var/lib/lxc/$parent/rootfs $HOME/.local/share/lxc/$child_ds
+  fi
+}
+#TODO
 function fs_clone {
   local parent_snap="$1"
   local child_ds="$2"
   sudo zfs clone "$parent_snap" "$child_ds"
 }
+#TODO
 function fs_set_mountpoint {
   local child_roofs="$1"
   local child="$2"
   sudo zfs set mountpoint=$child_rootfs lxc/$child
 }
-
+#TODO
 function fs_addmount {
   local name=$1
   local mount=$2
@@ -71,7 +92,7 @@ function fs_addmount {
   sudo zfs hold keep $dataset'@template'
   return
 }
-
+#TODO
 #snaphost ll holds on clone's rootfs
 function fs_snap_hold_readonly {
   local lxc_template="$1"
@@ -91,7 +112,7 @@ function fs_snap_hold_readonly {
   sudo zfs hold keep lxc-data/$lxc_template-home@template
   sudo zfs set readonly=on lxc-data/$lxc_template-home
 }
-
+#TODO
 function fs_recv {
   local template="$1"
   local deltas="$2"
@@ -102,7 +123,7 @@ function fs_recv {
   sudo zfs recv lxc-data/$template-var < $deltas/var.delta
   sudo zfs recv lxc-data/$template-home < $deltas/home.delta
 }
-
+#TODO
 #generate delta images of all filesystems
 function fs_send {
   local parent="$1"
@@ -113,7 +134,7 @@ function fs_send {
   sudo zfs send -I "lxc-data/$parent-var@template" "lxc-data/$container-var@template" > "$deltas/var.delta"
   sudo zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template" > "$deltas/home.delta"
 }
-
+#TODO
 function fs_remove_mount {
   child="$1"
   parent="$2"
@@ -138,7 +159,7 @@ function fs_remove_mount {
   msg_info "    - \"$child_ds\" dataset destroyed"
 }
 
-
+#TODO
 #release all holds on clone's rootfs snaps and delete snaps
 function fs_rls_holds_delete_snaps {
   local clone="$1"
@@ -152,7 +173,7 @@ function fs_rls_holds_delete_snaps {
     msg_info "    - \"$snap\" snapshot destroyed"
   done
 }
-
+#TODO
 #demote template
 function fs_demote_template {
   local temp="$1"  
@@ -186,7 +207,7 @@ function fs_demote_template {
   sudo zfs set readonly=off "lxc/$temp"
 
 }
-
+#TODO
 # returns the children of the provided container(arg $1)
 function fs_get_children_list {
   local parent="$1"
@@ -208,7 +229,7 @@ function fs_get_children_list {
   echo ${children_list[*]}
 }
 
-
+#TODO
 # prints out the children for a ds or container name (arg $1)
 # counts and prints out the children
 # returns the child count
@@ -233,7 +254,7 @@ function fs_get_children {
   return $count
 }
 
-
+#TODO
 # assert snapshot (arg $1) does NOT exist, if it does show usage (arg $2)
 # warning: exits!
 function fs_assert_nosnap {
@@ -246,7 +267,7 @@ function fs_assert_nosnap {
   fi
 }
 
-
+#TODO
 # assert snapshot (arg $1) exists, if it does NOT show usage (arg $2)
 # warning: exits!
 function fs_assert_snap {
@@ -259,7 +280,7 @@ function fs_assert_snap {
   fi
 }
 
-
+#TODO
 # assert dataset (arg $1) does NOT exist, if it does show usage (arg $2)
 # warning: exits!
 function fs_assert_nods {
@@ -272,7 +293,7 @@ function fs_assert_nods {
   fi
 }
 
-
+#TODO
 # assert dataset (arg $1) exists, if it does NOT show usage (arg $2)
 # warning: exits!
 function fs_assert_ds {
@@ -285,7 +306,7 @@ function fs_assert_ds {
   fi
 }
 
-
+#TODO
 # checks if the container (arg $1) is a template, echo "true"/"false"
 function fs_is_template {
   local c="$1"
@@ -296,7 +317,7 @@ function fs_is_template {
   fi
 }
 
-
+#TODO
 # gets the parent of a container
 # first argument $1 is the name of the child container
 # master returns master
@@ -312,42 +333,42 @@ function fs_get_parent {
   echo `fs_ctnr_from_ds $snap`
 }
 
-
+#TODO
 # extracts the container name from a dataset or a dataset snapshot
 function fs_ctnr_from_ds {
   local ds="$1"
   echo $ds | sed -e 's/lxc.*\///' -e 's/@.*//' -e 's/-.*//'
 }
 
-
+#TODO
 # extracts the zpool name from a dataset or a dataset snapshot
 function fs_pool_from_ds {
   local ds="$1"
   echo $ds | sed -e 's/\/.*//'
 }
 
-
+#TODO
 # extracts the snapshot name from a dataset snapshot
 function fs_snap_from_ds {
   local ds="$1"
   echo $ds | sed -e 's/.*@//'
 }
 
-
+#TODO
 # extracts the partition name from a dataset or a dataset snapshot
 function fs_part_from_ds {
   local ds="$1"
   echo $ds | sed -e 's/lxc.*\///' -e 's/@.*//' -e 's/.*-//'
 }
 
-
+#TODO
 # lists all the templates available
 function fs_list_templates {
   for l in `sudo zfs list -t snapshot -o name -H | grep @template | grep -v -`; do
     echo `fs_ctnr_from_ds $l`
   done
 }
-
+#TODO
 function fs_copy_ds {
   local from_ds="$1"
 
