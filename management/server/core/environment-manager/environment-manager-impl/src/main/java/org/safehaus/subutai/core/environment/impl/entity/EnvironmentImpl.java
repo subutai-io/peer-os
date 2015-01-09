@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.environment.impl;
+package org.safehaus.subutai.core.environment.impl.entity;
 
 
 import java.io.Serializable;
@@ -21,6 +21,7 @@ import javax.persistence.Table;
 
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
+import org.safehaus.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 import com.google.common.collect.Sets;

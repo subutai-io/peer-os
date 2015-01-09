@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.environment.impl;
+package org.safehaus.subutai.core.environment.impl.entity;
 
 
 import java.io.Serializable;

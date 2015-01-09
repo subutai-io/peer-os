@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.impl.model;
+package org.safehaus.subutai.core.peer.impl.entity;
 
 
 import java.util.ArrayList;
@@ -48,6 +48,7 @@ import com.google.common.collect.Sets;
 @Entity
 @Inheritance( strategy = InheritanceType.TABLE_PER_CLASS )
 @Access( AccessType.FIELD )
+
 public abstract class AbstractSubutaiHost implements Host
 {
     @Id

@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.messenger.impl.dao.MessageDataService;
-import org.safehaus.subutai.core.messenger.impl.model.MessageEntity;
+import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;

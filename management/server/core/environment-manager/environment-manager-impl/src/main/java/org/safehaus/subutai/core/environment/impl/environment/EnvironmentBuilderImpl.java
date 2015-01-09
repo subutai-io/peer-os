@@ -13,7 +13,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
-import org.safehaus.subutai.core.environment.impl.EnvironmentImpl;
+import org.safehaus.subutai.core.environment.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.slf4j.Logger;

@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.core.messenger.impl.model.MessageEntity;
+import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
 
 import junit.framework.TestCase;
 
