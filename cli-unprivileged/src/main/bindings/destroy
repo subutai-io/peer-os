@@ -139,8 +139,8 @@ function destroy {
   # (6) lxc-destroy the clone
   #lxc-destroy -n $clone -f
   lxc-stop -n $clone
-  sudo btrfs subvolume delete $HOME/.local/share/lxc/$clone/rootfs
-  sudo btrfs subvolume delete $HOME/.local/share/lxc/$clone
+  fs_volume_delete "$clone/rootfs"
+  fs_volume_delete "$clone"
 
   # (7) destroy mounted partitions 
   fs_remove_mount $clone $parent opt lxc
