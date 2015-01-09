@@ -23,7 +23,7 @@ function fs_send_recv_clone {
 
 function fs_volume_create {
   local dst_home="$1"
-  btrfs subvolume create $dst_home 1>/dev/null
+  sudo btrfs subvolume create $dst_home 1>/dev/null
 }
 
 function fs_volume_delete {
