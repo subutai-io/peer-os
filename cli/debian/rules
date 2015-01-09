@@ -3,10 +3,12 @@
 #export DH_VERBOSE=1
 
 d = debian/subutai-cli
-CONFDIR=/etc/subutai
-BINDINGS=/etc/subutai/bindings
-LIBDIR=/usr/share/subutai-cli/subutai/lib
-SCRIPTS=/usr/bin
+CONFDIR=/etc/subutai/
+BINDINGS=/etc/subutai/bindings/
+LIBDIR=/usr/share/subutai-cli/subutai/lib/
+SCRIPTS=/usr/bin/
+PRESCRIPTS=/usr/share/subutai-cli/subutai/pre-scripts/
+POSTSCRIPTS=/usr/share/subutai-cli/subutai/post-scripts/
 MANDIR=/usr/share/man/man1
 BASHCOMPDIR=/etc/bash_completion.d/
 %:
@@ -37,10 +39,14 @@ install: build
 	mkdir -p ${d}${SCRIPTS}
 	mkdir -p ${d}${MANDIR}
 	mkdir -p ${d}${BASHCOMPDIR}
+	mkdir -p ${d}${PRESCRIPTS}
+	mkdir -p ${d}${POSTSCRIPTS}
 	cp -a src/main/config/* ${d}${CONFDIR}
 	cp -a src/main/bindings/* ${d}${BINDINGS}
 	cp -a src/main/lib/* ${d}${LIBDIR}
 	cp -a src/main/scripts/* ${d}${SCRIPTS}
+	-@cp -a src/main/pre-scripts/* ${d}${PRESCRIPTS}
+	-@cp -a src/main/post-scripts/* ${d}${POSTSCRIPTS}
 	cp debian/subutai-manpage.1 ${d}${MANDIR}
 	gzip ${d}${MANDIR}/subutai-manpage.1
 	cp debian/subutai-cli.bash_completion ${d}${BASHCOMPDIR}

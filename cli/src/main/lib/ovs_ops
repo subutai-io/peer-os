@@ -49,7 +49,7 @@ function ovs_configure_lxc {
 
 
 function ovs_revert_configuration {
-  lxc=$1
+  local lxc=$1
   if [ -z "$lxc" ]; then
     msg_error "No value provided for container's name. Aborting ..."
     unlock_container_read $lxc
@@ -80,7 +80,7 @@ function ovs_revert_configuration {
 
 
 function ovs_get_port_name {
-  lxc=$1
+  local lxc=$1
   if [ -z "$lxc" ]; then
     msg_error "No value provided for container's name. Aborting ..."
     unlock_container_read $lxc

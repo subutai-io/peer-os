@@ -27,7 +27,6 @@ function exitIfNoCommits {
   branch_name="$(git symbolic-ref HEAD 2>/dev/null)" ||
   branch_name="(unnamed branch)"     # detached HEAD
   branch_name=${branch_name##refs/heads/}
-  
   # Check if there are local commits
   git_diff=$(git diff origin/$branch_name..HEAD)
   local status=$?

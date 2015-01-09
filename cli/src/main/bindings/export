@@ -85,6 +85,15 @@ function export {
   # (1) perform some sanity checks
   # ----------------------------------------------------------------------------
 
+  lxc_assert $container "`export_usage`"
+
+  if [ "$container" == "master" ]; then
+    echo "Please use master_export command!"
+    unlock_container_write $container
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+    exit 1
+  fi
+
   local debian_package_name=`get_debian_package_name $container $version` 
   local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
 

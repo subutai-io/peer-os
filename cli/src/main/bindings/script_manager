@@ -1,0 +1,41 @@
+#!/bin/bash
+
+function script_manager_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Manages the pre and post execution scripts
+  echo
+  echo "        "subutai \[-qh\] script_manager \[ \[register\|unregister\|import\|remove script_name\] \[list\] \]
+  echo "          "options: 
+  echo "                    " register: registers specified scripts 
+  echo "                    " unregister: unregisters specified scripts
+  echo "                    " import: imports the specified scripts to local machine
+  echo "                    " remove: removes the specified scripts from local machine
+  echo "                    " list: lists the registered scripts
+  echo -----------------------------------------------------------------------
+}
+
+
+function script_manager {
+  operation=$1
+  if [ -z "$operation" ]; then
+    show_usage "`script_manager_usage`"
+  fi
+
+  if [[ $operation == "register" || $operation == "unregister" || $operation == "import" || $operation == "remove" ]]; then
+    if [ "x$2" == "xall" ]; then
+      "$operation"_all_scripts
+    else
+      "$operation"_script $2
+    fi
+  elif [ $operation == "list" ]; then
+    list_registered_scripts
+  else
+    msg_error "Unrecognized operation $operation"
+    exit 1
+  fi
+}
+
+
+function script_manager_description {
+  echo "manages pre and post execution scripts syncronization with management server"
+}

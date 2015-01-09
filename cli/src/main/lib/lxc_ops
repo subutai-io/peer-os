@@ -451,14 +451,14 @@ function lxc_get_uptime_in_seconds {
 }
 
 function lxc_remove_agent {
-  container=$1
-  agent_package="subutai-agent"
+  local container=$1
+  local agent_package="subutai-agent"
   
   lxc_assert $container
   lxc-wait -n $container -s RUNNING
   lxc-attach -n $container -- apt-get purge -y -f $agent_package > /dev/null 2>&1
   lxc-attach -n $container -- dpkg -s $agent_package > /dev/null 2>&1
-  status=$?
+  local status=$?
   message="    - agent removed from \"$container\""
   if [ "$status" == "1" ]
   then
@@ -479,15 +479,15 @@ function lxc_install_agent {
 
   agent_package="subutai-agent"
   #Agent checks
-  agentresult=$(lxc-attach -n $container -- dpkg --get-selections | grep $agent_package)
+  local agentresult=$(lxc-attach -n $container -- dpkg --get-selections | grep $agent_package)
   if [ -z "$agentresult" ] ;then
     #installing agent
     lxc-attach -n $container -- apt-get update > /dev/null 2>&1
 
     lxc-attach -n $container -- apt-get install --assume-yes --force-yes $agent_package > /dev/null 2>&1
     lxc-attach -n $container -- dpkg -s $agent_package > /dev/null 2>&1
-    status=$?
-    message="    - subutai agent installed on $container"
+    local status=$?
+    local message="    - subutai agent installed on $container"
     if [ $status == "0" ]; then
       msg_info "$message"
     else
