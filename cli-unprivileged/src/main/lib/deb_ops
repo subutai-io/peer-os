@@ -245,5 +245,5 @@ function is_package_installed {
     msg_error "package name is not provided. Aborting ..."
     exit 1
   fi
-  dpkg-query -Wf'${db:Status-abbrev}' $1 2>/dev/null | grep -q '^ii'
+  sudo dpkg-query -Wf'${db:Status-abbrev}' $1 2>/dev/null | grep -q '^ii'
 }

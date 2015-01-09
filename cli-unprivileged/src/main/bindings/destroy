@@ -127,8 +127,8 @@ function destroy {
  
   # Check if the package is installed
   is_package_installed $package_name
-  if [ $? = 0  ]; then
-    apt-get --assume-yes --force-yes purge $package_name
+  if [ $? == 0  ]; then
+    sudo apt-get --assume-yes --force-yes purge $package_name
   fi
 
   # (4) & (5) release all holds on clone's rootfs snaps and delete snaps
