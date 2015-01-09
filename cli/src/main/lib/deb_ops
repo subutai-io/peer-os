@@ -121,7 +121,8 @@ function create_control_file {
   local parent_package_name=`get_package_name $parent`
 
   if [ "$lxc" != "master" ]; then
-    dependency="$dependency, $parent_package_name (= $SUBUTAI_VERSION)"
+    local parent_version=$(get_parent_template_version $lxc)
+    dependency="$dependency, $parent_package_name (= $parent_version)"
   fi
    
   # These properties are needed inside control file of debian package
@@ -268,6 +269,22 @@ function get_exported_package_version {
 }
 
 
+function get_parent_template_version {
+  local child=$1
+  local child_config="/var/lib/lxc/$child/config"
+  local parent=`cat $child_config | grep subutai.parent | awk '{print $3}'`
+  local config="/var/lib/lxc/$parent/config"
+  local parent_version=`cat $config | grep subutai.template.package | awk '{print $3}' | sed 's/.*\///' | cut -d'_' -f2`
+
+  if [ -z "$parent_version" ]; then
+    echo "$SUBUTAI_VERSION"
+  else
+    echo "$parent_version"
+  fi
+  return
+}
+
+
 function is_package_installed {
   if [ -z "$1" ]; then
     msg_error "package name is not provided. Aborting ..."
@@ -275,6 +292,7 @@ function is_package_installed {
   fi
   dpkg-query -Wf'${db:Status-abbrev}' $1 2>/dev/null | grep -q '^ii'
 }
+
 
 function assert_version_validity(){
   local version=$1
