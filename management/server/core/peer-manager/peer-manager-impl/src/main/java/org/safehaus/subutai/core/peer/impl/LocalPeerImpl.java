@@ -709,6 +709,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     @Override
+    public ResourceHost getResourceHostByContainerId( final String hostId ) throws HostNotFoundException
+    {
+        ContainerHost c = getContainerHostById( hostId );
+        ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) c;
+        return containerHostEntity.getParent();
+    }
+
+
+    @Override
     public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId )
     {
         Set<ContainerHost> result = new HashSet<>();
