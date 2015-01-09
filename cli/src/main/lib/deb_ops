@@ -271,7 +271,9 @@ function get_exported_package_version {
 
 function get_parent_template_version {
   local child=$1
-  local config="/var/lib/lxc/$child/config"
+  local child_config="/var/lib/lxc/$child/config"
+  local parent=`cat $child_config | grep subutai.parent | awk '{print $3}'`
+  local config="/var/lib/lxc/$parent/config"
   local parent_version=`cat $config | grep subutai.template.package | awk '{print $3}' | sed 's/.*\///' | cut -d'_' -f2`
 
   if [ -z "$parent_version" ]; then
