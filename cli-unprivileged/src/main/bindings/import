@@ -190,7 +190,7 @@ function import {
   lxc_config=$lxc_home/config
   deltas=$debian_root/deltas
 
-  fs_volume_create $lxc_home
+  fs_volume_create_sudo $lxc_home
   #mkdir -p $lxc_rootfs
   msg_info "    - lxc_rootfs = $lxc_rootfs"
   sudo cp $config $lxc_home;
