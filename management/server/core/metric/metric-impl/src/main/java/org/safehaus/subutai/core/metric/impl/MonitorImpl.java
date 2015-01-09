@@ -10,12 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-<<<<<<< HEAD
-import javax.persistence.EntityManager;
-import javax.sql.DataSource;
-=======
 import javax.persistence.EntityManagerFactory;
->>>>>>> master
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
@@ -61,27 +56,18 @@ public class MonitorImpl implements Monitor
             Collections.newSetFromMap( new ConcurrentHashMap<AlertListener, Boolean>() );
     private final Commands commands = new Commands();
     private final PeerManager peerManager;
-    private   EntityManager entityManager;
+
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
 
 
     public MonitorImpl( PeerManager peerManager, EntityManagerFactory emf ) throws MonitorException
     {
-<<<<<<< HEAD
-        Preconditions.checkNotNull( dataSource, "Data source is null" );
-        Preconditions.checkNotNull( peerManager, "Peer manager is null" );
-
-        try
-        {
-            this.monitorDao = new MonitorDao( dataSource );
-=======
         Preconditions.checkNotNull( peerManager, "Peer manager is null" );
         Preconditions.checkNotNull( emf, "EntityManagerFactory is null." );
         try
         {
             this.monitorDao = new MonitorDao( emf );
->>>>>>> master
             this.peerManager = peerManager;
             peerManager.addRequestListener( new RemoteAlertListener( this ) );
             peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
@@ -91,21 +77,9 @@ public class MonitorImpl implements Monitor
         {
             throw new MonitorException( e );
         }
-<<<<<<< HEAD
-    }
-
-    public EntityManager getEntityManager()
-    {
-        return entityManager;
-=======
->>>>>>> master
     }
 
 
-    public void setEntityManager( final EntityManager entityManager )
-    {
-        this.entityManager = entityManager;
-    }
     @Override
     public Set<ContainerHostMetric> getContainerHostsMetrics( final Environment environment ) throws MonitorException
     {

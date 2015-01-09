@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.exception.DaoException;
@@ -26,24 +26,9 @@ public class MonitorDao
     private SubscriberDataService dataService;
 
 
-<<<<<<< HEAD
-
-    public MonitorDao( final DataSource dataSource ) throws DaoException
-    {
-        Preconditions.checkNotNull( dataSource, "Data source is null" );
-
-        this.dbUtil = new DbUtil( dataSource );
-
-        setupDb();
-    }
-
-
-    public MonitorDao( EntityManager em ) throws DaoException
-=======
     public MonitorDao( EntityManagerFactory emf ) throws DaoException
->>>>>>> master
     {
-        this.dataService = new SubscriberDataService( em );
+        this.dataService = new SubscriberDataService( emf );
     }
 
 
@@ -53,13 +38,9 @@ public class MonitorDao
         Preconditions.checkNotNull( environmentId, INVALID_ENV_ID );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), "Invalid subscriber id" );
 
-<<<<<<< HEAD
-        dataService.update( environmentId.toString(), subscriberId );
-=======
 
         dataService.update( environmentId.toString(), subscriberId );
 
->>>>>>> master
     }
 
 
@@ -69,10 +50,7 @@ public class MonitorDao
         Preconditions.checkNotNull( environmentId, INVALID_ENV_ID );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), "Invalid subscriber id" );
 
-<<<<<<< HEAD
-=======
 
->>>>>>> master
         dataService.remove( environmentId.toString(), subscriberId );
 
     }

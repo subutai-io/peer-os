@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
@@ -45,16 +46,16 @@ public class MonitorDaoTest
 
     MonitorDaoExt monitorDao;
 
-    private EntityManager em;
+    private EntityManagerFactory emf;
 
 
     static class MonitorDaoExt extends MonitorDao
     {
 
 
-        public MonitorDaoExt( final EntityManager em ) throws DaoException
+        public MonitorDaoExt( final EntityManagerFactory emf ) throws DaoException
         {
-            super( em );
+            super( emf );
         }
 
 
@@ -67,15 +68,16 @@ public class MonitorDaoTest
 
     private void throwDbException() throws SQLException
     {
+        EntityManagerFactory emf = mock( EntityManagerFactory.class );
         EntityManager em = mock( EntityManager.class );
         EntityManager em1 = mock( EntityManager.class );
         EntityTransaction transaction = mock( EntityTransaction.class );
         when( transaction.isActive() ).thenReturn( false );
         when( em.getTransaction() ).thenThrow( new PersistenceException() ).thenReturn( transaction );
-
+        when( emf.createEntityManager() ).thenReturn( em1 ).thenReturn( em );
         try
         {
-            monitorDao = new MonitorDaoExt( em );
+            monitorDao = new MonitorDaoExt( emf );
         }
         catch ( DaoException e )
         {
@@ -91,9 +93,9 @@ public class MonitorDaoTest
     @Before
     public void setUp() throws Exception
     {
-        em = Persistence.createEntityManagerFactory( "default" ).createEntityManager() ;
+        emf = Persistence.createEntityManagerFactory( "default" );
 
-        monitorDao = new MonitorDaoExt( em );
+        monitorDao = new MonitorDaoExt( emf );
         monitorDao.setDbUtil( dbUtil );
     }
 
