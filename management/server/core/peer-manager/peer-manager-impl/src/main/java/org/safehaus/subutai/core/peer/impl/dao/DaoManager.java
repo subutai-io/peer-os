@@ -14,6 +14,26 @@ public class DaoManager
     private EntityManagerFactory entityManagerFactory;
 
 
+    public DaoManager()
+    {
+        //Destroy
+    }
+
+    public void init()
+    {
+        //Init
+    }
+    public void destroy()
+    {
+        if(entityManagerFactory!=null)
+        {
+            if(entityManagerFactory.isOpen())
+            {
+                entityManagerFactory.close();
+            }
+        }
+    }
+
     public EntityManager getEntityManager()
     {
         return entityManagerFactory.createEntityManager();

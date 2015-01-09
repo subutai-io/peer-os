@@ -73,9 +73,6 @@ public class PeerManagerImpl implements PeerManager
         this.messenger = messenger;
     }
 
-
-
-
     public void setHostRegistry( final HostRegistry hostRegistry )
     {
         this.hostRegistry = hostRegistry;

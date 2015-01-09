@@ -17,7 +17,7 @@
   </bean>
   <!-- ***************************************************************** -->
   <bean id="daoManager" init-method="init" destroy-method="destroy" scope="singleton"
-        class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
+        class="org.safehaus.subutai.core.peer.impl.dao.DaoManager">
     <jpa:unit unitname="peerManagerPUnit" property="entityManagerFactory" />
     <tx:transaction method="*" value="Required"/>
   </bean>
