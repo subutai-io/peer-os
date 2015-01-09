@@ -26,17 +26,56 @@ public interface QuotaManager
      */
     public PeerQuotaInfo getQuota( String containerName, QuotaType quotaType ) throws QuotaException;
 
-    //TODO add simplifed quota management functions and expose them in Peer
 
+    /**
+     * Returns RAM quota on container in megabytes
+     *
+     * @param containerId - id of container
+     *
+     * @return - quota in mb
+     */
     public int getRamQuota( UUID containerId ) throws QuotaException;
 
+    /**
+     * Sets RAM quota on container in megabytes
+     *
+     * @param containerId - id of container
+     * @param ramInMb - quota in mb
+     */
     public void setRamQuota( UUID containerId, int ramInMb ) throws QuotaException;
 
+
+    /**
+     * Returns CPU quota on container in percent
+     *
+     * @param containerId - id of container
+     *
+     * @return - cpu quota on container in percent
+     */
     public int getCpuQuota( UUID containerId ) throws QuotaException;
 
+    /**
+     * Sets CPU quota on container in percent
+     *
+     * @param containerId - id of container
+     * @param cpuPercent - cpu quota in percent
+     */
     public void setCpuQuota( UUID containerId, int cpuPercent ) throws QuotaException;
 
-    public Set<Integer> getCpuSet(UUID containerId) throws QuotaException;
+    /**
+     * Returns allowed cpus/cores ids on container
+     *
+     * @param containerId - id of container
+     *
+     * @return - allowed cpu set
+     */
+    public Set<Integer> getCpuSet( UUID containerId ) throws QuotaException;
 
-    public void setCpuSet(UUID containerId, Set<Integer> cpuSet) throws QuotaException;
+    /**
+     * Sets allowed cpus/cores on container
+     *
+     * @param containerId - id of container
+     * @param cpuSet - allowed cpu set
+     */
+    public void setCpuSet( UUID containerId, Set<Integer> cpuSet ) throws QuotaException;
 }
