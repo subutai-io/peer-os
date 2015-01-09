@@ -21,7 +21,7 @@ function fs_send_recv_clone {
   rm $tmp_parent-*.delta
 }
 
-function fs_volume_create_sudo{
+function fs_volume_create_sudo {
   local dst_home="$1"
   sudo btrfs subvolume create $dst_home 1>/dev/null
 }
