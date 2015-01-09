@@ -283,6 +283,8 @@ function get_parent_template_version {
   fi
   return
 }
+
+
 function is_package_installed {
   if [ -z "$1" ]; then
     msg_error "package name is not provided. Aborting ..."
@@ -290,6 +292,7 @@ function is_package_installed {
   fi
   dpkg-query -Wf'${db:Status-abbrev}' $1 2>/dev/null | grep -q '^ii'
 }
+
 
 function assert_version_validity(){
   local version=$1
