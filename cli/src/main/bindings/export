@@ -5,7 +5,7 @@ function export_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Exports a template as a debian pkg
   echo
-  echo "        "subutai export template
+  echo "        "subutai export template \[-v version\]
   echo
   echo -----------------------------------------------------------------------
 }
@@ -32,7 +32,7 @@ function export {
 
   OPTIND=0
   local container="$1"
-  lxc_assert $container "`usage`"
+  lxc_assert "$container" "`usage`"
 
   if [ "$container" == "master" ]; then
     echo "Please use master_export command!"
