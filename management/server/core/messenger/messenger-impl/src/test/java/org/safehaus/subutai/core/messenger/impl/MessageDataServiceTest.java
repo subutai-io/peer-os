@@ -4,6 +4,8 @@ package org.safehaus.subutai.core.messenger.impl;
 import java.io.PrintStream;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
@@ -30,7 +32,11 @@ public class MessageDataServiceTest
 {
     private static final String ID = "id";
     @Mock
+    EntityManagerFactory entityManagerFactory;
+    @Mock
     EntityManager entityManager;
+    @Mock
+    EntityTransaction transaction;
     @Mock
     TypedQuery typedQuery;
     @Mock
@@ -46,11 +52,14 @@ public class MessageDataServiceTest
     @Before
     public void setUp() throws Exception
     {
+        when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
+        when( entityManager.getTransaction() ).thenReturn( transaction );
+        when( transaction.isActive() ).thenReturn( true );
         when( entityManager.createQuery( anyString() ) ).thenReturn( query );
         when( entityManager.createQuery( anyString(), eq( String.class ) ) ).thenReturn( typedQuery );
         when( entityManager.createQuery( anyString(), eq( MessageEntity.class ) ) ).thenReturn( typedQuery );
 
-        messageDataService = new MessageDataService( entityManager );
+        messageDataService = new MessageDataService( entityManagerFactory );
 
         reset( exception );
     }
@@ -58,7 +67,7 @@ public class MessageDataServiceTest
 
     private void throwException()
     {
-        //doThrow( exception ).when( transaction ).begin();
+        doThrow( exception ).when( transaction ).begin();
     }
 
 

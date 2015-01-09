@@ -23,6 +23,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import javax.persistence.EntityManagerFactory;
 
 
 @RunWith( MockitoJUnitRunner.class )
@@ -39,7 +40,7 @@ public class MessengerDaoTest
 
 
     @Mock
-    EntityManager entityManager;
+    EntityManagerFactory entityManagerFactory;
     @Mock
     MessageDataService messageDataService;
     @Mock
@@ -54,7 +55,7 @@ public class MessengerDaoTest
     @Before
     public void setUp() throws Exception
     {
-        messengerDao = new MessengerDao( entityManager );
+        messengerDao = new MessengerDao( entityManagerFactory );
         messengerDao.messageDataService = messageDataService;
         message = new MessageImpl( SOURCE_PEER_ID, PAYLOAD );
         envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE );

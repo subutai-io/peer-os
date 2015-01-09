@@ -17,12 +17,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.aries.transaction</groupId>
-      <artifactId>org.apache.aries.transaction.manager</artifactId>
-      <version>1.1.0</version>
-    </dependency>
-
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
