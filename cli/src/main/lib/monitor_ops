@@ -1348,7 +1348,7 @@ function ram_alert {
     msg_info "Ram alert threshold $ram_alert_threshold_bytes is exceeded with usage $average_used_ram($metricCountToAverageToAlert)!"
     local url=`build_rest_url monitor/alert`
     local current_metrics=$(subutai monitor $lxc)
-    curl --data "$current_metrics" "$url"
+    curl --data "metric=$current_metrics" "$url"
   else
     msg_info "Ram usage $average_used_ram($metricCountToAverageToAlert) is lower than threshold $ram_alert_threshold_bytes"
   fi
@@ -1385,7 +1385,7 @@ function cpu_alert {
     msg_info "Cpu alert threshold $cpu_alert_threshold_nanoseconds is exceeded with usage $average_cpu_usage_between_samples($metricCountToAverageToAlert)!"
     local url=`build_rest_url monitor/alert`
     local current_metrics=$(subutai monitor $lxc)
-    curl --data "$current_metrics" "$url"
+    curl --data "metric=$current_metrics" "$url"
   else
     msg_info "Cpu usage $average_cpu_usage_between_samples($metricCountToAverageToAlert) is lower than threshold $cpu_alert_threshold_nanoseconds"
   fi
@@ -1423,7 +1423,7 @@ function disk_alert {
     msg_info "Disk alert threshold $disk_alert_threshold_bytes is exceeded with usage $average_used_disk($metricCountToAverageToAlert)!"
     local url=`build_rest_url monitor/alert`
     local current_metrics=$(subutai monitor $lxc)
-    curl --data "$current_metrics" "$url"
+    curl --data "metric=$current_metrics" "$url"
   else
     msg_info "Disk usage $average_used_disk($metricCountToAverageToAlert) is lower than threshold $disk_alert_threshold_bytes"
   fi
