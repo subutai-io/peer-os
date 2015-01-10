@@ -66,9 +66,9 @@ import org.safehaus.subutai.core.peer.impl.dao.ContainerHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.ManagementHostDataService;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.dao.ResourceHostDataService;
-import org.safehaus.subutai.core.peer.impl.model.ContainerHostEntity;
-import org.safehaus.subutai.core.peer.impl.model.ManagementHostEntity;
-import org.safehaus.subutai.core.peer.impl.model.ResourceHostEntity;
+import org.safehaus.subutai.core.peer.impl.entity.ContainerHostEntity;
+import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
+import org.safehaus.subutai.core.peer.impl.entity.ResourceHostEntity;
 import org.safehaus.subutai.core.peer.impl.task.CloneTaskImpl;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -709,6 +709,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     @Override
+    public ResourceHost getResourceHostByContainerId( final String hostId ) throws HostNotFoundException
+    {
+        ContainerHost c = getContainerHostById( hostId );
+        ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) c;
+        return containerHostEntity.getParent();
+    }
+
+
+    @Override
     public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId )
     {
         Set<ContainerHost> result = new HashSet<>();
@@ -1220,6 +1229,93 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 host.setPeer( this );
             }
             host.updateHostInfo( resourceHostInfo );
+        }
+    }
+
+
+    // ********** Quota functions *****************
+
+
+    @Override
+    public int getRamQuota( final UUID containerId ) throws PeerException
+    {
+        try
+        {
+            return quotaManager.getRamQuota( containerId );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public void setRamQuota( final UUID containerId, final int ramInMb ) throws PeerException
+    {
+        try
+        {
+            quotaManager.setRamQuota( containerId, ramInMb );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public int getCpuQuota( final UUID containerId ) throws PeerException
+    {
+        try
+        {
+            return quotaManager.getCpuQuota( containerId );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public void setCpuQuota( final UUID containerId, final int cpuPercent ) throws PeerException
+    {
+        try
+        {
+            quotaManager.setCpuQuota( containerId, cpuPercent );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public Set<Integer> getCpuSet( final UUID containerId ) throws PeerException
+    {
+        try
+        {
+            return quotaManager.getCpuSet( containerId );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
+        }
+    }
+
+
+    @Override
+    public void setCpuSet( final UUID containerId, final Set<Integer> cpuSet ) throws PeerException
+    {
+        try
+        {
+            quotaManager.setCpuSet( containerId, cpuSet );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( e );
         }
     }
 }

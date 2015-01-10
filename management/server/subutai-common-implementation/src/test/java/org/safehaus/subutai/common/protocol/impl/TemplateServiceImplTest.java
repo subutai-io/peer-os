@@ -30,13 +30,11 @@ public class TemplateServiceImplTest
 
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateServiceImplTest.class.getName() );
 
-    //    private EntityManager em;
     private EntityManagerFactory emf;
-    //    private EntityTransaction tx;
 
     private TemplateServiceImpl templateServiceImpl;
 
-
+    /*
     @Before
     public void setUp() throws Exception
     {
@@ -146,4 +144,5 @@ public class TemplateServiceImplTest
         Template savedTemplate = templateServiceImpl.getTemplate( template.getTemplateName(), template.getLxcArch() );
         assertEquals( template, savedTemplate );
     }
+    */
 }
