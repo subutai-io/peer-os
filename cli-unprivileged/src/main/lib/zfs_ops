@@ -7,17 +7,17 @@
 
 function fs_send_recv_clone {
   local parent="$1"
-  local tmp_path="$HOME/.local/tmpdir/"
-  local tmp_parent="$tmp_path$parent"
-  mkdir -p $HOME/.local/tmpdir/$parent
-  sudo zfs send /lxc-data/$parent-home > $tmp_parent-home.delta
-  sudo zfs send /lxc-data/$parent-var > $tmp_parent-var.delta
-  sudo zfs send /lxc/$parent-opt > $tmp_parent-opt.delta
-  sudo zfs send /var/lib/lxc/$parent/rootfs > $tmp_parent-rootfs.delta
-  sudo zfs recv $tmp_path$parent < $tmp_parent-rootfs.delta
-  sudo zfs recv $tmp_path < $tmp_parent-opt.delta
-  sudo zfs recv $tmp_path < $tmp_parent-var.delta
-  sudo zfs recv $tmp_path < $tmp_parent-home.delta
+  local tmp_path="$HOME/.local/tmpdir"
+  tmp_path=${tmp_path#"/"}
+  local tmp_parent="$tmp_path/$parent"
+  sudo zfs send lxc-data/$parent-home > $tmp_parent-home.delta
+  sudo zfs send lxc-data/$parent-var > $tmp_parent-var.delta
+  sudo zfs send lxc/$parent-opt > $tmp_parent-opt.delta
+  sudo zfs send lxc/$parent > $tmp_parent-rootfs.delta
+  sudo zfs recv $tmp_path/$parent < $tmp_parent-rootfs.delta
+  sudo zfs recv $tmp_path/$parent-opt < $tmp_parent-opt.delta
+  sudo zfs recv $tmp_path/$parent-var < $tmp_parent-var.delta
+  sudo zfs recv $tmp_path/$parent-home < $tmp_parent-home.delta
   rm $tmp_parent-*.delta
 }
 
@@ -27,7 +27,7 @@ function fs_volume_create_sudo {
 }
 function fs_volume_create {
   local dst_home="$1"
-  zfs create $dst_home 1>/dev/null
+  sudo zfs create $dst_home 1>/dev/null
 }
 
 function fs_volume_delete {
@@ -81,13 +81,13 @@ function fs_take_snapshot_from_parent {
     #sudo cp -R  /var/lib/lxc/$parent/rootfs $HOME/.local/share/lxc/$child_ds
   fi
 }
-#TODO
+#PROGRESS
 function fs_clone {
   local parent_snap="$1"
   local child_ds="$2"
   sudo zfs clone "$parent_snap" "$child_ds"
 }
-#TODO
+#PROGRESS
 function fs_set_mountpoint {
   local child_roofs="$1"
   local child="$2"
@@ -307,7 +307,7 @@ function fs_assert_nosnap {
   fi
 }
 
-#TODO
+#PROGRESS
 # assert snapshot (arg $1) exists, if it does NOT show usage (arg $2)
 # warning: exits!
 function fs_assert_snap {
