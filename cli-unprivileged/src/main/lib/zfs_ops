@@ -10,10 +10,10 @@ function fs_send_recv_clone {
   local tmp_path="$HOME/.local/tmpdir"
   tmp_path=${tmp_path#"/"}
   local tmp_parent="$tmp_path/$parent"
-  sudo zfs send lxc-data/$parent-home > /$tmp_parent-home.delta
-  sudo zfs send lxc-data/$parent-var > /$tmp_parent-var.delta
-  sudo zfs send lxc/$parent-opt > /$tmp_parent-opt.delta
-  sudo zfs send lxc/$parent > /$tmp_parent-rootfs.delta
+  sudo zfs send lxc-data/$parent-home@template > /$tmp_parent-home.delta
+  sudo zfs send lxc-data/$parent-var@template > /$tmp_parent-var.delta
+  sudo zfs send lxc/$parent-opt@template > /$tmp_parent-opt.delta
+  sudo zfs send lxc/$parent@template > /$tmp_parent-rootfs.delta
   sudo zfs recv $tmp_path/$parent < /$tmp_parent-rootfs.delta
   sudo zfs recv $tmp_path/$parent-opt < /$tmp_parent-opt.delta
   sudo zfs recv $tmp_path/$parent-var < /$tmp_parent-var.delta
