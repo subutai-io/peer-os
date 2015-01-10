@@ -242,7 +242,7 @@ function lxc_clone {
 
   local parent_home=`lxc_find_parent_dir $parent`
   local parent_conf=$parent_home/config
-  local child_home=/$HOME/.local/share/lxc/$child
+  local child_home=$HOME/.local/share/lxc/$child
   local child_rootfs=$child_home/rootfs
   local child_conf=$child_home/config
 
@@ -266,7 +266,9 @@ function lxc_clone {
   fi
   # (2) setup skeleton of new cloned child container
   fs_volume_create $child_home
-  
+
+  lxc_chown $child > /dev/null 2>&1
+
   local mac=`lxc_new_mac`
   #TODO sed failed
   sudo cat $parent_conf | grep -v subutai.template.package 		   \

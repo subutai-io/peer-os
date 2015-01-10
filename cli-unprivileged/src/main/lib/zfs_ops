@@ -7,26 +7,31 @@
 
 function fs_send_recv_clone {
   local parent="$1"
-  local tmp_path="$HOME/.local/tmpdir"
-  tmp_path=${tmp_path#"/"}
-  local tmp_parent="$tmp_path/$parent"
-  sudo zfs send lxc-data/$parent-home@template > /$tmp_parent-home.delta
-  sudo zfs send lxc-data/$parent-var@template > /$tmp_parent-var.delta
-  sudo zfs send lxc/$parent-opt@template > /$tmp_parent-opt.delta
-  sudo zfs send lxc/$parent@template > /$tmp_parent-rootfs.delta
-  sudo zfs recv $tmp_path/$parent < /$tmp_parent-rootfs.delta
-  sudo zfs recv $tmp_path/$parent-opt < /$tmp_parent-opt.delta
-  sudo zfs recv $tmp_path/$parent-var < /$tmp_parent-var.delta
-  sudo zfs recv $tmp_path/$parent-home < /$tmp_parent-home.delta
-  rm /$tmp_parent-*.delta
+  ls $HOME/.local/tmpdir/$parent > /dev/null 2>&1
+  if [ $? != 0 ]; then
+    local tmp_path="$HOME/.local/tmpdir"
+    tmp_path=${tmp_path#"/"}
+    local tmp_parent="$tmp_path/$parent"
+    sudo zfs send lxc-data/$parent-home@template > /$tmp_parent-home.delta
+    sudo zfs send lxc-data/$parent-var@template > /$tmp_parent-var.delta
+    sudo zfs send lxc/$parent-opt@template > /$tmp_parent-opt.delta
+    sudo zfs send lxc/$parent@template > /$tmp_parent-rootfs.delta
+    sudo zfs recv $tmp_path/$parent < /$tmp_parent-rootfs.delta
+    sudo zfs recv $tmp_path/$parent-opt < /$tmp_parent-opt.delta
+    sudo zfs recv $tmp_path/$parent-var < /$tmp_parent-var.delta
+    sudo zfs recv $tmp_path/$parent-home < /$tmp_parent-home.delta
+    rm /$tmp_parent-*.delta
+  fi
 }
 
 function fs_volume_create_sudo {
   local dst_home="$1"
+  dst_home=${dst_home#"/"}
   sudo zfs create $dst_home 1>/dev/null
 }
 function fs_volume_create {
   local dst_home="$1"
+  dst_home=${dst_home#"/"}
   sudo zfs create $dst_home 1>/dev/null
 }
 
@@ -83,15 +88,20 @@ function fs_take_snapshot_from_parent {
 }
 #PROGRESS
 function fs_clone {
-  local parent_snap="$1"
-  local child_ds="$2"
+  local parent_snap=`echo "$1" | awk -F"/" '{print $2}'`
+  parent_snap="$HOME/.local/tmpdir/$parent_snap"
+  parent_snap=${parent_snap#"/"}
+  local child_ds="$HOME/.local/$2"
+  child_ds=${child_ds#"/"}
   sudo zfs clone "$parent_snap" "$child_ds"
 }
 #PROGRESS
 function fs_set_mountpoint {
   local child_roofs="$1"
   local child="$2"
-  sudo zfs set mountpoint=$child_rootfs lxc/$child
+  local home=$HOME
+  home=${home#"/"}
+  sudo zfs set mountpoint=$child_rootfs $home/.local/lxc/$child
 }
 #TODO
 function fs_addmount {
