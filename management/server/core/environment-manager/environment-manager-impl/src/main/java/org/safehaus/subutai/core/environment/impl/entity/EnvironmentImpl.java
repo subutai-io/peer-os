@@ -2,8 +2,10 @@ package org.safehaus.subutai.core.environment.impl.entity;
 
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -21,8 +23,9 @@ import javax.persistence.Table;
 
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
-import org.safehaus.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+
+import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
 
@@ -51,6 +54,18 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Column( name = "public_key", length = 3000 )
     private String publicKey;
+
+    @Column( name = "subnetCidr" )
+    private String subnetCidr;
+
+    @Column( name = "lastUsedIpIndex" )
+    private int lastUsedIpIndex;
+
+    @Column( name = "peerVlanId" )
+    private Map<UUID, Integer> peerVlanId = new HashMap<>();
+
+    @Column( name = "vni" )
+    private int vni;
 
 
     protected EnvironmentImpl()
@@ -137,6 +152,59 @@ public class EnvironmentImpl implements Environment, Serializable
     public void setPublicKey( String publicKey )
     {
         this.publicKey = publicKey;
+    }
+
+
+    @Override
+    public String getSubnetCidr()
+    {
+        return subnetCidr;
+    }
+
+
+    public void setSubnetCidr( String subnetCidr )
+    {
+        // this ctor checks CIDR notation format validity
+        SubnetUtils cidr = new SubnetUtils( subnetCidr );
+        this.subnetCidr = cidr.getInfo().getCidrSignature();
+    }
+
+
+    public int getLastUsedIpIndex()
+    {
+        return lastUsedIpIndex;
+    }
+
+
+    public void setLastUsedIpIndex( int lastUsedIpIndex )
+    {
+        this.lastUsedIpIndex = lastUsedIpIndex;
+    }
+
+
+    @Override
+    public Map<UUID, Integer> getPeerVlanId()
+    {
+        return peerVlanId;
+    }
+
+
+    public void setPeerVlanId( Map<UUID, Integer> peerVlanId )
+    {
+        this.peerVlanId = peerVlanId;
+    }
+
+
+    @Override
+    public int getVni()
+    {
+        return vni;
+    }
+
+
+    public void setVni( int vni )
+    {
+        this.vni = vni;
     }
 
 

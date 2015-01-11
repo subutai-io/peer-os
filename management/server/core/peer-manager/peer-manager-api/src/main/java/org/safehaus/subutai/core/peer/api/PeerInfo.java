@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.peer.api;
 
 
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -10,6 +11,7 @@ import java.util.UUID;
 public class PeerInfo
 {
     private String ip = "127.0.0.1";
+    private String gatewayIp;
 
     private PeerStatus status;
 
@@ -18,6 +20,9 @@ public class PeerInfo
     private UUID ownerId;
     //TODO implement setting of port
     private int port = 8181;
+
+    private int vlanId;
+    private int lastUsedVlanId = 100;
 
 
     public UUID getId()
@@ -68,6 +73,18 @@ public class PeerInfo
     }
 
 
+    public String getGatewayIp()
+    {
+        return gatewayIp;
+    }
+
+
+    public void setGatewayIp( String gatewayIp )
+    {
+        this.gatewayIp = gatewayIp;
+    }
+
+
     public PeerStatus getStatus()
     {
         return status;
@@ -84,4 +101,52 @@ public class PeerInfo
     {
         return port;
     }
+
+
+    public int getVlanId()
+    {
+        return vlanId;
+    }
+
+
+    public void setVlanId( int vlanId )
+    {
+        this.vlanId = vlanId;
+    }
+
+
+    public int getLastUsedVlanId()
+    {
+        return lastUsedVlanId;
+    }
+
+
+    public void setLastUsedVlanId( int lastUsedVlanId )
+    {
+        this.lastUsedVlanId = lastUsedVlanId;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode( this.id );
+        return hash;
+    }
+
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( obj instanceof PeerInfo )
+        {
+            PeerInfo other = ( PeerInfo ) obj;
+            return Objects.equals( this.id, other.id );
+        }
+        return false;
+    }
+
+
 }
+

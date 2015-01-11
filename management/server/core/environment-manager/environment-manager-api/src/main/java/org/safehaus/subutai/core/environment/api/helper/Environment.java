@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.environment.api.helper;
 
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,6 +35,15 @@ public interface Environment
 
 
     public void setPublicKey( String key );
+
+
+    public String getSubnetCidr();
+
+
+    public Map<UUID, Integer> getPeerVlanId();
+
+
+    public int getVni();
 
 
     public ContainerHost getContainerHostById( UUID uuid );

@@ -5,7 +5,11 @@ import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.sql.DataSource;
@@ -56,10 +60,12 @@ public class EnvironmentDAO
                 + "id));";
         String sql3 = "create table if not exists environment (source varchar(100), id uuid, info clob, "
                 + "PRIMARY KEY (source, id));";
+        String sql4 = "create table if not exists vni2vlan (vni int, vlanId int, PRIMARY KEY (vni));";
 
         dbUtil.update( sql1 );
         dbUtil.update( sql2 );
         dbUtil.update( sql3 );
+        dbUtil.update( sql4 );
     }
 
 
@@ -259,6 +265,83 @@ public class EnvironmentDAO
             throw new EnvironmentPersistenceException( e.getMessage() );
         }
         return null;
+    }
+
+
+    public void saveVniVlanMapping( int vni, int vlanId ) throws EnvironmentPersistenceException
+    {
+        try
+        {
+            dbUtil.update( "merge into vni2vlan(vni,vlanId) values (?, ?)", vni, vlanId );
+        }
+        catch ( SQLException ex )
+        {
+            LOG.error( "Failed to save vni-vlan mapping", ex );
+            throw new EnvironmentPersistenceException( ex.getMessage() );
+        }
+    }
+
+
+    public Map<Integer, Set<Integer>> getVniVlanMappings() throws EnvironmentPersistenceException
+    {
+        Map<Integer, Set<Integer>> res = new HashMap<>();
+        try
+        {
+            ResultSet rs = dbUtil.select( "select vni,vlanId from vni2vlan" );
+            while ( rs.next() )
+            {
+                int vni = rs.getInt( "vni" );
+                int vlanId = rs.getInt( "vlanId" );
+                Set<Integer> set = res.get( vni );
+                if ( set == null )
+                {
+                    set = new HashSet<>();
+                    res.put( vni, set );
+                }
+                set.add( vlanId );
+            }
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( "Failed to get vni-vlan mappings", e );
+            throw new EnvironmentPersistenceException( e.getMessage() );
+        }
+        return res;
+    }
+
+
+    public boolean deleteVniVlanMapping( int vni, int vlanId ) throws EnvironmentPersistenceException
+    {
+        try
+        {
+            dbUtil.update( "delete from vni2vlan where vni=? and vlanId=?", vni, vlanId );
+            return true;
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( "Failed to delete vni-vlan mapping", e );
+            throw new EnvironmentPersistenceException( e.getMessage() );
+        }
+    }
+
+
+    public Set<Integer> getVlanSet( int vni ) throws EnvironmentPersistenceException
+    {
+        Set<Integer> res = new HashSet<>();
+        try
+        {
+            ResultSet rs = dbUtil.select( "select vlanId from vni2vlan where vni=?", vni );
+            if ( rs.next() )
+            {
+                res.add( rs.getInt( 1 ) );
+            }
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( "Failed to get vlan's for vni", e );
+            throw new EnvironmentPersistenceException( e.getMessage() );
+        }
+        return res;
     }
 }
 
