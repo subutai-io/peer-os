@@ -32,6 +32,7 @@ import com.vaadin.event.FieldEvents;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
@@ -137,7 +138,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
             }
         } );
 
-        Button networkBtn = new Button( "Network setup" );
+        Button networkBtn = new Button( "Network settings" );
         networkBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -254,6 +255,8 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private Window genNetworkConfigurationWindow( final EnvironmentBuildProcess process )
     {
         Window window = createWindow( "Network settings" );
+        Layout layout = new VerticalLayout();
+        window.setContent( layout );
 
         final N2NConnectionImpl n2n = N2NConnectionImpl.newCopy( process.getN2nConnection() );
         final TunnelImpl tunnel = TunnelImpl.newCopy( process.getTunnel() );
@@ -270,6 +273,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 n2n.superNodeIp = event.getText();
             }
         } );
+        layout.addComponent( txtSuperNodeIp );
 
         TextField txtSuperNodePort = new TextField( "Super node port" );
         txtSuperNodePort.setValue( Integer.toString( n2n.superNodePort ) );
@@ -288,6 +292,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 }
             }
         } );
+        layout.addComponent( txtSuperNodePort );
 
         TextField txtLocalIp = new TextField( "Local IP" );
         txtLocalIp.setValue( n2n.localIp );
@@ -299,6 +304,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 n2n.localIp = event.getText();
             }
         } );
+        layout.addComponent( txtLocalIp );
 
         TextField txtInterfaceName = new TextField( "Interface name" );
         txtInterfaceName.setValue( n2n.interfaceName );
@@ -310,6 +316,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 n2n.interfaceName = event.getText();
             }
         } );
+        layout.addComponent( txtInterfaceName );
 
         TextField txtCommunityName = new TextField( "Community name" );
         txtCommunityName.setValue( n2n.communityName );
@@ -321,6 +328,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 n2n.communityName = event.getText();
             }
         } );
+        layout.addComponent( txtCommunityName );
 
         TextField txtKeyFilePath = new TextField( "Key file path" );
         txtKeyFilePath.setValue( process.getKeyFilePath() );
@@ -332,6 +340,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 process.setKeyFilePath( event.getText() );
             }
         } );
+        layout.addComponent( txtKeyFilePath );
 
         TextField txtTunnelName = new TextField( "Tunnel name" );
         txtTunnelName.setValue( process.getTunnel().getTunnelName() );
@@ -343,7 +352,9 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 tunnel.tunnelName = event.getText();
             }
         } );
+        layout.addComponent( txtTunnelName );
 
+        contentRoot.getUI().addWindow( window );
         return window;
     }
 
@@ -417,12 +428,6 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     }
 
 
-    private void configureEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
-    {
-        //TODO: configure code
-    }
-
-
     @Override
     public void onExecutionEvent( final BuildProcessExecutionEvent event )
     {
@@ -439,7 +444,6 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
             public void run()
             {
                 Item row = environmentsTable.getItem( event.getEnvironmentBuildProcess().getId() );
-                EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
                 if ( row != null )
                 {
                     Property p = row.getItemProperty( STATUS );
@@ -450,29 +454,18 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         Embedded indicator = new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) );
                         indicator.setId( "indicator" );
                         p.setValue( indicator );
-
-
-                        //                        ebp.setProcessStatusEnum( ProcessStatusEnum.IN_PROGRESS );
-                        //                        module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.SUCCESS.equals( event.getEventType() ) )
                     {
                         p.setValue( new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) );
-
-                        //                        ebp.setProcessStatusEnum( ProcessStatusEnum.SUCCESSFUL );
-                        //                        module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.FAIL.equals( event.getEventType() ) )
                     {
                         Embedded error = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
                         p.setValue( error );
                         error.setId( "error" );
-
-                        //                        ebp.setProcessStatusEnum( ProcessStatusEnum.FAILED );
                     }
                 }
-
-                //                module.getEnvironmentManager().saveBuildProcess( ebp );
             }
         } );
     }
