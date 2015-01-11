@@ -214,11 +214,6 @@ generateRepoPackage() {
   TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
   ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
 
-  SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
-  TARGET="/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName"
-  PACK="/var/lib/jenkins/Automation/Automation_ISO/mgmt-repo/template-repo-package/"
-  ISOPATH="/var/lib/jenkins/Automation/Automation_ISO/work/custom-iso/pool/extras/"
-
   #it's template package operation
   if [[ $productName == *"template"* ]] || [[ $productName == *"plugin"*  ]]; then
     BASE=/var/lib/jenkins/Automation/Automation_ISO/Packages/$productName
@@ -311,7 +306,9 @@ generateTemplateRepo() {
   echo "Maintainer: <subut.ai>" >> $BASE/$templateName/DEBIAN/control
   echo "Priority: optional" >> $BASE/$templateName/DEBIAN/control
   echo "Description: This is subutai repo $purePackageName wrapper package" >> $BASE/$templateName/DEBIAN/control
-
+  echo "Homepage: http://www.safehaus.org" >> $BASE/$templateName/DEBIAN/control
+  echo "Section: devel" >> $BASE/$templateName/DEBIAN/control
+ 
   cp $currentPackage $BASE/$templateName/repo/ksks/amd64/trusty/
   mv $BASE/$templateName/ $BASE/subutai-repo-$shortCurrentPackage
 
