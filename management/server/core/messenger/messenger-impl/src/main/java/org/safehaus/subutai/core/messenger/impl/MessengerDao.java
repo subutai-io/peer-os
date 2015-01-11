@@ -9,7 +9,7 @@ import java.util.UUID;
 import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.core.messenger.impl.dao.MessageDataService;
-import org.safehaus.subutai.core.messenger.impl.model.MessageEntity;
+import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;

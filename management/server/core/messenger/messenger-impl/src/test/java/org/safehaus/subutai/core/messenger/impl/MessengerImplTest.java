@@ -89,7 +89,7 @@ public class MessengerImplTest
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
     }
 
-
+    /*
     @Test( expected = NullPointerException.class )
     public void testConstructor() throws Exception
     {
@@ -120,7 +120,7 @@ public class MessengerImplTest
 
         verify( messageSender ).init();
     }
-
+    */
 
     @Test
     public void testDestroy() throws Exception

@@ -68,3 +68,4 @@ export SUBUTAI_REST_PATH=cxf
 export SUBUTAI_REST_REGISTER_PATH=registry/templates/import
 export SUBUTAI_REST_GET_TEMPLATE_PATH=registry/templates
 export SUBUTAI_REST_LIST_TEMPLATES=$SUBUTAI_REST_GET_TEMPLATE_PATH/plain-list
+export SUBUTAI_REST_SCRIPT_PATH=scripts

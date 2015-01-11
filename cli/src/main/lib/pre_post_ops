@@ -1,0 +1,154 @@
+#!/bin/bash
+
+# ==========================================================================
+# Set of functions that provides functionality to run pre and post
+# execution scripts
+# ==========================================================================
+
+
+function execute_prescripts {
+  local scripts="$1"
+  local lxc="$2"
+  if [ -z "$scripts" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  if [ -z $lxc ]; then
+    msg_error "lxc name is not provided to ${FUNCNAME[0]}. Aborting!"
+    exit 1
+  fi
+
+  msg_info "    - ${FUNCNAME[0]} $scripts"
+
+  IFS=' ' read -a scriptArray <<< "$scripts"
+  for script in "${scriptArray[@]}"
+  do
+    # Remove unnecessary whitespaces if any
+    local script=$(echo " $script " | tr -d ' ')
+    run_script "$subutai_pre_script_base/$script" $lxc
+  done
+}
+
+
+function execute_all_prescripts {
+  local binding=$1
+  local lxc="$2"
+  if [ -z "$binding" ]; then
+    msg_error "No binding passed to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  if [ -z $lxc ]; then
+    msg_error "lxc name is not provided to ${FUNCNAME[0]}. Aborting!"
+    exit 1
+  fi
+
+  msg_info "    - ${FUNCNAME[0]} for $binding"
+
+  #Initialize scripts with all the scripts under subutai_pre_script_base 
+  # starting with pre-${FUNCNAME[0]}
+  shopt -s nullglob
+  local scriptArray=($subutai_pre_script_base/pre-$binding*)
+  for script in "${scriptArray[@]}"
+  do
+    # Remove unnecessary whitespaces if any
+   local script=$(echo " $script " | tr -d ' ')
+    run_script "$script" $lxc
+  done
+}
+
+
+function execute_postscripts {
+  local scripts="$1"
+  local lxc="$2"
+  if [ -z "$scripts" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  if [ -z $lxc ]; then
+    msg_error "lxc name is not provided to ${FUNCNAME[0]}. Aborting!"
+    exit 1
+  fi
+
+  msg_info "    - ${FUNCNAME[0]} $scripts"
+
+  IFS=' ' read -a scriptArray <<< "$scripts"
+  for script in "${scriptArray[@]}"
+  do
+    # Remove unnecessary whitespaces if any
+    local script=$(echo " $script " | tr -d ' ')
+    run_script "$subutai_post_script_base/$script" $lxc
+  done
+}
+
+
+function execute_all_postscripts {
+  local binding=$1
+  local lxc="$2"
+  if [ -z "$binding" ]; then
+    msg_error "No binding passed to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  if [ -z $lxc ]; then
+    msg_error "lxc name is not provided to ${FUNCNAME[0]}. Aborting!"
+    exit 1
+  fi
+  msg_info "    - ${FUNCNAME[0]} for $binding"
+
+  #TODO initialize scripts with all the scripts under subutai_pre_script_base 
+  # starting with pre-${FUNCNAME[0]}
+  scriptArray=($subutai_post_script_base/post-$binding*)
+  for script in "${scriptArray[@]}"
+  do
+    # Remove unnecessary whitespaces if any
+    local script=$(echo " $script " | tr -d ' ')
+    run_script "$script" $lxc
+  done
+}
+
+function run_script {
+  local script_directory=$1
+  local lxc=$2
+  if [ -z $script_directory ]; then
+    msg_error "script directory is not provided. Aborting!"
+    exit 1
+  fi
+
+  if [ -z $lxc ]; then
+    msg_error "lxc name is not provided to run $script_directory. Aborting!"
+    exit 1
+  fi
+  local message="      - running $script"
+  # copy the script to the container rootfs so that
+  # scripts cannot do anything on the server container itself
+  # but only on the LXC container
+  # and remove the script when finished
+  local runDirectory="/usr/share/subutai/scripts/"
+  local copyDirectory="/var/lib/lxc/$lxc/rootfs/$runDirectory"
+  if [ ! -f $script_directory ]; then
+    msg_error "$script_directory not found. Aborting..."
+    unlock_container_read $lxc
+    unlock_container_write $lxc
+    exit 1
+  fi
+  mkdir -p $copyDirectory
+  cp -a $script_directory $copyDirectory > /dev/null
+  # parse script name from the passed argument $script_directory
+  local script=$(echo $script_directory | sed 's/.*\///')
+  lxc-wait -n $lxc -s RUNNING
+  lxc-attach -n $lxc -- $runDirectory/$script
+  local status=$?
+  rm $copyDirectory/$script > /dev/null
+  
+  if [ $status == "0" ];then
+    msg_info "$message"
+  else
+    msg_error "$message"
+    unlock_container_read $lxc
+    unlock_container_write $lxc
+    exit 1
+  fi
+}

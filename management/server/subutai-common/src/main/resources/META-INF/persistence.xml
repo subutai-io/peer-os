@@ -2,8 +2,7 @@
 <persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
-  <persistence-unit name="commonUnit" transaction-type="RESOURCE_LOCAL">
-    <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
+  <persistence-unit name="commonServicePUnit" transaction-type="RESOURCE_LOCAL">
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/commonService)
     </non-jta-data-source>
     <class>org.safehaus.subutai.common.protocol.Template</class>
@@ -16,6 +15,4 @@
       <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)" />
     </properties>
   </persistence-unit>
-
-
 </persistence>

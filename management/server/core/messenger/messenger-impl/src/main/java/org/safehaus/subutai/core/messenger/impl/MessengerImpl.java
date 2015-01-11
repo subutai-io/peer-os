@@ -7,8 +7,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -19,6 +17,7 @@ import org.safehaus.subutai.core.messenger.api.MessageProcessor;
 import org.safehaus.subutai.core.messenger.api.MessageStatus;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.messenger.api.MessengerException;
+import org.safehaus.subutai.core.messenger.impl.dao.DaoManager;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
@@ -38,24 +37,34 @@ public class MessengerImpl implements Messenger, MessageProcessor
     protected final Set<MessageListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MessageListener, Boolean>() );
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
-    private final PeerManager peerManager;
+    private   PeerManager peerManager;
     protected MessengerDao messengerDao;
     protected MessageSender messageSender;
+    private DaoManager daoManager;
+    private EntityManagerFactory entityManagerFactory;
 
-
-    public MessengerImpl( final PeerManager peerManager, final EntityManagerFactory entityManagerFactory )
+    public MessengerImpl( )
             throws MessengerException
     {
-        Preconditions.checkNotNull( peerManager );
-        Preconditions.checkNotNull( entityManagerFactory );
-
+    }
+    public MessengerImpl(PeerManager peerManager,EntityManagerFactory entityManagerFactory  )
+            throws MessengerException
+    {
         this.peerManager = peerManager;
-        EntityManager entityManager = null;
+        this.entityManagerFactory = entityManagerFactory;
+    }
+    public void init( ) throws MessengerException
+    {
+        Preconditions.checkNotNull( peerManager );
+        Preconditions.checkNotNull( daoManager );
+
         try
         {
-            entityManager = entityManagerFactory.createEntityManager();
-            this.messengerDao = new MessengerDao( entityManagerFactory );
+            //entityManager = entityManagerFactory.createEntityManager();
+            this.messengerDao  = new MessengerDao( daoManager.getEntityManagerFactory());
             this.messageSender = new MessageSender( peerManager, messengerDao, this );
+
+            messageSender.init();
         }
         catch ( Exception e )
         {
@@ -64,24 +73,38 @@ public class MessengerImpl implements Messenger, MessageProcessor
         }
         finally
         {
-            if ( entityManager != null )
-            {
-                entityManager.close();
-            }
+
         }
     }
-
-
-    public void init()
-    {
-        messageSender.init();
-    }
-
 
     public void destroy()
     {
         messageSender.dispose();
         notificationExecutor.shutdown();
+    }
+
+
+    public PeerManager getPeerManager()
+    {
+        return peerManager;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
+    }
+
+
+    public DaoManager getDaoManager()
+    {
+        return daoManager;
+    }
+
+
+    public void setDaoManager( final DaoManager daoManager )
+    {
+        this.daoManager = daoManager;
     }
 
 

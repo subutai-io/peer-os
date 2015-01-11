@@ -1,15 +1,15 @@
 #!/bin/bash
 
 
-
 function clone_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Clone a new container instance from a temlate.
   echo
-  echo "        "subutai \[-qh\] clone parent child \[-e\|-m\]
+  echo "        "subutai \[-qh\] clone parent child \[-e environmentId\] \[-a \[post-execution-scripts\|\"all\"\] \[-m\] \]
   echo "          "parameters:
   echo "                    "e -- set environment id for container
   echo "                    "m -- starts monitoring of container
+  echo "                    "a -- after cloning container run the specified scripts
   echo
   echo -----------------------------------------------------------------------
 }
@@ -26,7 +26,7 @@ function clone {
   local child="$2"
 
   # Check that parent exists
-  lxc_assert "$parent" "`usage`"
+  lxc_assert "$parent" "`clone_usage`"
   # Check that container name is legal and it does not exist
   lxc_assert_name $child
   lxc_assert_no $child
@@ -49,14 +49,18 @@ function clone {
   local environmentId=""
   local monitor_enabled="false"
   shift_amount=0;
-  while getopts ":e:m" opt; do
+  while getopts ":e:a:m" opt; do
     case $opt in
       e)
-        environmentId=$OPTARG;
+        environmentId=$OPTARG
+        ;;
+      a)
+        postScriptsEnabled="true"
+        postScripts=$OPTARG
         ;;
       m)
-	monitor_enabled="true"
-	;;
+        monitor_enabled="true"
+        ;;
       \?)
         msg_error "Unrecognized option -$OPTARG"
         exit 1
@@ -73,14 +77,23 @@ function clone {
 
   # NOTE: underscore for our own lxc clone impl not supplied lxc-clone
   if [ -z "$environmentId" ]; then
-     environmentId="null"
+    environmentId="null"
   fi
 
   #cloning operation is starting..
-  lxc_clone $parent $child $environmentId "`usage`"
+  lxc_clone $parent $child $environmentId "`clone_usage`"
 
   ovs_configure_lxc $child
   git_child_branch $child
+
+  if [ "x$postScriptsEnabled" == "xtrue" ]; then
+    if [ "x$postScripts" == "xall" ]; then
+      execute_all_postscripts "${FUNCNAME[0]}" $child
+    else
+      execute_postscripts "$postScripts" $child
+    fi
+  fi
+  
   msg_ok "Successfully cloned $child container from $parent"
   unlock_container_write $child
   if [ $monitor_enabled == "true" ]; then

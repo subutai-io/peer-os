@@ -38,6 +38,7 @@ public interface LocalPeer extends Peer
     public ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException;
 
     public ResourceHost getResourceHostByContainerName( String containerName ) throws HostNotFoundException;
+    public ResourceHost getResourceHostByContainerId( String hostId ) throws HostNotFoundException;
 
     public ContainerHost getContainerHostImpl( HostKey hostKey );
 

@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<blueprint
-    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-    >
+<blueprint default-activation="eager"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0" xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.0.0"
 
-  <reference id="entityManagerFactory" interface="javax.persistence.EntityManagerFactory"
-             filter="(osgi.unit.name=peerManagerUnit)" />
+           xsi:schemaLocation="
+            http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
+            http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
+            http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0
+            http://aries.apache.org/xmlns/transactions/v1.0.0 http://aries.apache.org/xmlns/transactions/v1.0.0 ">
 
+  <!-- ******* Temporary *********************************************** -->
   <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
     <property name="URL" value="jdbc:h2:~/peer_manager" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
+  <!-- ***************************************************************** -->
+  <bean id="daoManager" init-method="init" destroy-method="destroy" scope="singleton"
+        class="org.safehaus.subutai.core.peer.impl.dao.DaoManager">
+    <jpa:unit unitname="peerManagerPUnit" property="entityManagerFactory" />
+    <tx:transaction method="*" value="Required"/>
+  </bean>
+  <!-- ***************************************************************** -->
+
   <service ref="peerManager" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
   <reference id="messenger" availability="mandatory"
@@ -32,12 +44,12 @@
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
     <property name="templateRegistry" ref="templateRegistry" />
-    <property name="hostRegistry" ref="hostRegistry" />
-    <property name="strategyManager" ref="strategyManager" />
-    <property name="quotaManager" ref="quotaManager" />
-    <property name="monitor" ref="monitor" />
-    <property name="commandExecutor" ref="commandExecutor" />
-    <property name="entityManagerFactory" ref="entityManagerFactory" />
+    <property name="hostRegistry"     ref="hostRegistry" />
+    <property name="strategyManager"  ref="strategyManager" />
+    <property name="quotaManager"     ref="quotaManager" />
+    <property name="monitor"          ref="monitor" />
+    <property name="commandExecutor"  ref="commandExecutor" />
+    <property name="daoManager"       ref="daoManager" />
     <argument ref="dataSource" />
     <argument ref="messenger" />
   </bean>

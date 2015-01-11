@@ -10,8 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.messenger.api.Message;
-import org.safehaus.subutai.core.messenger.api.Messenger;
-import org.safehaus.subutai.core.messenger.impl.model.MessageEntity;
+import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
 
 import com.google.common.collect.Maps;
 

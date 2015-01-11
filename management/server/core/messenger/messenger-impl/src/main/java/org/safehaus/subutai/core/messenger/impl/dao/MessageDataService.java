@@ -11,7 +11,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
-import org.safehaus.subutai.core.messenger.impl.model.MessageEntity;
+import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
