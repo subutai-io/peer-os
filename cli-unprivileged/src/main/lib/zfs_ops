@@ -45,7 +45,7 @@ function fs_volume_delete {
 
 function fs_is_read_only {
   local item="$1"
-  if [ -z "`sudo btrfs property get -ts /var/lib/lxc/$item/rootfs | grep true`" ]; then
+  if [ -z "`sudo zfs get readonly lxc/$item`" ]; then
     echo 1
   else
     echo 0
@@ -417,8 +417,20 @@ function fs_part_from_ds {
 #TODO
 # lists all the templates available
 function fs_list_templates {
-  for l in `sudo zfs list -t snapshot -o name -H | grep @template | grep -v -`; do
-    echo `fs_ctnr_from_ds $l`
+  local home=${HOME#"/"}
+  for item in `lxc-ls`
+  do
+    if [ ! -z "`sudo zfs list -t snapshot -o name -H | grep @template | grep -v - | grep "^home/user/.local/lxc/" | grep $item`" ]
+    then
+        echo `fs_ctnr_from_ds $item`
+    fi
+  done
+  for item in `sudo ls /var/lib/lxc/ | grep -v -`
+  do
+    if [ ! -z "`sudo zfs list -t snapshot -o name -H | grep @template | grep -v - | grep "^lxc/" | grep $item`" ]
+    then
+       echo "*`fs_ctnr_from_ds $item`"
+    fi
   done
 }
 #TODO

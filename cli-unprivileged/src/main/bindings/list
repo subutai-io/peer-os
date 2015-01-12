@@ -39,7 +39,7 @@ function get_ancestor_list {
 function list_contemp {
   if [ -z "$1" ]; then
     local contemps=`lxc-ls`
-    for item in `ls /var/lib/lxc/ | grep -v -`
+    for item in `sudo ls /var/lib/lxc/ | grep -v -`
   do
     if [ "`fs_is_read_only $item`" == "0" ]
     then
