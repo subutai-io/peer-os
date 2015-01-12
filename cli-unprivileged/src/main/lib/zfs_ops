@@ -148,22 +148,27 @@ function fs_addmount {
 #TODO
 #snaphost ll holds on clone's rootfs
 function fs_snap_hold_readonly {
+  local home=${HOME#"/"}
   local lxc_template="$1"
-  sudo zfs snapshot lxc/$lxc_template@template
-  sudo zfs hold keep lxc/$lxc_template@template
-  sudo zfs set readonly=on lxc/$lxc_template
+  sudo zfs snapshot $home/.local/lxc/$lxc_template@template
+  sudo zfs hold keep $home/.local/lxc/$lxc_template@template
+  sudo zfs set readonly=on $home/.local/lxc/$lxc_template
 
-  sudo zfs snapshot lxc/$lxc_template-opt@template
-  sudo zfs hold keep lxc/$lxc_template-opt@template
-  sudo zfs set readonly=on lxc/$lxc_template-opt
+  sudo zfs snapshot $home/.local/share/lxc/$lxc_template@template
+  sudo zfs hold keep $home/.local/share/lxc/$lxc_template@template
+  sudo zfs set readonly=on $home/.local/share/lxc/$lxc_template
 
-  sudo zfs snapshot lxc-data/$lxc_template-var@template
-  sudo zfs hold keep lxc-data/$lxc_template-var@template
-  sudo zfs set readonly=on lxc-data/$lxc_template-var
+  sudo zfs snapshot $home/.local/lxc/$lxc_template-opt@template
+  sudo zfs hold keep $home/.local/lxc/$lxc_template-opt@template
+  sudo zfs set readonly=on $home/.local/lxc/$lxc_template-opt
 
-  sudo zfs snapshot lxc-data/$lxc_template-home@template
-  sudo zfs hold keep lxc-data/$lxc_template-home@template
-  sudo zfs set readonly=on lxc-data/$lxc_template-home
+  sudo zfs snapshot $home/.local/lxc-data/$lxc_template-var@template
+  sudo zfs hold keep $home/.local/lxc-data/$lxc_template-var@template
+  sudo zfs set readonly=on $home/.local/lxc-data/$lxc_template-var
+
+  sudo zfs snapshot $home/.local/lxc-data/$lxc_template-home@template
+  sudo zfs hold keep $home/.local/lxc-data/$lxc_template-home@template
+  sudo zfs set readonly=on $home/.local/lxc-data/$lxc_template-home
 }
 #TODO
 function fs_recv {
@@ -356,7 +361,6 @@ function fs_assert_ds {
   fi
 }
 
-#TODO
 # checks if the container (arg $1) is a template, echo "true"/"false"
 function fs_is_template {
   local c="$1"
@@ -385,7 +389,8 @@ function fs_get_parent {
 # extracts the container name from a dataset or a dataset snapshot
 function fs_ctnr_from_ds {
   local ds="$1"
-  echo $ds | sed -e 's/lxc.*\///' -e 's/@.*//' -e 's/-.*//'
+  echo $ds | awk -F "@" '{print $1}' | awk -F "/" '{print $NF}'
+  #echo $ds | sed -e 's/lxc.*\///' -e 's/@.*//' -e 's/-.*//'
 }
 
 #TODO
