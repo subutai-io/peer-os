@@ -77,7 +77,7 @@ generateDebianPackagePlugins() {
   fi
   mvn clean install
   cp $productName-kar/target/*".deb" $TARGET/
-  cp $productName-kar/target/*".deb" $ISOPATH/
+  #cp $productName-kar/target/*".deb" $ISOPATH/
   popd
 }
 
