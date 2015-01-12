@@ -10,6 +10,7 @@ pool_list=("lxc" "lxc-data")
 parameter_list=("metricCollectionIntervalInMin" "maxSampleCount" "metricCountToAverageToAlert" "intervalBetweenAlertsInMin" "ramAlertThreshold" "cpuAlertThreshold" "diskAlertThreshold")
 
 
+# returns the total ram capacity of the container
 function get_total_ram {
   local lxc="$1"
   lxc_assert $lxc > /dev/null
@@ -51,6 +52,9 @@ function get_maximum_cpu_capacity_nanoseconds {
   return
 }
 
+
+# returns how much long the physical machine
+# can process the tasks within one second in nanoseconds
 function get_physical_cpu_capacity_nanoseconds {
   local cpu_core=$(nproc)
   local seconds_to_nanoseconds="1000000000"
@@ -59,6 +63,8 @@ function get_physical_cpu_capacity_nanoseconds {
   return
 }
 
+
+# returns the available ram of the container
 function get_available_ram {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -85,6 +91,7 @@ function get_available_ram {
 }
 
 
+# returns the amount of ram used by the container
 function get_used_ram {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -101,6 +108,9 @@ function get_used_ram {
 }
 
 
+# returns the average ram usage according to the passed sample count
+# for the host. If sample count is bigger than the stored sample counts
+# then it calculates the average according to the maximum available samples
 function get_average_used_ram {
   local lxc=$1
   local sampleCountToAverage=$2
@@ -109,6 +119,9 @@ function get_average_used_ram {
 }
 
 
+# returns the average disk usage according to the passed sample count
+# for the host. If sample count is bigger than the stored sample counts
+# then it calculates the average according to the maximum available samples
 function get_average_used_disk_by_metric_type {
   local lxc=$1
   local metric_type=$2
@@ -117,6 +130,9 @@ function get_average_used_disk_by_metric_type {
 }
 
 
+# returns the average cpu usage according to the passed sample count
+# for the host in terms of nanoseconds. If sample count is bigger than the stored sample counts
+# then it calculates the average according to the maximum available samples
 function get_average_cpu_usage_between_samples {
   local lxc=$1
   local sampleCountToAverage=$2
@@ -200,6 +216,9 @@ function get_average_cpu_usage_between_samples {
 }
 
 
+# returns the average usage of the specified metric type according to the passed sample count
+# for the host. If sample count is bigger than the stored sample counts
+# then it calculates the average according to the maximum available samples
 function get_metric_average {
   local lxc=$1
   local sampleCountToAverage=$2
@@ -268,6 +287,7 @@ function get_used_cpu {
 }
 
 
+# returns the total ram capacity of the physical machine
 function get_physical_total_ram {
   local total_ram_kb=$(grep MemTotal /proc/meminfo | awk '{print $2}')
   echo "$(($total_ram_kb * 1024))"
@@ -275,6 +295,7 @@ function get_physical_total_ram {
 }
 
 
+# returns the available ram capacity of the physical machine
 function get_physical_available_ram {
   local total_ram=$(get_physical_total_ram)
   local used_ram=$(get_physical_used_ram)
@@ -283,6 +304,7 @@ function get_physical_available_ram {
 }
 
 
+# returns the used ram amount of the physical machine
 function get_physical_used_ram {
   local used_ram=$(cat /sys/fs/cgroup/memory/memory.usage_in_bytes)
   local status=$?
@@ -304,6 +326,8 @@ function get_physical_used_cpu {
 }
 
 
+# returns the available disk space of the specified dataset of container
+# in terms of bytes
 function get_available_disk_by_dataset {
   local lxc=$1
   local dataset=$2
@@ -313,6 +337,8 @@ function get_available_disk_by_dataset {
 }
 
 
+# returns the available disk space of "var" dataset of container
+# in terms of bytes
 function get_available_diskVar {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -320,6 +346,8 @@ function get_available_diskVar {
 }
 
 
+# returns the available disk space of "opt" dataset of container
+# in terms of bytes
 function get_available_diskOpt {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -327,6 +355,8 @@ function get_available_diskOpt {
 }
 
 
+# returns the available disk space of "home" dataset of container
+# in terms of bytes
 function get_available_diskHome {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -334,6 +364,8 @@ function get_available_diskHome {
 }
 
 
+# returns the available disk space of "rootfs" dataset of container
+# in terms of bytes
 function get_available_diskRootfs {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -341,6 +373,8 @@ function get_available_diskRootfs {
 }
 
 
+# returns the used disk space of the specified dataset of container
+# in terms of bytes
 function get_used_disk_by_dataset {
   local lxc=$1
   local dataset=$2
@@ -350,6 +384,8 @@ function get_used_disk_by_dataset {
 }
 
 
+# returns the used disk space of "var" dataset of container
+# in terms of bytes
 function get_used_diskVar {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -357,6 +393,8 @@ function get_used_diskVar {
 }
 
 
+# returns the used disk space of "opt" dataset of container
+# in terms of bytes
 function get_used_diskOpt {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -364,6 +402,8 @@ function get_used_diskOpt {
 }
 
 
+# returns the used disk space of "home" dataset of container
+# in terms of bytes
 function get_used_diskHome {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -371,6 +411,8 @@ function get_used_diskHome {
 }
 
 
+# returns the used disk space of "rootfs" dataset of container
+# in terms of bytes
 function get_used_diskRootfs {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -378,6 +420,8 @@ function get_used_diskRootfs {
 }
 
 
+# returns the total disk space of the specified dataset of container
+# in terms of bytes
 function get_total_disk_by_dataset {
   local lxc=$1
   local dataset=$2
@@ -414,6 +458,8 @@ function get_total_disk_by_dataset {
 }
 
 
+# returns the total disk space of "var" dataset of container
+# in terms of bytes
 function get_total_diskVar {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -421,6 +467,8 @@ function get_total_diskVar {
 }
 
 
+# returns the used disk space of "opt" dataset of container
+# in terms of bytes
 function get_total_diskOpt {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -428,6 +476,8 @@ function get_total_diskOpt {
 }
 
 
+# returns the used disk space of "home" dataset of container
+# in terms of bytes
 function get_total_diskHome {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -435,6 +485,8 @@ function get_total_diskHome {
 }
 
 
+# returns the used disk space of "rootfs" dataset of container
+# in terms of bytes
 function get_total_diskRootfs {
   local lxc=$1
   lxc_assert $lxc > /dev/null
@@ -442,26 +494,31 @@ function get_total_diskRootfs {
 }
 
 
+# returns the pool name where "var" dataset is mounted to
 function get_var_dataset_pool {
   echo "lxc-data"
 }
 
 
+# returns the pool name where "opt" dataset is mounted to
 function get_opt_dataset_pool {
   echo "lxc"
 }
 
 
+# returns the pool name where "home" dataset is mounted to
 function get_home_dataset_pool {
   echo "lxc-data"
 }
 
 
+# returns the pool name where "rootfs" dataset is mounted to
 function get_rootfs_dataset_pool {
   echo "lxc"
 }
 
 
+# returns the available disk space of the specified pool
 function get_physical_available_disk_by_pool_name {
   local pool_name=$1
   assert_pool $pool_name
@@ -469,30 +526,35 @@ function get_physical_available_disk_by_pool_name {
 }
 
 
+# returns the available disk space of the pool where "var" dataset is mounted to
 function get_physical_available_diskVar {
   local pool=$(get_var_dataset_pool)
   get_physical_available_disk_by_pool_name $pool
 }
 
 
+# returns the available disk space of the pool where "opt" dataset is mounted to
 function get_physical_available_diskOpt {
   local pool=$(get_opt_dataset_pool)
   get_physical_available_disk_by_pool_name $pool
 }
 
 
+# returns the available disk space of the pool where "home" dataset is mounted to
 function get_physical_available_diskHome {
   local pool=$(get_home_dataset_pool)
   get_physical_available_disk_by_pool_name $pool
 }
 
 
+# returns the available disk space of the pool where "rootfs" is mounted to
 function get_physical_available_diskRootfs {
   local pool=$(get_rootfs_dataset_pool)
   get_physical_available_disk_by_pool_name $pool
 }
 
 
+# returns the used disk space of the pool specified pool
 function get_physical_used_disk_by_pool_name {
   local pool_name=$1
   assert_pool $pool_name
@@ -500,30 +562,35 @@ function get_physical_used_disk_by_pool_name {
 }
 
 
+# returns the used disk space of the pool where "var" dataset is mounted to
 function get_physical_used_diskVar {
   local pool=$(get_var_dataset_pool)
   get_physical_used_disk_by_pool_name $pool
 }
 
 
+# returns the used disk space of the pool where "opt" dataset is mounted to
 function get_physical_used_diskOpt {
   local pool=$(get_opt_dataset_pool)
   get_physical_used_disk_by_pool_name $pool
 }
 
 
+# returns the used disk space of the pool where "home" dataset is mounted to
 function get_physical_used_diskHome {
   local pool=$(get_home_dataset_pool)
   get_physical_used_disk_by_pool_name $pool
 }
 
 
+# returns the used disk space of the pool where "rootfs" dataset is mounted to
 function get_physical_used_diskRootfs {
   local pool=$(get_rootfs_dataset_pool)
   get_physical_used_disk_by_pool_name $pool
 }
 
 
+# returns the total disk space of the specified pool
 function get_physical_total_disk_by_pool_name {
   local pool_name=$1
   assert_pool $pool
@@ -532,30 +599,36 @@ function get_physical_total_disk_by_pool_name {
 }
 
 
+# returns the total disk space of the pool where "var" dataset is mounted to
 function get_physical_total_diskVar {
   local pool=$(get_var_dataset_pool)
   get_physical_total_disk_by_pool_name $pool
 }
 
 
+# returns the total disk space of the pool where "opt" dataset is mounted to
 function get_physical_total_diskOpt {
   local pool=$(get_opt_dataset_pool)
   get_physical_total_disk_by_pool_name $pool
 }
 
 
+# returns the total disk space of the pool where "home" dataset is mounted to
 function get_physical_total_diskHome {
   local pool=$(get_home_dataset_pool)
   get_physical_total_disk_by_pool_name $pool
 }
 
 
+# returns the total disk space of the pool where "rootfs" dataset is mounted to
 function get_physical_total_diskRootfs {
   local pool=$(get_rootfs_dataset_pool)
   get_physical_total_disk_by_pool_name $pool
 }
 
 
+# returns "y" if the array contains the passed value
+# returns "n" if the array does not contain the passed value
 function contains() {
     local n=$#
     local value=${!n}
@@ -570,6 +643,8 @@ function contains() {
 }
 
 
+# creates the rrd file for the host along with the passed parameters if any
+# and starts its monitoring which stores data on rrd database periodically
 function create_rrd {
   local hostname=$1
   local metric_type=$2
@@ -618,6 +693,7 @@ function create_rrd {
 }
 
 
+# creates all rrd files of the supported metrics
 function create_all_rrd {
   local hostname=$1
   local parameters=$2
@@ -629,6 +705,7 @@ function create_all_rrd {
 }
 
 
+# stores the value of the metric in its rrd database with the current timestamp
 function update_rrd {
   local hostname=$1
   local metric_type=$2
@@ -652,6 +729,8 @@ function update_rrd {
 }
 
 
+# returns the function name which returns the resource usage
+# of the specified host
 function get_resource_usage_function_name_by_metric_type {
   local hostname=$1
   local metric_type=$2
@@ -664,6 +743,7 @@ function get_resource_usage_function_name_by_metric_type {
 }
 
 
+# starts to monitor the specified metric for the host
 function start_update_rrd {
   local hostname=$1
   local metric_type=$2
@@ -700,6 +780,7 @@ function start_update_rrd {
 }
 
 
+# starts to monitor all the supported metrics for the host
 function start_update_all_rrd {
   local hostname=$1
 
@@ -710,6 +791,7 @@ function start_update_all_rrd {
 }
 
 
+# stops to monitor the specified metric for the host
 function stop_update_rrd {
   local hostname=$1
   local metric_type=$2
@@ -733,6 +815,7 @@ function stop_update_rrd {
 }
 
 
+# stops to monitor all the supported metrics for the host
 function stop_update_all_rrd {
   local hostname=$1
 
@@ -747,6 +830,7 @@ function stop_update_all_rrd {
 }
 
 
+# returns update entry of the metric for a given host inside crontab
 function get_update_entry {
   local hostname=$1
   local metric_type=$2
@@ -754,6 +838,7 @@ function get_update_entry {
 }
 
 
+# returns alert entry of the metric for a given host inside crontab
 function get_alert_entry {
   local hostname=$1
   local metric_type=$2
@@ -761,6 +846,7 @@ function get_alert_entry {
 }
 
 
+# queries the rrd database of the metric of the specified host
 function query_rrd {
   local hostname=$1
   local metric_type=$2
@@ -787,6 +873,8 @@ function query_rrd {
 }
 
 
+# returns the resource of the specified metric for the specified PID
+# inside the given container
 function query_pid {
   local hostname=$1
   local metric_type=$2
@@ -805,7 +893,6 @@ function query_pid {
   elif [ $metric_type == "cpu" ]; then
     local usage=$(get_cpu_usage_percentage_by_pid $hostname $pid)
     print_result="$print_result, \"usedCpu\":\"$usage\""
-
   elif [ "$metric_type" == "all" ]; then
     local cpu_usage_percentage=$(get_cpu_usage_percentage_by_pid $hostname $pid)
     local ram_usage_in_bytes=$(get_ram_usage_in_bytes_by_pid $hostname $pid)
@@ -821,6 +908,8 @@ function query_pid {
 }
 
 
+# returns the resource of cpu metric in terms of percentage
+# for the specified PID inside the given container
 function get_cpu_usage_percentage_by_pid {
   local hostname=$1
   local pid=$2
@@ -845,6 +934,8 @@ function get_cpu_usage_percentage_by_pid {
 }
 
 
+# returns the resource of ram metric in terms of percentage
+# for the specified PID inside the given container
 function get_ram_usage_percentage_by_pid {
   local hostname=$1
   local pid=$2
@@ -862,6 +953,8 @@ function get_ram_usage_percentage_by_pid {
 }
 
 
+# returns the resource of ram metric in terms of bytes
+# for the specified PID inside the given container
 function get_ram_usage_in_bytes_by_pid {
   local hostname=$1
   local pid=$2
@@ -873,6 +966,8 @@ function get_ram_usage_in_bytes_by_pid {
 }
 
 
+# removes the rrd database and the related configuration files
+# of the host for the given metric type
 function destroy_monitor {
   local hostname=$1
   local metric_type=$2
@@ -884,6 +979,7 @@ function destroy_monitor {
 }
 
 
+# destroys the monitoring related stuff for all the supported metrics
 function destroy_all_monitor {
   local hostname=$1
   for metric_type in "${metric_list[@]}"
@@ -893,6 +989,7 @@ function destroy_all_monitor {
 }
 
 
+# removes the rrd database file of the host for the given metric type
 function remove_rrd_file {
   local hostname=$1
   local metric_type=$2
@@ -908,6 +1005,7 @@ function remove_rrd_file {
 }
 
 
+# remove configuration file of the host for the given metric type
 function remove_monitor_configuration {
   local hostname=$1
   local metric_type=$2
@@ -925,6 +1023,7 @@ function remove_monitor_configuration {
 }
 
 
+# exit if the provided metric is not in the predefined metric list
 function assert_metric {
   local metric_type=$1
   if [ -z "$metric_type" ]; then
@@ -940,6 +1039,7 @@ function assert_metric {
 }
 
 
+# exit if the provided dataset is not in the predefined dataset list
 function assert_dataset {
   local dataset=$1
   if [ -z "$dataset" ]; then
@@ -955,6 +1055,7 @@ function assert_dataset {
 }
 
 
+# exit if the provided pool name is not in the predefined pool list 
 function assert_pool {
   local pool_name=$1
   if [ -z "$pool_name" ]; then
@@ -970,6 +1071,7 @@ function assert_pool {
 }
 
 
+# exit if all the parameters seperated by comma are not valid
 function assert_parameters {
   local parameters=$1
 
@@ -981,6 +1083,7 @@ function assert_parameters {
 }
 
 
+# exit if the provided parameter is not in the parameter list
 function assert_parameter {
   local parameter=$1
   if [ -z "$parameter" ]; then
@@ -998,6 +1101,7 @@ function assert_parameter {
 }
 
 
+# returns the name of the dataset stored in the rrd database for the given metric type
 function get_dataset_name {
   local metric_type=$1
 
@@ -1007,6 +1111,8 @@ function get_dataset_name {
 }
 
 
+# returns the tag used for outputs such as in json key:value pairs
+# for the given metric type
 function get_metric_tag {
   local metric_type=$1
 
@@ -1018,6 +1124,7 @@ function get_metric_tag {
 }
 
 
+# returns the database file name of host for the given metric type
 function get_database_file {
   local hostname=$1
   local metric_type=$2
@@ -1028,6 +1135,7 @@ function get_database_file {
 }
 
 
+# returns the update interval in minutes of the host for the given metric type
 function get_update_interval_in_minutes {
   local hostname=$1
   local metric_type=$2
@@ -1050,6 +1158,7 @@ function get_update_interval_in_minutes {
 }
 
 
+# returns the alert interval in minutes of the host for the given metric type
 function get_alert_interval_in_minutes {
   local hostname=$1
   local metric_type=$2
@@ -1072,6 +1181,7 @@ function get_alert_interval_in_minutes {
 }
 
 
+# returns the update interval in seconds of the host for the given metric type
 function get_update_sequence {
   local hostname=$1
   local metric_type=$2
@@ -1087,6 +1197,7 @@ function get_update_sequence {
 }
 
 
+# returns the maximum sample count to be stored of the host for the given metric type
 function get_max_sample_count {
   if [ -z "$maxSampleCount" ]; then
     echo "1440"
@@ -1097,6 +1208,7 @@ function get_max_sample_count {
 }
 
 
+# stores the passed parameters of the host for the given metric type in a configuration file
 function store_monitor_configuration {
   local hostname=$1
   local metric_type=$2
@@ -1154,6 +1266,8 @@ function store_monitor_configuration {
 }
 
 
+# loads the configuration parameters of the host for the given metric type 
+# to the current shell session
 function get_monitor_configuration {
   local hostname=$1
   local metric_type=$2
@@ -1172,6 +1286,7 @@ function get_monitor_configuration {
 }
 
 
+# returns the full path of the configuration file of the host for the given metric type
 function get_monitor_configuration_file {
   local hostname=$1
   local metric_type=$2
@@ -1187,6 +1302,7 @@ function get_monitor_configuration_file {
 }
 
 
+# returns the full path of the configuration directory of the host
 function get_monitor_configuration_dir {
   local hostname=$1
 
@@ -1200,6 +1316,7 @@ function get_monitor_configuration_dir {
 }
 
 
+# exit if there is configuration file of the host for the given metric type
 function assert_no_config {
   local hostname=$1
   local metric_type=$2
@@ -1218,6 +1335,7 @@ function assert_no_config {
 }
 
 
+# returns the ram threshold of the host
 function get_ram_threshold_percentage {
   local hostname=$1
   # Get configuration parameters
@@ -1232,6 +1350,7 @@ function get_ram_threshold_percentage {
 }
 
 
+# returns the cpu threshold of the host
 function get_cpu_threshold_percentage {
   local hostname=$1
   # Get configuration parameters
@@ -1246,6 +1365,7 @@ function get_cpu_threshold_percentage {
 }
 
 
+# returns the disk threshold of the host for the specified dataset
 function get_disk_threshold_percentage {
   local hostname=$1
   local dataset=$2
@@ -1261,6 +1381,7 @@ function get_disk_threshold_percentage {
 }
 
 
+# returns the metric count to average to trigger the alert
 function get_metric_count_to_average_to_alert {
   local hostname=$1
   local metric_type=$2
@@ -1276,6 +1397,7 @@ function get_metric_count_to_average_to_alert {
 }
 
 
+# returns the ram threshold in bytes to trigger the alert
 function get_ram_alert_threshold_bytes {
   local lxc=$1
   local ram_threshold_percentage=$(get_ram_threshold_percentage $lxc)
@@ -1287,6 +1409,7 @@ function get_ram_alert_threshold_bytes {
 }
 
 
+# returns the cpu threshold in nanoseconds to trigger the alert
 function get_cpu_alert_threshold_nanoseconds {
   local lxc=$1
   local cpu_threshold_percentage=$(get_cpu_threshold_percentage $lxc)
@@ -1298,6 +1421,7 @@ function get_cpu_alert_threshold_nanoseconds {
 }
 
 
+# returns the disk threshold in bytes for the given dataset to trigger the alert
 function get_disk_alert_threshold_bytes {
   local lxc=$1
   local dataset=$2
@@ -1311,12 +1435,14 @@ function get_disk_alert_threshold_bytes {
 }
 
 
+# returns the metric type of the given dataset
 function get_disk_metric_type_by_dataset {
   local dataset=$1
   echo "disk$(tr '[:lower:]' '[:upper:]' <<< ${dataset:0:1})${dataset:1}"
 }
 
 
+# make an alert if the ram threshold is exceeded by the given container
 function ram_alert {
   local lxc=$1
   local metric_type="ram"
@@ -1355,6 +1481,7 @@ function ram_alert {
 }
 
 
+# make an alert if the cpu threshold is exceeded by the given container
 function cpu_alert {
   local lxc=$1
   local metric_type="cpu"
@@ -1392,6 +1519,7 @@ function cpu_alert {
 }
 
 
+# make an alert if the disk threshold of the specified dataset is exceeded by the given container
 function disk_alert {
   local lxc=$1
   local dataset=$2
@@ -1430,6 +1558,7 @@ function disk_alert {
 }
 
 
+# make an alert if the disk threshold of the "opt" dataset is exceeded by the given container
 function diskOpt_alert {
   local lxc=$1
   local dataset="opt"
@@ -1437,6 +1566,7 @@ function diskOpt_alert {
 }
 
 
+# make an alert if the disk threshold of the "var" dataset is exceeded by the given container
 function diskVar_alert {
   local lxc=$1
   local dataset="var"
@@ -1444,6 +1574,7 @@ function diskVar_alert {
 }
 
 
+# make an alert if the disk threshold of the "home" dataset is exceeded by the given container
 function diskHome_alert {
   local lxc=$1
   local dataset="home"
@@ -1451,6 +1582,7 @@ function diskHome_alert {
 }
 
 
+# make an alert if the disk threshold of the "rootfs" dataset is exceeded by the given container
 function diskRootfs_alert {
   local lxc=$1
   local dataset="rootfs"
@@ -1458,6 +1590,7 @@ function diskRootfs_alert {
 }
 
 
+# exit if the variable is not a number
 function assert_number {
   local variable="$1"
   local numberExpression='^[0-9]+$'
@@ -1473,6 +1606,8 @@ function assert_number {
 }
 
 
+# returns "true" if the variable is a number
+# returns "false" if the variable is not a number
 function is_number {
   local variable="$1"
   local numberExpression='^[0-9]+$'
@@ -1489,3 +1624,5 @@ function is_number {
   echo "true"
   return
 }
+
+
