@@ -138,9 +138,9 @@ function destroy {
 #  ovs_port_name=$(ovs_get_port_name $clone)
   # (6) lxc-destroy the clone
   #lxc-destroy -n $clone -f
-  lxc-stop -n $clone
+  lxc-stop -n $clone  > /dev/null 2>&1
   fs_volume_delete "$clone/rootfs"
-  fs_volume_delete "$clone"
+  fs_volume_delete "$clone"  > /dev/null 2>&1
 
   # (7) destroy mounted partitions 
   fs_remove_mount $clone $parent opt lxc

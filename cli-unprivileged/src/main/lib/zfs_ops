@@ -37,7 +37,10 @@ function fs_volume_create {
 
 function fs_volume_delete {
   local src="$1"
-  sudo btrfs subvolume delete $HOME/.local/share/lxc/$src/ 1>/dev/null
+  local home=${HOME#"/"}
+  src="`echo $src | awk -F "/" '{print $1}'`"
+  sudo zfs destroy $home/.local/lxc/$src 1>/dev/null
+  sudo zfs destroy $home/.local/share/lxc/$src 1>/dev/null
 }
 
 function fs_is_read_only {
@@ -186,13 +189,13 @@ function fs_send {
 }
 #TODO
 function fs_remove_mount {
-  child="$1"
-  parent="$2"
-  partition="$3"
-  pool="$4"
-
-  child_ds="$pool/$child-$partition"
-  parent_ds="$pool/$parent-$partition"
+  local child="$1"
+  local parent="$2"
+  local partition="$3"
+  local pool="$4"
+  local home=${HOME#"/"}
+  local child_ds="$pool/$child-$partition"
+  local parent_ds="$pool/$parent-$partition"
 
   for snap in `sudo zfs list -t snapshot -o name -H | grep $child_ds@`; do
     for hold in `sudo zfs holds -r $snap | grep $snap | awk '{print $2}'`; do
@@ -205,11 +208,10 @@ function fs_remove_mount {
   done
 
   # Need to destroy mount
-  sudo zfs destroy $child_ds
+  sudo zfs destroy $home/.local/$child_ds
   msg_info "    - \"$child_ds\" dataset destroyed"
 }
 
-#TODO
 #release all holds on clone's rootfs snaps and delete snaps
 function fs_rls_holds_delete_snaps {
   local clone="$1"
@@ -257,17 +259,16 @@ function fs_demote_template {
   sudo zfs set readonly=off "lxc/$temp"
 
 }
-#TODO
 # returns the children of the provided container(arg $1)
 function fs_get_children_list {
   local parent="$1"
   local snap=
-
+  local home=${HOME#"/"}
   # we got a dataset instead of a clone name
   if [ -n "`echo $parent | egrep 'lxc.*/'`" ]; then
-    snap="$parent@template"
+    snap="$home/.local/share/lxc/$parent@template"
   else
-    snap="lxc/$parent@template"
+    snap="$home/.local/$parent@template"
   fi
   local count=0
   for ds in `sudo zfs get origin | grep $snap | awk '{print $1}' | grep -v $snap`
@@ -279,19 +280,18 @@ function fs_get_children_list {
   echo ${children_list[*]}
 }
 
-#TODO
 # prints out the children for a ds or container name (arg $1)
 # counts and prints out the children
 # returns the child count
 function fs_get_children {
   local parent="$1"
   local snap=
-
+  local home=${HOME#"/"}
   # we got a dataset instead of a clone name
-  if [ -n "`echo $parent | egrep 'lxc.*/'`" ]; then 
-    snap="$parent@template"
+  if [ -n "`echo $parent | egrep 'lxc.*/'`" ]; then
+    snap="$home/.local/share/lxc/$parent@template"
   else
-    snap="lxc/$parent@template"
+    snap="$home/.local/$parent@template"
   fi
 
   local count=0
@@ -367,7 +367,6 @@ function fs_is_template {
   fi
 }
 
-#TODO
 # gets the parent of a container
 # first argument $1 is the name of the child container
 # master returns master
@@ -378,12 +377,11 @@ function fs_get_parent {
     echo master
     return
   fi
-
-  local snap=`sudo zfs get origin -o value -H lxc/$c`
+  local home=${HOME#"/"}
+  local snap=`sudo zfs get origin -o value -H $home/.local/lxc/$c`
   echo `fs_ctnr_from_ds $snap`
 }
 
-#TODO
 # extracts the container name from a dataset or a dataset snapshot
 function fs_ctnr_from_ds {
   local ds="$1"
