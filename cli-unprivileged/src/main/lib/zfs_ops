@@ -233,35 +233,44 @@ function fs_rls_holds_delete_snaps {
 #TODO
 #demote template
 function fs_demote_template {
-  local temp="$1"  
-  local lxc_path="/var/lib/lxc/$temp"
+  local home=${HOME#"/"}
+  local temp="$1"
+  local lxc_path="$HOME/.local/share/lxc/$temp"
 
+  local var_snap="$home/.local/lxc-data/$temp-var@template"
+  sudo zfs release keep "$var_snap"
+  sudo zfs destroy "$var_snap"
+  sudo zfs set readonly=off "$home/.local/lxc-data/$temp-var"
+
+  local home_snap="$home/.local/lxc-data/$temp-home@template"
+  sudo zfs release keep "$home_snap"
+  sudo zfs destroy "$home_snap"
+  sudo zfs set readonly=off "$home/.local/lxc-data/$temp-home"
+
+  local opt_snap="$home/.local/lxc/$temp-opt@template"
+  sudo zfs release keep "$opt_snap"
+  sudo zfs destroy "$opt_snap"
+  sudo zfs set readonly=off "$home/.local/lxc/$temp-opt"
+
+  local root_snap="$home/.local/lxc/$temp@template"
+  sudo zfs release keep "$root_snap"
+  sudo zfs destroy "$root_snap"
+  sudo zfs set readonly=off "$home/.local/lxc/$temp"
+
+  local root_snap="$home/.local/share/lxc/$temp@template"
+  sudo zfs release keep "$root_snap"
+  sudo zfs destroy "$root_snap"
+  sudo zfs set readonly=off "$home/.local/share/lxc/$temp"
+
+  lxc_chown $temp
+  cat $HOME/.config/lxc/default.conf >> $lxc_path/config
   cat $lxc_path/config | \
     grep -v "lxc.hook.pre-start" | \
     grep -v "subutai.template.package" | \
     grep -v "subutai.git.uuid" >> $lxc_path/config.new
   rm $lxc_path/config
   mv $lxc_path/config.new $lxc_path/config
-
-  local var_snap="lxc-data/$temp-var@template"
-  sudo zfs release keep "$var_snap"
-  sudo zfs destroy "$var_snap"
-  sudo zfs set readonly=off "lxc-data/$temp-var"
-
-  local home_snap="lxc-data/$temp-home@template"
-  sudo zfs release keep "$home_snap"
-  sudo zfs destroy "$home_snap"
-  sudo zfs set readonly=off "lxc-data/$temp-home"
-
-  local opt_snap="lxc/$temp-opt@template"
-  sudo zfs release keep "$opt_snap"
-  sudo zfs destroy "$opt_snap"
-  sudo zfs set readonly=off "lxc/$temp-opt"
-
-  local root_snap="lxc/$temp@template"
-  sudo zfs release keep "$root_snap"
-  sudo zfs destroy "$root_snap"
-  sudo zfs set readonly=off "lxc/$temp"
+  lxc_mapshifting $temp
 
 }
 # returns the children of the provided container(arg $1)
