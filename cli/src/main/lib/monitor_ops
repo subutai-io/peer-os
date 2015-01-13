@@ -706,6 +706,7 @@ function create_all_rrd {
 
 
 # stores the value of the metric in its rrd database with the current timestamp
+# if the metric for host is enabled for update
 function update_rrd {
   local hostname=$1
   local metric_type=$2
@@ -716,6 +717,18 @@ function update_rrd {
 
   assert_metric "$metric_type"
   get_monitor_configuration "$hostname" "$metric_type"
+
+
+  get_monitor_update_configuration "$hostname"
+  local monitor_update_conf=$(get_monitor_update_configuration_file "$hostname")
+  local update_entry_in_configuration=$(get_update_entry_in_configuration "$hostname" "$metric_type")
+  local value=$(get_update_entry_value_in_configuration $update_entry_in_configuration)
+  # exit if the metric of host is not set
+  if [ "$value" != "true" ]; then
+    msg_notice "    - $metric_type metric for $hostname is not enabled for monitoring, skipping..."
+    return
+  fi
+
   local database_file="$SUBUTAI_RRD_DIRECTORY/$(get_database_file $hostname $metric_type)"
   local tag=$(get_metric_tag $metric_type)
   local dataset_name=$(get_dataset_name $metric_type)
@@ -726,6 +739,17 @@ function update_rrd {
   message="$metric_value is stored at $current_time for $metric_type($hostname) metric"
   msg_info "    - $message"
   rrdtool update  "$database_file" --template "$dataset_name" N:"$metric_value"
+}
+
+
+# calls update_rrd function for all the supported metric types
+function update_all_rrd {
+  local hostname=$1
+
+  for metric_type in "${metric_list[@]}"
+  do
+    update_rrd "$hostname" "$metric_type"
+  done
 }
 
 
@@ -757,6 +781,9 @@ function start_update_rrd {
   fi
 
   assert_metric "$metric_type"
+
+  local monitor_update_conf=$(get_monitor_update_configuration_file "$hostname")
+
   get_monitor_configuration $hostname $metric_type
   # Remove cron job of host for metric_type if exists
   stop_update_rrd "$hostname" "$metric_type" > /dev/null
@@ -768,12 +795,35 @@ function start_update_rrd {
   then
     sed -i "1s/^/$path_entry\n/" mycron
   fi
-  #echo new cron into cron file
-  local update_entry=$(get_update_entry $hostname $metric_type)
-  echo "*/$(get_update_interval_in_minutes $hostname $metric_type) * * * * $update_entry" >> mycron
-  #echo new cron into cron file
-  local alert_entry=$(get_alert_entry $hostname $metric_type)
-  echo "*/$(get_alert_interval_in_minutes $hostname $metric_type) * * * * $alert_entry" >> mycron
+
+  get_monitor_update_configuration "$hostname"
+  local monitor_update_conf=$(get_monitor_update_configuration_file "$hostname")
+  local update_entry_in_configuration=$(get_update_entry_in_configuration "$hostname" "$metric_type")
+  local value=$(get_update_entry_value_in_configuration $update_entry_in_configuration)
+
+  if [ "$value" != "true" ]; then
+    local entry="$update_entry_in_configuration=true"
+    mkdir -p "$SUBUTAI_MONITOR_CONF_DIRECTORY/$hostname"
+    touch $monitor_update_conf
+    echo "$entry" >> $monitor_update_conf
+    msg_info "    - adding \"$entry\""
+  fi
+
+  #echo new cron into cron file if update entry does not exist
+  local update_entry=$(get_update_entry $hostname)
+  crontab -l | grep "$update_entry" > /dev/null
+  local status=$?
+  if [ $status != 0 ]; then
+    echo "*/$(get_update_interval_in_minutes $hostname $metric_type) * * * * $update_entry" >> mycron
+  fi
+
+  #echo new cron into cron file if alert entry does not exist
+  local alert_entry=$(get_alert_entry $hostname)
+  crontab -l | grep "$alert_entry" > /dev/null
+  local status=$?
+  if [ $status != 0 ]; then
+    echo "*/$(get_alert_interval_in_minutes $hostname $metric_type) * * * * $alert_entry" >> mycron
+  fi
   #install new cron file
   crontab mycron
   rm mycron
@@ -795,22 +845,35 @@ function start_update_all_rrd {
 function stop_update_rrd {
   local hostname=$1
   local metric_type=$2
-
   assert_metric "$metric_type"
-  local update_entry=$(get_update_entry $hostname $metric_type)
-  crontab -l | grep "$update_entry" > /dev/null
-  local status=$?
-  if [ $status == 0 ]; then
-    msg_info "    - stop update job of $metric_type metric for $hostname"
-    crontab -l | sed "/$update_entry/d" | crontab -
+
+  get_monitor_update_configuration "$hostname"
+  local monitor_update_conf=$(get_monitor_update_configuration_file "$hostname")
+  local update_entry_in_configuration=$(get_update_entry_in_configuration "$hostname" "$metric_type")
+  local value=$(get_update_entry_value_in_configuration $update_entry_in_configuration)
+  if [ "$value" == "true" ]; then
+    local entry="$update_entry_in_configuration=true"
+    sed -i "/$entry/d" $monitor_update_conf
+    msg_info "    - removing \"$entry\""
+    unset $update_entry_in_configuration
   fi
 
-  local alert_entry=$(get_alert_entry $hostname $metric_type)
-  crontab -l | grep "$alert_entry" > /dev/null
-  local status=$?
-  if [ $status == 0 ]; then
-    msg_info "    - stop alert job of $metric_type metric for $hostname"
-    crontab -l | sed "/$alert_entry/d" | crontab -
+  if ! grep -q "true" "$monitor_update_conf" > /dev/null 2>&1; then
+    local update_entry=$(get_update_entry $hostname)
+    crontab -l | grep "$update_entry" > /dev/null
+    local status=$?
+    if [ $status == 0 ]; then
+      msg_info "    - stop update job for $hostname"
+      crontab -l | sed "/$update_entry/d" | crontab -
+    fi
+
+    local alert_entry=$(get_alert_entry $hostname)
+    crontab -l | grep "$alert_entry" > /dev/null
+    local status=$?
+    if [ $status == 0 ]; then
+      msg_info "    - stop alert job for $hostname"
+      crontab -l | sed "/$alert_entry/d" | crontab -
+    fi
   fi
 }
 
@@ -825,7 +888,7 @@ function stop_update_all_rrd {
 
   for metric_type in "${metric_list[@]}"
   do
-    stop_update_rrd $hostname $metric_type > /dev/null
+    stop_update_rrd $hostname $metric_type
   done
 }
 
@@ -833,16 +896,27 @@ function stop_update_all_rrd {
 # returns update entry of the metric for a given host inside crontab
 function get_update_entry {
   local hostname=$1
-  local metric_type=$2
-  echo "subutai monitor -u $metric_type $hostname"
+  echo "subutai monitor -u all $hostname"
 }
 
 
 # returns alert entry of the metric for a given host inside crontab
 function get_alert_entry {
   local hostname=$1
+  echo "subutai monitor -a all $hostname"
+}
+
+
+function get_update_entry_in_configuration {
+  local hostname=$1
   local metric_type=$2
-  echo "subutai monitor -a $metric_type $hostname"
+  echo "$hostname"_"$metric_type""_update"
+}
+
+
+function get_update_entry_value_in_configuration {
+  local update_entry_in_configuration=$1
+  echo ${!update_entry_in_configuration}
 }
 
 
@@ -975,6 +1049,8 @@ function destroy_monitor {
   assert_metric "$metric_type"
 
   remove_monitor_configuration $hostname $metric_type
+  remove_monitor_update_configuration "$hostname"
+  remove_monitor_directory "$hostname"
   remove_rrd_file $hostname $metric_type
 }
 
@@ -1022,6 +1098,37 @@ function remove_monitor_configuration {
   fi
 }
 
+
+# remove update configuration file of the host for the given metric type
+function remove_monitor_update_configuration {
+  local hostname=$1
+  if [ -z "$hostname" ]; then
+    msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  local monitor_update_conf=$(get_monitor_update_configuration_file $hostname)
+  if [ -f $monitor_update_conf ]; then
+    rm -f $monitor_update_conf
+    msg_info "    - $monitor_update_conf file is removed"
+  fi
+}
+
+
+# remove monitor configuration directory for the given host
+function remove_monitor_directory {
+  local hostname=$1
+  if [ -z "$hostname" ]; then
+    msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  local monitor_conf_dir=$(get_monitor_configuration_dir $hostname)
+  if [ -d $monitor_conf_dir ]; then
+    rm -rf $monitor_conf_dir
+    msg_info "    - $monitor_conf_dir directory is removed"
+  fi
+}
 
 # exit if the provided metric is not in the predefined metric list
 function assert_metric {
@@ -1286,6 +1393,39 @@ function get_monitor_configuration {
 }
 
 
+# loads the configuration parameters of the host for the given metric type
+# to the current shell session
+function get_monitor_update_configuration {
+  local hostname=$1
+
+  if [ -z "$hostname" ]; then
+    msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  local monitor_update_conf=$(get_monitor_update_configuration_file $hostname)
+  # Inject the configurations if file exists
+  if [ -f $monitor_update_conf ]; then
+    . $monitor_update_conf
+  fi
+}
+
+
+# returns the full path of the configuration file which keeps track of the metrics
+# which are currently monitored of the host for the given metric type
+function get_monitor_update_configuration_file {
+  local hostname=$1
+
+  if [ -z "$hostname" ]; then
+    msg_error "Hostname information not provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  echo "$SUBUTAI_MONITOR_CONF_DIRECTORY/$hostname/$hostname-monitor-current.conf"
+  return
+}
+
+
 # returns the full path of the configuration file of the host for the given metric type
 function get_monitor_configuration_file {
   local hostname=$1
@@ -1442,6 +1582,18 @@ function get_disk_metric_type_by_dataset {
 }
 
 
+# make an alert for all the supported metrics
+function alert_all_metrics {
+  local hostname=$1
+  ram_alert $hostname
+  cpu_alert $hostname
+  diskOpt_alert $hostname
+  diskVar_alert $hostname
+  diskHome_alert $hostname
+  diskRootfs_alert $hostname
+}
+
+
 # make an alert if the ram threshold is exceeded by the given container
 function ram_alert {
   local lxc=$1
@@ -1451,9 +1603,21 @@ function ram_alert {
   lxc_assert $lxc
   lxc_assert_running "$lxc"
 
+
+  get_monitor_update_configuration "$lxc"
+  local monitor_update_conf=$(get_monitor_update_configuration_file "$lxc")
+  local update_entry_in_configuration=$(get_update_entry_in_configuration "$lxc" "$metric_type")
+  local value=$(get_update_entry_value_in_configuration $update_entry_in_configuration)
+  # exit if the metric of host is not set
+  if [ "$value" != "true" ]; then
+    msg_notice "    - $metric_type metric for $lxc is not enabled for monitoring, skipping alert..."
+    return
+  fi
+
+
   if [ ! -f $database_file ]; then
-    msg_error "Database file of $metric_type rrd for $lxc does not exist. Aborting!"
-    exit 1
+    msg_notice "    - Database file of $metric_type rrd for $lxc does not exist. Aborting!"
+    return
   fi
 
 
@@ -1463,8 +1627,8 @@ function ram_alert {
 
   local last_N_values=$(query_rrd $lxc "$metric_type" | tail -$metricCountToAverageToAlert | grep "e+")
   if [ -z "$last_N_values" ]; then
-    msg_error "No data found for $metric_type metric for $lxc! Aborting.."
-    exit 1
+    msg_notice "    - No data found for $metric_type metric for $lxc! Aborting.."
+    return
   fi
 
   assert_number "$average_used_ram"
@@ -1490,15 +1654,26 @@ function cpu_alert {
   lxc_assert "$lxc"
   lxc_assert_running "$lxc"
 
+
+  get_monitor_update_configuration "$lxc"
+  local monitor_update_conf=$(get_monitor_update_configuration_file "$lxc")
+  local update_entry_in_configuration=$(get_update_entry_in_configuration "$lxc" "$metric_type")
+  local value=$(get_update_entry_value_in_configuration $update_entry_in_configuration)
+  # exit if the metric of host is not set
+  if [ "$value" != "true" ]; then
+    msg_notice "    - $metric_type metric for $lxc is not enabled for monitoring, skipping alert..."
+    return
+  fi
+
   if [ ! -f $database_file ]; then
-    msg_error "Database file of $metric_type rrd for $lxc does not exist. Aborting!"
-    exit 1
+    msg_notice "    - Database file of $metric_type rrd for $lxc does not exist. Aborting!"
+    return
   fi
 
   local last_N_values=$(query_rrd $lxc "$metric_type" | tail -$metricCountToAverageToAlert | grep "e+")
   if [ -z "$last_N_values" ]; then
-    msg_error "No data found for $metric_type metric_type for $lxc! Aborting.."
-    exit 1
+    msg_notice "    - No data found for $metric_type metric_type for $lxc! Aborting.."
+    return
   fi
 
   local cpu_alert_threshold_nanoseconds=$(get_cpu_alert_threshold_nanoseconds $lxc)
@@ -1529,9 +1704,20 @@ function disk_alert {
   lxc_assert $lxc
   lxc_assert_running "$lxc"
 
+
+  get_monitor_update_configuration "$lxc"
+  local monitor_update_conf=$(get_monitor_update_configuration_file "$lxc")
+  local update_entry_in_configuration=$(get_update_entry_in_configuration "$lxc" "$metric_type")
+  local value=$(get_update_entry_value_in_configuration $update_entry_in_configuration)
+  # exit if the metric of host is not set
+  if [ "$value" != "true" ]; then
+    msg_notice "    - $metric_type metric for $lxc is not enabled for monitoring, skipping alert..."
+    return
+  fi
+
   if [ ! -f $database_file ]; then
-    msg_error "Database file of $metric_type rrd for $lxc does not exist. Aborting!"
-    exit 1
+    msg_notice "    - Database file of $metric_type rrd for $lxc does not exist, skippping.."
+    return
   fi
 
   local disk_alert_threshold_bytes=$(get_disk_alert_threshold_bytes $lxc $dataset)
@@ -1540,8 +1726,8 @@ function disk_alert {
 
   local last_N_values=$(query_rrd $lxc "$metric_type" | tail -$metricCountToAverageToAlert | grep "e+")
   if [ -z "$last_N_values" ]; then
-    msg_error "No data found for $metric_type metric for $lxc! Aborting.."
-    exit 1
+    msg_notice "    - No data found for $metric_type metric for $lxc, skipping.."
+    return
   fi
 
   assert_number "$average_used_disk"
