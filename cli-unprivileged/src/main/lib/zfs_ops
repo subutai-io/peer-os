@@ -91,12 +91,27 @@ function fs_take_snapshot_from_parent {
 }
 #PROGRESS
 function fs_clone {
+  local home=${HOME#"/"}
   local parent_snap=`echo "$1" | awk -F"/" '{print $2}'`
-  parent_snap="$HOME/.local/tmpdir/$parent_snap"
-  parent_snap=${parent_snap#"/"}
-  local child_ds="$HOME/.local/$2"
-  child_ds=${child_ds#"/"}
-  sudo zfs clone "$parent_snap" "$child_ds"
+  local parent="`echo $parent_snap | awk -F "@" '{print $1}' | awk -F "-" '{print $1}'`"
+
+  lxc-info -n $parent > /dev/null 2>&1
+  if [ $? != 0 ]
+  then
+    parent_snap="$home/.local/tmpdir/$parent_snap"
+  else
+    prefix="$home/.local"
+    if [[ "$1" =~ "var" ]] || [[ "$1" =~ "home" ]]; then
+      prefix="$prefix/lxc-data"
+    elif [[ "$1" =~ "opt" ]]; then
+      prefix="$prefix/lxc"
+    else
+      prefix="$prefix/lxc"
+    fi
+    parent_snap="$prefix/$parent_snap"
+  fi
+    local child_ds="$home/.local/$2"
+    sudo zfs clone "$parent_snap" "$child_ds"
 }
 #PROGRESS
 function fs_set_mountpoint {
@@ -335,8 +350,26 @@ function fs_assert_nosnap {
 # assert snapshot (arg $1) exists, if it does NOT show usage (arg $2)
 # warning: exits!
 function fs_assert_snap {
-  local snap="$1"
+  local home=${HOME#"/"}
+  local snap=`echo "$1" | awk -F"/" '{print $2}'`
+  local parent="`echo $snap | awk -F "@" '{print $1}' | awk -F "-" '{print $1}'`"
   local usage="$2"
+
+  lxc-info -n $parent > /dev/null 2>&1
+  if [ $? != 0 ]
+  then
+    snap="$home/.local/tmpdir/$snap"
+  else
+    prefix="$home/.local"
+    if [[ "$1" =~ "var" ]] || [[ "$1" =~ "home" ]]; then
+      prefix="$prefix/lxc-data"
+    elif [[ "$1" =~ "opt" ]]; then
+      prefix="$prefix/lxc"
+    else
+      prefix="$prefix/share/lxc"
+    fi
+    snap="$prefix/$snap"
+  fi
 
   if [ -z "`sudo zfs list -t snapshot -o name -H $snap`" ]; then
     msg_error "Snapshot \"$snap\" does NOT exist!"
