@@ -169,9 +169,10 @@ function fs_snap_hold_readonly {
   sudo zfs hold keep $home/.local/lxc/$lxc_template@template
   sudo zfs set readonly=on $home/.local/lxc/$lxc_template
 
-  sudo zfs snapshot $home/.local/share/lxc/$lxc_template@template
-  sudo zfs hold keep $home/.local/share/lxc/$lxc_template@template
-  sudo zfs set readonly=on $home/.local/share/lxc/$lxc_template
+  #TODO should be fixed {sudo can modify config file} on btfs and zfs both
+  #sudo zfs snapshot $home/.local/share/lxc/$lxc_template@template
+  #sudo zfs hold keep $home/.local/share/lxc/$lxc_template@template
+  #sudo zfs set readonly=on $home/.local/share/lxc/$lxc_template
 
   sudo zfs snapshot $home/.local/lxc/$lxc_template-opt@template
   sudo zfs hold keep $home/.local/lxc/$lxc_template-opt@template
@@ -196,16 +197,25 @@ function fs_recv {
   sudo zfs recv lxc-data/$template-var < $deltas/var.delta
   sudo zfs recv lxc-data/$template-home < $deltas/home.delta
 }
-#TODO
 #generate delta images of all filesystems
 function fs_send {
   local parent="$1"
   local container="$2"
   local deltas="$3"
-  sudo zfs send -I "lxc/$parent@template" "lxc/$container@template" > "$deltas/rootfs.delta"
-  sudo zfs send -I "lxc/$parent-opt@template" "lxc/$container-opt@template" > "$deltas/opt.delta"
-  sudo zfs send -I "lxc-data/$parent-var@template" "lxc-data/$container-var@template" > "$deltas/var.delta"
-  sudo zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template" > "$deltas/home.delta"
+  local home=${HOME#"/"}
+
+  if [ $parent == "master" ]
+  then
+  (sudo zfs send -I "$home/.local/tmpdir/$parent/rootfs" "$home/.local/lxc/$container/rootfs" > "$deltas/rootfs.delta") > /dev/null 2>&1
+  (sudo zfs send -I "$home/.local/tmpdir/$parent-opt" "$home/.local/lxc/$container-opt" > "$deltas/opt.delta") > /dev/null 2>&1
+  (sudo zfs send -I "$home/.local/tmpdir/$parent-var" "$home/.local/lxc-data/$container-var" > "$deltas/var.delta") > /dev/null 2>&1
+  (sudo zfs send -I "$home/.local/tmpdir/$parent-home" "$home/.local/lxc-data/$container-home" > "$deltas/home.delta") > /dev/null 2>&1
+  else
+    (sudo zfs send -I "$home/.local/lxc/$parent/rootfs" "$home/.local/lxc/$container/rootfs" > "$deltas/rootfs.delta") > /dev/null 2>&1
+    (sudo zfs send -I "$home/.local/lxc/$parent-opt" "$home/.local/lxc/$container-opt" > "$deltas/opt.delta") > /dev/null 2>&1
+    (sudo zfs send -I "$home/.local/lxc/$parent-var" "$home/.local/lxc-data/$container-var" > "$deltas/var.delta") > /dev/null 2>&1
+    (sudo zfs send -I "$home/.local/lxc/$parent-home" "$home/.local/lxc-data/$container-home" > "$deltas/home.delta") > /dev/null 2>&1
+  fi
 }
 #TODO
 function fs_remove_mount {
