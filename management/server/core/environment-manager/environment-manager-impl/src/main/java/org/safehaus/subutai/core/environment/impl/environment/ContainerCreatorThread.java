@@ -8,7 +8,8 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.environment.impl.EnvironmentContainerImpl;
+import org.safehaus.subutai.common.protocol.api.DataService;
+import org.safehaus.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
@@ -25,14 +26,17 @@ public class ContainerCreatorThread extends Observable implements Runnable
     private CloneContainersMessage message;
     private PeerManager peerManager;
     private UUID environmentId;
+    private DataService dataService;
 
 
     public ContainerCreatorThread( final EnvironmentBuilderImpl environmentBuilder, final UUID environmentId,
-                                   final CloneContainersMessage message, final PeerManager peerManager )
+                                   final CloneContainersMessage message, final PeerManager peerManager,
+                                   final DataService dataService )
     {
         this.environmentId = environmentId;
         this.message = message;
         this.peerManager = peerManager;
+        this.dataService = dataService;
     }
 
 
@@ -55,6 +59,7 @@ public class ContainerCreatorThread extends Observable implements Runnable
                         new EnvironmentContainerImpl( message.getTargetPeerId(), message.getNodeGroupName(), hostInfo );
                 container.setCreatorPeerId( peerManager.getLocalPeer().getId().toString() );
                 container.setPeer( peerManager.getPeer( message.getTargetPeerId() ) );
+                container.setDataService( dataService );
                 container.setTemplateName( template.getTemplateName() );
                 containers.add( container );
             }

@@ -5,11 +5,11 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.core.messenger.impl.entity.MessageEntity;
 
 import junit.framework.TestCase;
 
@@ -17,9 +17,9 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.fail;
+import static org.mockito.Mockito.when;
 
 
-@Ignore
 @RunWith( MockitoJUnitRunner.class )
 public class EnvelopeTest
 {
@@ -30,6 +30,9 @@ public class EnvelopeTest
 
     @Mock
     MessageImpl message;
+    @Mock
+    MessageEntity messageEntity;
+
     Envelope envelope;
 
 
@@ -37,12 +40,23 @@ public class EnvelopeTest
     public void setUp() throws Exception
     {
         envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE );
+//        when(messageEntity.getTargetPeerId()).thenReturn( TARGET_PEER_ID );
+//        when( messageEntity.getRecipient() ).thenReturn( RECIPIENT );
+//        when( messageEntity.getTimeToLive() ).thenReturn( TIME_TO_LIVE );
     }
 
 
     @Test
     public void testConstructor() throws Exception
     {
+        try
+        {
+            new Envelope( null );
+            fail( "Exception was expected for null message" );
+        }
+        catch ( NullPointerException e )
+        {
+        }
         try
         {
             new Envelope( null, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE );
@@ -81,7 +95,7 @@ public class EnvelopeTest
     @Test
     public void testProperties() throws Exception
     {
-        assertEquals( message, envelope.getMessage() );
+        assertEquals( message.getId(), envelope.getMessage().getId() );
         assertEquals( RECIPIENT, envelope.getRecipient() );
         assertEquals( TARGET_PEER_ID, envelope.getTargetPeerId() );
         assertEquals( TIME_TO_LIVE, envelope.getTimeToLive() );
@@ -107,5 +121,18 @@ public class EnvelopeTest
         envelope.setCreateDate( CREATE_DATE );
 
         TestCase.assertEquals( CREATE_DATE, envelope.getCreateDate() );
+    }
+
+
+    @Test
+    public void testConstructorWithMessageEntity() throws Exception
+    {
+        long ts = System.currentTimeMillis();
+        when( messageEntity.getCreateDate() ).thenReturn( ts );
+
+        envelope = new Envelope( messageEntity );
+
+        TestCase.assertEquals(envelope.getCreateDate(), new Timestamp( ts ));
+
     }
 }

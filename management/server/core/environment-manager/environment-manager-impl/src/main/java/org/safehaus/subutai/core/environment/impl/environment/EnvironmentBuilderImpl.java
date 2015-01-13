@@ -13,7 +13,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
-import org.safehaus.subutai.core.environment.impl.EnvironmentImpl;
+import org.safehaus.subutai.core.environment.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.slf4j.Logger;
@@ -59,7 +59,8 @@ public class EnvironmentBuilderImpl implements EnvironmentBuilder, Observer
                 throw new BuildException( "No templates assigned" );
             }
             ContainerCreatorThread creatorThread =
-                    new ContainerCreatorThread( this, environment.getId(), message, manager.getPeerManager() );
+                    new ContainerCreatorThread( this, environment.getId(), message, manager.getPeerManager(),
+                            manager.getEnvironmentContainerDataService() );
             creatorThread.addObserver( this );
             containersAmount = containersAmount + message.getNumberOfNodes();
             LOG.info( String.format( "-----------> Scheduled: %s %d %s", key, message.getNumberOfNodes(),

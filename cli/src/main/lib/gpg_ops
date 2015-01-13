@@ -38,7 +38,6 @@ assert_key_exists_private_key_ring(){
 }
 
 
-
 # checks if the given key_id exists in keyring
 # parameters:
 #   1) key id
@@ -76,6 +75,8 @@ assert_key_exists(){
 
 # This function is used to print output table in an alinged fashion.
 # It caclucates the length of strings in column, and puts white spaces accordingly.
+# This function is used to print output table in an alinged fashion.
+# It caclucates the length of strings in column, and puts white spaces accordingly.
 find_len(){
   target=$1
   max_size=0
@@ -83,11 +84,12 @@ find_len(){
   IFS=' ' read -a array <<< "$all_pubs"
   for element in "${array[@]}"
   do
+    output=`gpg2 --list-keys | sed -n '/'$element'/,/^$/p'`
     case $target in
       sub | pub )
-        sub_ids=$(echo `gpg2 --list-key  $element | grep $target' ' | cut -d "/" -f2 | cut -d " " -f1`)
+        sub_ids=`echo -e "$output" | grep $target' ' | cut -d "/" -f2 | cut -d " " -f1`
         result=""
-        IFS=' ' read -a array <<< "$sub_ids"
+        IFS=' ' read -a array <<< $sub_ids
         for element in "${array[@]}"
         do
           result=$result$element:
@@ -95,16 +97,16 @@ find_len(){
         result=$(echo $result | sed s'/.$//')
         ;;
       name )
-        result=$(echo `gpg2 --list-key $element | grep 'uid'  | sed 's/([^)]*[^(]//g' | awk '{print $(NF-1)}'`)
+        result=`echo -e "$output" | grep uid  | grep -o -P '(?<=]).*(?=<)' | sed 's/([^)]*[^(]//g' | sed 's/ //1'`
         ;;
       mail )
-        result=$(echo `gpg2 --list-key $element | grep 'uid'  | awk '{print $NF}' |  sed 's/^.\(.*\).$/\1/'`)
+        result=`echo -e "$output" | grep uid  | awk '{print $NF}' |  sed 's/^.\(.*\).$/\1/'`
         ;;
       expiry)
-        result=$(echo `gpg2 --list-key $element | grep '^pub' | awk '{print $3}'`)
+        result=`echo -e "$output" | grep '^pub' | awk '{print $3}'`
         ;;
       trust)
-        result=$(echo `gpg2 --list-key $element | grep '^pub' | awk '{print $3}'`)
+        result=`echo -e "$output" | grep '^pub' | awk '{print $3}'`
         ;;
     esac
     size=${#result}
@@ -290,31 +292,19 @@ print_keys(){
     fi
 
     if [[ $date == true && $trust == true ]]; then
-      # print keys in summarized format
       summary=`summarize_key -et ${list[$i]} `
-      # echo "index " $i " : "  ${list[$i]}
-      # echo "summary: " $summary
       printf "%${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s %-${spaces[5]}s" $summary
       printf "\n"
     elif [[ $date == false && $trust == true ]]; then
-      # print keys in summarized format
       summary=`summarize_key -t ${list[$i]} `
-      # echo "index " $i " : "  ${list[$i]}
-      # echo "summary: " $summary
       printf "%${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s" $summary
       printf "\n"      
     elif [[ $date == true && $trust == false ]]; then
-      # print keys in summarized format
       summary=`summarize_key -e ${list[$i]} `
-      # echo "index " $i " : "  ${list[$i]}
-      # echo "summary: " $summary
       printf "%${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s %-${spaces[4]}s" $summary
       printf "\n"      
     elif [[ $date == false && $trust == false ]]; then
-      # print keys in summarized format
       summary=`summarize_key ${list[$i]} `
-      # echo "index " $i " : "  ${list[$i]}
-      # echo "summary: " $summary
       printf "%${spaces[0]}s %-${spaces[1]}s %-${spaces[2]}s %-${spaces[3]}s" $summary
       printf "\n"      
     fi
@@ -454,4 +444,3 @@ assert_email_validity(){
     exit 1
   fi
 }
-

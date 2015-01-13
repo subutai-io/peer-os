@@ -19,6 +19,16 @@ public class MemoryQuotaInfo extends QuotaInfo
     }
 
 
+    public MemoryQuotaInfo( final Memory memoryQuota )
+    {
+        this.memoryQuota = memoryQuota;
+        if ( this.memoryQuota.getValue() > Long.MAX_VALUE )
+        {
+            this.memoryQuota.unit = MemoryUnit.NONE;
+        }
+    }
+
+
     public Memory getMemoryQuota()
     {
         return memoryQuota;

@@ -4,7 +4,8 @@ function key_manager_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Key manager wrapper
   echo
-  echo "        "subutai key_manager generate real_name email
+  echo "  "subutai key_manager generate real_name email
+  echo "  "subutai key_manager generate_subkey key_id
   echo "  "subutai key_manager export \<--ssh\> key_id 
   echo "  "subutai key_manager list
   echo "  "subutai key_manager list key_id
@@ -55,13 +56,35 @@ generate(){
     Name-Comment: subutai environment key
     Name-Email: $email
     Expire-Date: 1y
-    #%dry-run
     %no-protection
     %commit
     %echo DONE
 EOF
     gpg2 --batch --gen-key $scriptName
     rm $scriptName
+}
+
+
+# FIXME: We can enable user to enter key size and expiration date.
+# generates unattented subkey 
+#
+# NOTE:Could not disable passphrase asking feature of gpg agent, 
+# but I could enter empty passphrase while creating subkeys.
+# gpg-agent does not ask for passphrase while signing files or keys, 
+# if the passphrase of subkey is "empty string". 
+# Emply string for passphrase practically enables us to create unattented GPG subkeys.
+# 
+#   type : RSA
+#   size : 2048
+#   expiry : 2 years
+#   passphrase : empty
+genereate_subkey(){
+  key_id=$1
+  assert_key_exists $key_id
+  echo -e "ADDKEY\n6\n2048\n2y\n\n\nsave\n" | gpg2 --pinentry-mode loopback \
+                                              --command-fd 0 --status-fd --verbose \
+                                              --edit-key $key_id
+  msg_ok "subkey is generated"
 }
 
 
@@ -108,6 +131,7 @@ list(){
   printf "\n"
   gpg2 --list-keys $key_id
 }
+
 
 # Revokes the key
 # parameters

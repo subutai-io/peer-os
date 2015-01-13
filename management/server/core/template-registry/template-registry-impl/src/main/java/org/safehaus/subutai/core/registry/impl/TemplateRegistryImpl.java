@@ -16,14 +16,20 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.safehaus.subutai.common.cache.ExpiringCache;
+import org.safehaus.subutai.common.datatypes.TemplateVersion;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.TemplateService;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.StringUtil;
+import org.safehaus.subutai.core.git.api.GitChangedFile;
+import org.safehaus.subutai.core.git.api.GitException;
+import org.safehaus.subutai.core.git.api.GitManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
@@ -45,6 +51,8 @@ public class TemplateRegistryImpl implements TemplateRegistry
     private static final String TEMPLATE_IS_NULL_MSG = "Template name is null or empty";
     private static final String LXC_ARCH_IS_NULL_MSG = "Lxc Arch is null or empty";
     private static final String TEMPLATE_NOT_FOUND_MSG = "Template %s not found";
+    private static final String REPO_ROOT_PATH = "/var/lib/git/subutai.git/";
+    private final ExpiringCache<String, Boolean> templateDownloadTokens = new ExpiringCache<>();
 
 
     public void setTemplateService( final TemplateService templateDAO )
@@ -54,6 +62,8 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
 
     protected TemplateService templateService;
+
+    private GitManager gitManager;
 
 
     public TemplateRegistryImpl() throws DaoException
@@ -117,8 +127,10 @@ public class TemplateRegistryImpl implements TemplateRegistry
             String subutaiGitBranch = properties.getProperty( "subutai.git.branch" );
             String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
 
+            LOG.warn( configFile );
+
             Template template = new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch,
-                    subutaiGitUuid, packagesFile, md5sum );
+                    subutaiGitUuid, packagesFile, md5sum, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ) );
 
             //check if template with such name already exists
             if ( getTemplate( template.getTemplateName() ) != null )
@@ -240,11 +252,25 @@ public class TemplateRegistryImpl implements TemplateRegistry
     @Override
     public void unregisterTemplate( final String templateName, final String lxcArch ) throws RegistryException
     {
+        unregisterTemplate( templateName, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), lxcArch );
+    }
+
+
+    /**
+     * Removes template entry from registry
+     *
+     * @param templateName - name of template to remove
+     * @param templateVersion - lxc architecture
+     */
+    public boolean unregisterTemplate( String templateName, TemplateVersion templateVersion, String lxcArch )
+            throws RegistryException
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), TEMPLATE_IS_NULL_MSG );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), LXC_ARCH_IS_NULL_MSG );
+        Preconditions.checkNotNull( templateVersion, "Template version is null." );
 
         //find template
-        Template template = getTemplate( templateName, lxcArch );
+        Template template = getTemplate( templateName, templateVersion, lxcArch );
 
         if ( template != null )
         {
@@ -257,7 +283,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
             }
 
             //check if template has children
-            List<Template> children = getChildTemplates( templateName, lxcArch );
+            List<Template> children = getChildTemplates( templateName, templateVersion, lxcArch );
             if ( !children.isEmpty() )
             {
                 throw new RegistryException(
@@ -281,6 +307,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
         {
             throw new RegistryException( String.format( TEMPLATE_NOT_FOUND_MSG, templateName ) );
         }
+        return true;
     }
 
 
@@ -309,12 +336,76 @@ public class TemplateRegistryImpl implements TemplateRegistry
     @Override
     public Template getTemplate( final String templateName, String lxcArch )
     {
+        return getTemplate( templateName, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), lxcArch );
+    }
+
+
+    /**
+     * Returns template by name and lxc arch
+     *
+     * @param templateName - name of template
+     * @param templateVersion - template version
+     *
+     * @return {@code Template}
+     */
+    @Override
+    public Template getTemplate( final String templateName, TemplateVersion templateVersion )
+    {
+        return getTemplate( templateName, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
+                Common.DEFAULT_LXC_ARCH );
+    }
+
+
+    /**
+     * Returns template by name and lxc arch
+     *
+     * @param templateName - name of template
+     * @param lxcArch - lxc architecture
+     * @param templateVersion - template version
+     *
+     * @return {@code Template}
+     */
+    @Override
+    public Template getTemplate( final String templateName, TemplateVersion templateVersion, String lxcArch )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), TEMPLATE_IS_NULL_MSG );
+        Preconditions.checkNotNull( templateVersion, "Template version is null." );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), LXC_ARCH_IS_NULL_MSG );
         //retrieve template from storage
         try
         {
-            return templateService.getTemplateByName( templateName, lxcArch );
+            return templateService.getTemplate( templateName, templateVersion, lxcArch );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in getTemplate", e );
+            return null;
+        }
+    }
+
+
+    /**
+     * Returns template by name and lxc arch
+     *
+     * @param templateName - name of template
+     * @param lxcArch - lxc architecture
+     * @param md5sum - lxc md5sum
+     * @param templateVersion - lxc templateVersion
+     *
+     * @return {@code Template}
+     */
+    @Override
+    public Template getTemplate( final String templateName, String lxcArch, String md5sum,
+                                 TemplateVersion templateVersion )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), TEMPLATE_IS_NULL_MSG );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), LXC_ARCH_IS_NULL_MSG );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( md5sum ), "Template md5sum cannot be null." );
+        Preconditions.checkNotNull( templateVersion, "Template version cannot be null." );
+        //retrieve template from storage
+        try
+        {
+            return templateService.getTemplate( templateName, lxcArch, md5sum, templateVersion );
         }
         catch ( Exception e )
         {
@@ -342,6 +433,20 @@ public class TemplateRegistryImpl implements TemplateRegistry
      * Returns child templates
      *
      * @param parentTemplateName - parent template name
+     *
+     * @return {@code List<Template>}
+     */
+    @Override
+    public List<Template> getChildTemplates( final String parentTemplateName, TemplateVersion templateVersion )
+    {
+        return getChildTemplates( parentTemplateName, templateVersion, Common.DEFAULT_LXC_ARCH );
+    }
+
+
+    /**
+     * Returns child templates
+     *
+     * @param parentTemplateName - parent template name
      * @param lxcArch - lxc architecture
      *
      * @return {@code List<Template>}
@@ -349,13 +454,30 @@ public class TemplateRegistryImpl implements TemplateRegistry
     @Override
     public List<Template> getChildTemplates( final String parentTemplateName, String lxcArch )
     {
+        return getChildTemplates( parentTemplateName, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), lxcArch );
+    }
+
+
+    /**
+     * Returns child templates
+     *
+     * @param parentTemplateName - parent template name
+     * @param lxcArch - lxc architecture
+     *
+     * @return {@code List<Template>}
+     */
+    @Override
+    public List<Template> getChildTemplates( final String parentTemplateName, final TemplateVersion templateVersion,
+                                             String lxcArch )
+    {
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( parentTemplateName ), "Parent template name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), LXC_ARCH_IS_NULL_MSG );
+        Preconditions.checkNotNull( templateVersion, "Template version is null." );
         //retrieve child templates from storage
         try
         {
-            return templateService.getChildTemplates( parentTemplateName, lxcArch );
+            return templateService.getChildTemplates( parentTemplateName, templateVersion, lxcArch );
         }
         catch ( Exception e )
         {
@@ -390,11 +512,28 @@ public class TemplateRegistryImpl implements TemplateRegistry
     @Override
     public Template getParentTemplate( final String childTemplateName, final String lxcArch )
     {
+        return getParentTemplate( childTemplateName, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), lxcArch );
+    }
+
+
+    /**
+     * Returns parent template
+     *
+     * @param childTemplateName - child template name
+     * @param templateVersion - child template version
+     * @param lxcArch - lxc architecture
+     *
+     * @return {@code Template}
+     */
+    @Override
+    public Template getParentTemplate( final String childTemplateName, final TemplateVersion templateVersion,
+                                       final String lxcArch )
+    {
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( childTemplateName ), "Child template name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), LXC_ARCH_IS_NULL_MSG );
         //retrieve parent template from storage
-        Template child = getTemplate( childTemplateName, lxcArch );
+        Template child = getTemplate( childTemplateName, templateVersion, lxcArch );
 
         if ( child != null && !Strings.isNullOrEmpty( child.getParentTemplateName() ) )
         {
@@ -449,6 +588,20 @@ public class TemplateRegistryImpl implements TemplateRegistry
      * Returns parent templates
      *
      * @param childTemplateName - name of template whose parents to return
+     *
+     * @return {@code List<Template>}
+     */
+    @Override
+    public List<Template> getParentTemplates( String childTemplateName, TemplateVersion templateVersion )
+    {
+        return getParentTemplates( childTemplateName, templateVersion, Common.DEFAULT_LXC_ARCH );
+    }
+
+
+    /**
+     * Returns parent templates
+     *
+     * @param childTemplateName - name of template whose parents to return
      * @param lxcArch - lxc architecture
      *
      * @return {@code List<Template>}
@@ -456,9 +609,26 @@ public class TemplateRegistryImpl implements TemplateRegistry
     @Override
     public List<Template> getParentTemplates( final String childTemplateName, final String lxcArch )
     {
+        return getParentTemplates( childTemplateName, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), lxcArch );
+    }
+
+
+    /**
+     * Returns parent templates
+     *
+     * @param childTemplateName - name of template whose parents to return
+     * @param templateVersion - version of template whose parents to return
+     * @param lxcArch - lxc architecture
+     *
+     * @return {@code List<Template>}
+     */
+    @Override
+    public List<Template> getParentTemplates( final String childTemplateName, final TemplateVersion templateVersion,
+                                              final String lxcArch )
+    {
         List<Template> parents = new ArrayList<>();
 
-        Template parent = getParentTemplate( childTemplateName, lxcArch );
+        Template parent = getParentTemplate( childTemplateName, templateVersion, lxcArch );
         while ( parent != null )
         {
             parents.add( parent );
@@ -526,11 +696,30 @@ public class TemplateRegistryImpl implements TemplateRegistry
     public synchronized boolean updateTemplateUsage( final String faiHostname, final String templateName,
                                                      final boolean inUse ) throws RegistryException
     {
+        return updateTemplateUsage( faiHostname, templateName, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ),
+                inUse );
+    }
+
+
+    /**
+     * Updates template usage on FAIs
+     *
+     * @param faiHostname - fai hostname
+     * @param templateVersion - target template version
+     * @param templateName - target template
+     * @param inUse - true - template is in use, false - template is out of use
+     */
+    @Override
+    public synchronized boolean updateTemplateUsage( final String faiHostname, final String templateName,
+                                                     TemplateVersion templateVersion, final boolean inUse )
+            throws RegistryException
+    {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( faiHostname ), "FAI hostname is null or empty" );
+        Preconditions.checkNotNull( templateVersion, "Template version is null." );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), TEMPLATE_IS_NULL_MSG );
 
-        Template template = getTemplate( templateName );
+        Template template = getTemplate( templateName, templateVersion );
         if ( template == null )
         {
             throw new RegistryException( String.format( TEMPLATE_NOT_FOUND_MSG, templateName ) );
@@ -562,9 +751,24 @@ public class TemplateRegistryImpl implements TemplateRegistry
     @Override
     public boolean isTemplateInUse( String templateName ) throws RegistryException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), TEMPLATE_IS_NULL_MSG );
+        return isTemplateInUse( templateName, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ) );
+    }
 
-        Template template = getTemplate( templateName );
+
+    /**
+     * Indicates if template is in use on any of FAIs
+     *
+     * @param templateName - name of template
+     *
+     * @return true - in use, false - not in use
+     */
+    @Override
+    public boolean isTemplateInUse( String templateName, TemplateVersion templateVersion ) throws RegistryException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), TEMPLATE_IS_NULL_MSG );
+        Preconditions.checkNotNull( templateVersion, "Template version is null." );
+
+        Template template = getTemplate( templateName, templateVersion );
         if ( template == null )
         {
             throw new RegistryException( String.format( TEMPLATE_NOT_FOUND_MSG, templateName ) );
@@ -595,13 +799,55 @@ public class TemplateRegistryImpl implements TemplateRegistry
     }
 
 
+    public List<GitChangedFile> getChangedFiles( Template template ) throws RegistryException
+    {
+        String parentBranch = template.getParentTemplateName();
+        String templateBranch = template.getTemplateName();
+        if ( parentBranch == null || "".equals( parentBranch ) )
+        {
+            parentBranch = templateBranch;
+        }
+        return getChangedFiles( parentBranch, templateBranch );
+    }
+
+
+    private List<GitChangedFile> getChangedFiles( String parentBranch, String childBranch ) throws RegistryException
+    {
+        try
+        {
+            return getGitManager().diffBranches( REPO_ROOT_PATH, parentBranch, childBranch );
+        }
+        catch ( GitException e )
+        {
+            return Collections.emptyList();
+        }
+    }
+
+
+    public GitManager getGitManager()
+    {
+        return gitManager;
+    }
+
+
+    public void setGitManager( final GitManager gitManager )
+    {
+        this.gitManager = gitManager;
+    }
+
+
     public void init()
     {
         try
         {
-            //            Template template = TestUtilsDuplicate.getParentTemplate();
-            //            templateService.saveTemplate( template );
-
+            try
+            {
+                templateService.saveTemplate( TestUtils2.getParentTemplate() );
+            }
+            catch ( IOException e )
+            {
+                e.printStackTrace();
+            }
             LOG.warn( "Printing saved templates..." );
             List<Template> templates = templateService.getAllTemplates();
             for ( Template template1 : templates )
@@ -609,13 +855,35 @@ public class TemplateRegistryImpl implements TemplateRegistry
                 LOG.warn( template1.getTemplateName() );
             }
         }
-        //        catch ( IOException e )
-        //        {
-        //            LOG.error( "Error in TestUtilsDuplicate.getParentTemplate()@TemplateRegistryImpl service: ", e );
-        //        }
         catch ( DaoException e )
         {
             LOG.error( "Error while saving template: ", e );
         }
+    }
+
+
+    public void dispose()
+    {
+        templateDownloadTokens.dispose();
+    }
+
+
+    @Override
+    public String getTemplateDownloadToken( final int timeout )
+    {
+        Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
+
+        String templateDownloadToken = UUID.randomUUID().toString();
+        templateDownloadTokens.put( templateDownloadToken, false, timeout * 1000 );
+        return templateDownloadToken;
+    }
+
+
+    @Override
+    public boolean checkTemplateDownloadToken( final String token )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token" );
+
+        return templateDownloadTokens.get( token ) != null;
     }
 }

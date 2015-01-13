@@ -9,6 +9,7 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
@@ -45,6 +46,9 @@ public interface Peer
 
     public boolean isConnected( Host host );
 
+    public ProcessResourceUsage getProcessResourceUsage( ContainerHost containerHost, int processPid )
+            throws PeerException;
+
     public CommandResult execute( RequestBuilder requestBuilder, Host host ) throws CommandException;
 
     public CommandResult execute( RequestBuilder requestBuilder, Host host, CommandCallback callback )
@@ -65,9 +69,64 @@ public interface Peer
 
     public boolean isOnline() throws PeerException;
 
-    public <T, V> V sendRequest( T request, String recipient, int timeout, Class<V> responseType ) throws PeerException;
+    public <T, V> V sendRequest( T request, String recipient, int requestTimeout, Class<V> responseType,
+                                 int responseTimeout ) throws PeerException;
 
-    public <T> void sendRequest( T request, String recipient, int timeout ) throws PeerException;
+    public <T> void sendRequest( T request, String recipient, int requestTimeout ) throws PeerException;
 
     public ContainerHostState getContainerHostState( String containerId ) throws PeerException;
+
+    //******** Quota functions ***********
+
+    /**
+     * Returns RAM quota on container in megabytes
+     *
+     * @param containerId - id of container
+     *
+     * @return - quota in mb
+     */
+    public int getRamQuota( UUID containerId ) throws PeerException;
+
+    /**
+     * Sets RAM quota on container in megabytes
+     *
+     * @param containerId - id of container
+     * @param ramInMb - quota in mb
+     */
+    public void setRamQuota( UUID containerId, int ramInMb ) throws PeerException;
+
+
+    /**
+     * Returns CPU quota on container in percent
+     *
+     * @param containerId - id of container
+     *
+     * @return - cpu quota on container in percent
+     */
+    public int getCpuQuota( UUID containerId ) throws PeerException;
+
+    /**
+     * Sets CPU quota on container in percent
+     *
+     * @param containerId - id of container
+     * @param cpuPercent - cpu quota in percent
+     */
+    public void setCpuQuota( UUID containerId, int cpuPercent ) throws PeerException;
+
+    /**
+     * Returns allowed cpus/cores ids on container
+     *
+     * @param containerId - id of container
+     *
+     * @return - allowed cpu set
+     */
+    public Set<Integer> getCpuSet( UUID containerId ) throws PeerException;
+
+    /**
+     * Sets allowed cpus/cores on container
+     *
+     * @param containerId - id of container
+     * @param cpuSet - allowed cpu set
+     */
+    public void setCpuSet( UUID containerId, Set<Integer> cpuSet ) throws PeerException;
 }

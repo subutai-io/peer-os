@@ -1,28 +1,32 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint default-activation="eager"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.1.0" xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.1.0"
 
-  <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:~/messenger" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
-  </bean>
-
-  <reference id="entityManagerFactory" interface="javax.persistence.EntityManagerFactory"
-             filter="(osgi.unit.name=messengerUnit)" />
+           xsi:schemaLocation="
+            http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
+            http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
+            http://aries.apache.org/xmlns/jpa/v1.1.0 http://aries.apache.org/xmlns/jpa/v1.0.0
+            http://aries.apache.org/xmlns/transactions/v1.1.0 http://aries.apache.org/xmlns/transactions/v1.1.0 ">
 
   <reference id="peerManager" availability="optional"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+             interface="org.safehaus.subutai.core.peer.api.PeerManager" >
+  </reference>
+
+  <!-- Data Access object to get EntityManager -->
+  <bean id="daoManager" class="org.safehaus.subutai.core.messenger.impl.dao.DaoManager">
+    <jpa:unit unitname="messengerPUnit"  property="entityManagerFactory" />
+    <tx:transaction method="*" value="Required"/>
+  </bean>
 
   <bean id="messenger" class="org.safehaus.subutai.core.messenger.impl.MessengerImpl" scope="singleton"
         init-method="init"
         destroy-method="destroy">
-    <argument ref="dataSource" />
-    <argument ref="peerManager" />
-    <property name="entityManagerFactory" ref="entityManagerFactory" />
+    <property name="peerManager" ref="peerManager"/>
+    <property name="daoManager"  ref="daoManager"/>
   </bean>
 
   <service ref="messenger" interface="org.safehaus.subutai.core.messenger.api.Messenger" />
-
   <service ref="messenger" interface="org.safehaus.subutai.core.messenger.api.MessageProcessor" />
 
 </blueprint>

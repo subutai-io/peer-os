@@ -3,8 +3,6 @@ package org.safehaus.subutai.core.peer.api;
 
 import java.util.List;
 import java.util.UUID;
-
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 

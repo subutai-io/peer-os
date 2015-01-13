@@ -9,6 +9,7 @@ import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
@@ -304,6 +305,197 @@ public class RemotePeerRestClient
         else
         {
             throw new PeerException( "Could not get quota", response.getEntity().toString() );
+        }
+    }
+
+
+    public ProcessResourceUsage getProcessResourceUsage( ContainerHost host, int processPid ) throws PeerException
+    {
+        String path = "peer/container/resource/usage";
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "hostId", host.getId().toString() )
+                      .query( "processPid", processPid ).get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<ProcessResourceUsage>()
+            {}.getType() );
+        }
+        else
+        {
+            throw new PeerException( "Could not get process resource usage", response.getEntity().toString() );
+        }
+    }
+
+
+    //******** Quota functions ***********
+
+
+    /**
+     * Returns RAM quota on container in megabytes
+     *
+     * @param containerId - id of container
+     *
+     * @return - quota in mb
+     */
+    public int getRamQuota( UUID containerId ) throws PeerException
+    {
+        String path = "peer/container/quota/ram";
+
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "containerId", containerId.toString() )
+                      .get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return response.readEntity( Integer.class );
+        }
+        else
+        {
+            throw new PeerException( "Could not get RAM quota", response.getEntity().toString() );
+        }
+    }
+
+
+    /**
+     * Sets RAM quota on container in megabytes
+     *
+     * @param containerId - id of container
+     * @param ramInMb - quota in mb
+     */
+    public void setRamQuota( UUID containerId, int ramInMb ) throws PeerException
+    {
+        String path = "peer/container/quota/ram";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+
+        form.set( "containerId", containerId.toString() );
+        form.set( "ram", ramInMb );
+
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE ).post( form );
+
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        {
+            throw new PeerException( "Could not set RAM quota", response.getEntity().toString() );
+        }
+    }
+
+
+    /**
+     * Returns CPU quota on container in percent
+     *
+     * @param containerId - id of container
+     *
+     * @return - cpu quota on container in percent
+     */
+    public int getCpuQuota( UUID containerId ) throws PeerException
+    {
+        String path = "peer/container/quota/cpu";
+
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "containerId", containerId.toString() )
+                      .get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return response.readEntity( Integer.class );
+        }
+        else
+        {
+            throw new PeerException( "Could not get CPU quota", response.getEntity().toString() );
+        }
+    }
+
+
+    /**
+     * Sets CPU quota on container in percent
+     *
+     * @param containerId - id of container
+     * @param cpuPercent - cpu quota in percent
+     */
+    public void setCpuQuota( UUID containerId, int cpuPercent ) throws PeerException
+    {
+        String path = "peer/container/quota/cpu";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+
+        form.set( "containerId", containerId.toString() );
+        form.set( "cpu", cpuPercent );
+
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE ).post( form );
+
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        {
+            throw new PeerException( "Could not set CPU quota", response.getEntity().toString() );
+        }
+    }
+
+
+    /**
+     * Returns allowed cpus/cores ids on container
+     *
+     * @param containerId - id of container
+     *
+     * @return - allowed cpu set
+     */
+    public Set<Integer> getCpuSet( UUID containerId ) throws PeerException
+    {
+        String path = "peer/container/quota/cpuset";
+
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "containerId", containerId.toString() )
+                      .get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<Set<Integer>>()
+            {}.getType() );
+        }
+        else
+        {
+            throw new PeerException( "Could not get allowed CPU set", response.getEntity().toString() );
+        }
+    }
+
+
+    /**
+     * Sets allowed cpus/cores on container
+     *
+     * @param containerId - id of container
+     * @param cpuSet - allowed cpu set
+     */
+    public void setCpuSet( UUID containerId, Set<Integer> cpuSet ) throws PeerException
+    {
+        String path = "peer/container/quota/cpuset";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+
+        form.set( "containerId", containerId.toString() );
+        form.set( "cpuSet", JsonUtil.toJson( cpuSet ) );
+
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE ).post( form );
+
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        {
+            throw new PeerException( "Could not set allowed CPU set", response.getEntity().toString() );
         }
     }
 }

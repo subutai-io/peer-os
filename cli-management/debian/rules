@@ -5,6 +5,7 @@
 d = debian/subutai-cli-management
 BINDINGS=/etc/subutai/bindings
 SCRIPTS=/usr/bin
+CONFIG=/etc/subutai
 LIBDIR=/usr/share/subutai-cli/subutai/lib
 BASHCOMPDIR=/etc/bash_completion.d/
 
@@ -34,10 +35,12 @@ install: build
 	mkdir -p ${d}${SCRIPTS}
 	mkdir -p ${d}${LIBDIR}
 	mkdir -p ${d}${BASHCOMPDIR}
+	mkdir -p ${d}${CONFIG}
 	cp -a src/main/lib/* ${d}${LIBDIR}
 	cp -a src/main/bindings/* ${d}${BINDINGS}
 	cp -a ../cli/src/main/lib/bsfl ${d}${LIBDIR}
 	cp -a ../cli/src/main/scripts/subutai ${d}${SCRIPTS}
+	cp -a ../cli/src/main/config/config ${d}${CONFIG}
 	cp debian/subutai-cli-management.bash_completion ${d}${BASHCOMPDIR}
 	dh_link
 

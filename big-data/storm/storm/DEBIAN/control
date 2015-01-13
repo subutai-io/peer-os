@@ -4,6 +4,6 @@ Section: devel
 Installed-Size: 488000
 Maintainer: subutai
 Architecture: all
-Version: 1.0.6
+Version: 1.0.7
 Depends: openjdk-7-jdk, automake, autoconf, zip, unzip, build-essential, uuid-dev, pkg-config, libtool, libxml2-utils
 Description: This is a storm package of subutai distribution.

@@ -43,6 +43,14 @@ public interface KeyManager
     public void signFileWithKey( String keyId, String filePath ) throws KeyManagerException;
 
     /**
+     * Sign key with specified key
+     *
+     * @param signerKeyId - id of pgp key which is used to sign
+     * @param signedKeyId - id of pgp key which is to be signed
+     */
+    public void signKeyWithKey( String signerKeyId, String signedKeyId ) throws KeyManagerException;
+
+    /**
      * Sends key to HUB
      *
      * @param keyId - id of pgp key to be sent

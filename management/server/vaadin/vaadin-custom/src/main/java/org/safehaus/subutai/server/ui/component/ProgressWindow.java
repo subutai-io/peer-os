@@ -23,6 +23,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -47,7 +48,9 @@ public class ProgressWindow
         final VerticalLayout l = new VerticalLayout();
         window = new Window( "Operation progress", l );
         window.setImmediate( true );
-        window.setModal( true );
+        window.setModal( false );
+        window.setResizable( true );
+        window.center();
         window.setWidth( 650, Sizeable.Unit.PIXELS );
 
         this.trackID = trackID;
@@ -120,10 +123,9 @@ public class ProgressWindow
                     {
                         setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
 
-                        if ( po.getState() == OperationState.SUCCEEDED
-                                || po.getState() == OperationState.FAILED )
+                        if ( po.getState() == OperationState.SUCCEEDED || po.getState() == OperationState.FAILED )
                         {
-                            hideProgress();
+                            hideProgress( po );
                             break;
                         }
                     }
@@ -175,10 +177,12 @@ public class ProgressWindow
     }
 
 
-    private void hideProgress()
+    private void hideProgress( final TrackerOperationView to )
     {
         indicator.setVisible( false );
         ok.setEnabled( true );
+
+        Notification.show( to.getState() + " " + to.getDescription(), to.getLog(), Notification.Type.WARNING_MESSAGE );
     }
 
 

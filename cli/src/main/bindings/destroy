@@ -67,7 +67,7 @@ function destroy {
   fi
 
   # (1) check that clone exists first: turn off if on
-  lxc_assert "$clone" "`usage`"
+  lxc_assert "$clone" "`destroy_usage`"
   lxc_stop $clone
 
   # (1) let's get the clone's parent

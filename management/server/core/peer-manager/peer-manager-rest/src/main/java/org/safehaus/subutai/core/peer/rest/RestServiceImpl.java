@@ -11,10 +11,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
@@ -161,8 +160,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setQuota( @FormParam( "hostId" ) final String hostId,
-                              @FormParam( "quotaInfo" ) final String quotaInfo )
+    public Response setQuota( final String hostId, final String quotaInfo )
     {
         try
         {
@@ -179,8 +177,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getQuota( @QueryParam( "hostId" ) final String hostId,
-                              @QueryParam( "quotaType" ) final String quotaType )
+    public Response getQuota( final String hostId, final String quotaType )
     {
         try
         {
@@ -190,6 +187,23 @@ public class RestServiceImpl implements RestService
             return Response.ok( GSON.toJson( quotaInfo ) ).build();
         }
         catch ( JsonParseException | PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getProcessResourceUsage( final String hostId, final int processPid )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            ProcessResourceUsage processResourceUsage =
+                    localPeer.getProcessResourceUsage( localPeer.getContainerHostById( hostId ), processPid );
+            return Response.ok( GSON.toJson( processResourceUsage ) ).build();
+        }
+        catch ( PeerException e )
         {
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
@@ -361,6 +375,100 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             Template result = localPeer.getTemplate( templateName );
             return Response.ok( JsonUtil.toJson( result ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    //*********** Quota functions ***************
+
+
+    @Override
+    public Response getRamQuota( final String containerId )
+    {
+        try
+        {
+            return Response.ok( peerManager.getLocalPeer().getRamQuota( UUID.fromString( containerId ) ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response setRamQuota( final String containerId, final int ram )
+    {
+        try
+        {
+            peerManager.getLocalPeer().setRamQuota( UUID.fromString( containerId ), ram );
+            return Response.ok().build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getCpuQuota( final String containerId )
+    {
+        try
+        {
+            return Response.ok( peerManager.getLocalPeer().getCpuQuota( UUID.fromString( containerId ) ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response setCpuQuota( final String containerId, final int cpu )
+    {
+        try
+        {
+            peerManager.getLocalPeer().setCpuQuota( UUID.fromString( containerId ), cpu );
+            return Response.ok().build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getCpuSet( final String containerId )
+    {
+        try
+        {
+            return Response
+                    .ok( JsonUtil.toJson( peerManager.getLocalPeer().getCpuSet( UUID.fromString( containerId ) ) ) )
+                    .build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response setCpuSet( final String containerId, final String cpuSet )
+    {
+        try
+        {
+            peerManager.getLocalPeer().setCpuSet( UUID.fromString( containerId ),
+                    ( Set<Integer> ) JsonUtil.fromJson( cpuSet, new TypeToken<Set<Integer>>()
+                    {}.getType() ) );
+            return Response.ok().build();
         }
         catch ( PeerException e )
         {

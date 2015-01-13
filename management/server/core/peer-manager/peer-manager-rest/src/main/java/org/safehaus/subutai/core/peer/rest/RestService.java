@@ -99,4 +99,39 @@ public interface RestService
     @Path( "container/quota" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getQuota( @QueryParam( "hostId" ) String hostId, @QueryParam( "quotaType" ) String quotaType );
+
+    @GET
+    @Path( "container/resource/usage" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getProcessResourceUsage( @QueryParam( "hostId" ) String hostId,
+                                      @QueryParam( "processId" ) int processPid );
+
+    //*********** Quota functions ***************
+
+    @GET
+    @Path( "container/quota/ram" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getRamQuota( @QueryParam( "containerId" ) String containerId );
+
+    @POST
+    @Path( "container/quota/ram" )
+    Response setRamQuota( @FormParam( "containerId" ) String containerId, @FormParam( "ram" ) int ram );
+
+    @GET
+    @Path( "container/quota/cpu" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getCpuQuota( @QueryParam( "containerId" ) String containerId );
+
+    @POST
+    @Path( "container/quota/cpu" )
+    Response setCpuQuota( @FormParam( "containerId" ) String containerId, @FormParam( "cpu" ) int cpu );
+
+    @GET
+    @Path( "container/quota/cpuset" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getCpuSet( @QueryParam( "containerId" ) String containerId );
+
+    @POST
+    @Path( "container/quota/cpuset" )
+    Response setCpuSet( @FormParam( "containerId" ) String containerId, @FormParam( "cpuset" ) String cpuSet );
 }

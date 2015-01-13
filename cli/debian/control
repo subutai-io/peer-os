@@ -8,7 +8,7 @@ Homepage: http://www.safehaus.org
 
 Package: subutai-cli
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, git, awk, sed, grep, coreutils, build-essential, packaging-dev, lxc, lxc-templates, curl, bash-completion, rrdtool
+Depends: ${shlibs:Depends}, ${misc:Depends}, git, awk, sed, grep, coreutils, build-essential, packaging-dev, lxc, lxc-templates, curl, bash-completion, rrdtool, bc
 Description: Subutai LXC container running server host scripts that enable 
  the creation of Subutai controlled LXC container templates and instance 
  containers.

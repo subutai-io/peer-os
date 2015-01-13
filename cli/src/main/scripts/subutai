@@ -5,6 +5,8 @@ subutai_conf_base=/etc/subutai
 subutai_binding_base=/etc/subutai/bindings
 subutai_lib_base=/usr/share/subutai-cli/subutai/lib
 subutai_script_base=/usr/bin
+subutai_pre_script_base=/usr/share/subutai-cli/subutai/pre-scripts
+subutai_post_script_base=/usr/share/subutai-cli/subutai/post-scripts
 
 # source user overrides and settings
 if [ -f ~/.subutairc ]; then

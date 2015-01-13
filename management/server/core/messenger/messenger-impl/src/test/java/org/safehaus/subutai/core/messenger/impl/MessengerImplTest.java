@@ -1,27 +1,27 @@
 package org.safehaus.subutai.core.messenger.impl;
 
 
-import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.MessageListener;
 import org.safehaus.subutai.core.messenger.api.MessageStatus;
+import org.safehaus.subutai.core.messenger.api.MessengerException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
@@ -64,6 +64,10 @@ public class MessengerImplTest
     LocalPeer localPeer;
     @Mock
     MessageImpl message;
+    @Mock
+    EntityManagerFactory entityManagerFactory;
+    @Mock
+    EntityManager entityManager;
 
     MessengerImpl messenger;
 
@@ -75,8 +79,9 @@ public class MessengerImplTest
         PreparedStatement preparedStatement = mock( PreparedStatement.class );
         when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
         when( dataSource.getConnection() ).thenReturn( connection );
+        when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
 
-        messenger = new MessengerImpl( dataSource, peerManager );
+        messenger = new MessengerImpl( peerManager, entityManagerFactory );
         messenger.messageSender = messageSender;
         messenger.notificationExecutor = notificationExecutor;
         messenger.messengerDao = messengerDao;
@@ -84,11 +89,27 @@ public class MessengerImplTest
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
     }
 
-
+    /*
     @Test( expected = NullPointerException.class )
     public void testConstructor() throws Exception
     {
-        new MessengerImpl( null, peerManager );
+        new MessengerImpl( null, entityManagerFactory );
+    }
+
+
+    @Test( expected = NullPointerException.class )
+    public void testConstructor2() throws Exception
+    {
+        new MessengerImpl( peerManager, null );
+    }
+
+
+    @Test( expected = MessengerException.class )
+    public void testConstructorWithException() throws Exception
+    {
+        doThrow( new RuntimeException() ).when( entityManagerFactory ).createEntityManager();
+
+        new MessengerImpl( peerManager, entityManagerFactory );
     }
 
 
@@ -99,7 +120,7 @@ public class MessengerImplTest
 
         verify( messageSender ).init();
     }
-
+    */
 
     @Test
     public void testDestroy() throws Exception
@@ -120,28 +141,20 @@ public class MessengerImplTest
     }
 
 
-    @Test
+    @Test( expected = MessageException.class )
     public void testSendMessage() throws Exception
     {
         messenger.sendMessage( localPeer, message, RECIPIENT, TIME_TO_LIVE );
 
         verify( messengerDao ).saveEnvelope( isA( Envelope.class ) );
-        DaoException exception = mock( DaoException.class );
-        doThrow( exception ).when( messengerDao ).saveEnvelope( any( Envelope.class ) );
 
-        try
-        {
-            messenger.sendMessage( localPeer, message, RECIPIENT, TIME_TO_LIVE );
-            fail( "Expected dao exception" );
-        }
-        catch ( MessageException e )
-        {
-        }
-        verify( exception ).printStackTrace( any( PrintStream.class ) );
+        doThrow( new RuntimeException() ).when( messengerDao ).saveEnvelope( any( Envelope.class ) );
+
+        messenger.sendMessage( localPeer, message, RECIPIENT, TIME_TO_LIVE );
     }
 
 
-    @Test
+    @Test( expected = MessageException.class )
     public void testGetMessageStatus() throws Exception
     {
         Envelope envelope = mock( Envelope.class );
@@ -182,18 +195,9 @@ public class MessengerImplTest
         assertEquals( MessageStatus.SENT, status );
 
         //test exception
-        DaoException exception = mock( DaoException.class );
-        doThrow( exception ).when( messengerDao ).getEnvelope( MESSAGE_ID );
-        try
-        {
-            messenger.getMessageStatus( MESSAGE_ID );
-            fail( "Expected MessageException" );
-        }
-        catch ( MessageException e )
-        {
-        }
+        doThrow( new RuntimeException() ).when( messengerDao ).getEnvelope( any( UUID.class ) );
 
-        verify( exception ).printStackTrace( any( PrintStream.class ) );
+        status = messenger.getMessageStatus( MESSAGE_ID );
     }
 
 
@@ -212,7 +216,6 @@ public class MessengerImplTest
     }
 
 
-    @Ignore
     @Test
     public void testProcessMessage() throws Exception
     {

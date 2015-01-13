@@ -30,13 +30,11 @@ public class TemplateServiceImplTest
 
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateServiceImplTest.class.getName() );
 
-    //    private EntityManager em;
     private EntityManagerFactory emf;
-    //    private EntityTransaction tx;
 
     private TemplateServiceImpl templateServiceImpl;
 
-
+    /*
     @Before
     public void setUp() throws Exception
     {
@@ -59,8 +57,7 @@ public class TemplateServiceImplTest
     {
         Template template = TestUtils.getParentTemplate();
         templateServiceImpl.saveTemplate( template );
-        Template savedTemplate =
-                templateServiceImpl.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
+        Template savedTemplate = templateServiceImpl.getTemplate( template.getTemplateName(), template.getLxcArch() );
         assertEquals( template, savedTemplate );
     }
 
@@ -110,8 +107,7 @@ public class TemplateServiceImplTest
         Template template = TestUtils.getParentTemplate();
         templateServiceImpl.saveTemplate( template );
 
-        Template savedTemplate =
-                templateServiceImpl.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
+        Template savedTemplate = templateServiceImpl.getTemplate( template.getTemplateName(), template.getLxcArch() );
         LOGGER.warn( template.toString() );
         LOGGER.warn( savedTemplate.toString() );
         LOGGER.warn( "\n\n\n\nGetting all templates from DB" );
@@ -121,7 +117,7 @@ public class TemplateServiceImplTest
         }
         assertEquals( template, savedTemplate );
         templateServiceImpl.removeTemplate( template );
-        savedTemplate = templateServiceImpl.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
+        savedTemplate = templateServiceImpl.getTemplate( template.getTemplateName(), template.getLxcArch() );
         LOGGER.warn( "\n\n\n\nGetting template from database" );
         assertNull( savedTemplate );
     }
@@ -145,8 +141,8 @@ public class TemplateServiceImplTest
     {
         Template template = TestUtils.getParentTemplate();
         templateServiceImpl.saveTemplate( template );
-        Template savedTemplate =
-                templateServiceImpl.getTemplateByName( template.getTemplateName(), template.getLxcArch() );
+        Template savedTemplate = templateServiceImpl.getTemplate( template.getTemplateName(), template.getLxcArch() );
         assertEquals( template, savedTemplate );
     }
+    */
 }

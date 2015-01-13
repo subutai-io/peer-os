@@ -31,6 +31,13 @@
       </action>
     </command>
   </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/tag-container">
+      <action class="org.safehaus.subutai.core.environment.cli.TagEnvironmentContainerCommand">
+        <property name="environmentManager" ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
 
   <reference id="environmentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />

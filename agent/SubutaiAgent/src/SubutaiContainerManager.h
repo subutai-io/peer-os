@@ -54,12 +54,14 @@ class SubutaiContainerManager {
         vector<SubutaiContainer> getRunningContainers();
         vector<SubutaiContainer> getStoppedContainers();
         vector<SubutaiContainer> getFrozenContainers();
+        void deleteContainerInfo(string);
         bool isContainerRunning(string );
         bool isContainerStopped(string );
         bool isContainerFrozen(string );
         void updateContainerLists();
         void write();
     protected:
+
     private:
         string                          _lxc_path;
         SubutaiLogger*                  _logger;

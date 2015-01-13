@@ -23,9 +23,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-/**
- * Created by bahadyr on 9/10/14.
- */
 public class NodeGroup2PeerWizard extends Window
 {
 
@@ -53,7 +50,7 @@ public class NodeGroup2PeerWizard extends Window
     }
 
 
-    public void next()
+    private void next()
     {
         step++;
         putForm();
@@ -65,20 +62,14 @@ public class NodeGroup2PeerWizard extends Window
         switch ( step )
         {
             case 1:
-            {
                 setContent( genPeersTable() );
                 break;
-            }
             case 2:
-            {
                 setContent( genNodeGroupToPeersTable() );
                 break;
-            }
             default:
-            {
                 setContent( genPeersTable() );
                 break;
-            }
         }
     }
 
@@ -92,12 +83,6 @@ public class NodeGroup2PeerWizard extends Window
     public void setManagerUI( final EnvironmentManagerPortalModule managerUI )
     {
         this.managerUI = managerUI;
-    }
-
-
-    public void back()
-    {
-        step--;
     }
 
 
@@ -122,8 +107,9 @@ public class NodeGroup2PeerWizard extends Window
             for ( Peer peer : peers )
             {
                 CheckBox checkBox = new CheckBox();
-                peersTable.addItem( new Object[] {
-                        peer.getName(), checkBox
+                peersTable.addItem( new Object[]
+                {
+                    peer.getName(), checkBox
                 }, peer );
             }
         }
@@ -167,8 +153,6 @@ public class NodeGroup2PeerWizard extends Window
         nodeGroupMap = new HashMap<>();
         for ( NodeGroup ng : blueprint.getNodeGroups() )
         {
-            //            for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
-            //            {
             ComboBox comboBox = new ComboBox();
             BeanItemContainer<Peer> bic = new BeanItemContainer<>( Peer.class );
             bic.addAll( selectedPeers() );
@@ -176,12 +160,13 @@ public class NodeGroup2PeerWizard extends Window
             comboBox.setNullSelectionAllowed( false );
             comboBox.setTextInputAllowed( false );
             comboBox.setItemCaptionPropertyId( "name" );
-            Integer itemId = (Integer) ngTopgTable.addItem( new Object[] {
-                    ng.getName(), comboBox
+            Integer itemId = ( Integer ) ngTopgTable.addItem( new Object[]
+            {
+                ng.getName(), comboBox
             }, null );
             nodeGroupMap.put( itemId, ng );
-            //            }
         }
+
         Button nextButton = new Button( "Save build task" );
         nextButton.addClickListener( new Button.ClickListener()
         {
@@ -191,11 +176,10 @@ public class NodeGroup2PeerWizard extends Window
                 Map<Integer, Peer> topology = topologySelection();
                 if ( !topology.isEmpty() || ngTopgTable.getItemIds().size() != topology.size() )
                 {
-                    Map<Integer, NodeGroup> map = getNodeGroupMap();
                     try
                     {
                         managerUI.getEnvironmentManager()
-                                 .saveBuildProcess( new NodeGroup2PeerData( blueprint.getId(), topology, map ) );
+                                .saveBuildProcess( new NodeGroup2PeerData( blueprint.getId(), topology, nodeGroupMap ) );
                     }
                     catch ( EnvironmentManagerException e )
                     {
@@ -221,9 +205,9 @@ public class NodeGroup2PeerWizard extends Window
     private List<Peer> selectedPeers()
     {
         List<Peer> peers = new ArrayList<>();
-        for ( Object itemId : getPeersTable().getItemIds() )
+        for ( Object itemId : peersTable.getItemIds() )
         {
-            CheckBox selection = ( CheckBox ) getPeersTable().getItem( itemId ).getItemProperty( "Select" ).getValue();
+            CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Select" ).getValue();
             if ( selection.getValue() )
             {
                 peers.add( ( Peer ) itemId );
@@ -233,41 +217,18 @@ public class NodeGroup2PeerWizard extends Window
     }
 
 
-    public Table getPeersTable()
-    {
-        return peersTable;
-    }
-
-
-    public Table getNgTopgTable()
-    {
-        return ngTopgTable;
-    }
-
-
-    public Map<Integer, NodeGroup> getNodeGroupMap()
-    {
-        return nodeGroupMap;
-    }
-
-
-    public void setNodeGroupMap( final Map<Integer, NodeGroup> nodeGroupMap )
-    {
-        this.nodeGroupMap = nodeGroupMap;
-    }
-
-
     public Map<Integer, Peer> topologySelection()
     {
         Map<Integer, Peer> topology = new HashMap<>();
-        for ( Object itemId : getNgTopgTable().getItemIds() )
+        for ( Object itemId : ngTopgTable.getItemIds() )
         {
-            ComboBox selection = ( ComboBox ) getNgTopgTable().getItem( (Integer) itemId ).getItemProperty(
+            ComboBox selection = ( ComboBox ) ngTopgTable.getItem( ( Integer ) itemId ).getItemProperty(
                     "Put" ).getValue();
             Peer peer = ( Peer ) selection.getValue();
 
-            topology.put( (Integer) itemId, peer );
+            topology.put( ( Integer ) itemId, peer );
         }
         return topology;
     }
 }
+

@@ -167,6 +167,16 @@ public class KeyManagerImpl implements KeyManager
 
 
     @Override
+    public void signKeyWithKey( final String signerKeyId, final String signedKeyId ) throws KeyManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( signerKeyId ), "Invalid signer key id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( signedKeyId ), "Invalid signed key id" );
+
+        execute( commands.getSignKeyCommand( signerKeyId, signedKeyId ) );
+    }
+
+
+    @Override
     public void sendKeyToHub( final String keyId ) throws KeyManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );

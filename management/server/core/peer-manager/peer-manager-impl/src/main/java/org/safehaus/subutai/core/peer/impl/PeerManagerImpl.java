@@ -13,6 +13,7 @@ import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.messenger.api.Messenger;
+import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -24,6 +25,7 @@ import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandRequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequestListener;
+import org.safehaus.subutai.core.peer.impl.dao.DaoManager;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequestListener;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
@@ -47,12 +49,11 @@ public class PeerManagerImpl implements PeerManager
     private static final String SOURCE_REMOTE_PEER = "PEER_REMOTE";
     private static final String SOURCE_LOCAL_PEER = "PEER_LOCAL";
     private static final String PEER_GROUP = "PEER_GROUP";
-    //    private AgentManager agentManager;
     private PeerDAO peerDAO;
     private QuotaManager quotaManager;
+    private Monitor monitor;
     private TemplateRegistry templateRegistry;
     private DataSource dataSource;
-    //    private CommunicationManager communicationManager;
     private CommandExecutor commandExecutor;
     private LocalPeer localPeer;
     private StrategyManager strategyManager;
@@ -61,8 +62,8 @@ public class PeerManagerImpl implements PeerManager
     private CommandResponseListener commandResponseListener;
     private Set<RequestListener> requestListeners = Sets.newHashSet();
     private MessageResponseListener messageResponseListener;
-    private EntityManagerFactory entityManagerFactory;
     private HostRegistry hostRegistry;
+    private DaoManager daoManager;
 
 
     public PeerManagerImpl( final DataSource dataSource, final Messenger messenger )
@@ -72,22 +73,28 @@ public class PeerManagerImpl implements PeerManager
         this.messenger = messenger;
     }
 
-
-    public void setEntityManagerFactory( EntityManagerFactory entityManagerFactory )
-    {
-        this.entityManagerFactory = entityManagerFactory;
-    }
-
-
     public void setHostRegistry( final HostRegistry hostRegistry )
     {
         this.hostRegistry = hostRegistry;
     }
 
 
+    public DaoManager getDaoManager()
+    {
+        return daoManager;
+    }
+
+
+    public void setDaoManager( final DaoManager daoManager )
+    {
+        this.daoManager = daoManager;
+    }
+
+
+    @Override
     public EntityManagerFactory getEntityManagerFactory()
     {
-        return entityManagerFactory;
+        return  daoManager.getEntityManagerFactory();
     }
 
 
@@ -106,7 +113,7 @@ public class PeerManagerImpl implements PeerManager
         if ( result.isEmpty() )
         {
             peerInfo = new PeerInfo();
-            peerInfo.setId( generatePeerId() );
+            peerInfo.setId( UUID.randomUUID() );
             peerInfo.setName( "Local Subutai server" );
             peerInfo.setOwnerId( UUID.randomUUID() );
             peerDAO.saveInfo( SOURCE_LOCAL_PEER, peerInfo.getId().toString(), peerInfo );
@@ -116,7 +123,7 @@ public class PeerManagerImpl implements PeerManager
             peerInfo = result.get( 0 );
         }
         localPeer = new LocalPeerImpl( this, templateRegistry, peerDAO, quotaManager, strategyManager, requestListeners,
-                commandExecutor, hostRegistry );
+                commandExecutor, hostRegistry, monitor );
         localPeer.init();
 
         //add command request listener
@@ -140,12 +147,6 @@ public class PeerManagerImpl implements PeerManager
     {
         localPeer.shutdown();
     }
-    //
-    //
-    //    public void setCommunicationManager( final CommunicationManager communicationManager )
-    //    {
-    //        this.communicationManager = communicationManager;
-    //    }
 
 
     public void setCommandExecutor( final CommandExecutor commandExecutor )
@@ -172,6 +173,12 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    public void setMonitor( final Monitor monitor )
+    {
+        this.monitor = monitor;
+    }
+
+
     @Override
     public boolean register( final PeerInfo peerInfo ) throws PeerException
     {
@@ -185,12 +192,6 @@ public class PeerManagerImpl implements PeerManager
     public boolean update( final PeerInfo peerInfo )
     {
         return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId().toString(), peerInfo );
-    }
-
-
-    private UUID generatePeerId()
-    {
-        return UUID.randomUUID();
     }
 
 
@@ -236,26 +237,14 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public List<PeerGroup> peersGroups()
     {
-        List<PeerGroup> peerGroups = peerDAO.getInfo( PEER_GROUP, PeerGroup.class );
-        /*Set<PeerGroup> peerGroups = new HashSet<>();
-        for ( int i = 0; i < 10; i++ )
-        {
-            PeerGroup peerGroup = new PeerGroup();
-            peerGroup.setName( "Group " + i );
-            for ( int j = 0; j < 10; j++ )
-            {
-                peerGroup.addPeerUUID( UUID.randomUUID() );
-            }
-            peerGroups.add( peerGroup );
-        }*/
-        return peerGroups;
+        return peerDAO.getInfo( PEER_GROUP, PeerGroup.class );
     }
 
 
     @Override
     public void deletePeerGroup( final PeerGroup group )
     {
-        peerDAO.deleteInfo( PEER_GROUP, group.getUUID().toString() );
+        peerDAO.deleteInfo( PEER_GROUP, group.getId().toString() );
     }
 
 
@@ -281,12 +270,11 @@ public class PeerManagerImpl implements PeerManager
             return localPeer;
         }
 
-        PeerInfo peerInfo = getPeerInfo( peerId );
+        PeerInfo pi = getPeerInfo( peerId );
 
-        if ( peerInfo != null )
+        if ( pi != null )
         {
-            return new RemotePeerImpl( localPeer, peerInfo, messenger, commandResponseListener,
-                    messageResponseListener );
+            return new RemotePeerImpl( localPeer, pi, messenger, commandResponseListener, messageResponseListener );
         }
         return null;
     }
@@ -332,3 +320,4 @@ public class PeerManagerImpl implements PeerManager
         }
     }
 }
+
