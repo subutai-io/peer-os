@@ -14,7 +14,7 @@
   </reference>
 
   <!-- Data Access object to get EntityManager -->
-  <bean id="daoManager" class="org.safehaus.subutai.core.messenger.impl.dao.DaoManager">
+  <bean id="daoManager" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="messengerPUnit"  property="entityManagerFactory" />
     <tx:transaction method="*" value="Required"/>
   </bean>

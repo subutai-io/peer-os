@@ -19,28 +19,21 @@
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
   <reference id="tracker" interface="org.safehaus.subutai.core.tracker.api.Tracker" />
 
-  <!--************************** Tempporary *************************** -->
-  <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:~/environment_manager" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
-  </bean>
-  <!-- ****************************************************************  -->
 
+  <!-- ***************************************************************** -->
+  <bean id="daoManager" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager">
+    <jpa:unit unitname="envManagerPUnit" property="entityManagerFactory" />
+  </bean>
+  <!-- ***************************************************************** -->
   <bean id="environmentManager" scope="singleton"
         init-method="init"
         destroy-method="destroy"
         class="org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl">
-
-    <jpa:context unitname="envManagerPUnit" property="entityManager" />
-    <tx:transaction method="*" value="Required"/>
-
     <property name="templateRegistry" ref="templateRegistry" />
     <property name="securityManager"  ref="securityManager" />
     <property name="tracker"          ref="tracker" />
     <property name="peerManager"      ref="peerManager" />
-    <property name="dataSource"       ref="dataSource" />
-
+    <property name="daoManager"       ref="daoManager" />
   </bean>
 
 </blueprint>

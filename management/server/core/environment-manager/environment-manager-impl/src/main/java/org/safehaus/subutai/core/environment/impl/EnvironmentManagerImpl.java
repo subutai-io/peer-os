@@ -12,9 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
-import javax.sql.DataSource;
-
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
@@ -81,26 +79,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private TemplateRegistry templateRegistry;
     private SecurityManager securityManager;
     private Tracker tracker;
-    private EntityManager entityManager;
     private EnvironmentDataService environmentDataService;
     private EnvironmentContainerDataService environmentContainerDataService;
-    private DataSource dataSource;
+    private DaoManager daoManager;
 
     public EnvironmentManagerImpl( )
     {
 
     }
-    public DataSource getDataSource()
-    {
-        return dataSource;
-    }
-
-
-    public void setDataSource( final DataSource dataSource )
-    {
-        this.dataSource = dataSource;
-    }
-
 
     public TemplateRegistry getTemplateRegistry()
     {
@@ -112,20 +98,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         this.templateRegistry = templateRegistry;
     }
-
-
-    public EntityManager getEntityManager()
-    {
-        return entityManager;
-    }
-
-
-    public void setEntityManager( EntityManager entityManager )
-    {
-        LOG.info( "**** Entity Manager Injected **********" );
-        this.entityManager = entityManager;
-    }
-
 
     public SecurityManager getSecurityManager()
     {
@@ -153,22 +125,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public void init()
     {
-
-        LOG.info( "**** Init Entity Manager **********" + entityManager.getProperties().toString());
-
-        // **** Temporary *******************
         try
         {
-            this.environmentDAO = new EnvironmentDAO( dataSource );
+            this.environmentDAO = new EnvironmentDAO( daoManager);
+            this.environmentDataService = new EnvironmentDataService( daoManager.getEntityManagerFactory());
+            this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager.getEntityManagerFactory() );
         }
         catch ( SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
         // ***********************************
-
-        environmentDataService = new EnvironmentDataService( entityManager );
-        environmentContainerDataService = new EnvironmentContainerDataService( entityManager );
     }
 
 
@@ -180,6 +147,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.peerManager = null;
         this.tracker = null;
         this.environmentDAO = null;
+        this.daoManager = null;
+
     }
 
 
@@ -274,7 +243,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             EnvironmentBlueprint environmentBlueprint = GSON.fromJson( blueprint, EnvironmentBlueprint.class );
-            LOG.info( "******* saveBlueprint ************" );
+
             return environmentDAO.saveBlueprint( environmentBlueprint );
         }
         catch ( JsonParseException | EnvironmentPersistenceException e )
@@ -466,6 +435,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             EnvironmentBuildProcess process = builder.prepareBuildProcess( topologyData );
             environmentDAO.saveInfo( PROCESS, process.getId().toString(), process );
+
             return process.getId();
         }
         catch ( ProcessBuilderException e )
@@ -690,5 +660,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void setPeerManager( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
+    }
+
+
+    public DaoManager getDaoManager()
+    {
+        return daoManager;
+    }
+
+
+    public void setDaoManager( final DaoManager daoManager )
+    {
+        this.daoManager = daoManager;
     }
 }

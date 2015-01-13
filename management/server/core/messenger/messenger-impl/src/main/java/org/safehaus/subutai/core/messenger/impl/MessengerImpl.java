@@ -17,7 +17,7 @@ import org.safehaus.subutai.core.messenger.api.MessageProcessor;
 import org.safehaus.subutai.core.messenger.api.MessageStatus;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.messenger.api.MessengerException;
-import org.safehaus.subutai.core.messenger.impl.dao.DaoManager;
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
@@ -40,8 +40,8 @@ public class MessengerImpl implements Messenger, MessageProcessor
     private   PeerManager peerManager;
     protected MessengerDao messengerDao;
     protected MessageSender messageSender;
-    private DaoManager daoManager;
-    private EntityManagerFactory entityManagerFactory;
+    private   DaoManager daoManager;
+    private   EntityManagerFactory entityManagerFactory;
 
     public MessengerImpl( )
             throws MessengerException

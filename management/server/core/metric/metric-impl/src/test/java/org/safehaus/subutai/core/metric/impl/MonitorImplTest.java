@@ -20,6 +20,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
@@ -81,6 +82,8 @@ public class MonitorImplTest
     @Mock
     EntityManager entityManager;
     @Mock
+    DaoManager daoManager;
+    @Mock
     PeerManager peerManager;
     @Mock
     MonitorDao monitorDao;
@@ -113,15 +116,16 @@ public class MonitorImplTest
 
     static class MonitorImplExt extends MonitorImpl
     {
-        public MonitorImplExt( final PeerManager peerManager, EntityManagerFactory emf,
+        public MonitorImplExt( final PeerManager peerManager, DaoManager daoManager,
                                EnvironmentManager environmentManager ) throws MonitorException
         {
-            super( peerManager, emf, environmentManager );
+            super( peerManager, daoManager, environmentManager );
         }
 
 
         public void setMonitorDao( MonitorDao monitorDao ) {this.monitorDao = monitorDao;}
 
+        public void setDaoManager( DaoManager daoManager ) {this.daoManager = daoManager;}
 
         public void setNotificationExecutor( ExecutorService executor ) {this.notificationExecutor = executor;}
 
@@ -137,7 +141,7 @@ public class MonitorImplTest
         PreparedStatement preparedStatement = mock( PreparedStatement.class );
         when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
         when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
-        monitor = new MonitorImplExt( peerManager, entityManagerFactory, environmentManager );
+        monitor = new MonitorImplExt( peerManager, daoManager, environmentManager );
         monitor.setMonitorDao( monitorDao );
 
         containerHostMetric = mock( ContainerHostMetricImpl.class );

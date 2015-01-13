@@ -25,18 +25,19 @@ import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandRequestListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequestListener;
-import org.safehaus.subutai.core.peer.impl.dao.DaoManager;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequestListener;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
 
 
 /**
