@@ -78,6 +78,7 @@ generateDebianPackagePlugins() {
   mvn clean install
   if [ "$productName" = "common" ]; then
     cp target/*".deb" $TARGET/
+    cp target/*".deb" $ISOPATH/
   else
     cp $productName-kar/target/*".deb" $TARGET/
     #cp $productName-kar/target/*".deb" $ISOPATH/
