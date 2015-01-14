@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.metric.impl;
 
 
-import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.peer.api.Payload;
 import org.safehaus.subutai.core.peer.api.RequestListener;
@@ -29,7 +28,7 @@ public class RemoteAlertListener extends RequestListener
     @Override
     public Object onRequest( final Payload payload )
     {
-        ContainerHostMetric containerHostMetric = payload.getMessage( ContainerHostMetricImpl.class );
+        ContainerHostMetricImpl containerHostMetric = payload.getMessage( ContainerHostMetricImpl.class );
 
         try
         {

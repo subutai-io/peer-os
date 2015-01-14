@@ -7,9 +7,10 @@ function quota_usage {
   echo
   echo "        "subutai \[-qh\] quota container quota_parameter \[quota_value\] \[additional_parameters\]
   echo "           "quota_parameters:
-  echo "                             "memory.quota
-  echo "                             "cpu.cpus
-  echo "                             "hdd.quota.\[home\|opt\|var\|rootfs\]
+  echo "                             "ram -- quota for memory \(in megabytes\)
+  echo "                             "cpu -- quota for cpu \(in percentage\)
+  echo "                             "cpuset -- quota for cpusets
+  echo "                             "diskHome\|diskOpt\|diskVar\|diskRootfs\] -- quota for disk datasets
   echo -----------------------------------------------------------------------
 }
 
@@ -17,6 +18,11 @@ function quota {
   OPTIND=0
   if [ "$1" == "quota" ]; then
     shift
+  fi
+
+  if [[ -z $1 ]]; then
+    quota_usage
+    exit 1;
   fi
 
   local container=$1
@@ -31,22 +37,25 @@ function quota {
 
   if [ -z $parameter_value ]; then
     case $resource_parameter in
-      "memory.quota" )
-        lxc_get_memory $container
+      "ram" )
+        lxc_get_memory_in_megabytes $container
       ;;
-      "cpu.cpus")
+      "cpuset")
         lxc_get_cpus $container
       ;;
-      "hdd.quota.home")
+      "cpu")
+        lxc_get_cpu_quota $container
+      ;;
+      "diskHome")
         fs_get_quota $container "home"
       ;;
-      "hdd.quota.var")
+      "diskVar")
         fs_get_quota $container "var"
       ;;
-      "hdd.quota.opt")
+      "diskOpt")
         fs_get_quota $container "opt"
       ;;
-      "hdd.quota.rootfs")
+      "diskRootfs")
         fs_get_quota $container "rootfs"
       ;;
       "json")
@@ -68,22 +77,30 @@ function quota {
     esac
   else
     case $resource_parameter in
-      "memory.quota" )
+      "ram" )
+        # If the parameter for ram metric does not have K,M,G letters
+        # then set the default value to M which causes to be tread as megabytes
+        if [ "`is_number $parameter_value`" == "true" ]; then
+          local parameter_value=$parameter_value"M"
+        fi
         lxc_set_memory $container $parameter_value
         ;;
-      "cpu.cpus" )
+      "cpuset" )
         lxc_set_cpus $container $parameter_value
       ;;
-      "hdd.quota.home")
+      "cpu")
+        lxc_set_cpu_quota $container $parameter_value
+      ;;
+      "diskHome" )
         fs_set_quota $container "home" $parameter_value
       ;;
-      "hdd.quota.var")
+      "diskVar")
         fs_set_quota $container "var" $parameter_value
       ;;
-      "hdd.quota.opt")
+      "diskOpt")
         fs_set_quota $container "opt" $parameter_value
       ;;
-      "hdd.quota.rootfs")
+      "diskRootfs")
         fs_set_quota $container "rootfs" $parameter_value
       ;;
       *)
@@ -91,10 +108,11 @@ function quota {
         exit 1
     esac
   fi
-
 }
 
 
 function quota_description {
   echo sets and gets container quotas;
 }
+
+
