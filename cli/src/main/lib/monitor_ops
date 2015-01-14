@@ -1421,7 +1421,7 @@ function get_monitor_update_configuration_file {
     exit 1
   fi
 
-  echo "$SUBUTAI_MONITOR_CONF_DIRECTORY/$hostname/$hostname-monitor-current.conf"
+  echo "$SUBUTAI_MONITOR_CONF_DIRECTORY/$hostname/$hostname-monitor-update.conf"
   return
 }
 
@@ -1734,12 +1734,12 @@ function disk_alert {
   assert_number "$disk_alert_threshold_bytes"
 
   if (( $(bc <<< "$average_used_disk >= $disk_alert_threshold_bytes") == 1 )); then
-    msg_info "Disk alert threshold $disk_alert_threshold_bytes is exceeded with usage $average_used_disk($metricCountToAverageToAlert)!"
+    msg_info "$metric_type alert threshold $disk_alert_threshold_bytes is exceeded with usage $average_used_disk($metricCountToAverageToAlert)!"
     local url=`build_rest_url monitor/alert`
     local current_metrics=$(subutai monitor $lxc)
     curl --data "$current_metrics" "$url"
   else
-    msg_info "Disk usage $average_used_disk($metricCountToAverageToAlert) is lower than threshold $disk_alert_threshold_bytes"
+    msg_info "$metric_type usage $average_used_disk($metricCountToAverageToAlert) is lower than threshold $disk_alert_threshold_bytes"
   fi
 }
 
