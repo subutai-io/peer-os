@@ -286,7 +286,7 @@ function lxc_clone {
      -e "s/$parent-/$child-/g" | grep -v subutai.git.uuid >> $child_conf
   cat $HOME/.config/lxc/default.conf >> $child_conf
   sudo cp $parent_home/fstab $child_home
-
+ 
   # (3) fs clone snapshots for child datasets
   fs_clone lxc/$parent@template lxc/$child
   fs_set_mountpoint $child_rootfs $child
@@ -475,6 +475,7 @@ function lxc_rename {
 
   # (2) setup skeleton of destination container
   fs_volume_create $dst_home
+  
   sudo cat $src_conf | sudo sed                                    \
      -e "s/lxc\.utsname.*/lxc\.utsname = $dst/"                  \
      -e "/lxc\.mount\.entry/d" \
@@ -487,17 +488,13 @@ function lxc_rename {
   cp $src_home/fstab $dst_home
   
   lxc_stop "$src"
-  
-  # umount all the partitions
-  umount "$HOME/.local/lxc-data/$src-home" > /dev/null 2>&1
-  umount "$HOME/.local/lxc-data/$src-var" > /dev/null 2>&1
-  umount "$HOME/.local/lxc/$src-opt" > /dev/null 2>&1
-  umount "$HOME/.local/share/lxc/$src/rootfs" > /dev/null 2>&1
+  fs_umount_partitions $src
   
   # rename datasets and set mount point for rootfs
   lxc_chown $src
   fs_rename_datasets_set_mount_point $src $dst $dst_rootfs
   lxc_chown $dst
+
   # change the hostname
   echo "$dst" > "$dst_rootfs/etc/hostname"
   str_replace_in_file "$src" "$dst" "$dst_rootfs/etc/hosts"

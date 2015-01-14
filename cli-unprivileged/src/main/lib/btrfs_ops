@@ -4,6 +4,14 @@
 # Bunch-O BTRFS convenience operations
 # --------------------------------------------------------------------------
 
+function fs_umount_partitions {
+  local src="$1"
+  # umount all the partitions
+  umount "$HOME/.local/lxc-data/$src-home" > /dev/null 2>&1
+  umount "$HOME/.local/lxc-data/$src-var" > /dev/null 2>&1
+  umount "$HOME/.local/lxc/$src-opt" > /dev/null 2>&1
+  umount "$HOME/.local/share/lxc/$src/rootfs" > /dev/null 2>&1
+}
 
 function fs_send_recv_clone {
   local parent="$1"
@@ -368,6 +376,7 @@ function fs_is_template {
   local path2="$HOME/.local/tmpdir"
   local path3="/var/lib/lxc"
   local fs_dir="$path1/$1/rootfs"
+  
   if [ -z "`(sudo btrfs property get -ts $fs_dir | grep true) 2>/dev/null`" ]; then
     local  fs_dir1="$path2/$1/rootfs"
     if [ -z "`(sudo btrfs property get -ts $fs_dir1 | grep true) 2>/dev/null`" ]; then

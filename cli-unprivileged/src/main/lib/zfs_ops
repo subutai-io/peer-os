@@ -4,6 +4,16 @@
 # Bunch-O ZFS convenience operations
 # --------------------------------------------------------------------------
 
+function fs_umount_partitions {
+  local src="$1"
+  local home=${HOME#"/"}
+  
+  #umount all the partitions
+  sudo umount "$home/.local/lxc-data/$src-home" 
+  sudo umount "$home/.local/lxc-data/$src-var" 
+  sudo umount "$home/.local/lxc/$src-opt" 
+  sudo umount "$home/.local/lxc/$src" 
+}
 
 function fs_send_recv_clone {
   local parent="$1"
@@ -34,14 +44,15 @@ function fs_volume_create {
   local dst_home="$1"
   dst_home=${dst_home#"/"}
   sudo zfs create $dst_home 1>/dev/null
+  sudo chown $USER:$USER -R /$dst_home
 }
 
 function fs_volume_delete {
   local src="$1"
   local home=${HOME#"/"}
   src="`echo $src | awk -F "/" '{print $1}'`"
-  sudo zfs destroy $home/.local/lxc/$src 1>/dev/null
-  sudo zfs destroy $home/.local/share/lxc/$src 1>/dev/null
+  sudo zfs destroy $home/.local/lxc/$src > /dev/null 2>&1
+  sudo zfs destroy $home/.local/share/lxc/$src > /dev/null 2>&1
 }
 
 function fs_is_read_only {
@@ -59,16 +70,18 @@ function fs_rename_datasets_set_mount_point {
   local src="$1"
   local dst="$2"
   local dst_rootfs="$3"
-  sudo zfs rename "$HOME/.local/lxc-data/$src-home" "$HOME/.local/lxc-data/$dst-home"
-  sudo zfs rename "$HOME/.local/lxc-data/$src-var"  "$HOME/.local/lxc-data/$dst-var"
-  sudo zfs rename "$HOME/.local/lxc/$src-opt" "$HOME/.local/lxc/$dst-opt"
-  sudo zfs rename "$HOME/.local/share/lxc/$src" "$HOME/.local/share/lxc/$dst"
-  sudo zfs set mountpoint="$dst_rootfs" "$HOME/.local/lxc/$dst"
+  local home=${HOME#"/"}
 
-  sudo zfs mount "$HOME/.local/share/lxc/$dst"
-  sudo zfs mount "$HOME/.local/lxc/$dst-opt"
-  sudo zfs mount "$HOME/.local/lxc-data/$dst-home"
-  sudo zfs mount "$HOME/.local/lxc-data/$dst-var"
+  sudo zfs rename "$home/.local/lxc-data/$src-home" "$home/.local/lxc-data/$dst-home"
+  sudo zfs rename "$home/.local/lxc-data/$src-var"  "$home/.local/lxc-data/$dst-var"
+  sudo zfs rename "$home/.local/lxc/$src-opt" "$home/.local/lxc/$dst-opt"
+  sudo zfs rename "$home/.local/lxc/$src" "$home/.local/lxc/$dst"
+  sudo zfs set mountpoint="$dst_rootfs" "$home/.local/lxc/$dst"
+
+  sudo zfs mount "$home/.local/lxc/$dst"
+  sudo zfs mount "$home/.local/lxc/$dst-opt"
+  sudo zfs mount "$home/.local/lxc-data/$dst-home"
+  sudo zfs mount "$home/.local/lxc-data/$dst-var"
 }
 function fs_find_parent_dir {
   local parent="$1"
