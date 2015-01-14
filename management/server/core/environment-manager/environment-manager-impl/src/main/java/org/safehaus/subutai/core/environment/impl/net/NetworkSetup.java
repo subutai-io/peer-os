@@ -101,7 +101,7 @@ public class NetworkSetup
         for ( PeerInfo pi : peers )
         {
             int vlanId = pi.getLastUsedVlanId() + 1;
-            env.getPeerVlanId().put( pi.getId(), vlanId );
+            env.setPeerVlanInfo( pi.getId(), vlanId );
             pi.setLastUsedVlanId( vlanId );
             pi.setGatewayIp( allAddresses[++lastIndex] );
 
@@ -127,7 +127,7 @@ public class NetworkSetup
         List<PeerInfo> peers = getPeers( buildProcess );
         for ( PeerInfo pi : peers )
         {
-            int vlanId = env.getPeerVlanId().get( pi.getId() );
+            int vlanId = env.getPeerVlanInfo().get( pi.getId() );
             NetworkManager nm = defineNetworkManager( pi );
             nm.setupVniVLanMapping( tunnelName, env.getVni(), vlanId );
             try
@@ -168,7 +168,7 @@ public class NetworkSetup
             PeerInfo pi = peerManager.getPeerInfo( UUID.fromString( ch.getPeerId() ) );
 
             NetworkManager nm = defineNetworkManager( pi );
-            nm.setContainerIp( ch.getHostname(), allAddresses[ind], netMask, env.getPeerVlanId().get( pi.getId() ) );
+            nm.setContainerIp( ch.getHostname(), allAddresses[ind], netMask, env.getPeerVlanInfo().get( pi.getId() ) );
 
             env.setLastUsedIpIndex( ind++ );
             environmentManager.saveEnvironment( env );

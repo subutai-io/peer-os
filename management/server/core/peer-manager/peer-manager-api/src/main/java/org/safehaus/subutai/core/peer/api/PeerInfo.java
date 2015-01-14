@@ -21,7 +21,6 @@ public class PeerInfo
     //TODO implement setting of port
     private int port = 8181;
 
-    private int vlanId;
     private int lastUsedVlanId = 100;
 
 
@@ -100,18 +99,6 @@ public class PeerInfo
     public int getPort()
     {
         return port;
-    }
-
-
-    public int getVlanId()
-    {
-        return vlanId;
-    }
-
-
-    public void setVlanId( int vlanId )
-    {
-        this.vlanId = vlanId;
     }
 
 

@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.environment.impl.entity;
 
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,6 +22,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -28,6 +30,7 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
+import com.google.gson.reflect.TypeToken;
 
 
 @Entity
@@ -61,8 +64,8 @@ public class EnvironmentImpl implements Environment, Serializable
     @Column( name = "lastUsedIpIndex" )
     private int lastUsedIpIndex;
 
-    @Column( name = "peerVlanId" )
-    private Map<UUID, Integer> peerVlanId = new HashMap<>();
+    @Column( name = "peerVlanInfo" )
+    private String peerVlanInfo;
 
     @Column( name = "vni" )
     private int vni;
@@ -183,15 +186,18 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public Map<UUID, Integer> getPeerVlanId()
+    public Map<UUID, Integer> getPeerVlanInfo()
     {
-        return peerVlanId;
+        Map<UUID, Integer> map = deserializePeerVlanInfo();
+        return Collections.unmodifiableMap( map );
     }
 
 
-    public void setPeerVlanId( Map<UUID, Integer> peerVlanId )
+    public void setPeerVlanInfo( UUID peerId, int vlanId )
     {
-        this.peerVlanId = peerVlanId;
+        Map<UUID, Integer> map = deserializePeerVlanInfo();
+        map.put( peerId, vlanId );
+        this.peerVlanInfo = JsonUtil.to( map );
     }
 
 
@@ -273,5 +279,19 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         getContainerHosts().remove( containerHost );
     }
+
+
+    private Map<UUID, Integer> deserializePeerVlanInfo()
+    {
+        if ( peerVlanInfo == null || peerVlanInfo.isEmpty() )
+        {
+            return new HashMap<>();
+        }
+        TypeToken<Map<UUID, Integer>> typeToken = new TypeToken<Map<UUID, Integer>>()
+        {
+        };
+        return JsonUtil.fromJson( peerVlanInfo, typeToken.getType() );
+    }
+
 }
 

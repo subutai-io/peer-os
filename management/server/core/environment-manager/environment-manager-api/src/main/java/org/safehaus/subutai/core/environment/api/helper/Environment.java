@@ -37,12 +37,27 @@ public interface Environment
     public void setPublicKey( String key );
 
 
+    /**
+     * Network subnet of the environment in CIDR format notation.
+     *
+     * @return subnet string in CIDR format notation
+     */
     public String getSubnetCidr();
 
 
-    public Map<UUID, Integer> getPeerVlanId();
+    /**
+     * VLAN ids of each participating peer.
+     *
+     * @return map of peer ids to VLAN ids
+     */
+    public Map<UUID, Integer> getPeerVlanInfo();
 
 
+    /**
+     * VNI of the environment.
+     *
+     * @return
+     */
     public int getVni();
 
 
