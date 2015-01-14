@@ -448,8 +448,10 @@ assert_email_validity(){
   fi
 }
 
-# find key id's number 
-find_key_id_number(){
+
+# find key id's index 
+# number refers the 
+find_key_id_index(){
   key_id=$1
   local pubkey_id
   assert_key_exists $key_id
@@ -466,8 +468,8 @@ find_key_id_number(){
 }
 
 
-# deletes subkey with given number
-del_subkey_with_number(){
+# deletes subkey with given index 
+del_subkey_with_index(){
   number=$1
   key_id=$2
   echo -e "key $number\ndelkey\ny\nsave\n" | gpg2 --pinentry-mode loopback --command-fd 0 \
