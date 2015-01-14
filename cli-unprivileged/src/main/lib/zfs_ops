@@ -29,6 +29,7 @@ function fs_volume_create_sudo {
   dst_home=${dst_home#"/"}
   sudo zfs create $dst_home 1>/dev/null
 }
+
 function fs_volume_create {
   local dst_home="$1"
   dst_home=${dst_home#"/"}
@@ -94,7 +95,7 @@ function fs_clone {
   local home=${HOME#"/"}
   local parent_snap=`echo "$1" | awk -F"/" '{print $2}'`
   local parent="`echo $parent_snap | awk -F "@" '{print $1}' | awk -F "-" '{print $1}'`"
-
+ 
   lxc-info -n $parent > /dev/null 2>&1
   if [ $? != 0 ]
   then
@@ -160,7 +161,7 @@ function fs_addmount {
   sudo zfs hold keep $dataset'@template'
   return
 }
-#TODO
+
 #snaphost ll holds on clone's rootfs
 function fs_snap_hold_readonly {
   local home=${HOME#"/"}
@@ -186,17 +187,20 @@ function fs_snap_hold_readonly {
   sudo zfs hold keep $home/.local/lxc-data/$lxc_template-home@template
   sudo zfs set readonly=on $home/.local/lxc-data/$lxc_template-home
 }
-#TODO
+
 function fs_recv {
   local template="$1"
   local deltas="$2"
   local lxc_rootfs="$3"
-  sudo zfs recv lxc/$template < $deltas/rootfs.delta
-  sudo zfs set mountpoint=$lxc_rootfs lxc/$template
-  sudo zfs recv lxc/$template-opt < $deltas/opt.delta
-  sudo zfs recv lxc-data/$template-var < $deltas/var.delta
-  sudo zfs recv lxc-data/$template-home < $deltas/home.delta
+  local home=${HOME#"/"}
+  echo "$deltas/rootfs.delta"
+  sudo zfs recv $home/.local/lxc/$template < $deltas/rootfs.delta
+  sudo zfs set mountpoint=$lxc_rootfs $home/.local/lxc/$template
+  sudo zfs recv $home/.local/lxc/$template-opt < $deltas/opt.delta
+  sudo zfs recv $home/.local/lxc-data/$template-var < $deltas/var.delta
+  sudo zfs recv $home/.local/lxc-data/$template-home < $deltas/home.delta
 }
+
 #generate delta images of all filesystems
 function fs_send {
   local parent="$1"
@@ -206,18 +210,18 @@ function fs_send {
 
   if [ $parent == "master" ]
   then
-  (sudo zfs send -I "$home/.local/tmpdir/$parent/rootfs" "$home/.local/lxc/$container/rootfs" > "$deltas/rootfs.delta") > /dev/null 2>&1
-  (sudo zfs send -I "$home/.local/tmpdir/$parent-opt" "$home/.local/lxc/$container-opt" > "$deltas/opt.delta") > /dev/null 2>&1
-  (sudo zfs send -I "$home/.local/tmpdir/$parent-var" "$home/.local/lxc-data/$container-var" > "$deltas/var.delta") > /dev/null 2>&1
-  (sudo zfs send -I "$home/.local/tmpdir/$parent-home" "$home/.local/lxc-data/$container-home" > "$deltas/home.delta") > /dev/null 2>&1
+  (sudo zfs send -I "$home/.local/tmpdir/$parent@template" "$home/.local/lxc/$container@template" > "$deltas/rootfs.delta") > /dev/null 2>&1
+  (sudo zfs send -I "$home/.local/tmpdir/$parent-opt@template" "$home/.local/lxc/$container-opt@template" > "$deltas/opt.delta") > /dev/null 2>&1
+  (sudo zfs send -I "$home/.local/tmpdir/$parent-var@template" "$home/.local/lxc-data/$container-var@template" > "$deltas/var.delta") > /dev/null 2>&1
+  (sudo zfs send -I "$home/.local/tmpdir/$parent-home@template" "$home/.local/lxc-data/$container-home@template" > "$deltas/home.delta") > /dev/null 2>&1
   else
-    (sudo zfs send -I "$home/.local/lxc/$parent/rootfs" "$home/.local/lxc/$container/rootfs" > "$deltas/rootfs.delta") > /dev/null 2>&1
-    (sudo zfs send -I "$home/.local/lxc/$parent-opt" "$home/.local/lxc/$container-opt" > "$deltas/opt.delta") > /dev/null 2>&1
-    (sudo zfs send -I "$home/.local/lxc/$parent-var" "$home/.local/lxc-data/$container-var" > "$deltas/var.delta") > /dev/null 2>&1
-    (sudo zfs send -I "$home/.local/lxc/$parent-home" "$home/.local/lxc-data/$container-home" > "$deltas/home.delta") > /dev/null 2>&1
+    (sudo zfs send -I "$home/.local/lxc/$parent@template" "$home/.local/lxc/$container@template" > "$deltas/rootfs.delta") > /dev/null 2>&1
+    (sudo zfs send -I "$home/.local/lxc/$parent-opt@template" "$home/.local/lxc/$container-opt@template" > "$deltas/opt.delta") > /dev/null 2>&1
+    (sudo zfs send -I "$home/.local/lxc/$parent-var@template" "$home/.local/lxc-data/$container-var@template" > "$deltas/var.delta") > /dev/null 2>&1
+    (sudo zfs send -I "$home/.local/lxc/$parent-home@template" "$home/.local/lxc-data/$container-home@template" > "$deltas/home.delta") > /dev/null 2>&1
   fi
 }
-#TODO
+
 function fs_remove_mount {
   local child="$1"
   local parent="$2"
@@ -255,38 +259,39 @@ function fs_rls_holds_delete_snaps {
     msg_info "    - \"$snap\" snapshot destroyed"
   done
 }
-#TODO
+
 #demote template
 function fs_demote_template {
   local home=${HOME#"/"}
-  local temp="$1"
+  local temp="$1" 
   local lxc_path="$HOME/.local/share/lxc/$temp"
 
   local var_snap="$home/.local/lxc-data/$temp-var@template"
-  sudo zfs release keep "$var_snap"
+  sudo zfs release keep "$var_snap" > /dev/null 2>&1 
   sudo zfs destroy "$var_snap"
   sudo zfs set readonly=off "$home/.local/lxc-data/$temp-var"
 
   local home_snap="$home/.local/lxc-data/$temp-home@template"
-  sudo zfs release keep "$home_snap"
+  sudo zfs release keep "$home_snap" > /dev/null 2>&1
   sudo zfs destroy "$home_snap"
   sudo zfs set readonly=off "$home/.local/lxc-data/$temp-home"
 
   local opt_snap="$home/.local/lxc/$temp-opt@template"
-  sudo zfs release keep "$opt_snap"
+  sudo zfs release keep "$opt_snap" > /dev/null 2>&1
   sudo zfs destroy "$opt_snap"
   sudo zfs set readonly=off "$home/.local/lxc/$temp-opt"
 
   local root_snap="$home/.local/lxc/$temp@template"
-  sudo zfs release keep "$root_snap"
+  sudo zfs release keep "$root_snap" > /dev/null 2>&1
   sudo zfs destroy "$root_snap"
   sudo zfs set readonly=off "$home/.local/lxc/$temp"
 
-  local root_snap="$home/.local/share/lxc/$temp@template"
-  sudo zfs release keep "$root_snap"
-  sudo zfs destroy "$root_snap"
-  sudo zfs set readonly=off "$home/.local/share/lxc/$temp"
-
+  #TODO should be fixed {sudo can modify config file} on btfs and zfs both 
+  #local root_snap="$home/.local/share/lxc/$temp@template"
+  #sudo zfs release keep "$root_snap"
+  #sudo zfs destroy "$root_snap"
+  #sudo zfs set readonly=off "$home/.local/share/lxc/$temp"
+ 
   lxc_chown $temp
   cat $HOME/.config/lxc/default.conf >> $lxc_path/config
   cat $lxc_path/config | \
@@ -296,8 +301,8 @@ function fs_demote_template {
   rm $lxc_path/config
   mv $lxc_path/config.new $lxc_path/config
   lxc_mapshifting $temp
-
 }
+
 # returns the children of the provided container(arg $1)
 function fs_get_children_list {
   local parent="$1"
@@ -356,7 +361,6 @@ function fs_assert_nosnap {
   fi
 }
 
-#PROGRESS
 # assert snapshot (arg $1) exists, if it does NOT show usage (arg $2)
 # warning: exits!
 function fs_assert_snap {
@@ -387,12 +391,13 @@ function fs_assert_snap {
   fi
 }
 
-#TODO
 # assert dataset (arg $1) does NOT exist, if it does show usage (arg $2)
 # warning: exits!
 function fs_assert_nods {
   local ds="$1"
   local usage="$2"
+  local home=${HOME#"/"}
+  ds="$home/.local/$ds"
 
   if [ -n "`sudo zfs list -o name -H | grep $ds`" ]; then
     msg_error "ZFS dataset \"$ds\" already exists!"
