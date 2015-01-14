@@ -383,7 +383,8 @@ function get_total_disk_by_dataset {
   local dataset=$2
   assert_dataset $dataset
 
-  local disk_quota=$(fs_get_quota_exact_values $lxc | grep "$dataset" | cut -d':' -f2 | tr -d '\040\011\015')
+#  local disk_quota=$(fs_get_quota_exact_values $lxc | grep "$dataset" | cut -d':' -f2 | tr -d '\040\011\015')
+  local disk_quota=$(fs_get_quota_exact_values "$lxc" "$dataset")
   local metric_type=$(get_disk_metric_type_by_dataset $dataset)
   local physical_total_disk_dataset=$(get_physical_total_"$metric_type")
   local numberExpression='^[0-9]+$'
