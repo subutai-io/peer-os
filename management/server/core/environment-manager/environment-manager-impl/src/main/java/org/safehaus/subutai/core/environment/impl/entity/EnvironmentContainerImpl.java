@@ -28,6 +28,7 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
@@ -205,6 +206,14 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public void setQuota( QuotaInfo quota ) throws PeerException
     {
         throw new UnsupportedOperationException( "Unsupported operation." );
+    }
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost containerHost, final int processPid )
+            throws PeerException
+    {
+        return getPeer().getProcessResourceUsage( containerHost, processPid );
     }
 
 

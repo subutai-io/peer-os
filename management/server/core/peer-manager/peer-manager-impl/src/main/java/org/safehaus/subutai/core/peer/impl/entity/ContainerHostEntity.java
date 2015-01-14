@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
@@ -230,6 +231,15 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         Peer peer = getPeer();
         return peer.getQuota( this, quotaType );
+    }
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost containerHost, final int processPid )
+            throws PeerException
+    {
+        Peer peer = getPeer();
+        return peer.getProcessResourceUsage( containerHost, processPid );
     }
 
 

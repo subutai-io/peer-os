@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.peer.api;
 
 import java.util.Set;
 
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
@@ -37,7 +38,8 @@ public interface ContainerHost extends Host
 
     public ContainerHostState getState() throws PeerException;
 
-    //    public void setParent( ResourceHost resourceHost );
+    public ProcessResourceUsage getProcessResourceUsage( ContainerHost containerHost, int processPid )
+            throws PeerException;
 
     public PeerQuotaInfo getQuota( QuotaType quotaType ) throws PeerException;
 
