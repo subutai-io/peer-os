@@ -4,11 +4,13 @@ function key_manager_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Key manager wrapper
   echo
-  echo "  "subutai key_manager generate real_name email
-  echo "  "subutai key_manager generate_subkey key_id
-  echo "  "subutai key_manager export \<--ssh\> key_id 
-  echo "  "subutai key_manager list
-  echo "  "subutai key_manager list key_id
+  echo "  "subutai keymanager generate real_name email
+  echo "  "subutai keymanager generate_subkey key_id
+  echo "  "subutai keymanager export \<--ssh\> key_id 
+  echo "  "subutai keymanager list
+  echo "  "subutai keymanager list key_id
+  echo "  "subutai keymanager revoke_subkey subkey_id
+  echo "  "subutai keymanager del_subkey subkey_id
   echo -----------------------------------------------------------------------
 }
 
@@ -23,10 +25,10 @@ function keymanager {
 }
 
 
-# FIXME: We are using $no-protection flag to force gpg agent not to ask
-# passphrase while creating key pair.
-# Starting from GnuPG 2.1.0 %no-ask-passphrase flag is not operational, that is why
-# we used $no-protection flag.
+# FIXME: We are using $no-protection flag to force gpg 
+# agent not to ask passphrase while creating key pair.
+# Starting from GnuPG 2.1.0 %no-ask-passphrase flag is
+# not operational, that is why we used $no-protection flag.
 #
 # https://www.gnupg.org/documentation/manuals/gnupg/Unattended-GPG-key-generation.html
 #
@@ -71,20 +73,27 @@ EOF
 # NOTE:Could not disable passphrase asking feature of gpg agent, 
 # but I could enter empty passphrase while creating subkeys.
 # gpg-agent does not ask for passphrase while signing files or keys, 
-# if the passphrase of subkey is "empty string". 
-# Emply string for passphrase practically enables us to create unattented GPG subkeys.
-# 
+# if the passphrase of subkey is "empty string". Emply string for 
+# passphrase practically enables us to create unattented GPG subkeys.
+# This method just creates subkeys for master key pair that are 
+# generated unattendedly.
+#  
 #   type : RSA
 #   size : 2048
 #   expiry : 2 years
 #   passphrase : empty
-genereate_subkey(){
+generate_subkey(){
   key_id=$1
   assert_key_exists $key_id
+  if [ -z `is_subkey $key_id` ]; then
+    key_id=`get_pubkey_of_subkey $key_id`    
+  fi
+  msg_info "generating subkey for $key_id"
   echo -e "ADDKEY\n6\n2048\n2y\n\n\nsave\n" | gpg2 --pinentry-mode loopback \
                                               --command-fd 0 --status-fd --verbose \
-                                              --edit-key $key_id
-  msg_ok "subkey is generated"
+                                              --no-tty --edit-key $key_id > /dev/null 2>&1
+  new_key_id=`gpg2 --list-keys | sed -n '/'$key_id'/,/^$/p' | grep "." | tail -1 | cut -d "/" -f2 | cut -d " " -f1`
+  msg_ok "subkey is generated. Id of genereated subkey is $new_key_id"
 }
 
 
@@ -133,11 +142,42 @@ list(){
 }
 
 
-# Revokes the key
+# Deletes subkey which are generated unattentedly
 # parameters
 #   1) key_id
-revoke(){
-   msg_info "revoke is not implemented yet!"
+del_subkey(){
+  key_id=$1
+  number=`find_key_id_number $key_id`
+  msg_info "removing subkey $key_id"
+  echo -e "key $number\ndelkey\ny\nsave\n" | gpg2 --pinentry-mode loopback --command-fd 0 \
+                                                  --no-tty --status-fd --verbose \
+                                                  --edit-key $key_id > /dev/null 2>&1
+  msg_ok "subkey $key_id deleted!"
+}
+
+
+# Revokes the subkey which are generated unattentedly
+# Note: After revoking subkeys, they are not listed
+# with "gpg2 -k" command, which may change result of 
+# find_key_id_number fuction and let it misbehave. 
+# That's why after revoking subkey, I delete that subkey
+# in order to overcome this pitfall. 
+# parameters
+#   1) key_id
+revoke_subkey(){
+  key_id=$1
+  if [[ -z `is_subkey $key_id` ]]; then
+    number=`find_key_id_number $key_id`
+  else
+    msg_error "$key_id does not belong to a subkey"
+    exit 1
+  fi
+  msg_info "revoking subkey $key_id"
+  echo -e "key $number\nrevkey\ny\n0\n\ny\nsave\n" | gpg2 --pinentry-mode loopback --command-fd 0 \
+                                                          --no-tty  --status-fd --verbose \
+                                                          --edit-key $key_id > /dev/null 2>&1
+  del_subkey_with_number $number $key_id
+  msg_ok "subkey $key_id revoked!"
 }
 
 
@@ -152,10 +192,10 @@ delete(){
   assert_key_exists $key_id
   fp=`get_fingerprint $key_id`
   # remove keys from the secret keyring
-  gpg2 --batch --yes --delete-secret-key $fp
+  gpg2 --batch --no-tty --yes --delete-secret-key $fp
 
   # remove keys from the public keyring
-  gpg2 --batch --yes --delete-key $fp
+  gpg2 --batch --no-tty --yes --delete-key $fp
 }
 
 

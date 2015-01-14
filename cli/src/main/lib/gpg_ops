@@ -10,7 +10,7 @@
 assert_key_exists_private_key_ring(){
   key_id=$1
   if [ -z $key_id ];then
-    echo "missing key id "
+    msg_error "missing key id "
     exit 1
   fi
   all_secs=$(echo `gpg2 --list-secret-key | grep 'sec' | cut -d "/" -f2 | cut -d " " -f1 | tail -n +1`)
@@ -44,7 +44,7 @@ assert_key_exists_private_key_ring(){
 assert_key_exists(){
   key_id=$1
   if [ -z $key_id ];then
-    echo "missing key id "
+    msg_error "missing key id "
     exit 1
   fi
   all_pubs=`list_pubkeys`
@@ -210,6 +210,9 @@ summarize_key(){
   output=`gpg2 --list-keys | sed -n '/'$key_id'/,/^$/p'`
   pub_id=`echo -e "$output" | grep 'pub' | cut -d "/" -f2 | cut -d " " -f1`
   sub_ids=$(echo `echo -e "$output" | grep '^sub' | cut -d "/" -f2 | cut -d " " -f1`)
+  if [[ -z $sub_ids ]]; then
+    sub_ids="----"
+  fi
   email=`echo -e "$output" | grep uid  | awk '{print $NF}' |  sed 's/^.\(.*\).$/\1/'`
   name=`echo -e "$output" | grep uid  | sed 's/([^)]*[^(]//g' | awk '{print $(NF-1)}'`
 
@@ -443,4 +446,31 @@ assert_email_validity(){
     msg_error "Invalid email address !"
     exit 1
   fi
+}
+
+# find key id's number 
+find_key_id_number(){
+  key_id=$1
+  local pubkey_id
+  assert_key_exists $key_id
+  if [[ -z `is_subkey $key_id` ]]; then
+    pubkey_id=`get_pubkey_of_subkey $key_id`    
+  else
+    msg_error "$key_id does not belong to a subkey"
+    exit 1
+  fi
+  number=`gpg2 --list-keys | sed -n '/'$pubkey_id'/,/^$/p' | grep "^sub" | grep -ne "." | grep $key_id | awk -F ":" {'print $1'}`
+  if [ ! -z $number ]; then
+    echo $number
+  fi 
+}
+
+
+# deletes subkey with given number
+del_subkey_with_number(){
+  number=$1
+  key_id=$2
+  echo -e "key $number\ndelkey\ny\nsave\n" | gpg2 --pinentry-mode loopback --command-fd 0 \
+                                                  --no-tty --status-fd --verbose \
+                                                  --edit-key $key_id > /dev/null 2>&1
 }
