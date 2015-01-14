@@ -3,17 +3,14 @@ package org.safehaus.subutai.core.environment.impl.net;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenceException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
-import org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl;
 import org.safehaus.subutai.core.environment.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.network.api.N2NConnection;
 import org.safehaus.subutai.core.network.api.NetworkManager;
@@ -122,23 +119,13 @@ public class NetworkSetup
         env.setVni( nextVni() );
         environmentManager.saveEnvironment( env );
 
-        EnvironmentManagerImpl emi = ( EnvironmentManagerImpl ) environmentManager;
-
         List<PeerInfo> peers = getPeers( buildProcess );
         for ( PeerInfo pi : peers )
         {
             int vlanId = env.getPeerVlanInfo().get( pi.getId() );
             NetworkManager nm = defineNetworkManager( pi );
             nm.setupVniVLanMapping( tunnelName, env.getVni(), vlanId );
-            try
-            {
-                emi.getEnvironmentDAO().saveVniVlanMapping( env.getVni(), vlanId );
-            }
-            catch ( EnvironmentPersistenceException ex )
-            {
-                LOGGER.error( "Failed to save vni-vlan mapping for peer {}", pi.getId(), ex );
-                throw new NetworkManagerException( ex );
-            }
+            environmentManager.saveEnvironment( env );
         }
     }
 
@@ -199,22 +186,27 @@ public class NetworkSetup
     }
 
 
-    private int nextVni()
+    private synchronized int nextVni()
     {
-        EnvironmentManagerImpl emi = ( EnvironmentManagerImpl ) environmentManager;
-        try
+        List<Environment> environments = environmentManager.getEnvironments();
+        if ( environments == null || environments.isEmpty() )
         {
-            Map<Integer, Set<Integer>> map = emi.getEnvironmentDAO().getVniVlanMappings();
-            List<Integer> ls = new ArrayList<>( map.keySet() );
+            return 1;
+        }
 
-            Collections.sort( ls );
-            return ls.get( ls.size() - 1 ) + 1;
-        }
-        catch ( EnvironmentPersistenceException ex )
+        // sort environments by descending vni values
+        Comparator<Environment> comparatorByVni = new Comparator<Environment>()
         {
-            LOGGER.error( "vni-vlan mappings", ex );
-            return 0;
-        }
+            @Override
+            public int compare( Environment o1, Environment o2 )
+            {
+                return -1 * Integer.compare( o1.getVni(), o2.getVni() );
+            }
+        };
+        Collections.sort( environments, comparatorByVni );
+
+        // return next available value
+        return environments.get( 0 ).getVni() + 1;
     }
 }
 
