@@ -16,39 +16,53 @@ public class Commands
 
     public RequestBuilder getReadRamQuotaCommand( String containerHostname )
     {
-        return new RequestBuilder( QUOTA_BINDING ).withCmdArgs( Lists.newArrayList( "ram", containerHostname ) );
+        return new RequestBuilder( QUOTA_BINDING ).withCmdArgs( Lists.newArrayList( containerHostname, "ram" ) );
     }
 
 
     public RequestBuilder getWriteRamQuotaCommand( String containerHostname, int ramInMb )
     {
         return new RequestBuilder( QUOTA_BINDING )
-                .withCmdArgs( Lists.newArrayList( "ram", containerHostname, String.valueOf( ramInMb ) ) );
+                .withCmdArgs( Lists.newArrayList( containerHostname, "ram", String.valueOf( ramInMb ) ) );
     }
 
 
     public RequestBuilder getReadCpuQuotaCommand( String containerHostname )
     {
-        return new RequestBuilder( QUOTA_BINDING ).withCmdArgs( Lists.newArrayList( "cpu", containerHostname ) );
+        return new RequestBuilder( QUOTA_BINDING ).withCmdArgs( Lists.newArrayList( containerHostname, "cpu" ) );
     }
 
 
     public RequestBuilder getWriteCpuQuotaCommand( String containerHostname, int cpuPercent )
     {
         return new RequestBuilder( QUOTA_BINDING )
-                .withCmdArgs( Lists.newArrayList( "cpu", containerHostname, String.valueOf( cpuPercent ) ) );
+                .withCmdArgs( Lists.newArrayList( containerHostname, "cpu", String.valueOf( cpuPercent ) ) );
     }
 
 
     public RequestBuilder getReadCpuSetCommand( String containerHostname )
     {
-        return new RequestBuilder( QUOTA_BINDING ).withCmdArgs( Lists.newArrayList( "cpuset", containerHostname ) );
+        return new RequestBuilder( QUOTA_BINDING ).withCmdArgs( Lists.newArrayList( containerHostname, "cpuset" ) );
     }
 
 
     public RequestBuilder getWriteCpuSetCommand( String containerHostname, String cpuset )
     {
         return new RequestBuilder( QUOTA_BINDING )
-                .withCmdArgs( Lists.newArrayList( "cpuset", containerHostname, cpuset ) );
+                .withCmdArgs( Lists.newArrayList( containerHostname, "cpuset", cpuset ) );
+    }
+
+
+    public RequestBuilder getReadDiskQuotaCommand( String containerHostname, String diskPartition )
+    {
+        return new RequestBuilder( QUOTA_BINDING )
+                .withCmdArgs( Lists.newArrayList( containerHostname, diskPartition ) );
+    }
+
+
+    public RequestBuilder getWriteDiskQuotaCommand( String containerHostname, String diskPartition, String diskQuota )
+    {
+        return new RequestBuilder( QUOTA_BINDING )
+                .withCmdArgs( Lists.newArrayList( containerHostname, diskPartition, diskQuota ) );
     }
 }
