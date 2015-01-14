@@ -134,4 +134,14 @@ public interface RestService
     @POST
     @Path( "container/quota/cpuset" )
     Response setCpuSet( @FormParam( "containerId" ) String containerId, @FormParam( "cpuset" ) String cpuSet );
+
+    @GET
+    @Path( "container/quota/disk" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getDiskQuota( @QueryParam( "containerId" ) String containerId,
+                           @QueryParam( "diskPartition" ) String diskPartition );
+
+    @POST
+    @Path( "container/quota/disk" )
+    Response setDiskQuota( @FormParam( "containerId" ) String containerId, @FormParam( "diskQuota" ) String diskQuota );
 }

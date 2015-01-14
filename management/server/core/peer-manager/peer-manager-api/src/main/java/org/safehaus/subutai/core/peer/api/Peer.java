@@ -12,6 +12,8 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.DiskPartition;
+import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -129,4 +131,9 @@ public interface Peer
      * @param cpuSet - allowed cpu set
      */
     public void setCpuSet( UUID containerId, Set<Integer> cpuSet ) throws PeerException;
+
+
+    public DiskQuota getDiskQuota( UUID containerId, DiskPartition diskPartition ) throws PeerException;
+
+    public void setDiskQuota( UUID containerId, DiskQuota diskQuota ) throws PeerException;
 }
