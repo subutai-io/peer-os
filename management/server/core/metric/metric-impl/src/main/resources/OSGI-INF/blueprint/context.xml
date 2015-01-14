@@ -17,15 +17,14 @@
 
   <!-- Data Access object to get EntityManager -->
 
-  <bean id="daoManager" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" scope="prototype">
+  <bean id="daoManagerMetric" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="metricPUnit"  property="entityManagerFactory" />
-    <tx:transaction method="*" value="Required"/>
   </bean>
 
   <bean id="monitor" class="org.safehaus.subutai.core.metric.impl.MonitorImpl"
         scope="singleton" destroy-method="destroy">
     <argument ref="peerManager" />
-    <argument ref="daoManager" />
+    <argument ref="daoManagerMetric" />
     <argument ref="environmentManager" />
   </bean>
 

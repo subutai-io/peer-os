@@ -88,6 +88,23 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     }
 
+    public void init()
+    {
+        try
+        {
+            //daoManager.getEntityManagerFactory().createEntityManager();
+
+            this.environmentDAO = new EnvironmentDAO( daoManager);
+            this.environmentDataService = new EnvironmentDataService( daoManager.getEntityManagerFactory());
+            this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager.getEntityManagerFactory() );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        // ***********************************
+    }
+
     public TemplateRegistry getTemplateRegistry()
     {
         return templateRegistry;
@@ -121,23 +138,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         this.tracker = tracker;
     }
-
-
-    public void init()
-    {
-        try
-        {
-            this.environmentDAO = new EnvironmentDAO( daoManager);
-            this.environmentDataService = new EnvironmentDataService( daoManager.getEntityManagerFactory());
-            this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager.getEntityManagerFactory() );
-        }
-        catch ( SQLException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-        // ***********************************
-    }
-
 
     public void destroy()
     {

@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.environment.impl.entity;
+package org.safehaus.subutai.core.peer.impl.entity;
 
 
 import java.io.Serializable;
@@ -9,12 +9,13 @@ import java.io.Serializable;
  */
 
 //*************** Primary Key ************************************
-class EnvironmentBuildProcessEntityPk implements Serializable
+
+class PeerDataPk  implements Serializable
 {
     private String id;
     private String source;
 
-    public EnvironmentBuildProcessEntityPk()
+    public PeerDataPk()
     {
 
     }
@@ -43,14 +44,14 @@ class EnvironmentBuildProcessEntityPk implements Serializable
     @Override
     public boolean equals(Object obj)
     {
-        if(obj instanceof EnvironmentBuildProcessEntityPk){
-            EnvironmentBuildProcessEntityPk envBPPK = (EnvironmentBuildProcessEntityPk) obj;
+        if(obj instanceof PeerDataPk ){
+            PeerDataPk ppk = (PeerDataPk ) obj;
 
-            if(!envBPPK.getId().equals( this.id )){
+            if(!ppk.getId().equals( this.id )){
                 return false;
             }
 
-            if(!envBPPK.getSource().equals( this.source )){
+            if(!ppk.getSource().equals( this.source )){
                 return false;
             }
 

@@ -20,7 +20,7 @@ import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.impl.TrackerImpl;
 import org.safehaus.subutai.core.tracker.impl.TrackerOperationImpl;
 import org.safehaus.subutai.core.tracker.impl.TrackerOperationViewImpl;
-import org.safehaus.subutai.core.tracker.impl.model.TrackerOperationEntity;
+import org.safehaus.subutai.core.tracker.impl.entity.TrackerOperationEntity;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

@@ -12,30 +12,18 @@ public class DaoManager
 {
     private EntityManager entityManager;
     private EntityManagerFactory entityManagerFactory;
-    private short injectionMethod = 0;
 
-
-    public short getInjectionMethod()
-    {
-        return injectionMethod;
-    }
-
-
-    public void setInjectionMethod( final short injectionMethod )
-    {
-        this.injectionMethod = injectionMethod;
-    }
-
-
-    public DaoManager()
-    {
-        //Destroy
-    }
 
     public void init()
     {
         //Init
     }
+    public DaoManager()
+    {
+        //Destroy
+    }
+
+
     public void destroy()
     {
         if(entityManagerFactory!=null)
@@ -59,7 +47,6 @@ public class DaoManager
     public void setEntityManager( final EntityManager entityManager )
     {
         this.entityManager = entityManager;
-        injectionMethod = 2;
     }
 
 
@@ -72,8 +59,13 @@ public class DaoManager
     public void setEntityManagerFactory( final EntityManagerFactory entityManagerFactory )
     {
         this.entityManagerFactory = entityManagerFactory;
-        injectionMethod = 1;
+
+        if(entityManagerFactory!=null)
+        {
+            this.entityManager = entityManagerFactory.createEntityManager();
+        }
     }
+
     public short rollBackTransaction(EntityManager em)
     {
         if(em!=null)
@@ -108,6 +100,66 @@ public class DaoManager
         if(em!=null)
         {
             em.close();
+        }
+
+        return 1;
+    }
+    public synchronized short mergeExt(EntityManager em,Object obj)
+    {
+        try
+        {
+            if(em!=null)
+            {
+                em.merge( obj );
+            }
+            else
+            {
+                return  0;
+            }
+        }
+        catch(Exception Ex)
+        {
+            return 0;
+        }
+
+        return 1;
+    }
+    public synchronized short persistExt(EntityManager em,Object obj)
+    {
+        try
+        {
+            if(em!=null)
+            {
+                em.persist( obj );
+            }
+            else
+            {
+                return  0;
+            }
+        }
+        catch(Exception Ex)
+        {
+            return 0;
+        }
+
+        return 1;
+    }
+    public synchronized short removeExt(EntityManager em,Object obj)
+    {
+        try
+        {
+            if(em!=null)
+            {
+                em.remove( obj );
+            }
+            else
+            {
+                return  0;
+            }
+        }
+        catch(Exception Ex)
+        {
+            return 0;
         }
 
         return 1;

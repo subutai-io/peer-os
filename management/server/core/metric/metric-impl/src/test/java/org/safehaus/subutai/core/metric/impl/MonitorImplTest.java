@@ -64,6 +64,7 @@ import static org.mockito.Mockito.when;
  * Test for MonitorImpl
  */
 @RunWith( MockitoJUnitRunner.class )
+
 public class MonitorImplTest
 {
     private static final String SUBSCRIBER_ID = "subscriber";
@@ -82,11 +83,11 @@ public class MonitorImplTest
     @Mock
     EntityManager entityManager;
     @Mock
-    DaoManager daoManager;
-    @Mock
     PeerManager peerManager;
     @Mock
     MonitorDao monitorDao;
+    @Mock
+    DaoManager daoManager;
     @Mock
     ContainerHostMetricImpl containerHostMetric;
     @Mock
@@ -125,7 +126,6 @@ public class MonitorImplTest
 
         public void setMonitorDao( MonitorDao monitorDao ) {this.monitorDao = monitorDao;}
 
-        public void setDaoManager( DaoManager daoManager ) {this.daoManager = daoManager;}
 
         public void setNotificationExecutor( ExecutorService executor ) {this.notificationExecutor = executor;}
 
@@ -137,12 +137,17 @@ public class MonitorImplTest
     @Before
     public void setUp() throws Exception
     {
-        Connection connection = mock( Connection.class );
-        PreparedStatement preparedStatement = mock( PreparedStatement.class );
-        when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
+        //Connection connection = mock( Connection.class );
+        //PreparedStatement preparedStatement = mock( PreparedStatement.class );
+        //when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
+
         when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
+        when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
+
+
         monitor = new MonitorImplExt( peerManager, daoManager, environmentManager );
         monitor.setMonitorDao( monitorDao );
+
 
         containerHostMetric = mock( ContainerHostMetricImpl.class );
         when( containerHostMetric.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
@@ -345,6 +350,7 @@ public class MonitorImplTest
     }
 
 
+
     @Test
     public void testGetContainerHostMetrics() throws Exception
     {
@@ -365,6 +371,7 @@ public class MonitorImplTest
         assertEquals( ENVIRONMENT_ID, metric.getEnvironmentId() );
         assertEquals( HOST, metric.getHost() );
         assertEquals( METRIC_VALUE, metric.getTotalRam() );
+
     }
 
 

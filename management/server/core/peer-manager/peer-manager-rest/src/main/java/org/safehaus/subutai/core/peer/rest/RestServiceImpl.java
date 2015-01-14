@@ -112,7 +112,6 @@ public class RestServiceImpl implements RestService
     public Response processRegisterRequest( String peer )
     {
         PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
-
         p.setIp( getRequestIp() );
         try
         {

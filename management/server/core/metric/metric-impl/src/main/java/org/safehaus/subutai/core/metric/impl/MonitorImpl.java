@@ -69,13 +69,12 @@ public class MonitorImpl implements Monitor
             throws MonitorException
     {
         Preconditions.checkNotNull( peerManager, "Peer manager is null" );
-        Preconditions.checkNotNull( daoManager, "DaoManager factory is null." );
-
-        EntityManagerFactory emf  = daoManager.getEntityManagerFactory();
+        Preconditions.checkNotNull( daoManager, "DaoManager is null." );
 
         try
         {
-            this.monitorDao = new MonitorDao( emf );
+            this.daoManager = daoManager;
+            this.monitorDao = new MonitorDao( daoManager.getEntityManagerFactory() );
             this.peerManager = peerManager;
             this.environmentManager = environmentManager;
             peerManager.addRequestListener( new RemoteAlertListener( this ) );

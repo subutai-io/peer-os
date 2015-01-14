@@ -70,8 +70,6 @@ public class EnvironmentDAO
             daoManager.startTransaction( entityManager );
             entityManager.merge( environmentBuildProcessEntity );
             daoManager.commitTransaction( entityManager );
-
-            return true;
         }
         catch ( Exception e )
         {
@@ -83,6 +81,7 @@ public class EnvironmentDAO
         finally
         {
             daoManager.closeEntityManager( entityManager );
+            return true;
         }
     }
 
@@ -101,7 +100,7 @@ public class EnvironmentDAO
         Preconditions.checkNotNull( clazz, "Class is null" );
 
         List<T> list   = new ArrayList<>();
-        EntityManager entityManager = daoManager.getEntityManagerFromFactory();
+        EntityManager entityManager = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {   /*
@@ -155,7 +154,7 @@ public class EnvironmentDAO
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), ERR_NO_KEY );
         Preconditions.checkNotNull( clazz, "Class is null" );
 
-        EntityManager entityManager = daoManager.getEntityManagerFromFactory();
+        EntityManager entityManager = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
@@ -180,6 +179,7 @@ public class EnvironmentDAO
 
             if(ebp !=null)
             {
+                daoManager.closeEntityManager( entityManager );
                 return GSON.fromJson( ebp.getInfo(), clazz );
             }
 
@@ -220,26 +220,25 @@ public class EnvironmentDAO
             query.setParameter( "id", key  );
             query.executeUpdate();
             daoManager.commitTransaction( entityManager );
-
-            return true;
-        }
+         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
             daoManager.rollBackTransaction( entityManager );
+            return false;
         }
         finally
         {
             daoManager.closeEntityManager( entityManager );
+            return true;
         }
-        return false;
     }
 
 
     public UUID saveBlueprint( final EnvironmentBlueprint blueprint ) throws EnvironmentPersistenceException
     {
         EntityManager entityManager = daoManager.getEntityManagerFromFactory();
-
+        UUID bpId;
         try
         {
             //dbUtil.update( "merge into blueprint (id, info) values (? , ?)", blueprint.getId(), json );
@@ -255,7 +254,7 @@ public class EnvironmentDAO
             entityManager.merge( environmentBlueprintEntity );
             daoManager.commitTransaction( entityManager );
 
-            return blueprint.getId();
+            bpId = blueprint.getId();
         }
         catch ( Exception e )
         {
@@ -267,14 +266,15 @@ public class EnvironmentDAO
         {
             daoManager.closeEntityManager( entityManager );
         }
+
+        return bpId;
     }
 
 
     public List<EnvironmentBlueprint> getBlueprints() throws EnvironmentPersistenceException
     {
         List<EnvironmentBlueprint> blueprints = new ArrayList<>();
-        //EntityManager entityManager = daoManager.getEntityManagerFromFactory();
-        EntityManager entityManager = daoManager.getEntityManagerFactory().createEntityManager();
+        EntityManager entityManager = daoManager.getEntityManagerFromFactory();
 
         try
         {   /*

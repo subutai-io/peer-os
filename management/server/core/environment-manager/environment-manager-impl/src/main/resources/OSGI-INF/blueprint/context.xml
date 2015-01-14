@@ -21,19 +21,19 @@
 
 
   <!-- ***************************************************************** -->
-  <bean id="daoManager" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager">
+  <bean id="daoManagerEnv" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" activation="eager" >
     <jpa:unit unitname="envManagerPUnit" property="entityManagerFactory" />
   </bean>
   <!-- ***************************************************************** -->
   <bean id="environmentManager" scope="singleton"
-        init-method="init"
+        init-method="init" depends-on="daoManagerEnv"
         destroy-method="destroy"
         class="org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl">
     <property name="templateRegistry" ref="templateRegistry" />
     <property name="securityManager"  ref="securityManager" />
     <property name="tracker"          ref="tracker" />
     <property name="peerManager"      ref="peerManager" />
-    <property name="daoManager"       ref="daoManager" />
+    <property name="daoManager"       ref="daoManagerEnv" />
   </bean>
 
 </blueprint>
