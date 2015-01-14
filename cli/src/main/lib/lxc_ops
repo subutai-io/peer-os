@@ -506,6 +506,22 @@ function lxc_get_memory {
 }
 
 
+function lxc_get_memory_in_megabytes {
+  local container=$1
+  local resource_parameter="memory.limit_in_bytes"
+
+  local ram_quota=$(lxc_quota_modification $container $resource_parameter)
+  local physical_total_ram=$(get_physical_total_ram)
+
+  if (( $(bc <<< "$ram_quota <= $physical_total_ram") == 1 )); then
+    local ram_quota=$(echo $ram_quota/1024/1024 | bc)
+  else
+    local ram_quota=$(echo $physical_total_ram/1024/1024 | bc)
+  fi
+  echo $ram_quota"M"
+  return
+}
+
 function lxc_set_memory {
   local container=$1
   local resource_parameter="memory.limit_in_bytes"
@@ -516,7 +532,7 @@ function lxc_set_memory {
 
 
 function lxc_get_cpus {
-  local container=$1
+  local container="$1"
   local resource_parameter="cpuset.cpus"
 
   lxc_quota_modification $container $resource_parameter
@@ -524,11 +540,37 @@ function lxc_get_cpus {
 
 
 function lxc_set_cpus {
-  local container=$1
+  local container="$1"
   local resource_parameter="cpuset.cpus"
-  local parameter_value=$2
+  local parameter_value="$2"
 
   lxc_quota_modification $container $resource_parameter $parameter_value
+}
+
+
+function lxc_get_cpu_quota {
+  local container="$1"
+  local cfs_quota=$(lxc_get_cfs_quota $container)
+  local cfs_period=$(lxc_get_cfs_period $container)
+
+  if [[ "$cfs_quota" == "-1" ]]; then
+    local cpu_quota="100"
+  else
+    local cpu_core_count=$(lxc_get_cpu_core_count $container)
+    local cpu_quota=$(echo $cfs_quota*100/$cfs_period/$cpu_core_count | bc)
+  fi
+  echo $cpu_quota
+}
+
+
+function lxc_set_cpu_quota {
+  local container="$1"
+  local parameter_value="$2"
+
+  local cpu_core_count=$(lxc_get_cpu_core_count $container)
+  local cfs_period=$(lxc_get_cfs_period $container)
+  local cfs_quota=$(echo $cfs_period*$cpu_core_count*$parameter_value/100 | bc)
+  lxc_set_cfs_quota "$container" "$cfs_quota"
 }
 
 
