@@ -450,7 +450,6 @@ assert_email_validity(){
 
 
 # find key id's index 
-# number refers the 
 find_key_id_index(){
   key_id=$1
   local pubkey_id
