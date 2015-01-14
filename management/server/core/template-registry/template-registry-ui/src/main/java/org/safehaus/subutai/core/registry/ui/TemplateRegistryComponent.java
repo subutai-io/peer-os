@@ -206,6 +206,12 @@ public class TemplateRegistryComponent extends CustomComponent
                                 public void itemClick( final ItemClickEvent event )
                                 {
                                     BeanItem<GitChangedFile> file = dataContainer.getItem( event.getItemId() );
+
+                                    if ( file == null )
+                                    {
+                                        return;
+                                    }
+
                                     GitChangedFile gitFile = file.getBean();
                                     Pair<String, String> fileVersions = registryManager
                                             .getChangedFileVersions( template.getParentTemplateName(),

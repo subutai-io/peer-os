@@ -105,7 +105,7 @@ public class Template
     //subutai products present only in this template excluding all subutai products present in the whole ancestry
     // lineage above
     @Expose
-    @ElementCollection( targetClass = String.class )
+    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> products;
 
 
