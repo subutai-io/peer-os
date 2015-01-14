@@ -78,6 +78,11 @@ function quota {
   else
     case $resource_parameter in
       "ram" )
+        # If the parameter for ram metric does not have K,M,G letters
+        # then set the default value to M which causes to be tread as megabytes
+        if [ "`is_number $parameter_value`" == "true" ]; then
+          local parameter_value=$parameter_value"M"
+        fi
         lxc_set_memory $container $parameter_value
         ;;
       "cpuset" )
