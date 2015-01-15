@@ -15,6 +15,7 @@ import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.util.CollectionUtil;
@@ -61,17 +62,19 @@ public class MonitorImpl implements Monitor
     private EnvironmentManager environmentManager;
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
+    protected DaoManager daoManager;
 
 
-    public MonitorImpl( PeerManager peerManager, EntityManagerFactory emf, EnvironmentManager environmentManager )
+    public MonitorImpl( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager )
             throws MonitorException
     {
         Preconditions.checkNotNull( peerManager, "Peer manager is null" );
-        Preconditions.checkNotNull( emf, "EntityManager factory is null." );
-        Preconditions.checkNotNull( emf, "Environment manager is null." );
+        Preconditions.checkNotNull( daoManager, "DaoManager is null." );
+
         try
         {
-            this.monitorDao = new MonitorDao( emf );
+            this.daoManager = daoManager;
+            this.monitorDao = new MonitorDao( daoManager.getEntityManagerFactory() );
             this.peerManager = peerManager;
             this.environmentManager = environmentManager;
             peerManager.addRequestListener( new RemoteAlertListener( this ) );

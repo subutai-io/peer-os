@@ -9,17 +9,9 @@
             http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0
             http://aries.apache.org/xmlns/transactions/v1.0.0 http://aries.apache.org/xmlns/transactions/v1.0.0 ">
 
-  <!-- ******* Temporary *********************************************** -->
-  <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:~/peer_manager" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
-  </bean>
   <!-- ***************************************************************** -->
-  <bean id="daoManager" init-method="init" destroy-method="destroy" scope="singleton"
-        class="org.safehaus.subutai.core.peer.impl.dao.DaoManager">
+  <bean id="daoManagerPeer" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="peerManagerPUnit" property="entityManagerFactory" />
-    <tx:transaction method="*" value="Required"/>
   </bean>
   <!-- ***************************************************************** -->
 
@@ -49,8 +41,7 @@
     <property name="quotaManager"     ref="quotaManager" />
     <property name="monitor"          ref="monitor" />
     <property name="commandExecutor"  ref="commandExecutor" />
-    <property name="daoManager"       ref="daoManager" />
-    <argument ref="dataSource" />
+    <property name="daoManager"       ref="daoManagerPeer" />
     <argument ref="messenger" />
   </bean>
 

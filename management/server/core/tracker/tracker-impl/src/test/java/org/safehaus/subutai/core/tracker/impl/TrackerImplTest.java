@@ -50,11 +50,6 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class TrackerImplTest
 {
-
-    @Mock
-    DataSource dataSource;
-    @Mock
-    DbUtil dbUtil;
     @Mock
     ResultSet resultSet;
     @Mock
@@ -69,24 +64,6 @@ public class TrackerImplTest
 
 
     private ByteArrayOutputStream myOut;
-
-
-    @Before
-    public void setUp() throws SQLException
-    {
-        productOperation = new TrackerOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
-        tracker = new TrackerImplExt( dataSource, dbUtil );
-        when( dbUtil.select( anyString(), anyVararg() ) ).thenReturn( resultSet );
-        when( resultSet.next() ).thenReturn( true ).thenReturn( false );
-        when( resultSet.getClob( "info" ) ).thenReturn( clobInfo );
-        when( resultSet.getString( SOURCE ) ).thenReturn( SOURCE );
-        when( clobInfo.length() ).thenReturn( 1L );
-
-        when( clobInfo.getSubString( anyLong(), anyInt() ) ).thenReturn( JsonUtil.toJson( productOperation ) );
-
-        myOut = new ByteArrayOutputStream();
-        System.setOut( new PrintStream( myOut ) );
-    }
 
 
     @After
@@ -121,7 +98,7 @@ public class TrackerImplTest
     @Test
     public void testGetProductOperationException() throws Exception
     {
-        when( dbUtil.select( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
+        //when( dbUtil.select( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
 
         TrackerOperationView pv = tracker.getTrackerOperation( SOURCE, operationId );
 
@@ -139,7 +116,7 @@ public class TrackerImplTest
     @Test
     public void testSaveProductOperationException() throws Exception
     {
-        when( dbUtil.update( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
+        //when( dbUtil.update( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
 
         assertFalse( tracker.saveTrackerOperation( SOURCE, productOperation ) );
     }
@@ -158,7 +135,7 @@ public class TrackerImplTest
     public void testCreateProductOperationException() throws Exception
     {
 
-        when( dbUtil.update( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
+        //when( dbUtil.update( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
 
         TrackerOperation po = tracker.createTrackerOperation( SOURCE, DESCRIPTION );
 
@@ -180,7 +157,7 @@ public class TrackerImplTest
     @Test
     public void testGetProductOperationsException() throws Exception
     {
-        when( dbUtil.select( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
+        //when( dbUtil.select( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
 
         List<TrackerOperationView> pos = tracker.getTrackerOperations( SOURCE, new Date(), new Date(), 1 );
 
@@ -202,7 +179,7 @@ public class TrackerImplTest
     @Test
     public void testGetProductOperationSourcesException() throws Exception
     {
-        when( dbUtil.select( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
+        //when( dbUtil.select( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
 
         List<String> sources = tracker.getTrackerOperationSources();
 
