@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.peer.api;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Template;
@@ -41,8 +40,6 @@ public interface ContainerHost extends Host
 
     public ContainerHostState getState() throws PeerException;
 
-    public ProcessResourceUsage getProcessResourceUsage( ContainerHost containerHost, int processPid )
-            throws PeerException;
 
     public PeerQuotaInfo getQuota( QuotaType quotaType ) throws PeerException;
 
@@ -68,61 +65,71 @@ public interface ContainerHost extends Host
 
     public void setDataService( DataService dataService );
 
+    /**
+     * Returns process's resource usage by pid
+     *
+     * @param processPid - pid which process usage to return
+     *
+     * @return - resource usage
+     */
+    public ProcessResourceUsage getProcessResourceUsage( int processPid ) throws PeerException;
 
     /**
      * Returns RAM quota on container in megabytes
      *
-     * @param containerId - id of container
-     *
      * @return - quota in mb
      */
-    public int getRamQuota( UUID containerId ) throws PeerException;
+    public int getRamQuota() throws PeerException;
 
     /**
      * Sets RAM quota on container in megabytes
      *
-     * @param containerId - id of container
      * @param ramInMb - quota in mb
      */
-    public void setRamQuota( UUID containerId, int ramInMb ) throws PeerException;
+    public void setRamQuota( int ramInMb ) throws PeerException;
 
 
     /**
      * Returns CPU quota on container in percent
      *
-     * @param containerId - id of container
-     *
      * @return - cpu quota on container in percent
      */
-    public int getCpuQuota( UUID containerId ) throws PeerException;
+    public int getCpuQuota() throws PeerException;
 
     /**
      * Sets CPU quota on container in percent
      *
-     * @param containerId - id of container
      * @param cpuPercent - cpu quota in percent
      */
-    public void setCpuQuota( UUID containerId, int cpuPercent ) throws PeerException;
+    public void setCpuQuota( int cpuPercent ) throws PeerException;
 
     /**
      * Returns allowed cpus/cores ids on container
      *
-     * @param containerId - id of container
-     *
      * @return - allowed cpu set
      */
-    public Set<Integer> getCpuSet( UUID containerId ) throws PeerException;
+    public Set<Integer> getCpuSet() throws PeerException;
 
     /**
      * Sets allowed cpus/cores on container
      *
-     * @param containerId - id of container
      * @param cpuSet - allowed cpu set
      */
-    public void setCpuSet( UUID containerId, Set<Integer> cpuSet ) throws PeerException;
+    public void setCpuSet( Set<Integer> cpuSet ) throws PeerException;
 
+    /**
+     * Returns disk quota
+     *
+     * @param diskPartition - disk partition which quota to return
+     *
+     * @return - disk partition quota
+     */
+    public DiskQuota getDiskQuota( DiskPartition diskPartition ) throws PeerException;
 
-    public DiskQuota getDiskQuota( UUID containerId, DiskPartition diskPartition ) throws PeerException;
-
-    public void setDiskQuota( UUID containerId, DiskQuota diskQuota ) throws PeerException;
+    /**
+     * Sets disk partition quota
+     *
+     * @param diskQuota - quota to set
+     */
+    public void setDiskQuota( DiskQuota diskQuota ) throws PeerException;
 }

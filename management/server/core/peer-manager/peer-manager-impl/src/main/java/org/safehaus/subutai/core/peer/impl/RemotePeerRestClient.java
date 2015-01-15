@@ -308,14 +308,14 @@ public class RemotePeerRestClient
     }
 
 
-    public ProcessResourceUsage getProcessResourceUsage( ContainerHost host, int processPid ) throws PeerException
+    public ProcessResourceUsage getProcessResourceUsage( UUID containerId, int processPid ) throws PeerException
     {
         String path = "peer/container/resource/usage";
 
         WebClient client = createWebClient();
 
         Response response =
-                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "hostId", host.getId().toString() )
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "hostId", containerId.toString() )
                       .query( "processPid", processPid ).get();
 
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
