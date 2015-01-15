@@ -48,8 +48,6 @@ public interface Peer
 
     public boolean isConnected( Host host );
 
-    public ProcessResourceUsage getProcessResourceUsage( ContainerHost containerHost, int processPid )
-            throws PeerException;
 
     public CommandResult execute( RequestBuilder requestBuilder, Host host ) throws CommandException;
 
@@ -79,6 +77,8 @@ public interface Peer
     public ContainerHostState getContainerHostState( String containerId ) throws PeerException;
 
     //******** Quota functions ***********
+
+    public ProcessResourceUsage getProcessResourceUsage( UUID containerId, int processPid ) throws PeerException;
 
     /**
      * Returns RAM quota on container in megabytes

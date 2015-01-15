@@ -203,11 +203,11 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost containerHost, final int processPid )
+    public ProcessResourceUsage getProcessResourceUsage( final UUID containerId, final int processPid )
             throws PeerException
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
-        return remotePeerRestClient.getProcessResourceUsage( containerHost, processPid );
+        return remotePeerRestClient.getProcessResourceUsage( containerId, processPid );
     }
 
 
