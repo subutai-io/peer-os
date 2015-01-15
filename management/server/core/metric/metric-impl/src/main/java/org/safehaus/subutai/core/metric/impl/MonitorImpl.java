@@ -175,7 +175,7 @@ public class MonitorImpl implements Monitor
             {
                 //get container's resource host
                 ResourceHost resourceHost =
-                        peerManager.getLocalPeer().getResourceHostByName( localContainer.getParentHostname() );
+                        peerManager.getLocalPeer().getResourceHostByContainerId( localContainer.getId().toString() );
                 addLocalContainerHostMetric( environmentId, resourceHost, localContainer, metrics );
             }
         }
@@ -218,7 +218,7 @@ public class MonitorImpl implements Monitor
         }
         else
         {
-            LOG.warn( String.format( "Could not find resource host %s", localContainer.getParentHostname() ) );
+            LOG.warn( String.format( "Could not find resource host if %s", localContainer.getHostname() ) );
         }
     }
 
@@ -410,7 +410,7 @@ public class MonitorImpl implements Monitor
             try
             {
                 ResourceHost resourceHost =
-                        peerManager.getLocalPeer().getResourceHostByName( containerHost.getParentHostname() );
+                        peerManager.getLocalPeer().getResourceHostByContainerId( containerHost.getId().toString() );
                 CommandResult commandResult = resourceHost.execute(
                         commands.getActivateMonitoringCommand( containerHost.getHostname(), monitoringSettings ) );
                 if ( !commandResult.hasSucceeded() )
