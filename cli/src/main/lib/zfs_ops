@@ -432,16 +432,23 @@ function fs_get_quota {
 
 function fs_get_quota_exact_values {
   local container=$1
+  local dataset=$2
+  case $dataset in
+    "home" )
+      container="lxc-data/$container-home";
+    ;;
+    "var")
+      container="lxc-data/$container-var";
+    ;;
+    "opt")
+      container="lxc/$container-opt";
+    ;;
+    "rootfs")
+      container="lxc/$container";
+    ;;
+  esac
 
-  local lxc_home=$(fs_quota_operations_exact_value "lxc-data/$container-home")
-  local lxc_var=$(fs_quota_operations_exact_value "lxc-data/$container-var")
-  local lxc_opt=$(fs_quota_operations_exact_value "lxc/$container-opt")
-  local lxc_rootfs=$(fs_quota_operations_exact_value "lxc/$container")
-
-  printf "Container home:\t%s\n" $lxc_home
-  printf "Container opt:\t%s\n" $lxc_opt
-  printf "Container var:\t%s\n" $lxc_var
-  printf "Container rootfs:\t%s\n" $lxc_rootfs
+  fs_quota_operations_exact_value $container
 }
 
 

@@ -14,6 +14,8 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.DiskPartition;
+import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -201,11 +203,11 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost containerHost, final int processPid )
+    public ProcessResourceUsage getProcessResourceUsage( final UUID containerId, final int processPid )
             throws PeerException
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
-        return remotePeerRestClient.getProcessResourceUsage( containerHost, processPid );
+        return remotePeerRestClient.getProcessResourceUsage( containerId, processPid );
     }
 
 
@@ -418,5 +420,23 @@ public class RemotePeerImpl implements RemotePeer
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
 
         remotePeerRestClient.setCpuSet( containerId, cpuSet );
+    }
+
+
+    @Override
+    public DiskQuota getDiskQuota( final UUID containerId, final DiskPartition diskPartition ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        return remotePeerRestClient.getDiskQuota( containerId, diskPartition );
+    }
+
+
+    @Override
+    public void setDiskQuota( final UUID containerId, final DiskQuota diskQuota ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        remotePeerRestClient.setDiskQuota( containerId, diskQuota );
     }
 }

@@ -12,6 +12,8 @@ import javax.ws.rs.core.Response;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.DiskPartition;
+import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -29,8 +31,6 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 
 /**
@@ -44,7 +44,6 @@ public class RemotePeerRestClient
     private static final long CONNECTION_TIMEOUT = 1000 * 60;
     private final long receiveTimeout;
     private final long connectionTimeout;
-    private final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private String baseUrl = "http://%s:%s/cxf";
 
 
@@ -309,14 +308,14 @@ public class RemotePeerRestClient
     }
 
 
-    public ProcessResourceUsage getProcessResourceUsage( ContainerHost host, int processPid ) throws PeerException
+    public ProcessResourceUsage getProcessResourceUsage( UUID containerId, int processPid ) throws PeerException
     {
         String path = "peer/container/resource/usage";
 
         WebClient client = createWebClient();
 
         Response response =
-                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "hostId", host.getId().toString() )
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "hostId", containerId.toString() )
                       .query( "processPid", processPid ).get();
 
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
@@ -496,6 +495,49 @@ public class RemotePeerRestClient
         if ( response.getStatus() != Response.Status.OK.getStatusCode() )
         {
             throw new PeerException( "Could not set allowed CPU set", response.getEntity().toString() );
+        }
+    }
+
+
+    public DiskQuota getDiskQuota( final UUID containerId, final DiskPartition diskPartition ) throws PeerException
+    {
+        String path = "peer/container/quota/disk";
+
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "containerId", containerId.toString() )
+                      .query( "diskPartition", JsonUtil.toJson( diskPartition ) ).get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<DiskQuota>()
+            {}.getType() );
+        }
+        else
+        {
+            throw new PeerException( "Could not get disk quota", response.getEntity().toString() );
+        }
+    }
+
+
+    public void setDiskQuota( final UUID containerId, final DiskQuota diskQuota ) throws PeerException
+    {
+        String path = "peer/container/quota/disk";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+
+        form.set( "containerId", containerId.toString() );
+        form.set( "diskQuota", JsonUtil.toJson( diskQuota ) );
+
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE ).post( form );
+
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        {
+            throw new PeerException( "Could not set disk quota", response.getEntity().toString() );
         }
     }
 }

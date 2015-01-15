@@ -4,7 +4,10 @@ package org.safehaus.subutai.core.lxc.quota.api;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.quota.DiskPartition;
+import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 
@@ -77,4 +80,9 @@ public interface QuotaManager
      * @param cpuSet - allowed cpu set
      */
     public void setCpuSet( UUID containerId, Set<Integer> cpuSet ) throws QuotaException;
+
+
+    public DiskQuota getDiskQuota( UUID containerId, DiskPartition diskPartition ) throws QuotaException;
+
+    public void setDiskQuota( UUID containerId, DiskQuota diskQuota ) throws QuotaException;
 }

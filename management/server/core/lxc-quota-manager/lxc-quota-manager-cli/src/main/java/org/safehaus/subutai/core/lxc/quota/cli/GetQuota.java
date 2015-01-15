@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.lxc.quota.cli;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
+import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
