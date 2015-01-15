@@ -61,7 +61,7 @@ public class LocalPeerImplTest
     @Before
     public void setup()
     {
-        peerManager = new PeerManagerImpl( dataSource, messenger );
+        peerManager = new PeerManagerImpl(  messenger );
         //        peerManager.init();
     }
 

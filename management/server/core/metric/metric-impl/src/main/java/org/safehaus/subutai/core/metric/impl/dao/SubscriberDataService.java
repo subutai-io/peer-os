@@ -43,9 +43,9 @@ public class SubscriberDataService
     }
 
 
-    public void setEmf( final EntityManagerFactory emf )
+    public void setEntityManagerFactory( final EntityManagerFactory emf )
     {
-        Preconditions.checkNotNull( emf, "EntityManagerFactory cannot be null." );
+        Preconditions.checkNotNull( emf, " EntityManagerFactory cannot be null." );
         this.emf = emf;
     }
 
