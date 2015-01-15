@@ -28,8 +28,11 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.DataService;
+import org.safehaus.subutai.common.quota.DiskPartition;
+import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -205,6 +208,14 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public void setQuota( QuotaInfo quota ) throws PeerException
     {
         throw new UnsupportedOperationException( "Unsupported operation." );
+    }
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost containerHost, final int processPid )
+            throws PeerException
+    {
+        return getPeer().getProcessResourceUsage( containerHost, processPid );
     }
 
 
@@ -501,5 +512,61 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public HostArchitecture getHostArchitecture()
     {
         return this.hostArchitecture;
+    }
+
+
+    @Override
+    public int getRamQuota( final UUID containerId ) throws PeerException
+    {
+        return getPeer().getRamQuota( containerId );
+    }
+
+
+    @Override
+    public void setRamQuota( final UUID containerId, final int ramInMb ) throws PeerException
+    {
+        getPeer().setRamQuota( containerId, ramInMb );
+    }
+
+
+    @Override
+    public int getCpuQuota( final UUID containerId ) throws PeerException
+    {
+        return getPeer().getCpuQuota( containerId );
+    }
+
+
+    @Override
+    public void setCpuQuota( final UUID containerId, final int cpuPercent ) throws PeerException
+    {
+        getPeer().setCpuQuota( containerId, cpuPercent );
+    }
+
+
+    @Override
+    public Set<Integer> getCpuSet( final UUID containerId ) throws PeerException
+    {
+        return getPeer().getCpuSet( containerId );
+    }
+
+
+    @Override
+    public void setCpuSet( final UUID containerId, final Set<Integer> cpuSet ) throws PeerException
+    {
+        getPeer().setCpuSet( containerId, cpuSet );
+    }
+
+
+    @Override
+    public DiskQuota getDiskQuota( final UUID containerId, final DiskPartition diskPartition ) throws PeerException
+    {
+        return getPeer().getDiskQuota( containerId, diskPartition );
+    }
+
+
+    @Override
+    public void setDiskQuota( final UUID containerId, final DiskQuota diskQuota ) throws PeerException
+    {
+        getPeer().setDiskQuota( containerId, diskQuota );
     }
 }

@@ -176,7 +176,11 @@ function monitor {
       destroy_monitor $hostname $metric_type
     fi
   elif [ $is_update == "true"  ]; then
-    update_rrd "$hostname" "$metric_type"
+    if [ "$metric_type" == "all" ]; then
+      update_all_rrd $hostname
+    else
+      update_rrd "$hostname" "$metric_type"
+    fi
   elif [ $is_start == "true"  ]; then
     if [ "$metric_type" == "all" ]; then
       start_update_all_rrd $hostname
@@ -192,7 +196,11 @@ function monitor {
   elif [ $is_query == "true" ]; then
     query_rrd "$hostname" "$metric_type"
   elif [ $is_alert == "true" ]; then
-    $metric_type"_alert" $hostname
+    if [ "$metric_type" == "all" ]; then
+      alert_all_metrics $hostname
+    else
+      $metric_type"_alert" $hostname
+    fi
   elif [ "$is_pid"  == "true" ]; then
     query_pid "$hostname" "all" "$pid"
   else

@@ -1,12 +1,6 @@
-package org.safehaus.subutai.core.lxc.quota.api;
+package org.safehaus.subutai.common.quota;
 
 
-import org.safehaus.subutai.common.quota.QuotaType;
-
-
-/**
- * Created by talas on 10/7/14.
- */
 public class QuotaException extends Exception
 {
     public QuotaException()
