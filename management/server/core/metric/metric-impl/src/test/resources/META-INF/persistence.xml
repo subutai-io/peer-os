@@ -7,7 +7,7 @@
     <properties>
       <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />
       <property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:test" />
-      <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
+      <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)" />
     </properties>
   </persistence-unit>
 </persistence>

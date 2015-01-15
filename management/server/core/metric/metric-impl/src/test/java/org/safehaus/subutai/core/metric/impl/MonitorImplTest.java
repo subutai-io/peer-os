@@ -20,6 +20,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
@@ -63,6 +64,7 @@ import static org.mockito.Mockito.when;
  * Test for MonitorImpl
  */
 @RunWith( MockitoJUnitRunner.class )
+
 public class MonitorImplTest
 {
     private static final String SUBSCRIBER_ID = "subscriber";
@@ -84,6 +86,8 @@ public class MonitorImplTest
     PeerManager peerManager;
     @Mock
     MonitorDao monitorDao;
+    @Mock
+    DaoManager daoManager;
     @Mock
     ContainerHostMetricImpl containerHostMetric;
     @Mock
@@ -113,10 +117,10 @@ public class MonitorImplTest
 
     static class MonitorImplExt extends MonitorImpl
     {
-        public MonitorImplExt( final PeerManager peerManager, EntityManagerFactory emf,
+        public MonitorImplExt( final PeerManager peerManager, DaoManager daoManager,
                                EnvironmentManager environmentManager ) throws MonitorException
         {
-            super( peerManager, emf, environmentManager );
+            super( peerManager, daoManager, environmentManager );
         }
 
 
@@ -133,12 +137,17 @@ public class MonitorImplTest
     @Before
     public void setUp() throws Exception
     {
-        Connection connection = mock( Connection.class );
-        PreparedStatement preparedStatement = mock( PreparedStatement.class );
-        when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
+        //Connection connection = mock( Connection.class );
+        //PreparedStatement preparedStatement = mock( PreparedStatement.class );
+        //when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
+
         when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
-        monitor = new MonitorImplExt( peerManager, entityManagerFactory, environmentManager );
+        when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
+
+
+        monitor = new MonitorImplExt( peerManager, daoManager, environmentManager );
         monitor.setMonitorDao( monitorDao );
+
 
         containerHostMetric = mock( ContainerHostMetricImpl.class );
         when( containerHostMetric.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
@@ -340,6 +349,7 @@ public class MonitorImplTest
     }
 
 
+
     @Test
     public void testGetContainerHostMetrics() throws Exception
     {
@@ -359,6 +369,7 @@ public class MonitorImplTest
         assertEquals( ENVIRONMENT_ID, metric.getEnvironmentId() );
         assertEquals( HOST, metric.getHost() );
         assertEquals( METRIC_VALUE, metric.getTotalRam() );
+
     }
 
 
