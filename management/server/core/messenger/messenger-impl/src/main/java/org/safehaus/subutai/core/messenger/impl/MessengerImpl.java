@@ -7,7 +7,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javax.persistence.EntityManagerFactory;
+
 
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.messenger.api.Message;
@@ -41,18 +41,13 @@ public class MessengerImpl implements Messenger, MessageProcessor
     protected MessengerDao messengerDao;
     protected MessageSender messageSender;
     private   DaoManager daoManager;
-    private   EntityManagerFactory entityManagerFactory;
+
 
     public MessengerImpl( )
             throws MessengerException
     {
     }
-    public MessengerImpl(PeerManager peerManager,EntityManagerFactory entityManagerFactory  )
-            throws MessengerException
-    {
-        this.peerManager = peerManager;
-        this.entityManagerFactory = entityManagerFactory;
-    }
+
     public void init( ) throws MessengerException
     {
         Preconditions.checkNotNull( peerManager );
@@ -60,7 +55,6 @@ public class MessengerImpl implements Messenger, MessageProcessor
 
         try
         {
-            //entityManager = entityManagerFactory.createEntityManager();
             this.messengerDao  = new MessengerDao( daoManager.getEntityManagerFactory());
             this.messageSender = new MessageSender( peerManager, messengerDao, this );
 

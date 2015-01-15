@@ -67,9 +67,8 @@
     </dependency>
     <dependency>
       <groupId>org.apache.openjpa</groupId>
-      <artifactId>openjpa-all</artifactId>
-      <version>2.3.0</version>
-      <scope>test</scope>
+      <artifactId>openjpa</artifactId>
+      <version>${openjpa.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
@@ -94,6 +93,12 @@
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
+            <Import-Package>
+              org.apache.openjpa.enhance;version="[1.0.0,2.3.0)",
+              org.apache.openjpa.util;version="[1.0.0,2.3.0)",
+              javax.persistence;version="[1.0.0,2.1.0)",
+              *
+            </Import-Package>
           </instructions>
         </configuration>
       </plugin>
