@@ -933,22 +933,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     @Override
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost host, final int processPid )
-            throws PeerException
-    {
-        try
-        {
-            Host c = bindHost( host.getHostId() );
-            return monitor.getProcessResourceUsage( ( ContainerHost ) c, processPid );
-        }
-        catch ( MonitorException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @Override
     public ManagementHost getManagementHost() throws HostNotFoundException
     {
         if ( managementHost == null )
@@ -1236,6 +1220,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
 
 
     // ********** Quota functions *****************
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( final UUID containerId, final int processPid )
+            throws PeerException
+    {
+        try
+        {
+            Host c = bindHost( containerId );
+            return monitor.getProcessResourceUsage( ( ContainerHost ) c, processPid );
+        }
+        catch ( MonitorException e )
+        {
+            throw new PeerException( e );
+        }
+    }
 
 
     @Override

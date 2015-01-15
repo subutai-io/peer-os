@@ -510,7 +510,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     @Override
     public ProcessResourceUsage getProcessResourceUsage( final int processPid ) throws PeerException
     {
-        return getPeer().getProcessResourceUsage( this, processPid );
+        return getPeer().getProcessResourceUsage( getId(), processPid );
     }
 
 

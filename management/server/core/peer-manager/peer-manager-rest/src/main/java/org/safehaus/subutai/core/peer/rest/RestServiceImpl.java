@@ -172,23 +172,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    @Override
-    public Response getProcessResourceUsage( final String hostId, final int processPid )
-    {
-        try
-        {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            ProcessResourceUsage processResourceUsage =
-                    localPeer.getProcessResourceUsage( localPeer.getContainerHostById( hostId ), processPid );
-            return Response.ok( GSON.toJson( processResourceUsage ) ).build();
-        }
-        catch ( PeerException e )
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
     private String getRequestIp()
     {
         Message message = PhaseInterceptorChain.getCurrentMessage();
@@ -331,6 +314,23 @@ public class RestServiceImpl implements RestService
 
 
     //*********** Quota functions ***************
+
+
+    @Override
+    public Response getProcessResourceUsage( final String hostId, final int processPid )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            ProcessResourceUsage processResourceUsage =
+                    localPeer.getProcessResourceUsage( UUID.fromString( hostId ), processPid );
+            return Response.ok( GSON.toJson( processResourceUsage ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
 
 
     @Override

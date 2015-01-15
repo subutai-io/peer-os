@@ -271,7 +271,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public ProcessResourceUsage getProcessResourceUsage( final int processPid ) throws PeerException
     {
         Peer peer = getPeer();
-        return peer.getProcessResourceUsage( this, processPid );
+        return peer.getProcessResourceUsage( getId(), processPid );
     }
 
 

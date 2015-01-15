@@ -100,13 +100,14 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getQuota( @QueryParam( "hostId" ) String hostId, @QueryParam( "quotaType" ) String quotaType );
 
+
+    //*********** Quota functions ***************
+
     @GET
     @Path( "container/resource/usage" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getProcessResourceUsage( @QueryParam( "hostId" ) String hostId,
                                       @QueryParam( "processId" ) int processPid );
-
-    //*********** Quota functions ***************
 
     @GET
     @Path( "container/quota/ram" )
