@@ -28,8 +28,11 @@ function get_available_ram {
 function get_used_ram {
   local lxc=$1
   lxc_assert $lxc > /dev/null
-
-  local used_ram=$(cat /sys/fs/cgroup/memory/lxc/$lxc/memory.usage_in_bytes)
+ 
+  local VAR=$(su -c "lxc-attach -n $lxc -- cat /proc/self/cgroup | grep memory" $USER)
+  local str=$(echo $VAR | awk -F":" '{print "/sys/fs/cgroup/memory"$3}')
+  local used_ram=$(cat $str/memory.usage_in_bytes)
+#  local used_ram=$(cat /sys/fs/cgroup/memory/lxc/$lxc/memory.usage_in_bytes)
   local status=$?
 
   if [ $status == 0 ]; then
@@ -41,8 +44,11 @@ function get_used_ram {
 function get_used_cpu {
   local lxc=$1
   lxc_assert $lxc > /dev/null
-  
-  local used_cpu=$(cat /sys/fs/cgroup/cpuacct/lxc/$lxc/cpuacct.usage)
+
+  local VAR=$(su -c "lxc-attach -n $lxc -- cat /proc/self/cgroup | grep cpuacct" $USER)
+  local str=$(echo $VAR | awk -F":" '{print "/sys/fs/cgroup/cpuacct"$3}')
+  local used_cpu=$(cat $str/cpuacct.usage)  
+#  local used_cpu=$(cat /sys/fs/cgroup/cpuacct/lxc/$lxc/cpuacct.usage)
   local status=$?
 
   if [ $status == 0 ]; then
