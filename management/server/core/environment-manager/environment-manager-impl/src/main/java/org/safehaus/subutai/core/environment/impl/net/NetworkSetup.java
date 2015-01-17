@@ -18,15 +18,12 @@ import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
 
 public class NetworkSetup
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( NetworkSetup.class );
 
     private final EnvironmentBuildProcess buildProcess;
     private NetworkManager networkManager;

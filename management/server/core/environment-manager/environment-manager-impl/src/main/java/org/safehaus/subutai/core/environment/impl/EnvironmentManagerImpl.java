@@ -87,15 +87,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
     }
 
+
     public void init()
     {
         try
         {
             //daoManager.getEntityManagerFactory().createEntityManager();
 
-            this.environmentDAO = new EnvironmentDAO( daoManager);
-            this.environmentDataService = new EnvironmentDataService( daoManager.getEntityManagerFactory());
-            this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager.getEntityManagerFactory() );
+            this.environmentDAO = new EnvironmentDAO( daoManager );
+            this.environmentDataService = new EnvironmentDataService( daoManager.getEntityManagerFactory() );
+            this.environmentContainerDataService = new EnvironmentContainerDataService(
+                    daoManager.getEntityManagerFactory() );
         }
         catch ( SQLException e )
         {
@@ -103,6 +105,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         // ***********************************
     }
+
 
     public TemplateRegistry getTemplateRegistry()
     {
@@ -114,6 +117,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         this.templateRegistry = templateRegistry;
     }
+
 
     public SecurityManager getSecurityManager()
     {
@@ -137,6 +141,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         this.tracker = tracker;
     }
+
 
     public void destroy()
     {
@@ -385,11 +390,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         catch ( EnvironmentBuildException e )
         {
             throw new EnvironmentBuildException( e.getMessage() );
-        }
-        catch ( NetworkManagerException ex )
-        {
-            LOG.error( "Errors while networking setup", ex );
-            throw new EnvironmentBuildException( ex.getMessage() );
         }
     }
 
@@ -674,19 +674,26 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void setupNetwork( EnvironmentBuildProcess process, Environment env ) throws NetworkManagerException
+    private void setupNetwork( EnvironmentBuildProcess process, Environment env )
     {
         NetworkSetup net = new NetworkSetup( process );
         net.setEnvironmentManager( this );
         net.setNetworkManager( networkManager );
         net.setPeerManager( peerManager );
 
-        net.setupN2Nconnections( process.getN2nConnection(), process.getKeyFilePath() );
-        net.setupTunnels( process.getTunnel().getTunnelName() );
-        net.setupGateways( env );
-        net.setupVniVlanMappings( process.getTunnel().getTunnelName(), env );
-        net.setupGatewaysOnContainers( env );
-        net.setupContainerIpAddresses( env );
+        try
+        {
+            net.setupN2Nconnections( process.getN2nConnection(), process.getKeyFilePath() );
+            net.setupTunnels( process.getTunnel().getTunnelName() );
+            net.setupGateways( env );
+            net.setupVniVlanMappings( process.getTunnel().getTunnelName(), env );
+            net.setupGatewaysOnContainers( env );
+            net.setupContainerIpAddresses( env );
+        }
+        catch ( NetworkManagerException ex )
+        {
+            LOG.error( "[*] Networking setup failed!", ex );
+        }
     }
 
 
