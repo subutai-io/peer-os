@@ -1,21 +1,22 @@
 package org.safehaus.subutai.core.messenger.impl;
 
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
+
 import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
+
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
@@ -50,8 +51,7 @@ public class MessengerImplTest
 
 
     private static final int TIME_TO_LIVE = 5;
-    @Mock
-    DataSource dataSource;
+
     @Mock
     PeerManager peerManager;
     @Mock
@@ -60,6 +60,8 @@ public class MessengerImplTest
     ExecutorService notificationExecutor;
     @Mock
     MessengerDao messengerDao;
+    @Mock
+    DaoManager daoManager;
     @Mock
     LocalPeer localPeer;
     @Mock
@@ -75,44 +77,21 @@ public class MessengerImplTest
     @Before
     public void setUp() throws Exception
     {
-        Connection connection = mock( Connection.class );
-        PreparedStatement preparedStatement = mock( PreparedStatement.class );
-        when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
-        when( dataSource.getConnection() ).thenReturn( connection );
         when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
+        when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
 
-        messenger = new MessengerImpl( peerManager, entityManagerFactory );
+        messenger = new MessengerImpl();
         messenger.messageSender = messageSender;
         messenger.notificationExecutor = notificationExecutor;
         messenger.messengerDao = messengerDao;
+        messenger.setDaoManager( daoManager );
+        messenger.setPeerManager( peerManager );
+
         when( localPeer.getId() ).thenReturn( LOCAL_PEER_ID );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
     }
 
-    /*
-    @Test( expected = NullPointerException.class )
-    public void testConstructor() throws Exception
-    {
-        new MessengerImpl( null, entityManagerFactory );
-    }
-
-
-    @Test( expected = NullPointerException.class )
-    public void testConstructor2() throws Exception
-    {
-        new MessengerImpl( peerManager, null );
-    }
-
-
-    @Test( expected = MessengerException.class )
-    public void testConstructorWithException() throws Exception
-    {
-        doThrow( new RuntimeException() ).when( entityManagerFactory ).createEntityManager();
-
-        new MessengerImpl( peerManager, entityManagerFactory );
-    }
-
-
+    @Ignore
     @Test
     public void testInit() throws Exception
     {
@@ -120,7 +99,7 @@ public class MessengerImplTest
 
         verify( messageSender ).init();
     }
-    */
+
 
     @Test
     public void testDestroy() throws Exception

@@ -100,13 +100,14 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getQuota( @QueryParam( "hostId" ) String hostId, @QueryParam( "quotaType" ) String quotaType );
 
+
+    //*********** Quota functions ***************
+
     @GET
     @Path( "container/resource/usage" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getProcessResourceUsage( @QueryParam( "hostId" ) String hostId,
                                       @QueryParam( "processId" ) int processPid );
-
-    //*********** Quota functions ***************
 
     @GET
     @Path( "container/quota/ram" )
@@ -134,4 +135,14 @@ public interface RestService
     @POST
     @Path( "container/quota/cpuset" )
     Response setCpuSet( @FormParam( "containerId" ) String containerId, @FormParam( "cpuset" ) String cpuSet );
+
+    @GET
+    @Path( "container/quota/disk" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getDiskQuota( @QueryParam( "containerId" ) String containerId,
+                           @QueryParam( "diskPartition" ) String diskPartition );
+
+    @POST
+    @Path( "container/quota/disk" )
+    Response setDiskQuota( @FormParam( "containerId" ) String containerId, @FormParam( "diskQuota" ) String diskQuota );
 }

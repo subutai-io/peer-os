@@ -220,7 +220,7 @@ public class NetworkManagerImpl implements NetworkManager
         try
         {
             ContainerHost containerHost = getContainerHost( containerName );
-            return peerManager.getLocalPeer().getResourceHostByName( containerHost.getParentHostname() );
+            return peerManager.getLocalPeer().getResourceHostByContainerName( containerHost.getHostname() );
         }
         catch ( PeerException e )
         {

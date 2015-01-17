@@ -28,8 +28,11 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.DataService;
+import org.safehaus.subutai.common.quota.DiskPartition;
+import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -501,5 +504,68 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public HostArchitecture getHostArchitecture()
     {
         return this.hostArchitecture;
+    }
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( final int processPid ) throws PeerException
+    {
+        return getPeer().getProcessResourceUsage( getId(), processPid );
+    }
+
+
+    @Override
+    public int getRamQuota() throws PeerException
+    {
+        return getPeer().getRamQuota( getId() );
+    }
+
+
+    @Override
+    public void setRamQuota( final int ramInMb ) throws PeerException
+    {
+        getPeer().setRamQuota( getId(), ramInMb );
+    }
+
+
+    @Override
+    public int getCpuQuota() throws PeerException
+    {
+        return getPeer().getCpuQuota( getId() );
+    }
+
+
+    @Override
+    public void setCpuQuota( final int cpuPercent ) throws PeerException
+    {
+        getPeer().setCpuQuota( getId(), cpuPercent );
+    }
+
+
+    @Override
+    public Set<Integer> getCpuSet() throws PeerException
+    {
+        return getPeer().getCpuSet( getId() );
+    }
+
+
+    @Override
+    public void setCpuSet( final Set<Integer> cpuSet ) throws PeerException
+    {
+        getPeer().setCpuSet( getId(), cpuSet );
+    }
+
+
+    @Override
+    public DiskQuota getDiskQuota( final DiskPartition diskPartition ) throws PeerException
+    {
+        return getPeer().getDiskQuota( getId(), diskPartition );
+    }
+
+
+    @Override
+    public void setDiskQuota( final DiskQuota diskQuota ) throws PeerException
+    {
+        getPeer().setDiskQuota( getId(), diskQuota );
     }
 }

@@ -12,13 +12,16 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
+import org.safehaus.subutai.common.quota.DiskPartition;
+import org.safehaus.subutai.common.quota.DiskQuota;
+import org.safehaus.subutai.common.quota.DiskQuotaUnit;
 import org.safehaus.subutai.common.quota.HddQuotaInfo;
 import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
+import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -248,6 +251,58 @@ public class QuotaManagerImpl implements QuotaManager
 
         executeOnContainersResourceHost( containerId,
                 commands.getWriteCpuSetCommand( containerHost.getHostname(), cpuSetString.toString() ) );
+    }
+
+
+    @Override
+    public DiskQuota getDiskQuota( final UUID containerId, DiskPartition diskPartition ) throws QuotaException
+    {
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkNotNull( diskPartition );
+
+        ContainerHost containerHost = getContainerHostById( containerId );
+
+        CommandResult result = executeOnContainersResourceHost( containerId,
+                commands.getReadDiskQuotaCommand( containerHost.getHostname(), diskPartition.getPartitionName() ) );
+
+        if ( result.getStdOut().equalsIgnoreCase( DiskQuotaUnit.UNLIMITED.getAcronym() ) )
+        {
+            return new DiskQuota( diskPartition, DiskQuotaUnit.UNLIMITED, -1 );
+        }
+        else
+        {
+            String regex = "(\\d+)(K|M|G){0,1}";
+            Pattern quotaPattern = Pattern.compile( regex );
+            Matcher quotaMatcher = quotaPattern.matcher( result.getStdOut() );
+            if ( quotaMatcher.matches() )
+            {
+                String quotaValue = quotaMatcher.group( 1 );
+                long value = Long.parseLong( quotaValue );
+                String acronym = quotaMatcher.group( 2 );
+                DiskQuotaUnit diskQuotaUnit = DiskQuotaUnit.parseFromAcronym( acronym );
+                return new DiskQuota( diskPartition, diskQuotaUnit == null ? DiskQuotaUnit.BYTE : diskQuotaUnit,
+                        value );
+            }
+            else
+            {
+                throw new QuotaException( String.format( "Unparseable result: %s", result.getStdOut() ) );
+            }
+        }
+    }
+
+
+    @Override
+    public void setDiskQuota( final UUID containerId, final DiskQuota diskQuota ) throws QuotaException
+    {
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkNotNull( diskQuota );
+
+        ContainerHost containerHost = getContainerHostById( containerId );
+
+        executeOnContainersResourceHost( containerId, commands.getWriteDiskQuotaCommand( containerHost.getHostname(),
+                diskQuota.getDiskPartition().getPartitionName(), String.format( "%s%s",
+                        diskQuota.getDiskQuotaUnit() == DiskQuotaUnit.UNLIMITED ? "" : diskQuota.getDiskQuotaValue(),
+                        diskQuota.getDiskQuotaUnit().getAcronym() ) ) );
     }
 
 

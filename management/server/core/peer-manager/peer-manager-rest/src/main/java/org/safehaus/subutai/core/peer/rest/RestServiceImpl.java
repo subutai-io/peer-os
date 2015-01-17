@@ -1,11 +1,6 @@
 package org.safehaus.subutai.core.peer.rest;
 
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -16,6 +11,8 @@ import javax.ws.rs.core.Response;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.DiskPartition;
+import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
@@ -27,8 +24,6 @@ import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -40,30 +35,14 @@ import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
 
-/**
- * Created by bahadyr on 5/6/14.
- */
-
 public class RestServiceImpl implements RestService
 {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
     private PeerManager peerManager;
 
 
-    public RestServiceImpl()
-    {
-    }
-
-
-    public PeerManager getPeerManager()
-    {
-        return peerManager;
-    }
-
-
-    public void setPeerManager( PeerManager peerManager )
+    public RestServiceImpl( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
     }
@@ -112,7 +91,6 @@ public class RestServiceImpl implements RestService
     public Response processRegisterRequest( String peer )
     {
         PeerInfo p = GSON.fromJson( peer, PeerInfo.class );
-
         p.setIp( getRequestIp() );
         try
         {
@@ -193,53 +171,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    @Override
-    public Response getProcessResourceUsage( final String hostId, final int processPid )
-    {
-        try
-        {
-            LocalPeer localPeer = peerManager.getLocalPeer();
-            ProcessResourceUsage processResourceUsage =
-                    localPeer.getProcessResourceUsage( localPeer.getContainerHostById( hostId ), processPid );
-            return Response.ok( GSON.toJson( processResourceUsage ) ).build();
-        }
-        catch ( PeerException e )
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    private static String getLocalIp()
-    {
-        Enumeration<NetworkInterface> n;
-        try
-        {
-            n = NetworkInterface.getNetworkInterfaces();
-            for (; n.hasMoreElements(); )
-            {
-                NetworkInterface e = n.nextElement();
-
-                Enumeration<InetAddress> a = e.getInetAddresses();
-                for (; a.hasMoreElements(); )
-                {
-                    InetAddress addr = a.nextElement();
-                    if ( !addr.getHostAddress().startsWith( "10" ) && addr.isSiteLocalAddress() )
-                    {
-                        return ( addr.getHostName() );
-                    }
-                }
-            }
-        }
-        catch ( SocketException e )
-        {
-            System.out.println( e.getMessage() );
-        }
-
-        return "127.0.0.1";
-    }
-
-
     private String getRequestIp()
     {
         Message message = PhaseInterceptorChain.getCurrentMessage();
@@ -253,17 +184,15 @@ public class RestServiceImpl implements RestService
                                              final String strategyId, final String criteria )
     {
 
-        List<Criteria> criteriaList = new ArrayList();
         try
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
             Set<HostInfoModel> result = localPeer.scheduleCloneContainers( UUID.fromString( creatorPeerId ),
-                    ( List<Template> ) JsonUtil.fromJson( templates, new TypeToken<List<Template>>()
+                    JsonUtil.<List<Template>>fromJson( templates, new TypeToken<List<Template>>()
                     {}.getType() ), quantity, strategyId,
-                    ( List<Criteria> ) JsonUtil.fromJson( templates, new TypeToken<List<Criteria>>()
+                    JsonUtil.<List<Criteria>>fromJson( templates, new TypeToken<List<Criteria>>()
                     {}.getType() ) );
             return Response.ok( JsonUtil.toJson( result ) ).build();
-            //            return Response.ok().entity( result ).build();
         }
         catch ( PeerException e )
         {
@@ -387,6 +316,23 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getProcessResourceUsage( final String hostId, final int processPid )
+    {
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            ProcessResourceUsage processResourceUsage =
+                    localPeer.getProcessResourceUsage( UUID.fromString( hostId ), processPid );
+            return Response.ok( GSON.toJson( processResourceUsage ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
     public Response getRamQuota( final String containerId )
     {
         try
@@ -466,7 +412,42 @@ public class RestServiceImpl implements RestService
         try
         {
             peerManager.getLocalPeer().setCpuSet( UUID.fromString( containerId ),
-                    ( Set<Integer> ) JsonUtil.fromJson( cpuSet, new TypeToken<Set<Integer>>()
+                    JsonUtil.<Set<Integer>>fromJson( cpuSet, new TypeToken<Set<Integer>>()
+                    {}.getType() ) );
+            return Response.ok().build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getDiskQuota( final String containerId, final String diskPartition )
+    {
+        try
+        {
+            return Response.ok( JsonUtil.toJson( peerManager.getLocalPeer()
+                                                            .getDiskQuota( UUID.fromString( containerId ),
+                                                                    JsonUtil.<DiskPartition>from( diskPartition,
+                                                                            new TypeToken<DiskPartition>()
+                                                                            {}.getType() ) ) ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response setDiskQuota( final String containerId, final String diskQuota )
+    {
+        try
+        {
+            peerManager.getLocalPeer().setDiskQuota( UUID.fromString( containerId ),
+                    JsonUtil.<DiskQuota>fromJson( diskQuota, new TypeToken<DiskQuota>()
                     {}.getType() ) );
             return Response.ok().build();
         }

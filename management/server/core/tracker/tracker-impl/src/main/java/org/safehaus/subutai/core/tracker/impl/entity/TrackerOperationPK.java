@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.tracker.impl.model;
+package org.safehaus.subutai.core.tracker.impl.entity;
 
 
 import java.io.Serializable;

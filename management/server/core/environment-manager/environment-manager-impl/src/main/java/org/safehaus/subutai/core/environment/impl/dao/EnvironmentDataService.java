@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.environment.impl.dao;
 import java.util.Collection;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -16,18 +17,18 @@ import com.google.common.collect.Lists;
 public class EnvironmentDataService implements DataService<String, EnvironmentImpl>
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDataService.class );
-    EntityManager em;
+    EntityManagerFactory emf;
 
 
-    public EnvironmentDataService( EntityManager entityManager )
+    public EnvironmentDataService( EntityManagerFactory entityManagerFactory )
     {
-        this.em = entityManager;
+        this.emf = entityManagerFactory;
     }
 
 
-    public void setEntityManager( final EntityManager em )
+    public void setEntityManagerFactory( final EntityManagerFactory emf )
     {
-        this.em = em;
+        this.emf = emf;
     }
 
 
@@ -35,18 +36,24 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     public EnvironmentImpl find( final String id )
     {
         EnvironmentImpl result = null;
-
+        EntityManager em = emf.createEntityManager();
         try
         {
+            em.getTransaction().begin();
             result = em.find( EnvironmentImpl.class, id );
-            em.flush();
+            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
         }
         finally
         {
+            em.close();
         }
         return result;
     }
@@ -56,17 +63,24 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     public Collection<EnvironmentImpl> getAll()
     {
         Collection<EnvironmentImpl> result = Lists.newArrayList();
-
+        EntityManager em = emf.createEntityManager();
         try
         {
+            em.getTransaction().begin();
             result = em.createQuery( "select h from EnvironmentImpl h", EnvironmentImpl.class ).getResultList();
+            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
         }
         finally
         {
+            em.close();
         }
         return result;
     }
@@ -75,18 +89,25 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     @Override
     public void persist( final EnvironmentImpl item )
     {
-
+        EntityManager em = emf.createEntityManager();
         try
         {
+            em.getTransaction().begin();
             em.persist( item );
             em.flush();
+            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
         }
         finally
         {
+            em.close();
         }
     }
 
@@ -94,18 +115,25 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     @Override
     public void remove( final String id )
     {
+        EntityManager em = emf.createEntityManager();
         try
         {
+            em.getTransaction().begin();
             EnvironmentImpl item = em.find( EnvironmentImpl.class, id );
             em.remove( item );
-            em.flush();
+            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
         }
         finally
         {
+            em.close();
         }
     }
 
@@ -113,17 +141,24 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     @Override
     public void update( final EnvironmentImpl item )
     {
+        EntityManager em = emf.createEntityManager();
         try
         {
+            em.getTransaction().begin();
             em.merge( item );
-            em.flush();
+            em.getTransaction().commit();
         }
         catch ( Exception e )
         {
             LOG.error( e.toString(), e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
         }
         finally
         {
+            em.close();
         }
     }
 }

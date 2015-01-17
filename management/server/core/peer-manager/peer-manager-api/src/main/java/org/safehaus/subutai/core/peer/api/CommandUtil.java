@@ -58,7 +58,7 @@ public class CommandUtil
 
 
     /**
-     * Execute request on host with callback. Allows to stop callback from being triggerer by calling stop() from inside
+     * Execute request on host with callback. Allows to stop callback from being triggered by calling stop() from inside
      * a callback. Please make sure that the command is not a daemon command (command which forks a daemon process).
      * Otherwise please set request as a daemon request by calling RequestBuilder.daemon()
      *
@@ -91,7 +91,7 @@ public class CommandUtil
 
 
     /**
-     * Allows to execute the same command on multiple hosts in parallel, with the same callback for reponses from each
+     * Allows to execute the same command on multiple hosts in parallel, with the same callback for responses from each
      * host
      *
      * @param requestBuilder - request
