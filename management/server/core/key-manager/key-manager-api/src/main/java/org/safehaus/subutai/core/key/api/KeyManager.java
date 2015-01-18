@@ -89,4 +89,28 @@ public interface KeyManager
      * @param keyId - id of pgp key to revoke
      */
     public void revokeKey( String keyId ) throws KeyManagerException;
+
+    /**
+     * Generates a subKey
+     *
+     * @param keyId - id of pgp key which sub key to generate
+     *
+     * @return - returns id of a newly created sub key
+     */
+    public String generateSubKey( String keyId ) throws KeyManagerException;
+
+    /**
+     * Deletes a subKey
+     *
+     * @param keyId - id of pgp sub key to delete
+     */
+    public void deleteSubKey( String keyId ) throws KeyManagerException;
+
+
+    /**
+     * Revokes a subKey
+     *
+     * @param keyId - id of pgp sub key to revoke
+     */
+    public void revokeSubKey( String keyId ) throws KeyManagerException;
 }

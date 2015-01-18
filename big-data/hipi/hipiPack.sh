@@ -15,7 +15,7 @@ downloadFileAndMakeChanges() {
     	mkdir -p $confDirectory
 
 	# download nutch 
-	wget http://hipi.cs.virginia.edu/downloads/hipi.tar.gz -P $tempDirectory
+	wget http://hipi.cs.virginia.edu/downloads/hipi-src.tar.bz2  -P $tempDirectory
 	pushd $tempDirectory
 	tar -xzpf hipi.tar.gz
 

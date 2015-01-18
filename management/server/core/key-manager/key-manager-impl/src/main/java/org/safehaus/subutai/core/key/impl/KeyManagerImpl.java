@@ -82,7 +82,7 @@ public class KeyManagerImpl implements KeyManager
         for ( String line : lines )
         {
             //skip headers
-            if ( i > 0 )
+            if ( i > 1 )
             {
                 Matcher keyMatcher = keyPattern.matcher( line );
                 if ( keyMatcher.find() )
@@ -228,5 +228,45 @@ public class KeyManagerImpl implements KeyManager
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
 
         execute( commands.getRevokeKeyCommand( keyId ) );
+    }
+
+
+    @Override
+    public String generateSubKey( final String keyId ) throws KeyManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
+
+        String output = execute( commands.getGenerateSubKeyCommand( keyId ) );
+
+        String regex = "(\\w+)$";
+        Pattern pattern = Pattern.compile( regex );
+        Matcher m = pattern.matcher( output );
+
+        if ( m.find() )
+        {
+            return m.group( 1 );
+        }
+        else
+        {
+            throw new KeyManagerException( String.format( "Sub key id not found in command output:%n%s", output ) );
+        }
+    }
+
+
+    @Override
+    public void deleteSubKey( final String keyId ) throws KeyManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
+
+        execute( commands.getDeleteSubKeyCommand( keyId ) );
+    }
+
+
+    @Override
+    public void revokeSubKey( final String keyId ) throws KeyManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ), "Invalid key id" );
+
+        execute( commands.getRevokeSubKeyCommand( keyId ) );
     }
 }

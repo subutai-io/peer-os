@@ -75,4 +75,22 @@ public class Commands
     {
         return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "revoke", keyId ) );
     }
+
+
+    public RequestBuilder getGenerateSubKeyCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "generate_subkey", keyId ) );
+    }
+
+
+    public RequestBuilder getRevokeSubKeyCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "revoke_subkey", keyId ) );
+    }
+
+
+    public RequestBuilder getDeleteSubKeyCommand( String keyId )
+    {
+        return new RequestBuilder( KEY_MANAGER_BINDING ).withCmdArgs( Lists.newArrayList( "del_subkey", keyId ) );
+    }
 }
