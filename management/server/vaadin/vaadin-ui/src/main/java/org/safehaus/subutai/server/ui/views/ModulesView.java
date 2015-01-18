@@ -82,12 +82,14 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 
         VerticalLayout titleAndDrafts = new VerticalLayout();
         titleAndDrafts.setSizeUndefined();
+        titleAndDrafts.setId( "Modules-Tab" );
         titleAndDrafts.setCaption( "Modules" );
         titleAndDrafts.setSpacing( true );
         titleAndDrafts.addStyleName( "drafts" );
         editors.addComponent( titleAndDrafts );
 
         Label draftsTitle = new Label( "Modules" );
+        draftsTitle.setId( "Modules-Tab2" );
         draftsTitle.addStyleName( "h1" );
         draftsTitle.setSizeUndefined();
         titleAndDrafts.addComponent( draftsTitle );
