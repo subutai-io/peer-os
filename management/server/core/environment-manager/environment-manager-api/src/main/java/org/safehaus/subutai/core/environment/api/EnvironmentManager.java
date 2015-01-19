@@ -28,46 +28,63 @@ import org.safehaus.subutai.core.peer.api.ResourceHost;
 public interface EnvironmentManager
 {
 
-    Environment buildEnvironment( EnvironmentBlueprint blueprint ) throws EnvironmentBuildException;
+    public Environment buildEnvironment( EnvironmentBlueprint blueprint ) throws EnvironmentBuildException;
 
-    List<Environment> getEnvironments();
+    public List<Environment> getEnvironments();
 
-    Environment getEnvironment( String environmentId );
+    public Environment findEnvironment( String environmentId ) throws EnvironmentManagerException;
 
-    boolean destroyEnvironment( UUID environmentId ) throws EnvironmentDestroyException;
+    public void destroyEnvironment( UUID environmentId ) throws EnvironmentDestroyException;
 
-    UUID saveBlueprint( String blueprint ) throws EnvironmentManagerException;
+    public UUID saveBlueprint( String blueprint ) throws EnvironmentManagerException;
 
-    List<EnvironmentBuildTask> getBlueprintTasks();
+    public List<EnvironmentBlueprint> getBlueprints();
 
-    List<EnvironmentBlueprint> getBlueprints();
+    public void deleteBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
 
-    boolean deleteBlueprintTask( String name );
+    public void saveEnvironment( final Environment environment );
 
-    boolean deleteBlueprint( UUID blueprintId );
+    public void saveBuildProcess( EnvironmentBuildProcess buildProgress ) throws EnvironmentManagerException;
 
-    void saveEnvironment( final Environment environment );
-
-    boolean saveBuildProcess( EnvironmentBuildProcess buildProgress ) throws EnvironmentManagerException;
-
-    List<EnvironmentBuildProcess> getBuildProcesses();
+    public List<EnvironmentBuildProcess> getBuildProcesses();
 
     public Environment buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException;
 
-    void deleteBuildProcess( EnvironmentBuildProcess environmentBuildProcess );
+    public void deleteBuildProcess( EnvironmentBuildProcess environmentBuildProcess )
+            throws EnvironmentManagerException;
 
+    public Environment findEnvironmentByID( UUID environmentId ) throws EnvironmentManagerException;
+
+    public UUID saveBuildProcess( TopologyData topologyData ) throws EnvironmentManagerException;
+
+    public EnvironmentBlueprint getEnvironmentBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
+
+    public void createAdditionalContainers( UUID id, String ngJson, Peer peer ) throws EnvironmentBuildException;
+
+
+    // ************** deprecated methods **************
+
+    @Deprecated
     Environment getEnvironmentByUUID( UUID environmentId );
 
-    UUID saveBuildProcess( TopologyData topologyData ) throws EnvironmentManagerException;
+    @Deprecated
+    Environment getEnvironment( String environmentId );
 
-    EnvironmentBlueprint getEnvironmentBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
+    @Deprecated
+    List<EnvironmentBuildTask> getBlueprintTasks();
 
-    void createAdditionalContainers( UUID id, String ngJson, Peer peer ) throws EnvironmentBuildException;
+    @Deprecated
+    boolean deleteBlueprintTask( String name );
 
+
+    @Deprecated
     public UUID addContainer( final UUID environmentId, final String template, PlacementStrategy strategy,
                               String nodeGroupName, final Peer peer ) throws EnvironmentManagerException;
 
+    @Deprecated
     void removeContainer( UUID environmentId, UUID hostId ) throws EnvironmentManagerException;
+
+    @Deprecated
 
     public void createLocalContainer( final Environment environment, final String templateName,
                                       final String nodeGroupName, ResourceHost resourceHost )
