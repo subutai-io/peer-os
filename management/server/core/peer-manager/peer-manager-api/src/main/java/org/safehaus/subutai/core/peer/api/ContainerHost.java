@@ -20,6 +20,7 @@ import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 public interface ContainerHost extends Host
 {
 
+    @Deprecated
     public String getParentHostname();
 
     public String getEnvironmentId();
