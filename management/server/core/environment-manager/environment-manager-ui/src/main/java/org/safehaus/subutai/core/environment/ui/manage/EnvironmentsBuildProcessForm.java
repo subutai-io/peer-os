@@ -228,9 +228,8 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
             }
             destroyButton.setId( bp.getName() + "-destroy" );
 
-            environmentsTable.addItem( new Object[]
-            {
-                bp.getName(), icon, viewButton, networkBtn, processButton, destroyButton
+            environmentsTable.addItem( new Object[] {
+                    bp.getName(), icon, viewButton, networkBtn, processButton, destroyButton
             }, process.getId() );
         }
         else
@@ -405,7 +404,14 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
 
     private void destroyBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
     {
-        module.getEnvironmentManager().deleteBuildProcess( environmentBuildProcess );
+        try
+        {
+            module.getEnvironmentManager().deleteBuildProcess( environmentBuildProcess );
+        }
+        catch ( EnvironmentManagerException e )
+        {
+            Notification.show( String.format( "Error destroying build process: %s", e ) );
+        }
     }
 
 
