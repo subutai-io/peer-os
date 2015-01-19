@@ -40,14 +40,14 @@ public class EnvironmentDAOTest
     @Test(expected = EnvironmentPersistenceException.class)
     public void shoudSaveInfo() throws EnvironmentPersistenceException
     {
-        assertTrue( environmentDAO.saveInfo( SOURCE, KEY, new DummyClass() ) );
+       environmentDAO.saveInfo( SOURCE, KEY, new DummyClass() );
     }
 
 
     @Test
-    public void shoudDeleteInfo()
+    public void shoudDeleteInfo() throws EnvironmentPersistenceException
     {
-        assertTrue( environmentDAO.deleteInfo( SOURCE, KEY ) );
+         environmentDAO.deleteInfo( SOURCE, KEY );
     }
 
 

@@ -56,6 +56,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
@@ -240,7 +241,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public boolean deleteBlueprintTask( String uuid )
     {
-        return environmentDAO.deleteInfo( BLUEPRINT, uuid );
+        try
+        {
+            environmentDAO.deleteInfo( BLUEPRINT, uuid );
+            return true;
+        }
+        catch ( EnvironmentPersistenceException e )
+        {
+            return false;
+        }
     }
 
 
@@ -278,10 +287,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         try
         {
-            if ( !environmentDAO.saveInfo( PROCESS, buildProgress.getId().toString(), buildProgress ) )
-            {
-                throw new EnvironmentManagerException( "Failed to save build process" );
-            }
+            environmentDAO.saveInfo( PROCESS, buildProgress.getId().toString(), buildProgress );
         }
         catch ( EnvironmentPersistenceException e )
         {
@@ -362,8 +368,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     @Override
     public void deleteBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
+            throws EnvironmentManagerException
     {
-        environmentDAO.deleteInfo( PROCESS, environmentBuildProcess.getId().toString() );
+        try
+        {
+            environmentDAO.deleteInfo( PROCESS, environmentBuildProcess.getId().toString() );
+        }
+        catch ( EnvironmentPersistenceException e )
+        {
+            throw new EnvironmentManagerException( e );
+        }
     }
 
 
@@ -494,10 +508,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void createAdditionalContainers( final UUID id, final String ngJson, final Peer peer )
             throws EnvironmentBuildException
     {
-        Environment environment = getEnvironmentByUUID( id );
-        NodeGroup nodeGroup = GSON.fromJson( ngJson, NodeGroup.class );
+        createAdditionalContainers( id, GSON.fromJson( ngJson, NodeGroup.class ), peer );
+    }
 
-        List<Template> templatesData = new ArrayList();
+
+    @Override
+    public void createAdditionalContainers( final UUID id, final NodeGroup nodeGroup, final Peer peer )
+            throws EnvironmentBuildException
+    {
+        Environment environment = getEnvironmentByUUID( id );
+
+        List<Template> templatesData = Lists.newArrayList();
 
         List<Template> templates = templateRegistry.getParentTemplates( nodeGroup.getTemplateName() );
         Template installationTemplate = templateRegistry.getTemplate( nodeGroup.getTemplateName() );
@@ -544,11 +565,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             saveEnvironment( environment );
         }
-        catch ( PeerException e )
-        {
-            throw new EnvironmentBuildException( e.getMessage() );
-        }
-        catch ( EnvironmentBuildException e )
+        catch ( PeerException | EnvironmentBuildException e )
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }

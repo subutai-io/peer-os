@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
@@ -59,10 +60,13 @@ public interface EnvironmentManager
 
     public EnvironmentBlueprint getEnvironmentBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
 
-    public void createAdditionalContainers( UUID id, String ngJson, Peer peer ) throws EnvironmentBuildException;
+    public void createAdditionalContainers( UUID id, NodeGroup nodeGroup, Peer peer ) throws EnvironmentBuildException;
 
 
     // ************** deprecated methods **************
+
+    @Deprecated
+    public void createAdditionalContainers( UUID id, String ngJson, Peer peer ) throws EnvironmentBuildException;
 
     @Deprecated
     Environment getEnvironmentByUUID( UUID environmentId );
