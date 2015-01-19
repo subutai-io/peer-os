@@ -20,6 +20,7 @@ import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecu
 import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutor;
 import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutorImpl;
 import org.safehaus.subutai.core.environment.ui.text.EnvAnswer;
+import org.safehaus.subutai.core.network.api.Tunnel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,12 +28,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -89,6 +93,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
         table.addContainerProperty( "Name", String.class, null );
         table.addContainerProperty( STATUS, Embedded.class, null );
         table.addContainerProperty( "Info", Button.class, null );
+        table.addContainerProperty( "Networking", Button.class, null );
         table.addContainerProperty( ACTION, Button.class, null );
         table.addContainerProperty( "Destroy", Button.class, null );
         table.setPageLength( 10 );
@@ -129,6 +134,17 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
                 Window window = genProcessWindow( process );
+                window.setVisible( true );
+            }
+        } );
+
+        Button networkBtn = new Button( "Network settings" );
+        networkBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent event )
+            {
+                Window window = genNetworkConfigurationWindow( process );
                 window.setVisible( true );
             }
         } );
@@ -177,6 +193,8 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 status = "ok";
                 icon = new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) );
                 break;
+            default:
+                throw new AssertionError( process.getProcessStatusEnum().name() );
         }
 
         Button destroyButton = new Button( "Destroy" );
@@ -189,29 +207,35 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 environmentsButton.click();
             }
         } );
+
+        EnvironmentBlueprint bp;
         try
         {
-            EnvironmentBlueprint bp = module.getEnvironmentManager().getEnvironmentBlueprint( process.getBlueprintId() );
-            if ( bp != null )
-            {
-                icon.setId( bp.getName() + "-" + status );
-                viewButton.setId( bp.getName() + "-view" );
-                processButton.setId( bp.getName() + "-process" );
-                destroyButton.setId( bp.getName() + "-destroy" );
-
-                environmentsTable.addItem( new Object[]
-                {
-                    bp.getName(), icon, viewButton, processButton, destroyButton
-                }, process.getId() );
-            }
-            else
-            {
-                LOGGER.error( "Blueprint not found id=" + process.getBlueprintId() );
-            }
+            bp = module.getEnvironmentManager().getEnvironmentBlueprint( process.getBlueprintId() );
         }
         catch ( EnvironmentManagerException e )
         {
             Notification.show( e.getMessage() );
+            return;
+        }
+        if ( bp != null )
+        {
+            icon.setId( bp.getName() + "-" + status );
+            viewButton.setId( bp.getName() + "-view" );
+            if ( processButton != null )
+            {
+                processButton.setId( bp.getName() + "-process" );
+            }
+            destroyButton.setId( bp.getName() + "-destroy" );
+
+            environmentsTable.addItem( new Object[]
+            {
+                bp.getName(), icon, viewButton, networkBtn, processButton, destroyButton
+            }, process.getId() );
+        }
+        else
+        {
+            LOGGER.error( "Blueprint not found id=" + process.getBlueprintId() );
         }
     }
 
@@ -223,6 +247,113 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
         area.setSizeFull();
         area.setValue( GSON.toJson( process ) );
         window.setContent( area );
+        contentRoot.getUI().addWindow( window );
+        return window;
+    }
+
+
+    private Window genNetworkConfigurationWindow( final EnvironmentBuildProcess process )
+    {
+        Window window = createWindow( "Network settings" );
+        Layout layout = new VerticalLayout();
+        window.setContent( layout );
+
+        final N2NConnectionImpl n2n = N2NConnectionImpl.newCopy( process.getN2nConnection() );
+        final TunnelImpl tunnel = TunnelImpl.newCopy( process.getTunnel() );
+        process.setN2nConnection( n2n );
+        process.setTunnel( tunnel );
+
+        TextField txtSuperNodeIp = new TextField( "Super node IP" );
+        txtSuperNodeIp.setValue( n2n.superNodeIp );
+        txtSuperNodeIp.addTextChangeListener( new FieldEvents.TextChangeListener()
+        {
+            @Override
+            public void textChange( FieldEvents.TextChangeEvent event )
+            {
+                n2n.superNodeIp = event.getText();
+            }
+        } );
+        layout.addComponent( txtSuperNodeIp );
+
+        TextField txtSuperNodePort = new TextField( "Super node port" );
+        txtSuperNodePort.setValue( Integer.toString( n2n.superNodePort ) );
+        txtSuperNodePort.addTextChangeListener( new FieldEvents.TextChangeListener()
+        {
+            @Override
+            public void textChange( FieldEvents.TextChangeEvent event )
+            {
+                try
+                {
+                    n2n.superNodePort = Integer.valueOf( event.getText() );
+                }
+                catch ( NumberFormatException ex )
+                {
+                    Notification.show( "Invalid super node port value" );
+                }
+            }
+        } );
+        layout.addComponent( txtSuperNodePort );
+
+        TextField txtLocalIp = new TextField( "Local IP" );
+        txtLocalIp.setValue( n2n.localIp );
+        txtLocalIp.addTextChangeListener( new FieldEvents.TextChangeListener()
+        {
+            @Override
+            public void textChange( FieldEvents.TextChangeEvent event )
+            {
+                n2n.localIp = event.getText();
+            }
+        } );
+        layout.addComponent( txtLocalIp );
+
+        TextField txtInterfaceName = new TextField( "Interface name" );
+        txtInterfaceName.setValue( n2n.interfaceName );
+        txtInterfaceName.addTextChangeListener( new FieldEvents.TextChangeListener()
+        {
+            @Override
+            public void textChange( FieldEvents.TextChangeEvent event )
+            {
+                n2n.interfaceName = event.getText();
+            }
+        } );
+        layout.addComponent( txtInterfaceName );
+
+        TextField txtCommunityName = new TextField( "Community name" );
+        txtCommunityName.setValue( n2n.communityName );
+        txtCommunityName.addTextChangeListener( new FieldEvents.TextChangeListener()
+        {
+            @Override
+            public void textChange( FieldEvents.TextChangeEvent event )
+            {
+                n2n.communityName = event.getText();
+            }
+        } );
+        layout.addComponent( txtCommunityName );
+
+        TextField txtKeyFilePath = new TextField( "Key file path" );
+        txtKeyFilePath.setValue( process.getKeyFilePath() );
+        txtKeyFilePath.addTextChangeListener( new FieldEvents.TextChangeListener()
+        {
+            @Override
+            public void textChange( FieldEvents.TextChangeEvent event )
+            {
+                process.setKeyFilePath( event.getText() );
+            }
+        } );
+        layout.addComponent( txtKeyFilePath );
+
+        TextField txtTunnelName = new TextField( "Tunnel name" );
+        txtTunnelName.setValue( process.getTunnel().getTunnelName() );
+        txtTunnelName.addTextChangeListener( new FieldEvents.TextChangeListener()
+        {
+            @Override
+            public void textChange( FieldEvents.TextChangeEvent event )
+            {
+                tunnel.tunnelName = event.getText();
+            }
+        } );
+        layout.addComponent( txtTunnelName );
+
         contentRoot.getUI().addWindow( window );
         return window;
     }
@@ -278,23 +409,22 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     }
 
 
-    public void startBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
+    public void startBuildProcess( final EnvironmentBuildProcess process )
     {
+        N2NConnectionImpl n2n = ( N2NConnectionImpl ) process.getN2nConnection();
+        Tunnel t = process.getTunnel();
+        if ( n2n == null || !n2n.hasAllValues() || t == null || t.getTunnelName() == null )
+        {
+            Notification.show( "Network settings are not complete" );
+            return;
+        }
 
-        BuildProcessExecutor buildProcessExecutor = new BuildProcessExecutorImpl( environmentBuildProcess );
+        BuildProcessExecutor buildProcessExecutor = new BuildProcessExecutorImpl( process );
         buildProcessExecutor.addListener( this );
         ExecutorService executor = Executors.newCachedThreadPool();
 
-
-        buildProcessExecutor.execute( executor,
-                new BuildCommandFactory( module.getEnvironmentManager(), environmentBuildProcess ) );
+        buildProcessExecutor.execute( executor, new BuildCommandFactory( module.getEnvironmentManager(), process ) );
         executor.shutdown();
-    }
-
-
-    private void configureEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
-    {
-        //TODO: configure code
     }
 
 
@@ -314,7 +444,6 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
             public void run()
             {
                 Item row = environmentsTable.getItem( event.getEnvironmentBuildProcess().getId() );
-                EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
                 if ( row != null )
                 {
                     Property p = row.getItemProperty( STATUS );
@@ -325,29 +454,18 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         Embedded indicator = new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) );
                         indicator.setId( "indicator" );
                         p.setValue( indicator );
-
-
-                        //                        ebp.setProcessStatusEnum( ProcessStatusEnum.IN_PROGRESS );
-                        //                        module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.SUCCESS.equals( event.getEventType() ) )
                     {
                         p.setValue( new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) );
-
-                        //                        ebp.setProcessStatusEnum( ProcessStatusEnum.SUCCESSFUL );
-                        //                        module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.FAIL.equals( event.getEventType() ) )
                     {
                         Embedded error = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
                         p.setValue( error );
                         error.setId( "error" );
-
-                        //                        ebp.setProcessStatusEnum( ProcessStatusEnum.FAILED );
                     }
                 }
-
-                //                module.getEnvironmentManager().saveBuildProcess( ebp );
             }
         } );
     }
@@ -358,3 +476,4 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
         return this.contentRoot;
     }
 }
+

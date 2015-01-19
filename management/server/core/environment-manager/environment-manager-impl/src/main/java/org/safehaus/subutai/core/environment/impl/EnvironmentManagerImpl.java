@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.core.environment.impl;
 
 
@@ -42,6 +37,9 @@ import org.safehaus.subutai.core.environment.impl.environment.EnvironmentBuilder
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentBuilderImpl;
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentDestroyer;
 import org.safehaus.subutai.core.environment.impl.environment.EnvironmentDestroyerImpl;
+import org.safehaus.subutai.core.environment.impl.net.NetworkSetup;
+import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -75,6 +73,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private PeerManager peerManager;
+    private NetworkManager networkManager;
     private EnvironmentDAO environmentDAO;
     private TemplateRegistry templateRegistry;
     private SecurityManager securityManager;
@@ -83,10 +82,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private EnvironmentContainerDataService environmentContainerDataService;
     private DaoManager daoManager;
 
-    public EnvironmentManagerImpl( )
-    {
 
+    public EnvironmentManagerImpl()
+    {
     }
+
 
     public void init()
     {
@@ -94,9 +94,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             //daoManager.getEntityManagerFactory().createEntityManager();
 
-            this.environmentDAO = new EnvironmentDAO( daoManager);
-            this.environmentDataService = new EnvironmentDataService( daoManager.getEntityManagerFactory());
-            this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager.getEntityManagerFactory() );
+            this.environmentDAO = new EnvironmentDAO( daoManager );
+            this.environmentDataService = new EnvironmentDataService( daoManager.getEntityManagerFactory() );
+            this.environmentContainerDataService = new EnvironmentContainerDataService(
+                    daoManager.getEntityManagerFactory() );
         }
         catch ( SQLException e )
         {
@@ -104,6 +105,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         // ***********************************
     }
+
 
     public TemplateRegistry getTemplateRegistry()
     {
@@ -115,6 +117,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         this.templateRegistry = templateRegistry;
     }
+
 
     public SecurityManager getSecurityManager()
     {
@@ -139,6 +142,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.tracker = tracker;
     }
 
+
     public void destroy()
     {
         this.environmentDAO = null;
@@ -149,6 +153,30 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.environmentDAO = null;
         this.daoManager = null;
 
+    }
+
+
+    public PeerManager getPeerManager()
+    {
+        return peerManager;
+    }
+
+
+    public void setPeerManager( PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
+    }
+
+
+    public NetworkManager getNetworkManager()
+    {
+        return networkManager;
+    }
+
+
+    public void setNetworkManager( NetworkManager networkManager )
+    {
+        this.networkManager = networkManager;
     }
 
 
@@ -176,8 +204,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             TopologyData data = new Blueprint2PeerData( peerManager.getLocalPeer().getId(), blueprintId );
             UUID processId = saveBuildProcess( data );
 
-            EnvironmentBuildProcess process =
-                    environmentDAO.getInfo( PROCESS, processId.toString(), EnvironmentBuildProcess.class );
+            EnvironmentBuildProcess process
+                    = environmentDAO.getInfo( PROCESS, processId.toString(), EnvironmentBuildProcess.class );
             return buildEnvironment( process );
         }
         catch ( EnvironmentManagerException e )
@@ -214,7 +242,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             containerHost.setDataService( environmentContainerDataService );
         }
         return result;
-        //        return environmentDAO.getInfo( ENVIRONMENT, uuid, Environment.class );
     }
 
 
@@ -303,7 +330,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public void saveEnvironment( final Environment environment )
     {
-
         if ( environmentDataService.find( environment.getId().toString() ) == null )
         {
             environmentDataService.persist( ( EnvironmentImpl ) environment );
@@ -354,9 +380,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             configureSshBetweenContainers( blueprint, environment.getContainerHosts() );
             configureLinkingHostsBetweenContainers( blueprint, environment.getContainerHosts() );
 
-            /*process.setProcessStatusEnum( ProcessStatusEnum.SUCCESSFUL );
-            saveBuildProcess( process );*/
-
+            setupNetwork( process, environment );
             return environment;
         }
         catch ( EnvironmentPersistenceException | BuildException | EnvironmentConfigureException e )
@@ -370,8 +394,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void configureLinkingHostsBetweenContainers( EnvironmentBlueprint blueprint,
-                                                         final Set<ContainerHost> containers )
+    private void configureLinkingHostsBetweenContainers( EnvironmentBlueprint blueprint, Set<ContainerHost> containers )
             throws EnvironmentConfigureException
     {
         if ( blueprint.isExchangeSshKeys() )
@@ -423,7 +446,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             containerHost.setDataService( environmentContainerDataService );
         }
         return result;
-        //        return environmentDAO.getInfo( ENVIRONMENT, environmentId.toString(), Environment.class );
     }
 
 
@@ -459,6 +481,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @Override
     public void createLocalContainer( final Environment environment, final String templateName,
                                       final String nodeGroupName, ResourceHost resourceHost )
             throws EnvironmentBuildException
@@ -508,8 +531,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         //construct host entity
         HostInfoModel hostInfoModel = new HostInfoModel( containerHost );
-        EnvironmentContainerImpl environmentContainer =
-                new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), nodeGroupName, hostInfoModel );
+        EnvironmentContainerImpl environmentContainer
+                = new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), nodeGroupName, hostInfoModel );
 
         //add container to environment
         environment.addContainer( environmentContainer );
@@ -556,14 +579,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             Set<HostInfoModel> hostInfoModels = peerManager.getPeer( peer.getId() ).
                     scheduleCloneContainers( peerId, templatesData, nodeGroup.getNumberOfNodes(),
-                            nodeGroup.getPlacementStrategy().getStrategyId(),
-                            nodeGroup.getPlacementStrategy().getCriteriaAsList() );
+                                             nodeGroup.getPlacementStrategy().getStrategyId(),
+                                             nodeGroup.getPlacementStrategy().getCriteriaAsList() );
             if ( !hostInfoModels.isEmpty() )
             {
                 for ( HostInfoModel hostInfoModel : hostInfoModels )
                 {
-                    EnvironmentContainerImpl environmentContainer =
-                            new EnvironmentContainerImpl( peer.getId(), nodeGroup.getName(), hostInfoModel );
+                    EnvironmentContainerImpl environmentContainer
+                            = new EnvironmentContainerImpl( peer.getId(), nodeGroup.getName(), hostInfoModel );
                     environment.addContainer( environmentContainer );
                 }
             }
@@ -595,9 +618,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             List<Template> templates = builder.fetchRequiredTemplates( peer.getId(), template );
 
             Set<HostInfoModel> hosts = peerManager.getPeer( peer.getId() )
-                                                  .scheduleCloneContainers( peerManager.getLocalPeer().getId(),
-                                                          templates, 1, strategy.getStrategyId(),
-                                                          strategy.getCriteriaAsList() );
+                    .scheduleCloneContainers( peerManager.getLocalPeer().getId(),
+                                              templates, 1, strategy.getStrategyId(),
+                                              strategy.getCriteriaAsList() );
 
             if ( hosts.isEmpty() )
             {
@@ -605,8 +628,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             else
             {
-                EnvironmentContainerImpl newHost =
-                        new EnvironmentContainerImpl( peer.getId(), nodeGroupName, hosts.iterator().next() );
+                EnvironmentContainerImpl newHost
+                        = new EnvironmentContainerImpl( peer.getId(), nodeGroupName, hosts.iterator().next() );
                 Environment environment = getEnvironmentByUUID( environmentId );
                 environment.addContainer( newHost );
                 saveEnvironment( environment );
@@ -639,12 +662,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public PeerManager getPeerManager()
-    {
-        return peerManager;
-    }
-
-
     public EnvironmentDataService getEnvironmentDataService()
     {
         return environmentDataService;
@@ -657,9 +674,26 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void setPeerManager( final PeerManager peerManager )
+    private void setupNetwork( EnvironmentBuildProcess process, Environment env )
     {
-        this.peerManager = peerManager;
+        NetworkSetup net = new NetworkSetup( process );
+        net.setEnvironmentManager( this );
+        net.setNetworkManager( networkManager );
+        net.setPeerManager( peerManager );
+
+        try
+        {
+            net.setupN2Nconnections( process.getN2nConnection(), process.getKeyFilePath() );
+            net.setupTunnels( process.getTunnel().getTunnelName() );
+            net.setupGateways( env );
+            net.setupVniVlanMappings( process.getTunnel().getTunnelName(), env );
+            net.setupGatewaysOnContainers( env );
+            net.setupContainerIpAddresses( env );
+        }
+        catch ( NetworkManagerException ex )
+        {
+            LOG.error( "[*] Networking setup failed!", ex );
+        }
     }
 
 
@@ -674,3 +708,4 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.daoManager = daoManager;
     }
 }
+

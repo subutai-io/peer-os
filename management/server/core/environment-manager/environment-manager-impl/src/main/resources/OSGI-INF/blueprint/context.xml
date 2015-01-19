@@ -17,6 +17,8 @@
              interface="org.safehaus.subutai.core.security.api.SecurityManager" />
   <reference id="peerManager"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <reference id="networkManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.network.api.NetworkManager" />
   <reference id="tracker" interface="org.safehaus.subutai.core.tracker.api.Tracker" />
 
 
@@ -34,6 +36,7 @@
     <property name="tracker"          ref="tracker" />
     <property name="peerManager"      ref="peerManager" />
     <property name="daoManager"       ref="daoManagerEnv" />
+    <property name="networkManager"   ref="networkManager" />
   </bean>
 
 </blueprint>
