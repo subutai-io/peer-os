@@ -1,8 +1,16 @@
 package org.safehaus.subutai.env.api;
 
 
+import java.util.Set;
+import java.util.UUID;
+
+
 /**
- * Created by dilshat on 1/19/15.
+ * Environment
  */
 public interface Environment
-{}
+{
+    public UUID getId();
+
+    public Set<EnvironmentContainer> getContainers();
+}

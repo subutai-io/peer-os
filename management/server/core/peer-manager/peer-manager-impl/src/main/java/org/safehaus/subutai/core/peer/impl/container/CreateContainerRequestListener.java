@@ -3,10 +3,10 @@ package org.safehaus.subutai.core.peer.impl.container;
 
 import java.util.Set;
 
-import org.safehaus.subutai.core.peer.api.HostInfoModel;
+import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Payload;
-import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.impl.RecipientType;
 import org.slf4j.Logger;

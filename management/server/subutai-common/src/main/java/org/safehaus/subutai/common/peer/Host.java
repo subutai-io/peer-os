@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.api;
+package org.safehaus.subutai.common.peer;
 
 
 import java.io.Serializable;
@@ -10,9 +10,9 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.SubutaiException;
-import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
-import org.safehaus.subutai.core.hostregistry.api.Interface;
+import org.safehaus.subutai.common.host.HostArchitecture;
+import org.safehaus.subutai.common.host.HostInfo;
+import org.safehaus.subutai.common.host.Interface;
 
 
 /**

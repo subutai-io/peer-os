@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.filetracker.api;
 
 
-import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.common.peer.Host;
 
 
 /**

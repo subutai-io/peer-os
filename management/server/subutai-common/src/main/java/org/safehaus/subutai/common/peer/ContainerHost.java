@@ -1,8 +1,9 @@
-package org.safehaus.subutai.core.peer.api;
+package org.safehaus.subutai.common.peer;
 
 
 import java.util.Set;
 
+import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.protocol.api.DataService;
@@ -11,7 +12,6 @@ import org.safehaus.subutai.common.quota.DiskQuota;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
 
 
 /**

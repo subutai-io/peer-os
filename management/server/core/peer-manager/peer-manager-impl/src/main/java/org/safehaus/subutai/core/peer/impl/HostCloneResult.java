@@ -1,8 +1,8 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.common.host.HostInfo;
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostTaskResult;
 
 

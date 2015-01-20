@@ -4,6 +4,8 @@ package org.safehaus.subutai.core.hostregistry.api;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.host.HostInfo;
+
 
 /**
  * Stores currently connected hosts

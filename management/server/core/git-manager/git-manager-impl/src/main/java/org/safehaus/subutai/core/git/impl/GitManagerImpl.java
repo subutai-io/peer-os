@@ -20,7 +20,7 @@ import org.safehaus.subutai.core.git.api.GitFileStatus;
 import org.safehaus.subutai.core.git.api.GitManager;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.common.base.Preconditions;
