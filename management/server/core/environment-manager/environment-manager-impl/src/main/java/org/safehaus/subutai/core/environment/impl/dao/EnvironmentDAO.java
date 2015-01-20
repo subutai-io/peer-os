@@ -1,23 +1,20 @@
 package org.safehaus.subutai.core.environment.impl.dao;
 
 
-import java.sql.Clob;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenceException;
-import org.safehaus.subutai.core.environment.impl.entity.EnvironmentBuildProcessEntity;
 import org.safehaus.subutai.core.environment.impl.entity.EnvironmentBlueprintEntity;
+import org.safehaus.subutai.core.environment.impl.entity.EnvironmentBuildProcessEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +22,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -175,7 +171,7 @@ public class EnvironmentDAO
                     + "                             AS ebp WHERE ebp.source = :source and ebp.id=:id" );
             query.setParameter( "source" ,source );
             query.setParameter( "id", key );
-            EnvironmentBlueprintEntity ebp = (EnvironmentBlueprintEntity) query.getSingleResult();
+            EnvironmentBuildProcessEntity ebp = (EnvironmentBuildProcessEntity) query.getSingleResult();
 
             if(ebp !=null)
             {

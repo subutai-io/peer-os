@@ -10,21 +10,29 @@ import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerException;
+import org.slf4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.vaadin.data.Property;
 import com.vaadin.server.Sizeable;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Slider;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
@@ -46,10 +54,13 @@ public class EnvironmentsForm
     private static final String START = "Start";
     private static final String STOP = "Stop";
     private static final String MANAGE_TITLE = "Manage environment containers";
+    private static final String CONTAINER_QUOTA = "%s container quota";
     private static final String ID = "ID";
     private static final String STATUS = "Status";
     private static final String DATE_CREATED = "Date";
     private static final String ADD_CONTAINERS = "Add containers";
+    private static final String QUOTA = "Quota";
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger( EnvironmentsForm.class );
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule managerUI;
@@ -131,13 +142,13 @@ public class EnvironmentsForm
                 {
                     executorService
                             .execute( new DestroyEnvironmentTask( managerUI, environment.getId(), new CompleteEvent()
-                                                                  {
-                                                                      @Override
-                                                                      public void onComplete( final String status )
-                                                                      {
-                                                                          Notification.show( status );
-                                                                          environmentsButton.click();
-                                                                      }
+                            {
+                                @Override
+                                public void onComplete( final String status )
+                                {
+                                    Notification.show( status );
+                                    environmentsButton.click();
+                                }
                             } ) );
                 }
             } );
@@ -167,10 +178,9 @@ public class EnvironmentsForm
 
 
             String cdate = getCreationDate( environment.getCreationTimestamp() );
-            environmentsTable.addItem( new Object[]
-            {
-                environment.getName(), environment.getId().toString(), cdate, environment.getStatus().toString(),
-                manageButton, addContainersButton, configureButton, destroyButton
+            environmentsTable.addItem( new Object[] {
+                    environment.getName(), environment.getId().toString(), cdate, environment.getStatus().toString(),
+                    manageButton, addContainersButton, configureButton, destroyButton
             }, environment.getId() );
         }
         environmentsTable.refreshRowCache();
@@ -211,7 +221,7 @@ public class EnvironmentsForm
                     try
                     {
                         managerUI.getEnvironmentManager()
-                                .createAdditionalContainers( environment.getId(), ngJson, peer );
+                                 .createAdditionalContainers( environment.getId(), ngJson, peer );
                         Notification.show( "Containers created successfully" );
                     }
                     catch ( EnvironmentBuildException e )
@@ -294,9 +304,8 @@ public class EnvironmentsForm
             fieldIp2.setWidth( "120px" );
             fieldIp2.setValue( "192.168.50." + ipInt++ );
 
-            containersTable.addItem( new Object[]
-            {
-                container.getTemplateName(), container.getPeerId(), fieldHostname, fieldIp2,
+            containersTable.addItem( new Object[] {
+                    container.getTemplateName(), container.getPeerId(), fieldHostname, fieldIp2,
             }, null );
         }
 
@@ -338,6 +347,7 @@ public class EnvironmentsForm
         containersTable.addContainerProperty( START, Button.class, null );
         containersTable.addContainerProperty( STOP, Button.class, null );
         containersTable.addContainerProperty( DESTROY, Button.class, null );
+        containersTable.addContainerProperty( QUOTA, Button.class, null );
         containersTable.setPageLength( 10 );
         containersTable.setSelectable( false );
         containersTable.setEnabled( true );
@@ -346,11 +356,10 @@ public class EnvironmentsForm
 
         for ( ContainerHost container : containers )
         {
-            containersTable.addItem( new Object[]
-            {
-                container.getHostname(), container.getPeerId(), propertiesButton( container ),
-                startButton( environment, container ), stopButton( environment, container ),
-                destroyButton( environment, container )
+            containersTable.addItem( new Object[] {
+                    container.getHostname(), container.getPeerId(), propertiesButton( container ),
+                    startButton( environment, container ), stopButton( environment, container ),
+                    destroyButton( environment, container ), getQuotaButton( environment, container )
             }, null );
         }
 
@@ -419,13 +428,11 @@ public class EnvironmentsForm
         table.setSizeFull();
         table.addContainerProperty( "Property", String.class, null );
         table.addContainerProperty( "Value", String.class, null );
-        table.addItem( new Object[]
-        {
-            "Peer", container.getPeerId()
+        table.addItem( new Object[] {
+                "Peer", container.getPeerId()
         }, null );
-        table.addItem( new Object[]
-        {
-            "Environment ID", container.getEnvironmentId()
+        table.addItem( new Object[] {
+                "Environment ID", container.getEnvironmentId()
         }, null );
         return table;
     }
@@ -482,6 +489,68 @@ public class EnvironmentsForm
             }
         } );
         return button;
+    }
+
+
+    private Button getQuotaButton( final Environment environment, final ContainerHost containerHost )
+    {
+        Button button = new Button( QUOTA );
+        button.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                try
+                {
+                    PeerQuotaInfo peerQuotaInfo = containerHost.getQuota( QuotaType.QUOTA_TYPE_ALL_JSON );
+                    Window window = getContainerQuotaWindow( environment, peerQuotaInfo );
+                    contentRoot.getUI().addWindow( window );
+                    window.setVisible( true );
+                }
+                catch ( PeerException e )
+                {
+                    LOGGER.error( "Error retrieving quota for container.", e );
+                }
+            }
+        } );
+        return button;
+    }
+
+
+    private Window getContainerQuotaWindow( Environment environment, PeerQuotaInfo containerQuotaInfo )
+    {
+        Window window = createWindow( MANAGE_TITLE );
+        window.setContent( getContainerQuotaLayout( containerQuotaInfo ) );
+        return window;
+    }
+
+
+    private VerticalLayout getContainerQuotaLayout( PeerQuotaInfo containerQuotaInfo )
+    {
+        VerticalLayout vl = new VerticalLayout();
+        final Label value = new Label( "0" );
+        value.setWidth( "3em" );
+
+        final Slider slider = new Slider( "Select a value between 0 and 100" );
+        slider.setWidth( "100%" );
+        slider.setMin( 0 );
+        slider.setMax( 100 );
+        slider.setImmediate( true );
+        slider.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( final Property.ValueChangeEvent event )
+            {
+                value.setValue( event.getProperty().getValue().toString() );
+            }
+        } );
+
+        vl.addComponent( slider );
+        vl.setExpandRatio( slider, 1 );
+        vl.addComponent( value );
+        vl.setComponentAlignment( value, Alignment.BOTTOM_LEFT );
+
+        return vl;
     }
 
 

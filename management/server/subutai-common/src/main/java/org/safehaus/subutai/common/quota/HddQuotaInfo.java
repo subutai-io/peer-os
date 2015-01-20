@@ -6,20 +6,20 @@ package org.safehaus.subutai.common.quota;
  */
 public class HddQuotaInfo extends QuotaInfo
 {
-    private String partitionName;
+    private DiskPartition partition;
     private Memory memory;
 
 
-    public HddQuotaInfo( final String partitionName, final String memory )
+    public HddQuotaInfo( final DiskPartition partition, final String memory )
     {
-        this.partitionName = partitionName;
+        this.partition = partition;
         this.memory = new Memory( memory );
     }
 
 
-    public String getPartitionName()
+    public DiskPartition getPartition()
     {
-        return partitionName;
+        return partition;
     }
 
 
@@ -32,7 +32,7 @@ public class HddQuotaInfo extends QuotaInfo
     @Override
     public String getQuotaKey()
     {
-        return "hdd.quota." + partitionName;
+        return partition.getPartitionName();
     }
 
 

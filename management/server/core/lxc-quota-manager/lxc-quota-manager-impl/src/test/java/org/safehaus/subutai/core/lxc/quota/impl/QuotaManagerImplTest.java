@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class QuotaManagerImplTest
 {
-    QuotaType parameter = QuotaType.QUOTA_MEMORY_QUOTA;
+    QuotaType parameter = QuotaType.QUOTA_TYPE_RAM;
     String expectedValue = "200000000";
     @Mock
     PeerManager peerManager;

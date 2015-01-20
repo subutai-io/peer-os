@@ -7,37 +7,37 @@ package org.safehaus.subutai.common.quota;
 public enum MemoryUnit
 {
     BYTES( "B", "Bytes", 0 ),
-    KILOBYTES( "K", "Kilobytes", 1 ),
-    MEGABYTES( "M", "Megabytes", 2 ),
-    GIGABYTES( "G", "Gigabytes", 3 ),
-    TERABYTES( "T", "Terabytes", 4 ),
-    PETABYTES( "P", "Petabytes", 5 ),
-    EXABYTES( "E", "Exabytes", 6 ),
-    ZETTABYTES( "Z", "Zetabytes", 7 ),
-    YOTTABYTES( "Y", "Yottabytes", 8 ),
+    KB( "K", "Kilobytes", 1 ),
+    MB( "M", "Megabytes", 2 ),
+    GB( "G", "Gigabytes", 3 ),
+    TB( "T", "Terabytes", 4 ),
+    PB( "P", "Petabytes", 5 ),
+    EB( "E", "Exabytes", 6 ),
+    ZB( "Z", "Zetabytes", 7 ),
+    YB( "Y", "Yottabytes", 8 ),
     NONE( "none", "None", 9 );
-    private String shortName;
-    private String longName;
+    private String acronym;
+    private String name;
     private int unitIdx;
 
 
-    private MemoryUnit( String shortName, String longName, int unitIdx )
+    private MemoryUnit( String acronym, String name, int unitIdx )
     {
-        this.shortName = shortName;
-        this.longName = longName;
+        this.acronym = acronym;
+        this.name = name;
         this.unitIdx = unitIdx;
     }
 
 
-    public String getShortName()
+    public String getAcronym()
     {
-        return shortName;
+        return acronym;
     }
 
 
-    public String getLongName()
+    public String getName()
     {
-        return longName;
+        return name;
     }
 
 
@@ -54,11 +54,11 @@ public enum MemoryUnit
             case 0:
                 return BYTES;
             case 1:
-                return KILOBYTES;
+                return KB;
             case 2:
-                return MEGABYTES;
+                return MB;
             case 3:
-                return GIGABYTES;
+                return GB;
             default:
                 return null;
         }
@@ -73,18 +73,18 @@ public enum MemoryUnit
             case "B":
             case "Bytes":
                 return BYTES;
-            case "k":
-            case "K":
+            case "kb":
+            case "KB":
             case "Kilobytes":
-                return KILOBYTES;
-            case "m":
-            case "M":
+                return KB;
+            case "mb":
+            case "MB":
             case "Megabytes":
-                return MEGABYTES;
-            case "g":
-            case "G":
+                return MB;
+            case "gb":
+            case "GB":
             case "Gigabytes":
-                return GIGABYTES;
+                return GB;
             default:
                 return null;
         }

@@ -81,6 +81,6 @@ public class CpuQuotaInfo extends QuotaInfo
     @Override
     public String getQuotaKey()
     {
-        return "cpu.cpus";
+        return "cpu";
     }
 }
