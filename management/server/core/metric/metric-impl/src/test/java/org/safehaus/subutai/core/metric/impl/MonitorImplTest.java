@@ -2,8 +2,6 @@ package org.safehaus.subutai.core.metric.impl;
 
 
 import java.io.PrintStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -30,11 +28,11 @@ import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RemotePeer;
 import org.safehaus.subutai.core.peer.api.ResourceHost;

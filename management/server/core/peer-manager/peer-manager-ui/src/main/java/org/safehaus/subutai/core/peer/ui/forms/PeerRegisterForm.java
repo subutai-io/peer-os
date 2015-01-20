@@ -7,9 +7,9 @@ import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.core.peer.api.PeerException;
-import org.safehaus.subutai.core.peer.api.PeerInfo;
-import org.safehaus.subutai.core.peer.api.PeerStatus;
+import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.peer.PeerInfo;
+import org.safehaus.subutai.common.peer.PeerStatus;
 import org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

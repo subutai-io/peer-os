@@ -1,12 +1,9 @@
-package org.safehaus.subutai.core.peer.api;
+package org.safehaus.subutai.common.peer;
 
 
-import org.safehaus.subutai.core.hostregistry.api.Interface;
+import org.safehaus.subutai.common.host.Interface;
 
 
-/**
- * Created by timur on 11/30/14.
- */
 public class InterfaceModel implements Interface
 {
     private String interfaceName;

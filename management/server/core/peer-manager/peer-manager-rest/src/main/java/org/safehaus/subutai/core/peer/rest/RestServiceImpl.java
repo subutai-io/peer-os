@@ -17,12 +17,12 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.Host;
-import org.safehaus.subutai.core.peer.api.HostInfoModel;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.PeerException;
-import org.safehaus.subutai.core.peer.api.PeerInfo;
+import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.cxf.message.Message;

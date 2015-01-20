@@ -19,7 +19,7 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerExc
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.topology.TopologyData;
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 

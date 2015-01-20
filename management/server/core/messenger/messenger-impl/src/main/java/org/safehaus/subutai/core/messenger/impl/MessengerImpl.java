@@ -18,7 +18,7 @@ import org.safehaus.subutai.core.messenger.api.MessageStatus;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.messenger.api.MessengerException;
 import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

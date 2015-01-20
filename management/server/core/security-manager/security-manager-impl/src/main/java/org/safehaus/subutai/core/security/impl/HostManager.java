@@ -6,7 +6,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

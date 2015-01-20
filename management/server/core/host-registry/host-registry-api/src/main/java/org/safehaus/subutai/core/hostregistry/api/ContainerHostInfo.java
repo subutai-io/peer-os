@@ -1,6 +1,10 @@
 package org.safehaus.subutai.core.hostregistry.api;
 
 
+import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostInfo;
+
+
 /**
  * Container info
  */

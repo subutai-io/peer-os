@@ -11,8 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.persistence.EntityManagerFactory;
-
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.dao.DaoManager;
@@ -28,10 +26,10 @@ import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
-import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.slf4j.Logger;

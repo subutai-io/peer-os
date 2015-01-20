@@ -3,6 +3,8 @@ package org.safehaus.subutai.core.peer.api;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.peer.HostEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,18 +1,15 @@
-package org.safehaus.subutai.core.peer.api;
+package org.safehaus.subutai.common.peer;
 
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
-import org.safehaus.subutai.core.hostregistry.api.Interface;
+import org.safehaus.subutai.common.host.HostArchitecture;
+import org.safehaus.subutai.common.host.HostInfo;
+import org.safehaus.subutai.common.host.Interface;
 
 
-/**
- * Created by timur on 11/30/14.
- */
 public class HostInfoModel implements HostInfo
 {
     private UUID id;

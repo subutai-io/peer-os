@@ -18,6 +18,7 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.command.Response;
+import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.util.CollectionUtil;
 
 import com.google.common.base.Preconditions;

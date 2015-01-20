@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.hostregistry.api;
+package org.safehaus.subutai.common.host;
 
 
 /**

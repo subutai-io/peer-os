@@ -7,7 +7,7 @@ import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.topology.Node2PeerData;
 import org.safehaus.subutai.core.environment.api.topology.TopologyData;
 import org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl;
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.common.peer.Peer;
 
 
 public class Node2PeerBuilder extends EnvironmentBuildProcessBuilder

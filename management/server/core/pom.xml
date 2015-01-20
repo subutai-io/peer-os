@@ -37,6 +37,7 @@
     <module>wol-manager</module>
     <module>key-manager</module>
     <module>plugin-manager</module>
+    <module>env-manager</module>
   </modules>
 
 </project>
