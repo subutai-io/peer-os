@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# ==========================================================================
+# Set of functions that configures openvswitch related stuff
+# ==========================================================================
+
+function ovs_configure_lxc {
+  local lxc="$1"
+  if [ -z $lxc ]; then
+    msg_error "lxc name cannot be empty. Aborting!"
+    unlock_container_read $1
+    exit 1
+  fi
+
+  if [ "x$OVS_DISABLED" == "xtrue" ]; then
+    return
+  fi
+
+  config="$HOME/.local/share/lxc/$lxc/config"
+
+  # Remove configuration entries for network.(type,flags,link,veth.pair,script.up)
+  sed -i '/lxc.network.type.*/d' $config
+  sed -i '/lxc.network.flags.*/d' $config
+  sed -i '/lxc.network.link.*/d' $config
+  sed -i '/lxc.network.veth.pair.*/d' $config
+  sed -i '/lxc.network.script.up.*/d' $config
+
+  # Insert ovs configuration
+  ovs_port_name=$(ovs_get_port_name $lxc)
+  add_before_line="lxc.network.hwaddr"
+  # Add these before the above line
+  sed -i "/$add_before_line/i \lxc.network.type = veth" $config
+  sed -i "/$add_before_line/i \lxc.network.flags = up" $config
+  sed -i "/$add_before_line/i \lxc.network.veth.pair = $ovs_port_name-1" $config
+  
+  # Add this just after the $add_before_line
+  sed -i "/$add_before_line/a \lxc.network.script.up = $subutai_script_base/create_ovs_interface" $config
+  
+  # Add these after the $add_after_line
+  # NOTICE: the line added last will be the closest line to the $add_after_line
+  add_after_line="lxc.network.script.up"
+  sed -i "/$add_after_line/a \lxc.network.veth.pair = $ovs_port_name-2" $config
+  sed -i "/$add_after_line/a \lxc.network.mtu = 1340" $config
+  sed -i "/$add_after_line/a \lxc.network.flags = up" $config
+  sed -i "/$add_after_line/a \lxc.network.type = veth" $config
+  sed -i "/lxc.network.veth.pair = $ovs_port_name-2/a \lxc.network.script.up = $subutai_script_base/create_ovs_interface" $config 
+  msg_info "    - configured $lxc's network with openvswitch"
+}
+
+
+function ovs_revert_configuration {
+  lxc=$1
+  if [ -z "$lxc" ]; then
+    msg_error "No value provided for container's name. Aborting ..."
+    unlock_container_read $lxc
+    show_usage "$usage"
+  fi
+
+  if [ "x$OVS_DISABLED" == "xtrue" ]; then
+    return
+  fi
+
+  config="$HOME/.local/share/lxc/$lxc/config"
+
+  # Remove configuration entries for network.(type,flags,link,veth.pair,script.up)
+  sed -i '/lxc.network.type.*/d' $config
+  sed -i '/lxc.network.flags.*/d' $config
+  sed -i '/lxc.network.link.*/d' $config
+  sed -i '/lxc.network.veth.pair.*/d' $config
+  sed -i '/lxc.network.script.up.*/d' $config
+
+  # Insert default network configurations
+  add_before_line="lxc.network.hwaddr"
+  sed -i "/$add_before_line/i \lxc.network.type = veth" $config
+  sed -i "/$add_before_line/i \lxc.network.flags = up" $config
+  sed -i "/$add_before_line/i \lxc.network.link = lxcbr0" $config
+
+  msg_info "    - revert back $lxc's network configuration"
+}
+
+
+function ovs_get_port_name {
+  lxc=$1
+  if [ -z "$lxc" ]; then
+    msg_error "No value provided for container's name. Aborting ..."
+    unlock_container_read $lxc
+    show_usage "$usage"
+  fi
+  
+  # get macaddress_of_container to initialize ovs bridges' name
+  macaddress_of_container=`cat $HOME/.local/share/lxc/$lxc/config | grep lxc.network.hwaddr | cut -d "=" -f 2 | tr -d ' '`
+  #Remove ':' characters from macaddress to initialize ovs_bridges
+  ovs_port_name=`echo $macaddress_of_container | tr -d ':'`
+  echo "$ovs_port_name"
+}
+
