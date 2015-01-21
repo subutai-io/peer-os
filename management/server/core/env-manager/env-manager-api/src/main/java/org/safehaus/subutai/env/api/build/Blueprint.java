@@ -9,5 +9,6 @@ import java.util.Set;
  */
 public interface Blueprint
 {
+    public String getName();
     public Set<NodeGroup> getNodeGroups();
 }
