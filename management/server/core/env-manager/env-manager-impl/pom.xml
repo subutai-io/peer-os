@@ -22,22 +22,18 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>env-manager-api</artifactId>
-      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>template-registry-api</artifactId>
-      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>peer-manager-api</artifactId>
-      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>commons-net</groupId>
       <artifactId>commons-net</artifactId>
-      <version>3.3</version>
     </dependency>
   </dependencies>
 

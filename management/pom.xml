@@ -62,7 +62,6 @@
     <h2database.version>1.4.184</h2database.version>
     <openjpa.version>2.3.0</openjpa.version>
 
-
   </properties>
 
   <dependencyManagement>
@@ -135,6 +134,33 @@
         <artifactId>environment-manager-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- environment-manager 2-->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>env-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>env-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <!--<dependency>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>environment-manager-cli</artifactId>-->
+      <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
+      <!--<dependency>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>environment-manager-rest</artifactId>-->
+      <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
+      <!--<dependency>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>environment-manager-ui</artifactId>-->
+      <!--<version>${project.version}</version>-->
+      <!--</dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- environment-terminal -->
@@ -673,6 +699,11 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
         <version>3.1</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-net</groupId>
+        <artifactId>commons-net</artifactId>
+        <version>3.3</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
