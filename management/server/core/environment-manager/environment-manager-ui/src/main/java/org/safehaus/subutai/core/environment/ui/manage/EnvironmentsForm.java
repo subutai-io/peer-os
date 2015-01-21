@@ -11,14 +11,12 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
-import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerException;
 import org.slf4j.Logger;
 
 import com.google.gson.Gson;
@@ -54,7 +52,7 @@ public class EnvironmentsForm
     private static final String START = "Start";
     private static final String STOP = "Stop";
     private static final String MANAGE_TITLE = "Manage environment containers";
-    private static final String CONTAINER_QUOTA = "%s container quota";
+    private static final String CONTAINER_QUOTA = "%s container quota description";
     private static final String ID = "ID";
     private static final String STATUS = "Status";
     private static final String DATE_CREATED = "Date";
@@ -500,53 +498,149 @@ public class EnvironmentsForm
             @Override
             public void buttonClick( final Button.ClickEvent event )
             {
-                try
-                {
-                    PeerQuotaInfo peerQuotaInfo = containerHost.getQuota( QuotaType.QUOTA_TYPE_ALL_JSON );
-                    Window window = getContainerQuotaWindow( environment, peerQuotaInfo );
+                //                try
+                //                {
+                //                    PeerQuotaInfo peerQuotaInfo = containerHost.getQuota( QuotaType
+                // .QUOTA_TYPE_ALL_JSON );
+                Window window = getContainerQuotaWindow( containerHost, null );
                     contentRoot.getUI().addWindow( window );
                     window.setVisible( true );
-                }
-                catch ( PeerException e )
-                {
-                    LOGGER.error( "Error retrieving quota for container.", e );
-                }
+                //                }
+                ////                catch ( PeerException e )
+                ////                {
+                ////                    LOGGER.error( "Error retrieving quota for container.", e );
+                //                }
             }
         } );
         return button;
     }
 
 
-    private Window getContainerQuotaWindow( Environment environment, PeerQuotaInfo containerQuotaInfo )
+    private Window getContainerQuotaWindow( ContainerHost containerHost, PeerQuotaInfo containerQuotaInfo )
     {
-        Window window = createWindow( MANAGE_TITLE );
+        Window window = createWindow( String.format( CONTAINER_QUOTA, containerHost.getHostname() ) );
         window.setContent( getContainerQuotaLayout( containerQuotaInfo ) );
         return window;
     }
 
 
-    private VerticalLayout getContainerQuotaLayout( PeerQuotaInfo containerQuotaInfo )
+    private VerticalLayout getContainerQuotaLayout( final PeerQuotaInfo containerQuotaInfo )
     {
         VerticalLayout vl = new VerticalLayout();
         final Label value = new Label( "0" );
-        value.setWidth( "3em" );
+        //        value.setWidth( "3em" );
+        value.setImmediate( true );
 
-        final Slider slider = new Slider( "Select a value between 0 and 100" );
-        slider.setWidth( "100%" );
-        slider.setMin( 0 );
-        slider.setMax( 100 );
-        slider.setImmediate( true );
-        slider.addValueChangeListener( new Property.ValueChangeListener()
+        //        CpuQuotaInfo cpuQuotaInfo;
+        //        HddQuotaInfo homePartitionQuota;
+        //        HddQuotaInfo varPartitionQuota;
+        //        HddQuotaInfo optPartitionQuota;
+        //        HddQuotaInfo rootfsPartitionQuota;
+        //        MemoryQuotaInfo memoryQuota;
+
+        final Slider cpuSlider = new Slider( "Select a value between 0 and 100" );
+        cpuSlider.setWidth( "50%" );
+        cpuSlider.setMin( 0 );
+        cpuSlider.setMax( 100 );
+        cpuSlider.setImmediate( true );
+        cpuSlider.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( final Property.ValueChangeEvent event )
             {
                 value.setValue( event.getProperty().getValue().toString() );
+                Integer percentage = Integer.parseInt( event.getProperty().getValue().toString() );
+                //                containerQuotaInfo.getCpuQuotaInfo().setPercentage( percentage );
             }
         } );
 
-        vl.addComponent( slider );
-        vl.setExpandRatio( slider, 1 );
+        final Slider homePartition = new Slider( "Select a value between 0 and 100" );
+        homePartition.setWidth( "50%" );
+        homePartition.setMin( 0 );
+        homePartition.setMax( 100 );
+        homePartition.setImmediate( true );
+        homePartition.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( final Property.ValueChangeEvent event )
+            {
+                value.setValue( event.getProperty().getValue().toString() );
+                Integer percentage = Integer.parseInt( event.getProperty().getValue().toString() );
+                //                containerQuotaInfo.getCpuQuotaInfo().setPercentage( percentage );
+            }
+        } );
+
+        final Slider varPartition = new Slider( "Select a value between 0 and 100" );
+        varPartition.setWidth( "50%" );
+        varPartition.setMin( 0 );
+        varPartition.setMax( 100 );
+        varPartition.setImmediate( true );
+        varPartition.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( final Property.ValueChangeEvent event )
+            {
+                value.setValue( event.getProperty().getValue().toString() );
+                Integer percentage = Integer.parseInt( event.getProperty().getValue().toString() );
+                //                containerQuotaInfo.getCpuQuotaInfo().setPercentage( percentage );
+            }
+        } );
+
+        final Slider optPartition = new Slider( "Select a value between 0 and 100" );
+        optPartition.setWidth( "50%" );
+        optPartition.setMin( 0 );
+        optPartition.setMax( 100 );
+        optPartition.setImmediate( true );
+        optPartition.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( final Property.ValueChangeEvent event )
+            {
+                value.setValue( event.getProperty().getValue().toString() );
+                Integer percentage = Integer.parseInt( event.getProperty().getValue().toString() );
+                //                containerQuotaInfo.getCpuQuotaInfo().setPercentage( percentage );
+            }
+        } );
+
+        final Slider rootfsPartition = new Slider( "Select a value between 0 and 100" );
+        rootfsPartition.setWidth( "50%" );
+        rootfsPartition.setMin( 0 );
+        rootfsPartition.setMax( 100 );
+        rootfsPartition.setImmediate( true );
+        rootfsPartition.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( final Property.ValueChangeEvent event )
+            {
+                value.setValue( event.getProperty().getValue().toString() );
+                Integer percentage = Integer.parseInt( event.getProperty().getValue().toString() );
+                //                containerQuotaInfo.getCpuQuotaInfo().setPercentage( percentage );
+            }
+        } );
+
+        final Slider memorySlider = new Slider( "Select a value between 0 and 100" );
+        memorySlider.setWidth( "50%" );
+        memorySlider.setMin( 0 );
+        memorySlider.setMax( 100 );
+        memorySlider.setImmediate( true );
+        memorySlider.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( final Property.ValueChangeEvent event )
+            {
+                value.setValue( event.getProperty().getValue().toString() );
+                Integer percentage = Integer.parseInt( event.getProperty().getValue().toString() );
+                //                containerQuotaInfo.getCpuQuotaInfo().setPercentage( percentage );
+            }
+        } );
+
+        vl.addComponent( cpuSlider );
+        vl.addComponent( homePartition );
+        vl.addComponent( varPartition );
+        vl.addComponent( optPartition );
+        vl.addComponent( rootfsPartition );
+        vl.addComponent( memorySlider );
+        //        vl.setExpandRatio( cpuSlider, 1 );
         vl.addComponent( value );
         vl.setComponentAlignment( value, Alignment.BOTTOM_LEFT );
 
