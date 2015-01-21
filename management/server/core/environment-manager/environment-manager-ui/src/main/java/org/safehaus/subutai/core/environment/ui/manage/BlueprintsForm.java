@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.environment.ui.manage;
 import java.util.List;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.environment.ui.wizard.Blueprint2PeerGroupWizard;
 import org.safehaus.subutai.core.environment.ui.wizard.Node2PeerWizard;
@@ -46,8 +47,10 @@ public class BlueprintsForm
         contentRoot.setSpacing( true );
         contentRoot.setMargin( true );
         environmentsTable = createTable( "Blueprints", 300 );
+        environmentsTable.setId( "environmentsTable" );
 
         environmentsButton = new Button( VIEW );
+        environmentsButton.setId( "environmentsButton" );
         environmentsButton.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -91,6 +94,7 @@ public class BlueprintsForm
             {
 
                 final Button view = new Button( VIEW );
+                view.setId( blueprint.getName() + "-view" );
                 view.addClickListener( new Button.ClickListener()
                 {
                     @Override
@@ -103,6 +107,7 @@ public class BlueprintsForm
                 } );
 
                 final Button N2P_BTN = new Button( N2P );
+                N2P_BTN.setId( blueprint.getName() + "-N2P" );
                 N2P_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
@@ -115,6 +120,7 @@ public class BlueprintsForm
                 } );
 
                 final Button B2PG_BTN = new Button( B2PG );
+                B2PG_BTN.setId( blueprint.getName() + "-B2PG" );
                 B2PG_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
@@ -128,6 +134,7 @@ public class BlueprintsForm
                 } );
 
                 final Button NG2PG_BTN = new Button( NG2PG );
+                NG2PG_BTN.setId( blueprint.getName() + "-NG2PG_BTN" );
                 NG2PG_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
@@ -141,6 +148,7 @@ public class BlueprintsForm
                 } );
 
                 final Button NG2P_BTN = new Button( NG2P );
+                NG2P_BTN.setId( blueprint.getName() + "-NG2P_BTN" );
                 NG2P_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
@@ -153,20 +161,21 @@ public class BlueprintsForm
                 } );
 
                 final Button delete = new Button( DELETE );
+                delete.setId( blueprint.getName() + "-delete" );
                 delete.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        boolean result = module.getEnvironmentManager().deleteBlueprint( blueprint.getId() );
-                        if ( result )
+                        try
                         {
+                            module.getEnvironmentManager().deleteBlueprint( blueprint.getId() );
                             Notification.show( "Blueprint deleted" );
                             environmentsButton.click();
                         }
-                        else
+                        catch ( EnvironmentManagerException e )
                         {
-                            Notification.show( "Problem deleting blueprint." );
+                            Notification.show( String.format( "Problem deleting blueprint: %s", e.getMessage() ) );
                         }
                     }
                 } );

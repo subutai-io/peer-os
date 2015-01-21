@@ -34,6 +34,12 @@ Usage:   List opened n2n Tunnels
 Usage:   Remove a n2n Tunnel                 
         "subutai \[-qh\] management_network -R INTERFACENAME COMMUNITYNAME
 ******************************************************************************
+Usage:   List opened tap devices                 
+        "subutai \[-qh\] management_network -S
+
+Usage:   Remove a tap device                 
+        "subutai \[-qh\] management_network -V INTERFACENAME
+******************************************************************************
 Usage:   Create a gateway tap device                 
         "subutai \[-qh\] management_network -T VLANIP/SUBNET VLANID
 
@@ -45,6 +51,9 @@ Usage:   Create VNI-VLAN Mapping on a Tunnel
 
 Usage:   Delete VNI-VLAN Mapping on a Tunnel                 
         "subutai \[-qh\] management_network -M TUNNELPORTNAME VNI VLANID
+
+Usage:   List  VNI-VLAN Mapping on a Tunnel                 
+        "subutai \[-qh\] management_network -v 
 -------------------------------------------------------------------------------
 EOF
 }
@@ -80,9 +89,12 @@ function management_network {
   local removeGateway="false"
   local vnivlanMap="false"  
   local delvnivlanMap="false"
-  
+  local listVNImapping="false"
+  local listTapDevices="false"
+  local removeTapDevice="false"
+
   shift_amount=0;
-  while getopts ":clrfspdNLRTDmM:" opt; do
+  while getopts ":clrfspdNLRSVTDmvM:" opt; do
      case $opt in
        c)
 	 createTunnel="true"	
@@ -123,6 +135,14 @@ function management_network {
          removeN2NTunnel="true"
          shift
          ;;
+       S)
+         listTapDevices="true"
+         shift
+         ;;
+       V)
+         removeTapDevice="true"
+         shift
+         ;;
        T)
          createGateway="true"
          shift
@@ -133,6 +153,10 @@ function management_network {
          ;;
        m)
          vnivlanMap="true"
+         shift
+         ;;
+       v)
+         listVNImapping="true"
          shift
          ;;
        M)
@@ -372,6 +396,7 @@ function management_network {
       net_check_N2N_IpAddress $supernodeIpAddress $localPeerIpAddress
       net_check_portNumber $supernodePort
       net_check_keyType $keyType
+      net_create_tap_device $interfaceName $localPeerIpAddress 
       
       if [ $keyType = "string" ]; then 
          edge -l $supernodeIpAddress:$supernodePort -d $interfaceName -c $communityName -k $keyFile -r -a $localPeerIpAddress
@@ -392,12 +417,17 @@ function management_network {
    fi
 
    if [ "true" == "$removeN2NTunnel" ]; then
-     kill -9 `ps aux | grep -e "-c $2" | grep -e "-d $1" | grep -v "\-\-color" | awk -F" " '{print $2}'` > /dev/null 2>&1
-     if [ "$?" != "0" ]; then
-       msg_error "Removing Tunnel Failed!"
-       show_usage "`management_network_usage`"
-     fi
-     msg_ok "N2N Tunnel Removed!"
+      if [ -z $1 ] || [ -z $2 ]; then
+        msg_error "missing parameter!"
+        show_usage "`management_network_usage`"
+      fi
+       
+      kill -9 `ps aux | grep -e "-c $2" | grep -e "-d $1" | grep -v "\-\-color" | awk -F" " '{print $2}'` > /dev/null 2>&1
+      if [ "$?" != "0" ]; then
+        msg_error "Removing Tunnel Failed!"
+        show_usage "`management_network_usage`"
+      fi
+      msg_ok "N2N Tunnel Removed!"
    fi
 
    if [ "true" == "$createGateway" ]; then
@@ -429,6 +459,26 @@ function management_network {
       msg_info "Gateway created for $vlanID"
    fi
 
+   if [ "true" == "$listTapDevices" ]; then
+      result=`echo -e "TapDeviceInterface \t TapDeviceIPAddress "`
+      echo $result
+      ps aux | grep 'tap_create -d' | grep -v 'grep' | awk '{ print $13 "  " $15}'
+   fi
+
+   if [ "true" == "$removeTapDevice" ]; then
+      if [ -z $1 ]; then
+        msg_error "missing parameter!"
+        show_usage "`management_network_usage`"
+      fi
+
+      kill -9 `ps aux | grep -e "-d $1" | grep -v "\-\-color" | awk -F" " '{print $2}'` > /dev/null 2>&1
+      if [ "$?" != "0" ]; then
+       msg_error "Removing Tap Device Failed!"
+       show_usage "`management_network_usage`"
+      fi
+      msg_ok "Tap Device Removed!"
+   fi
+
    if [ "true" == "$removeGateway" ]; then
       vlanID="$1"
       if [ -z "$vlanID" ]; then
@@ -439,6 +489,28 @@ function management_network {
       ovs-vsctl del-port br-int intto$vlanID
       msg_info "Gateway removed for $vlanID"
    fi
+
+
+   if [ "true" == "$listVNImapping" ]; then
+      search_dir="/var/subutai-network"
+      if [ -d "$search_dir" ]; then
+         # Control will enter here if $DIRECTORY exists.
+         echo "#################################################################################"
+         echo -e "  Tunnel name\t |  VNI \t| VLAN ID   "
+         for entry in "$search_dir"/*
+           do
+             if [ -f "$entry" ]; then  
+               echo "---------------------------------------------------------------------------------"
+               echo $(basename $entry)} | awk -F"_" '{print "\t",$1,""}'
+               cat $entry | awk -F" " '{print "\t\t | ",$1,"\t\t| ",$2}';
+             fi
+           done
+         echo "#################################################################################"
+      else 
+         echo "It seems no VNi mapping yet cause I can't open folder $search_dir"
+      fi
+   fi
+
 
    if [ "true" == "$delvnivlanMap" ]; then
      tunnelName="$1"

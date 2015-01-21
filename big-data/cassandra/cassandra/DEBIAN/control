@@ -4,5 +4,5 @@ Section: devel
 Installed-Size: 74955
 Maintainer: subutai
 Architecture: amd64 
-Version: 1.2.10
+Version: 1.2.11
 Description: This is a cassandra package of subutai distribution.

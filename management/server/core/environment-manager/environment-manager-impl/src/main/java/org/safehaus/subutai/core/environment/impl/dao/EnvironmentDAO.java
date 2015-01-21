@@ -1,18 +1,20 @@
 package org.safehaus.subutai.core.environment.impl.dao;
 
 
-import java.sql.Clob;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.sql.DataSource;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.util.DbUtil;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenceException;
+import org.safehaus.subutai.core.environment.impl.entity.EnvironmentBlueprintEntity;
+import org.safehaus.subutai.core.environment.impl.entity.EnvironmentBuildProcessEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +22,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -32,51 +32,48 @@ public class EnvironmentDAO
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDAO.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    protected DbUtil dbUtil;
+
+    private static final String ERR_NO_SOURCE = "Source is null or empty";
+    private static final String ERR_NO_KEY = "Key is null or empty";
+    private DaoManager daoManager;
 
 
-    public EnvironmentDAO( DataSource dataSource ) throws SQLException
+    public EnvironmentDAO( DaoManager daoManager ) throws SQLException
     {
-        Preconditions.checkNotNull( dataSource, "DataSource is null" );
-        this.dbUtil = new DbUtil( dataSource );
-
-        setupDb();
+        this.daoManager = daoManager;
     }
 
 
-    protected void setupDb() throws SQLException
+    public void saveInfo( String source, String key, Object info ) throws EnvironmentPersistenceException
     {
-
-        String sql1 = "create table if not exists blueprint (id uuid, info clob, PRIMARY KEY (id));";
-        String sql2 =
-                "create table if not exists process (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
-                        + "id));";
-        String sql3 = "create table if not exists environment (source varchar(100), id uuid, info clob, "
-                + "PRIMARY KEY (source, id));";
-
-        dbUtil.update( sql1 );
-        dbUtil.update( sql2 );
-        dbUtil.update( sql3 );
-    }
-
-
-    public boolean saveInfo( String source, String key, Object info ) throws EnvironmentPersistenceException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), ERR_NO_SOURCE );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), ERR_NO_KEY );
         Preconditions.checkNotNull( info, "Info is null" );
+
+        EntityManager entityManager = daoManager.getEntityManagerFromFactory();
 
         try
         {
-            dbUtil.update( "merge into environment (source, id, info) values (? , ?, ?)", source,
-                    UUID.fromString( key ), GSON.toJson( info ) );
 
-            return true;
+            EnvironmentBuildProcessEntity environmentBuildProcessEntity = new EnvironmentBuildProcessEntity();
+            environmentBuildProcessEntity.setId( key );
+            environmentBuildProcessEntity.setSource( source );
+            environmentBuildProcessEntity.setInfo( GSON.toJson( info ) );
+
+            daoManager.startTransaction( entityManager );
+            entityManager.merge( environmentBuildProcessEntity );
+            daoManager.commitTransaction( entityManager );
         }
-        catch ( JsonSyntaxException | SQLException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
+
+            daoManager.rollBackTransaction( entityManager );
             throw new EnvironmentPersistenceException( e.getMessage() );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( entityManager );
         }
     }
 
@@ -89,28 +86,34 @@ public class EnvironmentDAO
      *
      * @return - list of POJOs
      */
-    public <T> List<T> getInfo( String source, Class<T> clazz )
+    public <T> List getInfo( String source, Class<T> clazz )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), ERR_NO_SOURCE );
         Preconditions.checkNotNull( clazz, "Class is null" );
 
         List<T> list = new ArrayList<>();
+        EntityManager entityManager = daoManager.getEntityManagerFactory().createEntityManager();
+
         try
         {
-            ResultSet rs = dbUtil.select( "select info from environment where source = ?", source );
-            while ( rs != null && rs.next() )
+            Query query;
+            query = entityManager.createQuery( "SELECT ebp FROM EnvironmentBuildProcessEntity "
+                    + "                             AS ebp WHERE ebp.source = :source" );
+            query.setParameter( "source", source );
+            List<EnvironmentBuildProcessEntity> results = query.getResultList();
+
+            for ( EnvironmentBuildProcessEntity ebp : results )
             {
-                Clob infoClob = rs.getClob( "info" );
-                if ( infoClob != null && infoClob.length() > 0 )
-                {
-                    String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                    list.add( GSON.fromJson( info, clazz ) );
-                }
+                list.add( JsonUtil.fromJson( ebp.getInfo(), clazz ) );
             }
         }
-        catch ( JsonSyntaxException | SQLException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( entityManager );
         }
         return list;
     }
@@ -127,15 +130,17 @@ public class EnvironmentDAO
      */
     public <T> T getInfo( String source, String key, Class<T> clazz )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), ERR_NO_SOURCE );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), ERR_NO_KEY );
         Preconditions.checkNotNull( clazz, "Class is null" );
+
+        EntityManager entityManager = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
-
+            /*
             ResultSet rs = dbUtil.select( "select info from environment where source = ? and id = ?", source,
-                    UUID.fromString( key ) );
+                                          UUID.fromString( key ) );
             if ( rs != null && rs.next() )
             {
                 Clob infoClob = rs.getClob( "info" );
@@ -144,11 +149,27 @@ public class EnvironmentDAO
                     String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
                     return GSON.fromJson( info, clazz );
                 }
+            }*/
+            Query query;
+            query = entityManager.createQuery( "SELECT ebp FROM EnvironmentBuildProcessEntity "
+                    + "                             AS ebp WHERE ebp.source = :source and ebp.id=:id" );
+            query.setParameter( "source", source );
+            query.setParameter( "id", key );
+            EnvironmentBlueprintEntity ebp = ( EnvironmentBlueprintEntity ) query.getSingleResult();
+
+            if ( ebp != null )
+            {
+                daoManager.closeEntityManager( entityManager );
+                return GSON.fromJson( ebp.getInfo(), clazz );
             }
         }
-        catch ( JsonSyntaxException | SQLException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( entityManager );
         }
         return null;
     }
@@ -160,100 +181,156 @@ public class EnvironmentDAO
      * @param source - source key
      * @param key - POJO key
      */
-    public boolean deleteInfo( String source, String key )
+    public synchronized void deleteInfo( String source, String key ) throws EnvironmentPersistenceException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), ERR_NO_SOURCE );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), ERR_NO_KEY );
+        EntityManager entityManager = daoManager.getEntityManagerFromFactory();
 
         try
         {
-            dbUtil.update( "delete from environment where source = ? and id = ?", source, UUID.fromString( key ) );
-            return true;
+            //dbUtil.update( "delete from environment where source = ? and id = ?", source, UUID.fromString( key ) );
+            daoManager.startTransaction( entityManager );
+
+            Query query;
+            query = entityManager.createQuery( "delete FROM EnvironmentBuildProcessEntity "
+                    + "                         AS ebp WHERE ebp.source = :source and ebp.id=:id" );
+            query.setParameter( "source", source );
+            query.setParameter( "id", key );
+            query.executeUpdate();
+            daoManager.commitTransaction( entityManager );
         }
-        catch ( SQLException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
+            daoManager.rollBackTransaction( entityManager );
         }
-        return false;
+        finally
+        {
+            daoManager.closeEntityManager( entityManager );
+        }
     }
 
 
     public UUID saveBlueprint( final EnvironmentBlueprint blueprint ) throws EnvironmentPersistenceException
     {
+        EntityManager entityManager = daoManager.getEntityManagerFromFactory();
+        UUID bpId;
         try
         {
+            //dbUtil.update( "merge into blueprint (id, info) values (? , ?)", blueprint.getId(), json );
+
+
             String json = GSON.toJson( blueprint );
-            dbUtil.update( "merge into blueprint (id, info) values (? , ?)", blueprint.getId(), json );
-            return blueprint.getId();
+
+            EnvironmentBlueprintEntity environmentBlueprintEntity = new EnvironmentBlueprintEntity();
+            environmentBlueprintEntity.setId( blueprint.getId().toString() );
+            environmentBlueprintEntity.setInfo( json );
+
+            daoManager.startTransaction( entityManager );
+            entityManager.merge( environmentBlueprintEntity );
+            daoManager.commitTransaction( entityManager );
+
+            bpId = blueprint.getId();
         }
-        catch ( JsonParseException | SQLException e )
+        catch ( Exception e )
         {
+            LOG.error( "Failed to save blueprint", e );
+            daoManager.rollBackTransaction( entityManager );
             throw new EnvironmentPersistenceException( e.getMessage() );
         }
+        finally
+        {
+            daoManager.closeEntityManager( entityManager );
+        }
+
+        return bpId;
     }
 
 
     public List<EnvironmentBlueprint> getBlueprints() throws EnvironmentPersistenceException
     {
         List<EnvironmentBlueprint> blueprints = new ArrayList<>();
+        EntityManager entityManager = daoManager.getEntityManagerFromFactory();
+
         try
         {
-            ResultSet rs = dbUtil.select( "select info from blueprint" );
-            while ( rs != null && rs.next() )
+
+            Query query;
+            query = entityManager.createQuery( "SELECT ebe FROM EnvironmentBlueprintEntity AS ebe" );
+
+            List<EnvironmentBlueprintEntity> results = query.getResultList();
+
+            for ( EnvironmentBlueprintEntity ebe : results )
             {
-                Clob infoClob = rs.getClob( "info" );
-                if ( infoClob != null && infoClob.length() > 0 )
-                {
-                    String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                    blueprints.add( GSON.fromJson( info, EnvironmentBlueprint.class ) );
-                }
+                blueprints.add( GSON.fromJson( ebe.getInfo(), EnvironmentBlueprint.class ) );
             }
         }
-        catch ( JsonSyntaxException | SQLException e )
+        catch ( Exception e )
         {
+            LOG.error( "Failed to get blueprints", e );
             throw new EnvironmentPersistenceException( e.getMessage() );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( entityManager );
         }
         return blueprints;
     }
 
 
-    public boolean deleteBlueprint( final UUID blueprintId ) throws EnvironmentPersistenceException
+    public void deleteBlueprint( final UUID blueprintId ) throws EnvironmentPersistenceException
     {
+        EntityManager entityManager = daoManager.getEntityManagerFromFactory();
+
         try
         {
-            dbUtil.update( "delete from blueprint where id = ?", blueprintId );
-            EnvironmentBlueprint b = getBlueprint( blueprintId );
+            daoManager.startTransaction( entityManager );
 
-            return true;
+            Query query;
+            query = entityManager.createQuery(
+                    "delete FROM EnvironmentBlueprintEntity " + "                         AS ebe WHERE ebe.id=:id" );
+            query.setParameter( "id", blueprintId.toString() );
+            query.executeUpdate();
+            daoManager.commitTransaction( entityManager );
         }
-        catch ( SQLException e )
+        catch ( Exception e )
         {
+            LOG.error( "Failed to delete blueprint", e );
+            daoManager.rollBackTransaction( entityManager );
             throw new EnvironmentPersistenceException( e.getMessage() );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( entityManager );
         }
     }
 
 
     public EnvironmentBlueprint getBlueprint( UUID blueprintId ) throws EnvironmentPersistenceException
     {
+        EntityManager entityManager = daoManager.getEntityManagerFromFactory();
+
         try
         {
+            EnvironmentBlueprintEntity ebe =
+                    entityManager.find( EnvironmentBlueprintEntity.class, blueprintId.toString() );
 
-            ResultSet rs = dbUtil.select( "select info from blueprint where id = ?", blueprintId );
-            if ( rs != null && rs.next() )
+            if ( ebe != null )
             {
-                Clob infoClob = rs.getClob( "info" );
-                if ( infoClob != null && infoClob.length() > 0 )
-                {
-                    String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                    return GSON.fromJson( info, EnvironmentBlueprint.class );
-                }
+                return GSON.fromJson( ebe.getInfo(), EnvironmentBlueprint.class );
             }
         }
-        catch ( JsonSyntaxException | SQLException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
             throw new EnvironmentPersistenceException( e.getMessage() );
         }
+        finally
+        {
+            daoManager.closeEntityManager( entityManager );
+        }
         return null;
     }
 }
+

@@ -43,6 +43,10 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>metric-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>host-registry-api</artifactId>
     </dependency>
     <dependency>
@@ -68,28 +72,21 @@
       <artifactId>slf4j-simple</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-jta_1.1_spec</artifactId>
-      <version>1.1.1</version>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20131018</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.openjpa</groupId>
+      <artifactId>openjpa</artifactId>
+      <version>${openjpa.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-jpa_2.0_spec</artifactId>
       <version>1.1</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.openjpa</groupId>
-      <artifactId>openjpa</artifactId>
-      <!-- set the version to be the same as the level in your runtime -->
-      <version>2.3.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>1.4.181</version>
-    </dependency>
-  </dependencies>
+   </dependencies>
 
   <build>
     <plugins>
@@ -105,8 +102,9 @@
             <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
             <Bundle-SymbolicName>${project.groupId}.core.peer.impl</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages}, {local-packages}.*;version=${project.version};-noimport:=true
+              {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
+            <Import-Package>javax.persistence;version="[1.0.0,2.1.0)",*</Import-Package>
           </instructions>
         </configuration>
       </plugin>

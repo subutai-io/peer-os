@@ -3,6 +3,7 @@ set -e
 . /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/pack-funcs
 
 productName=hipi
+mode=bdproduct
 downloadFileAndMakeChanges() {
 	initializeVariables $1
 
@@ -14,18 +15,18 @@ downloadFileAndMakeChanges() {
     	mkdir -p $confDirectory
 
 	# download nutch 
-	wget http://hipi.cs.virginia.edu/downloads/hipi.tar.gz -P $tempDirectory
+	wget http://hipi.cs.virginia.edu/downloads/hipi-src.tar.bz2  -P $tempDirectory
 	pushd $tempDirectory
-	tar -xzpf hipi.tar.gz
+	tar -xvpf hipi-src.tar.bz2
 
 	# remove tar file
-	rm hipi.tar.gz
+	rm hipi-src.tar.bz2
 	
 	popd
 }
 
 # 1) Check if the version is changed or not. If not changed, dont create a new debian.
-checkPackageVersion $productName
+checkVersion $productName $mode
 # 2) Get the sources which are downloaded from version control system
 #    to local machine to relevant directories to generate the debian package
 getSourcesToRelevantDirectories $productName

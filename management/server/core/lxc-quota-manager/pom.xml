@@ -17,5 +17,6 @@
   <modules>
     <module>lxc-quota-manager-api</module>
     <module>lxc-quota-manager-impl</module>
+    <module>lxc-quota-manager-cli</module>
   </modules>
 </project>

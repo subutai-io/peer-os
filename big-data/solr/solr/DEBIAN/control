@@ -4,5 +4,5 @@ Section: devel
 Installed-Size: 212000
 Maintainer: subutai
 Architecture: all
-Version: 1.0.10
+Version: 1.0.11
 Description: This is a solr package of subutai distribution.

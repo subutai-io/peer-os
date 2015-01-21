@@ -14,8 +14,8 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.common.util.StringUtil;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

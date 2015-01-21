@@ -3,8 +3,9 @@ package org.safehaus.subutai.core.metric.api;
 
 import java.util.Set;
 
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.common.peer.ContainerHost;
 
 
 /**
@@ -67,11 +68,17 @@ public interface Monitor
     public void activateMonitoring( ContainerHost containerHost, MonitoringSettings monitoringSettings )
             throws MonitorException;
 
+
+    public ProcessResourceUsage getProcessResourceUsage( ContainerHost containerHost, int processPid ) throws MonitorException;
+
     /**
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
      * stress.
      *
      * @param alertMetric - body of alert in JSON
+     *
+     *
+     * TODO take this method to separate interface for by-REST only usage
      */
     public void alert( String alertMetric ) throws MonitorException;
 

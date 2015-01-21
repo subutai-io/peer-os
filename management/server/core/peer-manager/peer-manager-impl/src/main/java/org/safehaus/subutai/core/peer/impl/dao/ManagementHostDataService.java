@@ -7,7 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.common.protocol.api.DataService;
-import org.safehaus.subutai.core.peer.impl.model.ManagementHostEntity;
+import org.safehaus.subutai.core.peer.impl.entity.ManagementHostEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,12 +114,13 @@ public class ManagementHostDataService implements DataService<String, Management
 
 
     @Override
-    public void remove( final ManagementHostEntity item )
+    public void remove( final String id )
     {
         EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
+            ManagementHostEntity item = em.find( ManagementHostEntity.class, id );
             em.remove( item );
             em.getTransaction().commit();
         }

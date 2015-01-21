@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -44,14 +45,13 @@ public class EnvironmentManagerImplTest
     TemplateRegistry registry;
     @Mock
     EnvironmentBlueprint environmentBlueprint;
-    @Mock
-    DataSource dataSource;
+
 
 
     @Before
     public void setUp() throws Exception
     {
-        manager = new EnvironmentManagerImpl( dataSource );
+        manager = new EnvironmentManagerImpl(  );
         manager.setEnvironmentDAO( environmentDao );
     }
 

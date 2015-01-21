@@ -2,8 +2,9 @@ Package: subutai-hbase
 Priority: optional
 Section: devel
 Installed-Size: 43766
-Maintainer: 
+Maintainer: subutai
 Architecture: amd64
-Version: 1.1.3
+Version: 1.1.4
 Depends: subutai-hadoop
 Description: This is a hbase package of subutai distribution.
+

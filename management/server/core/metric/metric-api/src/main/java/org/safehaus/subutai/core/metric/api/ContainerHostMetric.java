@@ -12,6 +12,13 @@ import com.google.common.base.Objects;
 public abstract class ContainerHostMetric extends Metric
 {
     protected UUID environmentId;
+    protected UUID hostId;
+
+
+    public UUID getHostId()
+    {
+        return hostId;
+    }
 
 
     public UUID getEnvironmentId()
@@ -26,6 +33,6 @@ public abstract class ContainerHostMetric extends Metric
         return Objects.toStringHelper( this ).add( "host", host ).add( "availableRam", availableRam )
                       .add( "usedRam", usedRam ).add( "totalRam", totalRam ).add( "availableDisk", availableDisk )
                       .add( "usedDisk", usedDisk ).add( "totalDisk", totalDisk ).add( "usedCpu", usedCpu )
-                      .add( "environmentId", environmentId ).toString();
+                      .add( "hostId", hostId ).add( "environmentId", environmentId ).toString();
     }
 }

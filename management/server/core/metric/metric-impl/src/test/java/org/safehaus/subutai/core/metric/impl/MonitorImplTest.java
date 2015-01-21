@@ -2,13 +2,12 @@ package org.safehaus.subutai.core.metric.impl;
 
 
 import java.io.PrintStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import javax.sql.DataSource;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,25 +18,28 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RemotePeer;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import static junit.framework.Assert.assertEquals;
@@ -60,6 +62,7 @@ import static org.mockito.Mockito.when;
  * Test for MonitorImpl
  */
 @RunWith( MockitoJUnitRunner.class )
+
 public class MonitorImplTest
 {
     private static final String SUBSCRIBER_ID = "subscriber";
@@ -67,19 +70,24 @@ public class MonitorImplTest
     private static final UUID ENVIRONMENT_ID = UUID.randomUUID();
     private static final UUID LOCAL_PEER_ID = UUID.randomUUID();
     private static final UUID REMOTE_PEER_ID = UUID.randomUUID();
+    private static final UUID HOST_ID = UUID.randomUUID();
     private static final String HOST = "test";
     private static final double METRIC_VALUE = 123;
     private static final String METRIC_JSON = " {\"host\":\"test\", \"totalRam\":\"123\"," +
             "\"availableRam\":\"123\", \"usedRam\":\"123\", \"usedCpu\":\"123\","
             + "  \"availableDisk\" : \"123\", \"usedDisk\" : \"123\", \"totalDisk\" : \"123\"}";
     @Mock
-    DataSource dataSource;
+    EntityManagerFactory entityManagerFactory;
+    @Mock
+    EntityManager entityManager;
     @Mock
     PeerManager peerManager;
     @Mock
     MonitorDao monitorDao;
     @Mock
-    ContainerHostMetric containerHostMetric;
+    DaoManager daoManager;
+    @Mock
+    ContainerHostMetricImpl containerHostMetric;
     @Mock
     AlertListener alertListener;
     Set<AlertListener> alertListeners;
@@ -101,12 +109,16 @@ public class MonitorImplTest
     @Mock
     MonitoringSettings monitoringSettings;
 
+    @Mock
+    EnvironmentManager environmentManager;
+
 
     static class MonitorImplExt extends MonitorImpl
     {
-        public MonitorImplExt( final DataSource dataSource, final PeerManager peerManager ) throws MonitorException
+        public MonitorImplExt( final PeerManager peerManager, DaoManager daoManager,
+                               EnvironmentManager environmentManager ) throws MonitorException
         {
-            super( dataSource, peerManager );
+            super( peerManager, daoManager, environmentManager );
         }
 
 
@@ -123,15 +135,21 @@ public class MonitorImplTest
     @Before
     public void setUp() throws Exception
     {
-        Connection connection = mock( Connection.class );
-        PreparedStatement preparedStatement = mock( PreparedStatement.class );
-        when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
-        when( dataSource.getConnection() ).thenReturn( connection );
-        monitor = new MonitorImplExt( dataSource, peerManager );
+        //Connection connection = mock( Connection.class );
+        //PreparedStatement preparedStatement = mock( PreparedStatement.class );
+        //when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
+
+        when( entityManagerFactory.createEntityManager() ).thenReturn( entityManager );
+        when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
+
+
+        monitor = new MonitorImplExt( peerManager, daoManager, environmentManager );
         monitor.setMonitorDao( monitorDao );
 
-        containerHostMetric = mock( ContainerHostMetric.class );
+
+        containerHostMetric = mock( ContainerHostMetricImpl.class );
         when( containerHostMetric.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
+        when( containerHostMetric.getHostId() ).thenReturn( HOST_ID );
         when( alertListener.getSubscriberId() ).thenReturn( SUBSCRIBER_ID );
         alertListeners = Sets.newHashSet( alertListener );
         monitor.setMetricListeners( alertListeners );
@@ -143,23 +161,12 @@ public class MonitorImplTest
         when( localPeer.isLocal() ).thenReturn( true );
         when( remotePeer.isLocal() ).thenReturn( false );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
-        when( environment.getContainers() ).thenReturn( Sets.newHashSet( containerHost ) );
+        when( environment.getContainerHosts() ).thenReturn( Sets.newHashSet( containerHost ) );
+        when( environment.getContainerHostById( HOST_ID ) ).thenReturn( containerHost );
         when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID.toString() );
+        when( containerHost.getId() ).thenReturn( HOST_ID );
         when( localPeer.getResourceHosts() ).thenReturn( Sets.newHashSet( resourceHost ) );
-    }
-
-
-    @Test( expected = NullPointerException.class )
-    public void testConstructorShouldFailOnNullDataSource() throws Exception
-    {
-        new MonitorImpl( null, peerManager );
-    }
-
-
-    @Test( expected = NullPointerException.class )
-    public void testConstructorShouldFailOnNullPeerManager() throws Exception
-    {
-        new MonitorImpl( dataSource, null );
+        when( environmentManager.getEnvironments() ).thenReturn( Lists.newArrayList( environment ) );
     }
 
 
@@ -214,7 +221,7 @@ public class MonitorImplTest
 
         monitor.notifyOnAlert( containerHostMetric );
 
-        verify( containerHostMetric ).getEnvironmentId();
+        verify( containerHostMetric ).getHostId();
     }
 
 
@@ -279,8 +286,7 @@ public class MonitorImplTest
         String subscriberId = StringUtils.repeat( "s", 100 );
         when( alertListener.getSubscriberId() ).thenReturn( longSubscriberId );
         when( containerHost.getPeer() ).thenReturn( localPeer );
-        when( localPeer.getResourceHostByName( RESOURCE_HOST ) ).thenReturn( resourceHost );
-        when( containerHost.getParentHostname() ).thenReturn( RESOURCE_HOST );
+        when( localPeer.getResourceHostByContainerId(HOST_ID.toString()) ).thenReturn( resourceHost );
         CommandResult commandResult = mock( CommandResult.class );
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
@@ -341,6 +347,7 @@ public class MonitorImplTest
     }
 
 
+
     @Test
     public void testGetContainerHostMetrics() throws Exception
     {
@@ -349,11 +356,10 @@ public class MonitorImplTest
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( commandResult.getStdOut() ).thenReturn( METRIC_JSON );
         when( containerHost.getPeer() ).thenReturn( localPeer );
-        when( containerHost.getParentHostname() ).thenReturn( RESOURCE_HOST );
         when( localPeer.getContainerHostsByEnvironmentId( ENVIRONMENT_ID ) )
                 .thenReturn( Sets.newHashSet( containerHost ) );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
-        when( localPeer.getResourceHostByName( RESOURCE_HOST ) ).thenReturn( resourceHost );
+        when( localPeer.getResourceHostByContainerId( HOST_ID.toString() ) ).thenReturn( resourceHost );
 
         Set<ContainerHostMetric> metrics = monitor.getContainerHostsMetrics( environment );
 
@@ -361,6 +367,7 @@ public class MonitorImplTest
         assertEquals( ENVIRONMENT_ID, metric.getEnvironmentId() );
         assertEquals( HOST, metric.getHost() );
         assertEquals( METRIC_VALUE, metric.getTotalRam() );
+
     }
 
 
@@ -370,7 +377,8 @@ public class MonitorImplTest
 
         when( containerHost.getPeer() ).thenReturn( remotePeer );
         ContainerHostMetricResponse response = mock( ContainerHostMetricResponse.class );
-        when( remotePeer.sendRequest( anyObject(), anyString(), anyInt(), eq( ContainerHostMetricResponse.class ) ) )
+        when( remotePeer
+                .sendRequest( anyObject(), anyString(), anyInt(), eq( ContainerHostMetricResponse.class ), anyInt() ) )
                 .thenReturn( response );
         ContainerHostMetricImpl metric = JsonUtil.fromJson( METRIC_JSON, ContainerHostMetricImpl.class );
         when( response.getMetrics() ).thenReturn( Sets.newHashSet( metric ) );
@@ -384,7 +392,8 @@ public class MonitorImplTest
 
         PeerException exception = mock( PeerException.class );
         doThrow( exception ).when( remotePeer )
-                            .sendRequest( anyObject(), anyString(), anyInt(), eq( ContainerHostMetricResponse.class ) );
+                            .sendRequest( anyObject(), anyString(), anyInt(), eq( ContainerHostMetricResponse.class ),
+                                    anyInt() );
 
 
         monitor.getContainerHostsMetrics( environment );
@@ -393,10 +402,11 @@ public class MonitorImplTest
     }
 
 
+    //    @Ignore
     @Test( expected = MonitorException.class )
     public void testGetContainerHostMetricsWithException() throws Exception
     {
-        PeerException exception = mock( PeerException.class );
+        Exception exception = mock( RuntimeException.class );
         doThrow( exception ).when( containerHost ).getPeer();
 
         monitor.getContainerHostsMetrics( environment );
@@ -408,13 +418,11 @@ public class MonitorImplTest
     {
         when( localPeer.getContainerHostsByEnvironmentId( ENVIRONMENT_ID ) )
                 .thenReturn( Sets.newHashSet( containerHost ) );
-        when( containerHost.getParentHostname() ).thenReturn( RESOURCE_HOST );
-
 
         monitor.getLocalContainerHostsMetrics( ENVIRONMENT_ID );
 
 
-        verify( containerHost, times( 2 ) ).getParentHostname();
+        verify( containerHost).getId();
     }
 
 
@@ -438,10 +446,9 @@ public class MonitorImplTest
     {
         when( localPeer.getContainerHostsByEnvironmentId( ENVIRONMENT_ID ) )
                 .thenReturn( Sets.newHashSet( containerHost ) );
-        when( containerHost.getParentHostname() ).thenReturn( RESOURCE_HOST );
 
         HostNotFoundException exception = mock( HostNotFoundException.class );
-        doThrow( exception ).when( localPeer ).getResourceHostByName( RESOURCE_HOST );
+        doThrow( exception ).when( localPeer ).getResourceHostByContainerId( HOST_ID.toString());
 
 
         monitor.getLocalContainerHostsMetrics( ENVIRONMENT_ID );
@@ -568,8 +575,7 @@ public class MonitorImplTest
     @Test
     public void testActivateMonitoringAtLocalContainers() throws Exception
     {
-        when( localPeer.getResourceHostByName( RESOURCE_HOST ) ).thenReturn( resourceHost );
-        when( containerHost.getParentHostname() ).thenReturn( RESOURCE_HOST );
+        when( localPeer.getResourceHostByContainerId( HOST_ID.toString() ) ).thenReturn( resourceHost );
         CommandResult commandResult = mock( CommandResult.class );
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
@@ -587,7 +593,7 @@ public class MonitorImplTest
 
 
         HostNotFoundException exception = mock( HostNotFoundException.class );
-        doThrow( exception ).when( localPeer ).getResourceHostByName( RESOURCE_HOST );
+        doThrow( exception ).when( localPeer ).getResourceHostByContainerId( HOST_ID.toString());
 
         monitor.activateMonitoringAtLocalContainers( Sets.newHashSet( containerHost ), monitoringSettings );
 
@@ -595,12 +601,12 @@ public class MonitorImplTest
     }
 
 
+    //    @Ignore
     @Test( expected = MonitorException.class )
     public void testActivateMonitoring() throws Exception
     {
         when( containerHost.getPeer() ).thenReturn( localPeer );
-        when( localPeer.getResourceHostByName( RESOURCE_HOST ) ).thenReturn( resourceHost );
-        when( containerHost.getParentHostname() ).thenReturn( RESOURCE_HOST );
+        when( localPeer.getResourceHostByContainerId( HOST_ID.toString() ) ).thenReturn( resourceHost );
         CommandResult commandResult = mock( CommandResult.class );
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
@@ -626,7 +632,7 @@ public class MonitorImplTest
         verify( remotePeer, times( 3 ) ).sendRequest( isA( MonitoringActivationRequest.class ), anyString(), anyInt() );
 
 
-        PeerException exception = mock( PeerException.class );
+        Exception exception = mock( RuntimeException.class );
         doThrow( exception ).when( containerHost ).getPeer();
 
         monitor.activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings );

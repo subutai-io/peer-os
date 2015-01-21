@@ -30,7 +30,7 @@ function demote {
   if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
 
   #check for master	
-  if [ $temp == "master" ]; then
+  if [ "x$temp" == "xmaster" ]; then
     msg_error "Master templated cannot be demoted. Aborting ..."
     unlock_container_read $temp
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
@@ -41,7 +41,6 @@ function demote {
   if [ -z "$temp" ]; then
     msg_error "Template argument not provided. Aborting ..."
     unlock_container_read $temp
-    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     show_usage "`demote_usage`"
   fi
 
@@ -61,7 +60,7 @@ function demote {
     unlock_container_read $temp
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
-  elif [ "true" == `is_registered $temp` -a "x$SUBUTAI_OFFLINE_MODE" != "xtrue" ]; then
+  elif [ "true" == "`is_registered $temp`" ]; then
     msg_error "Cannot demote registered template \"$temp\""
     unlock_container_read $temp
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
@@ -72,7 +71,6 @@ function demote {
 
   fs_demote_template $temp
   ovs_configure_lxc $temp
-  lxc_install_agent $temp
   msg_ok "Successfully demoted $temp"
   unlock_container_read $temp
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi

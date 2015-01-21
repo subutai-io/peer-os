@@ -8,9 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.sql.DataSource;
 
-import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
@@ -19,12 +17,14 @@ import org.safehaus.subutai.core.messenger.api.MessageProcessor;
 import org.safehaus.subutai.core.messenger.api.MessageStatus;
 import org.safehaus.subutai.core.messenger.api.Messenger;
 import org.safehaus.subutai.core.messenger.api.MessengerException;
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.common.dao.DaoManager;
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.gson.JsonSyntaxException;
 
 
@@ -37,33 +37,39 @@ public class MessengerImpl implements Messenger, MessageProcessor
     protected final Set<MessageListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MessageListener, Boolean>() );
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
-    private final PeerManager peerManager;
+    private   PeerManager peerManager;
     protected MessengerDao messengerDao;
     protected MessageSender messageSender;
+    private   DaoManager daoManager;
 
 
-    public MessengerImpl( final DataSource dataSource, final PeerManager peerManager ) throws MessengerException
+    public MessengerImpl( )
+            throws MessengerException
     {
-        Preconditions.checkNotNull( dataSource, "Data source is null" );
+    }
+
+    public void init( ) throws MessengerException
+    {
+        Preconditions.checkNotNull( peerManager );
+        Preconditions.checkNotNull( daoManager );
 
         try
         {
-            this.peerManager = peerManager;
-            this.messengerDao = new MessengerDao( dataSource );
+            this.messengerDao  = new MessengerDao( daoManager.getEntityManagerFactory());
             this.messageSender = new MessageSender( peerManager, messengerDao, this );
+
+            messageSender.init();
         }
-        catch ( DaoException e )
+        catch ( Exception e )
         {
+            LOG.error( "Error on creating entity manager.", e );
             throw new MessengerException( e );
         }
+        finally
+        {
+
+        }
     }
-
-
-    public void init()
-    {
-        messageSender.init();
-    }
-
 
     public void destroy()
     {
@@ -72,9 +78,35 @@ public class MessengerImpl implements Messenger, MessageProcessor
     }
 
 
+    public PeerManager getPeerManager()
+    {
+        return peerManager;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
+    }
+
+
+    public DaoManager getDaoManager()
+    {
+        return daoManager;
+    }
+
+
+    public void setDaoManager( final DaoManager daoManager )
+    {
+        this.daoManager = daoManager;
+    }
+
+
     @Override
     public Message createMessage( final Object payload )
     {
+        Preconditions.checkNotNull( payload, "Invalid payload" );
+
         return new MessageImpl( peerManager.getLocalPeer().getId(), payload );
     }
 
@@ -83,13 +115,18 @@ public class MessengerImpl implements Messenger, MessageProcessor
     public void sendMessage( final Peer peer, final Message message, final String recipient, final int timeToLive )
             throws MessageException
     {
+        Preconditions.checkNotNull( peer, "Peer is null" );
+        Preconditions.checkNotNull( message, "Message is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
+        Preconditions.checkArgument( timeToLive > 0, "Invalid time-to-live" );
+
         try
         {
-            Envelope envelope = new Envelope( ( MessageImpl ) message, peer.getId(), recipient, timeToLive );
+            Envelope envelope = new Envelope( message, peer.getId(), recipient, timeToLive );
 
             messengerDao.saveEnvelope( envelope );
         }
-        catch ( DaoException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in sendMessage", e );
             throw new MessageException( e );
@@ -100,6 +137,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
     @Override
     public MessageStatus getMessageStatus( final UUID messageId ) throws MessageException
     {
+        Preconditions.checkNotNull( messageId, "Invalid message id" );
 
         try
         {
@@ -124,7 +162,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
 
             return MessageStatus.NOT_FOUND;
         }
-        catch ( DaoException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in getMessageStatus", e );
             throw new MessageException( e );
@@ -165,19 +203,17 @@ public class MessengerImpl implements Messenger, MessageProcessor
     @Override
     public void addMessageListener( final MessageListener listener )
     {
-        if ( listener != null )
-        {
-            listeners.add( listener );
-        }
+        Preconditions.checkNotNull( listener );
+
+        listeners.add( listener );
     }
 
 
     @Override
     public void removeMessageListener( final MessageListener listener )
     {
-        if ( listener != null )
-        {
-            listeners.remove( listener );
-        }
+        Preconditions.checkNotNull( listener );
+
+        listeners.remove( listener );
     }
 }

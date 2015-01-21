@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -12,19 +11,25 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
+import org.safehaus.subutai.common.quota.DiskPartition;
+import org.safehaus.subutai.common.quota.DiskQuota;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
+import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.core.messenger.api.Message;
 import org.safehaus.subutai.core.messenger.api.MessageException;
 import org.safehaus.subutai.core.messenger.api.Messenger;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.Host;
-import org.safehaus.subutai.core.peer.api.HostKey;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Payload;
-import org.safehaus.subutai.core.peer.api.PeerException;
-import org.safehaus.subutai.core.peer.api.PeerInfo;
+import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.core.peer.api.RemotePeer;
 import org.safehaus.subutai.core.peer.impl.command.BlockingCommandCallback;
 import org.safehaus.subutai.core.peer.impl.command.CommandRequest;
@@ -32,7 +37,6 @@ import org.safehaus.subutai.core.peer.impl.command.CommandResponseListener;
 import org.safehaus.subutai.core.peer.impl.command.CommandResultImpl;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerRequest;
 import org.safehaus.subutai.core.peer.impl.container.CreateContainerResponse;
-import org.safehaus.subutai.core.peer.impl.model.ContainerHostEntity;
 import org.safehaus.subutai.core.peer.impl.request.MessageRequest;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponse;
 import org.safehaus.subutai.core.peer.impl.request.MessageResponseListener;
@@ -129,48 +133,24 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<ContainerHost> createContainers( final UUID creatorPeerId, final UUID environmentId,
-                                                final List<Template> templates, final int quantity,
-                                                final String strategyId, final List<Criteria> criteria,
-                                                String nodeGroupName ) throws PeerException
+    public Set<HostInfoModel> scheduleCloneContainers( final UUID creatorPeerId, final List<Template> templates,
+                                                       final int quantity, final String strategyId,
+                                                       final List<Criteria> criteria ) throws PeerException
     {
-        try
+
+        CreateContainerResponse response =
+                sendRequest( new CreateContainerRequest( creatorPeerId, templates, quantity, strategyId, criteria ),
+                        RecipientType.CONTAINER_CREATE_REQUEST.name(), Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT,
+                        CreateContainerResponse.class, Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT );
+
+        if ( response != null )
         {
-            //send create request
-            CreateContainerRequest request =
-                    new CreateContainerRequest( creatorPeerId, environmentId, templates, quantity, strategyId, criteria,
-                            nodeGroupName );
-
-            CreateContainerResponse response = sendRequest( request, RecipientType.CONTAINER_CREATE_REQUEST.name(),
-                    Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateContainerResponse.class );
-
-            if ( response != null )
-            {
-                Set<HostKey> hostKeys = response.getHostKeys();
-                Set<ContainerHost> result = getContainerHostImpl( hostKeys );
-                return result;
-            }
-            else
-            {
-                throw new PeerException( "Received null response" );
-            }
+            return response.getHosts();
         }
-        catch ( PeerException e )
+        else
         {
-            LOG.error( "Error in createContainers", e );
-            throw new PeerException( e.getMessage() );
+            throw new PeerException( "Command timed out" );
         }
-    }
-
-
-    private Set<ContainerHost> getContainerHostImpl( final Set<HostKey> hostKeys )
-    {
-        Set<ContainerHost> result = new HashSet<>();
-        for ( HostKey hostKey : hostKeys )
-        {
-            result.add( new ContainerHostEntity( hostKey ) );
-        }
-        return result;
     }
 
 
@@ -199,7 +179,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public boolean isConnected( final Host host ) throws PeerException
+    public boolean isConnected( final Host host )
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
         return remotePeerRestClient.isConnected( host );
@@ -207,16 +187,27 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public String getQuota( final ContainerHost host, final QuotaEnum quota ) throws PeerException
+    public PeerQuotaInfo getQuota( final ContainerHost host, final QuotaType quotaType ) throws PeerException
     {
-        throw new PeerException( "Operation not allowed." );
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.getQuota( host, quotaType );
     }
 
 
     @Override
-    public void setQuota( final ContainerHost host, final QuotaEnum quota, final String value ) throws PeerException
+    public void setQuota( final ContainerHost host, final QuotaInfo quotaInfo ) throws PeerException
     {
-        throw new PeerException( "Operation not allowed." );
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+        remotePeerRestClient.setQuota( host, quotaInfo );
+    }
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( final UUID containerId, final int processPid )
+            throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 10000, peerInfo.getIp(), "8181" );
+        return remotePeerRestClient.getProcessResourceUsage( containerId, processPid );
     }
 
 
@@ -310,16 +301,17 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public <T, V> V sendRequest( final T request, String recipient, final int timeout, Class<V> responseType )
-            throws PeerException
+    public <T, V> V sendRequest( final T request, String recipient, final int requestTimeout, Class<V> responseType,
+                                 int responseTimeout ) throws PeerException
     {
         Preconditions.checkNotNull( responseType, "Invalid response type" );
 
         //send request
-        MessageRequest messageRequest = sendRequestInternal( request, recipient, timeout );
+        MessageRequest messageRequest = sendRequestInternal( request, recipient, requestTimeout );
 
         //wait for response here
-        MessageResponse messageResponse = messageResponseListener.waitResponse( messageRequest.getId(), timeout );
+        MessageResponse messageResponse =
+                messageResponseListener.waitResponse( messageRequest.getId(), requestTimeout, responseTimeout );
 
         if ( messageResponse != null )
         {
@@ -338,26 +330,33 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public <T> void sendRequest( final T request, final String recipient, final int timeout ) throws PeerException
+    public <T> void sendRequest( final T request, final String recipient, final int requestTimeout )
+            throws PeerException
     {
-        sendRequestInternal( request, recipient, timeout );
+        sendRequestInternal( request, recipient, requestTimeout );
     }
 
 
-    private <T> MessageRequest sendRequestInternal( final T request, final String recipient, final int timeout )
+    @Override
+    public ContainerHostState getContainerHostState( final String containerId ) throws PeerException
+    {
+        throw new UnsupportedOperationException( "Not implemented yet." );
+    }
+
+
+    private <T> MessageRequest sendRequestInternal( final T request, final String recipient, final int requestTimeout )
             throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
-        Preconditions.checkArgument( timeout > 0, "Timeout must be greater than 0" );
+        Preconditions.checkArgument( requestTimeout > 0, "Timeout must be greater than 0" );
 
         MessageRequest messageRequest = new MessageRequest( new Payload( request, localPeer.getId() ), recipient );
         Message message = messenger.createMessage( messageRequest );
 
         try
         {
-            messenger.sendMessage( this, message, RecipientType.PEER_REQUEST_LISTENER.name(),
-                    Timeouts.PEER_MESSAGE_TIMEOUT );
+            messenger.sendMessage( this, message, RecipientType.PEER_REQUEST_LISTENER.name(), requestTimeout );
         }
         catch ( MessageException e )
         {
@@ -365,5 +364,79 @@ public class RemotePeerImpl implements RemotePeer
         }
 
         return messageRequest;
+    }
+
+    // ********** Quota functions *****************
+
+
+    @Override
+    public int getRamQuota( final UUID containerId ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        return remotePeerRestClient.getRamQuota( containerId );
+    }
+
+
+    @Override
+    public void setRamQuota( final UUID containerId, final int ramInMb ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        remotePeerRestClient.setRamQuota( containerId, ramInMb );
+    }
+
+
+    @Override
+    public int getCpuQuota( final UUID containerId ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        return remotePeerRestClient.getCpuQuota( containerId );
+    }
+
+
+    @Override
+    public void setCpuQuota( final UUID containerId, final int cpuPercent ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        remotePeerRestClient.setCpuQuota( containerId, cpuPercent );
+    }
+
+
+    @Override
+    public Set<Integer> getCpuSet( final UUID containerId ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        return remotePeerRestClient.getCpuSet( containerId );
+    }
+
+
+    @Override
+    public void setCpuSet( final UUID containerId, final Set<Integer> cpuSet ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        remotePeerRestClient.setCpuSet( containerId, cpuSet );
+    }
+
+
+    @Override
+    public DiskQuota getDiskQuota( final UUID containerId, final DiskPartition diskPartition ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        return remotePeerRestClient.getDiskQuota( containerId, diskPartition );
+    }
+
+
+    @Override
+    public void setDiskQuota( final UUID containerId, final DiskQuota diskQuota ) throws PeerException
+    {
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( peerInfo.getIp(), "8181" );
+
+        remotePeerRestClient.setDiskQuota( containerId, diskQuota );
     }
 }

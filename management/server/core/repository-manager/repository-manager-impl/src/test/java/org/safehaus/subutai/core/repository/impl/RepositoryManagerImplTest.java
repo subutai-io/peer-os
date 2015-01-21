@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.repository.impl;
 
 
-import java.io.PrintStream;
 import java.util.Set;
 
 import org.junit.Before;
@@ -14,7 +13,6 @@ import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.repository.api.PackageInfo;
 import org.safehaus.subutai.core.repository.api.RepositoryException;
@@ -35,8 +33,18 @@ import static org.mockito.Mockito.when;
 public class RepositoryManagerImplTest
 {
     private static final String ARGUMENT = "argument";
+    private static final String SHORT_NAME = "hadoop-subutai-template";
+    private static final String FULL_NAME = "hadoop-subutai-template_2.1.0_amd64.deb";
     private static final String LIST_OUTPUT = "subutai-repo-hbase - Subutai Repository Package";
-    private static final String PACKAGE_INFO = "Some package info";
+    private static final String PACKAGE_INFO = "Package: hadoop-subutai-template\n" + "Maintainer: subutai\n"
+            + "Architecture: amd64\n" + "Version: 2.1.0\n"
+            + "Depends: subutai-cli (>= 2.1.0), master-subutai-template (= 2.1.0)\n" + "Priority: optional\n"
+            + "Section: devel\n"
+            + "Filename: pool/main/h/hadoop-subutai-template/hadoop-subutai-template_2.1.0_amd64.deb\n"
+            + "Size: 348573636\n" + "SHA256: 79a1c342c4bf99b588e6df3ce4cdccf889de5d5249024c69af01845d7814ef1f\n"
+            + "SHA1: c005a1d82d6a46af97612c6d3c2e2e59524a2865\n" + "MD5sum: 3fee4a7c3530f3c0d54964c8ca8a4a96\n"
+            + "Description: This is a Subutai delta image debian package of hadoop template\n"
+            + "Description-md5: d7a727affd4f3f44c48851e84dc4dabe\n";
     private static final Set<String> FILES = Sets.newHashSet( ARGUMENT );
 
     @Mock
@@ -195,5 +203,17 @@ public class RepositoryManagerImplTest
         String packageInfo = repositoryManager.getPackageInfo( ARGUMENT );
 
         assertEquals( PACKAGE_INFO, packageInfo );
+    }
+
+
+    @Test
+    public void testGetFullPackageName() throws Exception
+    {
+
+        when( result.getStdOut() ).thenReturn( PACKAGE_INFO );
+
+        String fullPackageName = repositoryManager.getFullPackageName( SHORT_NAME );
+
+        assertEquals( FULL_NAME, fullPackageName );
     }
 }

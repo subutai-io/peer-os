@@ -9,6 +9,15 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/get-quota">
+      <action class="org.safehaus.subutai.core.peer.cli.GetContainerQuotaCommand">
+        <argument ref="peerManager" />
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/register">
       <action class="org.safehaus.subutai.core.peer.cli.RegisterCommand">
         <property name="peerManager" ref="peerManager" />
@@ -51,24 +60,6 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/clone">
-      <action class="org.safehaus.subutai.core.peer.cli.CloneCommand">
-        <property name="peerManager" ref="peerManager" />
-        <property name="templateRegistry" ref="templateRegistry" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/remote-clone">
-      <action class="org.safehaus.subutai.core.peer.cli.RemoteCloneCommand">
-        <property name="peerManager" ref="peerManager" />
-        <property name="templateRegistry" ref="templateRegistry" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/hosts">
       <action class="org.safehaus.subutai.core.peer.cli.HostsCommand">
         <property name="peerManager" ref="peerManager" />
@@ -102,7 +93,14 @@
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/tasks">
-      <action class="org.safehaus.subutai.core.peer.cli.TaksCommand">
+      <action class="org.safehaus.subutai.core.peer.cli.TaskCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/tag-container">
+      <action class="org.safehaus.subutai.core.peer.cli.TagCommand">
         <property name="peerManager" ref="peerManager" />
       </action>
     </command>
@@ -111,6 +109,8 @@
   <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
+  <reference id="environmentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
   <!--<reference id="peerCommandDispatcher" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher" />-->
 

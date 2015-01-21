@@ -21,8 +21,7 @@ public class PeerManagerImplTest
 {
 
     PeerManagerImpl peerManager;
-    @Mock
-    DataSource dataSource;
+
     @Mock
     Messenger messenger;
 
@@ -30,7 +29,7 @@ public class PeerManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-        peerManager = new PeerManagerImpl( dataSource, messenger );
+        peerManager = new PeerManagerImpl( messenger );
     }
 
 

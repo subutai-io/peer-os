@@ -2,17 +2,26 @@ package org.safehaus.subutai.core.peer.impl;
 
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.quota.DiskPartition;
+import org.safehaus.subutai.common.quota.DiskQuota;
+import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.Host;
-import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.peer.HostInfoModel;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +31,6 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 
 /**
@@ -34,10 +41,9 @@ public class RemotePeerRestClient
 
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
     private static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 5;
-    private static final long CONNECTION_TIMEOUT = 1000 * 60 * 1;
+    private static final long CONNECTION_TIMEOUT = 1000 * 60;
     private final long receiveTimeout;
     private final long connectionTimeout;
-    public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private String baseUrl = "http://%s:%s/cxf";
 
 
@@ -91,8 +97,7 @@ public class RemotePeerRestClient
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
             return JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHost>>()
-            {
-            }.getType() );
+            {}.getType() );
         }
 
         if ( response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() )
@@ -160,13 +165,8 @@ public class RemotePeerRestClient
     }
 
 
-    public boolean isConnected( final Host host ) throws PeerException
+    public boolean isConnected( final Host host )
     {
-
-        if ( !( host instanceof ContainerHost ) )
-        {
-            throw new PeerException( "Operation not allowed." );
-        }
         String path = "peer/container/isconnected";
 
 
@@ -183,7 +183,8 @@ public class RemotePeerRestClient
         }
         else
         {
-            throw new PeerException( response.getEntity().toString() );
+            LOG.error( response.getEntity().toString() );
+            return false;
         }
     }
 
@@ -231,6 +232,312 @@ public class RemotePeerRestClient
         catch ( Exception ce )
         {
             throw new PeerException( "Could not retrieve remote peer ID.", ce.toString() );
+        }
+    }
+
+
+    public Set<HostInfoModel> scheduleCloneContainers( final UUID creatorPeerId, final List<Template> templates,
+                                                       final int quantity, final String strategyId,
+                                                       final List<Criteria> criteria ) throws PeerException
+    {
+        String path = "peer/container/schedule";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+        form.set( "creatorPeerId", creatorPeerId );
+        form.set( "templates", JsonUtil.toJson( templates ) );
+        form.set( "quantity", quantity );
+        form.set( "strategyId", strategyId );
+        form.set( "criteria", JsonUtil.toJson( criteria ) );
+
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                  .accept( MediaType.APPLICATION_JSON ).post( form );
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<Set<HostInfoModel>>()
+            {}.getType() );
+        }
+        else
+        {
+            throw new PeerException( "Could not clone remote containers.", response.getEntity().toString() );
+        }
+    }
+
+
+    public void setQuota( ContainerHost host, QuotaInfo quotaInfo ) throws PeerException
+    {
+        String path = "peer/container/quota";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+
+        form.set( "hostId", host.getId().toString() );
+        form.set( "quotaInfo", JsonUtil.toJson( quotaInfo ) );
+
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE ).post( form );
+
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        {
+            throw new PeerException( "Could not set quota", response.getEntity().toString() );
+        }
+    }
+
+
+    public PeerQuotaInfo getQuota( ContainerHost host, QuotaType quotaType ) throws PeerException
+    {
+        String path = "peer/container/quota";
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "hostId", host.getId().toString() )
+                      .query( "quotaType", JsonUtil.toJson( quotaType ) ).get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<PeerQuotaInfo>()
+            {}.getType() );
+        }
+        else
+        {
+            throw new PeerException( "Could not get quota", response.getEntity().toString() );
+        }
+    }
+
+
+    public ProcessResourceUsage getProcessResourceUsage( UUID containerId, int processPid ) throws PeerException
+    {
+        String path = "peer/container/resource/usage";
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "hostId", containerId.toString() )
+                      .query( "processPid", processPid ).get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<ProcessResourceUsage>()
+            {}.getType() );
+        }
+        else
+        {
+            throw new PeerException( "Could not get process resource usage", response.getEntity().toString() );
+        }
+    }
+
+
+    //******** Quota functions ***********
+
+
+    /**
+     * Returns RAM quota on container in megabytes
+     *
+     * @param containerId - id of container
+     *
+     * @return - quota in mb
+     */
+    public int getRamQuota( UUID containerId ) throws PeerException
+    {
+        String path = "peer/container/quota/ram";
+
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "containerId", containerId.toString() )
+                      .get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return response.readEntity( Integer.class );
+        }
+        else
+        {
+            throw new PeerException( "Could not get RAM quota", response.getEntity().toString() );
+        }
+    }
+
+
+    /**
+     * Sets RAM quota on container in megabytes
+     *
+     * @param containerId - id of container
+     * @param ramInMb - quota in mb
+     */
+    public void setRamQuota( UUID containerId, int ramInMb ) throws PeerException
+    {
+        String path = "peer/container/quota/ram";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+
+        form.set( "containerId", containerId.toString() );
+        form.set( "ram", ramInMb );
+
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE ).post( form );
+
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        {
+            throw new PeerException( "Could not set RAM quota", response.getEntity().toString() );
+        }
+    }
+
+
+    /**
+     * Returns CPU quota on container in percent
+     *
+     * @param containerId - id of container
+     *
+     * @return - cpu quota on container in percent
+     */
+    public int getCpuQuota( UUID containerId ) throws PeerException
+    {
+        String path = "peer/container/quota/cpu";
+
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "containerId", containerId.toString() )
+                      .get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return response.readEntity( Integer.class );
+        }
+        else
+        {
+            throw new PeerException( "Could not get CPU quota", response.getEntity().toString() );
+        }
+    }
+
+
+    /**
+     * Sets CPU quota on container in percent
+     *
+     * @param containerId - id of container
+     * @param cpuPercent - cpu quota in percent
+     */
+    public void setCpuQuota( UUID containerId, int cpuPercent ) throws PeerException
+    {
+        String path = "peer/container/quota/cpu";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+
+        form.set( "containerId", containerId.toString() );
+        form.set( "cpu", cpuPercent );
+
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE ).post( form );
+
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        {
+            throw new PeerException( "Could not set CPU quota", response.getEntity().toString() );
+        }
+    }
+
+
+    /**
+     * Returns allowed cpus/cores ids on container
+     *
+     * @param containerId - id of container
+     *
+     * @return - allowed cpu set
+     */
+    public Set<Integer> getCpuSet( UUID containerId ) throws PeerException
+    {
+        String path = "peer/container/quota/cpuset";
+
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "containerId", containerId.toString() )
+                      .get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<Set<Integer>>()
+            {}.getType() );
+        }
+        else
+        {
+            throw new PeerException( "Could not get allowed CPU set", response.getEntity().toString() );
+        }
+    }
+
+
+    /**
+     * Sets allowed cpus/cores on container
+     *
+     * @param containerId - id of container
+     * @param cpuSet - allowed cpu set
+     */
+    public void setCpuSet( UUID containerId, Set<Integer> cpuSet ) throws PeerException
+    {
+        String path = "peer/container/quota/cpuset";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+
+        form.set( "containerId", containerId.toString() );
+        form.set( "cpuSet", JsonUtil.toJson( cpuSet ) );
+
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE ).post( form );
+
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        {
+            throw new PeerException( "Could not set allowed CPU set", response.getEntity().toString() );
+        }
+    }
+
+
+    public DiskQuota getDiskQuota( final UUID containerId, final DiskPartition diskPartition ) throws PeerException
+    {
+        String path = "peer/container/quota/disk";
+
+
+        WebClient client = createWebClient();
+
+        Response response =
+                client.path( path ).accept( MediaType.APPLICATION_JSON ).query( "containerId", containerId.toString() )
+                      .query( "diskPartition", JsonUtil.toJson( diskPartition ) ).get();
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        {
+            return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<DiskQuota>()
+            {}.getType() );
+        }
+        else
+        {
+            throw new PeerException( "Could not get disk quota", response.getEntity().toString() );
+        }
+    }
+
+
+    public void setDiskQuota( final UUID containerId, final DiskQuota diskQuota ) throws PeerException
+    {
+        String path = "peer/container/quota/disk";
+
+        WebClient client = createWebClient();
+
+        Form form = new Form();
+
+        form.set( "containerId", containerId.toString() );
+        form.set( "diskQuota", JsonUtil.toJson( diskQuota ) );
+
+        Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE ).post( form );
+
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        {
+            throw new PeerException( "Could not set disk quota", response.getEntity().toString() );
         }
     }
 }

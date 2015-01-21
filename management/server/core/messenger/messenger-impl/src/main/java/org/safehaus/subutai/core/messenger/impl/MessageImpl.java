@@ -23,6 +23,15 @@ public class MessageImpl implements Message
     private String payloadString;
 
 
+    public MessageImpl( Message message )
+    {
+        this.sourcePeerId = message.getSourcePeerId();
+        payloadString = message.getPayload();
+        id = message.getId();
+        sender = message.getSender();
+    }
+
+
     public MessageImpl( UUID sourcePeerId, Object payload )
     {
         Preconditions.checkNotNull( sourcePeerId, "Source peer id is null" );
@@ -69,6 +78,13 @@ public class MessageImpl implements Message
                 String.format( "Max sender length must be %d", MAX_SENDER_LEN ) );
 
         this.sender = sender;
+    }
+
+
+    @Override
+    public String getPayload()
+    {
+        return payloadString;
     }
 
 

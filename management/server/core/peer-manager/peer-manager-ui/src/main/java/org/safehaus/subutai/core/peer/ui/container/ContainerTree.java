@@ -13,11 +13,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.server.ui.component.ConcurrentComponent;
 import org.slf4j.Logger;
@@ -75,11 +75,14 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
                     Host host = ( Host ) item.getItemProperty( "value" ).getValue();
                     if ( host != null )
                     {
-                        //TODO: remove agent
-                        description =
-                                "Hostname: " + host.getHostname() + "<br>" + "MAC: " + host.getAgent().getMacAddress()
-                                        + "<br>" + "UUID: " + host.getHostId() + "<br>" + "IP: " + host.getAgent()
-                                                                                                       .getListIP();
+                        String intfName = "br-int";
+                        if ( host instanceof ContainerHost )
+                        {
+                            intfName = "eth0";
+                        }
+                        description = "Hostname: " + host.getHostname() + "<br>" + "MAC: " + host
+                                .getMacByInterfaceName( intfName ) + "<br>" + "UUID: " + host.getHostId() + "<br>"
+                                + "IP: " + host.getIpByInterfaceName( intfName );
                     }
                 }
 
@@ -223,13 +226,13 @@ public class ContainerTree extends ConcurrentComponent implements Disposable
             // not registered containers
             //                for ( ResourceHostInfo resourceHostInfo : hostRegistry.getResourceHostsInfo() )
             //                {
-            //                    if ( resourceHostInfo.getContainers() != null )
+            //                    if ( resourceHostInfo.getContainerHosts() != null )
             //                    {
             //                        Item parentItem = container.getItem( resourceHostInfo.getId() );
             //                        if ( parentItem != null )
             //                        {
             //                            for ( ContainerHostInfo containerHostInfo : resourceHostInfo
-            // .getContainers() )
+            // .getContainerHosts() )
             //                            {
             //                                container.setChildrenAllowed( resourceHostInfo.getId(), true );
             //                                Item containerHostItem = container.getItem( containerHostInfo.getId

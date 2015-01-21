@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.filetracker.api;
 
 import java.util.Set;
 
-import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.common.peer.Host;
 
 
 public interface FileTracker

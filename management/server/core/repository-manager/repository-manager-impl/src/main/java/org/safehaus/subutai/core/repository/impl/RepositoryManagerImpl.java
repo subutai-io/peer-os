@@ -3,13 +3,15 @@ package org.safehaus.subutai.core.repository.impl;
 
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
-import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.repository.api.PackageInfo;
 import org.safehaus.subutai.core.repository.api.RepositoryException;
@@ -136,5 +138,24 @@ public class RepositoryManagerImpl implements RepositoryManager
         CommandResult result = executeCommand( commands.getPackageInfoCommand( packageName ) );
 
         return result.getStdOut();
+    }
+
+
+    @Override
+    public String getFullPackageName( final String shortPackageName ) throws RepositoryException
+    {
+        String packageInfo = getPackageInfo( shortPackageName );
+        Pattern p = Pattern.compile( "Filename:.+/(.+deb)" );
+        Matcher m = p.matcher( packageInfo );
+        if ( m.find() )
+        {
+            return m.group( 1 );
+        }
+        else
+        {
+            throw new RepositoryException(
+                    String.format( "Could not obtain full name by short name %s from:%n%s", shortPackageName,
+                            packageInfo ) );
+        }
     }
 }

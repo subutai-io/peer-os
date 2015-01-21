@@ -5,7 +5,7 @@ function promote_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Converts an instance container into a template
   echo
-  echo "        "subutai promote container
+  echo "        "subutai \[-qh\] promote container \[\[-c\] -n new_container_name\] \[-b pre-execution-scripts\|\"all\"\] 
   echo
   echo -----------------------------------------------------------------------
 }
@@ -34,10 +34,18 @@ function promote {
     shift
   fi
 
+  local lxc="$1"
+  lxc_assert "$lxc" "`promote_usage`"
+
+  if [ $1 = $lxc ]; then
+    shift
+  fi
+
   copyit="false"
   newname=""
 
-  while getopts ":cn:" opt; do
+
+  while getopts ":cn:b:" opt; do
     case $opt in
       n)
         newname="$OPTARG"
@@ -45,46 +53,43 @@ function promote {
       c)
         copyit="true"
         ;;
+      b)
+        preScriptsEnabled="true"
+        preScripts=$OPTARG
+        ;;
+      :)
+        msg_error "Option -$OPTARG requires an argument"
+        exit 1
+        ;;
       \?)
         msg_error "Unrecognized option -$OPTARG"
         exit 1
         ;;
     esac
   done
-
+ 
   if [ "$copyit" == "true" -a -z "$newname" ]; then
     msg_error "Cannot use -c option without -n option"
     exit 1
   fi
 
-  if [ -n "$newname" ]; then
-    while true; do
-      if [ "$1" == "$newname" ]; then
-        shift
-        break
-      else
-        shift
-      fi
-    done
-  fi
-
   if [ "$TEST_MODE" == "true" ]; then
     echo ---- TEST_MODE DUMP ----
+    echo -e "optind\t= $OPTIND"
     echo -e "operand count\t= $#"
     echo -e "operands\t= $@"
     echo -e "newname\t= $newname"
     echo -e "copyit\t= $copyit"
+    echo -e "prescripts\t= $preScripts"
     echo
   fi
- 
-  local lxc="$1"
-
+  
   if [ "`are_containers_writable $lxc`" == "true" ]
   then
      msg_error "Container(s) locked by a subutai process"
      exit 1
   fi
-
+ 
   lock_container_read $lxc
   if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
 
@@ -99,7 +104,6 @@ function promote {
   # ---------------------------------------------------------------------------
   # (1) perform some sanity checks
   # ---------------------------------------------------------------------------
-  lxc_assert $lxc
 
   # check to make sure the container is NOT already a template
   if [ "`fs_is_template $lxc`" == "true" ]; then
@@ -110,15 +114,19 @@ function promote {
   else
     msg_info "    - check passed: \"$lxc\" is NOT a template"
   fi
-
+  templatename="$lxc"
+  if [ -n $newname ] && [ "x$newname" != "x" ]; then
+    templatename="$newname"
+    lxc_assert_no "$templatename" "`promote_usage`"
+  fi
   # check to make sure container is NOT registered as a template
-  if [ "`is_registered $lxc`" == "true" -a "x$SUBUTAI_OFFLINE_MODE" != "xtrue" ]; then
+  if [ "`is_registered $lxc`" == "true" ]; then
     msg_error "A template with name \"$lxc\" is registered. Aborting ..."
     unlock_container_read $lxc
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
-    msg_info "    - check passed: \"$lxc\" is NOT registered"
+    msg_info "    - check passed: \"$templatename\" is NOT registered"
   fi
 
   parent=`fs_get_parent $lxc`
@@ -146,12 +154,10 @@ function promote {
   # if a newname is specified check to see such a container does not exist
   # make a copy of the container before converting it into a template
   if [ -n "$newname" -a "true" == "$copyit" ]; then
-    lxc_assert_no "$newname" "`usage`"
     lxc_stop "$lxc"
     lxc_copy "$lxc" "$newname"
     lxc_template="$newname"
   elif [ -n "$newname" -a "false" == "$copyit" ]; then
-    lxc_assert_no "$newname" "`usage`"
     lxc_stop "$lxc"
     lxc_rename "$lxc" "$newname"
     lxc_template="$newname"
@@ -167,18 +173,24 @@ function promote {
   # ---------------------------------------------------------------------------
   # (2) replace package manifest next to config file
   # ---------------------------------------------------------------------------
+  if [ "x$preScriptsEnabled" == "xtrue" ]; then
+    if [ "x$preScripts" == "xall" ]; then
+      execute_all_prescripts "${FUNCNAME[0]}" $lxc_template
+    else
+      execute_prescripts "$preScripts" $lxc_template
+    fi
+  fi
+
   lxc_home=/var/lib/lxc/$lxc_template
   for debpkg in "`lxc-attach -n $lxc_template -- dpkg -l`"; do
     echo "$debpkg" >> $lxc_home/packages
   done
-
   # ---------------------------------------------------------------------------
   # (3) git operations
   # ---------------------------------------------------------------------------
-
   # add and commit all uncommitted files (should be some: /etc/hosts)
   if [ -n "$newname" ]; then
-    `git_rename_branch $lxc $lxc_template`
+    o=$(git_rename_branch $lxc $lxc_template > /dev/null 2>&1)
   fi
 
   uuid=`git_add_commit $lxc_template`
@@ -203,7 +215,7 @@ function promote {
   destroy_all_monitor $lxc_template
   msg_ok "Successfully promoted $lxc_template"
   unlock_container_read $lxc
-  if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+  if [ $? != 0 ]; then msg_error "Release read lock of $lxc"; exit 1; fi
 }
 
 

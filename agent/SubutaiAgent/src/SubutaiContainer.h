@@ -36,6 +36,7 @@
 #include <csignal>
 #include <sstream>
 #include <list>
+#include <algorithm>
 #include <lxc/lxccontainer.h>
 #include "pugixml.hpp"
 #include <stdio.h>
@@ -79,7 +80,6 @@ class SubutaiContainer
         SubutaiContainer(SubutaiLogger*, lxc_container*);
         virtual ~SubutaiContainer(void);
         bool getContainerId();
-        void tryLongCommand();
         void UpdateUsersList();
         void getContainerAllFields();
         bool getContainerInterfaces();
@@ -88,10 +88,10 @@ class SubutaiContainer
         string getState();
         void write();
         void clear();
-        bool checkCWD(string cwd);
-        bool checkUser(string username);
-        int getRunAsUserId(string username);
-        void PutToFile(string filename, string text);
+        bool checkCWD(string);
+        bool checkUser(string);
+        int getRunAsUserId(string);
+        void PutToFile(string, string);
         vector<Interface> getContainerInterfaceValues();
         lxc_container* getLxcContainerValue();
         string getContainerArch();
@@ -101,9 +101,10 @@ class SubutaiContainer
         string RunPsCommand();
         string findFullProgramPath(string );
         string RunProgram(string , vector<string>);
-        ExecutionResult RunCommand(SubutaiCommand* command);
-        ExecutionResult RunDaemon(SubutaiCommand* command);
-        ExecutionResult RunProgram(string , vector<string>, bool return_result, lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT, bool captureOutput = true);
+        ExecutionResult RunCommand(SubutaiCommand*);
+        ExecutionResult RunDaemon(SubutaiCommand* );
+        ExecutionResult RunProgram(string , vector<string>, bool , lxc_attach_options_t opts = LXC_ATTACH_OPTIONS_DEFAULT, bool captureOutput = true);
+        bool hasSubCommand(SubutaiCommand* command);
     protected:
         vector<string> ExplodeCommandArguments(SubutaiCommand* command);
     private:

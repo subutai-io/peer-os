@@ -2,8 +2,8 @@ package org.safehaus.subutai.core.environment.impl.environment;
 
 
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +26,7 @@ public class EnvironmentDestroyerThread implements Runnable
     @Override
     public void run()
     {
-        for ( ContainerHost container : environment.getContainers() )
+        for ( ContainerHost container : environment.getContainerHosts() )
         {
             try
             {

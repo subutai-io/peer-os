@@ -24,7 +24,7 @@ import org.safehaus.subutai.core.filetracker.api.FileTracker;
 import org.safehaus.subutai.core.filetracker.api.FileTrackerException;
 import org.safehaus.subutai.core.filetracker.api.InotifyEventType;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
-import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

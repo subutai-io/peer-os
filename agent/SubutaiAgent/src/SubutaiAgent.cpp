@@ -49,6 +49,9 @@
 #include <iostream>
 #include <string.h>
 #include <unistd.h>
+#include <deque>
+
+#define COMMAND_ID_MAX 300          // This is a maximum size of commandIdsList
 
 using namespace std;
 
@@ -103,6 +106,7 @@ int main(int argc,char *argv[],char *envp[])
     SubutaiEnvironment environment(&logMain);
     string input = "";
     string sendout;
+    deque<string> commandIdsList;
 
     if (!thread.getUserID().checkRootUser()) {
         //user is not root SubutaiAgent Will be closed
@@ -289,6 +293,23 @@ int main(int argc,char *argv[],char *envp[])
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request Command:", command.getCommand()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request runAs:", command.getRunAs()));
                     logMain.writeLog(7, logMain.setLogData("<SubutaiAgent>","Request timeout:", helper.toString(command.getTimeout())));
+
+                    bool isCommandNew = true;
+                    for (deque<string>::iterator it = commandIdsList.begin(); it != commandIdsList.end(); it++) {
+                        if ((*it) == command.getCommandId()) {
+                            isCommandNew = false;
+                        }
+                    }
+
+                    if (!isCommandNew) {
+                        continue;
+                    } else {
+                        commandIdsList.push_back(command.getCommandId());
+                        // Remove first command if amount of commands has exceeded maximum size
+                        if (commandIdsList.size() > COMMAND_ID_MAX) {
+                            commandIdsList.pop_front();
+                        }
+                    }
 
                     // Check if this uuid belongs the resource host or one of child containers
                     bool isLocal = true;

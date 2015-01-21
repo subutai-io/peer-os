@@ -6,18 +6,23 @@ import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.util.DbUtil;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyVararg;
@@ -32,74 +37,62 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class MonitorDaoTest
 {
-    @Mock
-    DbUtil dbUtil;
-    @Mock
-    DataSource dataSource;
+
     private final static String SUBSCRIBER_ID = "subscriber";
     private final static UUID ENVIRONMENT_ID = UUID.randomUUID();
 
     MonitorDaoExt monitorDao;
 
+    private EntityManagerFactory emf;
+
 
     static class MonitorDaoExt extends MonitorDao
     {
 
-        public MonitorDaoExt( final DataSource dataSource ) throws DaoException
+
+        public MonitorDaoExt( final EntityManagerFactory emf ) throws DaoException
         {
-            super( dataSource );
+            super( emf );
         }
 
-
-        @Override
-        protected void setupDb() throws DaoException
-        {
-            //no-op
-        }
-
-
-        public void testSetupDB() throws DaoException
-        {
-            super.setupDb();
-        }
-
-
-        public void setDbUtil( DbUtil dbUtil )
-        {
-            this.dbUtil = dbUtil;
-        }
     }
 
 
     private void throwDbException() throws SQLException
     {
-        when( dbUtil.select( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
-        when( dbUtil.update( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
+        EntityManagerFactory emf = mock( EntityManagerFactory.class );
+        EntityManager em = mock( EntityManager.class );
+        EntityManager em1 = mock( EntityManager.class );
+        EntityTransaction transaction = mock( EntityTransaction.class );
+        when( transaction.isActive() ).thenReturn( false );
+        when( em.getTransaction() ).thenThrow( new PersistenceException() ).thenReturn( transaction );
+        when( emf.createEntityManager() ).thenReturn( em1 ).thenReturn( em );
+        try
+        {
+            monitorDao = new MonitorDaoExt( emf );
+        }
+        catch ( DaoException e )
+        {
+            e.printStackTrace();
+        }
     }
 
 
     @Before
     public void setUp() throws Exception
     {
-        monitorDao = new MonitorDaoExt( dataSource );
-        monitorDao.setDbUtil( dbUtil );
-    }
+        emf = Persistence.createEntityManagerFactory( "default" );
 
-
-    @Test( expected = NullPointerException.class )
-    public void testConstructorShouldFailOnNullDataSource() throws Exception
-    {
-        new MonitorDao( null );
+        monitorDao = new MonitorDaoExt( emf );
     }
 
 
     @Test
     public void testAddSubscription() throws Exception
     {
-
         monitorDao.addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
 
-        verify( dbUtil ).update( anyString(), anyVararg() );
+        assertTrue( monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID ).contains( SUBSCRIBER_ID ) );
     }
 
 
@@ -118,7 +111,7 @@ public class MonitorDaoTest
 
         monitorDao.removeSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
 
-        verify( dbUtil ).update( anyString(), anyVararg() );
+        assertFalse( monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID ).contains( SUBSCRIBER_ID ) );
     }
 
 
@@ -134,11 +127,6 @@ public class MonitorDaoTest
     @Test
     public void testGetEnvironmentSubscribersIds() throws Exception
     {
-        ResultSet resultSet = mock( ResultSet.class );
-        when( dbUtil.select( anyString(), anyVararg() ) ).thenReturn( resultSet );
-        when( resultSet.next() ).thenReturn( true ).thenReturn( false );
-        when( resultSet.getString( anyString() ) ).thenReturn( SUBSCRIBER_ID );
-
         Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID );
 
         assertTrue( subscribersIds.contains( SUBSCRIBER_ID ) );
@@ -151,30 +139,5 @@ public class MonitorDaoTest
         throwDbException();
 
         monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID );
-    }
-
-
-    @Test
-    public void testSetupDb() throws Exception
-    {
-        monitorDao.testSetupDB();
-
-        ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass( String.class );
-
-
-        verify( dbUtil ).update( sqlCaptor.capture() );
-
-        assertEquals( "create table if not exists monitor_subscriptions(environmentId uuid, subscriberId varchar(100), "
-                + " PRIMARY KEY (environmentId, subscriberId));", sqlCaptor.getValue() );
-    }
-
-
-    @Test( expected = DaoException.class )
-    public void testSetupDbException() throws Exception
-    {
-
-        throwDbException();
-
-        monitorDao.testSetupDB();
     }
 }

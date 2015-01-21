@@ -5,19 +5,15 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.AgentUtil;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.common.peer.ContainerHost;
 
 
-/**
- * Commands for NetworkManager
- */
 public class Commands
 {
 
     public RequestBuilder getCreateSSHCommand()
     {
-        return new RequestBuilder( "rm -Rf /root/.ssh && " +
+        return new RequestBuilder( "rm -rf /root/.ssh && " +
                 "mkdir -p /root/.ssh && " +
                 "chmod 700 /root/.ssh && " +
                 "ssh-keygen -t dsa -P '' -f /root/.ssh/id_dsa" );
@@ -39,6 +35,15 @@ public class Commands
     }
 
 
+    public RequestBuilder getAppendSSHCommand( String key )
+    {
+        return new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
+                "chmod 700 /root/.ssh && " +
+                "echo '%s' >> /root/.ssh/authorized_keys && " +
+                "chmod 644 /root/.ssh/authorized_keys", key ) );
+    }
+
+
     public RequestBuilder getConfigSSHCommand()
     {
         return new RequestBuilder( "echo 'Host *' > /root/.ssh/config && " +
@@ -46,7 +51,7 @@ public class Commands
                 "chmod 644 /root/.ssh/config" );
     }
 
-    //TODO use host.getInterfaces
+
     public RequestBuilder getAddIpHostToEtcHostsCommand( String domainName, Set<ContainerHost> containerHosts )
     {
         StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
@@ -54,7 +59,7 @@ public class Commands
 
         for ( ContainerHost host : containerHosts )
         {
-            String ip = AgentUtil.getAgentIpByMask( host.getAgent(), Common.IP_MASK );
+            String ip = host.getIpByMask( Common.IP_MASK );
             String hostname = host.getHostname();
             cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
             appendHosts.append( "/bin/echo '" ).

@@ -4,9 +4,9 @@ package org.safehaus.subutai.core.security.impl;
 import java.util.Set;
 
 import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.CommandUtil;
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +25,7 @@ public class HostManager
     private Set<ContainerHost> containerHosts;
     private String domainName;
     private Commands commands;
+    private CommandUtil commandUtil;
 
 
     public HostManager( Set<ContainerHost> containerHosts, String domainName )
@@ -35,18 +36,18 @@ public class HostManager
         this.containerHosts = containerHosts;
         this.domainName = domainName;
         this.commands = new Commands();
+        this.commandUtil = new CommandUtil();
     }
 
 
-    public boolean execute() throws HostManagerException
+    public void execute() throws HostManagerException
     {
-        return write();
+        write();
     }
 
 
-    private boolean write() throws HostManagerException
+    private void write() throws HostManagerException
     {
-
 
         if ( !CollectionUtil.isCollectionEmpty( containerHosts ) )
         {
@@ -54,12 +55,9 @@ public class HostManager
             {
                 for ( ContainerHost containerHost : containerHosts )
                 {
-                    CommandResult command = containerHost.execute(
-                            commands.getAddIpHostToEtcHostsCommand( domainName, Sets.newHashSet( containerHosts ) ) );
-                    if ( !command.hasSucceeded() )
-                    {
-                        throw new HostManagerException( command.getStdOut() );
-                    }
+                    commandUtil.execute(
+                            commands.getAddIpHostToEtcHostsCommand( domainName, Sets.newHashSet( containerHosts ) ),
+                            containerHost );
                 }
             }
             catch ( CommandException e )
@@ -68,14 +66,13 @@ public class HostManager
                 throw new HostManagerException( e.getMessage() );
             }
         }
-        return true;
     }
 
 
-    public boolean execute( ContainerHost containerHost ) throws HostManagerException
+    public void execute( ContainerHost containerHost ) throws HostManagerException
     {
         Preconditions.checkNotNull( containerHost, "Agent is null" );
         containerHosts.add( containerHost );
-        return write();
+        write();
     }
 }

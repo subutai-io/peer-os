@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.messenger.api;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.common.peer.Peer;
 
 
 /**
@@ -15,7 +15,7 @@ public interface Messenger
     /**
      * Creates message with specified payload
      *
-     * @param payload - object to send
+     * @param payload - object to send. Object must not be of interface type and must not contain any interface types
      *
      * @return - message
      */

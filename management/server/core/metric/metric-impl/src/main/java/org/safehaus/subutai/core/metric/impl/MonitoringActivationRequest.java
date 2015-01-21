@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.common.peer.ContainerHost;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;

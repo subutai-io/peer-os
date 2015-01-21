@@ -1,0 +1,118 @@
+#!/bin/bash
+
+
+function quota_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Quota management of containers.
+  echo
+  echo "        "subutai \[-qh\] quota container quota_parameter \[quota_value\] \[additional_parameters\]
+  echo "           "quota_parameters:
+  echo "                             "ram -- quota for memory \(in megabytes\)
+  echo "                             "cpu -- quota for cpu \(in percentage\)
+  echo "                             "cpuset -- quota for cpusets
+  echo "                             "diskHome\|diskOpt\|diskVar\|diskRootfs\] -- quota for disk datasets
+  echo -----------------------------------------------------------------------
+}
+
+function quota {
+  OPTIND=0
+  if [ "$1" == "quota" ]; then
+    shift
+  fi
+
+  if [[ -z $1 ]]; then
+    quota_usage
+    exit 1;
+  fi
+
+  local container=$1
+  local resource_parameter=$2
+  local parameter_value=$3
+  lxc_assert "$container" "`quota_usage`" > /dev/null
+
+  if [[ -z $resource_parameter ]]; then
+    msg_error "Resource parameter not provided. Aborting..."
+    exit 1;
+  fi
+
+  if [ -z $parameter_value ]; then
+    case $resource_parameter in
+      "ram" )
+        lxc_get_memory_in_megabytes $container
+      ;;
+      "cpuset")
+        lxc_get_cpus $container
+      ;;
+      "cpu")
+        lxc_get_cpu_quota $container
+      ;;
+      "diskHome")
+        fs_get_quota $container "home"
+      ;;
+      "diskVar")
+        fs_get_quota $container "var"
+      ;;
+      "diskOpt")
+        fs_get_quota $container "opt"
+      ;;
+      "diskRootfs")
+        fs_get_quota $container "rootfs"
+      ;;
+      "json")
+        local memory_value=$(lxc_get_memory $container)
+        local memory_value=$( [ -z $memory_value ] &&  echo "none" || echo $memory_value )
+
+        local cpu_value=$(lxc_get_cpus $container)
+        local cpu_value=$( [ -z $cpu_value ] && echo "none" || printf "\"$cpu_value\"" )
+
+        local hdd_home_value=$(fs_get_quota $container "home")
+        local hdd_var_value=$(fs_get_quota $container "var")
+        local hdd_opt_value=$(fs_get_quota $container "opt")
+        local hdd_rootfs_value=$(fs_get_quota $container "rootfs")
+        printf "{memory.quota=$memory_value,cpu.cpus=$cpu_value,hdd.quota.home=$hdd_home_value, hdd.quota.var=$hdd_var_value, hdd.quota.opt=$hdd_opt_value, hdd.quota.rootfs=$hdd_rootfs_value}"
+      ;;
+      *)
+        msg_error "$resource_parameter is not a supported parameter! Aborting.."
+        exit 1
+    esac
+  else
+    case $resource_parameter in
+      "ram" )
+        # If the parameter for ram metric does not have K,M,G letters
+        # then set the default value to M which causes to be tread as megabytes
+        if [ "`is_number $parameter_value`" == "true" ]; then
+          local parameter_value=$parameter_value"M"
+        fi
+        lxc_set_memory $container $parameter_value
+        ;;
+      "cpuset" )
+        lxc_set_cpus $container $parameter_value
+      ;;
+      "cpu")
+        lxc_set_cpu_quota $container $parameter_value
+      ;;
+      "diskHome" )
+        fs_set_quota $container "home" $parameter_value
+      ;;
+      "diskVar")
+        fs_set_quota $container "var" $parameter_value
+      ;;
+      "diskOpt")
+        fs_set_quota $container "opt" $parameter_value
+      ;;
+      "diskRootfs")
+        fs_set_quota $container "rootfs" $parameter_value
+      ;;
+      *)
+        msg_error "$resource_parameter is not a supported parameter! Aborting.."
+        exit 1
+    esac
+  fi
+}
+
+
+function quota_description {
+  echo sets and gets container quotas;
+}
+
+

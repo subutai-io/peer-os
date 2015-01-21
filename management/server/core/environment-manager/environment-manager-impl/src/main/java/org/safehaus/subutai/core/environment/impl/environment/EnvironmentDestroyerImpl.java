@@ -32,7 +32,7 @@ public class EnvironmentDestroyerImpl implements EnvironmentDestroyer
 
         try
         {
-            int timeout = environment.getContainers().size() * approximateDestroyTime;
+            int timeout = environment.getContainerHosts().size() * approximateDestroyTime;
             executorService.awaitTermination( timeout, TimeUnit.SECONDS );
         }
         catch ( InterruptedException e )

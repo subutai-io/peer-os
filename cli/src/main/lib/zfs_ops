@@ -33,6 +33,7 @@ function fs_set_mountpoint {
   zfs set mountpoint=$child_rootfs lxc/$child
 }
 
+
 function fs_addmount {
   local name=$1
   local mount=$2
@@ -72,6 +73,7 @@ function fs_addmount {
   return
 }
 
+
 #snaphost ll holds on clone's rootfs
 function fs_snap_hold_readonly {
   local lxc_template="$1"
@@ -92,6 +94,7 @@ function fs_snap_hold_readonly {
   zfs set readonly=on lxc-data/$lxc_template-home
 }
 
+
 function fs_recv {
   local template="$1"
   local deltas="$2"
@@ -103,6 +106,7 @@ function fs_recv {
   zfs recv lxc-data/$template-home < $deltas/home.delta
 }
 
+
 #generate delta images of all filesystems
 function fs_send {
   local parent="$1"
@@ -113,6 +117,7 @@ function fs_send {
   zfs send -I "lxc-data/$parent-var@template" "lxc-data/$container-var@template" > "$deltas/var.delta"
   zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template" > "$deltas/home.delta"
 }
+
 
 function fs_remove_mount {
   child="$1"
@@ -152,6 +157,7 @@ function fs_rls_holds_delete_snaps {
     msg_info "    - \"$snap\" snapshot destroyed"
   done
 }
+
 
 #demote template
 function fs_demote_template {
@@ -348,6 +354,7 @@ function fs_list_templates {
   done
 }
 
+
 function fs_copy_ds {
   local from_ds="$1"
 
@@ -390,3 +397,182 @@ function fs_copy_ds {
   zfs destroy "$to_ds@$now"
 }
 
+
+function fs_get_quota {
+  local container=$1
+  local directory=$2
+
+  case $directory in
+    "home" )
+      container="lxc-data/$container-home";
+      ;;
+    "var")
+      container="lxc-data/$container-var";
+      ;;
+    "opt")
+      container="lxc/$container-opt";
+      ;;
+    "rootfs")
+      container="lxc/$container";
+      ;;
+    \?)
+      local lxc_home=$(fs_quota_operations "lxc-data/$container-home")
+      local lxc_var=$(fs_quota_operations "lxc-data/$container-var")
+      local lxc_opt=$(fs_quota_operations "lxc/$container-opt")
+      local lxc_rootfs=$(fs_quota_operations "lxc/$container")
+      # printf "home:\t%s\n" $lxc_home
+      # printf "opt:\t%s\n" $lxc_opt
+      # printf "var:\t%s\n" $lxc_var
+      # printf "rootfs:\t%s\n" $lxc_rootfs
+      ;;
+  esac
+  fs_quota_operations $container
+}
+
+
+function fs_get_quota_exact_values {
+  local container=$1
+  local dataset=$2
+  case $dataset in
+    "home" )
+      container="lxc-data/$container-home";
+    ;;
+    "var")
+      container="lxc-data/$container-var";
+    ;;
+    "opt")
+      container="lxc/$container-opt";
+    ;;
+    "rootfs")
+      container="lxc/$container";
+    ;;
+  esac
+
+  fs_quota_operations_exact_value $container
+}
+
+
+function fs_set_quota {
+  local container=$1
+  local directory=$2
+  local quota_value=$3
+
+  case $directory in
+    "home" )
+        container="lxc-data/$container-home";
+      ;;
+      "var")
+        container="lxc-data/$container-var";
+      ;;
+      "opt")
+        container="lxc/$container-opt";
+      ;;
+      "rootfs")
+        container="lxc/$container";
+      ;;
+      \?)
+        echo "Wrong directory name.";
+        exit 1;
+      ;;
+  esac
+
+  if [ -z "$quota_value" ]; then
+    echo "Please provide with quota value  for function to work in proper way.";
+    exit 1;
+  fi
+  fs_quota_operations $container $quota_value
+}
+
+
+function fs_get_disk_info {
+  local container=$1
+  local dataset=$2
+  local disk_parameter=$3
+
+  case $dataset in
+    "home")
+      dataset_name="lxc-data/$container-home";
+      ;;
+    "var")
+      dataset_name="lxc-data/$container-var";
+      ;;
+    "opt")
+      dataset_name="lxc/$container-opt";
+      ;;
+    "rootfs")
+      dataset_name="lxc/$container";
+      ;;
+    \?)
+      echo "Unsupported dataset $dataset! Aborting..";
+      exit 1;
+      ;;
+  esac
+  zfs get -p $disk_parameter $dataset_name | grep "$disk_parameter" | awk '{ print $3 }'
+}
+
+
+function fs_get_available_disk {
+  local container=$1
+  local dataset=$2
+  fs_get_disk_info $container $dataset "available"
+}
+
+
+function fs_get_used_disk {
+  local container=$1
+  local dataset=$2
+  fs_get_disk_info $container $dataset "used"
+}
+
+
+function fs_get_mount_point {
+  local dataset=$1
+  zfs get mountpoint $dataset | grep $dataset | awk '{ print $3 }'
+}
+
+
+# Returns total disk size of the resource host
+# by pool name in bytes
+function fs_get_physical_total_disk {
+  local pool=$1
+  zpool get -p size $pool | grep "$pool" | awk '{ print $3 }'
+}
+
+
+# Returns available disk size of the resource host
+# by pool name in bytes
+function fs_get_physical_available_disk {
+  local pool=$1
+  zfs get -p available $pool | grep "$pool" | awk '{ print $3 }'
+}
+
+
+# Returns used disk size of the resource host
+# by pool name in bytes
+function fs_get_physical_used_disk {
+  local pool=$1
+  zfs get -p used $pool | grep "$pool" | awk '{ print $3 }'
+}
+
+
+function fs_quota_operations {
+  local container=$1
+  local quota_value=$2
+  local cmd=
+  if [ -z $quota_value ]; then
+    cmd=$(zfs get quota $container)
+    echo $cmd | awk '{print $7}'
+  else
+    cmd=$(zfs set quota=$quota_value $container)
+    echo $cmd
+  fi
+}
+
+
+function fs_quota_operations_exact_value {
+  local container=$1
+  local cmd=
+  if [ -z $quota_value ]; then
+    zfs get -p quota $container | grep "$container" | awk '{print $3}'
+  fi
+}

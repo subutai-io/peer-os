@@ -18,6 +18,7 @@ import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.command.Response;
+import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.util.CollectionUtil;
 
 import com.google.common.base.Preconditions;
@@ -46,13 +47,11 @@ public class CommandUtil
         Preconditions.checkNotNull( requestBuilder );
         Preconditions.checkNotNull( host );
 
-        CommandResult result;
-
-        result = host.execute( requestBuilder );
+        CommandResult result = host.execute( requestBuilder );
 
         if ( !result.hasSucceeded() )
         {
-            throw new CommandException( String.format( "Error on container %s: %s", host.getHostname(),
+            throw new CommandException( String.format( "Error executing command on host %s: %s", host.getHostname(),
                     result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
         }
         return result;
@@ -60,7 +59,7 @@ public class CommandUtil
 
 
     /**
-     * Execute request on host with callback. Allows to stop callback from being triggerer by calling stop() from inside
+     * Execute request on host with callback. Allows to stop callback from being triggered by calling stop() from inside
      * a callback. Please make sure that the command is not a daemon command (command which forks a daemon process).
      * Otherwise please set request as a daemon request by calling RequestBuilder.daemon()
      *
@@ -93,7 +92,7 @@ public class CommandUtil
 
 
     /**
-     * Allows to execute the same command on multiple hosts in parallel, with the same callback for reponses from each
+     * Allows to execute the same command on multiple hosts in parallel, with the same callback for responses from each
      * host
      *
      * @param requestBuilder - request
@@ -207,7 +206,7 @@ public class CommandUtil
     }
 
 
-    public static boolean isStdOutContains( CommandResult commandResult, String text )
+    public static boolean stdOutContains( CommandResult commandResult, String text )
     {
         Preconditions.checkNotNull( commandResult, "CommandResult is null" );
         Preconditions.checkNotNull( text, "Text is null" );

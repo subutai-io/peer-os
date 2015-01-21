@@ -7,13 +7,10 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.core.network.api.N2NConnection;
+import org.safehaus.subutai.core.network.api.Tunnel;
 
-//import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
 
-
-/**
- * Created by bahadyr on 9/14/14.
- */
 public class EnvironmentBuildProcess
 {
     private UUID id;
@@ -21,6 +18,10 @@ public class EnvironmentBuildProcess
     private long timestamp;
     private Map<String, CloneContainersMessage> messageMap;
     private UUID blueprintId;
+
+    private N2NConnection n2nConnection;
+    private String keyFilePath;
+    private Tunnel tunnel;
 
 
     public EnvironmentBuildProcess( UUID blueprintId )
@@ -41,12 +42,6 @@ public class EnvironmentBuildProcess
     public long getTimestamp()
     {
         return timestamp;
-    }
-
-
-    public void setTimestamp( final int timestamp )
-    {
-        this.timestamp = timestamp;
     }
 
 
@@ -96,4 +91,43 @@ public class EnvironmentBuildProcess
     {
         this.id = id;
     }
+
+
+    public N2NConnection getN2nConnection()
+    {
+        return n2nConnection;
+    }
+
+
+    public void setN2nConnection( N2NConnection n2nConnection )
+    {
+        this.n2nConnection = n2nConnection;
+    }
+
+
+    public String getKeyFilePath()
+    {
+        return keyFilePath;
+    }
+
+
+    public void setKeyFilePath( String keyFilePath )
+    {
+        this.keyFilePath = keyFilePath;
+    }
+
+
+    public Tunnel getTunnel()
+    {
+        return tunnel;
+    }
+
+
+    public void setTunnel( Tunnel tunnel )
+    {
+        this.tunnel = tunnel;
+    }
+
+
 }
+

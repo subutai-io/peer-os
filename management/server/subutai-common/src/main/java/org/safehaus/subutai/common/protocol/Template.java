@@ -10,15 +10,17 @@ import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.safehaus.subutai.common.datatypes.TemplateVersion;
+import org.safehaus.subutai.common.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -28,17 +30,21 @@ import com.google.gson.annotations.Expose;
 /**
  * Template represents template entry in registry
  */
-@Entity(name = "Template")
-@IdClass(TemplatePK.class)
+@Entity( name = "Template" )
+//@IdClass( TemplatePK.class )
 //@Table(name = "Template")
-@NamedQueries(value = {
-        @NamedQuery(name = "Template.getAll", query = "SELECT t FROM Template t"),
-        @NamedQuery(name = "Template.getTemplateByNameArch",
-                query = "SELECT t FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = " + ":lxcArch"),
-        @NamedQuery(name = "Template.removeTemplateByNameArch",
-                query = "DELETE FROM Template t WHERE t.templateName = :templateName AND t.lxcArch = :lxcArch")
-})
-@XmlRootElement(name = "")
+@NamedQueries( value = {
+        @NamedQuery( name = "Template.getAll", query = "SELECT t FROM Template t" ),
+        @NamedQuery( name = "Template.getTemplateByNameArch",
+                query = "SELECT t FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = "
+                        + ":lxcArch" ),
+        @NamedQuery( name = "Template.getTemplateByNameArchMd5Version",
+                query = "SELECT t FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = "
+                        + ":lxcArch AND t.pk.templateVersion = :templateVersion AND t.pk.md5sum = :md5sum" ),
+        @NamedQuery( name = "Template.removeTemplateByNameArch",
+                query = "DELETE FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = :lxcArch" )
+} )
+@XmlRootElement( name = "" )
 public class Template
 {
 
@@ -47,19 +53,12 @@ public class Template
 
     public static final String QUERY_GET_ALL = "Template.getAll";
     public static final String QUERY_GET_TEMPLATE_BY_NAME_ARCH = "Template.getTemplateByNameArch";
+    public static final String QUERY_GET_TEMPLATE_BY_NAME_ARCH_MD5_VERSION = "Template.getTemplateByNameArchMd5Version";
     public static final String QUERY_REMOVE_TEMPLATE_BY_NAME_ARCH = "Template.removeTemplateByNameArch";
 
-    //    @EmbeddedId
-    //    TemplatePK pk;
-
-    @Id
     @Expose
-    private String templateName;
-
-
-    @Id
-    @Expose
-    private String lxcArch;
+    @EmbeddedId
+    TemplatePK pk;
 
 
     //name of parent template
@@ -106,16 +105,13 @@ public class Template
     //subutai products present only in this template excluding all subutai products present in the whole ancestry
     // lineage above
     @Expose
-    @ElementCollection(targetClass = String.class)
+    @ElementCollection( targetClass = String.class )
     private Set<String> products;
 
-    //template's md5sum hash
-    @Expose
-    private String md5sum;
 
     //indicates whether this template is in use on any of FAIs connected to Subutai
     @Expose
-    @ElementCollection(targetClass = String.class)
+    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> faisUsingThisTemplate = new HashSet<>();
 
     //indicates where template is generated
@@ -131,6 +127,7 @@ public class Template
     }
 
 
+    @Deprecated
     public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
                      final String subutaiParent, final String subutaiGitBranch, final String subutaiGitUuid,
                      final String packagesManifest, final String md5sum )
@@ -146,8 +143,9 @@ public class Template
         Preconditions.checkArgument( !Strings.isNullOrEmpty( packagesManifest ), "Missing packages manifest" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( md5sum ), "Missing md5sum" );
 
-        this.templateName = lxcUtsname;
-        this.lxcArch = lxcArch;
+        this.pk = new TemplatePK( lxcUtsname, lxcArch, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ), md5sum );
+        //        this.templateName = lxcUtsname;
+        //        this.lxcArch = lxcArch;
         //        this.pk = new TemplatePK( lxcUtsname, lxcArch );
         this.lxcUtsname = lxcUtsname;
         this.subutaiConfigPath = subutaiConfigPath;
@@ -156,13 +154,64 @@ public class Template
         this.subutaiGitUuid = subutaiGitUuid;
         this.packagesManifest = packagesManifest;
         this.parentTemplateName = subutaiParent;
-        this.md5sum = md5sum;
+        //        this.md5sum = md5sum;
 
         //        if ( pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
-        if ( this.templateName.equalsIgnoreCase( parentTemplateName ) )
+        if ( this.pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
         {
             parentTemplateName = null;
         }
+    }
+
+
+    public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
+                     final String subutaiParent, final String subutaiGitBranch, final String subutaiGitUuid,
+                     final String packagesManifest, final String md5sum, final TemplateVersion templateVersion )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcUtsname ), "Missing lxc.utsname parameter" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "Missing lxc.arch parameter" );
+        Preconditions
+                .checkArgument( !Strings.isNullOrEmpty( subutaiConfigPath ), "Missing subutai.config.path parameter" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiParent ), "Missing subutai.parent parameter" );
+        Preconditions
+                .checkArgument( !Strings.isNullOrEmpty( subutaiGitBranch ), "Missing subutai.git.branch parameter" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiGitUuid ), "Missing subutai.git.uuid parameter" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( packagesManifest ), "Missing packages manifest" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( md5sum ), "Missing md5sum" );
+        Preconditions.checkNotNull( templateVersion, "Missing templateVersion" );
+
+        this.pk = new TemplatePK( lxcUtsname, lxcArch, templateVersion, md5sum );
+        //        this.templateName = lxcUtsname;
+        //        this.lxcArch = lxcArch;
+        //        this.pk = new TemplatePK( lxcUtsname, lxcArch );
+        this.lxcUtsname = lxcUtsname;
+        this.subutaiConfigPath = subutaiConfigPath;
+        this.subutaiParent = subutaiParent;
+        this.subutaiGitBranch = subutaiGitBranch;
+        this.subutaiGitUuid = subutaiGitUuid;
+        this.parentTemplateName = subutaiParent;
+        //        this.md5sum = md5sum;
+        //        this.templateVersion = templateVersion;
+        this.packagesManifest = packagesManifest;
+
+
+        //        if ( pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
+        if ( this.pk.getTemplateName().equalsIgnoreCase( parentTemplateName ) )
+        {
+            parentTemplateName = null;
+        }
+    }
+
+
+    public TemplatePK getPk()
+    {
+        return pk;
+    }
+
+
+    public void setPk( final TemplatePK pk )
+    {
+        this.pk = pk;
     }
 
 
@@ -174,6 +223,10 @@ public class Template
 
     public void setInUseOnFAI( final String faiHostname, final boolean inUseOnFAI )
     {
+        if ( faisUsingThisTemplate == null )
+        {
+            faisUsingThisTemplate = new HashSet<>();
+        }
         if ( inUseOnFAI )
         {
             faisUsingThisTemplate.add( faiHostname );
@@ -197,10 +250,6 @@ public class Template
         {
             this.children = new ArrayList<>();
         }
-        //        for ( Template child : children )
-        //        {
-        //            child.setParentTemplate( this );
-        //        }
         this.children.addAll( children );
     }
 
@@ -220,7 +269,7 @@ public class Template
 
     public String getMd5sum()
     {
-        return md5sum;
+        return pk.getMd5sum();
     }
 
 
@@ -238,8 +287,7 @@ public class Template
 
     public String getLxcArch()
     {
-        return lxcArch;
-        //        return pk.getLxcArch();
+        return this.pk.getLxcArch();
     }
 
 
@@ -281,8 +329,14 @@ public class Template
 
     public String getTemplateName()
     {
-        return templateName;
-        //        return pk.getTemplateName();
+        return this.pk.getTemplateName();
+    }
+
+
+    public String getFileName()
+    {
+        return String.format( "%s-subutai-template_%s_%s.deb", pk.getTemplateName(), pk.getTemplateVersion(),
+                pk.getLxcArch() ).toLowerCase();
     }
 
 
@@ -292,16 +346,10 @@ public class Template
     }
 
 
-    //    public Template getParentTemplate()
-    //    {
-    //        return parentTemplate;
-    //    }
-
-
-    //    public void setParentTemplate( Template template )
-    //    {
-    //        this.parentTemplate = template;
-    //    }
+    public TemplateVersion getTemplateVersion()
+    {
+        return pk.getTemplateVersion();
+    }
 
 
     public UUID getPeerId()
@@ -330,21 +378,12 @@ public class Template
 
     public Template getRemoteClone( UUID peerId )
     {
-        Template result = new Template( this.lxcArch, this.lxcUtsname, this.subutaiConfigPath, this.subutaiParent,
-                this.subutaiGitBranch, this.subutaiGitUuid, this.packagesManifest, this.md5sum );
+        Template result =
+                new Template( this.pk.getLxcArch(), this.lxcUtsname, this.subutaiConfigPath, this.subutaiParent,
+                        this.subutaiGitBranch, this.subutaiGitUuid, this.packagesManifest, this.pk.getMd5sum(),
+                        this.pk.getTemplateVersion() );
         result.setRemote( true );
         result.setPeerId( peerId );
-        return result;
-    }
-
-
-    @Override
-    public int hashCode()
-    {
-        int result = templateName.hashCode();
-        result = 31 * result + lxcArch.hashCode();
-        //        int result = pk.getTemplateName().hashCode();
-        //        result = 31 * result + pk.getLxcArch().hashCode();
         return result;
     }
 
@@ -356,16 +395,21 @@ public class Template
         {
             return true;
         }
-        if ( o == null || getClass() != o.getClass() )
+        if ( !( o instanceof Template ) )
         {
             return false;
         }
 
         final Template template = ( Template ) o;
 
-        return lxcArch.equals( template.getLxcArch() ) && templateName.equals( template.getTemplateName() );
-        //        return pk.getLxcArch().equals( template.getLxcArch() ) && pk.getTemplateName()
-        //                                                                    .equals( template.getTemplateName() );
+        return pk.equals( template.pk );
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return pk.hashCode();
     }
 
 
@@ -373,9 +417,9 @@ public class Template
     public String toString()
     {
         return "Template{" +
-                "templateName='" + templateName + '\'' +
+                "templateName='" + pk.getTemplateName() + '\'' +
                 ", parentTemplateName='" + parentTemplateName + '\'' +
-                ", lxcArch='" + lxcArch + '\'' +
+                ", lxcArch='" + pk.getLxcArch() + '\'' +
                 ", lxcUtsname='" + lxcUtsname + '\'' +
                 ", subutaiConfigPath='" + subutaiConfigPath + '\'' +
                 ", subutaiParent='" + subutaiParent + '\'' +
@@ -383,7 +427,8 @@ public class Template
                 ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
                 ", children=" + children +
                 ", products=" + products +
-                ", md5sum='" + md5sum + '\'' +
+                ", md5sum='" + pk.getMd5sum() + '\'' +
+                ", templateVersion='" + pk.getTemplateVersion() + '\'' +
                 ", faisUsingThisTemplate=" + faisUsingThisTemplate +
                 ", peerId=" + peerId +
                 ", remote=" + remote +

@@ -38,6 +38,8 @@ install: build
 	mkdir -p ${d}${SCRIPTS}
 	mkdir -p ${d}${MANDIR}
 	mkdir -p ${d}${BASHCOMPDIR}
+	mkdir -p ${d}${PRESCRIPTS}
+	mkdir -p ${d}${POSTSCRIPTS}
 	cp -a src/main/config/* ${d}${CONFDIR}
 	cp -a src/main/bindings/* ${d}${BINDINGS}
 	cp -a src/main/lib/* ${d}${LIBDIR}

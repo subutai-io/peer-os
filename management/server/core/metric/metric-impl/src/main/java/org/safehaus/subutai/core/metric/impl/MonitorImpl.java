@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.metric.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -10,13 +11,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.sql.DataSource;
-
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.exception.DaoException;
+import org.safehaus.subutai.common.metric.ProcessResourceUsage;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.metric.api.AlertListener;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
@@ -24,9 +26,10 @@ import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.MonitoringSettings;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.core.peer.api.HostNotFoundException;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.slf4j.Logger;
@@ -54,20 +57,24 @@ public class MonitorImpl implements Monitor
             Collections.newSetFromMap( new ConcurrentHashMap<AlertListener, Boolean>() );
     private final Commands commands = new Commands();
     private final PeerManager peerManager;
-
+    private EnvironmentManager environmentManager;
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
+    protected DaoManager daoManager;
 
 
-    public MonitorImpl( final DataSource dataSource, PeerManager peerManager ) throws MonitorException
+    public MonitorImpl( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager )
+            throws MonitorException
     {
-        Preconditions.checkNotNull( dataSource, "Data source is null" );
         Preconditions.checkNotNull( peerManager, "Peer manager is null" );
+        Preconditions.checkNotNull( daoManager, "DaoManager is null." );
 
         try
         {
-            this.monitorDao = new MonitorDao( dataSource );
+            this.daoManager = daoManager;
+            this.monitorDao = new MonitorDao( daoManager.getEntityManagerFactory() );
             this.peerManager = peerManager;
+            this.environmentManager = environmentManager;
             peerManager.addRequestListener( new RemoteAlertListener( this ) );
             peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
             peerManager.addRequestListener( new MonitoringActivationListener( this, peerManager ) );
@@ -87,7 +94,7 @@ public class MonitorImpl implements Monitor
         Set<ContainerHostMetric> metrics = new HashSet<>();
 
         //obtain environment containers
-        Set<ContainerHost> containerHosts = environment.getContainers();
+        Set<ContainerHost> containerHosts = environment.getContainerHosts();
 
         Set<Peer> peers = Sets.newHashSet();
 
@@ -98,7 +105,7 @@ public class MonitorImpl implements Monitor
             {
                 peers.add( containerHost.getPeer() );
             }
-            catch ( PeerException e )
+            catch ( Exception e )
             {
                 LOG.error( String.format( "Could not obtain peer for container %s", containerHost.getHostname() ), e );
                 throw new MonitorException( e );
@@ -135,7 +142,8 @@ public class MonitorImpl implements Monitor
             //send request and obtain metrics
             ContainerHostMetricResponse response =
                     peer.sendRequest( request, RecipientType.METRIC_REQUEST_RECIPIENT.name(),
-                            Constants.METRIC_REQUEST_TIMEOUT, ContainerHostMetricResponse.class );
+                            Constants.METRIC_REQUEST_TIMEOUT, ContainerHostMetricResponse.class,
+                            Constants.METRIC_REQUEST_TIMEOUT );
 
             //if response contains metrics, add them to result
             if ( response != null && !CollectionUtil.isCollectionEmpty( response.getMetrics() ) )
@@ -165,7 +173,7 @@ public class MonitorImpl implements Monitor
             {
                 //get container's resource host
                 ResourceHost resourceHost =
-                        peerManager.getLocalPeer().getResourceHostByName( localContainer.getParentHostname() );
+                        peerManager.getLocalPeer().getResourceHostByContainerId( localContainer.getId().toString() );
                 addLocalContainerHostMetric( environmentId, resourceHost, localContainer, metrics );
             }
         }
@@ -208,7 +216,7 @@ public class MonitorImpl implements Monitor
         }
         else
         {
-            LOG.warn( String.format( "Could not find resource host %s", localContainer.getParentHostname() ) );
+            LOG.warn( String.format( "Could not find resource host if %s", localContainer.getHostname() ) );
         }
     }
 
@@ -283,7 +291,7 @@ public class MonitorImpl implements Monitor
         }
 
         //activate monitoring
-        activateMonitoring( environment.getContainers(), monitoringSettings );
+        activateMonitoring( environment.getContainerHosts(), monitoringSettings );
     }
 
 
@@ -346,7 +354,7 @@ public class MonitorImpl implements Monitor
 
                 containers.add( containerHost );
             }
-            catch ( PeerException e )
+            catch ( Exception e )
             {
                 LOG.error( String.format( "Could not obtain peer for container %s", containerHost.getHostname() ), e );
                 throw new MonitorException( e );
@@ -400,7 +408,7 @@ public class MonitorImpl implements Monitor
             try
             {
                 ResourceHost resourceHost =
-                        peerManager.getLocalPeer().getResourceHostByName( containerHost.getParentHostname() );
+                        peerManager.getLocalPeer().getResourceHostByContainerId( containerHost.getId().toString() );
                 CommandResult commandResult = resourceHost.execute(
                         commands.getActivateMonitoringCommand( containerHost.getHostname(), monitoringSettings ) );
                 if ( !commandResult.hasSucceeded() )
@@ -413,6 +421,35 @@ public class MonitorImpl implements Monitor
             {
                 LOG.error( "Error in activateMonitoringAtLocalContainers", e );
             }
+        }
+    }
+
+
+    @Override
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost containerHost, final int processPid )
+            throws MonitorException
+    {
+        Preconditions.checkNotNull( containerHost );
+        Preconditions.checkArgument( processPid > 0 );
+        try
+        {
+            ResourceHost resourceHost =
+                    peerManager.getLocalPeer().getResourceHostByContainerName( containerHost.getHostname() );
+            CommandResult commandResult = resourceHost
+                    .execute( commands.getProcessResourceUsageCommand( containerHost.getHostname(), processPid ) );
+            if ( !commandResult.hasSucceeded() )
+            {
+                throw new MonitorException(
+                        String.format( "Error getting process resource usage of pid=%d on %s: %s %s", processPid,
+                                containerHost.getHostname(), commandResult.getStatus(), commandResult.getStdErr() ) );
+            }
+            return JsonUtil.fromJson( commandResult.getStdOut(), ProcessResourceUsage.class );
+        }
+        catch ( CommandException | HostNotFoundException | JsonSyntaxException e )
+        {
+            LOG.error( String.format( "Could not obtain process resource usage for container %s, pid %d",
+                    containerHost.getHostname(), processPid ), e );
+            throw new MonitorException( e );
         }
     }
 
@@ -436,8 +473,8 @@ public class MonitorImpl implements Monitor
                     peerManager.getLocalPeer().getContainerHostByName( containerHostMetric.getHost() );
             if ( containerHost != null )
             {
-                //set metric's environment id for future reference on the receiving end
-                containerHostMetric.setEnvironmentId( UUID.fromString( containerHost.getEnvironmentId() ) );
+                //set host id for future reference
+                containerHostMetric.setHostId( containerHost.getId() );
 
                 //find container's creator peer
                 Peer creatorPeer = peerManager.getPeer( UUID.fromString( containerHost.getCreatorPeerId() ) );
@@ -469,10 +506,32 @@ public class MonitorImpl implements Monitor
      *
      * @param metric - {@code ContainerHostMetric} metric of the host where thresholds are being exceeded
      */
-    public void notifyOnAlert( final ContainerHostMetric metric ) throws MonitorException
+    public void notifyOnAlert( final ContainerHostMetricImpl metric ) throws MonitorException
     {
         try
         {
+            //find container's environment
+            List<Environment> environments = environmentManager.getEnvironments();
+            ContainerHost containerHost = null;
+            for ( Environment environment : environments )
+            {
+                containerHost = environment.getContainerHostById( metric.getHostId() );
+                if ( containerHost != null )
+                {
+                    break;
+                }
+            }
+
+            if ( containerHost == null )
+            {
+                throw new MonitorException(
+                        String.format( "Could not find alert container within existing environments by id %s",
+                                metric.getHostId() ) );
+            }
+
+            metric.setEnvironmentId( UUID.fromString( containerHost.getEnvironmentId() ) );
+
+
             //search for environment, if not found then no-op
             Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( metric.getEnvironmentId() );
             //search for subscriber if not found then no-op

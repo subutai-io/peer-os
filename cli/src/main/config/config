@@ -65,6 +65,7 @@ export SUBUTAI_REST_PORT=8181
 export SUBUTAI_REST_PATH=cxf
 # Below are paths to specific actions, do not inclue leading and trailing
 # slashes in paths
-export SUBUTAI_REST_REGISTER_PATH=template
+export SUBUTAI_REST_REGISTER_PATH=registry/templates/import
 export SUBUTAI_REST_GET_TEMPLATE_PATH=registry/templates
 export SUBUTAI_REST_LIST_TEMPLATES=$SUBUTAI_REST_GET_TEMPLATE_PATH/plain-list
+export SUBUTAI_REST_SCRIPT_PATH=scripts

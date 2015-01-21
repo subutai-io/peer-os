@@ -1,42 +1,30 @@
 package org.safehaus.subutai.core.peer.ui.container.manage;
 
 
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
+import com.vaadin.event.Action;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.*;
+
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.quota.*;
+import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
+import org.safehaus.subutai.core.peer.api.*;
+import org.safehaus.subutai.core.peer.ui.container.common.Buttons;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.ContainerState;
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.PeerException;
-import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.ResourceHost;
-import org.safehaus.subutai.core.peer.ui.container.common.Buttons;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.event.Action;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.AbsoluteLayout;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.TreeTable;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 
 
 @SuppressWarnings( "serial" )
@@ -430,28 +418,37 @@ public class Manager extends VerticalLayout
                 Label containerStatus = new Label();
                 Button updateQuota = new Button( "Update" );
                 updateQuota.addStyleName( "default" );
-                String containerMemory;
+                PeerQuotaInfo containerMemory;
                 final QuotaMemoryComponent memoryQuotaComponent = new QuotaMemoryComponent();
                 final QuotaComponents modifyQuota = new QuotaComponents();
 
-                String containerCpu = "Cpu Shares";
+                //                String containerCpu = "Cpu Shares";
                 final TextField containerCpuTextField = new TextField();
                 final String lxcHostname = containerHost.getHostname();
-                if ( ContainerState.RUNNING.equals( containerHost.getState() ) )
+                ContainerHostState state = null;
+                try
+                {
+                    state = containerHost.getState();
+                }
+                catch ( PeerException e )
+                {
+                    state = ContainerHostState.STOPPED;
+                }
+                if ( ContainerState.RUNNING.equals( state ) )
                 {
                     containerStatus.setValue( "RUNNING" );
                     LOG.info( "This is quota manager: " + quotaManager.toString() );
 
                     try
                     {
-                        containerMemory = containerHost.getQuota( QuotaEnum.MEMORY_LIMIT_IN_BYTES );
-                        containerCpu = containerHost.getQuota( QuotaEnum.CPUSET_CPUS );
-                        containerCpuTextField.setValue( containerCpu );
+                        containerMemory = containerHost.getQuota( QuotaType.QUOTA_ALL_JSON );
+                        containerCpuTextField.setValue( containerMemory.getCpuQuotaInfo().getQuotaValue() );
 
-                        modifyQuota.setValueFormemoryTextField2( containerMemory );
-                        modifyQuota.setValueForCoresUsedTextField( containerCpu );
+                        modifyQuota.setValueForMemoryTextField2( containerMemory.getMemoryQuota().getQuotaValue() );
+                        modifyQuota.setValueForCoresUsedTextField( containerMemory.getCpuQuotaInfo().getQuotaValue() );
 
-                        memoryQuotaComponent.setValueForMemoryTextField( containerMemory );
+                        memoryQuotaComponent
+                                .setValueForMemoryTextField( containerMemory.getMemoryQuota().getQuotaValue() );
                         updateQuota.addClickListener( new Button.ClickListener()
                         {
                             @Override
@@ -487,8 +484,13 @@ public class Manager extends VerticalLayout
                                 {
                                     String memoryLimit = modifyQuota.getMemoryLimitValue();
                                     String cpuLimit = modifyQuota.getValueFromCpuCoresUsed();
-                                    containerHost.setQuota( QuotaEnum.MEMORY_LIMIT_IN_BYTES, memoryLimit );
-                                    containerHost.setQuota( QuotaEnum.CPUSET_CPUS, cpuLimit );
+
+//                                    Memory memory = new Memory( memoryLimit );
+                                    QuotaInfo memoryQuota = new MemoryQuotaInfo( memoryLimit );
+                                    QuotaInfo cpuQuota = new CpuQuotaInfo( cpuLimit );
+
+                                    containerHost.setQuota( memoryQuota );
+                                    containerHost.setQuota( cpuQuota );
                                 }
                                 catch ( PeerException pe )
                                 {
@@ -503,7 +505,7 @@ public class Manager extends VerticalLayout
                         show( pe.toString() );
                     }
                 }
-                else if ( ContainerState.STOPPED.equals( containerHost.getState() ) )
+                else if ( ContainerState.STOPPED.equals( state ) )
                 {
                     containerStatus.setValue( "STOPPED" );
                 }

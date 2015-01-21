@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Properties;
 
+import org.safehaus.subutai.common.datatypes.TemplateVersion;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.settings.Common;
 
 
 /**
@@ -22,6 +24,7 @@ public class TestUtils
                     + "lxc.network.type = veth\n" + "lxc.network.flags = up\n" + "lxc.network.link = br0\n"
                     + "lxc.network.hwaddr = 00:16:3e:aa:bd:80\n" + "subutai.config.path = /etc\n"
                     + "lxc.hook.pre-start = /usr/bin/pre_start_hook\n" + "subutai.parent = master\n"
+                    + "SUBUTAI_VERSION = 2.3\n"
                     + "subutai.git.branch = master\n" + "subutai.git.uuid = 76cc7a05286c25889fb611661b63d45896cf13af\n"
                     + "lxc.mount.entry = /lxc/master-opt opt none bind,rw 0 0\n"
                     + "lxc.mount.entry = /lxc-data/master-home home none bind,rw 0 0\n"
@@ -34,7 +37,7 @@ public class TestUtils
                     + "\n" + "# Network configuration\n" + "lxc.network.type = veth\n" + "lxc.network.flags = up\n"
                     + "lxc.network.link = br0\n" + "lxc.network.hwaddr = 00:16:3e:82:6e:f0\n"
                     + "subutai.config.path = /etc\n" + "lxc.hook.pre-start = /usr/bin/pre_start_hook\n"
-                    + "subutai.parent = master\n" + "subutai.git.branch = cassandra\n"
+                    + "subutai.parent = master\n" + "subutai.git.branch = cassandra\n" + "SUBUTAI_VERSION = 2.3\n"
                     + "lxc.mount.entry = /lxc/cassandra-opt opt none bind,rw 0 0\n"
                     + "lxc.mount.entry = /lxc-data/cassandra-home home none bind,rw 0 0\n"
                     + "lxc.mount.entry = /lxc-data/cassandra-var var none bind,rw 0 0\n"
@@ -77,7 +80,7 @@ public class TestUtils
         String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
 
         return new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch, subutaiGitUuid,
-                packagesFile, md5sum );
+                packagesFile, md5sum, new TemplateVersion( Common.DEFAULT_TEMPLATE_VERSION ) );
     }
 
 

@@ -43,6 +43,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
     private CssLayout modulesLayout;
     private HashMap<String, PortalModule> modules = new HashMap<>();
     private HashMap<String, AbstractLayout> moduleViews = new HashMap<>();
+    private static PortalModuleService portalModuleService = null;
 
 
     public ModulesView()
@@ -81,12 +82,14 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 
         VerticalLayout titleAndDrafts = new VerticalLayout();
         titleAndDrafts.setSizeUndefined();
+        titleAndDrafts.setId( "Modules-Tab" );
         titleAndDrafts.setCaption( "Modules" );
         titleAndDrafts.setSpacing( true );
         titleAndDrafts.addStyleName( "drafts" );
         editors.addComponent( titleAndDrafts );
 
         Label draftsTitle = new Label( "Modules" );
+        draftsTitle.setId( "Modules-Tab2" );
         draftsTitle.addStyleName( "h1" );
         draftsTitle.setSizeUndefined();
         titleAndDrafts.addComponent( draftsTitle );
@@ -108,18 +111,21 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 
     public static PortalModuleService getPortalModuleService()
     {
-        // get bundle instance via the OSGi Framework Util class
-        BundleContext ctx = FrameworkUtil.getBundle( PortalModuleService.class ).getBundleContext();
-        if ( ctx != null )
+        if ( portalModuleService == null )
         {
-            ServiceReference serviceReference = ctx.getServiceReference( PortalModuleService.class.getName() );
-            if ( serviceReference != null )
+            // get bundle instance via the OSGi Framework Util class
+            BundleContext ctx = FrameworkUtil.getBundle( PortalModuleService.class ).getBundleContext();
+            if ( ctx != null )
             {
-                return PortalModuleService.class.cast( ctx.getService( serviceReference ) );
+                ServiceReference serviceReference = ctx.getServiceReference( PortalModuleService.class.getName() );
+                if ( serviceReference != null )
+                {
+                    portalModuleService = PortalModuleService.class.cast( ctx.getService( serviceReference ) );
+                    //                    return PortalModuleService.class.cast( ctx.getService( serviceReference ) );
+                }
             }
         }
-
-        return null;
+        return portalModuleService;
     }
 
 
@@ -182,6 +188,18 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
     }
 
 
+    @Override
+    public void loadDependentModule( final String moduleId )
+    {
+        ModuleView moduleView = ( ModuleView ) getModuleViews().get( moduleId );
+        if ( moduleView == null )
+        {
+            return;
+        }
+        moduleView.addModuleTab();
+    }
+
+
     private void removeModule( PortalModule module )
     {
         ModuleView moduleView = ( ModuleView ) moduleViews.get( module.getId() );
@@ -189,6 +207,12 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         {
             modulesLayout.removeComponent( moduleView );
         }
+    }
+
+
+    public HashMap<String, AbstractLayout> getModuleViews()
+    {
+        return moduleViews;
     }
 }
 

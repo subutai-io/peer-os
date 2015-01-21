@@ -17,13 +17,9 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-/**
- * Created by bahadyr on 9/10/14.
- */
 public class Blueprint2PeerGroupWizard extends Window
 {
 
-    private int step = 0;
     private EnvironmentManagerPortalModule module;
     private EnvironmentBlueprint blueprint;
 
@@ -40,37 +36,8 @@ public class Blueprint2PeerGroupWizard extends Window
         setHeight( "200px" );
         this.module = module;
         this.blueprint = blueprint;
-        next();
-    }
 
-
-    public void next()
-    {
-        step++;
-        putForm();
-    }
-
-
-    private void putForm()
-    {
-        switch ( step )
-        {
-            case 1:
-            {
-                setContent( generatePeerGroupsLayout() );
-                break;
-            }
-            case 2:
-            {
-                close();
-                break;
-            }
-            default:
-            {
-                close();
-                break;
-            }
-        }
+        setContent( generatePeerGroupsLayout() );
     }
 
 
@@ -86,15 +53,6 @@ public class Blueprint2PeerGroupWizard extends Window
     }
 
 
-    public void back()
-    {
-        step--;
-    }
-
-
-    final ComboBox peerGroupsCombo = new ComboBox();
-
-
     private VerticalLayout generatePeerGroupsLayout()
     {
         VerticalLayout vl = new VerticalLayout();
@@ -105,6 +63,7 @@ public class Blueprint2PeerGroupWizard extends Window
         BeanItemContainer<PeerGroup> bic = new BeanItemContainer<>( PeerGroup.class );
         bic.addAll( peerGroups );
 
+        final ComboBox peerGroupsCombo = new ComboBox();
         peerGroupsCombo.setContainerDataSource( bic );
         peerGroupsCombo.setNullSelectionAllowed( false );
         peerGroupsCombo.setTextInputAllowed( false );
@@ -116,10 +75,11 @@ public class Blueprint2PeerGroupWizard extends Window
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                PeerGroup peerGroup = getSelectedPeerGroup();
-                if ( peerGroup != null )
+                Object selected = peerGroupsCombo.getValue();
+                if ( selected != null )
                 {
-                    Blueprint2PeerGroupData data = new Blueprint2PeerGroupData( blueprint.getId(), peerGroup.getId()  );
+                    PeerGroup peerGroup = ( PeerGroup ) selected;
+                    Blueprint2PeerGroupData data = new Blueprint2PeerGroupData( blueprint.getId(), peerGroup.getId() );
                     try
                     {
                         module.getEnvironmentManager().saveBuildProcess( data );
@@ -128,7 +88,7 @@ public class Blueprint2PeerGroupWizard extends Window
                     {
                         Notification.show( e.getMessage() );
                     }
-                    next();
+                    close();
                 }
                 else
                 {
@@ -143,9 +103,5 @@ public class Blueprint2PeerGroupWizard extends Window
         return vl;
     }
 
-
-    private PeerGroup getSelectedPeerGroup()
-    {
-        return ( PeerGroup ) peerGroupsCombo.getValue();
-    }
 }
+

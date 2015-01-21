@@ -1,159 +1,78 @@
 package org.safehaus.subutai.core.environment.api.helper;
 
 
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
-import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.HostKey;
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-
-import com.google.common.collect.Sets;
+import org.safehaus.subutai.common.peer.ContainerHost;
 
 
-public class Environment
+public interface Environment
 {
-
-    private UUID id;
-    private String name;
-    transient private Set<ContainerHost> containers;
-    private Set<HostKey> hostKeys;
-    private EnvironmentStatusEnum status;
-    private long creationTimestamp;
-    transient private LocalPeer localPeer;
+    public long getCreationTimestamp();
 
 
-    public Environment( String name, LocalPeer localPeer )
-    {
-        this.name = name;
-        this.localPeer = localPeer;
-        this.id = UUIDUtil.generateTimeBasedUUID();
-        this.containers = new HashSet<>();
-        this.hostKeys = new HashSet<>();
-        this.status = EnvironmentStatusEnum.EMPTY;
-        this.creationTimestamp = System.currentTimeMillis();
-    }
+    public EnvironmentStatusEnum getStatus();
 
 
-    public long getCreationTimestamp()
-    {
-        return creationTimestamp;
-    }
+    public void setStatus( final EnvironmentStatusEnum status );
 
 
-    public EnvironmentStatusEnum getStatus()
-    {
-        return status;
-    }
+    public void addContainer( ContainerHost container );
 
 
-    public void setStatus( final EnvironmentStatusEnum status )
-    {
-        this.status = status;
-    }
+    public Set<ContainerHost> getContainerHosts();
 
 
-    public void addContainer( ContainerHost container )
-    {
-        container.setEnvironmentId( id.toString() );
-        this.containers.add( container );
-        this.hostKeys.add( new HostKey( container.getHostId(), container.getPeerId(), container.getCreatorPeerId(),
-                container.getHostname(), container.getEnvironmentId(), container.getNodeGroupName() ) );
-    }
+    public String getName();
 
 
-    public Set<ContainerHost> getContainers()
-    {
-        containers = new HashSet<>();
-        for ( HostKey hostKey : hostKeys )
-        {
-            containers.add( localPeer.getContainerHostImpl( hostKey ) );
-        }
-        return containers;
-    }
-
-    //
-    //    public void setContainers( final Set<ContainerHost> containers )
-    //    {
-    //        this.containers = containers;
-    //    }
+    public UUID getId();
 
 
-    public void destroyContainer( UUID containerId ) throws EnvironmentManagerException
-    {
-        //TODO Baha fill in the logic
-    }
+    public String getPublicKey();
 
 
-    public String getName()
-    {
-        return name;
-    }
+    public void setPublicKey( String key );
 
 
-    public UUID getId()
-    {
-        return id;
-    }
+    /**
+     * Network subnet of the environment in CIDR format notation.
+     *
+     * @return subnet string in CIDR format notation
+     */
+    public String getSubnetCidr();
 
 
-    public ContainerHost getContainerHostByUUID( UUID uuid )
-    {
-        Iterator<ContainerHost> iterator = containers.iterator();
-        while ( iterator.hasNext() )
-        {
-            ContainerHost containerHost = iterator.next();
-            if ( containerHost.getId().equals( uuid ) )
-            {
-                return containerHost;
-            }
-        }
-        return null;
-    }
+    /**
+     * VLAN ids of each participating peer.
+     *
+     * @return map of peer ids to VLAN ids
+     */
+    public Map<UUID, Integer> getPeerVlanInfo();
 
 
-    public ContainerHost getContainerHostByHostname( String hostname )
-    {
-        Iterator<ContainerHost> iterator = containers.iterator();
-        while ( iterator.hasNext() )
-        {
-            ContainerHost containerHost = iterator.next();
-            if ( containerHost.getHostname().equalsIgnoreCase( hostname ) )
-            {
-                return containerHost;
-            }
-        }
-        return null;
-    }
+    /**
+     * VNI of the environment.
+     *
+     * @return
+     */
+    public int getVni();
 
 
-    public Set<ContainerHost> getHostsByIds( Set<UUID> ids )
-    {
-        Set<ContainerHost> hosts = Sets.newHashSet();
-        for ( UUID id : ids )
-        {
-            ContainerHost host = getContainerHostByUUID( id );
-            if ( host != null )
-            {
-                hosts.add( host );
-            }
-        }
-        return hosts;
-    }
+    public ContainerHost getContainerHostById( UUID uuid );
 
 
-    public void addContainers( final Set<ContainerHost> containerHosts )
-    {
-        this.containers.addAll( containerHosts );
-    }
+    public ContainerHost getContainerHostByHostname( String hostname );
 
 
-    public void removeContainer( final ContainerHost containerHost )
-    {
-        this.containers.remove( containerHost );
-    }
+    public Set<ContainerHost> getContainerHostsByIds( Set<UUID> ids );
+
+
+    public void addContainers( final Set<ContainerHost> containerHosts );
+
+
+    public void removeContainer( final ContainerHost containerHost );
 }
+

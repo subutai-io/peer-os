@@ -14,11 +14,8 @@
   <name>Subutai Wol Manager UI</name>
   <description>Subutai Wol Manager UI</description>
 
+
   <dependencies>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>wol-manager-api</artifactId>
@@ -26,10 +23,6 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-server</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
