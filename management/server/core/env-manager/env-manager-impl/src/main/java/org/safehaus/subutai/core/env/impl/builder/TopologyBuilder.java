@@ -5,22 +5,22 @@ import java.util.Map;
 import java.util.Set;
 
 import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.env.api.build.NodeGroup;
 import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.env.impl.exception.NodeGroupBuildException;
+import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 
 /**
- * Builds environment across peers
+ * Builds node groups across peers
  */
-public class EnvironmentBuilder
+public class TopologyBuilder
 {
 
     private final TemplateRegistry templateRegistry;
@@ -28,7 +28,7 @@ public class EnvironmentBuilder
     private final NodeGroupBuilder nodeGroupBuilder;
 
 
-    public EnvironmentBuilder( final TemplateRegistry templateRegistry, final PeerManager peerManager )
+    public TopologyBuilder( final TemplateRegistry templateRegistry, final PeerManager peerManager )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );

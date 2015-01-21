@@ -18,6 +18,8 @@ public interface Environment
 
     public String getName();
 
+    public EnvironmentStatus getStatus();
+
     public long getCreationTimestamp();
 
     public Set<ContainerHost> getContainerHosts();

@@ -1,17 +1,22 @@
 package org.safehaus.subutai.core.env.impl;
 
 
+import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.core.env.api.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.build.NodeGroup;
 import org.safehaus.subutai.core.env.api.build.Topology;
+import org.safehaus.subutai.core.env.api.exception.ContainerHostNotFoundException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
-import org.safehaus.subutai.core.env.impl.builder.EnvironmentBuilder;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
+import org.safehaus.subutai.core.env.impl.builder.TopologyBuilder;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -29,7 +34,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     private final TemplateRegistry templateRegistry;
     private final PeerManager peerManager;
-    private final EnvironmentBuilder environmentBuilder;
+    private final TopologyBuilder topologyBuilder;
 
 
     public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager )
@@ -39,7 +44,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
-        this.environmentBuilder = new EnvironmentBuilder( templateRegistry, peerManager );
+        this.topologyBuilder = new TopologyBuilder( templateRegistry, peerManager );
+    }
+
+
+    @Override
+    public Environment findEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        //TODO get environment from database
+        //TODO set dataservice to environment
+        //TODO set peer and data service on each container
+
+        return null;
     }
 
 
@@ -53,40 +71,96 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         EnvironmentImpl environment = new EnvironmentImpl( name );
 
+        //TODO save environment to database here
+
         try
         {
-            environment.addContainers( environmentBuilder.build( topology ) );
+            //TODO think of updating environment in topology builder after every node group is created
+            environment.addContainers( topologyBuilder.build( topology ) );
         }
         catch ( EnvironmentBuildException e )
         {
+            //TODO update env status here
+
             throw new EnvironmentCreationException( e );
         }
+
+        //TODO update env status here
 
         return environment;
     }
 
 
     @Override
-    public void destroyEnvironment( final UUID environmentId ) throws EnvironmentDestructionException
+    public void destroyEnvironment( final UUID environmentId )
+            throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
+
+        Set<ContainerHost> containers = environment.getContainerHosts();
+
+        for ( ContainerHost container : containers )
+        {
+            try
+            {
+                container.dispose();
+                environment.removeContainer( container.getId() );
+            }
+            catch ( ContainerHostNotFoundException | PeerException e )
+            {
+                //TODO update env status here
+
+                throw new EnvironmentDestructionException( e );
+            }
+        }
+
+        //TODO remove environment from database
     }
 
 
     @Override
     public void growEnvironment( final UUID environmentId, final Topology topology )
-            throws EnvironmentModificationException
+            throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+
+        EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
+
+        try
+        {
+            //TODO think of passing environment to topologyBuilder and adding every succeeded node group and saving
+            environment.addContainers( topologyBuilder.build( topology ) );
+        }
+        catch ( EnvironmentBuildException e )
+        {
+            throw new EnvironmentModificationException( e );
+        }
     }
 
 
     @Override
-    public void destroyContainer( final UUID containerId ) throws EnvironmentModificationException
+    public void destroyContainer( final ContainerHost containerHost )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkNotNull( containerHost, "Invalid container host" );
+
+        EnvironmentImpl environment =
+                ( EnvironmentImpl ) findEnvironment( UUID.fromString( containerHost.getEnvironmentId() ) );
+
+        try
+        {
+            containerHost.dispose();
+
+            environment.removeContainer( containerHost.getId() );
+        }
+        catch ( ContainerHostNotFoundException | PeerException e )
+        {
+            throw new EnvironmentModificationException( e );
+        }
     }
 
 

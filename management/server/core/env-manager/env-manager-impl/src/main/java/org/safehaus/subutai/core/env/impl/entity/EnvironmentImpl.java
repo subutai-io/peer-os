@@ -13,6 +13,8 @@ import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -22,6 +24,7 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.env.api.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentStatus;
 import org.safehaus.subutai.core.env.api.exception.ContainerHostNotFoundException;
 
 import org.apache.commons.net.util.SubnetUtils;
@@ -64,6 +67,9 @@ public class EnvironmentImpl implements Environment, Serializable
             cascade = CascadeType.ALL, orphanRemoval = true )
     private Set<ContainerHost> containers = Sets.newHashSet();
 
+    @Enumerated( EnumType.STRING )
+    private EnvironmentStatus status;
+
 
     protected EnvironmentImpl()
     {
@@ -89,6 +95,13 @@ public class EnvironmentImpl implements Environment, Serializable
     public String getName()
     {
         return name;
+    }
+
+
+    @Override
+    public EnvironmentStatus getStatus()
+    {
+        return status;
     }
 
 
@@ -228,19 +241,15 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void addContainer( EnvironmentContainerImpl container )
+    public void removeContainer( UUID containerId ) throws ContainerHostNotFoundException
     {
-        Preconditions.checkNotNull( container );
+        Preconditions.checkNotNull( containerId );
 
-        containers.add( container );
-    }
-
-
-    public void removeContainer( EnvironmentContainerImpl container )
-    {
-        Preconditions.checkNotNull( container );
+        ContainerHost container = getContainerHostById( containerId );
 
         containers.remove( container );
+
+        //TODO save env to db
     }
 
 
@@ -249,5 +258,15 @@ public class EnvironmentImpl implements Environment, Serializable
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containers ) );
 
         this.containers.addAll( containers );
+
+        //TODO save env to db
+    }
+
+
+    public void setStatus( EnvironmentStatus status )
+    {
+        Preconditions.checkNotNull( status );
+
+        this.status = status;
     }
 }
