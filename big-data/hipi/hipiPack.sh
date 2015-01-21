@@ -17,7 +17,7 @@ downloadFileAndMakeChanges() {
 	# download nutch 
 	wget http://hipi.cs.virginia.edu/downloads/hipi-src.tar.bz2  -P $tempDirectory
 	pushd $tempDirectory
-	tar -xzpf hipi-src.tar.bz2
+	tar -xvpf hipi-src.tar.bz2
 
 	# remove tar file
 	rm hipi-src.tar.bz2
