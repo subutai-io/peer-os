@@ -52,7 +52,6 @@ public class TopologyBuilder
             try
             {
                 //TODO parallelize container creation across peers
-                //TODO implement ssh and hosts linking
 
                 containers.addAll( nodeGroupBuilder.build( peerPlacement.getKey(), peerPlacement.getValue() ) );
             }
@@ -63,6 +62,8 @@ public class TopologyBuilder
                                 peerPlacement.getKey() ), e );
             }
         }
+
+        //TODO implement ssh and hosts linking
 
         return containers;
     }
