@@ -1,0 +1,223 @@
+#!/bin/bash
+
+
+function monitor_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Monitor containers.
+  echo
+  echo "        "subutai \[-qh\] monitor \[-c metric_type \[-p monitoring_parameters\] \|-d metric_type\|-s metric_type\|-e metric_type\|-q metric_type\] \[hostname\]
+  echo "          "parameters:
+  echo "                    "c -- create monitoring infrastructure for container
+  echo "                      "p -- parameters to override default values
+  echo "                        "parameters:
+  echo "                          "metricCollectionIntervalInMin
+  echo "                          "maxSampleCount
+  echo "                          "metricCountToAverageToAlert
+  echo "                          "intervalBetweenAlertsInMin
+  echo "                          "ramAlertThreshold
+  echo "                          "cpuAlertThreshold
+  echo "                          "diskAlertThreshold
+  echo "                    "d -- destroy monitoring infrastructure for container
+  echo "                    "s -- starts monitoring of container for given metric
+  echo "                    "e -- ends monitoring of container for given metric
+  echo "                    "q -- query rrd for container for given metric
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+
+function monitor {
+  local is_physical="false"
+  local is_create="false"
+  local is_destroy="false"
+  local is_update="false"
+  local is_start="false"
+  local is_end="false"
+  local is_query="false"
+  local is_parameter="false"
+  shift_amount=0;
+  error_message="Cannot use the -c, -d, -s, -e, -u, and -q options together."
+  while getopts ":c:d:s:e:u:q:p:" opt; do
+    case $opt in
+      c)
+        metric_type="$OPTARG"
+        is_create="true"
+        if [[ "true" == "$is_start" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_destroy" ]]; then
+          msg_error "$error_message" >&2
+          exit 1
+        fi
+	;;
+      d)
+        metric_type="$OPTARG"
+        is_destroy="true"
+        if [[ "true" == "$is_start" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_create" ]]; then
+          msg_error "$error_message" >&2
+          exit 1
+        fi
+        ;;
+      u)
+        metric_type="$OPTARG"
+        is_update="true"
+        if [[ "true" == "$is_create" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_start" || "true" == "$is_destroy" ]]; then
+          msg_error "$error_message" >&2
+          exit 1
+        fi
+        ;;
+      s)
+	metric_type="$OPTARG"
+        is_start="true"
+	if [[ "true" == "$is_create" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_destroy" ]]; then
+          msg_error "$error_message" >&2
+          exit 1
+        fi
+        ;;
+      e)
+        metric_type="$OPTARG"
+        is_end="true"
+        if [[ "true" == "$is_create" || "true" == "$is_query" || "true" == "$is_start" || "true" == "$is_update" || "true" == "$is_destroy" ]]; then
+          msg_error "$error_message" >&2
+          exit 1
+        fi
+        ;;
+      q)
+        metric_type="$OPTARG"
+        is_query="true"
+        if [[ "true" == "$is_start" || "true" == "$is_create" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_destroy" ]]; then
+          msg_error "$error_message" >&2
+          exit 1
+        fi
+	;;
+      p)
+        parameters="$OPTARG"
+        is_parameter="true"
+        if [[ "true" == "$is_start" || "true" == "$is_query" || "true" == "$is_end" || "true" == "$is_update" || "true" == "$is_destroy" ]]; then
+          msg_error "-p option can only be used together with -c option." >&2
+          exit 1
+        fi
+        ;;
+      \?)
+        msg_error "Unrecognized option -$OPTARG"
+        exit 1
+        ;;
+      :)
+        msg_error "Option -$OPTARG requires an argument." >&2
+        exit 1
+    esac
+    shift_amount=$(($shift_amount + 1))
+  done
+
+  if [ "$is_parameter" == "true" -a "$is_create" != "true" ]; then
+    msg_error "Cannot use -p option without -c option"
+    exit 1
+  fi
+
+#  while [ -n "`echo $1 | grep -`" ]; do
+#    shift
+#  done
+  shift $((OPTIND-1))
+  if [ "x$1" == "x`hostname`" ]; then
+    is_physical="true"
+  fi
+
+  if [ "x$1" == "x" ]; then
+    msg_error "Host is not provided. Aborting!"
+    show_usage "`monitor_usage`"
+  fi
+
+  hostname=$1
+
+  #TEST_MODE="true" 
+  if [ "$TEST_MODE" == "true" ]; then
+    echo ---- TEST_MODE DUMP ----
+    echo -e "operand count\t= $#"
+    echo -e "operands\t= $@"
+    echo -e "hostname\t= $hostname"
+    echo -e "is_physical\t= $is_physical"
+    echo -e "is_create\t= $is_create"
+    echo -e "is_destrot\t= $is_destroy"
+    echo -e "is_update\t= $is_update"
+    echo -e "is_start\t= $is_start"
+    echo -e "is_end\t= $is_end"
+    echo -e "is_query\t= $is_query"
+    echo -e "is_parameter\t= $is_parameter"
+    echo -e "parameters\t= $parameters"
+    echo -e "metric_type\t= $metric_type"
+    echo
+  fi
+ 
+  if [ $is_create == "true" ]; then
+    if [ "$metric_type" == "all" ]; then
+      create_all_rrd "$hostname" "$parameters"
+    else
+      create_rrd "$hostname" "$metric_type" "$parameters"
+    fi
+  elif [ $is_destroy == "true" ]; then
+    if [ "$metric_type" == "all" ]; then
+      destroy_all_monitor $hostname
+    else
+      destroy_monitor $hostname $metric_type
+    fi
+  elif [ $is_update == "true"  ]; then
+    update_rrd "$hostname" "$metric_type"
+  elif [ $is_start == "true"  ]; then
+    if [ "$metric_type" == "all" ]; then
+      start_update_all_rrd $hostname
+    else
+      start_update_rrd "$hostname" "$metric_type"
+    fi
+  elif [ $is_end == "true"  ]; then
+    if [ "$metric_type" == "all" ]; then
+      stop_update_all_rrd $hostname
+    else
+      stop_update_rrd "$hostname" "$metric_type"
+    fi
+  elif [ $is_query == "true" ]; then
+    query_rrd "$hostname" "$metric_type"
+  else
+    if [ "x$hostname" == "x`hostname`" ]; then
+      get_physical_machine_metrics
+    else
+      lxc=$1
+      lxc_assert "$lxc" > /dev/null
+      get_container_metrics $lxc
+    fi
+    print_results
+  fi
+}
+
+
+function get_physical_machine_metrics {
+  host=`hostname`
+  # Metrics
+  totalRam=$(get_physical_total_ram)
+  availableRam=$(get_physical_available_ram)
+  usedRam=$(get_physical_used_ram)
+  usedCpu=$(get_physical_used_cpu)
+  availableDisk=$(get_physical_available_disk)
+  usedDisk=$(get_physical_used_disk)
+  totalDisk=$(get_physical_total_disk)
+}
+
+
+function get_container_metrics {
+  host=$1
+  # Metrics
+  totalRam=$(get_total_ram $lxc)
+  availableRam=$(get_available_ram $lxc)
+  usedRam=$(get_used_ram $lxc)
+  usedCpu=$(get_used_cpu $lxc)
+  availableDisk=$(get_available_disk $lxc)
+  usedDisk=$(get_used_disk $lxc)
+  totalDisk=$(get_total_disk $lxc)
+}
+
+
+function print_results {
+  # Result
+  printf '{"host":"%s", "totalRam":"%s", "availableRam":"%s", "usedRam":"%s", "usedCpu":"%s", "availableDisk":"%s", "usedDisk":"%s", "totalDisk":"%s"}\n' "$host" "$totalRam" "$availableRam" "$usedRam" "$usedCpu" "$availableDisk" "$usedDisk" "$totalDisk"
+}
+
+
+function monitor_description {
+  echo provides metrics for a running container
+}
