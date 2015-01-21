@@ -14,7 +14,7 @@ import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationExcept
  */
 public interface EnvironmentManager
 {
-    public void createEnvironment( Topology topology ) throws EnvironmentCreationException;
+    public Environment createEnvironment(String name, Topology topology ) throws EnvironmentCreationException;
 
     public void destroyEnvironment( UUID environmentId ) throws EnvironmentDestructionException;
 

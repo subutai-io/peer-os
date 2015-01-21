@@ -228,7 +228,7 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void addContainer( ContainerHost container )
+    public void addContainer( EnvironmentContainerImpl container )
     {
         Preconditions.checkNotNull( container );
 
@@ -236,10 +236,18 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void removeContainer( ContainerHost container )
+    public void removeContainer( EnvironmentContainerImpl container )
     {
         Preconditions.checkNotNull( container );
 
         containers.remove( container );
+    }
+
+
+    public void addContainers( Set<EnvironmentContainerImpl> containers )
+    {
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containers ) );
+
+        this.containers.addAll( containers );
     }
 }

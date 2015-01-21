@@ -1,0 +1,60 @@
+package org.safehaus.subutai.core.env.cli;
+
+
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.core.env.api.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.env.impl.NodeGroupImpl;
+import org.safehaus.subutai.core.env.impl.TopologyImpl;
+import org.safehaus.subutai.core.peer.api.PeerManager;
+
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.console.OsgiCommandSupport;
+
+import com.google.common.base.Preconditions;
+
+
+@Command( scope = "env", name = "test-build", description = "Command to build test environment on local peer" )
+public class TestBuildEnvironmentCommand extends OsgiCommandSupport
+{
+
+    @Argument( name = "templateName", description = "Template name",
+            index = 0, multiValued = false, required = true )
+    private String templateName;
+    @Argument( name = "numberOfContainers", description = "Number of containers",
+            index = 1, multiValued = false, required = true )
+    private int numberOfContainers;
+
+    private final EnvironmentManager environmentManager;
+    private final PeerManager peerManager;
+
+
+    public TestBuildEnvironmentCommand( final EnvironmentManager environmentManager, final PeerManager peerManager )
+    {
+        Preconditions.checkNotNull( environmentManager );
+        Preconditions.checkNotNull( peerManager );
+
+        this.environmentManager = environmentManager;
+        this.peerManager = peerManager;
+    }
+
+
+    @Override
+    protected Object doExecute() throws Exception
+    {
+        TopologyImpl topology = new TopologyImpl();
+        NodeGroupImpl nodeGroup =
+                new NodeGroupImpl( "NodeGroup1", templateName, Common.DEFAULT_DOMAIN_NAME, numberOfContainers, 0, 0,
+                        new PlacementStrategy( "ROUND_ROBIN" ) );
+
+        topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );
+
+        Environment environment = environmentManager.createEnvironment( "Dummy environment name", topology );
+
+        System.out.println( environment );
+
+        return null;
+    }
+}

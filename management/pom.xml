@@ -146,11 +146,11 @@
         <artifactId>env-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>environment-manager-cli</artifactId>-->
-      <!--<version>${project.version}</version>-->
-      <!--</dependency>-->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>env-manager-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <!--<dependency>-->
       <!--<groupId>${project.groupId}</groupId>-->
       <!--<artifactId>environment-manager-rest</artifactId>-->
