@@ -10,4 +10,6 @@ import org.safehaus.subutai.common.peer.Peer;
 public interface Topology
 {
     public Map<Peer, Set<NodeGroup>> getNodeGroupPlacement();
+
+    public void addNodeGroupPlacement( Peer peer, NodeGroup nodeGroup );
 }

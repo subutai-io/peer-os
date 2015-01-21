@@ -29,6 +29,7 @@ public class TopologyImpl implements Topology
     }
 
 
+    @Override
     public void addNodeGroupPlacement( Peer peer, NodeGroup nodeGroup )
     {
         Preconditions.checkNotNull( peer, "Invalid peer" );

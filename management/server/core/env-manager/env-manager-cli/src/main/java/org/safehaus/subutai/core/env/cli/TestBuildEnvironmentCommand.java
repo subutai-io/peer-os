@@ -5,8 +5,8 @@ import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.env.api.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.env.impl.NodeGroupImpl;
-import org.safehaus.subutai.core.env.impl.TopologyImpl;
+import org.safehaus.subutai.core.env.api.build.NodeGroup;
+import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.karaf.shell.commands.Argument;
@@ -44,9 +44,9 @@ public class TestBuildEnvironmentCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        TopologyImpl topology = new TopologyImpl();
-        NodeGroupImpl nodeGroup =
-                new NodeGroupImpl( "NodeGroup1", templateName, Common.DEFAULT_DOMAIN_NAME, numberOfContainers, 0, 0,
+        Topology topology = environmentManager.newTopology();
+        NodeGroup nodeGroup = environmentManager
+                .newNodeGroup( "NodeGroup1", templateName, Common.DEFAULT_DOMAIN_NAME, numberOfContainers, 0, 0,
                         new PlacementStrategy( "ROUND_ROBIN" ) );
 
         topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );

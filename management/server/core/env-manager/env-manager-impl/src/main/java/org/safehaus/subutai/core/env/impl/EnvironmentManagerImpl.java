@@ -3,8 +3,10 @@ package org.safehaus.subutai.core.env.impl;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.core.env.api.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.env.api.build.NodeGroup;
 import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
@@ -85,5 +87,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void destroyContainer( final UUID containerId ) throws EnvironmentModificationException
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
+    }
+
+
+    @Override
+    public NodeGroup newNodeGroup( final String name, final String templateName, final String domainName,
+                                   final int numberOfNodes, final int sshGroupId, final int hostsGroupId,
+                                   final PlacementStrategy nodePlacementStrategy )
+    {
+        return new NodeGroupImpl( name, templateName, domainName, numberOfNodes, sshGroupId, hostsGroupId,
+                nodePlacementStrategy );
+    }
+
+
+    @Override
+    public Topology newTopology()
+    {
+        return new TopologyImpl();
     }
 }
