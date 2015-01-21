@@ -155,11 +155,10 @@ public class EnvironmentDAO
                     + "                             AS ebp WHERE ebp.source = :source and ebp.id=:id" );
             query.setParameter( "source", source );
             query.setParameter( "id", key );
-            EnvironmentBlueprintEntity ebp = ( EnvironmentBlueprintEntity ) query.getSingleResult();
+            EnvironmentBuildProcessEntity ebp = ( EnvironmentBuildProcessEntity ) query.getSingleResult();
 
             if ( ebp != null )
             {
-                daoManager.closeEntityManager( entityManager );
                 return GSON.fromJson( ebp.getInfo(), clazz );
             }
         }
@@ -289,7 +288,7 @@ public class EnvironmentDAO
 
             Query query;
             query = entityManager.createQuery(
-                    "delete FROM EnvironmentBlueprintEntity " + "                         AS ebe WHERE ebe.id=:id" );
+                    "delete FROM EnvironmentBlueprintEntity " + " AS ebe WHERE ebe.id=:id" );
             query.setParameter( "id", blueprintId.toString() );
             query.executeUpdate();
             daoManager.commitTransaction( entityManager );

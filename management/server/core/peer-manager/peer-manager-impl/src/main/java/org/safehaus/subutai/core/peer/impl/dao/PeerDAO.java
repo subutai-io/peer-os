@@ -174,8 +174,7 @@ public class PeerDAO
             }*/
 
             Query query;
-            query = entityManager.createQuery( "SELECT pd FROM PeerData "
-                    + "                             AS pd WHERE pd.source = :source and pd.id=:id" );
+            query = entityManager.createQuery( "SELECT pd FROM PeerData AS pd WHERE pd.source = :source and pd.id=:id" );
             query.setParameter( "source" ,source );
             query.setParameter( "id", key );
             PeerData pd = (PeerData) query.getSingleResult();
@@ -272,8 +271,7 @@ public class PeerDAO
         finally
         {
             daoManager.closeEntityManager( entityManager );
-
-            return true;
         }
+        return true;
     }
 }
