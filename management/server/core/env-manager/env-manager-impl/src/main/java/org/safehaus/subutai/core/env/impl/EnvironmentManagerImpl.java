@@ -236,11 +236,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     @Override
     public NodeGroup newNodeGroup( final String name, final String templateName, final String domainName,
-                                   final int numberOfNodes, final int sshGroupId, final int hostsGroupId,
-                                   final PlacementStrategy nodePlacementStrategy )
+                                   final int numberOfContainers, final int sshGroupId, final int hostsGroupId,
+                                   final PlacementStrategy containerPlacementStrategy )
     {
-        return new NodeGroupImpl( name, templateName, domainName, numberOfNodes, sshGroupId, hostsGroupId,
-                nodePlacementStrategy );
+        return new NodeGroupImpl( name, templateName, domainName, numberOfContainers, sshGroupId, hostsGroupId,
+                containerPlacementStrategy );
     }
 
 
