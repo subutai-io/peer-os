@@ -1,9 +1,11 @@
 package org.safehaus.subutai.core.env.impl;
 
 
+import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
@@ -17,6 +19,9 @@ import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionExcepti
 import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 import org.safehaus.subutai.core.env.impl.builder.TopologyBuilder;
+import org.safehaus.subutai.core.env.impl.dao.BlueprintDataService;
+import org.safehaus.subutai.core.env.impl.dao.EnvironmentContainerDataService;
+import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -36,6 +41,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private final PeerManager peerManager;
     private final TopologyBuilder topologyBuilder;
 
+    //************* DaoManager ******************
+    private DaoManager daoManager;
+
+    //************* Data Managers ******************
+    private EnvironmentDataService environmentDataService;
+    private EnvironmentContainerDataService environmentContainerDataService;
+    private BlueprintDataService blueprintDataService;
+
 
     public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager )
     {
@@ -47,6 +60,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.topologyBuilder = new TopologyBuilder( templateRegistry, peerManager );
     }
 
+    //************* Init Data Managers ******************
+    public void init()
+    {
+        try
+        {
+            this.blueprintDataService            = new BlueprintDataService( daoManager );
+            this.environmentDataService          = new EnvironmentDataService( daoManager);
+            this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
+        }
+        catch ( SQLException e )
+        {
+        }
+    }
 
     @Override
     public Environment findEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
@@ -178,5 +204,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Topology newTopology()
     {
         return new TopologyImpl();
+    }
+
+
+    public DaoManager getDaoManager()
+    {
+        return daoManager;
+    }
+
+
+    public void setDaoManager( final DaoManager daoManager )
+    {
+        this.daoManager = daoManager;
     }
 }
