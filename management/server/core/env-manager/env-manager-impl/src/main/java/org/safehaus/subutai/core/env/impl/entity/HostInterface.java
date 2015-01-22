@@ -37,7 +37,7 @@ public class HostInterface implements Interface, Serializable
     private EnvironmentContainerImpl host;
 
 
-    private HostInterface()
+    protected HostInterface()
     {
     }
 

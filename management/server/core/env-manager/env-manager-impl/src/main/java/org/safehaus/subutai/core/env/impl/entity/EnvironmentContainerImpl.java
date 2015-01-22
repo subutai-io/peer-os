@@ -97,7 +97,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     private DataService<String, EnvironmentContainerImpl> dataService;
 
 
-    private EnvironmentContainerImpl()
+    protected EnvironmentContainerImpl()
     {
     }
 
