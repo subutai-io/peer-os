@@ -11,16 +11,20 @@
     </cxf:features>
   </cxf:bus>
 
+  <reference id="environmentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
+  <reference id="peerManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+
+  <bean id="environmentRestServiceImpl" class="org.safehaus.subutai.core.environment.rest.RestServiceImpl">
+    <argument ref="environmentManager" />
+    <argument ref="peerManager" />
+  </bean>
+
   <jaxrs:server address="/environment" id="environmentRestService">
     <jaxrs:serviceBeans>
       <ref component-id="environmentRestServiceImpl" />
     </jaxrs:serviceBeans>
   </jaxrs:server>
 
-  <bean id="environmentRestServiceImpl" class="org.safehaus.subutai.core.environment.rest.RestServiceImpl">
-    <property name="environmentManager" ref="environmentManager" />
-  </bean>
-
-  <reference id="environmentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 </blueprint>
