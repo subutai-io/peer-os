@@ -364,7 +364,7 @@ public class MainUI extends UI implements ViewChangeListener
                                         String contextPath = VaadinService.getCurrentRequest().getContextPath();
                                         getUI().getPage().setLocation( contextPath );
                                         LOG.trace( "VaadinSession.close() called" );
-                                        getSession().close();
+//                                        getSession().close();
                                         //                                        buildLoginView( true );
                                     }
                                 } );

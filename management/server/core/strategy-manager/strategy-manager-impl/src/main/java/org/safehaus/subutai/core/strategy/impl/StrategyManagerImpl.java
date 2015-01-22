@@ -80,11 +80,11 @@ public class StrategyManagerImpl implements StrategyManager
             throw new StrategyException( String.format( "Only %d containers can be created", totalSlots ) );
         }
 
-        if ( totalSlots > nodesCount )
-        {
-            throw new StrategyException(
-                    String.format( "Total count of slots [%d] more than requested [%d].", totalSlots, nodesCount ) );
-        }
+//        if ( totalSlots > nodesCount )
+//        {
+//            throw new StrategyException(
+//                    String.format( "Total count of slots [%d] more than requested [%d].", totalSlots, nodesCount ) );
+//        }
 
         return result;
     }
