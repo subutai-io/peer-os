@@ -70,7 +70,7 @@ public class NodeGroupBuilder
                 {
                     containers.add( new EnvironmentContainerImpl( peer, nodeGroup.getName(), newHost,
                             templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
-                            nodeGroup.getHostsGroupId() ) );
+                            nodeGroup.getHostsGroupId(), nodeGroup.getDomainName() ) );
                 }
             }
             catch ( PeerException e )

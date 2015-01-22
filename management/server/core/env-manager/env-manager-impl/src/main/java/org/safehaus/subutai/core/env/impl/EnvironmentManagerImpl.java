@@ -50,7 +50,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private final TopologyBuilder topologyBuilder;
 
     //************* DaoManager ******************
-    private DaoManager daoManager;
+    private final DaoManager daoManager;
 
     //************* Data Managers ******************
     private EnvironmentDataService environmentDataService;
@@ -59,15 +59,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
-                                   final NetworkManager networkManager )
+                                   final NetworkManager networkManager, final DaoManager daoManager )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( networkManager );
+        Preconditions.checkNotNull( daoManager );
 
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.networkManager = networkManager;
+        this.daoManager = daoManager;
         this.topologyBuilder = new TopologyBuilder( templateRegistry, peerManager );
     }
 
@@ -142,8 +144,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             //TODO think of updating environment in topology builder after every node group is created
             environment.addContainers( topologyBuilder.build( topology ) );
+
+            configureHosts( environment.getContainerHosts() );
+
+            configureSsh( environment.getContainerHosts() );
         }
-        catch ( EnvironmentBuildException e )
+        catch ( EnvironmentBuildException | NetworkManagerException e )
         {
             environment.setStatus( EnvironmentStatus.UNHEALTHY );
 
@@ -154,8 +160,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         //set container's transient fields
         setContainersTransitiveFields( environment.getContainerHosts() );
-
-        //TODO implement ssh and hosts linking
 
         return environment;
     }
@@ -208,13 +212,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             environment.addContainers( newContainers );
 
+            configureHosts( environment.getContainerHosts() );
+
+            configureSsh( environment.getContainerHosts() );
+
             //set container's transient fields
             setContainersTransitiveFields( Sets.<ContainerHost>newHashSet( newContainers ) );
-
-            //TODO implement ssh and hosts linking
         }
-        catch ( EnvironmentBuildException e )
+        catch ( EnvironmentBuildException | NetworkManagerException e )
         {
+            environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
             throw new EnvironmentModificationException( e );
         }
 
@@ -350,14 +358,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             //ignore group ids <= 0
             if ( hostGroupId > 0 )
             {
-                networkManager.registerHosts( groupedContainers, "" );
+                //assume that inside one host group the domain name must be the same for all containers
+                //so pick one container's domain name as the group domain name
+                networkManager.registerHosts( groupedContainers,
+                        ( ( EnvironmentContainerImpl ) groupedContainers.iterator().next() ).getDomainName() );
             }
         }
-    }
-
-
-    public void setDaoManager( final DaoManager daoManager )
-    {
-        this.daoManager = daoManager;
     }
 }

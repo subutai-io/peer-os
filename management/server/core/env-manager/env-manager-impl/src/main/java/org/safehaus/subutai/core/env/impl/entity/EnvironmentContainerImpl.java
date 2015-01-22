@@ -94,6 +94,8 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     private int sshGroupId;
     @Column( name = "hosts_group_id" )
     private int hostsGroupId;
+    @Column( name = "domain_name" )
+    private String domainName;
 
 
     @Transient
@@ -115,10 +117,11 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
     public EnvironmentContainerImpl( final Peer peer, final String nodeGroupName, final HostInfoModel hostInfo,
-                                     final Template template, int sshGroupId, int hostsGroupId )
+                                     final Template template, int sshGroupId, int hostsGroupId, String domainName )
     {
         Preconditions.checkNotNull( peer );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
         Preconditions.checkNotNull( hostInfo );
         Preconditions.checkNotNull( template );
 
@@ -133,6 +136,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
         this.templateArch = template.getLxcArch();
         this.sshGroupId = sshGroupId;
         this.hostsGroupId = hostsGroupId;
+        this.domainName = domainName;
         for ( Interface anInterface : hostInfo.getInterfaces() )
         {
             HostInterface hostInterface = new HostInterface( anInterface );
@@ -594,5 +598,11 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public int getHostsGroupId()
     {
         return hostsGroupId;
+    }
+
+
+    public String getDomainName()
+    {
+        return domainName;
     }
 }
