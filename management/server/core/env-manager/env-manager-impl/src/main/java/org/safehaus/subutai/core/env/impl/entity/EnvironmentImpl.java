@@ -71,6 +71,9 @@ public class EnvironmentImpl implements Environment, Serializable
     @Enumerated( EnumType.STRING )
     private EnvironmentStatus status = EnvironmentStatus.EMPTY;
 
+    @Column( name = "public_key", length = 3000 )
+    private String publicKey;
+
     @Transient
     private DataService dataService;
 
@@ -85,6 +88,13 @@ public class EnvironmentImpl implements Environment, Serializable
         this.name = name;
         this.environmentId = UUID.randomUUID().toString();
         this.creationTimestamp = System.currentTimeMillis();
+    }
+
+
+    @Override
+    public String getPublicKey()
+    {
+        return publicKey;
     }
 
 

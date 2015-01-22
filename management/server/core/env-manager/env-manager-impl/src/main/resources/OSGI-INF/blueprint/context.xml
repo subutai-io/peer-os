@@ -11,6 +11,8 @@
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
   <reference id="peerManager"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <reference id="networkManager"
+             interface="org.safehaus.subutai.core.network.api.NetworkManager" />
 
   <!-- ************************************************************************************************* -->
   <bean id="daoManagerEnv" init-method="init" class="org.safehaus.subutai.common.dao.DaoManager" activation="eager">
@@ -20,9 +22,10 @@
 
   <bean id="environmentManager" scope="singleton" init-method="init"
         class="org.safehaus.subutai.core.env.impl.EnvironmentManagerImpl">
-    <property name="daoManager" ref="daoManagerEnv" />
     <argument ref="templateRegistry" />
     <argument ref="peerManager" />
+    <argument ref="networkManager" />
+    <argument ref="daoManagerEnv" />
   </bean>
 
   <service ref="environmentManager" interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />

@@ -90,6 +90,13 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
             .class, orphanRemoval = true )
     protected Set<Interface> interfaces = new HashSet<>();
 
+    @Column( name = "ssh_group_id" )
+    private int sshGroupId;
+    @Column( name = "hosts_group_id" )
+    private int hostsGroupId;
+    @Column( name = "domain_name" )
+    private String domainName;
+
 
     @Transient
     private Peer peer;
@@ -110,10 +117,11 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
     public EnvironmentContainerImpl( final Peer peer, final String nodeGroupName, final HostInfoModel hostInfo,
-                                     final Template template )
+                                     final Template template, int sshGroupId, int hostsGroupId, String domainName )
     {
         Preconditions.checkNotNull( peer );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
         Preconditions.checkNotNull( hostInfo );
         Preconditions.checkNotNull( template );
 
@@ -126,6 +134,9 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
         this.nodeGroupName = nodeGroupName;
         this.templateName = template.getTemplateName();
         this.templateArch = template.getLxcArch();
+        this.sshGroupId = sshGroupId;
+        this.hostsGroupId = hostsGroupId;
+        this.domainName = domainName;
         for ( Interface anInterface : hostInfo.getInterfaces() )
         {
             HostInterface hostInterface = new HostInterface( anInterface );
@@ -575,5 +586,23 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public String getParentHostname()
     {
         throw new UnsupportedOperationException( "Unsupported method." );
+    }
+
+
+    public int getSshGroupId()
+    {
+        return sshGroupId;
+    }
+
+
+    public int getHostsGroupId()
+    {
+        return hostsGroupId;
+    }
+
+
+    public String getDomainName()
+    {
+        return domainName;
     }
 }

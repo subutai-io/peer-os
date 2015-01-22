@@ -22,6 +22,8 @@ public interface Environment
 
     public long getCreationTimestamp();
 
+    public String getPublicKey();
+
     public Set<ContainerHost> getContainerHosts();
 
     /**

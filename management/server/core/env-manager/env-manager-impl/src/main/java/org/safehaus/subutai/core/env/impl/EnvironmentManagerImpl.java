@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.env.impl;
 
 
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -26,11 +27,14 @@ import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 
@@ -42,10 +46,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     private final TemplateRegistry templateRegistry;
     private final PeerManager peerManager;
+    private final NetworkManager networkManager;
     private final TopologyBuilder topologyBuilder;
 
     //************* DaoManager ******************
-    private DaoManager daoManager;
+    private final DaoManager daoManager;
 
     //************* Data Managers ******************
     private EnvironmentDataService environmentDataService;
@@ -53,13 +58,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private BlueprintDataService blueprintDataService;
 
 
-    public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager )
+    public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
+                                   final NetworkManager networkManager, final DaoManager daoManager )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
+        Preconditions.checkNotNull( networkManager );
+        Preconditions.checkNotNull( daoManager );
 
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
+        this.networkManager = networkManager;
+        this.daoManager = daoManager;
         this.topologyBuilder = new TopologyBuilder( templateRegistry, peerManager );
     }
 
@@ -132,10 +142,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         try
         {
-            //TODO think of updating environment in topology builder after every node group is created
-            environment.addContainers( topologyBuilder.build( topology ) );
+            topologyBuilder.build( environment, topology );
+
+            configureHosts( environment.getContainerHosts() );
+
+            configureSsh( environment.getContainerHosts() );
         }
-        catch ( EnvironmentBuildException e )
+        catch ( EnvironmentBuildException | NetworkManagerException e )
         {
             environment.setStatus( EnvironmentStatus.UNHEALTHY );
 
@@ -193,16 +206,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         try
         {
-            //TODO think of passing environment to topologyBuilder and adding every succeeded node group and saving
-            Set<EnvironmentContainerImpl> newContainers = topologyBuilder.build( topology );
+            topologyBuilder.build( environment, topology );
 
-            environment.addContainers( newContainers );
+            configureHosts( environment.getContainerHosts() );
+
+            configureSsh( environment.getContainerHosts() );
 
             //set container's transient fields
-            setContainersTransitiveFields( Sets.<ContainerHost>newHashSet( newContainers ) );
+            setContainersTransitiveFields( environment.getContainerHosts() );
         }
-        catch ( EnvironmentBuildException e )
+        catch ( EnvironmentBuildException | NetworkManagerException e )
         {
+            environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
             throw new EnvironmentModificationException( e );
         }
 
@@ -276,8 +292,73 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void setDaoManager( final DaoManager daoManager )
+    private void configureSsh( Set<ContainerHost> containerHosts ) throws NetworkManagerException
     {
-        this.daoManager = daoManager;
+        Map<Integer, Set<ContainerHost>> sshGroups = Maps.newHashMap();
+
+        //group containers by ssh group
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            int sshGroupId = ( ( EnvironmentContainerImpl ) containerHost ).getSshGroupId();
+            Set<ContainerHost> groupedContainers = sshGroups.get( sshGroupId );
+
+            if ( groupedContainers == null )
+            {
+                groupedContainers = Sets.newHashSet();
+                sshGroups.put( sshGroupId, groupedContainers );
+            }
+
+            groupedContainers.add( containerHost );
+        }
+
+        //configure ssh on each group
+        for ( Map.Entry<Integer, Set<ContainerHost>> sshGroup : sshGroups.entrySet() )
+        {
+            int sshGroupId = sshGroup.getKey();
+            Set<ContainerHost> groupedContainers = sshGroup.getValue();
+
+            //ignore group ids <= 0
+            if ( sshGroupId > 0 )
+            {
+                networkManager.exchangeSshKeys( groupedContainers );
+            }
+        }
+    }
+
+
+    private void configureHosts( Set<ContainerHost> containerHosts ) throws NetworkManagerException
+    {
+        Map<Integer, Set<ContainerHost>> hostGroups = Maps.newHashMap();
+
+        //group containers by host group
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            int hostGroupId = ( ( EnvironmentContainerImpl ) containerHost ).getHostsGroupId();
+            Set<ContainerHost> groupedContainers = hostGroups.get( hostGroupId );
+
+            if ( groupedContainers == null )
+            {
+                groupedContainers = Sets.newHashSet();
+                hostGroups.put( hostGroupId, groupedContainers );
+            }
+
+            groupedContainers.add( containerHost );
+        }
+
+        //configure hosts on each group
+        for ( Map.Entry<Integer, Set<ContainerHost>> hostGroup : hostGroups.entrySet() )
+        {
+            int hostGroupId = hostGroup.getKey();
+            Set<ContainerHost> groupedContainers = hostGroup.getValue();
+
+            //ignore group ids <= 0
+            if ( hostGroupId > 0 )
+            {
+                //assume that inside one host group the domain name must be the same for all containers
+                //so pick one container's domain name as the group domain name
+                networkManager.registerHosts( groupedContainers,
+                        ( ( EnvironmentContainerImpl ) groupedContainers.iterator().next() ).getDomainName() );
+            }
+        }
     }
 }

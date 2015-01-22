@@ -49,8 +49,6 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.security.api.SecurityManager;
-import org.safehaus.subutai.core.security.api.SecurityManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +75,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private NetworkManager networkManager;
     private EnvironmentDAO environmentDAO;
     private TemplateRegistry templateRegistry;
-    private SecurityManager securityManager;
     private EnvironmentDataService environmentDataService;
     private EnvironmentContainerDataService environmentContainerDataService;
     private DaoManager daoManager;
@@ -338,9 +335,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             try
             {
-                securityManager.configSshOnAgents( containers );
+                networkManager.exchangeSshKeys( containers );
             }
-            catch ( SecurityManagerException e )
+            catch ( NetworkManagerException e )
             {
                 LOG.error( e.getMessage() );
                 throw new EnvironmentConfigureException( e.getMessage() );
@@ -356,9 +353,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             try
             {
-                securityManager.configHostsOnAgents( containers, blueprint.getDomainName() );
+                networkManager.registerHosts( containers, blueprint.getDomainName() );
             }
-            catch ( SecurityManagerException e )
+            catch ( NetworkManagerException e )
             {
                 throw new EnvironmentConfigureException( e.getMessage() );
             }
@@ -709,12 +706,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
         this.templateRegistry = templateRegistry;
-    }
-
-
-    public void setSecurityManager( final SecurityManager securityManager )
-    {
-        this.securityManager = securityManager;
     }
 
 
