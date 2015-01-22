@@ -15,34 +15,31 @@ public interface RestService
 {
 
     @POST
-    @Path( "build" )
     public Response buildLocalEnvironment( @QueryParam( "blueprint" ) String blueprint );
 
     @GET
-    @Path( "getEnvironmentId" )
+    @Path( "container/environmentId" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getContainerEnvironmentId( @QueryParam( "containerId" ) String containerId );
 
     @GET
-    @Path( "getEnvironment" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getEnvironment( @QueryParam( "environmentId" ) String environmentId );
 
     @DELETE
-    @Path( "destroy" )
     public Response destroyEnvironment( @QueryParam( "environmentId" ) String environmentId );
 
     @DELETE
-    @Path( "container/destroy" )
+    @Path( "container" )
     public Response destroyContainer( @QueryParam( "containerId" ) String containerId );
 
     @POST
-    @Path( "add" )
+    @Path( "nodeGroup" )
     public Response addNodeGroup( @QueryParam( "environmentId" ) String environmentId,
                                   @QueryParam( "nodeGroup" ) String nodeGroup );
 
     @GET
-    @Path( "getContainerState" )
+    @Path( "container/state" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getContainerState( @QueryParam( "containerId" ) String containerId );
 }
