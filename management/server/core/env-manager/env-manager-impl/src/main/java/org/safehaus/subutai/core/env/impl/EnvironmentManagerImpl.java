@@ -159,7 +159,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
-        Set<ContainerHost> containers = environment.getContainerHosts();
+        Set<ContainerHost> containers = Sets.newHashSet( environment.getContainerHosts() );
 
         for ( ContainerHost container : containers )
         {
