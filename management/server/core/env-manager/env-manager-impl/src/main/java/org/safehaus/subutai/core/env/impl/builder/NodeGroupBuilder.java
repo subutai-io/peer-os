@@ -10,11 +10,11 @@ import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.env.api.build.NodeGroup;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.exception.NodeGroupBuildException;
+import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -69,7 +69,8 @@ public class NodeGroupBuilder
                 for ( HostInfoModel newHost : newHosts )
                 {
                     containers.add( new EnvironmentContainerImpl( peer, nodeGroup.getName(), newHost,
-                            templateRegistry.getTemplate( nodeGroup.getTemplateName() ) ) );
+                            templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
+                            nodeGroup.getHostsGroupId() ) );
                 }
             }
             catch ( PeerException e )
