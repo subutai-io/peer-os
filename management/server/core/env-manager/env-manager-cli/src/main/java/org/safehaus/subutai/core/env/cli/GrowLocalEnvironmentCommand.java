@@ -53,7 +53,7 @@ public class GrowLocalEnvironmentCommand extends OsgiCommandSupport
         Topology topology = environmentManager.newTopology();
         NodeGroup nodeGroup = environmentManager
                 .newNodeGroup( String.format( "NodeGroup%s", System.currentTimeMillis() ), templateName,
-                        Common.DEFAULT_DOMAIN_NAME, numberOfContainers, 0, 0, new PlacementStrategy( "ROUND_ROBIN" ) );
+                        Common.DEFAULT_DOMAIN_NAME, numberOfContainers, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
 
         topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );
 
