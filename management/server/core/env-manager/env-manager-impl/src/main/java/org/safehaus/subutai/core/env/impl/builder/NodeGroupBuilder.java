@@ -30,58 +30,22 @@ public class NodeGroupBuilder implements Callable<Set<EnvironmentContainerImpl>>
 
     private final TemplateRegistry templateRegistry;
     private final PeerManager peerManager;
+    private final Peer peer;
+    private final Set<NodeGroup> nodeGroups;
 
 
-    public NodeGroupBuilder( final TemplateRegistry templateRegistry, final PeerManager peerManager )
+    public NodeGroupBuilder( final TemplateRegistry templateRegistry, final PeerManager peerManager, final Peer peer,
+                             final Set<NodeGroup> nodeGroups )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
-
-        this.templateRegistry = templateRegistry;
-        this.peerManager = peerManager;
-    }
-
-
-    public Set<EnvironmentContainerImpl> build( Peer peer, Set<NodeGroup> nodeGroups ) throws NodeGroupBuildException
-    {
         Preconditions.checkNotNull( peer );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( nodeGroups ) );
 
-        Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
-
-        UUID localPeerId = peerManager.getLocalPeer().getId();
-
-        for ( NodeGroup nodeGroup : nodeGroups )
-        {
-            try
-            {
-                //TODO revise peer container cloning:
-                // 1) add batch set<nodeGroup> cloning
-                // 2) replace creatorPeerId with ownerId or remove at all
-                // 3) review template sharing and parameter passing
-
-
-                Set<HostInfoModel> newHosts = peer.scheduleCloneContainers( localPeerId,
-                        fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
-                        nodeGroup.getNumberOfNodes(), nodeGroup.getNodePlacementStrategy().getStrategyId(),
-                        nodeGroup.getNodePlacementStrategy().getCriteriaAsList() );
-
-
-                for ( HostInfoModel newHost : newHosts )
-                {
-                    containers.add( new EnvironmentContainerImpl( peer, nodeGroup.getName(), newHost,
-                            templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
-                            nodeGroup.getHostsGroupId(), nodeGroup.getDomainName() ) );
-                }
-            }
-            catch ( PeerException e )
-            {
-                throw new NodeGroupBuildException(
-                        String.format( "Error creating node group %s on peer %s", nodeGroup, peer ), e );
-            }
-        }
-
-        return containers;
+        this.templateRegistry = templateRegistry;
+        this.peerManager = peerManager;
+        this.peer = peer;
+        this.nodeGroups = nodeGroups;
     }
 
 
@@ -118,8 +82,43 @@ public class NodeGroupBuilder implements Callable<Set<EnvironmentContainerImpl>>
 
 
     @Override
-    public Set<EnvironmentContainerImpl> call() throws Exception
+    public Set<EnvironmentContainerImpl> call() throws NodeGroupBuildException
     {
-        return null;
+
+        Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
+
+        UUID localPeerId = peerManager.getLocalPeer().getId();
+
+        for ( NodeGroup nodeGroup : nodeGroups )
+        {
+            try
+            {
+                //TODO revise peer container cloning:
+                // 1) add batch set<nodeGroup> cloning
+                // 2) replace creatorPeerId with ownerId or remove at all
+                // 3) review template sharing and parameter passing
+
+
+                Set<HostInfoModel> newHosts = peer.scheduleCloneContainers( localPeerId,
+                        fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
+                        nodeGroup.getNumberOfNodes(), nodeGroup.getNodePlacementStrategy().getStrategyId(),
+                        nodeGroup.getNodePlacementStrategy().getCriteriaAsList() );
+
+
+                for ( HostInfoModel newHost : newHosts )
+                {
+                    containers.add( new EnvironmentContainerImpl( peer, nodeGroup.getName(), newHost,
+                            templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
+                            nodeGroup.getHostsGroupId(), nodeGroup.getDomainName() ) );
+                }
+            }
+            catch ( PeerException e )
+            {
+                throw new NodeGroupBuildException(
+                        String.format( "Error creating node group %s on peer %s", nodeGroup, peer ), e );
+            }
+        }
+
+        return containers;
     }
 }

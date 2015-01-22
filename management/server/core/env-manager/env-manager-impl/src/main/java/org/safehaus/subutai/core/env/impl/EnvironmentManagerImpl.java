@@ -43,8 +43,6 @@ import com.google.common.collect.Sets;
  */
 public class EnvironmentManagerImpl implements EnvironmentManager
 {
-
-    private final TemplateRegistry templateRegistry;
     private final PeerManager peerManager;
     private final NetworkManager networkManager;
     private final TopologyBuilder topologyBuilder;
@@ -66,7 +64,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkNotNull( networkManager );
         Preconditions.checkNotNull( daoManager );
 
-        this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.networkManager = networkManager;
         this.daoManager = daoManager;
@@ -74,18 +71,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    //************* Init Data Managers ******************
-    public void init()
+    public void init() throws SQLException
     {
-        try
-        {
-            this.blueprintDataService = new BlueprintDataService( daoManager );
-            this.environmentDataService = new EnvironmentDataService( daoManager );
-            this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
-        }
-        catch ( SQLException e )
-        {
-        }
+        this.blueprintDataService = new BlueprintDataService( daoManager );
+        this.environmentDataService = new EnvironmentDataService( daoManager );
+        this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
     }
 
 
