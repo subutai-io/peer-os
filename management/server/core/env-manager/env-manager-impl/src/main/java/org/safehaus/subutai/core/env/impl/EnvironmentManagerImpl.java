@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.env.impl;
 
 
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -27,11 +28,13 @@ import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 
@@ -152,6 +155,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         //set container's transient fields
         setContainersTransitiveFields( environment.getContainerHosts() );
 
+        //TODO implement ssh and hosts linking
+
         return environment;
     }
 
@@ -205,6 +210,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             //set container's transient fields
             setContainersTransitiveFields( Sets.<ContainerHost>newHashSet( newContainers ) );
+
+            //TODO implement ssh and hosts linking
         }
         catch ( EnvironmentBuildException e )
         {
@@ -277,6 +284,74 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             ( ( EnvironmentContainerImpl ) containerHost ).setDataService( environmentContainerDataService );
             ( ( EnvironmentContainerImpl ) containerHost ).setPeer( peerManager.getPeer( containerHost.getPeerId() ) );
+        }
+    }
+
+
+    private void configureSsh( Set<ContainerHost> containerHosts ) throws NetworkManagerException
+    {
+        Map<Integer, Set<ContainerHost>> sshGroups = Maps.newHashMap();
+
+        //group containers by ssh group
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            int sshGroupId = ( ( EnvironmentContainerImpl ) containerHost ).getSshGroupId();
+            Set<ContainerHost> groupedContainers = sshGroups.get( sshGroupId );
+
+            if ( groupedContainers == null )
+            {
+                groupedContainers = Sets.newHashSet();
+                sshGroups.put( sshGroupId, groupedContainers );
+            }
+
+            groupedContainers.add( containerHost );
+        }
+
+        //configure ssh on each group
+        for ( Map.Entry<Integer, Set<ContainerHost>> sshGroup : sshGroups.entrySet() )
+        {
+            int sshGroupId = sshGroup.getKey();
+            Set<ContainerHost> groupedContainers = sshGroup.getValue();
+
+            //ignore group ids <= 0
+            if ( sshGroupId > 0 )
+            {
+                networkManager.exchangeSshKeys( groupedContainers );
+            }
+        }
+    }
+
+
+    private void configureHosts( Set<ContainerHost> containerHosts ) throws NetworkManagerException
+    {
+        Map<Integer, Set<ContainerHost>> hostGroups = Maps.newHashMap();
+
+        //group containers by host group
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            int hostGroupId = ( ( EnvironmentContainerImpl ) containerHost ).getHostsGroupId();
+            Set<ContainerHost> groupedContainers = hostGroups.get( hostGroupId );
+
+            if ( groupedContainers == null )
+            {
+                groupedContainers = Sets.newHashSet();
+                hostGroups.put( hostGroupId, groupedContainers );
+            }
+
+            groupedContainers.add( containerHost );
+        }
+
+        //configure hosts on each group
+        for ( Map.Entry<Integer, Set<ContainerHost>> hostGroup : hostGroups.entrySet() )
+        {
+            int hostGroupId = hostGroup.getKey();
+            Set<ContainerHost> groupedContainers = hostGroup.getValue();
+
+            //ignore group ids <= 0
+            if ( hostGroupId > 0 )
+            {
+                networkManager.registerHosts( groupedContainers, "" );
+            }
         }
     }
 

@@ -63,8 +63,6 @@ public class TopologyBuilder
             }
         }
 
-        //TODO implement ssh and hosts linking
-
         return containers;
     }
 }

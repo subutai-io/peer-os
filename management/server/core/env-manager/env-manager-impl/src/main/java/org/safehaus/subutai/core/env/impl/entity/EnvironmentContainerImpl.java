@@ -95,6 +95,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     @Column( name = "hosts_group_id" )
     private int hostsGroupId;
 
+
     @Transient
     private Peer peer;
     @Transient
