@@ -41,4 +41,13 @@ public interface EnvironmentManager
                                    final PlacementStrategy nodePlacementStrategy );
 
     public Topology newTopology();
+
+    /**
+     * Removes environment from database only. Used to cleanup environment records.
+     *
+     * @param environmentId - environment id
+     *
+     * @throws EnvironmentNotFoundException - thrown if environment not found
+     */
+    public void removeEnvironment( UUID environmentId ) throws EnvironmentNotFoundException;
 }

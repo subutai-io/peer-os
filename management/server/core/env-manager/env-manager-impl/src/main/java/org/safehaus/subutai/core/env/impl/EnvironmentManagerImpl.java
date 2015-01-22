@@ -91,7 +91,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             setContainersTransitiveFields( environment.getContainerHosts() );
         }
 
-       return environments;
+        return environments;
     }
 
 
@@ -248,6 +248,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Topology newTopology()
     {
         return new TopologyImpl();
+    }
+
+
+    @Override
+    public void removeEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
+    {
+        Environment environment = findEnvironment( environmentId );
+
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
+        {
+            environmentContainerDataService.remove( containerHost.getId().toString() );
+        }
+
+        environmentDataService.remove( environmentId.toString() );
     }
 
 

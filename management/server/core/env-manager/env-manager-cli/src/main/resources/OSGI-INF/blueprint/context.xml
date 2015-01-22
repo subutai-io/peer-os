@@ -6,8 +6,17 @@
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="env/test-build">
-      <action class="org.safehaus.subutai.core.env.cli.BuildTestEnvironmentCommand">
+    <command name="env/build-local">
+      <action class="org.safehaus.subutai.core.env.cli.BuildLocalEnvironmentCommand">
+        <argument ref="environmentManager" />
+        <argument ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="env/grow-local">
+      <action class="org.safehaus.subutai.core.env.cli.GrowLocalEnvironmentCommand">
         <argument ref="environmentManager" />
         <argument ref="peerManager" />
       </action>
@@ -25,6 +34,30 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="env/view">
       <action class="org.safehaus.subutai.core.env.cli.ViewEnvironmentCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="env/destroy">
+      <action class="org.safehaus.subutai.core.env.cli.DestroyEnvironmentCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="env/destroy-container">
+      <action class="org.safehaus.subutai.core.env.cli.DestroyContainerCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="env/remove">
+      <action class="org.safehaus.subutai.core.env.cli.RemoveEnvironmentCommand">
         <argument ref="environmentManager" />
       </action>
     </command>

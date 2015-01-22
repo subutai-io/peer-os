@@ -16,8 +16,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import com.google.common.base.Preconditions;
 
 
-@Command( scope = "env", name = "test-build", description = "Command to build test environment on local peer" )
-public class BuildTestEnvironmentCommand extends OsgiCommandSupport
+@Command( scope = "env", name = "build-local", description = "Command to build environment on local peer" )
+public class BuildLocalEnvironmentCommand extends OsgiCommandSupport
 {
 
     @Argument( name = "templateName", description = "Template name",
@@ -31,7 +31,7 @@ public class BuildTestEnvironmentCommand extends OsgiCommandSupport
     private final PeerManager peerManager;
 
 
-    public BuildTestEnvironmentCommand( final EnvironmentManager environmentManager, final PeerManager peerManager )
+    public BuildLocalEnvironmentCommand( final EnvironmentManager environmentManager, final PeerManager peerManager )
     {
         Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( peerManager );
