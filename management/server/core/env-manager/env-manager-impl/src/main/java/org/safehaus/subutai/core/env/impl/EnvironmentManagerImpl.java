@@ -31,6 +31,7 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -79,6 +80,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
+    public Set<Environment> getEnvironments()
+    {
+        Set<Environment> environments = Sets.newHashSet();
+        environments.addAll( environmentDataService.getAll() );
+
+        for ( Environment environment : environments )
+        {
+            ( ( EnvironmentImpl ) environment ).setDataService( environmentDataService );
+            setContainersTransitiveFields( environment.getContainerHosts() );
+        }
+
+       return environments;
+    }
+
+
+    @Override
     public Environment findEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
@@ -93,11 +110,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         environment.setDataService( environmentDataService );
 
         //set container's transient fields
-        for ( ContainerHost containerHost : environment.getContainerHosts() )
-        {
-            ( ( EnvironmentContainerImpl ) containerHost ).setDataService( environmentContainerDataService );
-            ( ( EnvironmentContainerImpl ) containerHost ).setPeer( peerManager.getPeer( containerHost.getPeerId() ) );
-        }
+        setContainersTransitiveFields( environment.getContainerHosts() );
 
         return environment;
     }
@@ -129,14 +142,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throw new EnvironmentCreationException( e );
         }
 
-        //set container's transient fields
-        for ( ContainerHost containerHost : environment.getContainerHosts() )
-        {
-            ( ( EnvironmentContainerImpl ) containerHost ).setDataService( environmentContainerDataService );
-            ( ( EnvironmentContainerImpl ) containerHost ).setPeer( peerManager.getPeer( containerHost.getPeerId() ) );
-        }
-
         environment.setStatus( EnvironmentStatus.HEALTHY );
+
+        //set container's transient fields
+        setContainersTransitiveFields( environment.getContainerHosts() );
 
         return environment;
     }
@@ -190,11 +199,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             environment.addContainers( newContainers );
 
             //set container's transient fields
-            for ( EnvironmentContainerImpl container : newContainers )
-            {
-                container.setDataService( environmentContainerDataService );
-                container.setPeer( peerManager.getPeer( container.getPeerId() ) );
-            }
+            setContainersTransitiveFields( Sets.<ContainerHost>newHashSet( newContainers ) );
         }
         catch ( EnvironmentBuildException e )
         {
@@ -243,6 +248,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Topology newTopology()
     {
         return new TopologyImpl();
+    }
+
+
+    private void setContainersTransitiveFields( Set<ContainerHost> containers )
+    {
+        //set container's transient fields
+        for ( ContainerHost containerHost : containers )
+        {
+            ( ( EnvironmentContainerImpl ) containerHost ).setDataService( environmentContainerDataService );
+            ( ( EnvironmentContainerImpl ) containerHost ).setPeer( peerManager.getPeer( containerHost.getPeerId() ) );
+        }
     }
 
 

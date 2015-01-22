@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.env.api;
 
 
+import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
@@ -18,6 +19,9 @@ import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
  */
 public interface EnvironmentManager
 {
+
+    public Set<Environment> getEnvironments();
+
     public Environment findEnvironment( UUID environmentId ) throws EnvironmentNotFoundException;
 
     public Environment createEnvironment( String name, Topology topology ) throws EnvironmentCreationException;

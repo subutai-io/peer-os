@@ -7,9 +7,25 @@
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="env/test-build">
-      <action class="org.safehaus.subutai.core.env.cli.TestBuildEnvironmentCommand">
+      <action class="org.safehaus.subutai.core.env.cli.BuildTestEnvironmentCommand">
         <argument ref="environmentManager" />
         <argument ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="env/list">
+      <action class="org.safehaus.subutai.core.env.cli.ListEnvironmentsCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="env/view">
+      <action class="org.safehaus.subutai.core.env.cli.ViewEnvironmentCommand">
+        <argument ref="environmentManager" />
       </action>
     </command>
   </command-bundle>

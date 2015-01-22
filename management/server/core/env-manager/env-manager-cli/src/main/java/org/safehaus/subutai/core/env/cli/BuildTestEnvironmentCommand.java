@@ -17,7 +17,7 @@ import com.google.common.base.Preconditions;
 
 
 @Command( scope = "env", name = "test-build", description = "Command to build test environment on local peer" )
-public class TestBuildEnvironmentCommand extends OsgiCommandSupport
+public class BuildTestEnvironmentCommand extends OsgiCommandSupport
 {
 
     @Argument( name = "templateName", description = "Template name",
@@ -31,7 +31,7 @@ public class TestBuildEnvironmentCommand extends OsgiCommandSupport
     private final PeerManager peerManager;
 
 
-    public TestBuildEnvironmentCommand( final EnvironmentManager environmentManager, final PeerManager peerManager )
+    public BuildTestEnvironmentCommand( final EnvironmentManager environmentManager, final PeerManager peerManager )
     {
         Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( peerManager );
@@ -53,7 +53,7 @@ public class TestBuildEnvironmentCommand extends OsgiCommandSupport
 
         Environment environment = environmentManager.createEnvironment( "Dummy environment name", topology );
 
-        System.out.println( environment );
+        System.out.println( String.format( "Environment created with id %s", environment.getId() ) );
 
         return null;
     }
