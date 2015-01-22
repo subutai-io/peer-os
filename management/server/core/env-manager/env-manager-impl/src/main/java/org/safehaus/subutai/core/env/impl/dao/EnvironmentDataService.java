@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.env.impl.dao;
 import java.util.Collection;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.protocol.api.DataService;
@@ -26,6 +25,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         this.daoManager = daoManager;
     }
 
+
     @Override
     public EnvironmentImpl find( final String id )
     {
@@ -41,7 +41,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         }
         finally
         {
-            daoManager.closeEntityManager( em );;
+            daoManager.closeEntityManager( em );
         }
         return result;
     }
@@ -77,7 +77,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
             daoManager.startTransaction( em );
             em.persist( item );
             em.flush();
-            daoManager.commitTransaction( em )
+            daoManager.commitTransaction( em );
         }
         catch ( Exception e )
         {
