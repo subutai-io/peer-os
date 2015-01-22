@@ -3,6 +3,9 @@ package org.safehaus.subutai.core.peer.api;
 
 import java.io.IOException;
 
+import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.peer.PeerException;
+
 
 /**
  * Management host interface.

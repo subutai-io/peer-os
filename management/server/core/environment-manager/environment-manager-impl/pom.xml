@@ -41,6 +41,10 @@
       <artifactId>tracker-api</artifactId>
     </dependency>
     <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>network-manager-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>

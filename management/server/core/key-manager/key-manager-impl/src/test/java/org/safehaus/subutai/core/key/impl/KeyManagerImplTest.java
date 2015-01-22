@@ -14,7 +14,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.key.api.KeyInfo;
 import org.safehaus.subutai.core.key.api.KeyManagerException;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
-import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;

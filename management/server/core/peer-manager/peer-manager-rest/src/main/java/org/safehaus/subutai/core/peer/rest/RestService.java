@@ -13,7 +13,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.core.peer.api.PeerInfo;
+import org.safehaus.subutai.common.peer.PeerInfo;
 
 
 public interface RestService

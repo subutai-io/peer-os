@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.peer.api.task.clone;
 
 import java.util.Set;
 
-import org.safehaus.subutai.core.peer.api.HostInfoModel;
+import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.task.TaskResult;
 
 

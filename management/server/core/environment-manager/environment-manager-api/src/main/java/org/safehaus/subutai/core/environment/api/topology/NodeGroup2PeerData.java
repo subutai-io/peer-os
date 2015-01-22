@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.common.peer.Peer;
 
 
 public class NodeGroup2PeerData extends TopologyData

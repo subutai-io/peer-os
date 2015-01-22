@@ -1,9 +1,6 @@
 package org.safehaus.subutai.core.environment.api;
 
 
-/**
- * Created by bahadyr on 10/21/14.
- */
 public enum TopologyEnum
 {
 

@@ -14,9 +14,6 @@ import java.util.concurrent.Future;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 
 
-/**
- * Created by bahadyr on 9/23/14.
- */
 public class BuildProcessExecutorImpl implements BuildProcessExecutor
 {
     private Set<BuildProcessExecutionListener> listeners = new HashSet<>();
@@ -65,7 +62,6 @@ public class BuildProcessExecutorImpl implements BuildProcessExecutor
         } );
 
 
-        //        ExecutorService waiter = Executors.newFixedThreadPool( 1 );
         ExecutorService waiter = Executors.newCachedThreadPool();
         waiter.execute( new Runnable()
         {

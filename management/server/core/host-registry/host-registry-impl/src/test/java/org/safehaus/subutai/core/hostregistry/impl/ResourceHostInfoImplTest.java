@@ -9,8 +9,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
+import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostArchitecture;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 
 import com.google.common.collect.Maps;

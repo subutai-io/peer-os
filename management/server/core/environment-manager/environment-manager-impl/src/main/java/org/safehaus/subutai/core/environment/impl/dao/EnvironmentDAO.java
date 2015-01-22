@@ -11,7 +11,7 @@ import javax.persistence.Query;
 
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.util.DbUtil;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenceException;
 import org.safehaus.subutai.core.environment.impl.entity.EnvironmentBlueprintEntity;
 import org.safehaus.subutai.core.environment.impl.entity.EnvironmentBuildProcessEntity;
@@ -30,14 +30,12 @@ import com.google.gson.GsonBuilder;
 public class EnvironmentDAO
 {
 
-    private static final  Logger LOG = LoggerFactory.getLogger( EnvironmentDAO.class.getName() );
-    private static final  Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDAO.class.getName() );
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    private static final  String ERR_NO_SOURCE = "Source is null or empty";
-    private static final  String ERR_NO_KEY = "Key is null or empty";
-    private DaoManager    daoManager;
-
-    protected DbUtil dbUtil;
+    private static final String ERR_NO_SOURCE = "Source is null or empty";
+    private static final String ERR_NO_KEY = "Key is null or empty";
+    private DaoManager daoManager;
 
 
     public EnvironmentDAO( DaoManager daoManager ) throws SQLException
@@ -45,7 +43,8 @@ public class EnvironmentDAO
         this.daoManager = daoManager;
     }
 
-    public boolean saveInfo( String source, String key, Object info ) throws EnvironmentPersistenceException
+
+    public void saveInfo( String source, String key, Object info ) throws EnvironmentPersistenceException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), ERR_NO_SOURCE );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), ERR_NO_KEY );
@@ -55,11 +54,9 @@ public class EnvironmentDAO
 
         try
         {
-            //dbUtil.update( "merge into environment (source, id, info) values (? , ?, ?)", source,
-            // UUID.fromString( key ), GSON.toJson( info ) );
 
             EnvironmentBuildProcessEntity environmentBuildProcessEntity = new EnvironmentBuildProcessEntity();
-            environmentBuildProcessEntity.setId(  key );
+            environmentBuildProcessEntity.setId( key );
             environmentBuildProcessEntity.setSource( source );
             environmentBuildProcessEntity.setInfo( GSON.toJson( info ) );
 
@@ -77,7 +74,6 @@ public class EnvironmentDAO
         finally
         {
             daoManager.closeEntityManager( entityManager );
-            return true;
         }
     }
 
@@ -95,33 +91,21 @@ public class EnvironmentDAO
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), ERR_NO_SOURCE );
         Preconditions.checkNotNull( clazz, "Class is null" );
 
-        List<T> list   = new ArrayList<>();
+        List<T> list = new ArrayList<>();
         EntityManager entityManager = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
-        {   /*
-            ResultSet rs = dbUtil.select( "select info from environment where source = ?", source );
-            while ( rs != null && rs.next() )
-            {
-                Clob infoClob = rs.getClob( "info" );
-                if ( infoClob != null && infoClob.length() > 0 )
-                {
-                    String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                    list.add( GSON.fromJson( info, clazz ) );
-                }
-            }*/
-
+        {
             Query query;
             query = entityManager.createQuery( "SELECT ebp FROM EnvironmentBuildProcessEntity "
                     + "                             AS ebp WHERE ebp.source = :source" );
-            query.setParameter( "source" ,source );
+            query.setParameter( "source", source );
             List<EnvironmentBuildProcessEntity> results = query.getResultList();
 
-            for (EnvironmentBuildProcessEntity ebp : results)
+            for ( EnvironmentBuildProcessEntity ebp : results )
             {
-                list.add( GSON.fromJson( ebp.getInfo(), clazz ) );
+                list.add( JsonUtil.fromJson( ebp.getInfo(), clazz ) );
             }
-
         }
         catch ( Exception e )
         {
@@ -169,16 +153,15 @@ public class EnvironmentDAO
             Query query;
             query = entityManager.createQuery( "SELECT ebp FROM EnvironmentBuildProcessEntity "
                     + "                             AS ebp WHERE ebp.source = :source and ebp.id=:id" );
-            query.setParameter( "source" ,source );
+            query.setParameter( "source", source );
             query.setParameter( "id", key );
             EnvironmentBuildProcessEntity ebp = (EnvironmentBuildProcessEntity) query.getSingleResult();
 
-            if(ebp !=null)
+            if ( ebp != null )
             {
                 daoManager.closeEntityManager( entityManager );
                 return GSON.fromJson( ebp.getInfo(), clazz );
             }
-
         }
         catch ( Exception e )
         {
@@ -198,7 +181,7 @@ public class EnvironmentDAO
      * @param source - source key
      * @param key - POJO key
      */
-    public synchronized boolean deleteInfo( String source, String key )
+    public synchronized void deleteInfo( String source, String key ) throws EnvironmentPersistenceException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), ERR_NO_SOURCE );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), ERR_NO_KEY );
@@ -212,21 +195,19 @@ public class EnvironmentDAO
             Query query;
             query = entityManager.createQuery( "delete FROM EnvironmentBuildProcessEntity "
                     + "                         AS ebp WHERE ebp.source = :source and ebp.id=:id" );
-            query.setParameter( "source" ,source );
-            query.setParameter( "id", key  );
+            query.setParameter( "source", source );
+            query.setParameter( "id", key );
             query.executeUpdate();
             daoManager.commitTransaction( entityManager );
-         }
+        }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
             daoManager.rollBackTransaction( entityManager );
-            return false;
         }
         finally
         {
             daoManager.closeEntityManager( entityManager );
-            return true;
         }
     }
 
@@ -242,9 +223,9 @@ public class EnvironmentDAO
 
             String json = GSON.toJson( blueprint );
 
-            EnvironmentBlueprintEntity environmentBlueprintEntity = new  EnvironmentBlueprintEntity();
+            EnvironmentBlueprintEntity environmentBlueprintEntity = new EnvironmentBlueprintEntity();
             environmentBlueprintEntity.setId( blueprint.getId().toString() );
-            environmentBlueprintEntity.setInfo(json );
+            environmentBlueprintEntity.setInfo( json );
 
             daoManager.startTransaction( entityManager );
             entityManager.merge( environmentBlueprintEntity );
@@ -273,28 +254,17 @@ public class EnvironmentDAO
         EntityManager entityManager = daoManager.getEntityManagerFromFactory();
 
         try
-        {   /*
-            ResultSet rs = dbUtil.select( "select info from blueprint" );
-            while ( rs != null && rs.next() )
-            {
-                Clob infoClob = rs.getClob( "info" );
-                if ( infoClob != null && infoClob.length() > 0 )
-                {
-                    String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                    blueprints.add( GSON.fromJson( info, EnvironmentBlueprint.class ) );
-                }
-            }*/
+        {
 
             Query query;
             query = entityManager.createQuery( "SELECT ebe FROM EnvironmentBlueprintEntity AS ebe" );
 
             List<EnvironmentBlueprintEntity> results = query.getResultList();
 
-            for (EnvironmentBlueprintEntity ebe : results)
+            for ( EnvironmentBlueprintEntity ebe : results )
             {
                 blueprints.add( GSON.fromJson( ebe.getInfo(), EnvironmentBlueprint.class ) );
             }
-
         }
         catch ( Exception e )
         {
@@ -309,7 +279,7 @@ public class EnvironmentDAO
     }
 
 
-    public boolean deleteBlueprint( final UUID blueprintId ) throws EnvironmentPersistenceException
+    public void deleteBlueprint( final UUID blueprintId ) throws EnvironmentPersistenceException
     {
         EntityManager entityManager = daoManager.getEntityManagerFromFactory();
 
@@ -318,13 +288,11 @@ public class EnvironmentDAO
             daoManager.startTransaction( entityManager );
 
             Query query;
-            query = entityManager.createQuery( "delete FROM EnvironmentBlueprintEntity "
-                    + "                         AS ebe WHERE ebe.id=:id" );
-            query.setParameter( "id",blueprintId.toString() );
+            query = entityManager.createQuery(
+                    "delete FROM EnvironmentBlueprintEntity " + "                         AS ebe WHERE ebe.id=:id" );
+            query.setParameter( "id", blueprintId.toString() );
             query.executeUpdate();
             daoManager.commitTransaction( entityManager );
-
-            return true;
         }
         catch ( Exception e )
         {
@@ -345,11 +313,12 @@ public class EnvironmentDAO
 
         try
         {
-            EnvironmentBlueprintEntity ebe = entityManager.find(EnvironmentBlueprintEntity.class,blueprintId.toString());
+            EnvironmentBlueprintEntity ebe =
+                    entityManager.find( EnvironmentBlueprintEntity.class, blueprintId.toString() );
 
-            if(ebe!=null)
+            if ( ebe != null )
             {
-                return GSON.fromJson( ebe.getInfo() , EnvironmentBlueprint.class );
+                return GSON.fromJson( ebe.getInfo(), EnvironmentBlueprint.class );
             }
         }
         catch ( Exception e )

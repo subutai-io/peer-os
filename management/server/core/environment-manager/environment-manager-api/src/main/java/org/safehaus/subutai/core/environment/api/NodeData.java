@@ -7,9 +7,6 @@ import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
 
-/**
- * Created by bahadyr on 11/5/14.
- */
 public class NodeData
 {
     String nodeGroupName;

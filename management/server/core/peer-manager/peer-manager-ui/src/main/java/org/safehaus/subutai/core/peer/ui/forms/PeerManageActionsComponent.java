@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.peer.ui.forms;
 
 
-import org.safehaus.subutai.core.peer.api.PeerInfo;
+import org.safehaus.subutai.common.peer.PeerInfo;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;

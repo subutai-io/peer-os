@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.broker.api.Topic;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
+import org.safehaus.subutai.common.host.ContainerHostState;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
 
 import static org.junit.Assert.assertEquals;

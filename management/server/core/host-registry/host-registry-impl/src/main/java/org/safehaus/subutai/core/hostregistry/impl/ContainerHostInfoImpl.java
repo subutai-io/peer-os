@@ -6,10 +6,10 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
-import org.safehaus.subutai.core.hostregistry.api.ContainerHostState;
-import org.safehaus.subutai.core.hostregistry.api.HostArchitecture;
-import org.safehaus.subutai.core.hostregistry.api.HostInfo;
-import org.safehaus.subutai.core.hostregistry.api.Interface;
+import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.common.host.HostArchitecture;
+import org.safehaus.subutai.common.host.HostInfo;
+import org.safehaus.subutai.common.host.Interface;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
