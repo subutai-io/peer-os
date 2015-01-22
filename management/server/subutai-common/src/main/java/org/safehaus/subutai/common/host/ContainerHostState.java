@@ -6,6 +6,6 @@ package org.safehaus.subutai.common.host;
  */
 public enum ContainerHostState
 {
-    STARTING, RUNNING, STOPPING, STOPPED, ABORTING, FREEZING, FROZEN
+    STARTING, RUNNING, STOPPING, STOPPED, ABORTING, FREEZING, FROZEN, UNKNOWN
 
 }
