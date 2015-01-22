@@ -159,7 +159,6 @@ public class EnvironmentDAO
 
             if ( ebp != null )
             {
-                daoManager.closeEntityManager( entityManager );
                 return GSON.fromJson( ebp.getInfo(), clazz );
             }
         }
@@ -289,7 +288,7 @@ public class EnvironmentDAO
 
             Query query;
             query = entityManager.createQuery(
-                    "delete FROM EnvironmentBlueprintEntity " + "                         AS ebe WHERE ebe.id=:id" );
+                    "delete FROM EnvironmentBlueprintEntity " + " AS ebe WHERE ebe.id=:id" );
             query.setParameter( "id", blueprintId.toString() );
             query.executeUpdate();
             daoManager.commitTransaction( entityManager );

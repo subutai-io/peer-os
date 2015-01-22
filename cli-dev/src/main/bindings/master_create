@@ -64,8 +64,8 @@ function master_create {
     echo "deb-src $SUBUTAI_APT_PROXY $SUBUTAI_OS_RELEASE_NAME  main restricted universe multiverse" \
        >> $subutai_repo_file
   fi
-  lxc-attach -n master -- apt-get update
-  lxc-attach -n master -- apt-get -y dist-upgrade
+  sudo lxc-attach -n master -- apt-get update
+  sudo lxc-attach -n master -- apt-get -y dist-upgrade
 
   if [ -n "$SUBUTAI_PACKAGES" ]; then
     lxc-attach -n master -- \
@@ -73,12 +73,12 @@ function master_create {
            install `echo $SUBUTAI_PACKAGES | sed -e "s/,/ /"`
   fi
 
-  lxc-attach -n master -- apt-get -y autoclean
-  lxc-attach -n master -- apt-get -y autoremove
+  sudo lxc-attach -n master -- apt-get -y autoclean
+  sudo lxc-attach -n master -- apt-get -y autoremove
 
   echo "dpkg -l" | lxc-attach -n master > /var/lib/lxc/master/packages
-  lxc-stop -n master
-  lxc-wait -n master -s 'STOPPED'
+  sudo lxc-stop -n master
+  sudo lxc-wait -n master -s 'STOPPED'
   sleep 2
 
   # (5) setup git repository in / and control /etc

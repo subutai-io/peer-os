@@ -34,6 +34,5 @@ class TunnelImpl implements Tunnel
     {
         return tunnelIp;
     }
-
 }
 

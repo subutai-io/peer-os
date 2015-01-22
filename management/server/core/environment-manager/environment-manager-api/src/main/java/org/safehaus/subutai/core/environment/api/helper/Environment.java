@@ -55,8 +55,6 @@ public interface Environment
 
     /**
      * VNI of the environment.
-     *
-     * @return
      */
     public int getVni();
 

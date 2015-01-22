@@ -8,4 +8,5 @@ import org.safehaus.subutai.common.peer.ContainerHost;
  * EnvironmentContainer
  */
 public interface EnvironmentContainer extends ContainerHost
-{}
+{
+}

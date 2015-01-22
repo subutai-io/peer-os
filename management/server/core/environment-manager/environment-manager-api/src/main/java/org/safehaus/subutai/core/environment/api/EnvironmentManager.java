@@ -9,6 +9,7 @@ package org.safehaus.subutai.core.environment.api;
 import java.util.List;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
@@ -19,7 +20,6 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerExc
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.topology.TopologyData;
-import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 

@@ -1,0 +1,12 @@
+#!/bin/bash
+# creating default ovs bridge and ports durin lxc startup
+BRIDGE="br-int"
+echo $5 > /tmp/$1
+vlan_id="`cat /$HOME/.local/lxc/$1/config | grep "#vlan_id" | cut -d " " -f3`"
+sudo ovs-vsctl --may-exist add-br $BRIDGE
+sudo ovs-vsctl --if-exists del-port $BRIDGE $5
+if [ "$vlan_id" ] && [ "`cat /tmp/$1 | grep "\-2"`"  ]; then
+  sudo ovs-vsctl --may-exist add-port $BRIDGE $5 tag=$vlan_id
+else
+  sudo ovs-vsctl --may-exist add-port $BRIDGE $5
+fi

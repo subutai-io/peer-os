@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
@@ -15,8 +17,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.Peer;
+import org.slf4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -301,9 +302,8 @@ public class EnvironmentsForm
             fieldIp2.setWidth( "120px" );
             fieldIp2.setValue( "192.168.50." + ipInt++ );
 
-            containersTable.addItem( new Object[]
-            {
-                container.getTemplateName(), container.getPeerId(), fieldHostname, fieldIp2,
+            containersTable.addItem( new Object[] {
+                    container.getTemplateName(), container.getPeerId(), fieldHostname, fieldIp2,
             }, null );
         }
 

@@ -59,7 +59,8 @@ public class RemoteNetworkManager implements NetworkManager
 
 
     @Override
-    public void setContainerIp( String containerName, String ip, int netMask, int vLanId ) throws NetworkManagerException
+    public void setContainerIp( String containerName, String ip, int netMask, int vLanId )
+            throws NetworkManagerException
     {
         client.setContainerIp( containerName, ip, netMask, vLanId );
     }
@@ -87,7 +88,8 @@ public class RemoteNetworkManager implements NetworkManager
 
 
     @Override
-    public void setupGatewayOnContainer( String containerName, String gatewayIp, String interfaceName ) throws NetworkManagerException
+    public void setupGatewayOnContainer( String containerName, String gatewayIp, String interfaceName )
+            throws NetworkManagerException
     {
         client.setupGatewayOnContainer( containerName, gatewayIp, interfaceName );
     }
@@ -140,6 +142,5 @@ public class RemoteNetworkManager implements NetworkManager
     {
         return new RemoteNetworkManager( host, port );
     }
-
 }
 

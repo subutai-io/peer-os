@@ -39,6 +39,7 @@
     <module>backup-manager</module>
     <module>plugin-manager</module>
     <module>env-manager</module>
+    <module>shiro-manager-parent</module>
   </modules>
 
 </project>

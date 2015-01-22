@@ -9,9 +9,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.impl.entity.EnvironmentImpl;
-import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 
 import static org.junit.Assert.assertEquals;

@@ -1,0 +1,210 @@
+#!/bin/bash
+
+
+function import_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Imports a registered Subutai template
+  echo
+  echo "        "subutai import template
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+
+# Plan for importing a template
+# ----------------------------------------------------------------------------
+# (1) perform sanity checks first
+#     - a template with the same name MUST NOT already exist
+#     - the template name MUST be in the template registry
+#     - the template parent MUST be present and in the template registry
+#       if NOT the user will have to install the parent template first
+# (2) Install the debian package if subutai import not called during a debian package installation
+# (3) Setup the LXC template area under /var/lib/lxc/
+# (4) Receive delta images of all filesystems starting with the rootfs
+# (5) Mount the rootfs filesystem on /var/lib/lxc/$template/rootfs
+function import {
+  if [ "`is_system_locked`" == "true" ]
+  then
+    msg_error "System locked by a subutai process"
+    exit 1
+  fi
+
+  local template="$1"
+  local debian_package_name=`get_debian_package_name $template`
+  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+  local package_name=`get_package_name $template`
+ 
+  # ----------------------------------------------------------------------------
+  # (1) perform sanity checks first
+  #     - a template with the same name MUST NOT already exist
+  #     - the template name MUST be in the template registry
+  #     - the template parent MUST be present and in the template registry
+  #       if NOT the user will have to install the parent template first
+  # ----------------------------------------------------------------------------
+  lxc_assert_no $template
+  fs_assert_nods lxc/$template
+
+  if [ -f "$debian_file" ]; then
+    is_local="true"
+  else
+    is_local="false"
+  fi
+  
+  if [ -z "$template"  ]; then
+    msg_error "Expecting single parameter for the template to import"
+    show_usage "`import_usage`"
+  fi
+
+  if [ "$template" = "master" ];then
+    msg_error "Please use subutai master_import command!"
+    exit 1
+  fi
+
+  if [ $is_local == "true" ]; then
+    if [ "`are_md5sums_equal $template`" == true ];then
+      msg_info "    - check passed: local \"$template\" package is same with the registered package"
+    elif [ "`is_registered $template`" == true ]; then
+      msg_error "A template $template is already registered and it is different from your local package. Try \"rm -rf $SUBUTAI_TMPDIR/$template-*\" and import again"
+      exit 1
+    fi
+  else
+      # check to make sure template is registered as a template
+    if [ "`is_registered $template`" == "false" ]; then
+      msg_error "A template with name \"$template\" is NOT registered. Aborting ..."
+      exit 1
+    else
+      msg_info "    - check passed: \"$template\" is registered"
+    fi
+  fi
+
+  # ----------------------------------------------------------------------------
+  # (2) Install the debian package if subutai import not called during a debian package installation
+  # ----------------------------------------------------------------------------
+  if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
+    msg_info "    - subutai import called from command line"
+
+    cd $SUBUTAI_TMPDIR
+    is_package_installed $package_name
+    if [ $? = 0  ]; then
+      msg_error "Template $template seems already installed, please destroy first"
+      exit 1
+    fi
+    
+    if [ "`is_dpkg_locked`" == "true" ]
+    then
+      msg_error "$1 import FAILED! dpkg is locked by process!"
+      exit 1
+    fi
+
+    if [ "$is_local" == "true" ]
+    then
+      if [ "`are_containers_writable $template`" == "true" ]
+      then
+        msg_error "Template $template locked by a subutai process"
+        exit 1
+      fi
+     
+      lock_container_read $template
+      if [ $? != 0 ]; then msg_error "Template $template cannot be locked!"; exit 1; fi
+
+      sudo dpkg -i $debian_file
+      if [ $? -eq 0 ]; then
+        msg_ok "Debian package of $package_name is installed succesfully from local"
+        unlock_container_read $template
+        if [ $? != 0 ]; then msg_error "Template $template cannot be unlocked!"; exit 1; fi
+        exit 0
+      else
+        msg_error "Debian package of $package_name could not be installed, removing"
+        unlock_container_read $template
+        if [ $? != 0 ]; then msg_error "Template $template cannot be unlocked!"; exit 1; fi
+        subutai destroy $template
+        sudo apt-get --assume-yes --force-yes purge $package_name
+	exit 1
+      fi
+    elif [ "`is_registered $template`" == "true" ]
+    then
+      if [ "`are_containers_writable $template`" == "true" ]
+      then
+        msg_error "Template $template locked by a subutai process"
+        exit 1
+      fi
+
+      lock_container_read $template
+      if [ $? != 0 ]; then msg_error "Template $template cannot be locked!"; exit 1; fi
+
+      sudo apt-get --assume-yes --force-yes install $package_name
+      if [ $? -eq 0 ]; then
+       msg_ok "Debian package of $package_name is installed succesfully from repo"
+       unlock_container_read $template
+       if [ $? != 0 ]; then msg_error "Template $template cannot be unlocked!"; exit 1; fi
+       exit 0
+      else
+        msg_error "Debian package of $package_name could not be installed, removing"
+        unlock_container_read $template
+        if [ $? != 0 ]; then msg_error "Template $template cannot be unlocked!"; exit 1; fi
+	subutai destroy $template
+        sudo apt-get --assume-yes --force-yes purge $package_name
+        exit 1
+      fi
+    else
+      msg_error "Package $package_name is not found!"
+      unlock_container_read $template
+      if [ $? != 0 ]; then msg_error "Template $template cannot be unlocked!"; exit 1; fi
+      exit 1
+    fi
+  else
+    msg_info "    - subutai import called while installing template from the debian package"
+  fi
+  
+  debian_root=$SUBUTAI_TMPDIR/$template
+  config=$debian_root/config
+  parent=`cat $config | grep subutai.parent | awk '{print $3}'`
+
+  lxc_assert $parent
+
+  # check to make sure the parent is a template
+  if [ "`fs_is_template $parent`" == "false" ]; then
+    msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
+    sudo apt-get --assume-yes --force-yes purge $package_name
+    unlock_container_read $template
+    if [ $? != 0 ]; then msg_error "Template $template cannot be unlocked!"; exit 1; fi
+    exit 1
+  else
+    msg_info "    - check passed: parent \"$parent\" is a template"
+  fi
+
+  # check to make sure the parent is registered
+  if [ "`is_registered $parent`" == "false" ]; then
+    msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
+    sudo apt-get --assume-yes --force-yes purge $package_name
+    unlock_container_read $template
+    if [ $? != 0 ]; then msg_error "Template $template cannot be unlocked!"; exit 1; fi
+    exit 1
+  else
+    msg_info "    - check passed: parent \"$parent\" is registered"
+  fi
+
+  # start creating the template
+  lxc_home=$HOME/.local/share/lxc/$template
+  lxc_rootfs=$lxc_home/rootfs
+  lxc_config=$lxc_home/config
+  deltas=$debian_root/deltas
+
+  fs_volume_create_sudo $lxc_home
+  #mkdir -p $lxc_rootfs
+  msg_info "    - lxc_rootfs = $lxc_rootfs"
+  sudo cp $config $lxc_home;
+  sudo cp $debian_root/fstab $lxc_home;
+  sudo cp $debian_root/packages $lxc_home;
+
+  fs_recv $template $deltas $lxc_rootfs  
+
+  if [ "`is_registered $template`" == "true" ]; then
+    notify_template_import $template
+  fi
+}
+
+
+function import_description {
+  echo import a template
+}

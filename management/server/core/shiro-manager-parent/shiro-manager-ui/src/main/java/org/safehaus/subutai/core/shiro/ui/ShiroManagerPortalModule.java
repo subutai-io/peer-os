@@ -14,8 +14,8 @@ import com.vaadin.ui.Component;
 public class ShiroManagerPortalModule implements PortalModule
 {
 
-    private final static String MODULE_IMAGE = "env.png";
-    private final static String MODULE_NAME = "Environment";
+    private final static String MODULE_IMAGE = "shiro.png";
+    private final static String MODULE_NAME = "Shiro Manager";
     private ExecutorService executor;
 
 
@@ -29,7 +29,6 @@ public class ShiroManagerPortalModule implements PortalModule
     {
         this.executor = executor;
     }
-
 
 
     public void init()

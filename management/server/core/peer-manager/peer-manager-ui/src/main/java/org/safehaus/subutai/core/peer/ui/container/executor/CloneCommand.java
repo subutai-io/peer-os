@@ -3,8 +3,8 @@ package org.safehaus.subutai.core.peer.ui.container.executor;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 
 
 /**
