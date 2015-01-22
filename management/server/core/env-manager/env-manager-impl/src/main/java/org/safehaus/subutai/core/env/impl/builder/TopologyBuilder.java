@@ -7,14 +7,13 @@ import java.util.Set;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.core.env.api.build.NodeGroup;
 import org.safehaus.subutai.core.env.api.build.Topology;
-import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
+import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.env.impl.exception.NodeGroupBuildException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -39,11 +38,10 @@ public class TopologyBuilder
     }
 
 
-    public Set<EnvironmentContainerImpl> build( Topology topology ) throws EnvironmentBuildException
+    public void build( EnvironmentImpl environment, Topology topology ) throws EnvironmentBuildException
     {
+        Preconditions.checkNotNull( environment );
         Preconditions.checkNotNull( topology );
-
-        Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
 
         Map<Peer, Set<NodeGroup>> placement = topology.getNodeGroupPlacement();
 
@@ -53,7 +51,7 @@ public class TopologyBuilder
             {
                 //TODO parallelize container creation across peers
 
-                containers.addAll( nodeGroupBuilder.build( peerPlacement.getKey(), peerPlacement.getValue() ) );
+                environment.addContainers( nodeGroupBuilder.build( peerPlacement.getKey(), peerPlacement.getValue() ) );
             }
             catch ( NodeGroupBuildException e )
             {
@@ -62,7 +60,5 @@ public class TopologyBuilder
                                 peerPlacement.getKey() ), e );
             }
         }
-
-        return containers;
     }
 }

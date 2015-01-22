@@ -142,8 +142,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         try
         {
-            //TODO think of updating environment in topology builder after every node group is created
-            environment.addContainers( topologyBuilder.build( topology ) );
+            topologyBuilder.build( environment, topology );
 
             configureHosts( environment.getContainerHosts() );
 
@@ -207,17 +206,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         try
         {
-            //TODO think of passing environment to topologyBuilder and adding every succeeded node group and saving
-            Set<EnvironmentContainerImpl> newContainers = topologyBuilder.build( topology );
-
-            environment.addContainers( newContainers );
+            topologyBuilder.build( environment, topology );
 
             configureHosts( environment.getContainerHosts() );
 
             configureSsh( environment.getContainerHosts() );
 
             //set container's transient fields
-            setContainersTransitiveFields( Sets.<ContainerHost>newHashSet( newContainers ) );
+            setContainersTransitiveFields( environment.getContainerHosts() );
         }
         catch ( EnvironmentBuildException | NetworkManagerException e )
         {

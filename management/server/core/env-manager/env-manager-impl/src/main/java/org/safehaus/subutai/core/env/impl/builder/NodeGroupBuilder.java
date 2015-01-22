@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.env.impl.builder;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.common.peer.Peer;
@@ -24,7 +25,7 @@ import com.google.common.collect.Sets;
 /**
  * Creates node groups on a peer
  */
-public class NodeGroupBuilder
+public class NodeGroupBuilder implements Callable<Set<EnvironmentContainerImpl>>
 {
 
     private final TemplateRegistry templateRegistry;
@@ -113,5 +114,12 @@ public class NodeGroupBuilder
         }
 
         return requiredTemplates;
+    }
+
+
+    @Override
+    public Set<EnvironmentContainerImpl> call() throws Exception
+    {
+        return null;
     }
 }
