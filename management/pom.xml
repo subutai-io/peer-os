@@ -62,7 +62,6 @@
     <h2database.version>1.4.184</h2database.version>
     <openjpa.version>2.3.0</openjpa.version>
 
-
   </properties>
 
   <dependencyManagement>
@@ -821,6 +820,16 @@
         <version>1.9.13</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-core</artifactId>
+        <version>${org.apache.shiro.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-web</artifactId>
+        <version>${org.apache.shiro.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

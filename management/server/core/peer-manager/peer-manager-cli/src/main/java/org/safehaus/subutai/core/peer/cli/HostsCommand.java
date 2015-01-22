@@ -1,16 +1,22 @@
 package org.safehaus.subutai.core.peer.cli;
 
 
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Set;
 import java.util.UUID;
+
+import javax.security.auth.Subject;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
@@ -21,7 +27,6 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command( scope = "peer", name = "hosts" )
 public class HostsCommand extends OsgiCommandSupport
 {
-
     DateFormat fmt = new SimpleDateFormat( "dd.MM.yy HH:mm:ss.SS" );
     private PeerManager peerManager;
 
@@ -35,7 +40,16 @@ public class HostsCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-
+        AccessControlContext acc = AccessController.getContext();
+        Subject subject = Subject.getSubject( acc );
+        Set<Principal> principals = subject.getPrincipals();
+        String sessionId = getSessionId( principals );
+        org.apache.shiro.subject.Subject requestSubject =
+                new org.apache.shiro.subject.Subject.Builder().sessionId( sessionId ).buildSubject();
+        //        org.apache.shiro.subject.Subject sub = SecurityUtils.getSubject();
+        //        UsernamePasswordToken token = new UsernamePasswordToken( "admin", "secret" );
+        //        subject.login( token );
+        //        log.info( subject.toString() );
         LocalPeer localPeer = peerManager.getLocalPeer();
         //        localPeer.init();
         ManagementHost managementHost = localPeer.getManagementHost();
@@ -57,6 +71,20 @@ public class HostsCommand extends OsgiCommandSupport
             }
         }
         return null;
+    }
+
+
+    private String getSessionId( final Set<Principal> principals )
+    {
+        String result = "";
+        for ( Principal p : principals )
+        {
+            if ( p.getName().contains( "session" ) )
+            {
+                result = p.getName().split( ":" )[1];
+            }
+        }
+        return result;
     }
 
 
