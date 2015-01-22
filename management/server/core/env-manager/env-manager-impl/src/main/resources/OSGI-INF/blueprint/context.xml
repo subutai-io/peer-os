@@ -25,6 +25,7 @@
     <property name="daoManager" ref="daoManagerEnv" />
     <argument ref="templateRegistry" />
     <argument ref="peerManager" />
+    <argument ref="networkManager" />
   </bean>
 
   <service ref="environmentManager" interface="org.safehaus.subutai.core.env.api.EnvironmentManager" />

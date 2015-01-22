@@ -26,6 +26,7 @@ import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
@@ -42,6 +43,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     private final TemplateRegistry templateRegistry;
     private final PeerManager peerManager;
+    private final NetworkManager networkManager;
     private final TopologyBuilder topologyBuilder;
 
     //************* DaoManager ******************
@@ -53,13 +55,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private BlueprintDataService blueprintDataService;
 
 
-    public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager )
+    public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
+                                   final NetworkManager networkManager )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
+        Preconditions.checkNotNull( networkManager );
 
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
+        this.networkManager = networkManager;
         this.topologyBuilder = new TopologyBuilder( templateRegistry, peerManager );
     }
 
