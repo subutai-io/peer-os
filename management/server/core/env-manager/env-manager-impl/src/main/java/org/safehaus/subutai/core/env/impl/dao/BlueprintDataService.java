@@ -8,17 +8,14 @@ import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentBlueprintEntity;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -32,8 +29,6 @@ public class BlueprintDataService
     private static final Logger LOG = LoggerFactory.getLogger( BlueprintDataService.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    private static final String ERR_NO_SOURCE = "Source is null or empty";
-    private static final String ERR_NO_KEY = "Key is null or empty";
     private DaoManager daoManager;
 
 
@@ -42,11 +37,11 @@ public class BlueprintDataService
         this.daoManager = daoManager;
     }
 
-    
+
     public UUID persist( final EnvironmentBlueprint blueprint )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
-        UUID bpId= null;
+        UUID bpId = null;
 
         try
         {
@@ -83,8 +78,9 @@ public class BlueprintDataService
 
         try
         {
-            Query query;
-            query = em.createQuery( "SELECT ebe FROM EnvironmentBlueprintEntity AS ebe" );
+            TypedQuery<EnvironmentBlueprintEntity> query =
+                    em.createQuery( "SELECT ebe FROM EnvironmentBlueprintEntity AS ebe",
+                            EnvironmentBlueprintEntity.class );
 
             List<EnvironmentBlueprintEntity> results = query.getResultList();
 
@@ -105,7 +101,7 @@ public class BlueprintDataService
     }
 
 
-    public void remove(  final String id  )
+    public void remove( final String id )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
 
@@ -114,7 +110,7 @@ public class BlueprintDataService
             daoManager.startTransaction( em );
 
             Query query;
-            query = em.createQuery("delete FROM EnvironmentBlueprintEntity AS ebe WHERE ebe.id=:id" );
+            query = em.createQuery( "delete FROM EnvironmentBlueprintEntity AS ebe WHERE ebe.id=:id" );
             query.setParameter( "id", id );
             query.executeUpdate();
             daoManager.commitTransaction( em );

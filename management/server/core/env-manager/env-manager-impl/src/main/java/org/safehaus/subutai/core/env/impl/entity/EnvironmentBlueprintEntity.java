@@ -10,9 +10,6 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 
-/**
- * Created by nisakov on 1/12/15.
- */
 @Entity
 @Table( name = "environment_blueprint" )
 @Access( AccessType.FIELD )

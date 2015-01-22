@@ -3,7 +3,6 @@ package org.safehaus.subutai.core.env.impl.entity;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -187,10 +186,8 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         Preconditions.checkNotNull( id, "Invalid id" );
 
-        Iterator<ContainerHost> iterator = getContainerHosts().iterator();
-        while ( iterator.hasNext() )
+        for ( final ContainerHost containerHost : getContainerHosts() )
         {
-            ContainerHost containerHost = iterator.next();
             if ( containerHost.getId().equals( id ) )
             {
                 return containerHost;
@@ -205,10 +202,8 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
 
-        Iterator<ContainerHost> iterator = getContainerHosts().iterator();
-        while ( iterator.hasNext() )
+        for ( final ContainerHost containerHost : getContainerHosts() )
         {
-            ContainerHost containerHost = iterator.next();
             if ( containerHost.getHostname().equalsIgnoreCase( hostname ) )
             {
                 return containerHost;
