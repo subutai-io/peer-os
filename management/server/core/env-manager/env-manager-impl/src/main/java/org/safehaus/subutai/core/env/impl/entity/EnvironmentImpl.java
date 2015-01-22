@@ -19,8 +19,10 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.protocol.api.DataService;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.env.api.Environment;
@@ -68,7 +70,10 @@ public class EnvironmentImpl implements Environment, Serializable
     private Set<ContainerHost> containers = Sets.newHashSet();
 
     @Enumerated( EnumType.STRING )
-    private EnvironmentStatus status;
+    private EnvironmentStatus status = EnvironmentStatus.EMPTY;
+
+    @Transient
+    private DataService dataService;
 
 
     protected EnvironmentImpl()
@@ -249,7 +254,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
         containers.remove( container );
 
-        //TODO save env to db
+        dataService.update( this );
     }
 
 
@@ -257,9 +262,14 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containers ) );
 
+        for ( EnvironmentContainerImpl container : containers )
+        {
+            container.setEnvironment( this );
+        }
+
         this.containers.addAll( containers );
 
-        //TODO save env to db
+        dataService.update( this );
     }
 
 
@@ -268,5 +278,15 @@ public class EnvironmentImpl implements Environment, Serializable
         Preconditions.checkNotNull( status );
 
         this.status = status;
+
+        dataService.update( this );
+    }
+
+
+    public void setDataService( final DataService dataService )
+    {
+        this.dataService = dataService;
+
+        dataService.update( this );
     }
 }

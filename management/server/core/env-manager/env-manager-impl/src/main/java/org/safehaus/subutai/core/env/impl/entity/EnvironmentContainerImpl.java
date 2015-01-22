@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.env.impl.entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -17,6 +16,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -61,6 +61,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 {
     @Column( name = "peer_id" )
     private String peerId;
+    @Id
     @Column( name = "host_id" )
     private String hostId;
     @Column( name = "hostname" )
@@ -93,7 +94,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     @Transient
     private Peer peer;
     @Transient
-    private DataService dataService;
+    private DataService<String, EnvironmentContainerImpl> dataService;
 
 
     private EnvironmentContainerImpl()
@@ -138,6 +139,13 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     public void setDataService( final DataService dataService )
     {
         this.dataService = dataService;
+    }
+
+
+    @Override
+    public void setPeer( final Peer peer )
+    {
+        this.peer = peer;
     }
 
 
@@ -325,9 +333,8 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     @Override
     public String getIpByMask( final String mask )
     {
-        for ( Iterator<Interface> iterator = interfaces.iterator(); iterator.hasNext(); )
+        for ( Interface intf : interfaces )
         {
-            Interface intf = iterator.next();
             if ( intf.getIp().matches( mask ) )
             {
                 return intf.getIp();
@@ -508,11 +515,6 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
 
 
     //unsupported
-    @Override
-    public void setPeer( final Peer peer )
-    {
-        throw new UnsupportedOperationException( "Unsupported operation." );
-    }
 
 
     @Override

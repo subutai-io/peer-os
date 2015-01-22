@@ -5,7 +5,7 @@
 
   <persistence-unit name="envExtManagerPUnit" transaction-type="RESOURCE_LOCAL">
 
-    <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/envManagerDS)
+    <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/envManagerDS2)
     </non-jta-data-source>
     <class>org.safehaus.subutai.core.env.impl.entity.HostInterface</class>
     <class>org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl</class>

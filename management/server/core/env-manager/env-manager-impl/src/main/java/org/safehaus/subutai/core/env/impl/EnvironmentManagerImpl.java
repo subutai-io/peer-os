@@ -11,6 +11,7 @@ import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.core.env.api.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.env.api.EnvironmentStatus;
 import org.safehaus.subutai.core.env.api.build.NodeGroup;
 import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.env.api.exception.ContainerHostNotFoundException;
@@ -22,6 +23,7 @@ import org.safehaus.subutai.core.env.impl.builder.TopologyBuilder;
 import org.safehaus.subutai.core.env.impl.dao.BlueprintDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentContainerDataService;
 import org.safehaus.subutai.core.env.impl.dao.EnvironmentDataService;
+import org.safehaus.subutai.core.env.impl.entity.EnvironmentContainerImpl;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.env.impl.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -60,13 +62,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.topologyBuilder = new TopologyBuilder( templateRegistry, peerManager );
     }
 
+
     //************* Init Data Managers ******************
     public void init()
     {
         try
         {
-            this.blueprintDataService            = new BlueprintDataService( daoManager );
-            this.environmentDataService          = new EnvironmentDataService( daoManager);
+            this.blueprintDataService = new BlueprintDataService( daoManager );
+            this.environmentDataService = new EnvironmentDataService( daoManager );
             this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
         }
         catch ( SQLException e )
@@ -74,16 +77,29 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
     }
 
+
     @Override
     public Environment findEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        //TODO get environment from database
-        //TODO set dataservice to environment
-        //TODO set peer and data service on each container
+        EnvironmentImpl environment = environmentDataService.find( environmentId.toString() );
+        if ( environment == null )
+        {
+            throw new EnvironmentNotFoundException();
+        }
 
-        return null;
+        //set dataservice
+        environment.setDataService( environmentDataService );
+
+        //set container's transient fields
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
+        {
+            ( ( EnvironmentContainerImpl ) containerHost ).setDataService( environmentContainerDataService );
+            ( ( EnvironmentContainerImpl ) containerHost ).setPeer( peerManager.getPeer( containerHost.getPeerId() ) );
+        }
+
+        return environment;
     }
 
 
@@ -97,7 +113,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         EnvironmentImpl environment = new EnvironmentImpl( name );
 
-        //TODO save environment to database here
+        environmentDataService.persist( environment );
+
+        environment.setDataService( environmentDataService );
 
         try
         {
@@ -106,12 +124,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         catch ( EnvironmentBuildException e )
         {
-            //TODO update env status here
+            environment.setStatus( EnvironmentStatus.UNHEALTHY );
 
             throw new EnvironmentCreationException( e );
         }
 
-        //TODO update env status here
+        //set container's transient fields
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
+        {
+            ( ( EnvironmentContainerImpl ) containerHost ).setDataService( environmentContainerDataService );
+            ( ( EnvironmentContainerImpl ) containerHost ).setPeer( peerManager.getPeer( containerHost.getPeerId() ) );
+        }
+
+        environment.setStatus( EnvironmentStatus.HEALTHY );
 
         return environment;
     }
@@ -133,21 +158,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 container.dispose();
                 environment.removeContainer( container.getId() );
+                environmentContainerDataService.remove( container.getId().toString() );
             }
             catch ( ContainerHostNotFoundException | PeerException e )
             {
-                //TODO update env status here
+                environment.setStatus( EnvironmentStatus.UNHEALTHY );
 
                 throw new EnvironmentDestructionException( e );
             }
         }
 
-        //TODO remove environment from database
+        environmentDataService.remove( environmentId.toString() );
     }
 
 
     @Override
-    public void growEnvironment( final UUID environmentId, final Topology topology )
+    public Environment growEnvironment( final UUID environmentId, final Topology topology )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
@@ -159,12 +185,23 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             //TODO think of passing environment to topologyBuilder and adding every succeeded node group and saving
-            environment.addContainers( topologyBuilder.build( topology ) );
+            Set<EnvironmentContainerImpl> newContainers = topologyBuilder.build( topology );
+
+            environment.addContainers( newContainers );
+
+            //set container's transient fields
+            for ( EnvironmentContainerImpl container : newContainers )
+            {
+                container.setDataService( environmentContainerDataService );
+                container.setPeer( peerManager.getPeer( container.getPeerId() ) );
+            }
         }
         catch ( EnvironmentBuildException e )
         {
             throw new EnvironmentModificationException( e );
         }
+
+        return environment;
     }
 
 
@@ -182,6 +219,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             containerHost.dispose();
 
             environment.removeContainer( containerHost.getId() );
+
+            environmentContainerDataService.remove( containerHost.getId().toString() );
         }
         catch ( ContainerHostNotFoundException | PeerException e )
         {
@@ -204,12 +243,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Topology newTopology()
     {
         return new TopologyImpl();
-    }
-
-
-    public DaoManager getDaoManager()
-    {
-        return daoManager;
     }
 
 

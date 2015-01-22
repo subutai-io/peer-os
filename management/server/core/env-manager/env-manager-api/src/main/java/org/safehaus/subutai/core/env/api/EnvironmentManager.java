@@ -26,7 +26,7 @@ public interface EnvironmentManager
     public void destroyEnvironment( UUID environmentId )
             throws EnvironmentDestructionException, EnvironmentNotFoundException;
 
-    public void growEnvironment( UUID environmentId, Topology topology )
+    public Environment growEnvironment( UUID environmentId, Topology topology )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     public void destroyContainer( ContainerHost containerHost )
