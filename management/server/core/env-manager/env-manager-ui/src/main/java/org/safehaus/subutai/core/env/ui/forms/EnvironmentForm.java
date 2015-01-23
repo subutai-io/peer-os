@@ -73,7 +73,7 @@ public class EnvironmentForm
                 }
             } );
             environmentsTable.addItem( new Object[] {
-                    environment.getName(), environment.getStatus().name(), null
+                    environment.getName(), environment.getStatus().name(), destroy
             }, null );
         }
         environmentsTable.refreshRowCache();
@@ -100,6 +100,8 @@ public class EnvironmentForm
                 updateEnvironmentsTable();
             }
         } );
+
+        Notification.show( "Environment destruction started" );
     }
 
 
