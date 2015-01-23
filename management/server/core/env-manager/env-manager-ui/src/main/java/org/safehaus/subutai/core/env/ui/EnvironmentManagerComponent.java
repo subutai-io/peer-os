@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.env.ui;
 
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.env.ui.forms.BlueprintForm;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.vaadin.ui.CustomComponent;
@@ -33,8 +34,9 @@ public class EnvironmentManagerComponent extends CustomComponent implements Disp
         sheet.setStyleName( Runo.TABSHEET_SMALL );
         sheet.setSizeFull();
 
-
-        //TODO fill UI here
+        BlueprintForm blueprintForm = new BlueprintForm( environmentManager );
+        sheet.addTab( blueprintForm.getContentRoot(), "Blueprints" );
+        sheet.getTab( 0 ).setId( "Blueprints" );
 
         verticalLayout.addComponent( sheet );
 

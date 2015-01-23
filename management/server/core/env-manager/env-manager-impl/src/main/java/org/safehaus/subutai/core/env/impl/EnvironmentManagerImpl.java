@@ -13,11 +13,13 @@ import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.core.env.api.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.EnvironmentStatus;
+import org.safehaus.subutai.core.env.api.build.Blueprint;
 import org.safehaus.subutai.core.env.api.build.NodeGroup;
 import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.env.api.exception.ContainerHostNotFoundException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 import org.safehaus.subutai.core.env.impl.builder.TopologyBuilder;
@@ -350,5 +352,30 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                         ( ( EnvironmentContainerImpl ) groupedContainers.iterator().next() ).getDomainName() );
             }
         }
+    }
+
+
+    @Override
+    public void saveBlueprint( final Blueprint blueprint ) throws EnvironmentManagerException
+    {
+        Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
+
+        blueprintDataService.persist( blueprint );
+    }
+
+
+    @Override
+    public void removeBlueprint( final UUID blueprintId ) throws EnvironmentManagerException
+    {
+        Preconditions.checkNotNull( blueprintId, "Invalid blueprint id" );
+
+        blueprintDataService.remove( blueprintId );
+    }
+
+
+    @Override
+    public Set<Blueprint> getBlueprints() throws EnvironmentManagerException
+    {
+        return blueprintDataService.getAll();
     }
 }

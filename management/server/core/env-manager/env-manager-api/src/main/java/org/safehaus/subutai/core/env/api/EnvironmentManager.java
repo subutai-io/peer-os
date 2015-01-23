@@ -6,10 +6,12 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.core.env.api.build.Blueprint;
 import org.safehaus.subutai.core.env.api.build.NodeGroup;
 import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 
@@ -119,4 +121,11 @@ public interface EnvironmentManager
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
     public void removeEnvironment( UUID environmentId ) throws EnvironmentNotFoundException;
+
+
+    public void saveBlueprint( Blueprint blueprint ) throws EnvironmentManagerException;
+
+    public void removeBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
+
+    public Set<Blueprint> getBlueprints() throws EnvironmentManagerException;
 }
