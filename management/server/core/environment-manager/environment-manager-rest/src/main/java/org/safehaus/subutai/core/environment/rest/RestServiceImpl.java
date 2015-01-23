@@ -56,7 +56,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( JsonSyntaxException | NullPointerException e )
         {
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e ) ).build();
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
         try
         {
@@ -68,7 +68,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( EnvironmentBuildException e )
         {
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e ) ).build();
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
     }
 
@@ -116,7 +116,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( EnvironmentManagerException e )
         {
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e ) ).build();
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
     }
 
@@ -140,7 +140,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( EnvironmentManagerException e )
         {
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e ) ).build();
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
     }
 
@@ -165,7 +165,7 @@ public class RestServiceImpl implements RestService
             }
             catch ( EnvironmentManagerException e )
             {
-                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e ) ).build();
+                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
             }
         }
 
@@ -207,7 +207,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( NullPointerException | JsonSyntaxException e )
         {
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e ) ).build();
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
 
         try
@@ -218,7 +218,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( EnvironmentBuildException e )
         {
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e ) ).build();
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
     }
 
@@ -247,7 +247,7 @@ public class RestServiceImpl implements RestService
                 }
                 catch ( PeerException e )
                 {
-                    return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e ) ).build();
+                    return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
                 }
             }
         }

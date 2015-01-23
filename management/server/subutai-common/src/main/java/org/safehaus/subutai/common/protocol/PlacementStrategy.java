@@ -1,11 +1,10 @@
 package org.safehaus.subutai.common.protocol;
 
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 
@@ -20,7 +19,7 @@ public class PlacementStrategy
     public PlacementStrategy( String strategyId )
     {
         this.strategyId = strategyId;
-        criteria = new HashSet<>();
+        criteria = Sets.newHashSet();
     }
 
 
@@ -58,7 +57,11 @@ public class PlacementStrategy
 
     public List<Criteria> getCriteriaAsList()
     {
-        return new ArrayList<>( criteria );
+        if ( criteria == null )
+        {
+            return Lists.newArrayList();
+        }
+        return Lists.newArrayList( criteria );
     }
 
 

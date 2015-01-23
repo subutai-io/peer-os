@@ -103,6 +103,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>env-manager-cli</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>env-manager-ui</artifactId>
+    </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- environment-terminal -->
