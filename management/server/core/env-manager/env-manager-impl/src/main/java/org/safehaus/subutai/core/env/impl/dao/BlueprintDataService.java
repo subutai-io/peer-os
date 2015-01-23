@@ -2,8 +2,8 @@ package org.safehaus.subutai.core.env.impl.dao;
 
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
@@ -11,13 +11,14 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.safehaus.subutai.common.dao.DaoManager;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.env.api.build.Blueprint;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.env.impl.entity.EnvironmentBlueprintEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -27,7 +28,6 @@ public class BlueprintDataService
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( BlueprintDataService.class.getName() );
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private DaoManager daoManager;
 
@@ -38,42 +38,36 @@ public class BlueprintDataService
     }
 
 
-    public UUID persist( final EnvironmentBlueprint blueprint )
+    public void persist( final Blueprint blueprint ) throws EnvironmentManagerException
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
-        UUID bpId = null;
 
         try
         {
-            String json = GSON.toJson( blueprint );
-
             EnvironmentBlueprintEntity environmentBlueprintEntity = new EnvironmentBlueprintEntity();
             environmentBlueprintEntity.setId( blueprint.getId().toString() );
-            environmentBlueprintEntity.setInfo( json );
+            environmentBlueprintEntity.setInfo( JsonUtil.toJson( blueprint ) );
 
             daoManager.startTransaction( em );
             em.merge( environmentBlueprintEntity );
             daoManager.commitTransaction( em );
-
-            bpId = blueprint.getId();
         }
         catch ( Exception e )
         {
-            LOG.error( "Failed to save blueprint", e );
             daoManager.rollBackTransaction( em );
+            throw new EnvironmentManagerException( "Failed to save blueprint", e );
         }
         finally
         {
             daoManager.closeEntityManager( em );
         }
-
-        return bpId;
     }
 
 
-    public List<EnvironmentBlueprint> getAll()
+    public Set<Blueprint> getAll()
     {
-        List<EnvironmentBlueprint> blueprints = new ArrayList<>();
+        Set<Blueprint> blueprints = Sets.newHashSet();
+
         EntityManager em = daoManager.getEntityManagerFromFactory();
 
         try
@@ -86,7 +80,7 @@ public class BlueprintDataService
 
             for ( EnvironmentBlueprintEntity ebe : results )
             {
-                blueprints.add( GSON.fromJson( ebe.getInfo(), EnvironmentBlueprint.class ) );
+                blueprints.add( JsonUtil.fromJson( ebe.getInfo(), Blueprint.class ) );
             }
         }
         catch ( Exception e )
@@ -101,7 +95,7 @@ public class BlueprintDataService
     }
 
 
-    public void remove( final String id )
+    public void remove( final UUID id ) throws EnvironmentManagerException
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
 
@@ -111,44 +105,20 @@ public class BlueprintDataService
 
             Query query;
             query = em.createQuery( "delete FROM EnvironmentBlueprintEntity AS ebe WHERE ebe.id=:id" );
-            query.setParameter( "id", id );
+            query.setParameter( "id", id.toString() );
             query.executeUpdate();
             daoManager.commitTransaction( em );
         }
         catch ( Exception e )
         {
-            LOG.error( "Failed to delete blueprint", e );
             daoManager.rollBackTransaction( em );
+
+            throw new EnvironmentManagerException( "Failed to remove blueprint", e );
         }
         finally
         {
             daoManager.closeEntityManager( em );
         }
-    }
-
-
-    public EnvironmentBlueprint find( final String id )
-    {
-        EntityManager em = daoManager.getEntityManagerFromFactory();
-
-        try
-        {
-            EnvironmentBlueprintEntity ebe = em.find( EnvironmentBlueprintEntity.class, id );
-
-            if ( ebe != null )
-            {
-                return GSON.fromJson( ebe.getInfo(), EnvironmentBlueprint.class );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-        finally
-        {
-            daoManager.closeEntityManager( em );
-        }
-        return null;
     }
 }
 

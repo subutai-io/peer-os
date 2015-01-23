@@ -50,10 +50,9 @@ public class GrowLocalEnvironmentCommand extends OsgiCommandSupport
     {
         Preconditions.checkArgument( UUIDUtil.isStringAUuid( environmentId ), "Invalid environment id" );
 
-        Topology topology = environmentManager.newTopology();
-        NodeGroup nodeGroup = environmentManager
-                .newNodeGroup( String.format( "NodeGroup%s", System.currentTimeMillis() ), templateName,
-                        Common.DEFAULT_DOMAIN_NAME, numberOfContainers, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
+        Topology topology = new Topology();
+        NodeGroup nodeGroup = new NodeGroup( String.format( "NodeGroup%s", System.currentTimeMillis() ), templateName,
+                Common.DEFAULT_DOMAIN_NAME, numberOfContainers, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
 
         topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );
 
