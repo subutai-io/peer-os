@@ -22,9 +22,6 @@ public class Blueprint
     private Set<NodeGroup> nodeGroups;
 
 
-    private Blueprint() {}
-
-
     public Blueprint( final String name, final Set<NodeGroup> nodeGroups )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );

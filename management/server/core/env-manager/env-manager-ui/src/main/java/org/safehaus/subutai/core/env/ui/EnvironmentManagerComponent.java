@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.env.ui;
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.ui.forms.BlueprintForm;
+import org.safehaus.subutai.core.env.ui.forms.EnvironmentForm;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.vaadin.ui.CustomComponent;
@@ -37,6 +38,9 @@ public class EnvironmentManagerComponent extends CustomComponent implements Disp
         BlueprintForm blueprintForm = new BlueprintForm( environmentManager );
         sheet.addTab( blueprintForm.getContentRoot(), "Blueprints" );
         sheet.getTab( 0 ).setId( "Blueprints" );
+        EnvironmentForm environmentForm = new EnvironmentForm( environmentManager );
+        sheet.addTab( environmentForm.getContentRoot(), "Environments" );
+        sheet.getTab( 1 ).setId( "Environments" );
 
         verticalLayout.addComponent( sheet );
 

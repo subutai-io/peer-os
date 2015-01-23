@@ -9,12 +9,10 @@ import java.util.UUID;
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.core.env.api.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.EnvironmentStatus;
 import org.safehaus.subutai.core.env.api.build.Blueprint;
-import org.safehaus.subutai.core.env.api.build.NodeGroup;
 import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.env.api.exception.ContainerHostNotFoundException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
@@ -239,23 +237,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentModificationException( e );
         }
-    }
-
-
-    @Override
-    public NodeGroup newNodeGroup( final String name, final String templateName, final String domainName,
-                                   final int numberOfContainers, final int sshGroupId, final int hostsGroupId,
-                                   final PlacementStrategy containerPlacementStrategy )
-    {
-        return new NodeGroupImpl( name, templateName, domainName, numberOfContainers, sshGroupId, hostsGroupId,
-                containerPlacementStrategy );
-    }
-
-
-    @Override
-    public Topology newTopology()
-    {
-        return new TopologyImpl();
     }
 
 
