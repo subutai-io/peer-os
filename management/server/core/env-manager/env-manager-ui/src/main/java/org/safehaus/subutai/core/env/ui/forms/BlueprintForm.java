@@ -8,6 +8,7 @@ import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.build.Blueprint;
 import org.safehaus.subutai.core.env.api.build.NodeGroup;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
+import org.safehaus.subutai.core.env.ui.EnvironmentManagerComponent;
 
 import com.google.common.collect.Sets;
 import com.vaadin.ui.Button;
@@ -34,13 +35,16 @@ public class BlueprintForm
 
     private final VerticalLayout contentRoot;
     private final EnvironmentManager environmentManager;
+    private final EnvironmentManagerComponent environmentManagerComponent;
     private TextArea blueprintTxtArea;
     private Table blueprintsTable;
     private Button viewBlueprintsButton;
 
 
-    public BlueprintForm( EnvironmentManager environmentManager )
+    public BlueprintForm( EnvironmentManagerComponent environmentManagerComponent,
+                          EnvironmentManager environmentManager )
     {
+        this.environmentManagerComponent = environmentManagerComponent;
         this.environmentManager = environmentManager;
         contentRoot = new VerticalLayout();
 
@@ -166,6 +170,7 @@ public class BlueprintForm
         //TODO let user specify topology
         //TODO create environment in background thread
         //TODO redirect user to environments form
+        environmentManagerComponent.focusEnvironmentForm();
     }
 
 
@@ -214,6 +219,7 @@ public class BlueprintForm
             {
                 Blueprint blueprint = JsonUtil.fromJson( content, Blueprint.class );
                 environmentManager.saveBlueprint( blueprint );
+                updateBlueprintsTable();
                 Notification.show( BLUEPRINT_SAVED );
             }
             catch ( Exception e )

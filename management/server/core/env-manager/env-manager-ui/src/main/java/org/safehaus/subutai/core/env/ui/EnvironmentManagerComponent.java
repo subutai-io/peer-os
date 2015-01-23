@@ -18,6 +18,8 @@ public class EnvironmentManagerComponent extends CustomComponent implements Disp
 
     private EnvironmentManager environmentManager;
     private PeerManager peerManager;
+    private TabSheet formSheet;
+    private EnvironmentForm environmentForm;
 
 
     public EnvironmentManagerComponent( final EnvironmentManager environmentManager, final PeerManager peerManager )
@@ -31,20 +33,27 @@ public class EnvironmentManagerComponent extends CustomComponent implements Disp
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
-        TabSheet sheet = new TabSheet();
-        sheet.setStyleName( Runo.TABSHEET_SMALL );
-        sheet.setSizeFull();
+        formSheet = new TabSheet();
+        formSheet.setStyleName( Runo.TABSHEET_SMALL );
+        formSheet.setSizeFull();
 
-        BlueprintForm blueprintForm = new BlueprintForm( environmentManager );
-        sheet.addTab( blueprintForm.getContentRoot(), "Blueprints" );
-        sheet.getTab( 0 ).setId( "Blueprints" );
-        EnvironmentForm environmentForm = new EnvironmentForm( environmentManager );
-        sheet.addTab( environmentForm.getContentRoot(), "Environments" );
-        sheet.getTab( 1 ).setId( "Environments" );
+        BlueprintForm blueprintForm = new BlueprintForm( this, environmentManager );
+        formSheet.addTab( blueprintForm.getContentRoot(), "Blueprints" );
+        formSheet.getTab( 0 ).setId( "Blueprints" );
+        environmentForm = new EnvironmentForm( environmentManager );
+        formSheet.addTab( environmentForm.getContentRoot(), "Environments" );
+        formSheet.getTab( 1 ).setId( "Environments" );
 
-        verticalLayout.addComponent( sheet );
+        verticalLayout.addComponent( formSheet );
 
         setCompositionRoot( verticalLayout );
+    }
+
+
+    public void focusEnvironmentForm()
+    {
+        formSheet.setSelectedTab( 1 );
+        environmentForm.updateEnvironmentsTable();
     }
 
 
