@@ -29,4 +29,76 @@ public class ContainerJson
         this.ip = ip;
         this.templateName = templateName;
     }
+
+
+    public UUID getId()
+    {
+        return id;
+    }
+
+
+    public void setId( final UUID id )
+    {
+        this.id = id;
+    }
+
+
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
+    }
+
+
+    public String getHostname()
+    {
+        return hostname;
+    }
+
+
+    public void setHostname( final String hostname )
+    {
+        this.hostname = hostname;
+    }
+
+
+    public ContainerHostState getState()
+    {
+        return state;
+    }
+
+
+    public void setState( final ContainerHostState state )
+    {
+        this.state = state;
+    }
+
+
+    public String getIp()
+    {
+        return ip;
+    }
+
+
+    public void setIp( final String ip )
+    {
+        this.ip = ip;
+    }
+
+
+    public String getTemplateName()
+    {
+        return templateName;
+    }
+
+
+    public void setTemplateName( final String templateName )
+    {
+        this.templateName = templateName;
+    }
 }

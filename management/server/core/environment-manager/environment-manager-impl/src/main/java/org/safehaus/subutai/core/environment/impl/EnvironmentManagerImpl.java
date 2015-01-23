@@ -690,7 +690,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             net.setupGatewaysOnContainers( env );
             net.setupContainerIpAddresses( env );
         }
-        catch ( NetworkManagerException ex )
+        catch ( Exception ex )
         {
             LOG.error( "[*] Networking setup failed!", ex );
         }
