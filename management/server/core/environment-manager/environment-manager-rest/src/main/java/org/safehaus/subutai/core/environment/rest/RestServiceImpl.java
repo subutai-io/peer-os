@@ -88,7 +88,7 @@ public class RestServiceImpl implements RestService
 
         if ( environment != null )
         {
-            return Response.ok( JsonUtil.toJson( "ENV_ID", environment.getId() ) ).build();
+            return Response.ok( environment.getId().toString() ).build();
         }
 
         return Response.status( Response.Status.NOT_FOUND ).build();
