@@ -63,7 +63,9 @@ public class SecurityManagerImpl implements SecurityManager
         }
         IniSecurityManagerFactory factory = new IniSecurityManagerFactory( ini );
         securityManager = factory.getInstance();
+
         SecurityUtils.setSecurityManager( securityManager );
+
         LOG.info( String.format( "Security manager initialized: %s", securityManager ) );
     }
 
