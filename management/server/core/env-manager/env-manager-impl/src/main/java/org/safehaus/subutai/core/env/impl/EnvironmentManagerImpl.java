@@ -162,6 +162,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
+        environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+
         Set<ContainerHost> containers = Sets.newHashSet( environment.getContainerHosts() );
 
         for ( ContainerHost container : containers )
@@ -194,6 +196,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
+        environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+
         try
         {
             topologyBuilder.build( environment, topology );
@@ -212,6 +216,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throw new EnvironmentModificationException( e );
         }
 
+        environment.setStatus( EnvironmentStatus.HEALTHY );
+
         return environment;
     }
 
@@ -225,6 +231,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         EnvironmentImpl environment =
                 ( EnvironmentImpl ) findEnvironment( UUID.fromString( containerHost.getEnvironmentId() ) );
 
+        environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+
         try
         {
             containerHost.dispose();
@@ -235,8 +243,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         catch ( ContainerHostNotFoundException | PeerException e )
         {
+            environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
             throw new EnvironmentModificationException( e );
         }
+
+        environment.setStatus( EnvironmentStatus.HEALTHY );
     }
 
 

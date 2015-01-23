@@ -52,12 +52,14 @@ public class EnvironmentForm
 
     private void updateEnvironmentsTable()
     {
+        environmentsTable.removeAllItems();
         for ( Environment environment : environmentManager.getEnvironments() )
         {
             environmentsTable.addItem( new Object[] {
                     environment.getName(), environment.getStatus().name(), null
             }, null );
         }
+        environmentsTable.refreshRowCache();
     }
 
 

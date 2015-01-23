@@ -36,6 +36,7 @@ public class BlueprintForm
     private final EnvironmentManager environmentManager;
     private TextArea blueprintTxtArea;
     private Table blueprintsTable;
+    private Button viewBlueprintsButton;
 
 
     public BlueprintForm( EnvironmentManager environmentManager )
@@ -84,7 +85,7 @@ public class BlueprintForm
         blueprintsTable = createBlueprintsTable( "Blueprints" );
         blueprintsTable.setId( "blueprintsTable" );
 
-        Button viewBlueprintsButton = new Button( VIEW_BLUEPRINTS );
+        viewBlueprintsButton = new Button( VIEW_BLUEPRINTS );
         viewBlueprintsButton.setId( "viewBlueprintsButton" );
         viewBlueprintsButton.addClickListener( new Button.ClickListener()
         {
@@ -118,8 +119,8 @@ public class BlueprintForm
                     }
                 } );
                 final Button delete = new Button( DELETE );
-                view.setId( blueprint.getName() + "-delete" );
-                view.addClickListener( new Button.ClickListener()
+                delete.setId( blueprint.getName() + "-delete" );
+                delete.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
@@ -137,8 +138,8 @@ public class BlueprintForm
                     }
                 } );
                 final Button build = new Button( BUILD );
-                view.setId( blueprint.getName() + "-build" );
-                view.addClickListener( new Button.ClickListener()
+                build.setId( blueprint.getName() + "-build" );
+                build.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
