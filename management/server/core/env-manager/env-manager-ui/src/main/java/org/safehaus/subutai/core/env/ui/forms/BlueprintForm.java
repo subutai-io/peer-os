@@ -169,7 +169,6 @@ public class BlueprintForm
     {
         //TODO let user specify topology
         //TODO create environment in background thread
-        //TODO redirect user to environments form
         environmentManagerComponent.focusEnvironmentForm();
     }
 
