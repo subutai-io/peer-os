@@ -10,16 +10,16 @@
   </bean>
   <!--*****************************************************************-->
 
-  <bean id="networkManager" scope="singleton" class="org.safehaus.subutai.core.security.impl.SecurityManagerImpl"
+  <bean id="identityManager" scope="singleton" class="org.safehaus.subutai.core.identity.impl.IdentityManagerImpl"
         init-method="init">
     <!--  <property name="daoManager" ref="daoManagerSecurity" />-->
     <property name="bundleContext" ref="blueprintBundleContext"></property>
   </bean>
 
-  <service ref="networkManager" interface="SecurityManager" />
+  <service ref="identityManager" interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
 
   <jaas:config name="karaf" rank="2">
-    <jaas:module className="org.safehaus.subutai.core.security.impl.ShiroLoginModule"
+    <jaas:module className="org.safehaus.subutai.core.identity.impl.ShiroLoginModule"
                  flags="sufficient" name="Subutai">
     </jaas:module>
   </jaas:config>

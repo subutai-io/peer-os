@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.core.identity.api.IdentityManager;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -22,6 +23,7 @@ import org.safehaus.subutai.core.peer.api.ResourceHost;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.apache.shiro.SecurityUtils;
 
 
 @Command( scope = "peer", name = "hosts" )
@@ -29,11 +31,18 @@ public class HostsCommand extends OsgiCommandSupport
 {
     DateFormat fmt = new SimpleDateFormat( "dd.MM.yy HH:mm:ss.SS" );
     private PeerManager peerManager;
+    private IdentityManager identityManager;
 
 
     public void setPeerManager( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
+    }
+
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
     }
 
 
@@ -46,7 +55,10 @@ public class HostsCommand extends OsgiCommandSupport
         String sessionId = getSessionId( principals );
         org.apache.shiro.subject.Subject requestSubject =
                 new org.apache.shiro.subject.Subject.Builder().sessionId( sessionId ).buildSubject();
-        //        org.apache.shiro.subject.Subject sub = SecurityUtils.getSubject();
+        org.apache.shiro.subject.Subject sub = SecurityUtils.getSubject();
+        SecurityUtils.setSecurityManager( identityManager.getSecurityManager() );
+        sub = SecurityUtils.getSubject();
+
         //        UsernamePasswordToken token = new UsernamePasswordToken( "admin", "secret" );
         //        subject.login( token );
         //        log.info( subject.toString() );

@@ -63,6 +63,7 @@
     <command name="peer/hosts">
       <action class="org.safehaus.subutai.core.peer.cli.HostsCommand">
         <property name="peerManager" ref="peerManager" />
+        <property name="identityManager" ref="identityManager" />
       </action>
     </command>
   </command-bundle>
@@ -107,6 +108,9 @@
   </command-bundle>
 
   <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <reference id="identityManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.identity.api.IdentityManager" />
+
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
   <reference id="environmentManager" availability="mandatory"

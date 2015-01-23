@@ -37,6 +37,7 @@
     <module>key-manager</module>
     <module>plugin-manager</module>
     <module>env-manager</module>
+    <module>identity-manager</module>
   </modules>
 
 </project>
