@@ -108,6 +108,8 @@ install_latest_packages() {
 install_packages_to_containers() {
   # without waiting network, getting errors during apt-get update and install commands
   lxc_wait_net $target_template_name 10
+  #wait for dns binding updates on management Host
+  lxc-attach -n $target_template_name -- sleep 10
   lxc-attach -n $target_template_name -- apt-get update
   echo "Installing packages to container"
   IFS=', ' read -a debian_packages <<< "$list_of_packages_to_be_installated_on_target_template"

@@ -8,6 +8,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.dao.DaoManager;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.HostInfoModel;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
@@ -41,16 +45,10 @@ import org.safehaus.subutai.core.environment.impl.environment.EnvironmentDestroy
 import org.safehaus.subutai.core.environment.impl.net.NetworkSetup;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.HostInfoModel;
-import org.safehaus.subutai.common.peer.Peer;
-import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.ResourceHostException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.security.api.SecurityManager;
-import org.safehaus.subutai.core.security.api.SecurityManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +75,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private NetworkManager networkManager;
     private EnvironmentDAO environmentDAO;
     private TemplateRegistry templateRegistry;
-    private SecurityManager securityManager;
     private EnvironmentDataService environmentDataService;
     private EnvironmentContainerDataService environmentContainerDataService;
     private DaoManager daoManager;
@@ -135,6 +132,33 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             return buildEnvironment( process );
         }
         catch ( EnvironmentManagerException e )
+        {
+            throw new EnvironmentBuildException( e.getMessage() );
+        }
+    }
+
+
+    @Override
+    public Environment buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
+    {
+        EnvironmentBuilder environmentBuilder = new EnvironmentBuilderImpl( this );
+        try
+        {
+            EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBlueprintId() );
+            if ( blueprint == null )
+            {
+                throw new EnvironmentBuildException( "Blueprint not found..." );
+            }
+            Environment environment = environmentBuilder.build( blueprint, process );
+            saveEnvironment( environment );
+
+            configureSshBetweenContainers( blueprint, environment.getContainerHosts() );
+            configureLinkingHostsBetweenContainers( blueprint, environment.getContainerHosts() );
+
+            setupNetwork( process, environment );
+            return environment;
+        }
+        catch ( EnvironmentPersistenceException | BuildException | EnvironmentConfigureException e )
         {
             throw new EnvironmentBuildException( e.getMessage() );
         }
@@ -304,33 +328,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    @Override
-    public Environment buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
-    {
-        EnvironmentBuilder environmentBuilder = new EnvironmentBuilderImpl( this );
-        try
-        {
-            EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBlueprintId() );
-            if ( blueprint == null )
-            {
-                throw new EnvironmentBuildException( "Blueprint not found..." );
-            }
-            Environment environment = environmentBuilder.build( blueprint, process );
-            saveEnvironment( environment );
-
-            configureSshBetweenContainers( blueprint, environment.getContainerHosts() );
-            configureLinkingHostsBetweenContainers( blueprint, environment.getContainerHosts() );
-
-            setupNetwork( process, environment );
-            return environment;
-        }
-        catch ( EnvironmentPersistenceException | BuildException | EnvironmentConfigureException e )
-        {
-            throw new EnvironmentBuildException( e.getMessage() );
-        }
-    }
-
-
     private void configureLinkingHostsBetweenContainers( EnvironmentBlueprint blueprint, Set<ContainerHost> containers )
             throws EnvironmentConfigureException
     {
@@ -338,9 +335,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             try
             {
-                securityManager.configSshOnAgents( containers );
+                networkManager.exchangeSshKeys( containers );
             }
-            catch ( SecurityManagerException e )
+            catch ( NetworkManagerException e )
             {
                 LOG.error( e.getMessage() );
                 throw new EnvironmentConfigureException( e.getMessage() );
@@ -356,9 +353,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             try
             {
-                securityManager.configHostsOnAgents( containers, blueprint.getDomainName() );
+                networkManager.registerHosts( containers, blueprint.getDomainName() );
             }
-            catch ( SecurityManagerException e )
+            catch ( NetworkManagerException e )
             {
                 throw new EnvironmentConfigureException( e.getMessage() );
             }
@@ -516,7 +513,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void createAdditionalContainers( final UUID id, final NodeGroup nodeGroup, final Peer peer )
             throws EnvironmentBuildException
     {
-        Environment environment = getEnvironmentByUUID( id );
+        Environment environment = null;
+        try
+        {
+            environment = findEnvironmentByID( id );
+        }
+        catch ( EnvironmentManagerException e )
+        {
+            throw new EnvironmentBuildException( e.getMessage() );
+        }
 
         List<Template> templatesData = Lists.newArrayList();
 
@@ -610,6 +615,42 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
+    public void destroyContainer( final UUID containerId ) throws EnvironmentManagerException
+    {
+        ContainerHost targetHost = null;
+        Environment targetEnvironment = null;
+        search:
+        for ( Environment environment : getEnvironments() )
+        {
+            for ( ContainerHost containerHost : environment.getContainerHosts() )
+            {
+                if ( containerHost.getId().equals( containerId ) )
+                {
+                    targetEnvironment = environment;
+                    targetHost = containerHost;
+                    break search;
+                }
+            }
+        }
+
+        if ( targetHost == null )
+        {
+            throw new EnvironmentManagerException( "Container not found" );
+        }
+        try
+        {
+            targetHost.dispose();
+            targetEnvironment.removeContainer( targetHost );
+            saveEnvironment( targetEnvironment );
+        }
+        catch ( PeerException e )
+        {
+            throw new EnvironmentManagerException( e.getMessage() );
+        }
+    }
+
+
+    @Override
     public void removeContainer( final UUID environmentId, final UUID hostId ) throws EnvironmentManagerException
     {
         Environment environment = getEnvironmentByUUID( environmentId );
@@ -665,12 +706,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
         this.templateRegistry = templateRegistry;
-    }
-
-
-    public void setSecurityManager( final SecurityManager securityManager )
-    {
-        this.securityManager = securityManager;
     }
 
 
