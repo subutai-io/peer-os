@@ -10,7 +10,6 @@ import org.safehaus.subutai.common.util.CollectionUtil;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import com.google.gson.annotations.Expose;
 
 
 /**
@@ -19,9 +18,7 @@ import com.google.gson.annotations.Expose;
 public class Blueprint
 {
     private UUID id;
-    @Expose
     private String name;
-    @Expose
     private Set<NodeGroup> nodeGroups;
 
 

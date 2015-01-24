@@ -46,7 +46,8 @@ public class BlueprintForm
     private final TemplateRegistry templateRegistry;
     private TextArea blueprintTxtArea;
     private Table blueprintsTable;
-    private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
+    private Gson gson =
+            new GsonBuilder().setExclusionStrategies( new FieldExclusionStrategy( "id" ) ).setPrettyPrinting().create();
 
 
     public BlueprintForm( EnvironmentManager environmentManager, PeerManager peerManager,
@@ -274,13 +275,12 @@ public class BlueprintForm
                         }
                     }
 
-                    if ( blueprint.getId() == null )
-                    {
-                        blueprint.setId( UUID.randomUUID() );
-                    }
+                    blueprint.setId( UUID.randomUUID() );
 
                     environmentManager.saveBlueprint( blueprint );
+
                     updateBlueprintsTable();
+
                     Notification.show( BLUEPRINT_SAVED );
                 }
             }
