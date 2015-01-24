@@ -18,7 +18,6 @@ public class PeerInfo
     private String name;
     private UUID id;
     private UUID ownerId;
-    //TODO implement setting of port
     private int port = 8181;
 
     private int lastUsedVlanId = 100;
@@ -45,6 +44,12 @@ public class PeerInfo
     public void setName( final String name )
     {
         this.name = name;
+    }
+
+
+    public void setPort( final int port )
+    {
+        this.port = port;
     }
 
 
@@ -133,7 +138,5 @@ public class PeerInfo
         }
         return false;
     }
-
-
 }
 

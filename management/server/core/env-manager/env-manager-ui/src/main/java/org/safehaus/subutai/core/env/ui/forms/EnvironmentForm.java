@@ -69,6 +69,7 @@ public class EnvironmentForm
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent )
                 {
+                    destroy.setEnabled( false );
                     destroyEnvironment( environment );
                 }
             } );

@@ -24,6 +24,7 @@ public class EnvironmentManagerComponent extends CustomComponent implements Disp
 
     public EnvironmentManagerComponent( final EnvironmentManager environmentManager, final PeerManager peerManager )
     {
+
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
 
@@ -37,7 +38,7 @@ public class EnvironmentManagerComponent extends CustomComponent implements Disp
         formSheet.setStyleName( Runo.TABSHEET_SMALL );
         formSheet.setSizeFull();
 
-        BlueprintForm blueprintForm = new BlueprintForm( this, environmentManager );
+        BlueprintForm blueprintForm = new BlueprintForm( this, environmentManager, peerManager );
         formSheet.addTab( blueprintForm.getContentRoot(), "Blueprints" );
         formSheet.getTab( 0 ).setId( "Blueprints" );
         environmentForm = new EnvironmentForm( environmentManager );

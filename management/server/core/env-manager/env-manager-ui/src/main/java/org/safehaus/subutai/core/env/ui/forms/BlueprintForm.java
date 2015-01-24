@@ -9,6 +9,7 @@ import org.safehaus.subutai.core.env.api.build.Blueprint;
 import org.safehaus.subutai.core.env.api.build.NodeGroup;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.env.ui.EnvironmentManagerComponent;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.common.collect.Sets;
 import com.vaadin.ui.Button;
@@ -36,16 +37,18 @@ public class BlueprintForm
     private final VerticalLayout contentRoot;
     private final EnvironmentManager environmentManager;
     private final EnvironmentManagerComponent environmentManagerComponent;
+    private final PeerManager peerManager;
     private TextArea blueprintTxtArea;
     private Table blueprintsTable;
     private Button viewBlueprintsButton;
 
 
     public BlueprintForm( EnvironmentManagerComponent environmentManagerComponent,
-                          EnvironmentManager environmentManager )
+                          EnvironmentManager environmentManager, PeerManager peerManager )
     {
         this.environmentManagerComponent = environmentManagerComponent;
         this.environmentManager = environmentManager;
+        this.peerManager = peerManager;
         contentRoot = new VerticalLayout();
 
         contentRoot.setSpacing( true );
@@ -53,15 +56,15 @@ public class BlueprintForm
 
         blueprintTxtArea = getBlueprintTxtArea();
 
-        Button loadBlueprintButton = new Button( SAVE );
-        loadBlueprintButton.setId( "loadBlueprintButton" );
+        Button saveBlueprintBtn = new Button( SAVE );
+        saveBlueprintBtn.setId( "saveBlueprintButton" );
 
-        loadBlueprintButton.addClickListener( new Button.ClickListener()
+        saveBlueprintBtn.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                uploadAndSaveBlueprint();
+                saveBlueprint();
             }
         } );
 
@@ -82,7 +85,7 @@ public class BlueprintForm
         contentRoot.addComponent( blueprintTxtArea );
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.setSpacing( true );
-        buttons.addComponent( loadBlueprintButton );
+        buttons.addComponent( saveBlueprintBtn );
         buttons.addComponent( putSampleBlueprint );
         contentRoot.addComponent( buttons );
 
@@ -102,6 +105,8 @@ public class BlueprintForm
 
         contentRoot.addComponent( viewBlueprintsButton );
         contentRoot.addComponent( blueprintsTable );
+
+        updateBlueprintsTable();
     }
 
 
@@ -168,8 +173,9 @@ public class BlueprintForm
     private void buildBlueprint( Blueprint blueprint )
     {
         //TODO let user specify topology
+        contentRoot.getUI().addWindow( new TopologyWindow( blueprint, peerManager ) );
         //TODO create environment in background thread
-        environmentManagerComponent.focusEnvironmentForm();
+        //environmentManagerComponent.focusEnvironmentForm();
     }
 
 
@@ -209,7 +215,7 @@ public class BlueprintForm
     }
 
 
-    private void uploadAndSaveBlueprint()
+    private void saveBlueprint()
     {
         String content = blueprintTxtArea.getValue().trim();
         if ( content.length() > 0 )
