@@ -82,8 +82,6 @@ public class BlueprintForm
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-
-
                 String blueprintStr = gson.toJson( getSampleBlueprint() );
                 blueprintTxtArea.setValue( blueprintStr );
             }
