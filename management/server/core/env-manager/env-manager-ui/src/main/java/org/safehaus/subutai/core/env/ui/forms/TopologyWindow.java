@@ -2,15 +2,23 @@ package org.safehaus.subutai.core.env.ui.forms;
 
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.build.Blueprint;
 import org.safehaus.subutai.core.env.api.build.NodeGroup;
+import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.shared.ui.slider.SliderOrientation;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Notification;
@@ -25,9 +33,11 @@ public class TopologyWindow extends Window
     private final Blueprint blueprint;
     private final PeerManager peerManager;
     private Table placementTable;
+    private Button buildBtn;
 
 
-    public TopologyWindow( Blueprint blueprint, PeerManager peerManager )
+    public TopologyWindow( final Blueprint blueprint, final PeerManager peerManager,
+                           final EnvironmentManager environmentManager )
     {
 
         this.blueprint = blueprint;
@@ -56,7 +66,98 @@ public class TopologyWindow extends Window
 
         content.addComponent( placementTable );
 
+        buildBtn = new Button( "Build" );
+        buildBtn.setEnabled( false );
+        buildBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                Map<Peer, Set<NodeGroup>> placements = getPlacements();
+
+                if ( placements == null )
+                {
+                    Notification.show( "Failed to obtain topology", Notification.Type.ERROR_MESSAGE );
+                }
+                else
+                {
+
+                    Topology topology = new Topology();
+
+                    for ( Map.Entry<Peer, Set<NodeGroup>> placement : placements.entrySet() )
+                    {
+                        for ( NodeGroup nodeGroup : placement.getValue() )
+                        {
+                            topology.addNodeGroupPlacement( placement.getKey(), nodeGroup );
+                        }
+                    }
+
+                    environmentManager.createEnvironmentAsync( blueprint.getName(), topology );
+
+                    Notification.show( "Environment creation started" );
+
+                    close();
+                }
+            }
+        } );
+
+        content.addComponent( buildBtn );
+        content.setComponentAlignment( buildBtn, Alignment.TOP_RIGHT );
+
         setContent( content );
+    }
+
+
+    private Map<Peer, Set<NodeGroup>> getPlacements()
+    {
+        Map<Peer, Set<NodeGroup>> placements = Maps.newHashMap();
+
+        for ( Object itemId : placementTable.getItemIds() )
+        {
+            Item item = placementTable.getItem( itemId );
+            String nodeGroupName = item.getItemProperty( "Name" ).getValue().toString();
+            String peerName = item.getItemProperty( "Peer" ).getValue().toString();
+            int amount = Integer.parseInt( item.getItemProperty( "Amount" ).getValue().toString() );
+
+            NodeGroup nodeGroup = null;
+            for ( NodeGroup ng : blueprint.getNodeGroups() )
+            {
+                if ( ng.getName().equalsIgnoreCase( nodeGroupName ) )
+                {
+                    nodeGroup = new NodeGroup( nodeGroupName, ng.getTemplateName(), ng.getDomainName(), amount,
+                            ng.getSshGroupId(), ng.getHostsGroupId(), ng.getNodePlacementStrategy() );
+                    break;
+                }
+            }
+            Peer peer = null;
+            for ( Peer p : peerManager.getPeers() )
+            {
+                if ( p.getName().equalsIgnoreCase( peerName ) )
+                {
+                    peer = p;
+                    break;
+                }
+            }
+
+            if ( peer != null && nodeGroup != null )
+            {
+                Set<NodeGroup> peerNodeGroups = placements.get( peer );
+
+                if ( peerNodeGroups == null )
+                {
+                    peerNodeGroups = Sets.newHashSet();
+                    placements.put( peer, peerNodeGroups );
+                }
+
+                peerNodeGroups.add( nodeGroup );
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        return placements;
     }
 
 
@@ -67,7 +168,6 @@ public class TopologyWindow extends Window
         table.addContainerProperty( "Amount", Integer.class, null );
         table.addContainerProperty( "Peer", String.class, null );
         table.addContainerProperty( "Remove", Button.class, null );
-        table.addContainerProperty( "Build", Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setEnabled( true );
@@ -148,6 +248,7 @@ public class TopologyWindow extends Window
                 slider.setValue( slider.getMax() );
                 slider.setMin( 1 );
                 placementTable.removeItem( rowId );
+                updateBuildButton();
             }
         } );
 
@@ -156,7 +257,7 @@ public class TopologyWindow extends Window
         if ( row == null )
         {
             placementTable.addItem( new Object[] {
-                    nodeGroup.getName(), amount, peer.getName(), removeBtn, null
+                    nodeGroup.getName(), amount, peer.getName(), removeBtn
             }, rowId );
         }
         else
@@ -170,6 +271,14 @@ public class TopologyWindow extends Window
         slider.setMin( Math.min( slider.getMin(), newMax ) );
         slider.setMax( newMax );
         slider.setValue( newMax );
+
+        updateBuildButton();
+    }
+
+
+    private void updateBuildButton()
+    {
+        buildBtn.setEnabled( !CollectionUtil.isCollectionEmpty( placementTable.getItemIds() ) );
     }
 
 

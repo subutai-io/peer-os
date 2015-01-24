@@ -50,6 +50,14 @@ public interface EnvironmentManager
      */
     public Environment createEnvironment( String name, Topology topology ) throws EnvironmentCreationException;
 
+    /**
+     * Creates environment based on a passed topology  asynchronously
+     *
+     * @param name - environment name
+     * @param topology - {@code Topology}
+     */
+    public void createEnvironmentAsync( String name, Topology topology );
+
 
     /**
      * Destroys environment by id
@@ -61,6 +69,15 @@ public interface EnvironmentManager
      */
     public void destroyEnvironment( UUID environmentId )
             throws EnvironmentDestructionException, EnvironmentNotFoundException;
+
+    /**
+     * Destroys environment by id asynchronously
+     *
+     * @param environmentId - environment id
+     *
+     * @throws EnvironmentNotFoundException - thrown if environment not found
+     */
+    public void destroyEnvironmentAsync( UUID environmentId ) throws EnvironmentNotFoundException;
 
     /**
      * Grows environment based on a passed topology

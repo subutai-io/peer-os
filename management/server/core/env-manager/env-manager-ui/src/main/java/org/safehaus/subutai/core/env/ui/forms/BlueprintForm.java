@@ -8,7 +8,6 @@ import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.build.Blueprint;
 import org.safehaus.subutai.core.env.api.build.NodeGroup;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
-import org.safehaus.subutai.core.env.ui.EnvironmentManagerComponent;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.common.collect.Sets;
@@ -36,17 +35,13 @@ public class BlueprintForm
 
     private final VerticalLayout contentRoot;
     private final EnvironmentManager environmentManager;
-    private final EnvironmentManagerComponent environmentManagerComponent;
     private final PeerManager peerManager;
     private TextArea blueprintTxtArea;
     private Table blueprintsTable;
-    private Button viewBlueprintsButton;
 
 
-    public BlueprintForm( EnvironmentManagerComponent environmentManagerComponent,
-                          EnvironmentManager environmentManager, PeerManager peerManager )
+    public BlueprintForm( EnvironmentManager environmentManager, PeerManager peerManager )
     {
-        this.environmentManagerComponent = environmentManagerComponent;
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
         contentRoot = new VerticalLayout();
@@ -92,7 +87,7 @@ public class BlueprintForm
         blueprintsTable = createBlueprintsTable( "Blueprints" );
         blueprintsTable.setId( "blueprintsTable" );
 
-        viewBlueprintsButton = new Button( VIEW_BLUEPRINTS );
+        final Button viewBlueprintsButton = new Button( VIEW_BLUEPRINTS );
         viewBlueprintsButton.setId( "viewBlueprintsButton" );
         viewBlueprintsButton.addClickListener( new Button.ClickListener()
         {
@@ -172,10 +167,7 @@ public class BlueprintForm
 
     private void buildBlueprint( Blueprint blueprint )
     {
-        //TODO let user specify topology
-        contentRoot.getUI().addWindow( new TopologyWindow( blueprint, peerManager ) );
-        //TODO create environment in background thread
-        //environmentManagerComponent.focusEnvironmentForm();
+        contentRoot.getUI().addWindow( new TopologyWindow( blueprint, peerManager, environmentManager ) );
     }
 
 
@@ -223,6 +215,7 @@ public class BlueprintForm
             try
             {
                 Blueprint blueprint = JsonUtil.fromJson( content, Blueprint.class );
+                //TODO validate blueprint
                 environmentManager.saveBlueprint( blueprint );
                 updateBlueprintsTable();
                 Notification.show( BLUEPRINT_SAVED );
