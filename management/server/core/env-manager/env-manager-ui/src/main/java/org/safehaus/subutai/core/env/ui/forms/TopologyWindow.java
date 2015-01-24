@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.env.ui.forms;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.peer.Peer;
 import org.safehaus.subutai.common.util.CollectionUtil;
@@ -92,7 +93,9 @@ public class TopologyWindow extends Window
                         }
                     }
 
-                    environmentManager.createEnvironmentAsync( blueprint.getName(), topology );
+                    environmentManager
+                            .createEnvironmentAsync( String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ),
+                                    topology );
 
                     Notification.show( "Environment creation started" );
 
