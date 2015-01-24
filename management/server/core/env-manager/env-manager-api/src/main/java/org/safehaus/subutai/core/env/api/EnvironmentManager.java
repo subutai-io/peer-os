@@ -96,6 +96,19 @@ public interface EnvironmentManager
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**
+     * Grows environment based on a passed topology asynchronously
+     *
+     * @param environmentId - environment id
+     * @param topology - {@code Topology}
+     *
+     * @return - target environment
+     *
+     * @throws EnvironmentNotFoundException - thrown if environment not found
+     */
+    public Environment growEnvironmentAsync( UUID environmentId, Topology topology )
+            throws EnvironmentNotFoundException;
+
+    /**
      * Destroys container
      *
      * @param containerHost - container to destroy
@@ -105,6 +118,15 @@ public interface EnvironmentManager
      */
     public void destroyContainer( ContainerHost containerHost )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
+
+    /**
+     * Destroys container asynchronously
+     *
+     * @param containerHost - container to destroy
+     *
+     * @throws EnvironmentNotFoundException - thrown if environment not found
+     */
+    public void destroyContainerAsync( ContainerHost containerHost ) throws EnvironmentNotFoundException;
 
 
     /**
