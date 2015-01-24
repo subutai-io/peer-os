@@ -101,8 +101,8 @@ public class NodeGroupBuilder implements Callable<Set<EnvironmentContainerImpl>>
 
                 Set<HostInfoModel> newHosts = peer.scheduleCloneContainers( localPeerId,
                         fetchRequiredTemplates( peer.getId(), nodeGroup.getTemplateName() ),
-                        nodeGroup.getNumberOfNodes(), nodeGroup.getNodePlacementStrategy().getStrategyId(),
-                        nodeGroup.getNodePlacementStrategy().getCriteriaAsList() );
+                        nodeGroup.getNumberOfContainers(), nodeGroup.getContainerPlacementStrategy().getStrategyId(),
+                        nodeGroup.getContainerPlacementStrategy().getCriteriaAsList() );
 
 
                 for ( HostInfoModel newHost : newHosts )

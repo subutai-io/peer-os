@@ -1,12 +1,8 @@
 package org.safehaus.subutai.core.env.ui.forms;
 
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.safehaus.subutai.core.env.api.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
-import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 
 import com.vaadin.ui.Button;
@@ -25,7 +21,6 @@ public class EnvironmentForm
 
     private final VerticalLayout contentRoot;
     private Table environmentsTable;
-    private ExecutorService executorService = Executors.newCachedThreadPool();
 
 
     public EnvironmentForm( final EnvironmentManager environmentManager )
@@ -69,6 +64,7 @@ public class EnvironmentForm
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent )
                 {
+                    destroy.setEnabled( false );
                     destroyEnvironment( environment );
                 }
             } );
@@ -82,26 +78,18 @@ public class EnvironmentForm
 
     private void destroyEnvironment( final Environment environment )
     {
-        executorService.execute( new Runnable()
+        try
         {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    environmentManager.destroyEnvironment( environment.getId() );
-                }
-                catch ( EnvironmentNotFoundException | EnvironmentDestructionException e )
-                {
-                    Notification
-                            .show( "Error destroying environment", e.getMessage(), Notification.Type.ERROR_MESSAGE );
-                }
+            environmentManager.destroyEnvironmentAsync( environment.getId() );
 
-                updateEnvironmentsTable();
-            }
-        } );
+            Notification.show( "Environment destruction started" );
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            Notification.show( "Error destroying environment", e.getMessage(), Notification.Type.ERROR_MESSAGE );
+        }
 
-        Notification.show( "Environment destruction started" );
+        updateEnvironmentsTable();
     }
 
 

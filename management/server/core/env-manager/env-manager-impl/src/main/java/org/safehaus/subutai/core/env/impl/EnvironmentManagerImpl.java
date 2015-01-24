@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.peer.ContainerHost;
@@ -31,6 +33,8 @@ import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.network.api.NetworkManagerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -43,9 +47,12 @@ import com.google.common.collect.Sets;
  */
 public class EnvironmentManagerImpl implements EnvironmentManager
 {
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class.getName() );
+
     private final PeerManager peerManager;
     private final NetworkManager networkManager;
     private final TopologyBuilder topologyBuilder;
+    private final ExecutorService executor = Executors.newCachedThreadPool();
 
     //************* DaoManager ******************
     private final DaoManager daoManager;
@@ -155,6 +162,31 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
+    public void createEnvironmentAsync( final String name, final Topology topology )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
+        Preconditions.checkNotNull( topology, "Invalid topology" );
+        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+
+        executor.submit( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    createEnvironment( name, topology );
+                }
+                catch ( EnvironmentCreationException e )
+                {
+                    LOG.error( String.format( "Error creating environment %s, topology %s", name, topology ), e );
+                }
+            }
+        } );
+    }
+
+
+    @Override
     public void destroyEnvironment( final UUID environmentId )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
@@ -183,6 +215,31 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
 
         environmentDataService.remove( environmentId.toString() );
+    }
+
+
+    @Override
+    public void destroyEnvironmentAsync( final UUID environmentId ) throws EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
+
+        executor.submit( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    destroyEnvironment( environmentId );
+                }
+                catch ( EnvironmentNotFoundException | EnvironmentDestructionException e )
+                {
+                    LOG.error( String.format( "Error destroying environment %s", environment ), e );
+                }
+            }
+        } );
     }
 
 

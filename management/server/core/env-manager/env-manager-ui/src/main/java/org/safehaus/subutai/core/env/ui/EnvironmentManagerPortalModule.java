@@ -6,6 +6,7 @@ import java.io.File;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -16,14 +17,17 @@ public class EnvironmentManagerPortalModule implements PortalModule
 
     private final static String MODULE_IMAGE = "environment.jpg";
     private final static String MODULE_NAME = "Environment2";
-    private EnvironmentManager environmentManager;
-    private PeerManager peerManager;
+    private final EnvironmentManager environmentManager;
+    private final PeerManager peerManager;
+    private final TemplateRegistry templateRegistry;
 
 
-    public EnvironmentManagerPortalModule( final EnvironmentManager environmentManager, final PeerManager peerManager )
+    public EnvironmentManagerPortalModule( final EnvironmentManager environmentManager, final PeerManager peerManager,
+                                           final TemplateRegistry templateRegistry )
     {
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
+        this.templateRegistry = templateRegistry;
     }
 
 
@@ -51,7 +55,7 @@ public class EnvironmentManagerPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-        return new EnvironmentManagerComponent( environmentManager, peerManager );
+        return new EnvironmentManagerComponent( environmentManager, peerManager, templateRegistry );
     }
 
 
