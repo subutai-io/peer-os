@@ -14,6 +14,7 @@ import com.vaadin.ui.VerticalLayout;
 public class EnvironmentForm
 {
     private final EnvironmentManager environmentManager;
+    private static final String MANAGE = "Manage";
     private static final String NAME = "Name";
     private static final String STATUS = "Status";
     private static final String DESTROY = "Destroy";
@@ -57,6 +58,9 @@ public class EnvironmentForm
         environmentsTable.removeAllItems();
         for ( final Environment environment : environmentManager.getEnvironments() )
         {
+            final Button manage = new Button( MANAGE );
+            //TODO implement environment management window
+
             final Button destroy = new Button( DESTROY );
             destroy.setId( environment.getName() + "-destroy" );
             destroy.addClickListener( new Button.ClickListener()
@@ -68,8 +72,9 @@ public class EnvironmentForm
                     destroyEnvironment( environment );
                 }
             } );
+
             environmentsTable.addItem( new Object[] {
-                    environment.getName(), environment.getStatus().name(), destroy
+                    environment.getName(), environment.getStatus().name(), manage, destroy
             }, null );
         }
         environmentsTable.refreshRowCache();
@@ -98,6 +103,7 @@ public class EnvironmentForm
         Table table = new Table( caption );
         table.addContainerProperty( NAME, String.class, null );
         table.addContainerProperty( STATUS, String.class, null );
+        table.addContainerProperty( MANAGE, Button.class, null );
         table.addContainerProperty( DESTROY, Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
