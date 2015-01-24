@@ -5,11 +5,11 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.core.env.api.build.NodeGroup;
+import org.safehaus.subutai.core.env.api.build.Blueprint;
 import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 
@@ -87,29 +87,6 @@ public interface EnvironmentManager
     public void destroyContainer( ContainerHost containerHost )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
-    /**
-     * Creates a node group
-     *
-     * @param name - name of node group
-     * @param templateName - name of template from which to clone containers
-     * @param domainName - domain name  e.g. "intra.lan"
-     * @param numberOfContainers- number of containers to create
-     * @param sshGroupId - id of ssh group inside which all containers will be exchanged with ssh keys for passwordless
-     * access
-     * @param hostsGroupId - id of host group inside which all containers will be registered in /etc/hosts file of each
-     * other
-     * @param containerPlacementStrategy - container placement strategy
-     */
-    public NodeGroup newNodeGroup( final String name, final String templateName, final String domainName,
-                                   final int numberOfContainers, final int sshGroupId, final int hostsGroupId,
-                                   final PlacementStrategy containerPlacementStrategy );
-
-    /**
-     * Returns new empty topology
-     *
-     * @return - {@code Topology}
-     */
-    public Topology newTopology();
 
     /**
      * Removes environment from database only. Used to cleanup environment records.
@@ -119,4 +96,11 @@ public interface EnvironmentManager
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
     public void removeEnvironment( UUID environmentId ) throws EnvironmentNotFoundException;
+
+
+    public void saveBlueprint( Blueprint blueprint ) throws EnvironmentManagerException;
+
+    public void removeBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
+
+    public Set<Blueprint> getBlueprints() throws EnvironmentManagerException;
 }

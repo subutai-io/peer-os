@@ -19,7 +19,7 @@ public interface RestService
 
     @GET
     @Path( "container/environmentId" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( { MediaType.TEXT_PLAIN } )
     public Response getContainerEnvironmentId( @QueryParam( "containerId" ) String containerId );
 
     @GET

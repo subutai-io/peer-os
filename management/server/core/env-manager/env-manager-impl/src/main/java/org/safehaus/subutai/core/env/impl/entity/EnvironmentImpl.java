@@ -69,7 +69,7 @@ public class EnvironmentImpl implements Environment, Serializable
     private Set<ContainerHost> containers = Sets.newHashSet();
 
     @Enumerated( EnumType.STRING )
-    private EnvironmentStatus status = EnvironmentStatus.EMPTY;
+    private EnvironmentStatus status = EnvironmentStatus.UNDER_MODIFICATION;
 
     @Column( name = "public_key", length = 3000 )
     private String publicKey;

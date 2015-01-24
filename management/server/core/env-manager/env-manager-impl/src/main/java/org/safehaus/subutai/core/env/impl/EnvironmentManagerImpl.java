@@ -9,15 +9,15 @@ import java.util.UUID;
 import org.safehaus.subutai.common.dao.DaoManager;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.core.env.api.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.EnvironmentStatus;
-import org.safehaus.subutai.core.env.api.build.NodeGroup;
+import org.safehaus.subutai.core.env.api.build.Blueprint;
 import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.env.api.exception.ContainerHostNotFoundException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 import org.safehaus.subutai.core.env.impl.builder.TopologyBuilder;
@@ -162,6 +162,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
+        environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+
         Set<ContainerHost> containers = Sets.newHashSet( environment.getContainerHosts() );
 
         for ( ContainerHost container : containers )
@@ -194,6 +196,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         EnvironmentImpl environment = ( EnvironmentImpl ) findEnvironment( environmentId );
 
+        environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+
         try
         {
             topologyBuilder.build( environment, topology );
@@ -212,6 +216,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throw new EnvironmentModificationException( e );
         }
 
+        environment.setStatus( EnvironmentStatus.HEALTHY );
+
         return environment;
     }
 
@@ -225,6 +231,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         EnvironmentImpl environment =
                 ( EnvironmentImpl ) findEnvironment( UUID.fromString( containerHost.getEnvironmentId() ) );
 
+        environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
+
         try
         {
             containerHost.dispose();
@@ -235,25 +243,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         catch ( ContainerHostNotFoundException | PeerException e )
         {
+            environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
             throw new EnvironmentModificationException( e );
         }
-    }
 
-
-    @Override
-    public NodeGroup newNodeGroup( final String name, final String templateName, final String domainName,
-                                   final int numberOfContainers, final int sshGroupId, final int hostsGroupId,
-                                   final PlacementStrategy containerPlacementStrategy )
-    {
-        return new NodeGroupImpl( name, templateName, domainName, numberOfContainers, sshGroupId, hostsGroupId,
-                containerPlacementStrategy );
-    }
-
-
-    @Override
-    public Topology newTopology()
-    {
-        return new TopologyImpl();
+        environment.setStatus( EnvironmentStatus.HEALTHY );
     }
 
 
@@ -350,5 +345,30 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                         ( ( EnvironmentContainerImpl ) groupedContainers.iterator().next() ).getDomainName() );
             }
         }
+    }
+
+
+    @Override
+    public void saveBlueprint( final Blueprint blueprint ) throws EnvironmentManagerException
+    {
+        Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
+
+        blueprintDataService.persist( blueprint );
+    }
+
+
+    @Override
+    public void removeBlueprint( final UUID blueprintId ) throws EnvironmentManagerException
+    {
+        Preconditions.checkNotNull( blueprintId, "Invalid blueprint id" );
+
+        blueprintDataService.remove( blueprintId );
+    }
+
+
+    @Override
+    public Set<Blueprint> getBlueprints() throws EnvironmentManagerException
+    {
+        return blueprintDataService.getAll();
     }
 }

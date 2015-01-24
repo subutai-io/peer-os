@@ -44,9 +44,9 @@ public class BuildLocalEnvironmentCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Topology topology = environmentManager.newTopology();
-        NodeGroup nodeGroup = environmentManager
-                .newNodeGroup( "NodeGroup1", templateName, Common.DEFAULT_DOMAIN_NAME, numberOfContainers, 1, 1,
+        Topology topology = new Topology();
+        NodeGroup nodeGroup =
+                new NodeGroup( "NodeGroup1", templateName, Common.DEFAULT_DOMAIN_NAME, numberOfContainers, 1, 1,
                         new PlacementStrategy( "ROUND_ROBIN" ) );
 
         topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );

@@ -56,7 +56,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( JsonSyntaxException | NullPointerException e )
         {
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
+                           .build();
         }
         try
         {
@@ -87,7 +88,7 @@ public class RestServiceImpl implements RestService
 
         if ( environment != null )
         {
-            return Response.ok( JsonUtil.toJson( "ENV_ID", environment.getId() ) ).build();
+            return Response.ok( environment.getId().toString() ).build();
         }
 
         return Response.status( Response.Status.NOT_FOUND ).build();
@@ -162,6 +163,8 @@ public class RestServiceImpl implements RestService
             try
             {
                 environmentManager.destroyContainer( hostId );
+
+                return Response.ok().build();
             }
             catch ( EnvironmentManagerException e )
             {
@@ -207,7 +210,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( NullPointerException | JsonSyntaxException e )
         {
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
+                           .build();
         }
 
         try

@@ -35,8 +35,8 @@ public class BlueprintsForm
     private static final String NAME = "Name";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private VerticalLayout contentRoot;
-    private Table environmentsTable;
     private EnvironmentManagerPortalModule module;
+    private Table environmentsTable;
     private Button environmentsButton;
 
 
