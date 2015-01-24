@@ -55,8 +55,8 @@
       <artifactId>slf4j-simple</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.googlecode.catch-exception</groupId>
-      <artifactId>catch-exception</artifactId>
+      <groupId>com.googlecode.catch-result</groupId>
+      <artifactId>catch-result</artifactId>
       <version>1.2.0</version>
       <scope>test</scope>
     </dependency>

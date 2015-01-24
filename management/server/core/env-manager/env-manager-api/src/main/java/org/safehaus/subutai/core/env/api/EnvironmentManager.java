@@ -55,8 +55,10 @@ public interface EnvironmentManager
      *
      * @param name - environment name
      * @param topology - {@code Topology}
+     *
+     * @return - id of environment
      */
-    public void createEnvironmentAsync( String name, Topology topology );
+    public UUID createEnvironmentAsync( String name, Topology topology );
 
 
     /**
