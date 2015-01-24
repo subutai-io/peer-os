@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import javax.security.auth.Subject;
 
+import org.safehaus.subutai.common.helper.UserIdMdcHelper;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.common.peer.Peer;
@@ -49,15 +50,17 @@ public class HostsCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        AccessControlContext acc = AccessController.getContext();
-        Subject subject = Subject.getSubject( acc );
-        Set<Principal> principals = subject.getPrincipals();
-        String sessionId = getSessionId( principals );
-        org.apache.shiro.subject.Subject requestSubject =
-                new org.apache.shiro.subject.Subject.Builder().sessionId( sessionId ).buildSubject();
+        boolean isSet = UserIdMdcHelper.isSet();
+        String userId = UserIdMdcHelper.get();
+//        AccessControlContext acc = AccessController.getContext();
+//        Subject subject = Subject.getSubject( acc );
+//        Set<Principal> principals = subject.getPrincipals();
+//        String sessionId = getSessionId( principals );
+//        org.apache.shiro.subject.Subject requestSubject =
+//                new org.apache.shiro.subject.Subject.Builder().sessionId( sessionId ).buildSubject();
         org.apache.shiro.subject.Subject sub = SecurityUtils.getSubject();
-        SecurityUtils.setSecurityManager( identityManager.getSecurityManager() );
-        sub = SecurityUtils.getSubject();
+//        SecurityUtils.setSecurityManager( identityManager.getSecurityManager() );
+        //        sub = SecurityUtils.getSubject();
 
         //        UsernamePasswordToken token = new UsernamePasswordToken( "admin", "secret" );
         //        subject.login( token );

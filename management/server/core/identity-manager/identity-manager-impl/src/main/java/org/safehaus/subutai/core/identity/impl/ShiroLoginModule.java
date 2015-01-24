@@ -17,6 +17,7 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
 import org.osgi.framework.BundleContext;
+import org.safehaus.subutai.common.helper.UserIdMdcHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,14 +113,16 @@ public class ShiroLoginModule implements LoginModule
         principals = new HashSet<Principal>();
 
 
-        org.apache.shiro.subject.Subject s = SecurityUtils.getSubject();
-        UsernamePasswordToken token = new UsernamePasswordToken( user, password );
 
         LOGGER.info( "************************" + user + " " + password );
         try
         {
+            org.apache.shiro.subject.Subject s = SecurityUtils.getSubject();
+            UsernamePasswordToken token = new UsernamePasswordToken( user, password );
+
             LOGGER.info( "Trying authc..." );
             s.login( token );
+            UserIdMdcHelper.set( s );
             Session session = s.getSession();
             LOGGER.info( "Login success." );
 
@@ -171,6 +174,7 @@ public class ShiroLoginModule implements LoginModule
     {
         LOGGER.info( "Invoking logout." );
 
+        UserIdMdcHelper.unset();
         subject.getPrincipals().removeAll( principals );
         principals.clear();
         return true;

@@ -223,5 +223,9 @@
       <artifactId>shiro-web</artifactId>
       <version>${org.apache.shiro.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.safehaus.subutai</groupId>
+      <artifactId>identity-manager-impl</artifactId>
+    </dependency>
   </dependencies>
 </project>
