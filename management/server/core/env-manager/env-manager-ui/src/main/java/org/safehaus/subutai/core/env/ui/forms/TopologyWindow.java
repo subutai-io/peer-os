@@ -125,10 +125,11 @@ public class TopologyWindow extends Window
                 if ( ng.getName().equalsIgnoreCase( nodeGroupName ) )
                 {
                     nodeGroup = new NodeGroup( nodeGroupName, ng.getTemplateName(), ng.getDomainName(), amount,
-                            ng.getSshGroupId(), ng.getHostsGroupId(), ng.getNodePlacementStrategy() );
+                            ng.getSshGroupId(), ng.getHostsGroupId(), ng.getContainerPlacementStrategy() );
                     break;
                 }
             }
+
             Peer peer = null;
             for ( Peer p : peerManager.getPeers() )
             {
@@ -181,10 +182,10 @@ public class TopologyWindow extends Window
     {
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
         {
-            Slider slider = new Slider( 1, nodeGroup.getNumberOfNodes() );
+            Slider slider = new Slider( 1, nodeGroup.getNumberOfContainers() );
             slider.setWidth( 100, Unit.PIXELS );
             slider.setOrientation( SliderOrientation.HORIZONTAL );
-            slider.setValue( ( double ) nodeGroup.getNumberOfNodes() );
+            slider.setValue( ( double ) nodeGroup.getNumberOfContainers() );
 
             ComboBox peersCombo = createPeersComboBox();
 

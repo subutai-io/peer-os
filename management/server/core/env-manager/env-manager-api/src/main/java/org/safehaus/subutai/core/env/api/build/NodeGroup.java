@@ -15,29 +15,30 @@ public class NodeGroup
     private String name;
     private String templateName;
     private String domainName;
-    private int numberOfNodes;
+    private int numberOfContainers;
     private int sshGroupId;
     private int hostsGroupId;
-    private PlacementStrategy nodePlacementStrategy;
+    private PlacementStrategy containerPlacementStrategy;
 
 
-    public NodeGroup( final String name, final String templateName, final String domainName, final int numberOfNodes,
-                      final int sshGroupId, final int hostsGroupId, final PlacementStrategy nodePlacementStrategy )
+    public NodeGroup( final String name, final String templateName, final String domainName,
+                      final int numberOfContainers, final int sshGroupId, final int hostsGroupId,
+                      final PlacementStrategy containerPlacementStrategy )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ), "Invalid domain name" );
-        Preconditions.checkArgument( numberOfNodes > 0, "Number of nodes must be greater than 0" );
-        Preconditions.checkNotNull( nodePlacementStrategy, "Invalid node placement strategy" );
+        Preconditions.checkArgument( numberOfContainers > 0, "Number of containers must be greater than 0" );
+        Preconditions.checkNotNull( containerPlacementStrategy, "Invalid container placement strategy" );
 
 
         this.name = name;
         this.templateName = templateName;
         this.domainName = domainName;
-        this.numberOfNodes = numberOfNodes;
+        this.numberOfContainers = numberOfContainers;
         this.sshGroupId = sshGroupId;
         this.hostsGroupId = hostsGroupId;
-        this.nodePlacementStrategy = nodePlacementStrategy;
+        this.containerPlacementStrategy = containerPlacementStrategy;
     }
 
 
@@ -47,9 +48,9 @@ public class NodeGroup
     }
 
 
-    public int getNumberOfNodes()
+    public int getNumberOfContainers()
     {
-        return numberOfNodes;
+        return numberOfContainers;
     }
 
 
@@ -59,9 +60,9 @@ public class NodeGroup
     }
 
 
-    public PlacementStrategy getNodePlacementStrategy()
+    public PlacementStrategy getContainerPlacementStrategy()
     {
-        return nodePlacementStrategy;
+        return containerPlacementStrategy;
     }
 
 

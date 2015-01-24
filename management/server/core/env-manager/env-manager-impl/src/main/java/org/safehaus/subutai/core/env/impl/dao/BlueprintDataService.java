@@ -80,7 +80,9 @@ public class BlueprintDataService
 
             for ( EnvironmentBlueprintEntity ebe : results )
             {
-                blueprints.add( JsonUtil.fromJson( ebe.getInfo(), Blueprint.class ) );
+                Blueprint blueprint = JsonUtil.fromJson( ebe.getInfo(), Blueprint.class );
+                blueprint.setId( UUID.fromString( ebe.getId() ) );
+                blueprints.add( blueprint );
             }
         }
         catch ( Exception e )
