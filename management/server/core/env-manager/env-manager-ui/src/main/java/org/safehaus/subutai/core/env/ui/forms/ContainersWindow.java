@@ -57,15 +57,18 @@ public class ContainersWindow extends Window
                 {
                     try
                     {
+
+                        Notification.show( "Please, wait...", Notification.Type.ASSISTIVE_NOTIFICATION );
+
                         containerHost.start();
 
                         updateContainersTable();
                     }
                     catch ( PeerException e )
                     {
-                        Notification.show( String
-                                .format( "Error starting container %s: %s", containerHost.getHostname(), e ),
-                                Notification.Type.ERROR_MESSAGE );
+                        Notification
+                                .show( String.format( "Error starting container %s: %s", containerHost.getHostname(),
+                                                e ), Notification.Type.ERROR_MESSAGE );
                     }
                 }
             } );
@@ -78,6 +81,8 @@ public class ContainersWindow extends Window
                 {
                     try
                     {
+                        Notification.show( "Please, wait...", Notification.Type.ASSISTIVE_NOTIFICATION );
+
                         containerHost.stop();
 
                         updateContainersTable();
@@ -101,15 +106,17 @@ public class ContainersWindow extends Window
                 {
                     try
                     {
+                        Notification.show( "Please, wait...", Notification.Type.ASSISTIVE_NOTIFICATION );
+
                         containerHost.dispose();
 
                         updateContainersTable();
                     }
                     catch ( PeerException e )
                     {
-                        Notification
-                                .show( String.format( "Error destroying container %s: %s", containerHost.getHostname(),
-                                                e ), Notification.Type.ERROR_MESSAGE );
+                        Notification.show( String
+                                .format( "Error destroying container %s: %s", containerHost.getHostname(), e ),
+                                Notification.Type.ERROR_MESSAGE );
                     }
                 }
             } );
