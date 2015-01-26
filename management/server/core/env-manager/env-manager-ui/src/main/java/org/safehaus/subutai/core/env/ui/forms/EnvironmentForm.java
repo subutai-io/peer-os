@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.core.env.api.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.env.api.EnvironmentStatus;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 
@@ -118,6 +119,8 @@ public class EnvironmentForm
                     destroyEnvironment( environment );
                 }
             } );
+
+            destroyBtn.setEnabled( !environment.getStatus().equals( EnvironmentStatus.UNDER_MODIFICATION ) );
 
             environmentsTable.addItem( new Object[] {
                     environment.getName(), environment.getStatus().name(), containersBtn, destroyBtn
