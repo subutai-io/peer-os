@@ -6,7 +6,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.core.env.api.build.Topology;
 import org.safehaus.subutai.core.env.api.exception.ContainerHostNotFoundException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentModificationException;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 
 
 /**
@@ -25,6 +28,16 @@ public interface Environment
     public String getPublicKey();
 
     public Set<ContainerHost> getContainerHosts();
+
+    public void destroyContainer( ContainerHost containerHost )
+            throws EnvironmentNotFoundException, EnvironmentModificationException;
+
+    public void destroyContainerAsync( ContainerHost containerHost ) throws EnvironmentNotFoundException;
+
+    public void growEnvironment( Topology topology ) throws EnvironmentModificationException;
+
+    public void growEnvironmentAsync( Topology topology );
+
 
     /**
      * Network subnet of the environment in CIDR format notation.

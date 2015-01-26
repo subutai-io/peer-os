@@ -96,8 +96,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         for ( Environment environment : environments )
         {
-            ( ( EnvironmentImpl ) environment ).setDataService( environmentDataService );
-            setContainersTransitiveFields( environment.getContainerHosts() );
+            setEnvironmentTransientFields( environment );
+            setContainersTransientFields( environment.getContainerHosts() );
         }
 
         return environments;
@@ -115,11 +115,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throw new EnvironmentNotFoundException();
         }
 
-        //set dataservice
-        environment.setDataService( environmentDataService );
+        //set environment's transient fields
+        setEnvironmentTransientFields( environment );
 
         //set container's transient fields
-        setContainersTransitiveFields( environment.getContainerHosts() );
+        setContainersTransientFields( environment.getContainerHosts() );
 
         return environment;
     }
@@ -172,7 +172,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 {
                     environmentDataService.persist( environment );
 
-                    environment.setDataService( environmentDataService );
+                    setEnvironmentTransientFields( environment );
 
                     try
                     {
@@ -192,7 +192,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     environment.setStatus( EnvironmentStatus.HEALTHY );
 
                     //set container's transient fields
-                    setContainersTransitiveFields( environment.getContainerHosts() );
+                    setContainersTransientFields( environment.getContainerHosts() );
                 }
                 catch ( EnvironmentCreationException e )
                 {
@@ -276,7 +276,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     {
                         try
                         {
-                            container.dispose();
+                            ( ( EnvironmentContainerImpl ) container ).destroy();
                             environment.removeContainer( container.getId() );
                             environmentContainerDataService.remove( container.getId().toString() );
                         }
@@ -377,7 +377,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                         configureSsh( environment.getContainerHosts() );
 
                         //set container's transient fields
-                        setContainersTransitiveFields( environment.getContainerHosts() );
+                        setContainersTransientFields( environment.getContainerHosts() );
                     }
                     catch ( EnvironmentBuildException | NetworkManagerException e )
                     {
@@ -469,7 +469,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
                     try
                     {
-                        containerHost.dispose();
+                        ( ( EnvironmentContainerImpl ) containerHost ).destroy();
 
                         environment.removeContainer( containerHost.getId() );
 
@@ -529,12 +529,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void setContainersTransitiveFields( Set<ContainerHost> containers )
+    private void setEnvironmentTransientFields( Environment environment )
     {
-        //set container's transient fields
+        ( ( EnvironmentImpl ) environment ).setDataService( environmentDataService );
+        ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
+    }
+
+
+    private void setContainersTransientFields( Set<ContainerHost> containers )
+    {
         for ( ContainerHost containerHost : containers )
         {
             ( ( EnvironmentContainerImpl ) containerHost ).setDataService( environmentContainerDataService );
+            ( ( EnvironmentContainerImpl ) containerHost ).setEnvironmentManager( this );
             ( ( EnvironmentContainerImpl ) containerHost ).setPeer( peerManager.getPeer( containerHost.getPeerId() ) );
         }
     }
