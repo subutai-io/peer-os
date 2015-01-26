@@ -12,7 +12,9 @@ import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionExcepti
 import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 
 import com.vaadin.server.ClientConnector;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
@@ -26,6 +28,9 @@ public class EnvironmentForm
     private static final String STATUS = "Status";
     private static final String DESTROY = "Destroy";
     private static final String VIEW_ENVIRONMENTS = "View environments";
+    private static final String OK_ICON_SOURCE = "img/ok.png";
+    private static final String ERROR_ICON_SOURCE = "img/cancel.png";
+    private static final String LOAD_ICON_SOURCE = "img/spinner.gif";
 
     private final VerticalLayout contentRoot;
     private Table environmentsTable;
@@ -126,8 +131,14 @@ public class EnvironmentForm
             destroyBtn.setEnabled( !isEnvironmentUnderModification );
             containersBtn.setEnabled( !isEnvironmentUnderModification );
 
+            Embedded icon = isEnvironmentUnderModification ? new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) :
+                            environment.getStatus().equals( EnvironmentStatus.HEALTHY ) ?
+                            new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) :
+                            new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
+
+
             environmentsTable.addItem( new Object[] {
-                    environment.getName(), environment.getStatus().name(), containersBtn, destroyBtn
+                    environment.getName(), icon, containersBtn, destroyBtn
             }, null );
         }
         environmentsTable.refreshRowCache();
@@ -153,7 +164,7 @@ public class EnvironmentForm
     {
         Table table = new Table( caption );
         table.addContainerProperty( NAME, String.class, null );
-        table.addContainerProperty( STATUS, String.class, null );
+        table.addContainerProperty( STATUS, Embedded.class, null );
         table.addContainerProperty( CONTAINERS, Button.class, null );
         table.addContainerProperty( DESTROY, Button.class, null );
         table.setPageLength( 10 );

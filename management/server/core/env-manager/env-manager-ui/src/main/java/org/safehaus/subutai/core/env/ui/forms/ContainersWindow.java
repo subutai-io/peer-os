@@ -1,8 +1,6 @@
 package org.safehaus.subutai.core.env.ui.forms;
 
 
-import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -15,7 +13,6 @@ import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.EnvironmentStatus;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 
-import com.google.common.collect.Sets;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
@@ -30,7 +27,6 @@ public class ContainersWindow extends Window
     private Table containersTable;
     private ScheduledExecutorService updater = Executors.newSingleThreadScheduledExecutor();
     private ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
-    private Set<UUID> containersWithTasksInProgress = Sets.newHashSet();
 
 
     public ContainersWindow( final EnvironmentManager environmentManager, final Environment environment )
@@ -108,13 +104,8 @@ public class ContainersWindow extends Window
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-                    containersWithTasksInProgress.add( containerHost.getId() );
 
-                    startBtn.setEnabled( false );
-                    stopBtn.setEnabled( false );
-                    destroyBtn.setEnabled( false );
-
-                    Notification.show( "Please, wait..." );
+                    disableTable();
 
                     taskExecutor.submit( new Runnable()
                     {
@@ -133,7 +124,7 @@ public class ContainersWindow extends Window
                             }
                             finally
                             {
-                                containersWithTasksInProgress.remove( containerHost.getId() );
+                                enableTable();
                             }
                         }
                     } );
@@ -145,13 +136,9 @@ public class ContainersWindow extends Window
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-                    containersWithTasksInProgress.add( containerHost.getId() );
 
-                    startBtn.setEnabled( false );
-                    stopBtn.setEnabled( false );
-                    destroyBtn.setEnabled( false );
+                    disableTable();
 
-                    Notification.show( "Please, wait..." );
                     taskExecutor.submit( new Runnable()
                     {
                         @Override
@@ -170,7 +157,7 @@ public class ContainersWindow extends Window
                             }
                             finally
                             {
-                                containersWithTasksInProgress.remove( containerHost.getId() );
+                                enableTable();
                             }
                         }
                     } );
@@ -182,13 +169,9 @@ public class ContainersWindow extends Window
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-                    containersWithTasksInProgress.add( containerHost.getId() );
 
-                    startBtn.setEnabled( false );
-                    stopBtn.setEnabled( false );
-                    destroyBtn.setEnabled( false );
+                    disableTable();
 
-                    Notification.show( "Please, wait..." );
                     taskExecutor.submit( new Runnable()
                     {
                         @Override
@@ -215,7 +198,7 @@ public class ContainersWindow extends Window
                             }
                             finally
                             {
-                                containersWithTasksInProgress.remove( containerHost.getId() );
+                                enableTable();
                             }
                         }
                     } );
@@ -227,22 +210,29 @@ public class ContainersWindow extends Window
                     containerHost.getIpByInterfaceName( "eth0" ), startBtn, stopBtn, destroyBtn
             }, null );
 
-            if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION || containersWithTasksInProgress
-                    .contains( containerHost.getId() ) )
-            {
-                startBtn.setEnabled( false );
-                stopBtn.setEnabled( false );
-                destroyBtn.setEnabled( false );
-            }
-            else
-            {
-                boolean isContainerConnected = containerHost.isConnected();
-                startBtn.setEnabled( !isContainerConnected );
-                stopBtn.setEnabled( isContainerConnected );
-            }
+            boolean isContainerConnected = containerHost.isConnected();
+            startBtn.setEnabled( !isContainerConnected );
+            stopBtn.setEnabled( isContainerConnected );
         }
 
         containersTable.refreshRowCache();
+    }
+
+
+    private void enableTable()
+    {
+        if ( environment.getStatus() != EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            containersTable.setEnabled( true );
+        }
+    }
+
+
+    private void disableTable()
+    {
+        containersTable.setEnabled( false );
+
+        Notification.show( "Please, wait..." );
     }
 
 
