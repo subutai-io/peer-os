@@ -120,7 +120,11 @@ public class EnvironmentForm
                 }
             } );
 
-            destroyBtn.setEnabled( !environment.getStatus().equals( EnvironmentStatus.UNDER_MODIFICATION ) );
+            boolean isEnvironmentUnderModification =
+                    environment.getStatus().equals( EnvironmentStatus.UNDER_MODIFICATION );
+
+            destroyBtn.setEnabled( !isEnvironmentUnderModification );
+            containersBtn.setEnabled( !isEnvironmentUnderModification );
 
             environmentsTable.addItem( new Object[] {
                     environment.getName(), environment.getStatus().name(), containersBtn, destroyBtn

@@ -100,6 +100,9 @@ public class ContainersWindow extends Window
         for ( final ContainerHost containerHost : environment.getContainerHosts() )
         {
             final Button startBtn = new Button( "Start" );
+            final Button stopBtn = new Button( "Stop" );
+            final Button destroyBtn = new Button( "Destroy" );
+
             startBtn.addClickListener( new Button.ClickListener()
             {
                 @Override
@@ -108,6 +111,8 @@ public class ContainersWindow extends Window
                     containersWithTasksInProgress.add( containerHost.getId() );
 
                     startBtn.setEnabled( false );
+                    stopBtn.setEnabled( false );
+                    destroyBtn.setEnabled( false );
 
                     Notification.show( "Please, wait..." );
 
@@ -123,9 +128,8 @@ public class ContainersWindow extends Window
                             }
                             catch ( PeerException e )
                             {
-                                Notification.show( String
-                                        .format( "Error starting container %s: %s", containerHost.getHostname(), e ),
-                                        Notification.Type.ERROR_MESSAGE );
+                                Notification.show( String.format( "Error starting container %s: %s",
+                                                containerHost.getHostname(), e ), Notification.Type.ERROR_MESSAGE );
                             }
                             finally
                             {
@@ -136,7 +140,6 @@ public class ContainersWindow extends Window
                 }
             } );
 
-            final Button stopBtn = new Button( "Stop" );
             stopBtn.addClickListener( new Button.ClickListener()
             {
                 @Override
@@ -144,7 +147,9 @@ public class ContainersWindow extends Window
                 {
                     containersWithTasksInProgress.add( containerHost.getId() );
 
+                    startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
+                    destroyBtn.setEnabled( false );
 
                     Notification.show( "Please, wait..." );
                     taskExecutor.submit( new Runnable()
@@ -172,7 +177,6 @@ public class ContainersWindow extends Window
                 }
             } );
 
-            final Button destroyBtn = new Button( "Destroy" );
             destroyBtn.addClickListener( new Button.ClickListener()
             {
                 @Override
@@ -180,6 +184,8 @@ public class ContainersWindow extends Window
                 {
                     containersWithTasksInProgress.add( containerHost.getId() );
 
+                    startBtn.setEnabled( false );
+                    stopBtn.setEnabled( false );
                     destroyBtn.setEnabled( false );
 
                     Notification.show( "Please, wait..." );
@@ -204,9 +210,8 @@ public class ContainersWindow extends Window
                             }
                             catch ( PeerException e )
                             {
-                                Notification.show( String
-                                        .format( "Error destroying container %s: %s", containerHost.getHostname(), e ),
-                                        Notification.Type.ERROR_MESSAGE );
+                                Notification.show( String.format( "Error destroying container %s: %s",
+                                                containerHost.getHostname(), e ), Notification.Type.ERROR_MESSAGE );
                             }
                             finally
                             {
