@@ -35,19 +35,19 @@ public class PeerQuotaInfo
         }
         else if ( quotaInfo instanceof HddQuotaInfo )
         {
-            if ( quotaInfo.getQuotaKey().equals( QuotaType.QUOTA_HDD_HOME.getKey() ) )
+            if ( quotaInfo.getQuotaKey().equals( QuotaType.QUOTA_TYPE_DISK_HOME.getKey() ) )
             {
                 this.homePartitionQuota = ( HddQuotaInfo ) quotaInfo;
             }
-            else if ( quotaInfo.getQuotaKey().equals( QuotaType.QUOTA_HDD_VAR.getKey() ) )
+            else if ( quotaInfo.getQuotaKey().equals( QuotaType.QUOTA_TYPE_DISK_VAR.getKey() ) )
             {
                 this.varPartitionQuota = ( HddQuotaInfo ) quotaInfo;
             }
-            else if ( quotaInfo.getQuotaKey().equals( QuotaType.QUOTA_HDD_OPT.getKey() ) )
+            else if ( quotaInfo.getQuotaKey().equals( QuotaType.QUOTA_TYPE_DISK_OPT.getKey() ) )
             {
                 this.optPartitionQuota = ( HddQuotaInfo ) quotaInfo;
             }
-            else if ( quotaInfo.getQuotaKey().equals( QuotaType.QUOTA_HDD_ROOTFS.getKey() ) )
+            else if ( quotaInfo.getQuotaKey().equals( QuotaType.QUOTA_TYPE_DISK_ROOTFS.getKey() ) )
             {
                 this.rootfsPartitionQuota = ( HddQuotaInfo ) quotaInfo;
             }

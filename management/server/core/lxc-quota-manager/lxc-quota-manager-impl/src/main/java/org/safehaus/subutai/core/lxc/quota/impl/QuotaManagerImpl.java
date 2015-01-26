@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandResult;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.quota.CpuQuotaInfo;
 import org.safehaus.subutai.common.quota.DiskPartition;
 import org.safehaus.subutai.common.quota.DiskQuota;
@@ -18,13 +19,12 @@ import org.safehaus.subutai.common.quota.DiskQuotaUnit;
 import org.safehaus.subutai.common.quota.HddQuotaInfo;
 import org.safehaus.subutai.common.quota.MemoryQuotaInfo;
 import org.safehaus.subutai.common.quota.PeerQuotaInfo;
+import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.common.quota.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
-import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -88,50 +88,55 @@ public class QuotaManagerImpl implements QuotaManager
             ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerName( containerName );
             CommandResult commandResult = commandUtil.execute( new RequestBuilder( cmd ), resourceHost );
 
-            if ( quotaType == QuotaType.QUOTA_ALL_JSON )
+            if ( quotaType == QuotaType.QUOTA_TYPE_ALL_JSON )
             {
                 JSONObject jsonObject = new JSONObject( commandResult.getStdOut() );
 
-                CpuQuotaInfo cpuQuota = new CpuQuotaInfo( jsonObject.getString( QuotaType.QUOTA_CPU_CPUS.getKey() ) );
-                HddQuotaInfo hddHomeQuota =
-                        new HddQuotaInfo( "home", jsonObject.getString( QuotaType.QUOTA_HDD_HOME.getKey() ) );
-                HddQuotaInfo hddVarQuota =
-                        new HddQuotaInfo( "var", jsonObject.getString( QuotaType.QUOTA_HDD_VAR.getKey() ) );
-                HddQuotaInfo hddOptQuota =
-                        new HddQuotaInfo( "opt", jsonObject.getString( QuotaType.QUOTA_HDD_OPT.getKey() ) );
-                HddQuotaInfo hddRootfsQuota =
-                        new HddQuotaInfo( "rootfs", jsonObject.getString( QuotaType.QUOTA_HDD_ROOTFS.getKey() ) );
+                CpuQuotaInfo cpuQuota = new CpuQuotaInfo( jsonObject.getString( QuotaType.QUOTA_TYPE_CPU.getKey() ) );
+                HddQuotaInfo hddHomeQuota = new HddQuotaInfo( DiskPartition.HOME,
+                        jsonObject.getString( QuotaType.QUOTA_TYPE_DISK_HOME.getKey() ) );
+                HddQuotaInfo hddVarQuota = new HddQuotaInfo( DiskPartition.VAR,
+                        jsonObject.getString( QuotaType.QUOTA_TYPE_DISK_VAR.getKey() ) );
+                HddQuotaInfo hddOptQuota = new HddQuotaInfo( DiskPartition.OPT,
+                        jsonObject.getString( QuotaType.QUOTA_TYPE_DISK_OPT.getKey() ) );
+                HddQuotaInfo hddRootfsQuota = new HddQuotaInfo( DiskPartition.ROOT_FS,
+                        jsonObject.getString( QuotaType.QUOTA_TYPE_DISK_ROOTFS.getKey() ) );
                 MemoryQuotaInfo memoryQuotaInfo =
-                        new MemoryQuotaInfo( jsonObject.getString( QuotaType.QUOTA_MEMORY_QUOTA.getKey() ) );
+                        new MemoryQuotaInfo( jsonObject.getString( QuotaType.QUOTA_TYPE_RAM.getKey() ) );
 
                 return new PeerQuotaInfo( cpuQuota, hddHomeQuota, hddVarQuota, hddOptQuota, hddRootfsQuota,
                         memoryQuotaInfo );
             }
-            else if ( quotaType == QuotaType.QUOTA_MEMORY_QUOTA )
+            else if ( quotaType == QuotaType.QUOTA_TYPE_RAM )
             {
                 return new PeerQuotaInfo( new MemoryQuotaInfo( commandResult.getStdOut() ) );
             }
-            else if ( quotaType == QuotaType.QUOTA_CPU_CPUS )
+            else if ( quotaType == QuotaType.QUOTA_TYPE_CPU )
             {
                 CpuQuotaInfo cpuQuotaInfo = new CpuQuotaInfo( commandResult.getStdOut() );
                 return new PeerQuotaInfo( cpuQuotaInfo );
             }
-            else if ( quotaType == QuotaType.QUOTA_HDD_HOME )
+            else if ( quotaType == QuotaType.QUOTA_TYPE_DISK_HOME )
             {
-                return new PeerQuotaInfo( new HddQuotaInfo( "home", commandResult.getStdOut() ) );
+                return new PeerQuotaInfo( new HddQuotaInfo( DiskPartition.HOME, commandResult.getStdOut() ) );
             }
-            else if ( quotaType == QuotaType.QUOTA_HDD_OPT )
+            else if ( quotaType == QuotaType.QUOTA_TYPE_DISK_OPT )
             {
-                return new PeerQuotaInfo( new HddQuotaInfo( "opt", commandResult.getStdOut() ) );
+                return new PeerQuotaInfo( new HddQuotaInfo( DiskPartition.OPT, commandResult.getStdOut() ) );
             }
-            else if ( quotaType == QuotaType.QUOTA_HDD_ROOTFS )
+            else if ( quotaType == QuotaType.QUOTA_TYPE_DISK_ROOTFS )
             {
-                return new PeerQuotaInfo( new HddQuotaInfo( "rootfs", commandResult.getStdOut() ) );
+                return new PeerQuotaInfo( new HddQuotaInfo( DiskPartition.ROOT_FS, commandResult.getStdOut() ) );
+            }
+            else if ( quotaType == QuotaType.QUOTA_TYPE_DISK_VAR )
+            {
+                //defaul QuotaType.QUOTA_TYPE_DISK_VAR
+                return new PeerQuotaInfo( new HddQuotaInfo( DiskPartition.VAR, commandResult.getStdOut() ) );
             }
             else
             {
-                //defaul QuotaType.QUOTA_HDD_VAR
-                return new PeerQuotaInfo( new HddQuotaInfo( "var", commandResult.getStdOut() ) );
+                LOGGER.error( "Error in getQuota. Unsupported quota type." );
+                throw new QuotaException( "Specify correct quota type: " + cmd );
             }
         }
         catch ( CommandException | HostNotFoundException e )

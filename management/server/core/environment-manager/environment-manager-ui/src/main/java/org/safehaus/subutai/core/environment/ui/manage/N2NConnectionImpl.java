@@ -65,11 +65,9 @@ class N2NConnectionImpl implements N2NConnection
 
     public boolean hasAllValues()
     {
-        return superNodeIp != null && !superNodeIp.isEmpty()
-                && superNodePort > 0
-                && localIp != null && !localIp.isEmpty()
-                && interfaceName != null && !interfaceName.isEmpty()
-                && communityName != null && !communityName.isEmpty();
+        return superNodeIp != null && !superNodeIp.isEmpty() && superNodePort > 0 && localIp != null && !localIp
+                .isEmpty() && interfaceName != null && !interfaceName.isEmpty() && communityName != null
+                && !communityName.isEmpty();
     }
 }
 

@@ -13,12 +13,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
+import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.common.peer.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.ui.container.ContainerTree;
 import org.safehaus.subutai.core.peer.ui.container.executor.AgentExecutionEvent;

@@ -35,8 +35,10 @@
     <module>command-executor</module>
     <module>wol-manager</module>
     <module>key-manager</module>
+    <module>backup-manager</module>
     <module>plugin-manager</module>
     <module>env-manager</module>
+    <module>shiro-manager-parent</module>
   </modules>
 
 </project>
