@@ -36,6 +36,7 @@ import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.executor.api.CommandExecutor;
 import org.safehaus.subutai.core.hostregistry.api.ContainerHostInfo;
 import org.safehaus.subutai.common.host.ContainerHostState;
+import org.safehaus.subutai.core.hostregistry.api.HostDisconnectedException;
 import org.safehaus.subutai.core.hostregistry.api.HostListener;
 import org.safehaus.subutai.core.hostregistry.api.HostRegistry;
 import org.safehaus.subutai.core.hostregistry.api.ResourceHostInfo;
@@ -880,19 +881,29 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
     {
         try
         {
-            Host h = bindHost( host.getId() );
-
-            if ( h instanceof ContainerHost )
-            {
-                return ContainerHostState.RUNNING.equals( ( ( ContainerHost ) h ).getState() );
-            }
-
-            return !isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME );
+            ContainerHostInfo hostInfo = hostRegistry.getContainerHostInfoById( host.getId() );
+            return ContainerHostState.RUNNING.equals( hostInfo.getStatus());
         }
-        catch ( PeerException e )
+        catch ( HostDisconnectedException e )
         {
             return false;
         }
+
+//        try
+        //        {
+        //            Host h = bindHost( host.getId() );
+        //
+        //            if ( h instanceof ContainerHost )
+        //            {
+        //                return ContainerHostState.RUNNING.equals( ( ( ContainerHost ) h ).getState() );
+        //            }
+        //
+        //            return !isTimedOut( h.getLastHeartbeat(), HOST_INACTIVE_TIME );
+        //        }
+        //        catch ( PeerException e )
+        //        {
+        //            return false;
+        //        }
     }
 
 
