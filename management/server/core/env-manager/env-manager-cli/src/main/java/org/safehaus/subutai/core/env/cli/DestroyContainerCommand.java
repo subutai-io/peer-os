@@ -22,6 +22,14 @@ public class DestroyContainerCommand extends OsgiCommandSupport
             index = 0, multiValued = false, required = true )
     private String containerIdStr;
 
+    @Argument( name = "async", description = "asynchronous destruction",
+            index = 1, multiValued = false, required = false )
+    private boolean async = false;
+
+    @Argument( name = "force", description = "force metadata removal",
+            index = 2, multiValued = false, required = false )
+    private boolean forceMetadataRemoval = false;
+
     private final EnvironmentManager environmentManager;
 
 
@@ -46,7 +54,7 @@ public class DestroyContainerCommand extends OsgiCommandSupport
             {
                 if ( containerHost.getId().equals( containerId ) )
                 {
-                    environmentManager.destroyContainer( containerHost );
+                    environmentManager.destroyContainer( containerHost, async, forceMetadataRemoval );
 
                     System.out.println( "Container destroyed" );
 

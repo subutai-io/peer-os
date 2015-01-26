@@ -7,4 +7,10 @@ public class EnvironmentDestructionException extends Exception
     {
         super( cause );
     }
+
+
+    public EnvironmentDestructionException( final String message )
+    {
+        super( message );
+    }
 }

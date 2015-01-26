@@ -239,7 +239,7 @@ public class EnvironmentContainerImpl implements ContainerHost, Serializable
     {
         try
         {
-            environmentManager.destroyContainer( this );
+            environmentManager.destroyContainer( this, false, false );
         }
         catch ( EnvironmentNotFoundException | EnvironmentModificationException e )
         {

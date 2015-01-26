@@ -29,14 +29,11 @@ public interface Environment
 
     public Set<ContainerHost> getContainerHosts();
 
-    public void destroyContainer( ContainerHost containerHost )
+    public void destroyContainer( ContainerHost containerHost, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException;
 
-    public void destroyContainerAsync( ContainerHost containerHost ) throws EnvironmentNotFoundException;
 
-    public void growEnvironment( Topology topology ) throws EnvironmentModificationException;
-
-    public void growEnvironmentAsync( Topology topology );
+    public void growEnvironment( Topology topology, boolean async ) throws EnvironmentModificationException;
 
 
     /**

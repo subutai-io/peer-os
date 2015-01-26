@@ -262,26 +262,19 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public void destroyContainer( ContainerHost containerHost )
+    public void destroyContainer( ContainerHost containerHost, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        environmentManager.destroyContainer( containerHost );
+        environmentManager.destroyContainer( containerHost, async, false );
     }
 
 
     @Override
-    public void destroyContainerAsync( ContainerHost containerHost ) throws EnvironmentNotFoundException
-    {
-        environmentManager.destroyContainerAsync( containerHost );
-    }
-
-
-    @Override
-    public void growEnvironment( final Topology topology ) throws EnvironmentModificationException
+    public void growEnvironment( final Topology topology, boolean async ) throws EnvironmentModificationException
     {
         try
         {
-            environmentManager.growEnvironment( getId(), topology );
+            environmentManager.growEnvironment( getId(), topology, async );
         }
         catch ( EnvironmentNotFoundException e )
         {
@@ -291,30 +284,22 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    @Override
-    public void growEnvironmentAsync( final Topology topology )
-    {
-        try
-        {
-            environmentManager.growEnvironmentAsync( getId(), topology );
-        }
-        catch ( EnvironmentNotFoundException e )
-        {
-            //this should not happen
-            LOG.error( String.format( "Error growing environment %s", getName() ), e );
-        }
-    }
-
-
-    public void removeContainer( UUID containerId ) throws ContainerHostNotFoundException
+    public void removeContainer( UUID containerId )
     {
         Preconditions.checkNotNull( containerId );
 
-        ContainerHost container = getContainerHostById( containerId );
+        try
+        {
+            ContainerHost container = getContainerHostById( containerId );
 
-        containers.remove( container );
+            containers.remove( container );
 
-        dataService.update( this );
+            dataService.update( this );
+        }
+        catch ( ContainerHostNotFoundException e )
+        {
+            LOG.warn( String.format( "Failed to remove container %s because it does not exist", containerId ), e );
+        }
     }
 
 

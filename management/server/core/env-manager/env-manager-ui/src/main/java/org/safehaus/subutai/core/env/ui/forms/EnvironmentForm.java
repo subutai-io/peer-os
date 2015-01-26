@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.env.ui.forms;
 
 import org.safehaus.subutai.core.env.api.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 
 import com.vaadin.ui.Button;
@@ -92,11 +93,11 @@ public class EnvironmentForm
     {
         try
         {
-            environmentManager.destroyEnvironmentAsync( environment.getId() );
+            environmentManager.destroyEnvironment( environment.getId(), true, false );
 
             Notification.show( "Environment destruction started" );
         }
-        catch ( EnvironmentNotFoundException e )
+        catch ( EnvironmentDestructionException | EnvironmentNotFoundException e )
         {
             Notification.show( "Error destroying environment", e.getMessage(), Notification.Type.ERROR_MESSAGE );
         }

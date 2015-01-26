@@ -126,31 +126,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Environment createEnvironment( final String name, final Topology topology )
+    public Environment createEnvironment( final String name, final Topology topology, boolean async )
             throws EnvironmentCreationException
     {
-        return createEnvironment( name, topology, false );
+        return createEnv( name, topology, async );
     }
 
 
-    @Override
-    public UUID createEnvironmentAsync( final String name, final Topology topology )
-    {
-        try
-        {
-            Environment environment = createEnvironment( name, topology, true );
-            return environment.getId();
-        }
-        catch ( EnvironmentCreationException e )
-        {
-            //this should not happen
-            LOG.error( String.format( "Error creating environment %s, topology %s", name, topology ), e );
-            return null;
-        }
-    }
-
-
-    private Environment createEnvironment( final String name, final Topology topology, boolean async )
+    private Environment createEnv( final String name, final Topology topology, boolean async )
             throws EnvironmentCreationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
@@ -229,29 +212,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void destroyEnvironment( final UUID environmentId )
+    public void destroyEnvironment( final UUID environmentId, boolean async, boolean forceMetadataRemoval )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
-        destroyEnvironment( environmentId, false );
+        destroyEnv( environmentId, async, forceMetadataRemoval );
     }
 
 
-    @Override
-    public void destroyEnvironmentAsync( final UUID environmentId ) throws EnvironmentNotFoundException
-    {
-        try
-        {
-            destroyEnvironment( environmentId, true );
-        }
-        catch ( EnvironmentDestructionException e )
-        {
-            //this should not happen
-            LOG.error( String.format( "Error destroying environment %s", environmentId ), e );
-        }
-    }
-
-
-    private void destroyEnvironment( final UUID environmentId, boolean async )
+    private void destroyEnv( final UUID environmentId, boolean async, final boolean forceMetadataRemoval )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
@@ -261,6 +229,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         final Semaphore semaphore = new Semaphore( 0 );
 
         final ResultHolder<EnvironmentDestructionException> resultHolder = new ResultHolder<>();
+
+        final Set<EnvironmentDestructionException> exceptions = Sets.newHashSet();
 
         executor.submit( new Runnable()
         {
@@ -277,14 +247,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                         try
                         {
                             ( ( EnvironmentContainerImpl ) container ).destroy();
-                            environment.removeContainer( container.getId() );
-                            environmentContainerDataService.remove( container.getId().toString() );
-                        }
-                        catch ( ContainerHostNotFoundException | PeerException e )
-                        {
-                            environment.setStatus( EnvironmentStatus.UNHEALTHY );
 
-                            throw new EnvironmentDestructionException( e );
+                            environment.removeContainer( container.getId() );
+                        }
+                        catch ( PeerException e )
+                        {
+                            if ( forceMetadataRemoval )
+                            {
+                                exceptions.add( new EnvironmentDestructionException( e ) );
+                            }
+                            else
+                            {
+                                environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
+                                throw new EnvironmentDestructionException( e );
+                            }
                         }
                     }
 
@@ -308,9 +285,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 semaphore.acquire();
 
-                if ( resultHolder.getResult() != null )
+                if ( forceMetadataRemoval )
                 {
-                    throw resultHolder.getResult();
+
+                    if ( !exceptions.isEmpty() )
+                    {
+                        throw new EnvironmentDestructionException(
+                                String.format( "There were errors while destroying environment: %s", exceptions ) );
+                    }
+                }
+                else
+                {
+
+                    if ( resultHolder.getResult() != null )
+                    {
+                        throw resultHolder.getResult();
+                    }
                 }
             }
             catch ( InterruptedException e )
@@ -322,31 +312,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Environment growEnvironment( final UUID environmentId, final Topology topology )
+    public Environment growEnvironment( final UUID environmentId, final Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        return growEnvironment( environmentId, topology, false );
+        return growEnv( environmentId, topology, async );
     }
 
 
-    @Override
-    public Environment growEnvironmentAsync( final UUID environmentId, final Topology topology )
-            throws EnvironmentNotFoundException
-    {
-        try
-        {
-            return growEnvironment( environmentId, topology, true );
-        }
-        catch ( EnvironmentModificationException e )
-        {
-            //this should not happen
-            LOG.error( String.format( "Error growing environment %s, topology %s", environmentId, topology ), e );
-            return null;
-        }
-    }
-
-
-    private Environment growEnvironment( final UUID environmentId, final Topology topology, boolean async )
+    private Environment growEnv( final UUID environmentId, final Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
@@ -424,35 +397,29 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void destroyContainer( final ContainerHost containerHost )
+    public void destroyContainer( final ContainerHost containerHost, boolean async, boolean forceMetadataRemoval )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        destroyContainer( containerHost, false );
+        destroyCont( containerHost, async, forceMetadataRemoval );
     }
 
 
-    @Override
-    public void destroyContainerAsync( final ContainerHost containerHost ) throws EnvironmentNotFoundException
-    {
-        try
-        {
-            destroyContainer( containerHost, true );
-        }
-        catch ( EnvironmentModificationException e )
-        {
-            //this should not happen
-            LOG.error( String.format( "Error destroying container %s", containerHost.getHostname() ), e );
-        }
-    }
-
-
-    private void destroyContainer( final ContainerHost containerHost, boolean async )
+    private void destroyCont( final ContainerHost containerHost, boolean async, final boolean forceMetadataRemoval )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( containerHost, "Invalid container host" );
 
         final EnvironmentImpl environment =
                 ( EnvironmentImpl ) findEnvironment( UUID.fromString( containerHost.getEnvironmentId() ) );
+
+        try
+        {
+            environment.getContainerHostById( containerHost.getId() );
+        }
+        catch ( ContainerHostNotFoundException e )
+        {
+            throw new EnvironmentModificationException( e );
+        }
 
         final Semaphore semaphore = new Semaphore( 0 );
 
@@ -469,20 +436,49 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
                     try
                     {
-                        ( ( EnvironmentContainerImpl ) containerHost ).destroy();
+                        try
+                        {
+                            ( ( EnvironmentContainerImpl ) containerHost ).destroy();
+                        }
+                        catch ( PeerException e )
+                        {
+                            if ( forceMetadataRemoval )
+                            {
+                                resultHolder.setResult( new EnvironmentModificationException( e ) );
+                            }
+                            else
+                            {
+                                throw e;
+                            }
+                        }
+
 
                         environment.removeContainer( containerHost.getId() );
-
-                        environmentContainerDataService.remove( containerHost.getId().toString() );
                     }
-                    catch ( ContainerHostNotFoundException | PeerException e )
+                    catch ( PeerException e )
                     {
+
                         environment.setStatus( EnvironmentStatus.UNHEALTHY );
 
                         throw new EnvironmentModificationException( e );
                     }
 
-                    environment.setStatus( EnvironmentStatus.HEALTHY );
+
+                    if ( environment.getContainerHosts().isEmpty() )
+                    {
+                        try
+                        {
+                            removeEnvironment( environment.getId() );
+                        }
+                        catch ( EnvironmentNotFoundException e )
+                        {
+                            LOG.error( "Error removing environment", e );
+                        }
+                    }
+                    else
+                    {
+                        environment.setStatus( EnvironmentStatus.HEALTHY );
+                    }
                 }
                 catch ( EnvironmentModificationException e )
                 {

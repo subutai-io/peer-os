@@ -12,6 +12,7 @@ import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.build.Blueprint;
 import org.safehaus.subutai.core.env.api.build.NodeGroup;
 import org.safehaus.subutai.core.env.api.build.Topology;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentCreationException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.common.collect.Maps;
@@ -93,11 +94,19 @@ public class TopologyWindow extends Window
                         }
                     }
 
-                    environmentManager
-                            .createEnvironmentAsync( String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ),
-                                    topology );
+                    try
+                    {
+                        environmentManager
+                                .createEnvironment( String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ),
+                                        topology, true );
+                        Notification.show( "Environment creation started" );
+                    }
+                    catch ( EnvironmentCreationException e )
+                    {
+                        Notification.show( String.format( "Failed to create environment: %s", e ),
+                                Notification.Type.ERROR_MESSAGE );
+                    }
 
-                    Notification.show( "Environment creation started" );
 
                     close();
                 }

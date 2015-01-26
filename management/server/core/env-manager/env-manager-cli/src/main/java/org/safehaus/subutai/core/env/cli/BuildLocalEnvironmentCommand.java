@@ -26,6 +26,9 @@ public class BuildLocalEnvironmentCommand extends OsgiCommandSupport
     @Argument( name = "numberOfContainers", description = "Number of containers",
             index = 1, multiValued = false, required = true )
     private int numberOfContainers;
+    @Argument( name = "async", description = "asynchronous build",
+            index = 2, multiValued = false, required = false )
+    private boolean async = false;
 
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
@@ -51,7 +54,7 @@ public class BuildLocalEnvironmentCommand extends OsgiCommandSupport
 
         topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );
 
-        Environment environment = environmentManager.createEnvironment( "Dummy environment name", topology );
+        Environment environment = environmentManager.createEnvironment( "Dummy environment name", topology, async );
 
         System.out.println( String.format( "Environment created with id %s", environment.getId() ) );
 
