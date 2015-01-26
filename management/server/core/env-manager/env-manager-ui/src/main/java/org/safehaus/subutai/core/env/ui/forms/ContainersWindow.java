@@ -58,7 +58,7 @@ public class ContainersWindow extends Window
                     try
                     {
 
-                        Notification.show( "Please, wait...", Notification.Type.ASSISTIVE_NOTIFICATION );
+                        Notification.show( "Please, wait..." );
 
                         containerHost.start();
 
@@ -81,7 +81,7 @@ public class ContainersWindow extends Window
                 {
                     try
                     {
-                        Notification.show( "Please, wait...", Notification.Type.ASSISTIVE_NOTIFICATION );
+                        Notification.show( "Please, wait..." );
 
                         containerHost.stop();
 
@@ -106,7 +106,7 @@ public class ContainersWindow extends Window
                 {
                     try
                     {
-                        Notification.show( "Please, wait...", Notification.Type.ASSISTIVE_NOTIFICATION );
+                        Notification.show( "Please, wait...");
 
                         containerHost.dispose();
 
