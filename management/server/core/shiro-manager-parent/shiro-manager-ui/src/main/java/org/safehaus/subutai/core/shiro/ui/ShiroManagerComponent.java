@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.shiro.ui;
 
 
 import org.safehaus.subutai.common.protocol.Disposable;
+import org.safehaus.subutai.core.shiro.ui.tabs.RoleManagementForm;
 import org.safehaus.subutai.core.shiro.ui.tabs.UserManagementForm;
 import org.safehaus.subutai.core.shiro.ui.tabs.UserRegistrationForm;
 
@@ -19,6 +20,7 @@ public class ShiroManagerComponent extends CustomComponent implements Disposable
 
     private UserManagementForm userManagementForm;
     private UserRegistrationForm userRegistrationForm;
+    private RoleManagementForm roleManagementForm;
 
 
     public ShiroManagerComponent( final ShiroManagerPortalModule portalModule )
@@ -35,12 +37,17 @@ public class ShiroManagerComponent extends CustomComponent implements Disposable
         userManagementForm = new UserManagementForm();
         userRegistrationForm = new UserRegistrationForm();
         userRegistrationForm.init();
+        roleManagementForm = new RoleManagementForm();
 
         sheet.addTab( userManagementForm, "User management space." );
         sheet.getTab( 0 ).setId( "UserManagement" );
 
         sheet.addTab( userRegistrationForm, "New user registration space." );
         sheet.getTab( 1 ).setId( "UserRegistration" );
+
+        sheet.addTab( roleManagementForm, "Role editing/creation space." );
+        sheet.getTab( 2 ).setId( "UserRegistration" );
+
         verticalLayout.addComponent( sheet );
 
 
