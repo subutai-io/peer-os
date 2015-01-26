@@ -10,6 +10,7 @@ import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 
+import com.vaadin.server.ClientConnector;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
@@ -57,6 +58,15 @@ public class EnvironmentForm
         //        contentRoot.addComponent( viewEnvironmentsButton );
         contentRoot.addComponent( environmentsTable );
 
+        contentRoot.addDetachListener( new ClientConnector.DetachListener()
+        {
+            @Override
+            public void detach( final ClientConnector.DetachEvent event )
+            {
+                executor.shutdown();
+            }
+        } );
+
         startTableUpdateThread();
     }
 
@@ -78,7 +88,7 @@ public class EnvironmentForm
                     }
                 } );
             }
-        }, 0, 5, TimeUnit.SECONDS );
+        }, 3, 5, TimeUnit.SECONDS );
     }
 
 
