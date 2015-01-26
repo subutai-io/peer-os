@@ -1,8 +1,6 @@
 package org.safehaus.subutai.core.shiro.ui.tabs;
 
 
-import java.io.Serializable;
-
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
@@ -29,30 +27,6 @@ public class PermissionsTab extends CustomComponent
     {
         editorForm();
         // TODO still need some modifications
-    }
-
-
-    public class Permission implements Serializable
-    {
-        String name;
-
-
-        public Permission( String name )
-        {
-            this.name = name;
-        }
-
-
-        public String getName()
-        {
-            return name;
-        }
-
-
-        public void setName( String name )
-        {
-            this.name = name;
-        }
     }
 
 
