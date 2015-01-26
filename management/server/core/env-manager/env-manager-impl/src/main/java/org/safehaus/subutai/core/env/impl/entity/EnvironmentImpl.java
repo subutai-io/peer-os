@@ -338,4 +338,34 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         this.environmentManager = environmentManager;
     }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof EnvironmentImpl ) )
+        {
+            return false;
+        }
+
+        final EnvironmentImpl that = ( EnvironmentImpl ) o;
+
+        if ( environmentId != null ? !environmentId.equals( that.environmentId ) : that.environmentId != null )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return environmentId != null ? environmentId.hashCode() : 0;
+    }
 }

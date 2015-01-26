@@ -514,12 +514,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public void removeEnvironment( final UUID environmentId ) throws EnvironmentNotFoundException
     {
-        Environment environment = findEnvironment( environmentId );
-
-        for ( ContainerHost containerHost : environment.getContainerHosts() )
-        {
-            environmentContainerDataService.remove( containerHost.getId().toString() );
-        }
+        findEnvironment( environmentId );
 
         environmentDataService.remove( environmentId.toString() );
     }

@@ -1,6 +1,10 @@
 package org.safehaus.subutai.core.env.ui.forms;
 
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.safehaus.subutai.core.env.api.Environment;
 import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.exception.EnvironmentDestructionException;
@@ -23,6 +27,7 @@ public class EnvironmentForm
 
     private final VerticalLayout contentRoot;
     private Table environmentsTable;
+    private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
 
     public EnvironmentForm( final EnvironmentManager environmentManager )
@@ -49,14 +54,35 @@ public class EnvironmentForm
         environmentsTable = createEnvironmentsTable( "Environments" );
         environmentsTable.setId( "Environments" );
 
-        contentRoot.addComponent( viewEnvironmentsButton );
+        //        contentRoot.addComponent( viewEnvironmentsButton );
         contentRoot.addComponent( environmentsTable );
 
-        updateEnvironmentsTable();
+        startTableUpdateThread();
     }
 
 
-    public void updateEnvironmentsTable()
+    private void startTableUpdateThread()
+    {
+        executor.scheduleWithFixedDelay( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+
+                environmentsTable.getUI().access( new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        updateEnvironmentsTable();
+                    }
+                } );
+            }
+        }, 0, 5, TimeUnit.SECONDS );
+    }
+
+
+    private void updateEnvironmentsTable()
     {
         environmentsTable.removeAllItems();
         for ( final Environment environment : environmentManager.getEnvironments() )
@@ -103,8 +129,6 @@ public class EnvironmentForm
         {
             Notification.show( "Error destroying environment", e.getMessage(), Notification.Type.ERROR_MESSAGE );
         }
-
-        updateEnvironmentsTable();
     }
 
 
