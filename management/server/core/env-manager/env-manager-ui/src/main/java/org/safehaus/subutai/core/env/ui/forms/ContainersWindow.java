@@ -47,6 +47,8 @@ public class ContainersWindow extends Window
     private void updateContainersTable()
     {
 
+        containersTable.removeAllItems();
+
         for ( final ContainerHost containerHost : environment.getContainerHosts() )
         {
             Button startBtn = new Button( "Start" );
@@ -66,9 +68,9 @@ public class ContainersWindow extends Window
                     }
                     catch ( PeerException e )
                     {
-                        Notification
-                                .show( String.format( "Error starting container %s: %s", containerHost.getHostname(),
-                                                e ), Notification.Type.ERROR_MESSAGE );
+                        Notification.show( String
+                                .format( "Error starting container %s: %s", containerHost.getHostname(), e ),
+                                Notification.Type.ERROR_MESSAGE );
                     }
                 }
             } );
@@ -106,7 +108,7 @@ public class ContainersWindow extends Window
                 {
                     try
                     {
-                        Notification.show( "Please, wait...");
+                        Notification.show( "Please, wait..." );
 
                         containerHost.dispose();
 
@@ -114,9 +116,9 @@ public class ContainersWindow extends Window
                     }
                     catch ( PeerException e )
                     {
-                        Notification.show( String
-                                .format( "Error destroying container %s: %s", containerHost.getHostname(), e ),
-                                Notification.Type.ERROR_MESSAGE );
+                        Notification
+                                .show( String.format( "Error destroying container %s: %s", containerHost.getHostname(),
+                                                e ), Notification.Type.ERROR_MESSAGE );
                     }
                 }
             } );
@@ -130,6 +132,8 @@ public class ContainersWindow extends Window
             startBtn.setEnabled( !isContainerConnected );
             stopBtn.setEnabled( isContainerConnected );
         }
+
+        containersTable.refreshRowCache();
     }
 
 

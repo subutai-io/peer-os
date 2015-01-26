@@ -51,6 +51,8 @@ public class EnvironmentForm
 
         contentRoot.addComponent( viewEnvironmentsButton );
         contentRoot.addComponent( environmentsTable );
+
+        updateEnvironmentsTable();
     }
 
 
