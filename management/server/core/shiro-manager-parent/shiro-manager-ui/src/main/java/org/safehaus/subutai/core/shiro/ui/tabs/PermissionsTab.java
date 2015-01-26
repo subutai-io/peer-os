@@ -28,7 +28,7 @@ public class PermissionsTab extends CustomComponent
     public PermissionsTab()
     {
         editorForm();
-        // TODO add user code here
+        // TODO still need some modifications
     }
 
 
@@ -64,6 +64,7 @@ public class PermissionsTab extends CustomComponent
         final BeanItemContainer<Permission> beans = new BeanItemContainer<>( Permission.class );
 
         // Add some beans to it
+        //TODO need to retrieve all permissions from db.
         beans.addBean( new Permission( "CRUD permissions" ) );
         beans.addBean( new Permission( "Read permissions" ) );
         beans.addBean( new Permission( "Update permissions" ) );
@@ -72,19 +73,18 @@ public class PermissionsTab extends CustomComponent
         HorizontalLayout layout = new HorizontalLayout();
 
         // Bind a table to it
-        final Table table = new Table( "Beans of All Sorts", beans );
+        final Table table = new Table( "Permissions", beans );
         table.setVisibleColumns( new Object[] { "name" } );
         table.setPageLength( 7 );
         table.setBuffered( false );
-        layout.addComponent( table );
 
         // Create a form for editing a selected or new item.
         // It is invisible until actually used.
         final Form form = new Form();
-        form.setCaption( "Edit Item" );
+        form.setCaption( "Edit Permission" );
         form.setVisible( false );
         form.setBuffered( true );
-        layout.addComponent( form );
+
 
         // When the user selects an item, show it in the form
         table.addValueChangeListener( new Property.ValueChangeListener()
@@ -113,7 +113,7 @@ public class PermissionsTab extends CustomComponent
         // Creates a new bean for editing in the form before adding
         // it to the table. Adding is handled after committing
         // the form.
-        final Button newBean = new Button( "New Bean" );
+        final Button newBean = new Button( "New Permission" );
         newBean.addClickListener( new Button.ClickListener()
         {
             public void buttonClick( Button.ClickEvent event )
@@ -130,7 +130,8 @@ public class PermissionsTab extends CustomComponent
                 newBean.setEnabled( false );
 
                 // Make the form a bit nicer
-                //                form.setVisibleItemProperties( new Object[] { "name" } );
+                //this is an example for future how to improve UI
+                // form.setVisibleItemProperties( new Object[] { "name" } );
                 form.setItemDataSource( beans.getItem( newPermission ) );
                 form.setVisible( true );
             }
@@ -146,17 +147,13 @@ public class PermissionsTab extends CustomComponent
                 form.setVisible( false ); // and close it
 
                 // New items have to be added to the container
-                //                if ( table.getValue() == null )
-                {
-                    // Commit the addition
-                    table.commit();
+                // Commit the addition
+                table.commit();
 
-                    table.setEnabled( true );
-                    newBean.setEnabled( true );
-                }
+                table.setEnabled( true );
+                newBean.setEnabled( true );
             }
         } );
-        form.getFooter().addComponent( submit );
 
         // Make modification to enable/disable the Save button
         form.setFormFieldFactory( new DefaultFieldFactory()
@@ -221,11 +218,18 @@ public class PermissionsTab extends CustomComponent
                 newBean.setEnabled( true );
             }
         } );
+
+        layout.addComponent( table );
+        layout.addComponent( form );
+
+        form.getFooter().addComponent( submit );
         form.getFooter().addComponent( cancel );
 
         layout.setSpacing( true );
+
         vlayout.addComponent( layout );
         vlayout.addComponent( newBean );
+
         setCompositionRoot( vlayout );
     }
 }
