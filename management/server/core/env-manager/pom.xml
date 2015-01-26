@@ -17,5 +17,8 @@
   <modules>
 
     <module>env-manager-api</module>
+    <module>env-manager-impl</module>
+    <module>env-manager-cli</module>
+    <module>env-manager-ui</module>
   </modules>
 </project>

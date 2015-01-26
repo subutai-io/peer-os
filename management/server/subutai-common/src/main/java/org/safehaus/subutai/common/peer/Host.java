@@ -20,15 +20,29 @@ import org.safehaus.subutai.common.host.Interface;
  */
 public interface Host extends Serializable
 {
+
+
+    @Deprecated
+    public void setPeer( Peer peer );
+
+    @Deprecated
+    void updateHostInfo( HostInfo hostInfo );
+
+    @Deprecated
+    public void addListener( HostEventListener hostEventListener );
+
+    @Deprecated
+    public void removeListener( HostEventListener hostEventListener );
+
+    @Deprecated
+    public void fireEvent( HostEvent hostEvent );
+
     /**
      * Returns reference to parent peer
      *
      * @return returns Peer interface
      */
     public Peer getPeer();
-
-    public void setPeer( Peer peer );
-
 
     public String getPeerId();
 
@@ -38,12 +52,6 @@ public interface Host extends Serializable
 
     public String getHostname();
 
-    public void addListener( HostEventListener hostEventListener );
-
-    public void removeListener( HostEventListener hostEventListener );
-
-    public void fireEvent( HostEvent hostEvent );
-
     public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException;
 
     public CommandResult execute( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
@@ -51,8 +59,6 @@ public interface Host extends Serializable
     public void executeAsync( RequestBuilder requestBuilder, CommandCallback callback ) throws CommandException;
 
     public void executeAsync( RequestBuilder requestBuilder ) throws CommandException;
-
-    void updateHostInfo( HostInfo hostInfo );
 
     public boolean isConnected();
 

@@ -355,7 +355,10 @@ public class TemplateRegistryComponent extends CustomComponent
     {
         String itemId = String.format( "%s-%s", currentTemplate.getTemplateName(), currentTemplate.getLxcArch() );
         Item templateItem = container.addItem( itemId );
-        templateItem.getItemProperty( VALUE_PROPERTY ).setValue( currentTemplate );
+        if ( templateItem != null && templateItem.getItemProperty( VALUE_PROPERTY ) != null )
+        {
+            templateItem.getItemProperty( VALUE_PROPERTY ).setValue( currentTemplate );
+        }
         templateTree.setItemCaption( itemId, currentTemplate.getTemplateName() );
 
         Template parent = tree.getParentTemplate( currentTemplate );

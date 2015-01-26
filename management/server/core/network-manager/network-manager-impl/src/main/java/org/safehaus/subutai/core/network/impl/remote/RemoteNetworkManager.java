@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.core.network.api.ContainerInfo;
 import org.safehaus.subutai.core.network.api.N2NConnection;
 import org.safehaus.subutai.core.network.api.NetworkManager;
@@ -141,6 +142,29 @@ public class RemoteNetworkManager implements NetworkManager
     public NetworkManager getRemoteManager( String host, int port )
     {
         return new RemoteNetworkManager( host, port );
+    }
+
+
+    @Override
+    public void exchangeSshKeys( final Set<ContainerHost> containers ) throws NetworkManagerException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public void addSshKeyToAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
+            throws NetworkManagerException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public void registerHosts( final Set<ContainerHost> containers, final String domainName )
+            throws NetworkManagerException
+    {
+        throw new UnsupportedOperationException();
     }
 }
 

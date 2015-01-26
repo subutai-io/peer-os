@@ -260,4 +260,27 @@ public class NetworkManagerImpl implements NetworkManager
             throw new NetworkManagerException( e );
         }
     }
+
+
+    @Override
+    public void exchangeSshKeys( final Set<ContainerHost> containers ) throws NetworkManagerException
+    {
+        new SshManager( containers ).execute();
+    }
+
+
+    @Override
+    public void addSshKeyToAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
+            throws NetworkManagerException
+    {
+        new SshManager( containers ).append(sshKey);
+    }
+
+
+    @Override
+    public void registerHosts( final Set<ContainerHost> containerHosts, final String domainName )
+            throws NetworkManagerException
+    {
+        new HostManager( containerHosts, domainName ).execute();
+    }
 }

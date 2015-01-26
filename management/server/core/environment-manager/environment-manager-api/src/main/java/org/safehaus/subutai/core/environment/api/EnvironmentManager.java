@@ -62,6 +62,8 @@ public interface EnvironmentManager
 
     public void createAdditionalContainers( UUID id, NodeGroup nodeGroup, Peer peer ) throws EnvironmentBuildException;
 
+    public void destroyContainer( UUID containerId ) throws EnvironmentManagerException;
+
 
     // ************** deprecated methods **************
 

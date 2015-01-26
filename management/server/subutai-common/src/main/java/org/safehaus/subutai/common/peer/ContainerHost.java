@@ -23,28 +23,42 @@ public interface ContainerHost extends Host
     @Deprecated
     public String getParentHostname();
 
-    public String getEnvironmentId();
-
+    @Deprecated
     public void setNodeGroupName( String nodeGroupName );
 
+    @Deprecated
     public void setEnvironmentId( String environmentId );
 
+    @Deprecated
     public void setCreatorPeerId( String creatorPeerId );
 
+    @Deprecated
     public void setTemplateName( String templateName );
+
+    @Deprecated
+    void setTemplateArch( String templateArch );
+
+    @Deprecated
+    void setPeer( Peer peer );
+
+    @Deprecated
+    public PeerQuotaInfo getQuota( QuotaType quotaType ) throws PeerException;
+
+    @Deprecated
+    public void setQuota( QuotaInfo quota ) throws PeerException;
+
+    @Deprecated
+    public void setDataService( DataService dataService );
+
+
+    public String getEnvironmentId();
 
     public String getNodeGroupName();
 
     String getTemplateArch();
 
-    void setTemplateArch( String templateArch );
-
     public ContainerHostState getState() throws PeerException;
 
-
-    public PeerQuotaInfo getQuota( QuotaType quotaType ) throws PeerException;
-
-    public void setQuota( QuotaInfo quota ) throws PeerException;
 
     String getCreatorPeerId();
 
@@ -52,7 +66,6 @@ public interface ContainerHost extends Host
 
     Peer getPeer();
 
-    void setPeer( Peer peer );
 
     Template getTemplate() throws PeerException;
 
@@ -64,7 +77,6 @@ public interface ContainerHost extends Host
 
     public Set<String> getTags();
 
-    public void setDataService( DataService dataService );
 
     /**
      * Returns process's resource usage by pid
