@@ -76,7 +76,5 @@ class N2NConnectionImpl implements N2NConnection
     {
         this.communityName = communityName;
     }
-
-
 }
 

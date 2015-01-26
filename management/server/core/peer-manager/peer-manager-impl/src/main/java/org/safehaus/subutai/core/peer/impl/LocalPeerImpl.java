@@ -54,12 +54,20 @@ import org.safehaus.subutai.core.metric.api.Monitor;
 import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.peer.api.CloneParam;
 import org.safehaus.subutai.core.peer.api.CommandUtil;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.peer.HostEvent;
+import org.safehaus.subutai.common.peer.HostEventListener;
+import org.safehaus.subutai.common.peer.HostInfoModel;
 import org.safehaus.subutai.core.peer.api.HostKey;
 import org.safehaus.subutai.core.peer.api.HostNotFoundException;
 import org.safehaus.subutai.core.peer.api.HostTask;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.Payload;
+import org.safehaus.subutai.common.peer.Peer;
+import org.safehaus.subutai.common.peer.PeerException;
+import org.safehaus.subutai.common.peer.PeerInfo;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RequestListener;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
@@ -1202,7 +1210,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, HostEventListener
                 {
                     for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
                     {
-                        if ( CollectionUtil.isCollectionEmpty( containerHostInfo.getInterfaces() ) )
+                        if ( containerHostInfo.getInterfaces().size() == 0 )
                         {
                             continue;
                         }

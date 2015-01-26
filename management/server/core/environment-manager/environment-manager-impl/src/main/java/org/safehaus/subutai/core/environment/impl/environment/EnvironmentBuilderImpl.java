@@ -8,14 +8,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
-import org.safehaus.subutai.core.environment.impl.entity.EnvironmentImpl;
 import org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl;
-import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.core.environment.impl.entity.EnvironmentImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

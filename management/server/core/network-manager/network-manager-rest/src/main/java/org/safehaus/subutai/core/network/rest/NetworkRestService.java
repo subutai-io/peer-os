@@ -14,7 +14,6 @@ import javax.ws.rs.core.Response;
 
 /**
  * REST services related to networking setup of peers.
- *
  */
 public interface NetworkRestService
 {
@@ -91,16 +90,13 @@ public interface NetworkRestService
 
     @POST
     @Path( "mapping" )
-    Response setupVniVLanMapping( @FormParam( "tunnelName" ) String tunnelName,
-                                  @FormParam( "vni" ) int vni,
+    Response setupVniVLanMapping( @FormParam( "tunnelName" ) String tunnelName, @FormParam( "vni" ) int vni,
                                   @FormParam( "vLanId" ) int vLanId );
 
 
     @DELETE
     @Path( "mapping" )
-    Response removeVniVLanMapping( @FormParam( "tunnelName" ) String tunnelName,
-                                   @FormParam( "vni" ) int vni,
+    Response removeVniVLanMapping( @FormParam( "tunnelName" ) String tunnelName, @FormParam( "vni" ) int vni,
                                    @FormParam( "vLanId" ) int vLanId );
-
 }
 

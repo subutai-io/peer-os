@@ -10,6 +10,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.metric.ProcessResourceUsage;
+import org.safehaus.subutai.common.peer.ContainerHost;
+import org.safehaus.subutai.common.peer.Host;
+import org.safehaus.subutai.common.peer.HostInfoModel;
+import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.common.protocol.Criteria;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.quota.DiskPartition;
@@ -18,10 +22,6 @@ import org.safehaus.subutai.common.quota.PeerQuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaInfo;
 import org.safehaus.subutai.common.quota.QuotaType;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.peer.ContainerHost;
-import org.safehaus.subutai.common.peer.Host;
-import org.safehaus.subutai.common.peer.HostInfoModel;
-import org.safehaus.subutai.common.peer.PeerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
