@@ -1,9 +1,15 @@
 package org.safehaus.subutai.core.env.ui.forms;
 
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.env.api.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentStatus;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
@@ -16,6 +22,8 @@ public class ContainersWindow extends Window
 {
     private final Environment environment;
     private Table containersTable;
+    private ScheduledExecutorService updater = Executors.newSingleThreadScheduledExecutor();
+    private ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
 
 
     public ContainersWindow( final Environment environment )
@@ -41,6 +49,38 @@ public class ContainersWindow extends Window
         content.addComponent( containersTable );
 
         setContent( content );
+
+        addDetachListener( new DetachListener()
+        {
+            @Override
+            public void detach( final DetachEvent event )
+            {
+                updater.shutdown();
+            }
+        } );
+
+        startTableUpdateThread();
+    }
+
+
+    private void startTableUpdateThread()
+    {
+        updater.scheduleWithFixedDelay( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+
+                containersTable.getUI().access( new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        updateContainersTable();
+                    }
+                } );
+            }
+        }, 3, 5, TimeUnit.SECONDS );
     }
 
 
@@ -51,75 +91,94 @@ public class ContainersWindow extends Window
 
         for ( final ContainerHost containerHost : environment.getContainerHosts() )
         {
-            Button startBtn = new Button( "Start" );
+            final Button startBtn = new Button( "Start" );
             startBtn.addClickListener( new Button.ClickListener()
             {
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-                    try
+
+                    startBtn.setEnabled( false );
+
+                    Notification.show( "Please, wait..." );
+
+                    taskExecutor.submit( new Runnable()
                     {
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
 
-                        Notification.show( "Please, wait..." );
-
-                        containerHost.start();
-
-                        updateContainersTable();
-                    }
-                    catch ( PeerException e )
-                    {
-                        Notification.show( String
-                                .format( "Error starting container %s: %s", containerHost.getHostname(), e ),
-                                Notification.Type.ERROR_MESSAGE );
-                    }
+                                containerHost.start();
+                            }
+                            catch ( PeerException e )
+                            {
+                                Notification.show( String.format( "Error starting container %s: %s",
+                                                containerHost.getHostname(), e ), Notification.Type.ERROR_MESSAGE );
+                            }
+                        }
+                    } );
                 }
             } );
 
-            Button stopBtn = new Button( "Stop" );
+            final Button stopBtn = new Button( "Stop" );
             stopBtn.addClickListener( new Button.ClickListener()
             {
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-                    try
-                    {
-                        Notification.show( "Please, wait..." );
+                    stopBtn.setEnabled( false );
 
-                        containerHost.stop();
-
-                        updateContainersTable();
-                    }
-                    catch ( PeerException e )
+                    Notification.show( "Please, wait..." );
+                    taskExecutor.submit( new Runnable()
                     {
-                        Notification
-                                .show( String.format( "Error stopping container %s: %s", containerHost.getHostname(),
-                                                e ),
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                containerHost.stop();
+                            }
+                            catch ( PeerException e )
+                            {
+                                Notification.show( String.format( "Error stopping container %s: %s",
+                                                containerHost.getHostname(), e ),
 
                                         Notification.Type.ERROR_MESSAGE );
-                    }
+                            }
+                        }
+                    } );
                 }
             } );
 
-            Button destroyBtn = new Button( "Destroy" );
+            final Button destroyBtn = new Button( "Destroy" );
             destroyBtn.addClickListener( new Button.ClickListener()
             {
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-                    try
-                    {
-                        Notification.show( "Please, wait..." );
+                    destroyBtn.setEnabled( false );
 
-                        containerHost.dispose();
-
-                        updateContainersTable();
-                    }
-                    catch ( PeerException e )
+                    Notification.show( "Please, wait..." );
+                    taskExecutor.submit( new Runnable()
                     {
-                        Notification
-                                .show( String.format( "Error destroying container %s: %s", containerHost.getHostname(),
-                                                e ), Notification.Type.ERROR_MESSAGE );
-                    }
+                        @Override
+                        public void run()
+                        {
+
+                            try
+                            {
+                                containerHost.dispose();
+                            }
+                            catch ( PeerException e )
+                            {
+                                Notification.show( String
+                                        .format( "Error destroying container %s: %s", containerHost.getHostname(), e ),
+                                        Notification.Type.ERROR_MESSAGE );
+                            }
+                        }
+                    } );
                 }
             } );
 
@@ -128,9 +187,18 @@ public class ContainersWindow extends Window
                     containerHost.getIpByInterfaceName( "eth0" ), startBtn, stopBtn, destroyBtn
             }, null );
 
-            boolean isContainerConnected = containerHost.isConnected();
-            startBtn.setEnabled( !isContainerConnected );
-            stopBtn.setEnabled( isContainerConnected );
+            if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+            {
+                startBtn.setEnabled( false );
+                stopBtn.setEnabled( false );
+                destroyBtn.setEnabled( false );
+            }
+            else
+            {
+                boolean isContainerConnected = containerHost.isConnected();
+                startBtn.setEnabled( !isContainerConnected );
+                stopBtn.setEnabled( isContainerConnected );
+            }
         }
 
         containersTable.refreshRowCache();

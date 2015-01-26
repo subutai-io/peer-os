@@ -29,7 +29,7 @@ public class EnvironmentForm
 
     private final VerticalLayout contentRoot;
     private Table environmentsTable;
-    private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService updater = Executors.newSingleThreadScheduledExecutor();
 
 
     public EnvironmentForm( final EnvironmentManager environmentManager )
@@ -64,7 +64,7 @@ public class EnvironmentForm
             @Override
             public void detach( final ClientConnector.DetachEvent event )
             {
-                executor.shutdown();
+                updater.shutdown();
             }
         } );
 
@@ -74,7 +74,7 @@ public class EnvironmentForm
 
     private void startTableUpdateThread()
     {
-        executor.scheduleWithFixedDelay( new Runnable()
+        updater.scheduleWithFixedDelay( new Runnable()
         {
             @Override
             public void run()
