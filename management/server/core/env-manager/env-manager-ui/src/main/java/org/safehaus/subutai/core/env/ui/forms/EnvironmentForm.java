@@ -104,7 +104,7 @@ public class EnvironmentForm
                 @Override
                 public void buttonClick( final Button.ClickEvent event )
                 {
-                    contentRoot.getUI().addWindow( new ContainersWindow( environment ) );
+                    contentRoot.getUI().addWindow( new ContainersWindow( environmentManager, environment ) );
                 }
             } );
 

@@ -9,7 +9,9 @@ import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.common.peer.ContainerHost;
 import org.safehaus.subutai.common.peer.PeerException;
 import org.safehaus.subutai.core.env.api.Environment;
+import org.safehaus.subutai.core.env.api.EnvironmentManager;
 import org.safehaus.subutai.core.env.api.EnvironmentStatus;
+import org.safehaus.subutai.core.env.api.exception.EnvironmentNotFoundException;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
@@ -20,14 +22,16 @@ import com.vaadin.ui.Window;
 
 public class ContainersWindow extends Window
 {
-    private final Environment environment;
+    private final EnvironmentManager environmentManager;
+    private Environment environment;
     private Table containersTable;
     private ScheduledExecutorService updater = Executors.newSingleThreadScheduledExecutor();
     private ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
 
 
-    public ContainersWindow( final Environment environment )
+    public ContainersWindow( final EnvironmentManager environmentManager, final Environment environment )
     {
+        this.environmentManager = environmentManager;
         this.environment = environment;
 
         setCaption( "Containers" );
@@ -89,6 +93,7 @@ public class ContainersWindow extends Window
 
         containersTable.removeAllItems();
 
+
         for ( final ContainerHost containerHost : environment.getContainerHosts() )
         {
             final Button startBtn = new Button( "Start" );
@@ -114,8 +119,9 @@ public class ContainersWindow extends Window
                             }
                             catch ( PeerException e )
                             {
-                                Notification.show( String.format( "Error starting container %s: %s",
-                                                containerHost.getHostname(), e ), Notification.Type.ERROR_MESSAGE );
+                                Notification.show( String
+                                        .format( "Error starting container %s: %s", containerHost.getHostname(), e ),
+                                        Notification.Type.ERROR_MESSAGE );
                             }
                         }
                     } );
@@ -170,6 +176,15 @@ public class ContainersWindow extends Window
                             try
                             {
                                 containerHost.dispose();
+
+                                try
+                                {
+                                    environment = environmentManager.findEnvironment( environment.getId() );
+                                }
+                                catch ( EnvironmentNotFoundException e )
+                                {
+                                    close();
+                                }
                             }
                             catch ( PeerException e )
                             {
