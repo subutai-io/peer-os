@@ -37,10 +37,9 @@ import com.google.gson.annotations.Expose;
         @NamedQuery( name = "Template.getAll", query = "SELECT t FROM Template t" ),
         @NamedQuery( name = "Template.getTemplateByNameArch",
                 query = "SELECT t FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = "
-                        + ":lxcArch" ),
-        @NamedQuery( name = "Template.getTemplateByNameArchMd5Version",
-                query = "SELECT t FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = "
-                        + ":lxcArch AND t.pk.templateVersion = :templateVersion AND t.pk.md5sum = :md5sum" ),
+                        + ":lxcArch" ), @NamedQuery( name = "Template.getTemplateByNameArchMd5Version",
+        query = "SELECT t FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = "
+                + ":lxcArch AND t.pk.templateVersion = :templateVersion AND t.pk.md5sum = :md5sum" ),
         @NamedQuery( name = "Template.removeTemplateByNameArch",
                 query = "DELETE FROM Template t WHERE t.pk.templateName = :templateName AND t.pk.lxcArch = :lxcArch" )
 } )
@@ -100,7 +99,7 @@ public class Template
     //children of template, this property is calculated upon need and is null by default (see REST API for calculation)
     @Expose
     @OneToMany( fetch = FetchType.EAGER, cascade = { CascadeType.ALL }, orphanRemoval = true )
-    private List<Template> children;
+    private Set<Template> children;
 
     //subutai products present only in this template excluding all subutai products present in the whole ancestry
     // lineage above
@@ -248,7 +247,7 @@ public class Template
     {
         if ( this.children == null )
         {
-            this.children = new ArrayList<>();
+            this.children = new HashSet<>();
         }
         this.children.addAll( children );
     }
@@ -258,7 +257,7 @@ public class Template
     {
         if ( children != null )
         {
-            return Collections.unmodifiableList( children );
+            return Collections.unmodifiableList( new ArrayList<>( children ) );
         }
         else
         {
