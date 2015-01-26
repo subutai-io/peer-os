@@ -121,6 +121,7 @@ public class EnvironmentForm
                 public void buttonClick( final Button.ClickEvent clickEvent )
                 {
                     destroyBtn.setEnabled( false );
+                    containersBtn.setEnabled( false );
                     destroyEnvironment( environment );
                 }
             } );
